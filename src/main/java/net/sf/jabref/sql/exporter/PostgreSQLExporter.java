@@ -47,9 +47,10 @@ public class PostgreSQLExporter extends DBExporter {
      * @return The singleton instance of the PostgreSQLExporter
      */
     public static PostgreSQLExporter getInstance() {
-        if (instance == null)
-            instance = new PostgreSQLExporter();
-        return instance;
+        if (PostgreSQLExporter.instance == null) {
+            PostgreSQLExporter.instance = new PostgreSQLExporter();
+        }
+        return PostgreSQLExporter.instance;
     }
 
     @Override

@@ -42,9 +42,10 @@ public class KeyWord extends HashSet<String> {
     }
 
     public static KeyWord getKeyWord() {
-        if (singleton == null)
-            singleton = new KeyWord();
-        return singleton;
+        if (KeyWord.singleton == null) {
+            KeyWord.singleton = new KeyWord();
+        }
+        return KeyWord.singleton;
     }
 
     public boolean isKeyWord(String matchWord) {

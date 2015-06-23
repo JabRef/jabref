@@ -1,5 +1,6 @@
 package net.sf.jabref.bst;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -92,10 +93,11 @@ public class BibtexCaseChangersTest {
     }
 
     private void assertCaseChangerT(final String string, final String string2) {
-        assertEquals(string, BibtexCaseChanger.changeCase(string2, 't', new Warn() {
+        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 't', new Warn() {
 
+            @Override
             public void warn(String s) {
-                fail("Should not Warn (" + s + ")! changeCase('t') should be " + string + " for "
+                Assert.fail("Should not Warn (" + s + ")! changeCase('t') should be " + string + " for "
                         + string2);
 
             }
@@ -104,10 +106,11 @@ public class BibtexCaseChangersTest {
     }
 
     private void assertCaseChangerL(final String string, final String string2) {
-        assertEquals(string, BibtexCaseChanger.changeCase(string2, 'l', new Warn() {
+        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 'l', new Warn() {
 
+            @Override
             public void warn(String s) {
-                fail("Should not Warn (" + s + ")! changeCase('l') should be " + string + " for "
+                Assert.fail("Should not Warn (" + s + ")! changeCase('l') should be " + string + " for "
                         + string2);
 
             }
@@ -116,10 +119,11 @@ public class BibtexCaseChangersTest {
     }
 
     private void assertCaseChangerU(final String string, final String string2) {
-        assertEquals(string, BibtexCaseChanger.changeCase(string2, 'u', new Warn() {
+        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 'u', new Warn() {
 
+            @Override
             public void warn(String s) {
-                fail("Should not Warn (" + s + ")! changeCase('u') should be " + string + " for "
+                Assert.fail("Should not Warn (" + s + ")! changeCase('u') should be " + string + " for "
                         + string2);
 
             }

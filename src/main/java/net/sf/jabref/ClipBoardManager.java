@@ -39,6 +39,7 @@ public class ClipBoardManager implements ClipboardOwner
     /**
      * Empty implementation of the ClipboardOwner interface.
      */
+    @Override
     public void lostOwnership(Clipboard aClipboard, Transferable aContents)
     {
         //do nothing

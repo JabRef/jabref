@@ -95,25 +95,29 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     private final Map<String, String> replacements = new HashMap<String, String>();
 
 
+    @Override
     public void setArgument(String arg) {
-        String[] parts = parseArgument(arg);
+        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
         format = parseFormatString(parts[0]);
-        if ((parts.length > 1) && (parts[1].trim().length() > 0))
+        if ((parts.length > 1) && (parts[1].trim().length() > 0)) {
             fileType = parts[1];
+        }
         if (parts.length > 2) {
-            for (int i = 2; i < parts.length - 1; i += 2) {
+            for (int i = 2; i < (parts.length - 1); i += 2) {
                 replacements.put(parts[i], parts[i + 1]);
             }
         }
     }
 
+    @Override
     public String format(String field) {
         StringBuilder sb = new StringBuilder();
 
         // Build the table model containing the links:
         FileListTableModel tableModel = new FileListTableModel();
-        if (field == null)
+        if (field == null) {
             return "";
+        }
         tableModel.setContent(field);
 
         int piv = 1; // counter for relevant iterations
@@ -131,18 +135,20 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         sb.append(String.valueOf(piv));
                         break;
                     case FILE_PATH:
-                        if (flEntry.getLink() == null)
+                        if (flEntry.getLink() == null) {
                             break;
+                        }
 
                         String[] dirs;
                         // We need to resolve the file directory from the database's metadata,
                         // but that is not available from a formatter. Therefore, as an
                         // ugly hack, the export routine has set a global variable before
                         // starting the export, which contains the database's file directory:
-                        if (Globals.prefs.fileDirForDatabase != null)
+                        if (Globals.prefs.fileDirForDatabase != null) {
                             dirs = Globals.prefs.fileDirForDatabase;
-                        else
+                        } else {
                             dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
+                        }
 
                         File f = Util.expandFilename(flEntry.getLink(), dirs);
 
@@ -164,8 +170,9 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                         break;
                     case RELATIVE_FILE_PATH:
-                        if (flEntry.getLink() == null)
+                        if (flEntry.getLink() == null) {
                             break;
+                        }
 
                         /*
                          * Stumbled over this while investigating
@@ -176,11 +183,13 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                         break;
                     case FILE_EXTENSION:
-                        if (flEntry.getLink() == null)
+                        if (flEntry.getLink() == null) {
                             break;
+                        }
                         int index = flEntry.getLink().lastIndexOf('.');
-                        if ((index >= 0) && (index < flEntry.getLink().length() - 1))
+                        if ((index >= 0) && (index < (flEntry.getLink().length() - 1))) {
                             sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
+                        }
                         break;
                     case FILE_TYPE:
                         sb.append(replaceStrings(flEntry.getType().getName()));
@@ -216,12 +225,12 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     final static Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
 
     static {
-        ESCAPE_SEQ.put('i', ITERATION_COUNT);
-        ESCAPE_SEQ.put('p', FILE_PATH);
-        ESCAPE_SEQ.put('r', RELATIVE_FILE_PATH);
-        ESCAPE_SEQ.put('f', FILE_TYPE);
-        ESCAPE_SEQ.put('x', FILE_EXTENSION);
-        ESCAPE_SEQ.put('d', FILE_DESCRIPTION);
+        WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
+        WrapFileLinks.ESCAPE_SEQ.put('p', WrapFileLinks.FILE_PATH);
+        WrapFileLinks.ESCAPE_SEQ.put('r', WrapFileLinks.RELATIVE_FILE_PATH);
+        WrapFileLinks.ESCAPE_SEQ.put('f', WrapFileLinks.FILE_TYPE);
+        WrapFileLinks.ESCAPE_SEQ.put('x', WrapFileLinks.FILE_EXTENSION);
+        WrapFileLinks.ESCAPE_SEQ.put('d', WrapFileLinks.FILE_DESCRIPTION);
     }
 
 
@@ -242,17 +251,18 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             char c = format.charAt(i);
             if (!escaped) {
                 // Check if we are at the start of an escape sequence:
-                if (c == '\\')
+                if (c == '\\') {
                     escaped = true;
-                else
+                } else {
                     sb.append(c);
+                }
             } else {
                 escaped = false; // we know we'll be out of escape mode after this
                 // Check if this escape sequence is meaningful:
                 if (c == '\\') {
                     // Escaped backslash: means that we add a backslash:
                     sb.append(c);
-                } else if (ESCAPE_SEQ.containsKey(c)) {
+                } else if (WrapFileLinks.ESCAPE_SEQ.containsKey(c)) {
                     // Ok, we have the code. Add the previous string (if any) and
                     // the entry indicated by the escape sequence:
                     if (sb.length() > 0) {
@@ -260,7 +270,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         // Clear the buffer:
                         sb = new StringBuilder();
                     }
-                    l.add(new FormatEntry(ESCAPE_SEQ.get(c)));
+                    l.add(new FormatEntry(WrapFileLinks.ESCAPE_SEQ.get(c)));
                 } else {
                     // Unknown escape sequence.
                     sb.append('\\');
@@ -297,7 +307,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         }
 
         public FormatEntry(String value) {
-            this.type = STRING;
+            this.type = WrapFileLinks.STRING;
             this.string = value;
         }
 

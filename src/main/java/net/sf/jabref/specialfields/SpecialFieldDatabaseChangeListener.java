@@ -13,6 +13,7 @@ public class SpecialFieldDatabaseChangeListener implements
     private static SpecialFieldDatabaseChangeListener INSTANCE = null;
 
 
+    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         if ((e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) &&
                 SpecialFieldsUtils.keywordSyncEnabled()) {
@@ -26,10 +27,10 @@ public class SpecialFieldDatabaseChangeListener implements
     }
 
     public static SpecialFieldDatabaseChangeListener getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new SpecialFieldDatabaseChangeListener();
+        if (SpecialFieldDatabaseChangeListener.INSTANCE == null) {
+            SpecialFieldDatabaseChangeListener.INSTANCE = new SpecialFieldDatabaseChangeListener();
         }
-        return INSTANCE;
+        return SpecialFieldDatabaseChangeListener.INSTANCE;
     }
 
 }

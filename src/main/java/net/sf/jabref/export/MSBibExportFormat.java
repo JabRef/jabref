@@ -39,6 +39,7 @@ class MSBibExportFormat extends ExportFormat {
         super(Globals.lang("MS Office 2007"), "MSBib", null, null, ".xml");
     }
 
+    @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData,
             final String file, final String encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with

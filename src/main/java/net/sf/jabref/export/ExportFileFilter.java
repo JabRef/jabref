@@ -44,17 +44,21 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         return extension;
     }
 
+    @Override
     public boolean accept(File file) {
-        if (file.isDirectory())
+        if (file.isDirectory()) {
             return true;
-        else
+        } else {
             return file.getPath().toLowerCase().endsWith(extension);
+        }
     }
 
+    @Override
     public String getDescription() {
         return name;
     }
 
+    @Override
     public int compareTo(ExportFileFilter o) {
         return name.compareTo(o.name);
     }

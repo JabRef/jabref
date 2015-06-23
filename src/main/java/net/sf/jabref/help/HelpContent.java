@@ -58,6 +58,7 @@ public class HelpContent extends JTextPane {
         // Handles Anchors
         final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(final HyperlinkEvent e) {
                 if (e.getDescription().startsWith("#")) {
                     scrollToReference(e.getDescription().substring(1));
@@ -107,7 +108,9 @@ public class HelpContent extends JTextPane {
 
         String middle = prefs.get("language") + "/";
         if (middle.equals("en/"))
+         {
             middle = ""; // english in base help dir.
+        }
 
         URL old = getPage();
         try {
@@ -122,7 +125,7 @@ public class HelpContent extends JTextPane {
             // If still not available print a warning
             if (resource == null) {
                 // TODO show warning to user
-                log.error("Could not find html-help for file '" + file + "'.");
+                HelpContent.log.error("Could not find html-help for file '" + file + "'.");
                 return;
             }
             setPageOnly(new URL(resource.toString() + "#" + reference));
@@ -132,14 +135,16 @@ public class HelpContent extends JTextPane {
         }
 
         forw.removeAllElements();
-        if (old != null)
+        if (old != null) {
             history.push(old);
+        }
 
     }
 
     /**
      * Convenience method for setPage(String)
      */
+    @Override
     public void setPage(URL url) {
         File f = new File(url.getPath());
         setPage(f.getName(), JabRef.class);

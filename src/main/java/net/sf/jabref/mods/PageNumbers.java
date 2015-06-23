@@ -43,9 +43,9 @@ public class PageNumbers {
         if (m.matches()) {
             start = Integer.parseInt(m.group(1));
             end = Integer.parseInt(m.group(2));
-        }
-        else
+        } else {
             freeform = s;
+        }
     }
 
     public Element getDOMrepresentation(Document d) {
@@ -67,11 +67,13 @@ public class PageNumbers {
     }
 
     public String toString(String seperator) {
-        if (freeform != null)
+        if (freeform != null) {
             return freeform;
+        }
         return (start + seperator + end);
     }
 
+    @Override
     public String toString() {
         return toString("--");
     }

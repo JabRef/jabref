@@ -129,8 +129,9 @@ public abstract class DBImporter extends DBImporterExporter {
             ArrayList<String> colNames = new ArrayList<String>();
             while (rsColumns.next()) {
                 if (!columnsNotConsideredForEntries.contains(rsColumns
-                        .getString(1)))
+                        .getString(1))) {
                     colNames.add(rsColumns.getString(1));
+                }
             }
             rsColumns.getStatement().close();
             String database_id = rsDatabase.getString("database_id");

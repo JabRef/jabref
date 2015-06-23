@@ -35,10 +35,12 @@ public class Iso690FormatDate implements LayoutFormatter {
     public Iso690FormatDate() {
     }
 
+    @Override
     public String format(String s) {
 
-        if (s == null || s.trim().equals(""))
+        if ((s == null) || s.trim().equals("")) {
             return "";
+        }
         StringBuilder sb = new StringBuilder();
         String[] date = s.split("de");
         //parte el string en los distintos campos de la fecha

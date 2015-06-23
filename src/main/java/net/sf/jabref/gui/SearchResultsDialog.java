@@ -121,6 +121,7 @@ public class SearchResultsDialog {
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
@@ -132,6 +133,7 @@ public class SearchResultsDialog {
 
         entryTable.getActionMap().put("copy", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectionModel.getSelected().size() > 0) {
                     BibtexEntry[] bes = selectionModel.getSelected().toArray
@@ -150,10 +152,12 @@ public class SearchResultsDialog {
 
         diag.addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
             }
 
+            @Override
             public void windowClosing(WindowEvent event) {
                 Globals.prefs.putInt("searchDialogWidth", diag.getSize().width);
                 Globals.prefs.putInt("searchDialogHeight", diag.getSize().height);
@@ -176,9 +180,9 @@ public class SearchResultsDialog {
     }
 
     public void selectFirstEntry() {
-        if (entryTable.getRowCount() > 0)
+        if (entryTable.getRowCount() > 0) {
             entryTable.setRowSelectionInterval(0, 0);
-        else {
+        } else {
             contentPane.setDividerLocation(1.0f);
         }
     }
@@ -210,14 +214,15 @@ public class SearchResultsDialog {
         for (int i = 2; i < PAD; i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            if (i == FILE_COL)
+            if (i == FILE_COL) {
                 comparators.add(new IconComparator(new String[] {GUIGlobals.FILE_FIELD}));
-            else if (i == URL_COL)
+            } else if (i == URL_COL) {
                 comparators.add(new IconComparator(new String[] {"url"}));
+            }
 
         }
         // Remaining columns:
-        for (int i = PAD; i < PAD + fields.length; i++) {
+        for (int i = PAD; i < (PAD + fields.length); i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             comparators.add(new FieldComparator(fields[i - PAD]));
@@ -287,12 +292,14 @@ public class SearchResultsDialog {
      */
     class TableClickListener extends MouseAdapter {
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
             }
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
@@ -315,6 +322,7 @@ public class SearchResultsDialog {
             }
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
@@ -331,8 +339,9 @@ public class SearchResultsDialog {
                     if (o != null) {
                         FileListTableModel tableModel = new FileListTableModel();
                         tableModel.setContent((String) o);
-                        if (tableModel.getRowCount() == 0)
+                        if (tableModel.getRowCount() == 0) {
                             return;
+                        }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
                                 p.metaData(), fl.getType())).actionPerformed(null);
@@ -341,8 +350,9 @@ public class SearchResultsDialog {
                 case URL_COL:
                     Object link = entry.getField("url");
                     try {
-                        if (link != null)
+                        if (link != null) {
                             Util.openExternalViewer(p.metaData(), (String) link, "url");
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -375,8 +385,9 @@ public class SearchResultsDialog {
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
                     String description = flEntry.getDescription();
-                    if ((description == null) || (description.trim().length() == 0))
+                    if ((description == null) || (description.trim().length() == 0)) {
                         description = flEntry.getLink();
+                    }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
                             flEntry.getLink(), flEntry.getType().getIcon(), p.metaData(),
                             flEntry.getType()));
@@ -385,8 +396,9 @@ public class SearchResultsDialog {
 
             }
 
-            if (count > 0)
+            if (count > 0) {
                 menu.show(entryTable, e.getX(), e.getY());
+            }
         }
     }
 
@@ -396,6 +408,7 @@ public class SearchResultsDialog {
      */
     class EntrySelectionListener implements ListEventListener<BibtexEntry> {
 
+        @Override
         public void listChanged(ListEvent<BibtexEntry> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
                 BibtexEntry entry = listEvent.getSourceList().get(0);
@@ -408,6 +421,7 @@ public class SearchResultsDialog {
                 contentPane.setDividerLocation(0.5f);
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         preview.scrollRectToVisible(toRect);
                     }
@@ -422,17 +436,21 @@ public class SearchResultsDialog {
      */
     public class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
 
+        @Override
         public int getColumnCount() {
             return PAD + fields.length;
         }
 
+        @Override
         public String getColumnName(int column) {
-            if (column >= PAD)
+            if (column >= PAD) {
                 return Util.nCase(fields[column - PAD]);
-            else
+            } else {
                 return "";
+            }
         }
 
+        @Override
         public Object getColumnValue(BibtexEntry entry, int column) {
             if (column < PAD) {
                 Object o;
@@ -443,18 +461,21 @@ public class SearchResultsDialog {
                         FileListTableModel model = new FileListTableModel();
                         model.setContent((String) o);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0)
+                        if (model.getRowCount() > 0) {
                             fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                        }
                         return fileLabel;
-                    } else
+                    } else {
                         return null;
+                    }
                 case URL_COL:
                     o = entry.getField("url");
                     if (o != null) {
                         urlLabel.setToolTipText((String) o);
                         return urlLabel;
-                    } else
+                    } else {
                         return null;
+                    }
                 default:
                     return null;
                 }
@@ -464,21 +485,25 @@ public class SearchResultsDialog {
                 if (field.equals("author") || field.equals("editor")) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
-                    if (frame.basePanel() != null)
+                    if (frame.basePanel() != null) {
                         return frame.basePanel().tableFormat.formatName
                                 (entry.getField(field));
+                    }
                 }
                 return entry.getField(field);
             }
         }
 
+        @Override
         public Class<?> getColumnClass(int i) {
-            if (i < PAD)
+            if (i < PAD) {
                 return JLabel.class;
-            else
+            } else {
                 return String.class;
+            }
         }
 
+        @Override
         public Comparator<?> getColumnComparator(int i) {
             return null;
         }

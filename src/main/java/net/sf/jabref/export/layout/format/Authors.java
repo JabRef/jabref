@@ -47,34 +47,34 @@ public class Authors extends AbstractParamLayoutFormatter {
     static final Pattern numberPattern = Pattern.compile("[0-9]+");
 
     static {
-        authorOrder.add("firstfirst");
-        authorOrder.add("lastfirst");
-        authorOrder.add("lastfirstfirstfirst");
+        Authors.authorOrder.add("firstfirst");
+        Authors.authorOrder.add("lastfirst");
+        Authors.authorOrder.add("lastfirstfirstfirst");
 
-        authorAbbr.add("fullname");
-        authorAbbr.add("initials");
-        authorAbbr.add("firstinitial");
-        authorAbbr.add("middleinitial");
-        authorAbbr.add("lastname");
-        authorAbbr.add("initialsnospace");
+        Authors.authorAbbr.add("fullname");
+        Authors.authorAbbr.add("initials");
+        Authors.authorAbbr.add("firstinitial");
+        Authors.authorAbbr.add("middleinitial");
+        Authors.authorAbbr.add("lastname");
+        Authors.authorAbbr.add("initialsnospace");
 
-        authorPunc.add("fullpunc");
-        authorPunc.add("nopunc");
-        authorPunc.add("nocomma");
-        authorPunc.add("noperiod");
+        Authors.authorPunc.add("fullpunc");
+        Authors.authorPunc.add("nopunc");
+        Authors.authorPunc.add("nocomma");
+        Authors.authorPunc.add("noperiod");
 
-        separators.add("comma");
-        separators.add("and");
-        separators.add("colon");
-        separators.add("semicolon");
-        separators.add("sep");
+        Authors.separators.add("comma");
+        Authors.separators.add("and");
+        Authors.separators.add("colon");
+        Authors.separators.add("semicolon");
+        Authors.separators.add("sep");
 
-        lastSeparators.add("and");
-        lastSeparators.add("colon");
-        lastSeparators.add("semicolon");
-        lastSeparators.add("amp");
-        lastSeparators.add("oxford");
-        lastSeparators.add("lastsep");
+        Authors.lastSeparators.add("and");
+        Authors.lastSeparators.add("colon");
+        Authors.lastSeparators.add("semicolon");
+        Authors.lastSeparators.add("amp");
+        Authors.lastSeparators.add("oxford");
+        Authors.lastSeparators.add("lastsep");
 
     }
 
@@ -91,7 +91,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             AND = " and ",
             OXFORD = ", and ";
 
-    int flMode = FIRST_FIRST;
+    int flMode = Authors.FIRST_FIRST;
 
     boolean
             abbreviate = true,
@@ -109,36 +109,39 @@ public class Authors extends AbstractParamLayoutFormatter {
     final String
             firstFirstSeparator = " ";
     String lastFirstSeparator = ", ";
-    String separator = COMMA;
-    String lastSeparator = AND;
+    String separator = Authors.COMMA;
+    String lastSeparator = Authors.AND;
     String etAlString = " et al.";
     final String jrSeparator = " ";
 
 
+    @Override
     public void setArgument(String arg) {
-        String[] parts = parseArgument(arg);
+        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
         for (String part : parts) {
             int index = part.indexOf("=");
             if (index > 0) {
                 String key = part.substring(0, index);
                 String value = part.substring(index + 1);
                 handleArgument(key, value);
-            } else
+            } else {
                 handleArgument(part, "");
+            }
 
         }
     }
 
     private void handleArgument(String key, String value) {
-        if (authorOrder.contains(key.trim().toLowerCase())) {
-            if (comp(key, "FirstFirst"))
-                flMode = FIRST_FIRST;
-            else if (comp(key, "LastFirst"))
-                flMode = LAST_FIRST;
-            else if (comp(key, "LastFirstFirstFirst"))
-                flMode = LF_FF;
+        if (Authors.authorOrder.contains(key.trim().toLowerCase())) {
+            if (comp(key, "FirstFirst")) {
+                flMode = Authors.FIRST_FIRST;
+            } else if (comp(key, "LastFirst")) {
+                flMode = Authors.LAST_FIRST;
+            } else if (comp(key, "LastFirstFirstFirst")) {
+                flMode = Authors.LF_FF;
+            }
         }
-        else if (authorAbbr.contains(key.trim().toLowerCase())) {
+        else if (Authors.authorAbbr.contains(key.trim().toLowerCase())) {
             if (comp(key, "FullName")) {
                 abbreviate = false;
             }
@@ -162,7 +165,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                 abbrSpaces = false;
             }
         }
-        else if (authorPunc.contains(key.trim().toLowerCase())) {
+        else if (Authors.authorPunc.contains(key.trim().toLowerCase())) {
             if (comp(key, "FullPunc")) {
                 abbrDots = true;
                 lastFirstSeparator = ", ";
@@ -183,40 +186,44 @@ public class Authors extends AbstractParamLayoutFormatter {
 
         // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
         // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
-        else if (separators.contains(key.trim().toLowerCase()) || lastSeparators.contains(key.trim().toLowerCase())) {
+        else if (Authors.separators.contains(key.trim().toLowerCase()) || Authors.lastSeparators.contains(key.trim().toLowerCase())) {
             if (comp(key, "Comma")) {
                 if (!setSep) {
-                    separator = COMMA;
+                    separator = Authors.COMMA;
                     setSep = true;
-                } else
-                    lastSeparator = COMMA;
+                } else {
+                    lastSeparator = Authors.COMMA;
+                }
             }
             else if (comp(key, "And")) {
                 if (!setSep) {
-                    separator = AND;
+                    separator = Authors.AND;
                     setSep = true;
-                } else
-                    lastSeparator = AND;
+                } else {
+                    lastSeparator = Authors.AND;
+                }
             }
             else if (comp(key, "Colon")) {
                 if (!setSep) {
-                    separator = COLON;
+                    separator = Authors.COLON;
                     setSep = true;
-                } else
-                    lastSeparator = COLON;
+                } else {
+                    lastSeparator = Authors.COLON;
+                }
             }
             else if (comp(key, "Semicolon")) {
                 if (!setSep) {
-                    separator = SEMICOLON;
+                    separator = Authors.SEMICOLON;
                     setSep = true;
-                } else
-                    lastSeparator = SEMICOLON;
+                } else {
+                    lastSeparator = Authors.SEMICOLON;
+                }
             }
             else if (comp(key, "Oxford")) {
-                lastSeparator = OXFORD;
+                lastSeparator = Authors.OXFORD;
             }
             else if (comp(key, "Amp")) {
-                lastSeparator = AMP;
+                lastSeparator = Authors.AMP;
             }
             else if (comp(key, "Sep") && (value.length() > 0)) {
                 separator = value;
@@ -229,15 +236,15 @@ public class Authors extends AbstractParamLayoutFormatter {
         else if (key.trim().toLowerCase().equals("etal") && (value.length() > 0)) {
             etAlString = value;
         }
-        else if (numberPattern.matcher(key.trim()).matches()) {
+        else if (Authors.numberPattern.matcher(key.trim()).matches()) {
             // Just a number:
             int num = Integer.parseInt(key.trim());
             if (!setMaxAuthors) {
                 maxAuthors = num;
                 setMaxAuthors = true;
-            }
-            else
+            } else {
                 authorNumberEtAl = num;
+            }
         }
 
     }
@@ -253,6 +260,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         return one.trim().equalsIgnoreCase(two);
     }
 
+    @Override
     public String format(String fieldText) {
         StringBuilder sb = new StringBuilder();
         AuthorList al = AuthorList.getAuthorList(fieldText);
@@ -261,20 +269,22 @@ public class Authors extends AbstractParamLayoutFormatter {
             for (int i = 0; i < al.size(); i++) {
                 AuthorList.Author a = al.getAuthor(i);
 
-                addSingleName(sb, a, (flMode == FIRST_FIRST) || ((flMode == LF_FF) && (i > 0)));
+                addSingleName(sb, a, (flMode == Authors.FIRST_FIRST) || ((flMode == Authors.LF_FF) && (i > 0)));
 
-                if (i < al.size() - 2)
+                if (i < (al.size() - 2)) {
                     sb.append(separator);
-                else if (i < al.size() - 1)
+                } else if (i < (al.size() - 1)) {
                     sb.append(lastSeparator);
+                }
             }
         }
 
         else {
             for (int i = 0; i < Math.min(al.size() - 1, authorNumberEtAl); i++) {
-                if (i > 0)
+                if (i > 0) {
                     sb.append(separator);
-                addSingleName(sb, al.getAuthor(i), flMode == FIRST_FIRST);
+                }
+                addSingleName(sb, al.getAuthor(i), flMode == Authors.FIRST_FIRST);
             }
             sb.append(etAlString);
         }
@@ -286,18 +296,20 @@ public class Authors extends AbstractParamLayoutFormatter {
         String firstNamePart = a.getFirst();
         String lastNamePart = a.getLast();
         String von = a.getVon();
-        if ((von != null) && (von.length() > 0))
+        if ((von != null) && (von.length() > 0)) {
             lastNamePart = von + " " + lastNamePart;
+        }
         String jr = a.getJr();
-        if ((jr != null) && (jr.length() > 0))
+        if ((jr != null) && (jr.length() > 0)) {
             lastNamePart = lastNamePart + jrSeparator + jr;
+        }
 
         if (abbreviate && (firstNamePart != null)) {
             firstNamePart = a.getFirstAbbr();
 
-            if (firstInitialOnly && (firstNamePart.length() > 2))
+            if (firstInitialOnly && (firstNamePart.length() > 2)) {
                 firstNamePart = firstNamePart.substring(0, 2);
-            else if (middleInitial) {
+            } else if (middleInitial) {
                 String abbr = firstNamePart;
                 firstNamePart = a.getFirst();
                 int index = firstNamePart.indexOf(" ");
@@ -310,10 +322,12 @@ public class Authors extends AbstractParamLayoutFormatter {
                     }
                 }
             }
-            if (!abbrDots)
+            if (!abbrDots) {
                 firstNamePart = firstNamePart.replaceAll("\\.", "");
-            if (!abbrSpaces)
+            }
+            if (!abbrSpaces) {
                 firstNamePart = firstNamePart.replaceAll(" ", "");
+            }
         }
 
         if (lastNameOnly || (firstNamePart == null)) {

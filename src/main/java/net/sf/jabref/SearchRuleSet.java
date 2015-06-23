@@ -44,6 +44,7 @@ public class SearchRuleSet implements SearchRule {
         ruleSet.clear();
     }
 
+    @Override
     public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException {
         int score = 0;
         Enumeration<SearchRule> e = ruleSet.elements();
@@ -54,11 +55,13 @@ public class SearchRuleSet implements SearchRule {
         return score;
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         Enumeration<SearchRule> e = ruleSet.elements();
         while (e.hasMoreElements()) {
-            if (!e.nextElement().validateSearchStrings(searchStrings))
+            if (!e.nextElement().validateSearchStrings(searchStrings)) {
                 return false;
+            }
         }
         return true;
     }

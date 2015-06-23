@@ -70,7 +70,7 @@ public class MonthUtil {
      * @return if valid number -> month.isValid() == true, else otherwise
      */
     public static Month getMonthByNumber(int number) {
-        return getMonthByIndex(number - 1);
+        return MonthUtil.getMonthByIndex(number - 1);
     }
 
     /**
@@ -80,12 +80,12 @@ public class MonthUtil {
      * @return if valid index -> month.isValid() == true, else otherwise
      */
     public static Month getMonthByIndex(int index) {
-        for (Month month : months) {
+        for (Month month : MonthUtil.months) {
             if (month.index == index) {
                 return month;
             }
         }
-        return NULL_OBJECT;
+        return MonthUtil.NULL_OBJECT;
     }
 
     /**
@@ -95,12 +95,12 @@ public class MonthUtil {
      * @return if valid shortName -> month.isValid() == true, else otherwise
      */
     public static Month getMonthByShortName(String shortName) {
-        for (Month month : months) {
+        for (Month month : MonthUtil.months) {
             if (month.shortName.equalsIgnoreCase(shortName)) {
                 return month;
             }
         }
-        return NULL_OBJECT;
+        return MonthUtil.NULL_OBJECT;
     }
 
     /**
@@ -114,7 +114,7 @@ public class MonthUtil {
      */
     public static Month getMonth(String value) {
         if (value == null) {
-            return NULL_OBJECT;
+            return MonthUtil.NULL_OBJECT;
         }
 
         // Much more liberal matching covering most known abbreviations etc.
@@ -122,16 +122,16 @@ public class MonthUtil {
         if (testString.length() > 3) {
             testString = testString.substring(0, 3);
         }
-        Month m = getMonthByShortName(testString);
+        Month m = MonthUtil.getMonthByShortName(testString);
         if (m.isValid()) {
             return m;
         }
 
         try {
             int number = Util.intValueOf(value);
-            return getMonthByNumber(number);
+            return MonthUtil.getMonthByNumber(number);
         } catch (NumberFormatException e) {
-            return NULL_OBJECT;
+            return MonthUtil.NULL_OBJECT;
         }
     }
 

@@ -64,7 +64,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        String urlString = String.format(URL_PATTERN, q);
+        String urlString = String.format(ISBNtoBibTeXFetcher.URL_PATTERN, q);
 
         // Send the request
         URL url;

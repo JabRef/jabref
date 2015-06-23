@@ -33,6 +33,7 @@ public class HTMLParagraphs implements LayoutFormatter {
     static Pattern beforeNewLines;
 
 
+    @Override
     public String format(String fieldText) {
 
         fieldText = fieldText.trim();
@@ -41,11 +42,11 @@ public class HTMLParagraphs implements LayoutFormatter {
             return fieldText;
         }
 
-        if (beforeNewLines == null) {
-            beforeNewLines = Pattern.compile("(.*?)\\n\\s*\\n");
+        if (HTMLParagraphs.beforeNewLines == null) {
+            HTMLParagraphs.beforeNewLines = Pattern.compile("(.*?)\\n\\s*\\n");
         }
 
-        Matcher m = beforeNewLines.matcher(fieldText);
+        Matcher m = HTMLParagraphs.beforeNewLines.matcher(fieldText);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             String middle = m.group(1).trim();

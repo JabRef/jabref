@@ -36,6 +36,7 @@ class AndOrSearchRuleSet extends SearchRuleSet {
         this.invert = invert;
     }
 
+    @Override
     public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) {
         int score = 0;
 
@@ -47,13 +48,15 @@ class AndOrSearchRuleSet extends SearchRuleSet {
         // Then an AND rule demands that score == number of rules, and
         // an OR rule demands score > 0.
         boolean res;
-        if (and)
+        if (and) {
             res = (score == ruleSet.size());
-        else
+        } else {
             res = (score > 0);
+        }
 
-        if (invert)
+        if (invert) {
             return (res ? 0 : 1);
+        }
         return (res ? 1 : 0);
     }
 }

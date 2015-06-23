@@ -74,6 +74,7 @@ class CustomExportDialog extends JDialog {
         parent = parent_;
         ActionListener okListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 // Check that there are no empty strings.
@@ -102,6 +103,7 @@ class CustomExportDialog extends JDialog {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -111,12 +113,14 @@ class CustomExportDialog extends JDialog {
 
         browse.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 File directory = new File(Globals.prefs.get("exportWorkingDirectory"));
                 String chosenStr = FileDialogs.getNewFile(parent, directory, ".layout",
                         JFileChooser.OPEN_DIALOG, false);
-                if (chosenStr == null)
+                if (chosenStr == null) {
                     return;
+                }
                 File chosen = new File(chosenStr);
 
                 // Update working directory for layout files.
@@ -224,12 +228,13 @@ class CustomExportDialog extends JDialog {
 
     public String extension() {
         String ext = extension.getText();
-        if (ext.startsWith("."))
+        if (ext.startsWith(".")) {
             return ext;
-        else if (ext.startsWith("*."))
+        } else if (ext.startsWith("*.")) {
             return ext.substring(1);
-        else
+        } else {
             return "." + ext;
+        }
     }
 
 }

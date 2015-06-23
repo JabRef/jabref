@@ -54,6 +54,7 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
         return list;
     }
 
+    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         list.getReadWriteLock().writeLock().lock();
         if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {

@@ -52,14 +52,14 @@ public class BibtexTextPrefix {
 
         int braceLevel = 0;
 
-        while (i < n && numOfChars > 0) {
+        while ((i < n) && (numOfChars > 0)) {
             char c = cs[i];
             i++;
             if (c == '{') {
                 braceLevel++;
-                if (braceLevel == 1 && i < n && (cs[i] == '\\')) {
+                if ((braceLevel == 1) && (i < n) && (cs[i] == '\\')) {
                     i++; // skip backslash
-                    while (i < n && braceLevel > 0) {
+                    while ((i < n) && (braceLevel > 0)) {
                         if (cs[i] == '}') {
                             braceLevel--;
                         } else if (cs[i] == '{') {
@@ -73,8 +73,9 @@ public class BibtexTextPrefix {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    if (warn != null)
+                    if (warn != null) {
                         warn.warn("Unbalanced brace in string for purify$: " + toPrefix);
+                    }
                 }
             } else {
                 numOfChars--;

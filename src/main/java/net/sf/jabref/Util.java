@@ -42,7 +42,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -128,19 +127,19 @@ public class Util {
     public static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
     public static final int MARK_COLOR_LEVELS = 6;
-    public static final int MAX_MARKING_LEVEL = MARK_COLOR_LEVELS - 1;
-    public static final int IMPORT_MARK_LEVEL = MARK_COLOR_LEVELS;
+    public static final int MAX_MARKING_LEVEL = Util.MARK_COLOR_LEVELS - 1;
+    public static final int IMPORT_MARK_LEVEL = Util.MARK_COLOR_LEVELS;
     public static final Pattern markNumberPattern = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
     static {
         idFormat = NumberFormat.getInstance();
-        idFormat.setMinimumIntegerDigits(8);
-        idFormat.setGroupingUsed(false);
+        Util.idFormat.setMinimumIntegerDigits(8);
+        Util.idFormat.setGroupingUsed(false);
     }
 
 
     public static int getMinimumIntegerDigits() {
-        return idFormat.getMinimumIntegerDigits();
+        return Util.idFormat.getMinimumIntegerDigits();
     }
 
     public static void pr(String s) {
@@ -150,16 +149,17 @@ public class Util {
     public static String nCase(String s) {
         // Make first character of String uppercase, and the
         // rest lowercase.
-        if (s.length() > 1)
+        if (s.length() > 1) {
             return s.substring(0, 1).toUpperCase() + s.substring(1, s.length()).toLowerCase();
-        else
+        } else {
             return s.toUpperCase();
+        }
 
     }
 
     public static String checkName(String s) {
         // Append '.bib' to the string unless it ends with that.
-        if (s.length() < 4 || !s.substring(s.length() - 4).equalsIgnoreCase(".bib")) {
+        if ((s.length() < 4) || !s.substring(s.length() - 4).equalsIgnoreCase(".bib")) {
             return s + ".bib";
         }
         return s;
@@ -170,7 +170,7 @@ public class Util {
 
 
     public synchronized static String createNeutralId() {
-        return idFormat.format(idCounter++);
+        return Util.idFormat.format(Util.idCounter++);
     }
 
     /**
@@ -190,8 +190,9 @@ public class Util {
      */
     public static String parseField(String content) {
 
-        if (content.length() == 0)
+        if (content.length() == 0) {
             return content;
+        }
 
         String[] strings = content.split("#");
         StringBuffer result = new StringBuffer();
@@ -200,12 +201,12 @@ public class Util {
             if (s.length() > 0) {
                 char c = s.charAt(0);
                 // String reference or not?
-                if (c == '{' || c == '"') {
-                    result.append(shaveString(string));
+                if ((c == '{') || (c == '"')) {
+                    result.append(Util.shaveString(string));
                 } else {
                     // This part should normally be a string reference, but if it's
                     // a pure number, it is not.
-                    String s2 = shaveString(s);
+                    String s2 = Util.shaveString(s);
                     try {
                         Integer.parseInt(s2);
                         // If there's no exception, it's a number.
@@ -231,8 +232,9 @@ public class Util {
     public static String getPublicationDate(BibtexEntry entry) {
 
         Object o = entry.getField("year");
-        if (o == null)
+        if (o == null) {
             return null;
+        }
 
         String year = YearUtil.toFourDigitYear(o.toString());
 
@@ -250,8 +252,9 @@ public class Util {
         // returns the string, after shaving off whitespace at the beginning
         // and end, and removing (at most) one pair of braces or " surrounding
         // it.
-        if (s == null)
+        if (s == null) {
             return null;
+        }
         char ch, ch2;
         int beg = 0, end = s.length();
         // We start out assuming nothing will be removed.
@@ -259,26 +262,30 @@ public class Util {
         while (!begok) {
             if (beg < s.length()) {
                 ch = s.charAt(beg);
-                if (Character.isWhitespace(ch))
+                if (Character.isWhitespace(ch)) {
                     beg++;
-                else
+                } else {
                     begok = true;
-            } else
+                }
+            } else {
                 begok = true;
+            }
 
         }
         while (!endok) {
-            if (end > beg + 1) {
+            if (end > (beg + 1)) {
                 ch = s.charAt(end - 1);
-                if (Character.isWhitespace(ch))
+                if (Character.isWhitespace(ch)) {
                     end--;
-                else
+                } else {
                     endok = true;
-            } else
+                }
+            } else {
                 endok = true;
+            }
         }
 
-        if (end > beg + 1) {
+        if (end > (beg + 1)) {
             ch = s.charAt(beg);
             ch2 = s.charAt(end - 1);
             if (((ch == '{') && (ch2 == '}')) || ((ch == '"') && (ch2 == '"'))) {
@@ -304,8 +311,9 @@ public class Util {
      *            mayBeNull
      */
     public static String checkLegalKey(String key) {
-        if (key == null)
+        if (key == null) {
             return null;
+        }
         if (!JabRefPreferences.getInstance().getBoolean("enforceLegalBibtexKey")) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
@@ -314,8 +322,9 @@ public class Util {
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
                 if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"')
-                        && (c != '}') && (c != ','))
+                        && (c != '}') && (c != ',')) {
                     newKey.append(c);
+                }
             }
             return newKey.toString();
 
@@ -324,14 +333,15 @@ public class Util {
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
             if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"')
-                    && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\''))
+                    && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
                 newKey.append(c);
+            }
         }
 
         // Replace non-english characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
 
-        return replaceSpecialCharacters(newKey.toString());
+        return Util.replaceSpecialCharacters(newKey.toString());
     }
 
     /**
@@ -358,8 +368,9 @@ public class Util {
         int lastInserted = -1;
         while (p > 0) {
             p = out.lastIndexOf(" ", p);
-            if (p <= 0 || p <= 20)
+            if ((p <= 0) || (p <= 20)) {
                 break;
+            }
             int lbreak = out.indexOf("\n", p);
             System.out.println(lbreak + " " + lastInserted);
             if ((lbreak > p) && ((lastInserted >= 0) && (lbreak < lastInserted))) {
@@ -387,15 +398,17 @@ public class Util {
         // int lastInserted = -1;
         while (p < out.length()) {
             int q = out.indexOf(" ", p + wrapAmount);
-            if ((q < 0) || (q >= out.length()))
+            if ((q < 0) || (q >= out.length())) {
                 break;
+            }
             int lbreak = out.indexOf("\n", p);
             // System.out.println(lbreak);
             if ((lbreak > p) && (lbreak < q)) {
                 p = lbreak + 1;
                 int piv = lbreak + 1;
-                if ((out.length() > piv) && !(out.charAt(piv) == '\t'))
+                if ((out.length() > piv) && !(out.charAt(piv) == '\t')) {
                     out.insert(piv, "\n\t");
+                }
 
             } else {
                 // System.out.println(q+" "+out.length());
@@ -417,8 +430,9 @@ public class Util {
             if (o != null) {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
-                while (tok.hasMoreTokens())
-                    res.add(nCase(tok.nextToken().trim()));
+                while (tok.hasMoreTokens()) {
+                    res.add(Util.nCase(tok.nextToken().trim()));
+                }
             }
         }
         return res;
@@ -444,8 +458,9 @@ public class Util {
             Object o = be.getField(field);
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
-                while (tok.hasMoreTokens())
-                    res.add(nCase(tok.nextToken().trim()));
+                while (tok.hasMoreTokens()) {
+                    res.add(Util.nCase(tok.nextToken().trim()));
+                }
             }
         }
         return res;
@@ -468,8 +483,9 @@ public class Util {
                     for (int i = 0; i < al.size(); i++) {
                         AuthorList.Author a = al.getAuthor(i);
                         String lastName = a.getLast();
-                        if ((lastName != null) && (lastName.length() > 0))
+                        if ((lastName != null) && (lastName.length() > 0)) {
                             res.add(lastName);
+                        }
                     }
                 }
 
@@ -490,12 +506,14 @@ public class Util {
      * @return Delimited String.
      */
     public static String stringArrayToDelimited(String[] strs, String delimiter) {
-        if ((strs == null) || (strs.length == 0))
+        if ((strs == null) || (strs.length == 0)) {
             return "";
-        if (strs.length == 1)
+        }
+        if (strs.length == 1) {
             return strs[0];
+        }
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < strs.length - 1; i++) {
+        for (int i = 0; i < (strs.length - 1); i++) {
             sb.append(strs[i]);
             sb.append(delimiter);
         }
@@ -511,8 +529,9 @@ public class Util {
      * @return a <code>String[]</code> value
      */
     public static String[] delimToStringArray(String names, String delimiter) {
-        if (names == null)
+        if (names == null) {
             return null;
+        }
         return names.split(delimiter);
     }
 
@@ -532,22 +551,23 @@ public class Util {
 
         // advance to first char and skip whitespace
         i++;
-        while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
+        while ((i < text.length()) && Character.isWhitespace(text.charAt(i))) {
             i++;
         }
 
         // then grab whathever is the first token (counting braces)
         while (i < text.length()) {
             c = text.charAt(i);
-            if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
+            if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
                 i--; // end argument and leave whitespace for further
                 // processing
                 break;
             }
-            if (c == '}' && --count < 0)
+            if ((c == '}') && (--count < 0)) {
                 break;
-            else if (c == '{')
+            } else if (c == '{') {
                 count++;
+            }
             part.append(c);
             i++;
         }
@@ -565,7 +585,7 @@ public class Util {
             // Find the default directory for this field type:
             String[] dir = metaData.getFileDirectory(fieldName);
 
-            File file = expandFilename(link, dir);
+            File file = Util.expandFilename(link, dir);
 
             // Check that the file exists:
             if ((file == null) || !file.exists()) {
@@ -577,11 +597,12 @@ public class Util {
             // Use the correct viewer even if pdf and ps are mixed up:
             String[] split = file.getName().split("\\.");
             if (split.length >= 2) {
-                if (split[split.length - 1].equalsIgnoreCase("pdf"))
+                if (split[split.length - 1].equalsIgnoreCase("pdf")) {
                     fieldName = "pdf";
-                else if (split[split.length - 1].equalsIgnoreCase("ps")
-                        || (split.length >= 3 && split[split.length - 2].equalsIgnoreCase("ps")))
+                } else if (split[split.length - 1].equalsIgnoreCase("ps")
+                        || ((split.length >= 3) && split[split.length - 2].equalsIgnoreCase("ps"))) {
                     fieldName = "ps";
+                }
             }
 
         } else if (fieldName.equals("doi")) {
@@ -593,7 +614,7 @@ public class Util {
         } else if (fieldName.equals("eprint")) {
             fieldName = "url";
 
-            link = sanitizeUrl(link);
+            link = Util.sanitizeUrl(link);
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
@@ -603,7 +624,7 @@ public class Util {
 
         if (fieldName.equals("url")) { // html
             try {
-                openBrowser(link);
+                Util.openBrowser(link);
             } catch (IOException e) {
                 System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
                 e.printStackTrace();
@@ -616,7 +637,7 @@ public class Util {
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (Globals.ON_WIN) {
-                    openFileOnWindows(link, true);
+                    Util.openFileOnWindows(link, true);
                     /*
                      * cmdArray[0] = Globals.prefs.get("psviewer"); cmdArray[1] =
                      * link; Process child = Runtime.getRuntime().exec(
@@ -642,7 +663,7 @@ public class Util {
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (Globals.ON_WIN) {
-                    openFileOnWindows(link, true);
+                    Util.openFileOnWindows(link, true);
                     /*
                      * String[] spl = link.split("\\\\"); StringBuffer sb = new
                      * StringBuffer(); for (int i = 0; i < spl.length; i++) { if
@@ -735,7 +756,7 @@ public class Util {
 
         boolean httpLink = false;
 
-        if (remoteLinkPattern.matcher(link.toLowerCase()).matches()) {
+        if (Util.remoteLinkPattern.matcher(link.toLowerCase()).matches()) {
             httpLink = true;
         }
         /*if (link.toLowerCase().startsWith("file://")) {
@@ -759,16 +780,17 @@ public class Util {
         File file = new File(link);
 
         if (!httpLink) {
-            File tmp = expandFilename(metaData, link);
-            if (tmp != null)
+            File tmp = Util.expandFilename(metaData, link);
+            if (tmp != null) {
                 file = tmp;
+            }
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
         if ((httpLink || file.exists()) && (fileType != null)) {
             // Open the file:
             String filePath = httpLink ? link : file.getPath();
-            openExternalFilePlatformIndependent(fileType, filePath);
+            Util.openExternalFilePlatformIndependent(fileType, filePath);
             return true;
 
         } else {
@@ -793,16 +815,18 @@ public class Util {
         } else if (Globals.ON_WIN) {
             if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
                 // Application is specified. Use it:
-                openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-            } else
-                openFileOnWindows(filePath, true);
+                Util.openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
+            } else {
+                Util.openFileOnWindows(filePath, true);
+            }
         } else {
             // Use the given app if specified, and the universal "xdg-open" otherwise:
             String[] openWith;
-            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0))
+            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
                 openWith = fileType.getOpenWith().split(" ");
-            else
+            } else {
                 openWith = new String[] {"xdg-open"};
+            }
 
             String[] cmdArray = new String[openWith.length + 1];
             System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
@@ -828,9 +852,10 @@ public class Util {
         final String ln = temp.getPath();
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
-                    openExternalFileAnyFormat(metaData, ln, fileType);
+                    Util.openExternalFileAnyFormat(metaData, ln, fileType);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -867,7 +892,7 @@ public class Util {
                 Collections.sort(fileTypes);
                 Globals.prefs.setExternalFileTypes(fileTypes);
                 // Finally, open the file:
-                return openExternalFileAnyFormat(metaData, link, newType);
+                return Util.openExternalFileAnyFormat(metaData, link, newType);
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -905,7 +930,7 @@ public class Util {
                 frame.basePanel().undoManager.addEdit(ce);
                 frame.basePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
+                return Util.openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -928,8 +953,9 @@ public class Util {
 
         // First check if it is enclosed in \\url{}. If so, remove
 // the wrapper.
-        if (link.startsWith("\\url{") && link.endsWith("}"))
+        if (link.startsWith("\\url{") && link.endsWith("}")) {
             link = link.substring(5, link.length() - 1);
+        }
 
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
@@ -943,8 +969,8 @@ public class Util {
         // the trailing "/abstract" is included but doesn't lead to a resolvable DOI).
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
-        if (checkForPlainDOI(link) && !link.startsWith("http://")) {
-            link = Globals.DOI_LOOKUP_PREFIX + getDOI(link);
+        if (Util.checkForPlainDOI(link) && !link.startsWith("http://")) {
+            link = Globals.DOI_LOOKUP_PREFIX + Util.getDOI(link);
         }
 
         link = link.replaceAll("\\+", "%2B");
@@ -976,7 +1002,7 @@ public class Util {
     public static String getFileExtension(File file) {
         String name = file.getName();
         int pos = name.lastIndexOf('.');
-        return ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
+        return ((pos >= 0) && (pos < (name.length() - 1))) ? name.substring(pos + 1)
                 .trim().toLowerCase() : null;
     }
 
@@ -993,10 +1019,10 @@ public class Util {
             int start = i;
             if (Character.isJavaIdentifierStart(c[i])) {
                 i++;
-                while (i < c.length && (Character.isJavaIdentifierPart(c[i]) || c[i] == '.')) {
+                while ((i < c.length) && (Character.isJavaIdentifierPart(c[i]) || (c[i] == '.'))) {
                     i++;
                 }
-                if (i < c.length && c[i] == '(') {
+                if ((i < c.length) && (c[i] == '(')) {
 
                     String method = calls.substring(start, i);
 
@@ -1013,13 +1039,13 @@ public class Util {
                             int startParam = i;
                             i++;
                             boolean escaped = false;
-                            while (i + 1 < c.length &&
-                                    !(!escaped && c[i] == '"' && c[i + 1] == ')')) {
+                            while (((i + 1) < c.length) &&
+                                    !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
-                                }
-                                else
+                                } else {
                                     escaped = false;
+                                }
                                 i++;
 
                             }
@@ -1032,7 +1058,7 @@ public class Util {
 
                             int startParam = i;
 
-                            while (i < c.length && c[i] != ')') {
+                            while ((i < c.length) && (c[i] != ')')) {
                                 i++;
                             }
 
@@ -1073,12 +1099,13 @@ public class Util {
      */
     public static String expandBrackets(String bracketString, BibtexEntry entry,
             BibtexDatabase database) {
-        Matcher m = squareBracketsPattern.matcher(bracketString);
+        Matcher m = Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = getFieldAndFormat(m.group(), entry, database);
-            if (replacement == null)
+            String replacement = Util.getFieldAndFormat(m.group(), entry, database);
+            if (replacement == null) {
                 replacement = "";
+            }
             m.appendReplacement(s, replacement);
         }
         m.appendTail(s);
@@ -1103,21 +1130,22 @@ public class Util {
      * @return
      */
     public static String join(String[] strings, String separator, int from, int to) {
-        if (strings.length == 0 || from >= to)
+        if ((strings.length == 0) || (from >= to)) {
             return "";
+        }
 
         from = Math.max(from, 0);
         to = Math.min(strings.length, to);
 
         StringBuffer sb = new StringBuffer();
-        for (int i = from; i < to - 1; i++) {
+        for (int i = from; i < (to - 1); i++) {
             sb.append(strings[i]).append(separator);
         }
         return sb.append(strings[to - 1]).toString();
     }
 
     public static String join(String[] strings, String separator) {
-        return join(strings, separator, 0, strings.length);
+        return Util.join(strings, separator, 0, strings.length);
     }
 
     /**
@@ -1137,7 +1165,7 @@ public class Util {
      */
     public static File expandFilename(final MetaData metaData, String name) {
         int pos = name.lastIndexOf('.');
-        String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name
+        String extension = ((pos >= 0) && (pos < (name.length() - 1))) ? name
                 .substring(pos + 1).trim().toLowerCase() : null;
         // Find the default directory for this field type, if any:
         String[] dir = metaData.getFileDirectory(extension);
@@ -1145,14 +1173,18 @@ public class Util {
         String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<String>();
-        for (String aDir : dir)
-            if (!al.contains(aDir))
+        for (String aDir : dir) {
+            if (!al.contains(aDir)) {
                 al.add(aDir);
-        for (String aFileDir : fileDir)
-            if (!al.contains(aFileDir))
+            }
+        }
+        for (String aFileDir : fileDir) {
+            if (!al.contains(aFileDir)) {
                 al.add(aFileDir);
+            }
+        }
         String[] dirs = al.toArray(new String[al.size()]);
-        return expandFilename(name, dirs);
+        return Util.expandFilename(name, dirs);
     }
 
     /**
@@ -1166,7 +1198,7 @@ public class Util {
 
         for (String aDir : dir) {
             if (aDir != null) {
-                File result = expandFilename(name, aDir);
+                File result = Util.expandFilename(name, aDir);
                 if (result != null) {
                     return result;
                 }
@@ -1183,25 +1215,27 @@ public class Util {
     public static File expandFilename(String name, String dir) {
 
         File file;
-        if (name == null || name.length() == 0)
+        if ((name == null) || (name.length() == 0)) {
             return null;
-        else {
+        } else {
             file = new File(name);
         }
 
         if (!file.exists() && (dir != null)) {
-            if (dir.endsWith(System.getProperty("file.separator")))
+            if (dir.endsWith(System.getProperty("file.separator"))) {
                 name = dir + name;
-            else
+            } else {
                 name = dir + System.getProperty("file.separator") + name;
+            }
 
             // System.out.println("expanded to: "+name);
             // if (name.startsWith("ftp"))
 
             file = new File(name);
 
-            if (file.exists())
+            if (file.exists()) {
                 return file;
+            }
             // Ok, try to fix / and \ problems:
             if (Globals.ON_WIN) {
                 // workaround for catching Java bug in regexp replacer
@@ -1213,12 +1247,14 @@ public class Util {
                             .println("An internal Java error was caused by the entry " +
                                     "\"" + name + "\"");
                 }
-            } else
+            } else {
                 name = name.replaceAll("\\\\", "/");
+            }
             // System.out.println("expandFilename: "+name);
             file = new File(name);
-            if (!file.exists())
+            if (!file.exists()) {
                 file = null;
+            }
         }
         return file;
     }
@@ -1234,26 +1270,31 @@ public class Util {
      * @param dirs directories to check.
      */
     public static File shortenFileName(File fileName, String[] dirs) {
-        if (fileName == null || fileName.length() == 0)
+        if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
-        if (!fileName.isAbsolute() || (dirs == null))
+        }
+        if (!fileName.isAbsolute() || (dirs == null)) {
             return fileName;
+        }
 
         for (String dir : dirs) {
             if (dir != null) {
-                File result = shortenFileName(fileName, dir);
-                if ((result != null) && (!result.equals(fileName)))
+                File result = Util.shortenFileName(fileName, dir);
+                if ((result != null) && (!result.equals(fileName))) {
                     return result;
+                }
             }
         }
         return fileName;
     }
 
     public static File shortenFileName(File fileName, String dir) {
-        if (fileName == null || fileName.length() == 0)
+        if ((fileName == null) || (fileName.length() == 0)) {
             return fileName;
-        if (!fileName.isAbsolute() || dir == null)
+        }
+        if (!fileName.isAbsolute() || (dir == null)) {
             return fileName;
+        }
 
         String longName;
         if (Globals.ON_WIN) {
@@ -1264,8 +1305,9 @@ public class Util {
             longName = fileName.toString();
         }
 
-        if (!dir.endsWith(System.getProperty("file.separator")))
+        if (!dir.endsWith(System.getProperty("file.separator"))) {
             dir = dir.concat(System.getProperty("file.separator"));
+        }
 
         if (longName.startsWith(dir)) {
             // result is based on original name, not on lower-cased name
@@ -1301,12 +1343,13 @@ public class Util {
         String timeStampField = Globals.prefs.get("timeStampField");
 
         String defaultOwner = Globals.prefs.get("defaultOwner");
-        String timestamp = easyDateFormat();
+        String timestamp = Util.easyDateFormat();
         boolean globalSetOwner = Globals.prefs.getBoolean("useOwner"), globalSetTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
 
         // Do not need to do anything if all options are disabled
-        if (!(globalSetOwner || globalSetTimeStamp || markEntries))
+        if (!(globalSetOwner || globalSetTimeStamp || markEntries)) {
             return;
+        }
 
         // Iterate through all entries
         for (BibtexEntry curEntry : bibs) {
@@ -1314,10 +1357,11 @@ public class Util {
                     (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
             boolean setTimeStamp = globalSetTimeStamp &&
                     (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
-            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
+            Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
                     timestamp);
-            if (markEntries)
-                Util.markEntry(curEntry, IMPORT_MARK_LEVEL, false, new NamedCompound(""));
+            if (markEntries) {
+                Util.markEntry(curEntry, Util.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
+            }
         }
 
     }
@@ -1337,14 +1381,14 @@ public class Util {
     public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner,
             boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get("defaultOwner");
-        String timestamp = easyDateFormat();
+        String timestamp = Util.easyDateFormat();
         String timeStampField = Globals.prefs.get("timeStampField");
         boolean setOwner = Globals.prefs.getBoolean("useOwner") &&
                 (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
         boolean setTimeStamp = Globals.prefs.getBoolean("useTimeStamp") &&
                 (overwriteTimestamp || (entry.getField(timeStampField) == null));
 
-        setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+        Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
     private static void setAutomaticFields(BibtexEntry entry, boolean setOwner, String owner,
@@ -1360,8 +1404,9 @@ public class Util {
             // }
         }
 
-        if (setTimeStamp)
+        if (setTimeStamp) {
             entry.setField(timeStampField, timeStamp);
+        }
     }
 
     /**
@@ -1387,8 +1432,10 @@ public class Util {
             // Check if the file already exists.
             if (dest.exists()) {
                 if (!deleteIfExists)
+                 {
                     return false;
                 // else dest.delete();
+                }
             }
 
             in = new BufferedInputStream(new FileInputStream(source));
@@ -1423,16 +1470,17 @@ public class Util {
         if (genFields.contains("abstract")) {
             // pr(genFields+"\t"+genFields.indexOf("abstract"));
             String newGen;
-            if (genFields.equals("abstract"))
+            if (genFields.equals("abstract")) {
                 newGen = "";
-            else if (genFields.contains(";abstract;")) {
+            } else if (genFields.contains(";abstract;")) {
                 newGen = genFields.replaceAll(";abstract;", ";");
             } else if (genFields.indexOf("abstract;") == 0) {
                 newGen = genFields.replaceAll("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == genFields.length() - 9) {
+            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
                 newGen = genFields.replaceAll(";abstract", "");
-            } else
+            } else {
                 newGen = genFields;
+            }
             // pr(newGen);
             Globals.prefs.put("generalFields", newGen);
         }
@@ -1447,7 +1495,7 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
-        return upgradePdfPsToFile(database.getEntryMap().values(), fields);
+        return Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
     }
 
     /**
@@ -1499,13 +1547,15 @@ public class Util {
      * be found
      */
     public static String getCorrectFileName(String orgName, String defaultExtension) {
-        if (orgName == null)
+        if (orgName == null) {
             return "";
+        }
 
         String back = orgName;
         int t = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
-        if (t < 1)
+        if (t < 1) {
             back = back + "." + defaultExtension;
+        }
 
         return back;
     }
@@ -1523,7 +1573,7 @@ public class Util {
     }
 
     public static String quote(String s, String specials, char quoteChar) {
-        return quote(s, specials, quoteChar, 0);
+        return Util.quote(s, specials, quoteChar, 0);
     }
 
     /**
@@ -1549,10 +1599,10 @@ public class Util {
         boolean isSpecial;
         for (int i = 0; i < s.length(); ++i) {
             c = s.charAt(i);
-            isSpecial = specials.indexOf(c) >= 0 || c == quoteChar;
+            isSpecial = (specials.indexOf(c) >= 0) || (c == quoteChar);
             // linebreak?
-            if (linewrap > 0
-                    && (++linelength >= linewrap || (isSpecial && linelength >= linewrap - 1))) {
+            if ((linewrap > 0)
+                    && ((++linelength >= linewrap) || (isSpecial && (linelength >= (linewrap - 1))))) {
                 sb.append(quoteChar);
                 sb.append('\n');
                 linelength = 0;
@@ -1582,8 +1632,9 @@ public class Util {
         for (int i = 0; i < s.length(); ++i) {
             c = s.charAt(i);
             if (quoted) { // append literally...
-                if (c != '\n') // ...unless newline
+                if (c != '\n') {
                     sb.append(c);
+                }
                 quoted = false;
             } else if (c != quoteChar) {
                 sb.append(c);
@@ -1618,7 +1669,7 @@ public class Util {
      * Currently not used anywhere
      */
     public static String sortWordsAndRemoveDuplicates(String text) {
-        ArrayList<String> words = getSeparatedKeywords(text);
+        ArrayList<String> words = Util.getSeparatedKeywords(text);
         // by adding the words to a set, they are automatically sorted
         TreeSet<String> set = new TreeSet<String>(words);
         StringBuffer sb = new StringBuffer();
@@ -1626,8 +1677,9 @@ public class Util {
             sb.append(aSet);
             sb.append(", ");
         }
-        if (sb.length() > 2)
+        if (sb.length() > 2) {
             sb.delete(sb.length() - 2, sb.length());
+        }
         String result = sb.toString();
         return result.length() > 2 ? result : "";
     }
@@ -1656,7 +1708,9 @@ public class Util {
                 KeywordGroup kg = (KeywordGroup) group;
                 String field = kg.getSearchField().toLowerCase();
                 if (field.equals("keywords"))
+                 {
                     continue; // this is not undesired
+                }
                 for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
                     if (field.equals(BibtexFields.getFieldName(i))) {
                         affectedFields.add(field);
@@ -1666,14 +1720,17 @@ public class Util {
             }
         }
         if (affectedFields.size() == 0)
+         {
             return true; // no side effects
+        }
 
         // show a warning, then return
         StringBuffer message = // JZTODO lyrics...
         new StringBuffer("This action will modify the following field(s)\n"
                 + "in at least one entry each:\n");
-        for (int i = 0; i < affectedFields.size(); ++i)
+        for (int i = 0; i < affectedFields.size(); ++i) {
             message.append(affectedFields.elementAt(i)).append("\n");
+        }
         message.append("This could cause undesired changes to "
                 + "your entries, so it is\nrecommended that you change the grouping field "
                 + "in your group\ndefinition to \"keywords\" or a non-standard name."
@@ -1734,12 +1791,13 @@ public class Util {
         for (int i = 0; i < s.length(); i++) {
             // Update variables based on special characters:
             int c = s.charAt(i);
-            if (c == '{')
+            if (c == '{') {
                 inBrace++;
-            else if (c == '}')
+            } else if (c == '}') {
                 inBrace--;
-            else if (!escaped && (c == '#'))
+            } else if (!escaped && (c == '#')) {
                 inString = !inString;
+            }
 
             // See if we should start bracing:
             if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
@@ -1764,8 +1822,9 @@ public class Util {
 
         }
         // Check if we have an unclosed brace:
-        if (isBracing)
+        if (isBracing) {
             buf.append('}');
+        }
 
         return buf.toString();
 
@@ -1795,7 +1854,7 @@ public class Util {
      */
     public static String removeBracesAroundCapitals(String s) {
         String previous = s;
-        while ((s = removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
+        while ((s = Util.removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
             previous = s;
         }
         return s;
@@ -1811,7 +1870,7 @@ public class Util {
      * @return A new String with braces removed.
      */
     public static String removeSingleBracesAroundCapitals(String s) {
-        Matcher mcr = bracedTitleCapitalPattern.matcher(s);
+        Matcher mcr = Util.bracedTitleCapitalPattern.matcher(s);
         StringBuffer buf = new StringBuffer();
         while (mcr.find()) {
             String replaceStr = mcr.group();
@@ -1834,10 +1893,11 @@ public class Util {
         String s = BibtexFields.getFieldExtras(fieldName);
         final String ext = "." + fieldName.toLowerCase();
         final OpenFileFilter off;
-        if (s.equals("browseDocZip"))
+        if (s.equals("browseDocZip")) {
             off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
-        else
+        } else {
             off = new OpenFileFilter(new String[] {ext});
+        }
         return off;
     }
 
@@ -1879,6 +1939,7 @@ public class Util {
 
         flip.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 crd.show(pan, "details");
             }
@@ -1903,10 +1964,10 @@ public class Util {
                     charsLeft = lineWidth;
                 }
             } else { // continue previous line
-                if (charsLeft < word.length() + 1) {
+                if (charsLeft < (word.length() + 1)) {
                     sb.append("<br>\n");
                     sb.append(word);
-                    if (word.length() >= lineWidth - 1) {
+                    if (word.length() >= (lineWidth - 1)) {
                         sb.append("<br>\n");
                         charsLeft = lineWidth;
                     } else {
@@ -1931,7 +1992,7 @@ public class Util {
      */
     public static String easyDateFormat() {
         // Date today = new Date();
-        return easyDateFormat(new Date());
+        return Util.easyDateFormat(new Date());
     }
 
     /**
@@ -1942,11 +2003,11 @@ public class Util {
      */
     public static String easyDateFormat(Date date) {
         // first use, create an instance
-        if (dateFormatter == null) {
+        if (Util.dateFormatter == null) {
             String format = Globals.prefs.get("timeStampFormat");
-            dateFormatter = new SimpleDateFormat(format);
+            Util.dateFormatter = new SimpleDateFormat(format);
         }
-        return dateFormatter.format(date);
+        return Util.dateFormatter.format(date);
     }
 
     /**
@@ -1966,16 +2027,16 @@ public class Util {
                         + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length())
                         + Globals.prefs.WRAPPED_USERNAME.substring(0,
                                 Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" +
-                        (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
+                        (increment ? Math.min(Util.MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
                                 : markIncrement) + "]";
             }
             else {
-                Matcher m = markNumberPattern.matcher(s);
+                Matcher m = Util.markNumberPattern.matcher(s);
                 if (m.find()) {
                     try {
                         prevMarkLevel = Integer.parseInt(m.group(1));
                         newValue = s.substring(0, m.start(1)) +
-                                (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
+                                (increment ? Math.min(Util.MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
                                         : markIncrement) +
                                 s.substring(m.end(1));
                     } catch (NumberFormatException ex) {
@@ -1984,9 +2045,10 @@ public class Util {
                 }
             }
         }
-        if (newValue == null)
+        if (newValue == null) {
             newValue = Globals.prefs.WRAPPED_USERNAME.substring(0,
                     Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
+        }
 
         ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
                 .getField(BibtexFields.MARKED), newValue));
@@ -2003,7 +2065,7 @@ public class Util {
             String s = o.toString();
             if (s.equals("0")) {
                 if (!onlyMaxLevel) {
-                    unmarkOldStyle(be, database, ce);
+                    Util.unmarkOldStyle(be, database, ce);
                 }
                 return;
             }
@@ -2011,22 +2073,23 @@ public class Util {
             int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Marked 1 for this user.
-                if (!onlyMaxLevel)
+                if (!onlyMaxLevel) {
                     newValue = s.substring(0, index)
                             + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
-                else
+                } else {
                     return;
+                }
             }
             else {
-                Matcher m = markNumberPattern.matcher(s);
+                Matcher m = Util.markNumberPattern.matcher(s);
                 if (m.find()) {
                     try {
                         int prevMarkLevel = Integer.parseInt(m.group(1));
-                        if (!onlyMaxLevel || (prevMarkLevel == MARK_COLOR_LEVELS)) {
-                            if (prevMarkLevel > 1)
+                        if (!onlyMaxLevel || (prevMarkLevel == Util.MARK_COLOR_LEVELS)) {
+                            if (prevMarkLevel > 1) {
                                 newValue = s.substring(0, m.start(1)) +
                                         s.substring(m.end(1));
-                            else {
+                            } else {
                                 String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0,
                                         Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":1]";
                                 index = s.indexOf(toRemove);
@@ -2035,9 +2098,9 @@ public class Util {
                                             + s.substring(index + toRemove.length());
                                 }
                             }
-                        }
-                        else
+                        } else {
                             return;
+                        }
                     } catch (NumberFormatException ex) {
                         // Do nothing.
                     }
@@ -2078,8 +2141,10 @@ public class Util {
         for (BibtexEntry entry : database.getEntries()) {
             Object o = entry.getField(BibtexFields.OWNER);
             if (o != null)
+             {
                 owners.add(o);
             // System.out.println("Owner: "+entry.getField(Globals.OWNER));
+            }
         }
         owners.remove(Globals.prefs.get("defaultOwner"));
         StringBuffer sb = new StringBuffer();
@@ -2089,8 +2154,9 @@ public class Util {
             sb.append(']');
         }
         String newVal = sb.toString();
-        if (newVal.length() == 0)
+        if (newVal.length() == 0) {
             newVal = null;
+        }
         ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
                 .getField(BibtexFields.MARKED), newVal));
         be.setField(BibtexFields.MARKED, newVal);
@@ -2099,25 +2165,28 @@ public class Util {
 
     public static int isMarked(BibtexEntry be) {
         Object fieldVal = be.getField(BibtexFields.MARKED);
-        if (fieldVal == null)
+        if (fieldVal == null) {
             return 0;
+        }
         String s = (String) fieldVal;
-        if (s.equals("0"))
+        if (s.equals("0")) {
             return 1;
+        }
         int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
-        if (index >= 0)
+        if (index >= 0) {
             return 1;
+        }
 
-        Matcher m = markNumberPattern.matcher(s);
+        Matcher m = Util.markNumberPattern.matcher(s);
         if (m.find()) {
             try {
                 return Integer.parseInt(m.group(1));
             } catch (NumberFormatException ex) {
                 return 1;
             }
-        }
-        else
+        } else {
             return 0;
+        }
 
     }
 
@@ -2147,12 +2216,14 @@ public class Util {
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && ((oldVal).length() > 0))
+            if (!overwriteValues && (oldVal != null) && ((oldVal).length() > 0)) {
                 continue;
-            if (text != null)
+            }
+            if (text != null) {
                 entry.setField(field, text);
-            else
+            } else {
                 entry.clearField(field);
+            }
             ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
         }
         ce.end();
@@ -2174,13 +2245,15 @@ public class Util {
         for (BibtexEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
-            if ((valToMove == null) || (valToMove.length() == 0))
+            if ((valToMove == null) || (valToMove.length() == 0)) {
                 continue;
+            }
             // If we are not allowed to overwrite values, check if there is a
             // nonempy value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && (valInNewField.length() > 0))
+            if (!overwriteValues && (valInNewField != null) && (valInNewField.length() > 0)) {
                 continue;
+            }
 
             entry.setField(newField, valToMove);
             ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField, valToMove));
@@ -2204,8 +2277,9 @@ public class Util {
         List<String> encodings = new ArrayList<String>();
         for (int i = 0; i < Globals.ENCODINGS.length; i++) {
             CharsetEncoder encoder = Charset.forName(Globals.ENCODINGS[i]).newEncoder();
-            if (encoder.canEncode(characters))
+            if (encoder.canEncode(characters)) {
                 encodings.add(Globals.ENCODINGS[i]);
+            }
         }
         return encodings;
     }
@@ -2221,18 +2295,21 @@ public class Util {
         boolean sign = false;
         char ch;
 
-        if (str == null || (end = str.length()) == 0 ||
-                ((ch = str.charAt(0)) < '0' || ch > '9')
-                && (!(sign = ch == '-') || ++idx == end || ((ch = str.charAt(idx)) < '0' || ch > '9')))
+        if ((str == null) || ((end = str.length()) == 0) ||
+                ((((ch = str.charAt(0)) < '0') || (ch > '9'))
+                && (!(sign = ch == '-') || (++idx == end) || (((ch = str.charAt(idx)) < '0') || (ch > '9'))))) {
             throw new NumberFormatException(str);
+        }
 
         for (;; ival *= 10)
         {
             ival += '0' - ch;
-            if (++idx == end)
+            if (++idx == end) {
                 return sign ? ival : -ival;
-            if ((ch = str.charAt(idx)) < '0' || ch > '9')
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
                 throw new NumberFormatException(str);
+            }
         }
     }
 
@@ -2245,9 +2322,10 @@ public class Util {
     public static String encodeStringArray(String[][] values) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
-            sb.append(encodeStringArray(values[i]));
-            if (i < values.length - 1)
+            sb.append(Util.encodeStringArray(values[i]));
+            if (i < (values.length - 1)) {
                 sb.append(';');
+            }
         }
         return sb.toString();
     }
@@ -2261,9 +2339,10 @@ public class Util {
     public static String encodeStringArray(String[] entry) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entry.length; i++) {
-            sb.append(encodeString(entry[i]));
-            if (i < entry.length - 1)
+            sb.append(Util.encodeString(entry[i]));
+            if (i < (entry.length - 1)) {
                 sb.append(':');
+            }
 
         }
         return sb.toString();
@@ -2296,15 +2375,17 @@ public class Util {
                 sb = new StringBuilder();
                 newList.add(thisEntry);
                 thisEntry = new ArrayList<String>();
-            }
-            else
+            } else {
                 sb.append(c);
+            }
             escaped = false;
         }
-        if (sb.length() > 0)
+        if (sb.length() > 0) {
             thisEntry.add(sb.toString());
-        if (thisEntry.size() > 0)
+        }
+        if (thisEntry.size() > 0) {
             newList.add(thisEntry);
+        }
 
         // Convert to String[][]:
         String[][] res = new String[newList.size()][];
@@ -2318,13 +2399,15 @@ public class Util {
     }
 
     public static String encodeString(String s) {
-        if (s == null)
+        if (s == null) {
             return null;
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\'))
+            if ((c == ';') || (c == ':') || (c == '\\')) {
                 sb.append('\\');
+            }
             sb.append(c);
         }
         return sb.toString();
@@ -2357,11 +2440,13 @@ public class Util {
      *         rest unchanged from the given one.
      */
     public static String toUpperFirstLetter(String string) {
-        if (string == null)
+        if (string == null) {
             throw new IllegalArgumentException();
+        }
 
-        if (string.length() == 0)
+        if (string.length() == 0) {
             return string;
+        }
 
         return Character.toUpperCase(string.charAt(0)) + string.substring(1);
     }
@@ -2468,8 +2553,9 @@ public class Util {
                     break;
                 }
             }
-            if (!found)
+            if (!found) {
                 al.add(anAll);
+            }
         }
         return al.toArray(new String[al.size()]);
     }
@@ -2509,15 +2595,15 @@ public class Util {
     // Some DOI's are not caught by the regexp in the above link, i.e. 10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S
     // Removed <> from non-permitted characters
     private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'])\\S)+)\\b";
-    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + REGEXP_PLAINDOI;
-    private static final Pattern PATTERN_PLAINDOI = Pattern.compile(REGEXP_PLAINDOI);
+    private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + Util.REGEXP_PLAINDOI;
+    private static final Pattern PATTERN_PLAINDOI = Pattern.compile(Util.REGEXP_PLAINDOI);
 
 
     /**
      * Check if the String matches a DOI (with http://...)
      */
     public static boolean checkForDOIwithHTTPprefix(String check) {
-        return check != null && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
+        return (check != null) && check.matches(".*" + Util.REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
     }
 
     /**
@@ -2526,7 +2612,7 @@ public class Util {
      * @return true if "check" contains a DOI
      */
     public static boolean checkForPlainDOI(String check) {
-        return check != null && check.matches(".*" + REGEXP_PLAINDOI + ".*");
+        return (check != null) && check.matches(".*" + Util.REGEXP_PLAINDOI + ".*");
     }
 
     /**
@@ -2536,7 +2622,7 @@ public class Util {
      * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
      */
     public static String getDOI(String doi) {
-        Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
+        Matcher matcher = Util.PATTERN_PLAINDOI.matcher(doi);
         if (matcher.find()) {
             return matcher.group();
         } else {
@@ -2547,11 +2633,12 @@ public class Util {
     public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
         String origValue = bes.getField(fieldName);
         String value = origValue;
-        value = value.replaceAll(REGEXP_DOI_WITH_HTTP_PREFIX, "");
-        value = value.replaceAll(REGEXP_PLAINDOI, "");
+        value = value.replaceAll(Util.REGEXP_DOI_WITH_HTTP_PREFIX, "");
+        value = value.replaceAll(Util.REGEXP_PLAINDOI, "");
         value = value.trim();
-        if (value.isEmpty())
+        if (value.isEmpty()) {
             value = null;
+        }
         if (!origValue.equals(value)) {
             ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, value));
             bes.setField(fieldName, value);
@@ -2578,8 +2665,9 @@ public class Util {
 
     public static ArrayList<String> getSeparatedKeywords(String keywords) {
         ArrayList<String> res = new ArrayList<String>();
-        if (keywords == null)
+        if (keywords == null) {
             return res;
+        }
         // _NOSPACE is a hack to support keywords such as "choreography transactions"
         // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
         // if nothing is found, " " is likely to be the separating char.
@@ -2593,7 +2681,7 @@ public class Util {
     }
 
     public static ArrayList<String> getSeparatedKeywords(BibtexEntry be) {
-        return getSeparatedKeywords(be.getField("keywords"));
+        return Util.getSeparatedKeywords(be.getField("keywords"));
     }
 
     public static void putKeywords(BibtexEntry entry, ArrayList<String> keywords, NamedCompound ce) {
@@ -2611,12 +2699,14 @@ public class Util {
         } else {
             newValue = null;
         }
-        if ((oldValue == null) && (newValue == null))
+        if ((oldValue == null) && (newValue == null)) {
             return;
+        }
         if ((oldValue == null) || (!oldValue.equals(newValue))) {
             entry.setField("keywords", newValue);
-            if (ce != null)
+            if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
+            }
         }
     }
 
@@ -2624,7 +2714,7 @@ public class Util {
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce) {
-        updateField(be, field, newValue, ce, false);
+        Util.updateField(be, field, newValue, ce, false);
     }
 
     /**
@@ -2636,12 +2726,14 @@ public class Util {
             // if oldValue == newValue then reset field if required by parameter
             newValue = null;
         }
-        if ((oldValue == null) && (newValue == null))
+        if ((oldValue == null) && (newValue == null)) {
             return;
+        }
         if ((oldValue == null) || (!oldValue.equals(newValue))) {
             be.setField(field, newValue);
-            if (ce != null)
+            if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+            }
         }
     }
 
@@ -2666,7 +2758,7 @@ public class Util {
      */
     public static String getResults(URLConnection source) throws IOException {
 
-        return getResultsWithEncoding(source, null);
+        return Util.getResultsWithEncoding(source, null);
     }
 
     /**
@@ -2688,8 +2780,9 @@ public class Util {
         StringBuilder sb = new StringBuilder();
         while (true) {
             int byteRead = in.read();
-            if (byteRead == -1)
+            if (byteRead == -1) {
                 break;
+            }
             sb.append((char) byteRead);
         }
         return sb.toString();
@@ -2759,6 +2852,7 @@ public class Util {
 
         Runnable r = new Runnable() {
 
+            @Override
             public void run() {
 
                 // determine directories to search in
@@ -2779,7 +2873,7 @@ public class Util {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = findAssociatedFiles(entries, extensions, dirs);
+                    result = Util.findAssociatedFiles(entries, extensions, dirs);
                 }
 
                 boolean foundAny = false;
@@ -2790,8 +2884,9 @@ public class Util {
                     String oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
-                        if (oldVal != null)
+                        if (oldVal != null) {
                             tableModel.setContent(oldVal);
+                        }
                     } else {
                         assert (entries.size() == 1);
                         tableModel = singleTableModel;
@@ -2813,7 +2908,7 @@ public class Util {
                             foundAny = true;
                             ExternalFileType type;
                             int index = f.getPath().lastIndexOf('.');
-                            if ((index >= 0) && (index < f.getPath().length() - 1)) {
+                            if ((index >= 0) && (index < (f.getPath().length() - 1))) {
                                 type = Globals.prefs.getExternalFileTypeByExt
                                         (f.getPath().substring(index + 1).toLowerCase());
                             } else {
@@ -2823,8 +2918,9 @@ public class Util {
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
                             String newVal = tableModel.getStringRepresentation();
-                            if (newVal.length() == 0)
+                            if (newVal.length() == 0) {
                                 newVal = null;
+                            }
                             if (ce != null) {
                                 // store undo information
                                 UndoableFieldChange change = new UndoableFieldChange(anEntry,
@@ -2835,8 +2931,9 @@ public class Util {
                             if (singleTableModel == null) {
                                 anEntry.setField(GUIGlobals.FILE_FIELD, newVal);
                             }
-                            if (changedEntries != null)
+                            if (changedEntries != null) {
                                 changedEntries.add(anEntry);
+                            }
                         }
                     }
                 }
@@ -2845,11 +2942,14 @@ public class Util {
                 final int id = foundAny ? 1 : 0;
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
-                        if (diag != null)
+                        if (diag != null) {
                             diag.dispose();
-                        if (callback != null)
+                        }
+                        if (callback != null) {
                             callback.actionPerformed(new ActionEvent(this, id, ""));
+                        }
                     }
                 });
             }
@@ -2885,7 +2985,7 @@ public class Util {
         final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         entries.add(entry);
 
-        return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+        return Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
     }
 
     /**
@@ -2895,11 +2995,11 @@ public class Util {
      */
     public static void openFolderAndSelectFile(String fileLink) throws IOException {
         if (Globals.ON_WIN) {
-            openFolderAndSelectFileOnWindows(fileLink);
+            Util.openFolderAndSelectFileOnWindows(fileLink);
         } else if (Globals.ON_LINUX) {
-            openFolderAndSelectFileOnLinux(fileLink);
+            Util.openFolderAndSelectFileOnLinux(fileLink);
         } else {
-            openFolderAndSelectFileGeneric(fileLink);
+            Util.openFolderAndSelectFileGeneric(fileLink);
         }
     }
 
@@ -3017,7 +3117,7 @@ public class Util {
     public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry,
             BibtexDatabase database) {
 
-        fieldAndFormat = stripBrackets(fieldAndFormat);
+        fieldAndFormat = Util.stripBrackets(fieldAndFormat);
 
         int colon = fieldAndFormat.indexOf(':');
 
@@ -3038,14 +3138,17 @@ public class Util {
         String fieldValue = BibtexDatabase.getResolvedField(beforeColon, entry, database);
 
         // If no field value was found, try to interpret it as a key generator field marker:
-        if (fieldValue == null)
+        if (fieldValue == null) {
             fieldValue = LabelPatternUtil.makeLabel(entry, beforeColon);
+        }
 
-        if (fieldValue == null)
+        if (fieldValue == null) {
             return null;
+        }
 
-        if (afterColon == null || afterColon.length() == 0)
+        if ((afterColon == null) || (afterColon.length() == 0)) {
             return fieldValue;
+        }
 
         String[] parts = afterColon.split(":");
         fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
@@ -3072,9 +3175,9 @@ public class Util {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        url = sanitizeUrl(url);
+        url = Util.sanitizeUrl(url);
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
-        openExternalFilePlatformIndependent(fileType, url);
+        Util.openExternalFilePlatformIndependent(fileType, url);
     }
 
 }

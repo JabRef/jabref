@@ -171,6 +171,7 @@ public class FromAuxDialog
         im.put(parent.prefs().getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -184,11 +185,13 @@ public class FromAuxDialog
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
-            if (parent.baseAt(i) == parent.basePanel())
+            if (parent.baseAt(i) == parent.basePanel()) {
                 toSelect = i;
+            }
         }
-        if (toSelect >= 0)
+        if (toSelect >= 0) {
             dbChooser.setSelectedIndex(toSelect);
+        }
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
@@ -320,6 +323,7 @@ public class FromAuxDialog
             comp = tc;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             String chosen = FileDialogs.getNewFile(_frame,
                     new File(comp.getText()),
@@ -345,6 +349,7 @@ class FromAuxDialog_generate_actionAdapter
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.generate_actionPerformed(e);
     }
@@ -360,6 +365,7 @@ class FromAuxDialog_Cancel_actionAdapter
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.cancel_actionPerformed(e);
     }
@@ -375,6 +381,7 @@ class FromAuxDialog_parse_actionAdapter
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.parse_actionPerformed(e);
     }

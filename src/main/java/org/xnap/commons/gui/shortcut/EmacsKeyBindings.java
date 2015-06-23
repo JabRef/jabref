@@ -206,17 +206,17 @@ public class EmacsKeyBindings
             DefaultEditorKit.beginLineAction);
 
     private static final TextAction[] EMACS_ACTIONS = {
-            new KillWordAction(killWordAction),
-            new BackwardKillWordAction(backwardKillWordAction),
-            new SetMarkCommandAction(setMarkCommandAction),
-            new KillRingSaveAction(killRingSaveAction),
-            new KillRegionAction(killRegionAction),
-            new KillLineAction(killLineAction),
-            new YankAction(yankAction),
-            new YankPopAction(yankPopAction),
-            new CapitalizeWordAction(capitalizeWordAction),
-            new DowncaseWordAction(downcaseWordAction),
-            new UpcaseWordAction(upcaseWordAction)
+            new KillWordAction(EmacsKeyBindings.killWordAction),
+            new BackwardKillWordAction(EmacsKeyBindings.backwardKillWordAction),
+            new SetMarkCommandAction(EmacsKeyBindings.setMarkCommandAction),
+            new KillRingSaveAction(EmacsKeyBindings.killRingSaveAction),
+            new KillRegionAction(EmacsKeyBindings.killRegionAction),
+            new KillLineAction(EmacsKeyBindings.killLineAction),
+            new YankAction(EmacsKeyBindings.yankAction),
+            new YankPopAction(EmacsKeyBindings.yankPopAction),
+            new CapitalizeWordAction(EmacsKeyBindings.capitalizeWordAction),
+            new DowncaseWordAction(EmacsKeyBindings.downcaseWordAction),
+            new UpcaseWordAction(EmacsKeyBindings.upcaseWordAction)
     };
 
     // components to modify
@@ -240,18 +240,18 @@ public class EmacsKeyBindings
      */
     public static void load()
     {
-        createBackup();
-        loadEmacsKeyBindings();
+        EmacsKeyBindings.createBackup();
+        EmacsKeyBindings.loadEmacsKeyBindings();
     }
 
     private static void createBackup() {
-        Keymap oldBackup = JTextComponent.getKeymap(JTCS[0].getClass().getName());
+        Keymap oldBackup = JTextComponent.getKeymap(EmacsKeyBindings.JTCS[0].getClass().getName());
         if (oldBackup != null) {
             // if there is already a backup, do not create a new backup
             return;
         }
 
-        for (JTextComponent JTC : JTCS) {
+        for (JTextComponent JTC : EmacsKeyBindings.JTCS) {
             Keymap orig = JTC.getKeymap();
             Keymap backup = JTextComponent.addKeymap
                     (JTC.getClass().getName(), null);
@@ -273,12 +273,12 @@ public class EmacsKeyBindings
      */
     public static void unload()
     {
-        for (int i = 0; i < JTCS.length; i++) {
+        for (int i = 0; i < EmacsKeyBindings.JTCS.length; i++) {
             Keymap backup = JTextComponent.getKeymap
-                    (JTCS[i].getClass().getName());
+                    (EmacsKeyBindings.JTCS[i].getClass().getName());
 
             if (backup != null) {
-                Keymap current = JTCS[i].getKeymap();
+                Keymap current = EmacsKeyBindings.JTCS[i].getKeymap();
                 current.removeBindings();
 
                 Action[] bound = backup.getBoundActions();
@@ -300,24 +300,24 @@ public class EmacsKeyBindings
      */
     private static void loadEmacsKeyBindings()
     {
-        logger.debug("Loading emacs keybindings");
+        EmacsKeyBindings.logger.debug("Loading emacs keybindings");
 
-        for (JTextComponent JTC : JTCS) {
+        for (JTextComponent JTC : EmacsKeyBindings.JTCS) {
             Action[] origActions = JTC.getActions();
-            Action[] actions = new Action[origActions.length + EMACS_ACTIONS.length];
+            Action[] actions = new Action[origActions.length + EmacsKeyBindings.EMACS_ACTIONS.length];
             System.arraycopy(origActions, 0, actions, 0, origActions.length);
-            System.arraycopy(EMACS_ACTIONS, 0, actions, origActions.length, EMACS_ACTIONS.length);
+            System.arraycopy(EmacsKeyBindings.EMACS_ACTIONS, 0, actions, origActions.length, EmacsKeyBindings.EMACS_ACTIONS.length);
 
             Keymap k = JTC.getKeymap();
 
             JTextComponent.KeyBinding[] keybindings;
             if (JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA)) {
-                int size = EMACS_KEY_BINDINGS_BASE.length + 1;
+                int size = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length + 1;
                 keybindings = new JTextComponent.KeyBinding[size];
-                System.arraycopy(EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EMACS_KEY_BINDINGS_BASE.length);
-                keybindings[EMACS_KEY_BINDINGS_BASE.length] = EMACS_KEY_BINDING_C_A;
+                System.arraycopy(EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length);
+                keybindings[EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length] = EmacsKeyBindings.EMACS_KEY_BINDING_C_A;
             } else {
-                keybindings = EMACS_KEY_BINDINGS_BASE;
+                keybindings = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE;
             }
             JTextComponent.loadKeymap(k, keybindings, actions);
         }
@@ -339,6 +339,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             JTextComponent jtc = getTextComponent(e);
@@ -346,7 +347,7 @@ public class EmacsKeyBindings
                 try {
                     int offs = jtc.getCaretPosition();
                     jtc.setSelectionStart(offs);
-                    offs = getWordEnd(jtc, offs);
+                    offs = EmacsKeyBindings.getWordEnd(jtc, offs);
                     jtc.setSelectionEnd(offs);
                     KillRing.getInstance().add(jtc.getSelectedText());
                     jtc.cut();
@@ -372,6 +373,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             JTextComponent jtc = getTextComponent(e);
@@ -402,6 +404,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             JTextComponent jtc = getTextComponent(e);
@@ -421,6 +424,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             JTextComponent jtc = getTextComponent(e);
@@ -480,6 +484,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             JTextComponent jtc = getTextComponent(e);
@@ -487,7 +492,7 @@ public class EmacsKeyBindings
                 try {
                     int start = jtc.getCaretPosition();
                     int end = Utilities.getRowEnd(jtc, start);
-                    if (start == end && jtc.isEditable()) {
+                    if ((start == end) && jtc.isEditable()) {
                         Document doc = jtc.getDocument();
                         doc.remove(end, 1);
                     }
@@ -521,28 +526,29 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
-            jtc = getTextComponent(e);
-            if (jtc != null) {
-                position = jtc.getCaretPosition();
+            SetMarkCommandAction.jtc = getTextComponent(e);
+            if (SetMarkCommandAction.jtc != null) {
+                SetMarkCommandAction.position = SetMarkCommandAction.jtc.getCaretPosition();
             }
         }
 
         public static boolean isMarked(JTextComponent jt)
         {
-            return (jtc == jt && position != -1);
+            return ((SetMarkCommandAction.jtc == jt) && (SetMarkCommandAction.position != -1));
         }
 
         public static void reset()
         {
-            jtc = null;
-            position = -1;
+            SetMarkCommandAction.jtc = null;
+            SetMarkCommandAction.position = -1;
         }
 
         public static int getCaretPosition()
         {
-            return position;
+            return SetMarkCommandAction.position;
         }
     }
 
@@ -562,16 +568,17 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event)
         {
             JTextComponent jtc = getTextComponent(event);
 
             if (jtc != null) {
                 try {
-                    start = jtc.getCaretPosition();
+                    YankAction.start = jtc.getCaretPosition();
                     jtc.paste();
-                    end = jtc.getCaretPosition();
-                    KillRing.getInstance().add(jtc.getText(start, end));
+                    YankAction.end = jtc.getCaretPosition();
+                    KillRing.getInstance().add(jtc.getText(YankAction.start, YankAction.end));
                     KillRing.getInstance().setCurrentTextComponent(jtc);
                 } catch (Exception ignored) {
                 }
@@ -591,6 +598,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event)
         {
             JTextComponent jtc = getTextComponent(event);
@@ -631,7 +639,7 @@ public class EmacsKeyBindings
 
         public static KillRing getInstance()
         {
-            return instance;
+            return KillRing.instance;
         }
 
         void setCurrentTextComponent(JTextComponent jtc)
@@ -718,6 +726,7 @@ public class EmacsKeyBindings
          * EmacsKeyBindings.DowncaseWordAction} is performed, to ensure the
          * word is in lower case, then the first letter is capialized.
          */
+        @Override
         public void actionPerformed(ActionEvent event)
         {
             JTextComponent jtc = getTextComponent(event);
@@ -726,7 +735,7 @@ public class EmacsKeyBindings
                 try {
                     /* downcase code */
                     int start = jtc.getCaretPosition();
-                    int end = getWordEnd(jtc, start);
+                    int end = EmacsKeyBindings.getWordEnd(jtc, start);
                     jtc.setSelectionStart(start);
                     jtc.setSelectionEnd(end);
                     String word = jtc.getText(start, end - start);
@@ -769,6 +778,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event)
         {
             JTextComponent jtc = getTextComponent(event);
@@ -776,7 +786,7 @@ public class EmacsKeyBindings
             if (jtc != null) {
                 try {
                     int start = jtc.getCaretPosition();
-                    int end = getWordEnd(jtc, start);
+                    int end = EmacsKeyBindings.getWordEnd(jtc, start);
                     jtc.setSelectionStart(start);
                     jtc.setSelectionEnd(end);
                     String word = jtc.getText(start, end - start);
@@ -801,6 +811,7 @@ public class EmacsKeyBindings
             super(nm);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event)
         {
             JTextComponent jtc = getTextComponent(event);
@@ -808,7 +819,7 @@ public class EmacsKeyBindings
             if (jtc != null) {
                 try {
                     int start = jtc.getCaretPosition();
-                    int end = getWordEnd(jtc, start);
+                    int end = EmacsKeyBindings.getWordEnd(jtc, start);
                     jtc.setSelectionStart(start);
                     jtc.setSelectionEnd(end);
                     String word = jtc.getText(start, end - start);

@@ -53,10 +53,12 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 
         keywordSeparator.addFocusListener(new FocusListener() {
 
+            @Override
             public void focusGained(FocusEvent e) {
                 keywordSeparator.selectAll();
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 // deselection is automatic
             }
@@ -115,6 +117,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
         add(panel, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         showIcons.setSelected(prefs.getBoolean("groupShowIcons"));
         showDynamic.setSelected(prefs.getBoolean("groupShowDynamic"));
@@ -126,6 +129,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
         autoAssignGroup.setSelected(prefs.getBoolean("autoAssignGroup"));
     }
 
+    @Override
     public void storeSettings() {
         prefs.putBoolean("groupShowIcons", showIcons.isSelected());
         prefs.putBoolean("groupShowDynamic", showDynamic.isSelected());
@@ -137,10 +141,12 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.put("groupKeywordSeparator", keywordSeparator.getText());
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Groups");
     }

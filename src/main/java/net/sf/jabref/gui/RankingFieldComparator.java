@@ -29,6 +29,7 @@ import java.util.Comparator;
  */
 public class RankingFieldComparator implements Comparator<BibtexEntry> {
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
         String val1 = e1.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         String val2 = e2.getField(SpecialFieldsUtils.FIELDNAME_RANKING);

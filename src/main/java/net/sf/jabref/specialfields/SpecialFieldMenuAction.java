@@ -33,6 +33,7 @@ public class SpecialFieldMenuAction extends AbstractAction {
         this.actionName = val.getActionName();
     }
 
+    @Override
     public void actionPerformed(ActionEvent evt) {
         frame.basePanel().runCommand(actionName);
     }

@@ -54,24 +54,29 @@ import net.sf.jabref.BibtexDatabase;
  */
 public class ADSFetcher implements EntryFetcher {
 
+    @Override
     public JPanel getOptionsPanel() {
         // No option panel
         return null;
     }
 
+    @Override
     public String getHelpPage() {
         // TODO: No help page
         return null;
     }
 
+    @Override
     public String getKeyName() {
         return "ADS from ADS-DOI";
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle(getKeyName());
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
             /* Remove "doi:" scheme identifier */
@@ -96,6 +101,7 @@ public class ADSFetcher implements EntryFetcher {
         return true;
     }
 
+    @Override
     public void stopFetching() {
     }
 

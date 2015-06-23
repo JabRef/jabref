@@ -37,6 +37,7 @@ public class IconStringRenderer extends DefaultTableCellRenderer {
     /*
      * @see TableCellRenderer#getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int)
      */
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus,
             int row, int column) {

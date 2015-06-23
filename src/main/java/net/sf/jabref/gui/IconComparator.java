@@ -31,6 +31,7 @@ public class IconComparator implements Comparator<BibtexEntry> {
         this.fields = fields;
     }
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
 
         for (String field : fields) {

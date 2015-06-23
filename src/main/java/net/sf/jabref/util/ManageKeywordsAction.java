@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -89,7 +90,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(NAME, "Manage keywords");
+        putValue(Action.NAME, "Manage keywords");
         this.frame = frame;
     }
 
@@ -117,6 +118,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         group.add(mergeKeywords);
         ActionListener stateChanged = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 fillKeyWordList();
             }
@@ -149,6 +151,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = false;
                 diag.dispose();
@@ -157,6 +160,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = true;
                 diag.dispose();
@@ -166,6 +170,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         final ActionListener addActionListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 String text = keyword.getText().trim();
                 if (text.equals("")) {
@@ -198,6 +203,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         final ActionListener removeActionListenter = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
                 String[] values = (String[]) keywordList.getSelectedValues();
@@ -210,12 +216,15 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         remove.addActionListener(removeActionListenter);
         keywordList.addKeyListener(new KeyListener() {
 
+            @Override
             public void keyTyped(KeyEvent arg0) {
             }
 
+            @Override
             public void keyReleased(KeyEvent arg0) {
             }
 
+            @Override
             public void keyPressed(KeyEvent arg0) {
                 if (arg0.getKeyCode() == KeyEvent.VK_DELETE) {
                     removeActionListenter.actionPerformed(null);
@@ -229,12 +238,15 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keyword.addFocusListener(acl);
         keyword.addKeyListener(new KeyListener() {
 
+            @Override
             public void keyTyped(KeyEvent e) {
             }
 
+            @Override
             public void keyReleased(KeyEvent e) {
             }
 
+            @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     addActionListener.actionPerformed(null);
@@ -253,10 +265,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         //diag.pack();
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         BasePanel bp = frame.basePanel();
-        if (bp == null)
+        if (bp == null) {
             return;
+        }
         if (bp.getSelectedEntries().length == 0) {
             // no entries selected, silently ignore action
             return;
@@ -274,8 +288,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         diag.pack();
         Util.placeDialog(diag, frame);
         diag.setVisible(true);
-        if (cancelled)
+        if (cancelled) {
             return;
+        }
 
         HashSet<String> keywordsToAdd = new HashSet<String>();
         HashSet<String> userSelectedKeywords = new HashSet<String>();

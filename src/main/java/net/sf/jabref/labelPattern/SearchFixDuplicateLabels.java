@@ -38,6 +38,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         this.panel = panel;
     }
 
+    @Override
     public void run() {
         // Find all multiple occurences of BibTeX keys.
         dupes = new HashMap<String, List<BibtexEntry>>();

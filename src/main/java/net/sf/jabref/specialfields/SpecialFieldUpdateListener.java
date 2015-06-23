@@ -34,6 +34,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
     private static SpecialFieldUpdateListener INSTANCE = null;
 
 
+    @Override
     public void vetoableChange(PropertyChangeEvent e)
             throws PropertyVetoException {
         final BibtexEntry entry = (BibtexEntry) e.getSource();
@@ -44,6 +45,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
         // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed. 
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 if (fieldName.equals("keywords")) {
                     // we do NOT pass a named component indicating that we do not want to have undo capabilities
@@ -52,6 +54,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             JabRef.jrf.basePanel().updateEntryEditorIfShowing();
                         }
@@ -65,6 +68,7 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
                         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, null);
                         SwingUtilities.invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 JabRef.jrf.basePanel().updateEntryEditorIfShowing();
                             }
@@ -76,10 +80,10 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
     }
 
     public static SpecialFieldUpdateListener getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new SpecialFieldUpdateListener();
+        if (SpecialFieldUpdateListener.INSTANCE == null) {
+            SpecialFieldUpdateListener.INSTANCE = new SpecialFieldUpdateListener();
         }
-        return INSTANCE;
+        return SpecialFieldUpdateListener.INSTANCE;
     }
 
 }

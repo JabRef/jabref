@@ -60,7 +60,7 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
 
-        setCookieHandler();
+        URLDownload.setCookieHandler();
     }
 
     public URL getSource() {
@@ -170,8 +170,9 @@ public class URLDownload {
         byte[] buffer = new byte[512];
         while (true) {
             int bytesRead = monitorInputStream.read(buffer);
-            if (bytesRead == -1)
+            if (bytesRead == -1) {
                 break;
+            }
             out.write(buffer, 0, bytesRead);
         }
     }

@@ -70,7 +70,7 @@ public class ResolveDuplicateLabelDialog {
             //pan.add(cb, BorderLayout.NORTH);
             //cb.add(new JPanel(), BorderLayout.CENTER);
             b.append(cb);
-            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), layout);
+            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), ResolveDuplicateLabelDialog.layout);
             pp.setPreferredSize(new Dimension(800, 90));
             //pp.setBorder(BorderFactory.createEtchedBorder());
             b.append(new JScrollPane(pp));
@@ -93,6 +93,7 @@ public class ResolveDuplicateLabelDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = true;
                 diag.dispose();
@@ -100,6 +101,7 @@ public class ResolveDuplicateLabelDialog {
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
@@ -107,6 +109,7 @@ public class ResolveDuplicateLabelDialog {
 
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }

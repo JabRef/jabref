@@ -86,7 +86,7 @@ public class JabRefMain {
 
             String errorMessage =
                     "\nERROR while starting or running JabRef:\n\n" +
-                            exceptionToString(e.getCause()) + "\n" +
+                            JabRefMain.exceptionToString(e.getCause()) + "\n" +
                             "Please first check if this problem and a solution is already known. Find our...\n" +
                             "  * ...FAQ at http://jabref.sf.net/faq.php and our...\n" +
                             "  * ...user mailing-list at http://sf.net/mailarchive/forum.php?forum_name=jabref-users\n\n" +
@@ -106,7 +106,7 @@ public class JabRefMain {
 
             JEditorPane pane = new JEditorPane("text/html",
                     "<html>The following error occurred while running JabRef:<p><font color=\"red\">" +
-                            exceptionToString(e.getCause()).replaceAll("\\n", "<br>") +
+                            JabRefMain.exceptionToString(e.getCause()).replaceAll("\\n", "<br>") +
                             "</font></p>" +
                             "<p>Please first check if this problem and a solution is already known. Find our...</p>" +
                             "<ul><li>...FAQ at <b>http://jabref.sf.net/faq.php</b> and our..." +
@@ -160,7 +160,7 @@ public class JabRefMain {
         } catch (UnsupportedClassVersionError e) {
 
             String errorMessage =
-                    exceptionToString(e) + "\n" +
+                    JabRefMain.exceptionToString(e) + "\n" +
                             "This means that your Java version (" + javaVersion + ") is not high enough to run JabRef.\n" +
                             "Please update your Java Runtime Environment to a version 1.6 or higher.\n";
 

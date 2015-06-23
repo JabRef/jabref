@@ -72,11 +72,13 @@ public class BibtexString {
                 return OTHER;
             }
             if (!(name.charAt(1) + "").toUpperCase().equals(
-                    (name.charAt(1) + "")))
+                    (name.charAt(1) + ""))) {
                 return OTHER;
+            }
             for (Type t : Type.values()) {
-                if (t.prefix.equals(name.charAt(0) + ""))
+                if (t.prefix.equals(name.charAt(0) + "")) {
                     return t;
+                }
             }
             return OTHER;
         }
@@ -126,6 +128,7 @@ public class BibtexString {
         _content = content;
     }
 
+    @Override
     public Object clone() {
         return new BibtexString(_id, _name, _content);
     }

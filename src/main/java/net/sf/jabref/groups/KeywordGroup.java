@@ -49,8 +49,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         m_searchExpression = searchExpression;
         m_caseSensitive = caseSensitive;
         m_regExp = regExp;
-        if (m_regExp)
+        if (m_regExp) {
             compilePattern();
+        }
     }
 
     protected void compilePattern() throws IllegalArgumentException {
@@ -67,23 +68,24 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      */
     public static AbstractGroup fromString(String s, BibtexDatabase db,
             int version) throws Exception {
-        if (!s.startsWith(ID))
+        if (!s.startsWith(KeywordGroup.ID)) {
             throw new Exception(
                     "Internal error: KeywordGroup cannot be created from \""
                             + s
                             + "\". "
                             + "Please report this on www.sf.net/projects/jabref");
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
-                .length()), SEPARATOR, QUOTE_CHAR);
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
+                .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
         switch (version) {
         case 0: {
             String name = tok.nextToken();
             String field = tok.nextToken();
             String expression = tok.nextToken();
             // assume caseSensitive=false and regExp=true for old groups
-            return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
-                    .unquote(field, QUOTE_CHAR), Util.unquote(expression,
-                    QUOTE_CHAR), false, true, AbstractGroup.INDEPENDENT);
+            return new KeywordGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
+                    .unquote(field, AbstractGroup.QUOTE_CHAR), Util.unquote(expression,
+                    AbstractGroup.QUOTE_CHAR), false, true, AbstractGroup.INDEPENDENT);
         }
         case 1:
         case 2: {
@@ -92,9 +94,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             String expression = tok.nextToken();
             boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
             boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
-                    .unquote(field, QUOTE_CHAR), Util.unquote(expression,
-                    QUOTE_CHAR), caseSensitive, regExp,
+            return new KeywordGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
+                    .unquote(field, AbstractGroup.QUOTE_CHAR), Util.unquote(expression,
+                    AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
                     AbstractGroup.INDEPENDENT);
         }
         case 3: {
@@ -104,9 +106,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             String expression = tok.nextToken();
             boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
             boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
-                    .unquote(field, QUOTE_CHAR), Util.unquote(expression,
-                    QUOTE_CHAR), caseSensitive, regExp, context);
+            return new KeywordGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
+                    .unquote(field, AbstractGroup.QUOTE_CHAR), Util.unquote(expression,
+                    AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, context);
         }
         default:
             throw new UnsupportedVersionException("KeywordGroup", version);
@@ -116,6 +118,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     /**
      * @see net.sf.jabref.groups.AbstractGroup#getSearchRule()
      */
+    @Override
     public SearchRule getSearchRule() {
         return this;
     }
@@ -124,26 +127,31 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      * Returns a String representation of this object that can be used to
      * reconstruct it.
      */
+    @Override
     public String toString() {
-        return ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR
-                + m_context + SEPARATOR
-                + Util.quote(m_searchField, SEPARATOR, QUOTE_CHAR) + SEPARATOR
-                + Util.quote(m_searchExpression, SEPARATOR, QUOTE_CHAR)
-                + SEPARATOR + (m_caseSensitive ? "1" : "0") + SEPARATOR
-                + (m_regExp ? "1" : "0") + SEPARATOR;
+        return KeywordGroup.ID + Util.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + m_context + AbstractGroup.SEPARATOR
+                + Util.quote(m_searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + Util.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + (m_caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
+                + (m_regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
     }
 
+    @Override
     public boolean supportsAdd() {
         return !m_regExp;
     }
 
+    @Override
     public boolean supportsRemove() {
         return !m_regExp;
     }
 
+    @Override
     public AbstractUndoableEdit add(BibtexEntry[] entries) {
-        if (!supportsAdd())
+        if (!supportsAdd()) {
             return null;
+        }
         if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound(
                     Globals.lang("add entries to group"));
@@ -163,8 +171,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     modified = true;
                 }
             }
-            if (modified)
+            if (modified) {
                 ce.end();
+            }
 
             return modified ? ce : null;
         }
@@ -172,9 +181,11 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return null;
     }
 
+    @Override
     public AbstractUndoableEdit remove(BibtexEntry[] entries) {
-        if (!supportsRemove())
+        if (!supportsRemove()) {
             return null;
+        }
 
         if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
@@ -192,8 +203,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     modified = true;
                 }
             }
-            if (modified)
+            if (modified) {
                 ce.end();
+            }
 
             return modified ? ce : null;
         }
@@ -201,16 +213,18 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return null;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (!(o instanceof KeywordGroup))
+        if (!(o instanceof KeywordGroup)) {
             return false;
+        }
         KeywordGroup other = (KeywordGroup) o;
         return m_name.equals(other.m_name)
                 && m_searchField.equals(other.m_searchField)
                 && m_searchExpression.equals(other.m_searchExpression)
-                && m_caseSensitive == other.m_caseSensitive
-                && m_regExp == other.m_regExp
-                && getHierarchicalContext() == other.getHierarchicalContext();
+                && (m_caseSensitive == other.m_caseSensitive)
+                && (m_regExp == other.m_regExp)
+                && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
     /*
@@ -219,19 +233,24 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
+    @Override
     public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
         return contains(entry);
     }
 
+    @Override
     public boolean contains(BibtexEntry entry) {
         String content = entry.getField(m_searchField);
-        if (content == null)
+        if (content == null) {
             return false;
-        if (m_regExp)
+        }
+        if (m_regExp) {
             return m_pattern.matcher(content).find();
-        if (m_caseSensitive)
-            return containsWord(m_searchExpression, content);
-        return containsWord(m_searchExpression.toLowerCase(), content.toLowerCase());
+        }
+        if (m_caseSensitive) {
+            return KeywordGroup.containsWord(m_searchExpression, content);
+        }
+        return KeywordGroup.containsWord(m_searchExpression.toLowerCase(), content.toLowerCase());
     }
 
     /**
@@ -245,15 +264,16 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         int piv = 0;
         while (piv < text.length()) {
             int ind = text.indexOf(word, piv);
-            if (ind < 0)
+            if (ind < 0) {
                 return false;
+            }
             // Found a match. See if it is a complete word:
             if (((ind == 0) || !Character.isLetterOrDigit(text.charAt(ind - 1))) &&
-                    ((ind + word.length() == text.length()) || !Character.isLetterOrDigit(text.charAt(ind + word.length())))) {
+                    (((ind + word.length()) == text.length()) || !Character.isLetterOrDigit(text.charAt(ind + word.length())))) {
                 return true;
-            }
-            else
+            } else {
                 piv = ind + 1;
+            }
         }
         return false;
     }
@@ -265,7 +285,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     private void removeMatches(BibtexEntry entry) {
         String content = entry.getField(m_searchField);
         if (content == null)
+         {
             return; // nothing to modify
+        }
         StringBuffer sbOrig = new StringBuffer(content);
         StringBuffer sbLower = new StringBuffer(content.toLowerCase());
         StringBuffer haystack = m_caseSensitive ? sbOrig : sbLower;
@@ -279,26 +301,31 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             // reduce spaces at i to 1
             j = i;
             k = i;
-            while (j - 1 >= 0 && separator.indexOf(haystack.charAt(j - 1)) >= 0)
+            while (((j - 1) >= 0) && (separator.indexOf(haystack.charAt(j - 1)) >= 0)) {
                 --j;
-            while (k < haystack.length() && separator.indexOf(haystack.charAt(k)) >= 0)
+            }
+            while ((k < haystack.length()) && (separator.indexOf(haystack.charAt(k)) >= 0)) {
                 ++k;
-            sbOrig.replace(j, k, j >= 0 && k < sbOrig.length() ? separator : "");
-            sbLower.replace(j, k, j >= 0 && k < sbOrig.length() ? separator : "");
+            }
+            sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
+            sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
         }
 
         String result = sbOrig.toString().trim();
         entry.setField(m_searchField, (result.length() > 0 ? result : null));
     }
 
+    @Override
     public int applyRule(Map<String, String> searchOptions, BibtexEntry entry) {
         return contains(searchOptions, entry) ? 1 : 0;
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }
 
+    @Override
     public AbstractGroup deepCopy() {
         try {
             return new KeywordGroup(m_name, m_searchField, m_searchExpression,
@@ -329,12 +356,14 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return m_searchField;
     }
 
+    @Override
     public boolean isDynamic() {
         return true;
     }
 
+    @Override
     public String getDescription() {
-        return getDescriptionForPreview(m_searchField, m_searchExpression, m_caseSensitive,
+        return KeywordGroup.getDescriptionForPreview(m_searchField, m_searchExpression, m_caseSensitive,
                 m_regExp);
     }
 
@@ -361,13 +390,15 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                         field, Util.quoteForHTML(expr)));
     }
 
+    @Override
     public String getShortDescription() {
         StringBuffer sb = new StringBuffer();
         sb.append("<b>");
-        if (Globals.prefs.getBoolean("groupShowDynamic"))
+        if (Globals.prefs.getBoolean("groupShowDynamic")) {
             sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
-        else
+        } else {
             sb.append(Util.quoteForHTML(getName()));
+        }
         sb.append("</b> - ");
         sb.append(Globals.lang("dynamic group"));
         sb.append("<b>");
@@ -390,7 +421,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return sb.toString();
     }
 
+    @Override
     public String getTypeId() {
-        return ID;
+        return KeywordGroup.ID;
     }
 }

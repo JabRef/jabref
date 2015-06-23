@@ -60,6 +60,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         // import inspector related choices;
         useProxy.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 //useProxy.setEnabled(useProxy.isSelected());
                 defProxyHostname.setEnabled(useProxy.isSelected());
@@ -94,6 +95,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void setValues() {
 
         useProxy.setSelected(_prefs.getBoolean("useProxy"));
@@ -103,6 +105,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean("useProxy", useProxy.isSelected());
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
@@ -110,6 +113,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         _prefs.put("proxyPort", defProxyPort.getText().trim());
     }
 
+    @Override
     public boolean readyToClose() {
         boolean validSetting;
         if (useProxy.isSelected()) {
@@ -139,6 +143,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         return validSetting;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Network");
     }

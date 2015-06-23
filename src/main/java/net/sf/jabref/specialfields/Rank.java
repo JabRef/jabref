@@ -31,14 +31,17 @@ public abstract class Rank extends SpecialField {
         }
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_RANKING;
     }
 
+    @Override
     public String getToolTip() {
         return Globals.lang("Rank");
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Rank");
     }

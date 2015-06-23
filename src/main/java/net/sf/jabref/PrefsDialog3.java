@@ -125,9 +125,11 @@ public class PrefsDialog3 extends JDialog {
         // selection changes:
         chooser.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting())
+                if (e.getValueIsAdjusting()) {
                     return;
+                }
                 String o = (String) chooser.getSelectedValue();
                 cardLayout.show(main, o);
             }
@@ -167,11 +169,13 @@ public class PrefsDialog3 extends JDialog {
         importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
         exportPrefs.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String filename = FileDialogs.getNewFile(frame, new File(System
                         .getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
-                if (filename == null)
+                if (filename == null) {
                     return;
+                }
                 File file = new File(filename);
                 if (!file.exists()
                         || (JOptionPane.showConfirmDialog(PrefsDialog3.this, "'" + file.getName()
@@ -194,11 +198,13 @@ public class PrefsDialog3 extends JDialog {
 
         importPrefs.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String filename = FileDialogs.getNewFile(frame, new File(System
                         .getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
-                if (filename == null)
+                if (filename == null) {
                     return;
+                }
 
                 try {
                     prefs.importPreferences(filename);
@@ -236,6 +242,7 @@ public class PrefsDialog3 extends JDialog {
             super("Ok");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
 
             AbstractWorker worker = new AbstractWorker() {
@@ -243,6 +250,7 @@ public class PrefsDialog3 extends JDialog {
                 boolean ready = true;
 
 
+                @Override
                 public void run() {
                     // First check that all tabs are ready to close:
                     int count = main.getComponentCount();
@@ -260,9 +268,11 @@ public class PrefsDialog3 extends JDialog {
                     Globals.prefs.flush();
                 }
 
+                @Override
                 public void update() {
-                    if (!ready)
+                    if (!ready) {
                         return;
+                    }
                     setVisible(false);
                     MainTable.updateRenderers();
                     GUIGlobals.updateEntryEditorColors();
@@ -295,6 +305,7 @@ public class PrefsDialog3 extends JDialog {
             super("Cancel");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             setVisible(false);
         }

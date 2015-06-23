@@ -28,6 +28,7 @@ public class JPanelYBoxPreferredSize extends JPanelYBox {
         add(c);
     }
 
+    @Override
     public Dimension getMaximumSize() {
         return getPreferredSize();
     }

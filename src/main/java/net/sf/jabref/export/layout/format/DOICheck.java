@@ -29,6 +29,7 @@ import net.sf.jabref.Util;
  */
 public class DOICheck implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
 
         if (fieldText == null) {

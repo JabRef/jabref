@@ -26,6 +26,7 @@ public class MyEditorKit extends LargeHTMLEditorKit {
             this.direction = direction;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JTextComponent c = getTextComponent(e);
 
@@ -49,6 +50,7 @@ public class MyEditorKit extends LargeHTMLEditorKit {
     private Action[] myActions;
 
 
+    @Override
     public Action[] getActions() {
         if (myActions == null) {
             Action[] actions = super.getActions();

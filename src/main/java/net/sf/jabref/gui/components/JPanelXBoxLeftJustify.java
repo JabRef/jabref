@@ -30,6 +30,7 @@ public class JPanelXBoxLeftJustify extends JPanelXBox {
         add(c);
     }
 
+    @Override
     public Component add(Component c) {
         return super.add(c, Math.max(0, getComponentCount() - 1));
     }

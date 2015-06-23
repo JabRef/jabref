@@ -8,6 +8,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,10 +53,10 @@ public class DatabaseFileLookupTest {
      */
     @Test
     public void testTestDatabase() throws Exception {
-        assertEquals(2, database.getEntryCount());
-        assertEquals(2, entries.size());
-        assertNotNull(entry1);
-        assertNotNull(entry2);
+        Assert.assertEquals(2, database.getEntryCount());
+        Assert.assertEquals(2, entries.size());
+        Assert.assertNotNull(entry1);
+        Assert.assertNotNull(entry2);
     }
 
     @Test
@@ -78,7 +80,7 @@ public class DatabaseFileLookupTest {
         UnlinkedFilesCrawler crawler = new UnlinkedFilesCrawler(database);
         CheckableTreeNode treeNode = crawler.searchDirectory(ImportDataTest.EXISTING_FOLDER, new EntryFromPDFCreator());
 
-        assertNotNull(treeNode);
+        Assert.assertNotNull(treeNode);
 
         /**
          * Select all nodes manually.
@@ -92,9 +94,9 @@ public class DatabaseFileLookupTest {
 
         List<File> resultList = getFileListFromNode(treeNode);
 
-        assertFalse(resultList.isEmpty());
-        assertTrue(resultList.contains(ImportDataTest.FILE_NOT_IN_DATABASE));
-        assertFalse(resultList.contains(ImportDataTest.FILE_IN_DATABASE));
+        Assert.assertFalse(resultList.isEmpty());
+        Assert.assertTrue(resultList.contains(ImportDataTest.FILE_NOT_IN_DATABASE));
+        Assert.assertFalse(resultList.contains(ImportDataTest.FILE_IN_DATABASE));
     }
 
     /**
@@ -107,7 +109,7 @@ public class DatabaseFileLookupTest {
      * @see FindUnlinkedFilesDialog#getFileListFromNode(net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode)
      */
     private List<File> getFileListFromNode(CheckableTreeNode node) throws Exception {
-        return invokeMethod("getFileListFromNode", FindUnlinkedFilesDialog.class, node);
+        return DatabaseFileLookupTest.invokeMethod("getFileListFromNode", FindUnlinkedFilesDialog.class, node);
     }
 
     /**
@@ -144,13 +146,14 @@ public class DatabaseFileLookupTest {
      */
     @SuppressWarnings("unchecked")
     public static <R, T> R invokeMethod(String methodName, Class<T> targetClass, Object... params) throws Exception {
-        T instance = getInstanceFromType(targetClass);
+        T instance = DatabaseFileLookupTest.getInstanceFromType(targetClass);
         if (instance == null) {
             throw new InstantiationException("The type '" + targetClass + "' could not be instantiated.");
         }
         Class<?>[] paramTypes = new Class<?>[params.length];
-        for (int i = 0; i < params.length; i++)
+        for (int i = 0; i < params.length; i++) {
             paramTypes[i] = params[i].getClass();
+        }
         Method method = targetClass.getDeclaredMethod(methodName, paramTypes);
         method.setAccessible(true);
         return (R) method.invoke(instance, params);
@@ -164,7 +167,7 @@ public class DatabaseFileLookupTest {
             constructor.setAccessible(true);
             instance = constructor.newInstance();
         } catch (Exception e) {
-            instance = getInstanceFromNonDefaultConstructor(targetClass);
+            instance = DatabaseFileLookupTest.getInstanceFromNonDefaultConstructor(targetClass);
         }
         return instance;
     }
@@ -174,6 +177,7 @@ public class DatabaseFileLookupTest {
         List<Constructor<? extends T>> list = Arrays.asList(constructors);
         Collections.sort(list, new Comparator<Constructor<? extends T>>() {
 
+            @Override
             public int compare(Constructor<? extends T> c1, Constructor<? extends T> c2) {
                 return new Integer(c1.getParameterTypes().length).compareTo(c2.getParameterTypes().length);
             }
@@ -183,7 +187,7 @@ public class DatabaseFileLookupTest {
 
     private static <T> T getInstanceFromNonDefaultConstructor(Class<T> targetClass) {
         Constructor<?>[] constructors = targetClass.getDeclaredConstructors();
-        constructors = orderByParamCount(constructors);
+        constructors = DatabaseFileLookupTest.orderByParamCount(constructors);
         for (Constructor<?> constructor : constructors) {
             constructor.setAccessible(true);
             Class<?>[] parameterTypes = constructor.getParameterTypes();
@@ -199,7 +203,7 @@ public class DatabaseFileLookupTest {
             /**
              * Creating proper instances for the parameter types.
              */
-            Object[] arguments = createArguments(parameterTypes, targetClass);
+            Object[] arguments = DatabaseFileLookupTest.createArguments(parameterTypes, targetClass);
             if (arguments == null) {
                 continue;
             }
@@ -231,7 +235,7 @@ public class DatabaseFileLookupTest {
                 return null;
             }
             try {
-                parameterValues[i] = getInstanceFromType(typeClass);
+                parameterValues[i] = DatabaseFileLookupTest.getInstanceFromType(typeClass);
             } catch (Exception e) {
                 parameterValues[i] = null;
             }

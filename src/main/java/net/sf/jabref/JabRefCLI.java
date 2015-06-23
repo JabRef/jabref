@@ -187,7 +187,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("m").
                 longOpt("exportMatches").
-                desc(getExportMatchesSyntax()).
+                desc(JabRefCLI.getExportMatchesSyntax()).
                 hasArg().
                 argName("FILE").
                 build());

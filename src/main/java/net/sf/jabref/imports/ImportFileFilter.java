@@ -37,6 +37,7 @@ public class ImportFileFilter extends FileFilter implements Comparable<ImportFil
         return format;
     }
 
+    @Override
     public boolean accept(File file) {
         return true;
         /*if (file.isDirectory())
@@ -45,10 +46,12 @@ public class ImportFileFilter extends FileFilter implements Comparable<ImportFil
             return file.getPath().toLowerCase().endsWith(extension);*/
     }
 
+    @Override
     public String getDescription() {
         return name;
     }
 
+    @Override
     public int compareTo(ImportFileFilter o) {
         return name.compareTo(o.name);
     }

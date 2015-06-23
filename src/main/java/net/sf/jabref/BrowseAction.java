@@ -63,6 +63,7 @@ public class BrowseAction extends AbstractAction implements ActionListener {
         this.focusTarget = focusTarget;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         String chosen = askUser();
 

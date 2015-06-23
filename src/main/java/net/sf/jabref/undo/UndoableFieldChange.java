@@ -57,30 +57,34 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
         return Globals.lang("Redo") + ": " + Globals.lang("change field");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
         // Revert the change.
         try {
-            if (oldValue != null)
+            if (oldValue != null) {
                 entry.setField(field, oldValue);
-            else
+            } else {
                 entry.clearField(field);
+            }
 
         } catch (Throwable ex) {
             Util.pr(ex.getMessage());
         }
     }
 
+    @Override
     public void redo() {
         super.redo();
 
         // Redo the change.
         try {
-            if (newValue != null)
+            if (newValue != null) {
                 entry.setField(field, newValue);
-            else
+            } else {
                 entry.clearField(field);
+            }
 
         } catch (Throwable ex) {
             Util.pr(ex.getMessage());

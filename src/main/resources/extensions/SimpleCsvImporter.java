@@ -6,11 +6,13 @@ import net.sf.jabref.imports.ImportFormatReader;
 
 public class SimpleCsvImporter extends ImportFormat {
 
-  public String getFormatName() {
+  @Override
+public String getFormatName() {
     return "Simple CSV Importer";
   }
 
-  public boolean isRecognizedFormat(InputStream stream) throws IOException {
+  @Override
+public boolean isRecognizedFormat(InputStream stream) throws IOException {
     return true; // this is discouraged except for demonstration purposes
   }
 

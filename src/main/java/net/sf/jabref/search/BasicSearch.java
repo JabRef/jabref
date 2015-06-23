@@ -50,6 +50,7 @@ public class BasicSearch implements SearchRule {
         return applyRule(map, bibtexEntry);
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         if (regExp) {
             int flags = 0;
@@ -71,6 +72,7 @@ public class BasicSearch implements SearchRule {
         return true;
     }
 
+    @Override
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
 
         int flags = 0;
@@ -82,7 +84,7 @@ public class BasicSearch implements SearchRule {
 
         ArrayList<String> words = parseQuery(searchString);
 
-        if (regExp)
+        if (regExp) {
             try {
                 pattern = new Pattern[words.size()];
                 for (int i = 0; i < pattern.length; i++) {
@@ -91,6 +93,7 @@ public class BasicSearch implements SearchRule {
             } catch (PatternSyntaxException ex) {
                 return 0;
             }
+        }
 
         //print(words);
         // We need match for all words:
@@ -102,9 +105,10 @@ public class BasicSearch implements SearchRule {
         for (String field : bibtexEntry.getAllFields()) {
             fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
-                fieldContent = removeBrackets.format(fieldContentAsObject.toString());
-                if (!caseSensitive)
+                fieldContent = BasicSearch.removeBrackets.format(fieldContentAsObject.toString());
+                if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
+                }
                 int index = 0;
                 // Check if we have a match for each of the query words, ignoring
                 // those words for which we already have a match:
@@ -116,7 +120,7 @@ public class BasicSearch implements SearchRule {
                     } else {
                         if (fieldContent != null) {
                             Matcher m = pattern[j].matcher
-                                    (removeBrackets.format(fieldContent));
+                                    (BasicSearch.removeBrackets.format(fieldContent));
                             matchFound[index] = matchFound[index]
                                     || m.find();
                         }
@@ -129,7 +133,9 @@ public class BasicSearch implements SearchRule {
         }
         for (boolean aMatchFound : matchFound) {
             if (!aMatchFound)
+             {
                 return 0; // Didn't match all words.
+            }
         }
         return 1; // Matched all words.
     }
@@ -142,9 +148,9 @@ public class BasicSearch implements SearchRule {
         for (int i = 0; i < query.length(); i++) {
             c = query.charAt(i);
             // Check if we are entering an escape sequence:
-            if (!escaped && (c == '\\'))
+            if (!escaped && (c == '\\')) {
                 escaped = true;
-            else {
+            } else {
                 // See if we have reached the end of a word:
                 if (!escaped && !quoted && Character.isWhitespace((char) c)) {
                     if (sb.length() > 0) {

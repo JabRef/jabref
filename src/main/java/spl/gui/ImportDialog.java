@@ -3,12 +3,14 @@ package spl.gui;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.ImportSettingsTab;
 import spl.listener.LabelLinkListener;
 import spl.localization.LocalizationSupport;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -129,6 +131,7 @@ public class ImportDialog extends JDialog {
 
         buttonOK.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
@@ -136,14 +139,16 @@ public class ImportDialog extends JDialog {
 
         buttonCancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 onCancel();
             }
@@ -151,6 +156,7 @@ public class ImportDialog extends JDialog {
 
         contentPane.registerKeyboardAction(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -205,20 +211,21 @@ public class ImportDialog extends JDialog {
     }
 
     public int getChoice() {
-        if (radioButtonXmp.isSelected())
-            return XMP;
-        else if (radioButtonPDFcontent.isSelected())
-            return CONTENT;
-        else if (radioButtonMrDlib.isSelected())
-            return MRDLIB;
-        else if (radioButtonNoMeta.isSelected())
-            return NOMETA;
-        else if (radioButtononlyAttachPDF.isSelected())
-            return ONLYATTACH;
-        else if (radioButtonUpdateEmptyFields.isSelected())
-            return UPDATEEMPTYFIELDS;
-        else
+        if (radioButtonXmp.isSelected()) {
+            return ImportDialog.XMP;
+        } else if (radioButtonPDFcontent.isSelected()) {
+            return ImportDialog.CONTENT;
+        } else if (radioButtonMrDlib.isSelected()) {
+            return ImportDialog.MRDLIB;
+        } else if (radioButtonNoMeta.isSelected()) {
+            return ImportDialog.NOMETA;
+        } else if (radioButtononlyAttachPDF.isSelected()) {
+            return ImportDialog.ONLYATTACH;
+        } else if (radioButtonUpdateEmptyFields.isSelected()) {
+            return ImportDialog.UPDATEEMPTYFIELDS;
+        } else {
             throw new IllegalStateException();
+        }
     }
 
     public boolean getDoNotShowAgain() {

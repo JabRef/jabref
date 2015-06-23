@@ -71,6 +71,7 @@ public class GroupAddRemoveDialog extends BaseAction {
 
         jbExpandAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 expandAll(tree, true);
             }
@@ -80,6 +81,7 @@ public class GroupAddRemoveDialog extends BaseAction {
         JButton jbCollapseAll = new JButton("Collapse All");
         jbCollapseAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 expandAll(tree, false);
             }
@@ -99,13 +101,16 @@ public class GroupAddRemoveDialog extends BaseAction {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (doAddOrRemove())
+                if (doAddOrRemove()) {
                     diag.dispose();
+                }
             }
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
@@ -120,6 +125,7 @@ public class GroupAddRemoveDialog extends BaseAction {
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
@@ -139,6 +145,7 @@ public class GroupAddRemoveDialog extends BaseAction {
     public void expandAll(final JTree tree, final boolean expand) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 TreeNode root = ((TreeNode) tree.getModel().getRoot());
                 // walk through the tree, beginning at the root:
@@ -169,6 +176,7 @@ public class GroupAddRemoveDialog extends BaseAction {
 
     class SelectionListener implements TreeSelectionListener {
 
+        @Override
         public void valueChanged(TreeSelectionEvent e) {
             GroupTreeNode node = (GroupTreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
             AbstractGroup group = node.getGroup();
@@ -244,10 +252,11 @@ public class GroupAddRemoveDialog extends BaseAction {
 
             GroupTreeNode node = (GroupTreeNode) value;
             AbstractGroup group = node.getGroup();
-            if (checkGroupEnable(group))
+            if (checkGroupEnable(group)) {
                 c.setForeground(Color.black);
-            else
+            } else {
                 c.setForeground(Color.gray);
+            }
 
             return c;
         }

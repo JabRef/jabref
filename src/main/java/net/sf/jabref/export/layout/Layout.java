@@ -32,7 +32,7 @@ public class Layout
 
     //~ Instance fields ////////////////////////////////////////////////////////
 
-    private LayoutEntry[] layoutEntries;
+    private final LayoutEntry[] layoutEntries;
 
     private final ArrayList<String> missingFormatters = new ArrayList<String>();
 
@@ -57,7 +57,7 @@ public class Layout
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_FIELD_END) {
-                if (blockStart != null && blockEntries != null) {
+                if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
@@ -74,7 +74,7 @@ public class Layout
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_GROUP_END) {
-                if (blockStart != null && blockEntries != null) {
+                if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix,
@@ -138,8 +138,9 @@ public class Layout
             // The following change means we treat null fields as "". This is to fix the
             // problem of whitespace disappearing after missing fields. Hoping there are
             // no side effects.
-            if (fieldText == null)
+            if (fieldText == null) {
                 fieldText = "";
+            }
 
             sb.append(fieldText);
         }

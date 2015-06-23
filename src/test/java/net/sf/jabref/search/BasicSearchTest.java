@@ -1,6 +1,8 @@
 package net.sf.jabref.search;
 
 import net.sf.jabref.*;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,24 +24,24 @@ public class BasicSearchTest {
 
         String query = "marine 2001 shields";
 
-        assertEquals(0, bsCaseSensitive.applyRule(query, be));
-        assertEquals(1, bsCaseInsensitive.applyRule(query, be));
-        assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
-        assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseSensitive.applyRule(query, be));
+        Assert.assertEquals(1, bsCaseInsensitive.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "\"marine larviculture\"";
 
-        assertEquals(0, bsCaseSensitive.applyRule(query, be));
-        assertEquals(0, bsCaseInsensitive.applyRule(query, be));
-        assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
-        assertEquals(0, bsCaseInsensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseSensitive.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseInsensitive.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "\"marine [A-Za-z]* larviculture\"";
 
-        assertEquals(0, bsCaseSensitive.applyRule(query, be));
-        assertEquals(0, bsCaseInsensitive.applyRule(query, be));
-        assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
-        assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseSensitive.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseInsensitive.applyRule(query, be));
+        Assert.assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
 
     }
 

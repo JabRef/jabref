@@ -38,6 +38,7 @@ public class EntryAddChange extends Change {
         sp = new JScrollPane(pp);
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         diskEntry.setId(Util.createNeutralId());
         panel.database().insertEntry(diskEntry);
@@ -46,6 +47,7 @@ public class EntryAddChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

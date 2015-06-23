@@ -75,6 +75,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -207,6 +208,7 @@ public class TextInputDialog
                 new ChangeListener()
                 {
 
+                    @Override
                     public void stateChanged(ChangeEvent e)
                     {
                         if (inputChanged)
@@ -232,6 +234,7 @@ public class TextInputDialog
         am.put("close", new AbstractAction()
         {
 
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 dispose();
@@ -511,9 +514,9 @@ public class TextInputDialog
                         if (type.hashCode() == "author".hashCode())
                         {
                             entry.setField(type, old + " and " + txt);
-                        }
-                        else
+                        } else {
                             entry.setField(type, old + txt);
+                        }
                     }
                     else // "null"+"txt" Strings forbidden
                     {
@@ -537,6 +540,7 @@ public class TextInputDialog
 
     //  ActionListener
     //  handling of buttons-click actions
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         Object source = e.getSource();
@@ -617,8 +621,9 @@ public class TextInputDialog
         Collections.addAll(f, req);
         Collections.addAll(f, opt);
         for (String allField : allFields) {
-            if (!f.contains(allField))
+            if (!f.contains(allField)) {
                 f.add(allField);
+            }
         }
         return f.toArray(new String[f.size()]);
     }
@@ -634,6 +639,7 @@ public class TextInputDialog
             super("Paste", "Paste from clipboard", GUIGlobals.getIconUrl("paste"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             String data = ClipBoardManager.clipBoard.getClipboardContents();
@@ -641,7 +647,7 @@ public class TextInputDialog
             {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
-                if (selEnd - selStart > 0)
+                if ((selEnd - selStart) > 0)
                 {
                     textPane.replaceSelection("");
                 }
@@ -666,6 +672,7 @@ public class TextInputDialog
             super("Open", "Open_file", GUIGlobals.getIconUrl("open"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             try
@@ -700,6 +707,7 @@ public class TextInputDialog
             super("Clear", "Clear_inputarea", GUIGlobals.getIconUrl("new"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             textPane.setText("");
@@ -717,6 +725,7 @@ public class TextInputDialog
             this.setEnabled(false);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
         }
@@ -731,6 +740,7 @@ public class TextInputDialog
         private int lastIndex = -1;
 
 
+        @Override
         public void valueChanged(ListSelectionEvent e)
         {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
@@ -782,6 +792,7 @@ public class TextInputDialog
         /* This is the only method defined by ListCellRenderer.  We just
          * reconfigure the Jlabel each time we're called.
          */
+        @Override
         public Component getListCellRendererComponent(
                 JList list,
                 Object value, // value to display
@@ -821,6 +832,7 @@ public class TextInputDialog
             extends MouseAdapter
     {
 
+        @Override
         public void mouseClicked(MouseEvent e)
         {
             if (e.getClickCount() == 2)
@@ -844,11 +856,13 @@ class PopupListener
         popMenu = menu;
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         maybeShowPopup(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         maybeShowPopup(e);
@@ -875,14 +889,14 @@ abstract class BasicAction
     public BasicAction(String text, String description, URL icon)
     {
         super(Globals.lang(text), new ImageIcon(icon));
-        putValue(SHORT_DESCRIPTION, Globals.lang(description));
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
     }
 
     public BasicAction(String text, String description, URL icon, KeyStroke key)
     {
         super(Globals.lang(text), new ImageIcon(icon));
-        putValue(ACCELERATOR_KEY, key);
-        putValue(SHORT_DESCRIPTION, Globals.lang(description));
+        putValue(Action.ACCELERATOR_KEY, key);
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
     }
 
     public BasicAction(String text)
@@ -893,9 +907,10 @@ abstract class BasicAction
     public BasicAction(String text, KeyStroke key)
     {
         super(Globals.lang(text));
-        putValue(ACCELERATOR_KEY, key);
+        putValue(Action.ACCELERATOR_KEY, key);
     }
 
+    @Override
     public abstract void actionPerformed(ActionEvent e);
 }
 //---------------------------------------------------------------

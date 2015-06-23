@@ -23,6 +23,7 @@ public class ArticleLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author last name)/(year)/(first unique journal word)
+    @Override
     public String applyRule(BibtexEntry oldEntry) {
         String oldLabel = (oldEntry.getField(BibtexFields.KEY_FIELD));
         String newLabel = "";
@@ -33,7 +34,9 @@ public class ArticleLabelRule extends DefaultLabelRule {
             String[] tokens = author.split("\\band\\b");
             if (tokens.length > 0) { // if author is empty
                 if (tokens[0].indexOf(",") > 0)
+                 {
                     tokens[0] = AuthorList.fixAuthor_firstNameFirst(tokens[0]); // convert lastname, firstname to firstname lastname
+                }
                 String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").split(" ");
                 // lastname, firstname
 
@@ -49,8 +52,10 @@ public class ArticleLabelRule extends DefaultLabelRule {
                 if (oldEntry.getField("year") != null) {
                     newLabel += String.valueOf(oldEntry.getField("year"));
                 }
-            } else
+            }
+            else {
                 newLabel = oldLabel; // don't make a key since there is no author
+            }
         } catch (Throwable t) {
             System.out.println("error getting year: " + t);
         }

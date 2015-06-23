@@ -50,6 +50,7 @@ public class ResourceExtractor implements Worker {
         this.destination = destination;
     }
 
+    @Override
     public void run() {
         URLDownload ud = URLDownload.buildMonitoredDownload(parent, resource);
         try {

@@ -164,6 +164,7 @@ public class DBConnectDialog extends JDialog {
 
         ActionListener connectAction = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 String errorMessage = checkInput();
@@ -188,6 +189,7 @@ public class DBConnectDialog extends JDialog {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 dispose();

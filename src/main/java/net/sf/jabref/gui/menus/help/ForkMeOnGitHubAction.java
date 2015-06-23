@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
@@ -29,9 +30,10 @@ public class ForkMeOnGitHubAction extends AbstractAction {
 
     public ForkMeOnGitHubAction() {
         super(Globals.menuTitle("Fork me on GitHub"));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Opens JabRef's GitHub page"));
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Opens JabRef's GitHub page"));
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             Util.openBrowser("https://github.com/JabRef/jabref");

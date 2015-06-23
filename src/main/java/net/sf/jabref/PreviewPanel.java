@@ -164,7 +164,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
          * If we have been given a panel and the preference option
          * previewPrintButton is set, show the tool bar
          */
-        if (panel != null
+        if ((panel != null)
                 && JabRefPreferences.getInstance().getBoolean("previewPrintButton")) {
             add(createToolBar(), BorderLayout.LINE_START);
         }
@@ -196,16 +196,18 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         public PrintAction() {
             super(Globals.lang("Print Preview"), GUIGlobals.getImage("psSmall"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Print Preview"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Print Preview"));
         }
 
         //DocumentPrinter printerService;
 
+        @Override
         public void actionPerformed(ActionEvent arg0) {
 
             // Background this, as it takes a while.
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
@@ -231,8 +233,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     public Action getPrintAction() {
-        if (printAction == null)
+        if (printAction == null) {
             printAction = new PrintAction();
+        }
         return printAction;
     }
 
@@ -241,9 +244,10 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         public CloseAction() {
             super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Close window"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close window"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             panel.hideBottomComponent();
         }
@@ -256,8 +260,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     public Action getCloseAction() {
-        if (closeAction == null)
+        if (closeAction == null) {
             closeAction = new CloseAction();
+        }
         return closeAction;
     }
 
@@ -301,8 +306,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         Component[] comps = tlb.getComponents();
 
-        for (Component comp : comps)
+        for (Component comp : comps) {
             ((JComponent) comp).setOpaque(false);
+        }
 
         return tlb;
     }
@@ -310,6 +316,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     JEditorPane createPreviewPane() {
         JEditorPane previewPane = new JEditorPane() {
 
+            @Override
             public Dimension getPreferredScrollableViewportSize() {
                 return getPreferredSize();
             }
@@ -324,6 +331,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         previewPane.setContentType("text/html");
         previewPane.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
@@ -366,8 +374,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     public void setEntry(BibtexEntry newEntry) {
         if (newEntry != entry) {
-            if (entry != null)
+            if (entry != null) {
                 entry.removePropertyChangeListener(this);
+            }
             newEntry.addPropertyChangeListener(this);
         }
         entry = newEntry;
@@ -381,6 +390,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         }
     }
 
+    @Override
     public BibtexEntry getEntry() {
         return this.entry;
     }
@@ -399,6 +409,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         final JScrollBar bar = scrollPane.getVerticalScrollBar();
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 bar.setValue(0);
             }
@@ -419,6 +430,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      * currently displayed BibtexEntry. If the entry changes, an event is
      * received here, and we can update the preview immediately.
      */
+    @Override
     public void vetoableChange(PropertyChangeEvent evt)
             throws PropertyVetoException {
         // TODO updating here is not really necessary isn't it?

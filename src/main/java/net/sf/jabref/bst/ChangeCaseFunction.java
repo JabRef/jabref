@@ -53,6 +53,7 @@ public class ChangeCaseFunction implements BstFunction {
         this.vm = vm;
     }
 
+    @Override
     public void execute(BstEntry context) {
         Stack<Object> stack = vm.getStack();
 
@@ -62,7 +63,7 @@ public class ChangeCaseFunction implements BstFunction {
         Object o1 = stack.pop();
         Object o2 = stack.pop();
 
-        if (!(o1 instanceof String && ((String) o1).length() == 1)) {
+        if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
             throw new VMException("A format string of length 1 is needed for change.case$");
         }
 

@@ -48,6 +48,7 @@ public class DbConnectAction extends BaseAction {
 
     class DbImpAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             action();
 
@@ -55,6 +56,7 @@ public class DbConnectAction extends BaseAction {
     }
 
 
+    @Override
     public void action() {
 
         DBStrings dbs = panel.metaData().getDBStrings();

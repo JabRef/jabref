@@ -28,10 +28,12 @@ import javax.swing.*;
  */
 public class HandleDuplicateWarnings implements PostOpenAction {
 
+    @Override
     public boolean isActionNecessary(ParserResult pr) {
         return pr.hasDuplicateKeys();
     }
 
+    @Override
     public void performAction(BasePanel panel, ParserResult pr) {
         int answer = JOptionPane.showConfirmDialog(null,
                 "<html><p>" + Globals.lang("This database contains one or more duplicated BibTeX keys.")

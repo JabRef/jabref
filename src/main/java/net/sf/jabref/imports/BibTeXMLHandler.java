@@ -55,18 +55,22 @@ public class BibTeXMLHandler extends DefaultHandler {
             String systemId) {
     }
 
+    @Override
     public void startDocument() {
         bibitems = new ArrayList<BibtexEntry>();
     }
 
+    @Override
     public void endDocument() {
     }
 
+    @Override
     public void characters(char ch[], int start, int length) {
         String s = new String(ch, start, length).trim();
         currentChars += s;
     }
 
+    @Override
     public void startElement(String uri, String local, String raw, Attributes atts) {
         if (raw.equals("bibtex:entry")) {
             String articleID = null;
@@ -98,6 +102,7 @@ public class BibTeXMLHandler extends DefaultHandler {
         currentChars = "";
     }
 
+    @Override
     public void endElement(String uri, String local, String raw) {
         if (raw.equals("bibtex:entry")) {
             bibitems.add(b);

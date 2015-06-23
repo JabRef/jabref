@@ -60,6 +60,7 @@ public class ExportCustomizationDialog extends JDialog {
         frame = frame_;
         addExport.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 CustomExportDialog ecd = new CustomExportDialog(frame);
                 ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
@@ -73,10 +74,12 @@ public class ExportCustomizationDialog extends JDialog {
 
         modify.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
-                if (row == -1)
+                if (row == -1) {
                     return;
+                }
                 String[] old = Globals.prefs.customExports.getSortedList().get(row);
                 CustomExportDialog ecd = new CustomExportDialog(frame, old[0], old[1], old[2]);
                 ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
@@ -93,21 +96,26 @@ public class ExportCustomizationDialog extends JDialog {
 
         remove.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int[] rows = table.getSelectedRows();
-                if (rows.length == 0)
+                if (rows.length == 0) {
                     return;
+                }
                 String[][] entries = new String[rows.length][];
-                for (int i = 0; i < rows.length; i++)
+                for (int i = 0; i < rows.length; i++) {
                     entries[i] = Globals.prefs.customExports.getSortedList().get(rows[i]);
-                for (int i = 0; i < rows.length; i++)
+                }
+                for (int i = 0; i < rows.length; i++) {
                     Globals.prefs.customExports.remove(entries[i]);
+                }
                 Globals.prefs.customExports.store();
             }
         });
 
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -129,8 +137,9 @@ public class ExportCustomizationDialog extends JDialog {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setPreferredScrollableViewportSize(
                 new Dimension(500, 150));
-        if (table.getRowCount() > 0)
+        if (table.getRowCount() > 0) {
             table.setRowSelectionInterval(0, 0);
+        }
 
         // Key bindings:
         ActionMap am = main.getActionMap();
@@ -164,14 +173,17 @@ public class ExportCustomizationDialog extends JDialog {
 
     static class ExportTableFormat implements TableFormat<String[]> {
 
+        @Override
         public Object getColumnValue(String[] strings, int i) {
             return strings[i];
         }
 
+        @Override
         public int getColumnCount() {
             return 3;
         }
 
+        @Override
         public String getColumnName(int col) {
             switch (col) {
             case 0:

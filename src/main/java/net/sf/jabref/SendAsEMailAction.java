@@ -49,6 +49,7 @@ public class SendAsEMailAction extends AbstractWorker {
         this.frame = frame;
     }
 
+    @Override
     public void run() {
         if (!Desktop.isDesktopSupported()) {
             message = Globals.lang("Error creating email");
@@ -56,8 +57,9 @@ public class SendAsEMailAction extends AbstractWorker {
         }
 
         BasePanel panel = frame.basePanel();
-        if (panel == null)
+        if (panel == null) {
             return;
+        }
         if (panel.getSelectedEntries().length == 0) {
             message = Globals.lang("No entries selected.");
             return;
@@ -90,7 +92,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 try {
                     Util.openFolderAndSelectFile(f.getAbsolutePath());
                 } catch (IOException e) {
-                    logger.fine(e.getMessage());
+                    SendAsEMailAction.logger.fine(e.getMessage());
                 }
             }
         }
@@ -125,6 +127,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 Globals.lang("Entries added to an email"), bes.length);
     }
 
+    @Override
     public void update() {
         frame.output(message);
     }

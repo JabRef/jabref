@@ -44,24 +44,28 @@ public class Priority extends SpecialField {
     }
 
     public static Priority getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Priority();
+        if (Priority.INSTANCE == null) {
+            Priority.INSTANCE = new Priority();
         }
-        return INSTANCE;
+        return Priority.INSTANCE;
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_PRIORITY;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return this.icon;
     }
 
+    @Override
     public String getToolTip() {
         return Globals.lang("Priority");
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Priority");
     }

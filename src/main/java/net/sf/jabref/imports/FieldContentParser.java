@@ -56,8 +56,8 @@ public class FieldContentParser {
 
             int c = content.charAt(i);
             if (c == '\n') {
-                if ((content.length() > i + 1) && (content.charAt(i + 1) == '\t')
-                        && ((content.length() == i + 2) || !Character.isWhitespace(content.charAt(i + 2)))) {
+                if ((content.length() > (i + 1)) && (content.charAt(i + 1) == '\t')
+                        && ((content.length() == (i + 2)) || !Character.isWhitespace(content.charAt(i + 2)))) {
                     // We have either \n\t followed by non-whitespace, or \n\t at the
                     // end. Both cases indicate a wrap made by JabRef. Remove and insert space if necessary.
 
@@ -75,7 +75,7 @@ public class FieldContentParser {
                         i++;
                     }
                 }
-                else if ((content.length() > i + 3) && (content.charAt(i + 1) == '\t')
+                else if ((content.length() > (i + 3)) && (content.charAt(i + 1) == '\t')
                         && (content.charAt(i + 2) == ' ')
                         && !Character.isWhitespace(content.charAt(i + 3))) {
                     // We have \n\t followed by ' ' followed by non-whitespace, which indicates
@@ -87,7 +87,7 @@ public class FieldContentParser {
                         content.deleteCharAt(i);
                     }
                 }
-                else if ((content.length() > i + 3) && (content.charAt(i + 1) == '\t')
+                else if ((content.length() > (i + 3)) && (content.charAt(i + 1) == '\t')
                         && (content.charAt(i + 2) == '\n') && (content.charAt(i + 3) == '\t')) {
                     // We have \n\t\n\t, which looks like a JabRef-formatted empty line.
                     // Remove the tabs and keep one of the line breaks:
@@ -99,14 +99,14 @@ public class FieldContentParser {
 
                     // Now, if more \n\t pairs are following, keep each line break. This
                     // preserves several line breaks properly. Repeat until done:
-                    while ((content.length() > i + 1) && (content.charAt(i) == '\n')
+                    while ((content.length() > (i + 1)) && (content.charAt(i) == '\n')
                             && (content.charAt(i + 1) == '\t')) {
 
                         content.deleteCharAt(i + 1);
                         i++;
                     }
                 }
-                else if ((content.length() > i + 1) && (content.charAt(i + 1) != '\n')) {
+                else if ((content.length() > (i + 1)) && (content.charAt(i + 1) != '\n')) {
                     // We have a line break not followed by another line break.
                     // Interpretation before JabRef 2.10:
                     //   line break made by whatever other editor, so we will remove the line break.
@@ -114,7 +114,7 @@ public class FieldContentParser {
                     //   keep line break
                     i++;
                 }
-                else if ((content.length() > i + 1) && (content.charAt(i + 1) == '\n')) {
+                else if ((content.length() > (i + 1)) && (content.charAt(i + 1) == '\n')) {
                     // we have a line break followed by another line break.
                     // This is a linebreak was manually input by the user
                     // Handling before JabRef 2.10:
@@ -126,9 +126,10 @@ public class FieldContentParser {
                     // do not handle \n again
                     i++;
                 }
-                else
+                else {
                     i++;
                 //content.deleteCharAt(i);
+                }
             }
             else if (c == ' ') {
                 //if ((content.length()>i+2) && (content.charAt(i+1)==' ')) {
@@ -137,19 +138,20 @@ public class FieldContentParser {
 
                     // Yes, of course we have, but in Filenames it is nessary to have all spaces. :-)
                     // This is the reason why the next lines are required
-                    if (key != null && key.equals(GUIGlobals.FILE_FIELD)) {
+                    if ((key != null) && key.equals(GUIGlobals.FILE_FIELD)) {
                         i++;
-                    }
-                    else
+                    } else {
                         content.deleteCharAt(i);
-                }
-                else
+                    }
+                } else {
                     i++;
-            } else if (c == '\t')
+                }
+            } else if (c == '\t') {
                 // Remove all tab characters that aren't associated with a line break.
                 content.deleteCharAt(i);
-            else
+            } else {
                 i++;
+            }
 
         }
 
@@ -181,7 +183,7 @@ public class FieldContentParser {
 
         String[] lines = in.split("\n");
         StringBuffer res = new StringBuffer();
-        addWrappedLine(res, lines[0], wrapAmount);
+        FieldContentParser.addWrappedLine(res, lines[0], wrapAmount);
         for (int i = 1; i < lines.length; i++) {
 
             if (!lines[i].trim().equals("")) {
@@ -192,7 +194,7 @@ public class FieldContentParser {
                 String line = lines[i];
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
                 line = Util.rtrim(line);
-                addWrappedLine(res, line, wrapAmount);
+                FieldContentParser.addWrappedLine(res, line, wrapAmount);
             } else {
                 res.append(Globals.NEWLINE);
                 res.append('\t');
@@ -209,8 +211,9 @@ public class FieldContentParser {
 
         while (p < res.length()) {
             int q = res.indexOf(" ", p + wrapAmount);
-            if ((q < 0) || (q >= res.length()))
+            if ((q < 0) || (q >= res.length())) {
                 break;
+            }
 
             res.deleteCharAt(q);
             res.insert(q, Globals.NEWLINE + "\t");

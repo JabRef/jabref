@@ -48,20 +48,24 @@ public class OAI2Handler extends DefaultHandler {
         this.entry = be;
     }
 
+    @Override
     public void startDocument() throws SAXException {
         authors = new StringBuffer();
     }
 
+    @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         characters.append(ch, start, length);
     }
 
+    @Override
     public void startElement(String uri, String localName, String qualifiedName,
             Attributes attributes) throws SAXException {
 
         characters = new StringBuffer();
     }
 
+    @Override
     public void endElement(String uri, String localName, String qualifiedName) throws SAXException {
 
         String content = characters.toString();
@@ -90,7 +94,7 @@ public class OAI2Handler extends DefaultHandler {
             entry.setField("pages", pages);
         } else if (qualifiedName.equals("datestamp")) {
             String year = entry.getField("year");
-            if (year == null || year.equals("")) {
+            if ((year == null) || year.equals("")) {
                 entry.setField("year", content.replaceFirst("-.*", ""));
             }
         } else if (qualifiedName.equals("title")) {
@@ -103,12 +107,14 @@ public class OAI2Handler extends DefaultHandler {
             entry.setField("reportno", content);
         } else if (qualifiedName.equals("author")) {
             String author = forenames + " " + keyname;
-            if (authors.length() > 0)
+            if (authors.length() > 0) {
                 authors.append(" and ");
+            }
             authors.append(author);
         }
     }
 
+    @Override
     public void endDocument() throws SAXException {
         entry.setField("author", authors.toString());
     }

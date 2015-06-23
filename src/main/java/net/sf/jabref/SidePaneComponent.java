@@ -121,6 +121,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
     }
@@ -128,6 +129,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 
     class CloseButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             hideAway();
         }
@@ -135,6 +137,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 
     class UpButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveUp();
         }
@@ -142,6 +145,7 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 
     class DownButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveDown();
         }

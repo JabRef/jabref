@@ -31,6 +31,7 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         this.considerRefs = considerRefs;
     }
 
+    @Override
     public int compare(BibtexString s1, BibtexString s2) {
 
         int res;
@@ -40,8 +41,9 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
         res = name1.compareTo(name2);
 
-        if (res == 0)
+        if (res == 0) {
             return res;
+        }
 
         // Then, if we are supposed to, see if the ordering needs
         // to be changed because of one string referring to the other.x

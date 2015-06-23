@@ -47,16 +47,24 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param pr
      * @return true if the file was written by a jabref version <=2.2
      */
+    @Override
     public boolean isActionNecessary(ParserResult pr) {
         // First check if this warning is disabled:
-        if (!Globals.prefs.getBoolean("showFileLinksUpgradeWarning"))
+        if (!Globals.prefs.getBoolean("showFileLinksUpgradeWarning")) {
             return false;
+        }
         if (pr.getJabrefMajorVersion() < 0)
+         {
             return false; // non-JabRef file
+        }
         if (pr.getJabrefMajorVersion() < 2)
+         {
             return true; // old
+        }
         if (pr.getJabrefMajorVersion() > 2)
+         {
             return false; // wow, did we ever reach version 3?
+        }
         return (pr.getJabrefMinorVersion() <= 2);
     }
 
@@ -66,18 +74,21 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param panel
      * @param pr
      */
+    @Override
     public void performAction(BasePanel panel, ParserResult pr) {
         // Find out which actions should be offered:
         // Only offer to change Preferences if file column is not already visible:
         boolean offerChangeSettings = !Globals.prefs.getBoolean("fileColumn") || !showsFileInGenFields();
         // Only offer to upgrade links if the pdf/ps fields are used:
-        boolean offerChangeDatabase = linksFound(pr.getDatabase(), FIELDS_TO_LOOK_FOR);
+        boolean offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
         boolean offerSetFileDir = !Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory")
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         if (!offerChangeDatabase && !offerChangeSettings && !offerSetFileDir)
+         {
             return; // Nothing to do, just return.
+        }
 
         JCheckBox changeSettings = new JCheckBox(Globals.lang("Change table column and General fields settings to use the new feature"),
                 offerChangeSettings);
@@ -105,10 +116,11 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             b.nextLine();
         }
         if (offerSetFileDir) {
-            if (Globals.prefs.hasKey("pdfDirectory"))
+            if (Globals.prefs.hasKey("pdfDirectory")) {
                 fileDir.setText(Globals.prefs.get("pdfDirectory"));
-            else
+            } else {
                 fileDir.setText(Globals.prefs.get("psDirectory"));
+            }
             JPanel pan = new JPanel();
             pan.add(setFileDir);
             pan.add(fileDir);
@@ -124,12 +136,14 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Globals.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
-        if (doNotShowDialog.isSelected())
+        if (doNotShowDialog.isSelected()) {
             Globals.prefs.putBoolean("showFileLinksUpgradeWarning", false);
+        }
 
-        if (answer == JOptionPane.YES_OPTION)
+        if (answer == JOptionPane.YES_OPTION) {
             makeChanges(panel, pr, changeSettings.isSelected(), changeDatabase.isSelected(),
                     setFileDir.isSelected() ? fileDir.getText() : null);
+        }
     }
 
     /**
@@ -143,8 +157,9 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     public boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()) {
             for (String field : fields) {
-                if (entry.getField(field) != null)
+                if (entry.getField(field) != null) {
                     return true;
+                }
             }
         }
         return false;
@@ -161,7 +176,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
-            NamedCompound ce = Util.upgradePdfPsToFile(pr.getDatabase(), FIELDS_TO_LOOK_FOR);
+            NamedCompound ce = Util.upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
         }
@@ -181,8 +196,9 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 String gfs = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "0");
                 //System.out.println(gfs);
                 StringBuffer sb = new StringBuffer(gfs);
-                if (gfs.length() > 0)
+                if (gfs.length() > 0) {
                     sb.append(";");
+                }
                 sb.append(GUIGlobals.FILE_FIELD);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();

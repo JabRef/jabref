@@ -63,9 +63,11 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         this(s.split("[, ]+", 0));
     }
 
+    @Override
     public boolean accept(File file) {
-        if (file.isDirectory())
+        if (file.isDirectory()) {
             return true;
+        }
 
         return accept(file.getName());
     }
@@ -75,13 +77,14 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         filenm = filenm.toLowerCase();
         int dotPos = filenm.lastIndexOf(".");
 
-        if (dotPos == -1)
+        if (dotPos == -1) {
             return false;
+        }
 
         int dotDotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
 
         return extSet.contains(filenm.substring(dotPos)) ||
-                (dotDotPos >= 0 && extSet.contains(filenm.substring(dotDotPos)));
+                ((dotDotPos >= 0) && extSet.contains(filenm.substring(dotDotPos)));
     }
 
     public String getSuffix(String filenm) {
@@ -90,28 +93,34 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         String suffix;
 
         dotPos = filenm.lastIndexOf(".");
-        if (dotPos == -1)
+        if (dotPos == -1) {
             return null;
+        }
 
         suffix = filenm.substring(dotPos);
-        if (extSet.contains(suffix))
+        if (extSet.contains(suffix)) {
             return suffix;
+        }
 
         dotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
-        if (dotPos == -1)
+        if (dotPos == -1) {
             return null;
+        }
 
         suffix = filenm.substring(dotPos);
-        if (extSet.contains(suffix))
+        if (extSet.contains(suffix)) {
             return suffix;
+        }
 
         return null;
     }
 
+    @Override
     public String getDescription() {
         return desc;
     }
 
+    @Override
     public boolean accept(File dir, String name) {
         return accept(new File(dir.getPath() + name));
     }

@@ -32,26 +32,32 @@ public class PushToWinEdt implements PushToApplication {
     private final JTextField citeCommand = new JTextField(30);
 
 
+    @Override
     public String getName() {
         return Globals.lang("Insert selected citations into WinEdt");
     }
 
+    @Override
     public String getApplicationName() {
         return "WinEdt";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push selection to WinEdt");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("winedt");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return "Push to WinEdt";
     }
 
+    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
         couldNotCall = false;
@@ -75,6 +81,7 @@ public class PushToWinEdt implements PushToApplication {
 
     }
 
+    @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
             panel.output(Globals.lang("Error") + ": " +
@@ -83,18 +90,21 @@ public class PushToWinEdt implements PushToApplication {
         else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
                     + Globals.prefs.get("winEdtPath") + "'.");
-        }
-        else
+        } else {
             Globals.lang("Pushed citations to WinEdt");
+        }
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
+        }
         winEdtPath.setText(Globals.prefs.get("winEdtPath"));
         citeCommand.setText(Globals.prefs.get("citeCommandWinEdt"));
         return settings;
@@ -115,6 +125,7 @@ public class PushToWinEdt implements PushToApplication {
         settings = builder.getPanel();
     }
 
+    @Override
     public void storeSettings() {
         Globals.prefs.put("winEdtPath", winEdtPath.getText());
         Globals.prefs.put("citeCommandWinEdt", citeCommand.getText());

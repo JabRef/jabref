@@ -27,6 +27,7 @@ public class SearchMatcher implements Matcher<BibtexEntry> {
     public static final SearchMatcher INSTANCE = new SearchMatcher();
 
 
+    @Override
     public boolean matches(BibtexEntry entry) {
         return entry.isSearchHit();
     }

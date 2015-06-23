@@ -91,6 +91,7 @@ public class ExternalFilePanel extends JPanel {
 
         browseBut.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 browseFile(fieldName, editor);
                 // editor.setText(chosenValue);
@@ -100,6 +101,7 @@ public class ExternalFilePanel extends JPanel {
 
         download.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 downLoadFile(fieldName, editor, frame);
             }
@@ -107,12 +109,14 @@ public class ExternalFilePanel extends JPanel {
 
         auto.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JabRefExecutorService.INSTANCE.execute(autoSetFile(fieldName, editor));
             }
         });
         xmp.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 pushXMP(fieldName, editor);
             }
@@ -124,9 +128,10 @@ public class ExternalFilePanel extends JPanel {
         add(xmp);
 
         // Add drag and drop support to the field
-        if (editor != null)
+        if (editor != null) {
             ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
                     DnDConstants.ACTION_NONE, new UrlDragDrop(entryEditor, frame, editor)));
+        }
     }
 
     /**
@@ -151,14 +156,16 @@ public class ExternalFilePanel extends JPanel {
     }
 
     protected void output(String s) {
-        if (frame != null)
+        if (frame != null) {
             frame.output(s);
+        }
     }
 
     public void pushXMP(final String fieldName, final FieldEditor editor) {
 
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
 
                 output(Globals.lang("Looking for pdf..."));
@@ -168,8 +175,9 @@ public class ExternalFilePanel extends JPanel {
                 File file = null;
                 if (dirs.length > 0) {
                     File tmp = Util.expandFilename(editor.getText(), dirs);
-                    if (tmp != null)
+                    if (tmp != null) {
                         file = tmp;
+                    }
                 }
 
                 if (file == null) {
@@ -207,15 +215,18 @@ public class ExternalFilePanel extends JPanel {
         String[] dirs = metaData.getFileDirectory(fieldName);
         String directory = null;
         if (dirs.length > 0)
+         {
             directory = dirs[0]; // Default to the first directory in the list
+        }
 
         String dir = editor.getText(), retVal;
 
         if ((directory == null) || !(new File(dir)).isAbsolute()) {
-            if (directory != null)
+            if (directory != null) {
                 dir = directory;
-            else
+            } else {
                 dir = Globals.prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
+            }
         }
 
         String chosenFile = FileDialogs.getNewFile(frame, new File(dir), "." + fieldName,
@@ -238,8 +249,9 @@ public class ExternalFilePanel extends JPanel {
                 }
 
                 retVal = relPath;
-            } else
+            } else {
                 retVal = newFile.getPath();
+            }
 
             editor.setText(retVal);
             Globals.prefs.put(fieldName + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
@@ -252,34 +264,38 @@ public class ExternalFilePanel extends JPanel {
         final String res = JOptionPane.showInputDialog(parent,
                 Globals.lang("Enter URL to download"));
 
-        if (res == null || res.trim().length() == 0)
+        if ((res == null) || (res.trim().length() == 0)) {
             return;
+        }
 
         /*
          * If this panel belongs in an entry editor, note which entry is
          * currently shown:
          */
         final BibtexEntry targetEntry;
-        if (entryEditor != null)
+        if (entryEditor != null) {
             targetEntry = entryEditor.getEntry();
-        else
+        } else {
             targetEntry = entry;
+        }
 
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
             public String getPlannedFileName(String res) {
                 String suffix = off.getSuffix(res);
-                if (suffix == null)
+                if (suffix == null) {
                     suffix = "." + fieldName.toLowerCase();
+                }
 
                 String plannedName;
-                if (getKey() != null)
+                if (getKey() != null) {
                     plannedName = getKey() + suffix;
-                else {
+                } else {
                     plannedName = JOptionPane.showInputDialog(parent,
                             Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));
-                    if (plannedName != null && !off.accept(plannedName))
+                    if ((plannedName != null) && !off.accept(plannedName)) {
                         plannedName += suffix;
+                    }
                 }
 
                 /*
@@ -298,6 +314,7 @@ public class ExternalFilePanel extends JPanel {
                 return plannedName;
             }
 
+            @Override
             public void run() {
                 String originalText = fieldEditor.getText();
                 fieldEditor.setEnabled(false);
@@ -319,12 +336,13 @@ public class ExternalFilePanel extends JPanel {
                         }
                     }
                     if (directory == null) {
-                        if (dirs.length > 0)
+                        if (dirs.length > 0) {
                             JOptionPane.showMessageDialog(parent, Globals.lang("Could not find directory for %0-files: %1", fieldName, dirs[0]),
                                     Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                        else
+                        } else {
                             JOptionPane.showMessageDialog(parent, Globals.lang("No directory defined for %0-files", fieldName),
                                     Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                        }
                         return;
                     }
                     File file = new File(new File(directory), plannedName);
@@ -357,7 +375,7 @@ public class ExternalFilePanel extends JPanel {
                      * Check if we should update the editor text field, or
                      * update the target entry directly:
                      */
-                    if (entryEditor == null || entryEditor.getEntry() != targetEntry) {
+                    if ((entryEditor == null) || (entryEditor.getEntry() != targetEntry)) {
                         /*
                          * Editor has probably changed to show a different
                          * entry. So we must update the target entry directly
@@ -383,6 +401,7 @@ public class ExternalFilePanel extends JPanel {
                         updateEditor = false;
                         SwingUtilities.invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 entryEditor.updateField(fieldEditor);
                             }
@@ -428,6 +447,7 @@ public class ExternalFilePanel extends JPanel {
 
         return new Runnable() {
 
+            @Override
             public void run() {
                 /*
                  * Find the following directories to look in for:
@@ -451,8 +471,9 @@ public class ExternalFilePanel extends JPanel {
 
                 if (found != null) {
                     editor.setText(found);
-                    if (entryEditor != null)
+                    if (entryEditor != null) {
                         entryEditor.updateField(editor);
+                    }
                     output(Globals.lang("%0 field set", fieldName.toUpperCase()) + ".");
                 } else {
                     output(Globals.lang("No %0 found", fieldName.toUpperCase()) + ".");

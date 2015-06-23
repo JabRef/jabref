@@ -79,7 +79,7 @@ public class JabRef {
 
     protected JabRef(String[] args) {
 
-        singleton = this;
+        JabRef.singleton = this;
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
@@ -144,9 +144,9 @@ public class JabRef {
 
         // Check for running JabRef
         if (Globals.prefs.getBoolean("useRemoteServer")) {
-            remoteListener = RemoteListener.openRemoteListener(this);
+            JabRef.remoteListener = RemoteListener.openRemoteListener(this);
 
-            if (remoteListener == null) {
+            if (JabRef.remoteListener == null) {
                 // Unless we are alone, try to contact already running JabRef:
                 if (RemoteListener.sendToActiveJabRefInstance(args)) {
 
@@ -171,7 +171,7 @@ public class JabRef {
          * journal names and abbreviations to the list:
          */
         String personalJournalList = prefs.get("personalJournalList");
-        if (personalJournalList != null && !personalJournalList.isEmpty()) {
+        if ((personalJournalList != null) && !personalJournalList.isEmpty()) {
             try {
                 Globals.journalAbbrev.readJournalList(new File(
                         personalJournalList));
@@ -189,7 +189,7 @@ public class JabRef {
         if (Globals.ON_WIN) {
             // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
             // Based on http://stackoverflow.com/a/1928830
-            setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.VERSION);
+            JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.VERSION);
             //System.out.println(getCurrentProcessExplicitAppUserModelID());
         }
 
@@ -207,7 +207,7 @@ public class JabRef {
     {
         final PointerByReference r = new PointerByReference();
 
-        if (GetCurrentProcessExplicitAppUserModelID(r).longValue() == 0)
+        if (JabRef.GetCurrentProcessExplicitAppUserModelID(r).longValue() == 0)
         {
             final Pointer p = r.getValue();
 
@@ -218,8 +218,9 @@ public class JabRef {
 
     public static void setCurrentProcessExplicitAppUserModelID(final String appID)
     {
-        if (SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0)
+        if (JabRef.SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0) {
             throw new RuntimeException("unable to set current process explicit AppUserModelID to: " + appID);
+        }
     }
 
     private static native NativeLong GetCurrentProcessExplicitAppUserModelID(PointerByReference appID);
@@ -256,7 +257,7 @@ public class JabRef {
         // splash screen or not.
         if (initialStartup && !commandmode && !cli.isDisableSplash()) {
             try {
-                splashScreen = SplashScreen.splash();
+                JabRef.splashScreen = SplashScreen.splash();
             } catch (Throwable ex) {
                 graphicFailure = true;
                 System.err.println(Globals.lang("Unable to create graphical interface")
@@ -314,8 +315,9 @@ public class JabRef {
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase().endsWith("bib");
                 ParserResult pr = null;
-                if (bibExtension)
-                    pr = openBibFile(aLeftOver, false);
+                if (bibExtension) {
+                    pr = JabRef.openBibFile(aLeftOver, false);
+                }
 
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     // We will try to import this file. Normally we
@@ -327,14 +329,16 @@ public class JabRef {
                     if (initialStartup) {
                         toImport.add(aLeftOver);
                     } else {
-                        ParserResult res = importToOpenBase(aLeftOver);
-                        if (res != null)
+                        ParserResult res = JabRef.importToOpenBase(aLeftOver);
+                        if (res != null) {
                             loaded.add(res);
-                        else
+                        } else {
                             loaded.add(ParserResult.INVALID_FORMAT);
+                        }
                     }
-                } else if (pr != ParserResult.FILE_LOCKED)
+                } else if (pr != ParserResult.FILE_LOCKED) {
                     loaded.add(pr);
+                }
 
             }
         }
@@ -344,21 +348,24 @@ public class JabRef {
         }
 
         for (String filenameString : toImport) {
-            ParserResult pr = importFile(filenameString);
-            if (pr != null)
+            ParserResult pr = JabRef.importFile(filenameString);
+            if (pr != null) {
                 loaded.add(pr);
+            }
         }
 
         if (!cli.isBlank() && cli.isImportToOpenBase()) {
-            ParserResult res = importToOpenBase(cli.getImportToOpenBase());
-            if (res != null)
+            ParserResult res = JabRef.importToOpenBase(cli.getImportToOpenBase());
+            if (res != null) {
                 loaded.add(res);
+            }
         }
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
             ParserResult res = fetch(cli.getFetcherEngine());
-            if (res != null)
+            if (res != null) {
                 loaded.add(res);
+            }
         }
 
         if (cli.isExportMatches()) {
@@ -373,7 +380,7 @@ public class JabRef {
                 BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
 
                 //export database
-                if (newBase != null && newBase.getEntryCount() > 0) {
+                if ((newBase != null) && (newBase.getEntryCount() > 0)) {
                     String formatName = null;
                     IExportFormat format;
 
@@ -405,9 +412,10 @@ public class JabRef {
                             System.err.println(Globals.lang("Could not export file")
                                     + " '" + data[1] + "': " + ex.getMessage());
                         }
-                    } else
+                    } else {
                         System.err.println(Globals.lang("Unknown export format")
                                 + ": " + formatName);
+                    }
                 } /*end if newBase != null*/else {
                     System.err.println(Globals.lang("No search matches."));
                 }
@@ -433,19 +441,21 @@ public class JabRef {
                                         pr.getMetaData(), new File(data[0]), Globals.prefs,
                                         false, false, Globals.prefs.get("defaultEncoding"), false);
                                 // Show just a warning message if encoding didn't work for all characters:
-                                if (!session.getWriter().couldEncodeAll())
+                                if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Globals.lang("Warning") + ": " +
                                             Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
                                                     session.getEncoding()) + session.getWriter().getProblemCharacters());
+                                }
                                 session.commit();
                             } catch (SaveException ex) {
                                 System.err.println(Globals.lang("Could not save file") + " '"
                                         + data[0] + "': " + ex.getMessage());
                             }
                         }
-                    } else
+                    } else {
                         System.err.println(Globals.lang(
                                 "The output option depends on a valid import option."));
+                    }
                 } else if (data.length == 2) {
                     // This signals that the latest import should be stored in the given
                     // format to the given file.
@@ -455,8 +465,9 @@ public class JabRef {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     File theFile = pr.getFile();
-                    if (!theFile.isAbsolute())
+                    if (!theFile.isAbsolute()) {
                         theFile = theFile.getAbsoluteFile();
+                    }
                     MetaData metaData = pr.getMetaData();
                     metaData.setFile(theFile);
                     Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
@@ -472,15 +483,16 @@ public class JabRef {
                             System.err.println(Globals.lang("Could not export file")
                                     + " '" + data[0] + "': " + ex.getMessage());
                         }
-                    }
-                    else
+                    } else {
                         System.err.println(Globals.lang("Unknown export format")
                                 + ": " + data[1]);
+                    }
 
                 }
-            } else
+            } else {
                 System.err.println(Globals.lang(
                         "The output option depends on a valid import option."));
+            }
         }
 
         //Util.pr(": Finished export");
@@ -519,10 +531,11 @@ public class JabRef {
                                         new File(subName), Globals.prefs, false, false,
                                         Globals.prefs.get("defaultEncoding"), false);
                                 // Show just a warning message if encoding didn't work for all characters:
-                                if (!session.getWriter().couldEncodeAll())
+                                if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Globals.lang("Warning") + ": " +
                                             Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
                                                     session.getEncoding()) + session.getWriter().getProblemCharacters());
+                                }
                                 session.commit();
                             } catch (SaveException ex) {
                                 System.err.println(Globals.lang("Could not save file")
@@ -533,12 +546,15 @@ public class JabRef {
                         }
                     }
 
-                    if (!notSavedMsg)
+                    if (!notSavedMsg) {
                         System.out.println(Globals.lang("no database generated"));
-                } else
+                    }
+                } else {
                     usageMsg = true;
-            } else
+                }
+            } else {
                 usageMsg = true;
+            }
 
             if (usageMsg) {
                 System.out.println(Globals.lang("no base-bibtex-file specified"));
@@ -566,8 +582,8 @@ public class JabRef {
      */
     protected ParserResult fetch(String fetchCommand) {
 
-        if (fetchCommand == null || !fetchCommand.contains(":") ||
-                fetchCommand.split(":").length != 2) {
+        if ((fetchCommand == null) || !fetchCommand.contains(":") ||
+                (fetchCommand.split(":").length != 2)) {
             System.out.println(Globals.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Globals.lang("The following fetchers are available:"));
             return null;
@@ -579,8 +595,9 @@ public class JabRef {
         EntryFetcher fetcher = null;
         for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
                 .getEntryFetcherExtensions()) {
-            if (engine.toLowerCase().equals(e.getId().replaceAll("Fetcher", "").toLowerCase()))
+            if (engine.toLowerCase().equals(e.getId().replaceAll("Fetcher", "").toLowerCase())) {
                 fetcher = e.getEntryFetcher();
+            }
         }
 
         if (fetcher == null) {
@@ -597,7 +614,7 @@ public class JabRef {
                 " " + Globals.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if (result == null || result.size() == 0) {
+        if ((result == null) || (result.size() == 0)) {
             System.out.println(Globals.lang(
                     "Query '%0' with fetcher '%1' did not return any results.", query, engine));
             return null;
@@ -634,7 +651,7 @@ public class JabRef {
                     // also set system l&f as default
                     Globals.prefs.put("lookAndFeel", systemLnF);
                     // notify the user
-                    JOptionPane.showMessageDialog(jrf, Globals.lang("Unable to find the requested Look & Feel and thus the default one is used."),
+                    JOptionPane.showMessageDialog(JabRef.jrf, Globals.lang("Unable to find the requested Look & Feel and thus the default one is used."),
                             Globals.lang("Warning"),
                             JOptionPane.WARNING_MESSAGE);
                 }
@@ -707,19 +724,21 @@ public class JabRef {
                 for (int j = 0; j < loaded.size(); j++) {
                     ParserResult pr = loaded.elementAt(j);
 
-                    if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen))
+                    if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
                         continue lastEdLoop;
+                    }
                 }
 
                 if (fileToOpen.exists()) {
-                    ParserResult pr = openBibFile(name, false);
+                    ParserResult pr = JabRef.openBibFile(name, false);
 
                     if (pr != null) {
 
                         if (pr == ParserResult.INVALID_FORMAT) {
                             System.out.println(Globals.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
-                        } else if (pr != ParserResult.FILE_LOCKED)
+                        } else if (pr != ParserResult.FILE_LOCKED) {
                             loaded.add(pr);
+                        }
 
                     }
                 }
@@ -732,7 +751,7 @@ public class JabRef {
                         Globals.prefs.getInt("fontSize"));
 
         //Util.pr(": Initializing frame");
-        jrf = new JabRefFrame();
+        JabRef.jrf = new JabRefFrame();
 
         // Add all loaded databases to the frame:
 
@@ -753,7 +772,7 @@ public class JabRef {
                         // add them to the list
                         toOpenTab.add(pr);
                     } else {
-                        jrf.addParserResult(pr, first);
+                        JabRef.jrf.addParserResult(pr, first);
                         first = false;
                     }
                 }
@@ -766,17 +785,18 @@ public class JabRef {
 
         // finally add things to the currently opened tab
         for (ParserResult pr : toOpenTab) {
-            jrf.addParserResult(pr, first);
+            JabRef.jrf.addParserResult(pr, first);
             first = false;
         }
 
-        if (cli.isLoadSession())
-            jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(
-                    jrf, 0, ""));
+        if (cli.isLoadSession()) {
+            JabRef.jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(
+                    JabRef.jrf, 0, ""));
+        }
 
-        if (splashScreen != null) {// do this only if splashscreen was actually created
-            splashScreen.dispose();
-            splashScreen = null;
+        if (JabRef.splashScreen != null) {// do this only if splashscreen was actually created
+            JabRef.splashScreen.dispose();
+            JabRef.splashScreen = null;
         }
 
         /*JOptionPane.showMessageDialog(null, Globals.lang("Please note that this "
@@ -784,30 +804,31 @@ public class JabRef {
                 Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
 
         // Start auto save timer:
-        if (Globals.prefs.getBoolean("autoSave"))
-            Globals.startAutoSaveManager(jrf);
+        if (Globals.prefs.getBoolean("autoSave")) {
+            Globals.startAutoSaveManager(JabRef.jrf);
+        }
 
         // If we are set to remember the window location, we also remember the maximised
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
         if (Globals.prefs.getBoolean("windowMaximised")) {
-            jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        jrf.setVisible(true);
+        JabRef.jrf.setVisible(true);
 
         if (Globals.prefs.getBoolean("windowMaximised")) {
-            jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         // TEST TEST TEST TEST TEST TEST
-        startSidePanePlugins(jrf);
+        startSidePanePlugins(JabRef.jrf);
 
         for (ParserResult pr : failed) {
             String message = "<html>" + Globals.lang("Error opening file '%0'.", pr.getFile().getName())
                     + "<p>" + pr.getErrorMessage() + "</html>";
 
-            JOptionPane.showMessageDialog(jrf, message, Globals.lang("Error opening file"),
+            JOptionPane.showMessageDialog(JabRef.jrf, message, Globals.lang("Error opening file"),
                     JOptionPane.ERROR_MESSAGE);
         }
 
@@ -816,16 +837,18 @@ public class JabRef {
             if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
                 String[] wrns = pr.warnings();
                 StringBuilder wrn = new StringBuilder();
-                for (int j = 0; j < Math.min(MAX_DIALOG_WARNINGS, wrns.length); j++)
+                for (int j = 0; j < Math.min(JabRef.MAX_DIALOG_WARNINGS, wrns.length); j++) {
                     wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
-                if (wrns.length > MAX_DIALOG_WARNINGS) {
+                }
+                if (wrns.length > JabRef.MAX_DIALOG_WARNINGS) {
                     wrn.append("... ");
                     wrn.append(Globals.lang("%0 warnings", String.valueOf(wrns.length)));
                 }
-                else if (wrn.length() > 0)
+                else if (wrn.length() > 0) {
                     wrn.deleteCharAt(wrn.length() - 1);
-                jrf.showBaseAt(i);
-                JOptionPane.showMessageDialog(jrf, wrn.toString(),
+                }
+                JabRef.jrf.showBaseAt(i);
+                JOptionPane.showMessageDialog(JabRef.jrf, wrn.toString(),
                         Globals.lang("Warnings") + " (" + pr.getFile().getName() + ")",
                         JOptionPane.WARNING_MESSAGE);
             }
@@ -839,9 +862,9 @@ public class JabRef {
         // Note that we have to check whether i does not go over baseCount().
         // This is because importToOpen might have been used, which adds to
         // loaded, but not to baseCount()
-        for (int i = 0; (i < loaded.size()) && (i < jrf.baseCount()); i++) {
+        for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.baseCount()); i++) {
             ParserResult pr = loaded.elementAt(i);
-            BasePanel panel = jrf.baseAt(i);
+            BasePanel panel = JabRef.jrf.baseAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
 
@@ -850,13 +873,13 @@ public class JabRef {
         // If any database loading was postponed due to an autosave, schedule them
         // for handing now:
         if (postponed.size() > 0) {
-            AutosaveStartupPrompter asp = new AutosaveStartupPrompter(jrf, postponed);
+            AutosaveStartupPrompter asp = new AutosaveStartupPrompter(JabRef.jrf, postponed);
             SwingUtilities.invokeLater(asp);
         }
 
         if (loaded.size() > 0) {
-            jrf.tabbedPane.setSelectedIndex(0);
-            new FocusRequester(((BasePanel) jrf.tabbedPane.getComponentAt(0)).mainTable);
+            JabRef.jrf.tabbedPane.setSelectedIndex(0);
+            new FocusRequester(((BasePanel) JabRef.jrf.tabbedPane.getComponentAt(0)).mainTable);
         }
     }
 
@@ -922,8 +945,9 @@ public class JabRef {
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 String[] warn = pr.warnings();
-                for (String aWarn : warn)
+                for (String aWarn : warn) {
                     System.out.println(Globals.lang("Warning") + ": " + aWarn);
+                }
 
             }
             return pr;
@@ -946,11 +970,11 @@ public class JabRef {
                 try {
                     List<BibtexEntry> entries;
                     if (Globals.ON_WIN) {
-                        entries = Globals.importFormatReader.importFromFile(data[1], data[0], jrf);
+                        entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
                     }
                     else {
                         entries = Globals.importFormatReader.importFromFile(data[1],
-                                data[0].replaceAll("~", System.getProperty("user.home")), jrf);
+                                data[0].replaceAll("~", System.getProperty("user.home")), JabRef.jrf);
                     }
                     return new ParserResult(entries);
                 } catch (IllegalArgumentException ex) {
@@ -994,10 +1018,11 @@ public class JabRef {
      * @return ParserResult with setToOpenTab(true)
      */
     public static ParserResult importToOpenBase(String argument) {
-        ParserResult result = importFile(argument);
+        ParserResult result = JabRef.importFile(argument);
 
-        if (result != null)
+        if (result != null) {
             result.setToOpenTab(true);
+        }
 
         return result;
     }

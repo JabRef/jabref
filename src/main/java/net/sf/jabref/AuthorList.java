@@ -209,18 +209,18 @@ public class AuthorList {
     private static final java.util.HashSet<String> tex_names = new java.util.HashSet<String>();
     // and static constructor to initialize it
     static {
-        tex_names.add("aa");
-        tex_names.add("ae");
-        tex_names.add("l");
-        tex_names.add("o");
-        tex_names.add("oe");
-        tex_names.add("i");
-        tex_names.add("AA");
-        tex_names.add("AE");
-        tex_names.add("L");
-        tex_names.add("O");
-        tex_names.add("OE");
-        tex_names.add("j");
+        AuthorList.tex_names.add("aa");
+        AuthorList.tex_names.add("ae");
+        AuthorList.tex_names.add("l");
+        AuthorList.tex_names.add("o");
+        AuthorList.tex_names.add("oe");
+        AuthorList.tex_names.add("i");
+        AuthorList.tex_names.add("AA");
+        AuthorList.tex_names.add("AE");
+        AuthorList.tex_names.add("L");
+        AuthorList.tex_names.add("O");
+        AuthorList.tex_names.add("OE");
+        AuthorList.tex_names.add("j");
     }
 
     static final WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
@@ -243,8 +243,9 @@ public class AuthorList {
         token_end = 0; // of parser
         while (token_start < orig.length()) {
             Author author = getAuthor();
-            if (author != null)
+            if (author != null) {
                 authors.add(author);
+            }
         }
         // clean-up
         orig = null;
@@ -262,10 +263,10 @@ public class AuthorList {
      * @return An AuthorList object representing the given authors.
      */
     public static AuthorList getAuthorList(String authors) {
-        AuthorList authorList = authorCache.get(authors);
+        AuthorList authorList = AuthorList.authorCache.get(authors);
         if (authorList == null) {
             authorList = new AuthorList(authors);
-            authorCache.put(authors, authorList);
+            AuthorList.authorCache.put(authors, authorList);
         }
         return authorList;
     }
@@ -277,7 +278,7 @@ public class AuthorList {
      */
     public static String fixAuthor_firstNameFirstCommas(String authors, boolean abbr,
             boolean oxfordComma) {
-        return getAuthorList(authors).getAuthorsFirstFirst(abbr, oxfordComma);
+        return AuthorList.getAuthorList(authors).getAuthorsFirstFirst(abbr, oxfordComma);
     }
 
     /**
@@ -286,7 +287,7 @@ public class AuthorList {
      * @see net.sf.jabref.AuthorList#getAuthorsFirstFirstAnds
      */
     public static String fixAuthor_firstNameFirst(String authors) {
-        return getAuthorList(authors).getAuthorsFirstFirstAnds();
+        return AuthorList.getAuthorList(authors).getAuthorsFirstFirstAnds();
     }
 
     /**
@@ -296,7 +297,7 @@ public class AuthorList {
      */
     public static String fixAuthor_lastNameFirstCommas(String authors, boolean abbr,
             boolean oxfordComma) {
-        return getAuthorList(authors).getAuthorsLastFirst(abbr, oxfordComma);
+        return AuthorList.getAuthorList(authors).getAuthorsLastFirst(abbr, oxfordComma);
     }
 
     /**
@@ -305,7 +306,7 @@ public class AuthorList {
      * @see net.sf.jabref.AuthorList#getAuthorsLastFirstAnds
      */
     public static String fixAuthor_lastNameFirst(String authors) {
-        return getAuthorList(authors).getAuthorsLastFirstAnds(false);
+        return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(false);
     }
 
     /**
@@ -314,7 +315,7 @@ public class AuthorList {
      * @see net.sf.jabref.AuthorList#getAuthorsLastFirstAnds
      */
     public static String fixAuthor_lastNameFirst(String authors, boolean abbreviate) {
-        return getAuthorList(authors).getAuthorsLastFirstAnds(abbreviate);
+        return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(abbreviate);
     }
 
     /**
@@ -323,7 +324,7 @@ public class AuthorList {
      * @see net.sf.jabref.AuthorList#getAuthorsLastOnly
      */
     public static String fixAuthor_lastNameOnlyCommas(String authors, boolean oxfordComma) {
-        return getAuthorList(authors).getAuthorsLastOnly(oxfordComma);
+        return AuthorList.getAuthorList(authors).getAuthorsLastOnly(oxfordComma);
     }
 
     /**
@@ -332,7 +333,7 @@ public class AuthorList {
      * @see net.sf.jabref.AuthorList#getAuthorsForAlphabetization
      */
     public static String fixAuthorForAlphabetization(String authors) {
-        return getAuthorList(authors).getAuthorsForAlphabetization();
+        return AuthorList.getAuthorList(authors).getAuthorsForAlphabetization();
     }
 
     /**
@@ -366,27 +367,30 @@ public class AuthorList {
             case TOKEN_AND:
                 break token_loop;
             case TOKEN_COMMA:
-                if (comma_first < 0)
+                if (comma_first < 0) {
                     comma_first = tokens.size();
-                else if (comma_second < 0)
+                } else if (comma_second < 0) {
                     comma_second = tokens.size();
+                }
                 break;
             case TOKEN_WORD:
                 tokens.add(orig.substring(token_start, token_end));
                 tokens.add(orig.substring(token_start, token_abbr));
                 tokens.add(token_term);
                 tokens.add(token_case);
-                if (comma_first >= 0)
+                if (comma_first >= 0) {
                     break;
-                if (last_start >= 0)
+                }
+                if (last_start >= 0) {
                     break;
+                }
                 if (von_start < 0) {
                     if (!token_case) {
-                        von_start = tokens.size() - TOKEN_GROUP_LENGTH;
+                        von_start = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
                         break;
                     }
-                } else if (last_start < 0 && token_case) {
-                    last_start = tokens.size() - TOKEN_GROUP_LENGTH;
+                } else if ((last_start < 0) && token_case) {
+                    last_start = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
                     break;
                 }
             }
@@ -395,7 +399,9 @@ public class AuthorList {
         // Second step: split name into parts (here: calculate indices
         // of parts in 'tokens' Vector)
         if (tokens.size() == 0)
+         {
             return null; // no author information
+        }
 
         // the following negatives indicate absence of the corresponding part
         int first_part_start = -1, von_part_start = -1, last_part_start = -1, jr_part_start = -1;
@@ -404,12 +410,13 @@ public class AuthorList {
         if (comma_first < 0) { // no commas
             if (von_start < 0) { // no 'von part'
                 last_part_end = tokens.size();
-                last_part_start = tokens.size() - TOKEN_GROUP_LENGTH;
-                int index = tokens.size() - 2 * TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM;
+                last_part_start = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
+                int index = (tokens.size() - (2 * AuthorList.TOKEN_GROUP_LENGTH)) + AuthorList.OFFSET_TOKEN_TERM;
                 if (index > 0) {
                     Character ch = (Character) tokens.elementAt(index);
-                    if (ch == '-')
-                        last_part_start -= TOKEN_GROUP_LENGTH;
+                    if (ch == '-') {
+                        last_part_start -= AuthorList.TOKEN_GROUP_LENGTH;
+                    }
                 }
                 first_part_end = last_part_start;
                 if (first_part_end > 0) {
@@ -425,8 +432,9 @@ public class AuthorList {
                 }
                 von_part_start = von_start;
                 first_part_end = von_part_start;
-                if (first_part_end > 0)
+                if (first_part_end > 0) {
                     first_part_start = 0;
+                }
             }
         } else { // commas are present: it affects only 'first part' and
             // 'junior part'
@@ -438,16 +446,19 @@ public class AuthorList {
                     //    jrAsFirstname = true;
                 }
             } else { // two or more commas
-                if (comma_second < first_part_end)
+                if (comma_second < first_part_end) {
                     first_part_start = comma_second;
+                }
                 jr_part_end = comma_second;
-                if (comma_first < jr_part_end)
+                if (comma_first < jr_part_end) {
                     jr_part_start = comma_first;
+                }
             }
             if (von_start != 0) { // no 'von part'
                 last_part_end = comma_first;
-                if (last_part_end > 0)
+                if (last_part_end > 0) {
                     last_part_start = 0;
+                }
             } else { // 'von part' is present
                 if (last_start < 0) {
                     von_part_end = comma_first;
@@ -478,12 +489,12 @@ public class AuthorList {
 
         // Third step: do actual splitting, construct Author object
         return new Author((first_part_start < 0 ? null : concatTokens(first_part_start,
-                first_part_end, OFFSET_TOKEN, false)), (first_part_start < 0 ? null : concatTokens(
-                first_part_start, first_part_end, OFFSET_TOKEN_ABBR, true)), (von_part_start < 0 ? null
-                : concatTokens(von_part_start, von_part_end, OFFSET_TOKEN, false)),
+                first_part_end, AuthorList.OFFSET_TOKEN, false)), (first_part_start < 0 ? null : concatTokens(
+                first_part_start, first_part_end, AuthorList.OFFSET_TOKEN_ABBR, true)), (von_part_start < 0 ? null
+                : concatTokens(von_part_start, von_part_end, AuthorList.OFFSET_TOKEN, false)),
                 (last_part_start < 0 ? null : concatTokens(last_part_start, last_part_end,
-                        OFFSET_TOKEN, false)), (jr_part_start < 0 ? null : concatTokens(jr_part_start,
-                        jr_part_end, OFFSET_TOKEN, false)));
+                        AuthorList.OFFSET_TOKEN, false)), (jr_part_start < 0 ? null : concatTokens(jr_part_start,
+                        jr_part_end, AuthorList.OFFSET_TOKEN, false)));
     }
 
     /**
@@ -510,15 +521,17 @@ public class AuthorList {
         StringBuilder res = new StringBuilder();
         // Here we always have start < end
         res.append((String) tokens.get(start + offset));
-        if (dot_after)
+        if (dot_after) {
             res.append('.');
-        start += TOKEN_GROUP_LENGTH;
+        }
+        start += AuthorList.TOKEN_GROUP_LENGTH;
         while (start < end) {
-            res.append(tokens.get(start - TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM));
+            res.append(tokens.get((start - AuthorList.TOKEN_GROUP_LENGTH) + AuthorList.OFFSET_TOKEN_TERM));
             res.append((String) tokens.get(start + offset));
-            if (dot_after)
+            if (dot_after) {
                 res.append('.');
-            start += TOKEN_GROUP_LENGTH;
+            }
+            start += AuthorList.TOKEN_GROUP_LENGTH;
         }
         return res.toString();
     }
@@ -554,16 +567,18 @@ public class AuthorList {
         token_start = token_end;
         while (token_start < orig.length()) {
             char c = orig.charAt(token_start);
-            if (!(c == '~' || c == '-' || Character.isWhitespace(c)))
+            if (!((c == '~') || (c == '-') || Character.isWhitespace(c))) {
                 break;
+            }
             token_start++;
         }
         token_end = token_start;
-        if (token_start >= orig.length())
-            return TOKEN_EOF;
+        if (token_start >= orig.length()) {
+            return AuthorList.TOKEN_EOF;
+        }
         if (orig.charAt(token_start) == ',') {
             token_end++;
-            return TOKEN_COMMA;
+            return AuthorList.TOKEN_COMMA;
         }
         token_abbr = -1;
         token_term = ' ';
@@ -576,36 +591,43 @@ public class AuthorList {
             if (c == '{') {
                 braces_level++;
             }
-            if (braces_level > 0)
-                if (c == '}')
+            if (braces_level > 0) {
+                if (c == '}') {
                     braces_level--;
-            if (first_letter_is_found && token_abbr < 0 && braces_level == 0)
+                }
+            }
+            if (first_letter_is_found && (token_abbr < 0) && (braces_level == 0)) {
                 token_abbr = token_end;
-            if (!first_letter_is_found && current_backslash < 0 && Character.isLetter(c)) {
-                if (braces_level == 0)
+            }
+            if (!first_letter_is_found && (current_backslash < 0) && Character.isLetter(c)) {
+                if (braces_level == 0) {
                     token_case = Character.isUpperCase(c);
-                else
+                } else {
                     // If this is a particle in braces, always treat it as if it starts with
                     // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"
                     // will not yield a proper last name:
                     token_case = true;
+                }
                 first_letter_is_found = true;
             }
-            if (current_backslash >= 0 && !Character.isLetter(c)) {
+            if ((current_backslash >= 0) && !Character.isLetter(c)) {
                 if (!first_letter_is_found) {
                     String tex_cmd_name = orig.substring(current_backslash + 1, token_end);
-                    if (tex_names.contains(tex_cmd_name)) {
+                    if (AuthorList.tex_names.contains(tex_cmd_name)) {
                         token_case = Character.isUpperCase(tex_cmd_name.charAt(0));
                         first_letter_is_found = true;
                     }
                 }
                 current_backslash = -1;
             }
-            if (c == '\\')
+            if (c == '\\') {
                 current_backslash = token_end;
-            if (braces_level == 0)
-                if (c == ',' || c == '~' || c == '-' || Character.isWhitespace(c))
+            }
+            if (braces_level == 0) {
+                if ((c == ',') || (c == '~') || (c == '-') || Character.isWhitespace(c)) {
                     break;
+                }
+            }
             // Morten Alver 18 Apr 2006: Removed check for hyphen '-' above to
             // prevent
             // problems with names like Bailey-Jones getting broken up and
@@ -613,14 +635,17 @@ public class AuthorList {
             // Aaron Chen 14 Sep 2008: Enable hyphen check for first names like Chang-Chin
             token_end++;
         }
-        if (token_abbr < 0)
+        if (token_abbr < 0) {
             token_abbr = token_end;
-        if (token_end < orig.length() && orig.charAt(token_end) == '-')
+        }
+        if ((token_end < orig.length()) && (orig.charAt(token_end) == '-')) {
             token_term = '-';
-        if (orig.substring(token_start, token_end).equalsIgnoreCase("and"))
-            return TOKEN_AND;
-        else
-            return TOKEN_WORD;
+        }
+        if (orig.substring(token_start, token_end).equalsIgnoreCase("and")) {
+            return AuthorList.TOKEN_AND;
+        } else {
+            return AuthorList.TOKEN_WORD;
+        }
     }
 
     /**
@@ -657,8 +682,9 @@ public class AuthorList {
      */
     public String getAuthorsNatbib() {
         // Check if we've computed this before:
-        if (authorsNatbib != null)
+        if (authorsNatbib != null) {
             return authorsNatbib;
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
@@ -698,20 +724,22 @@ public class AuthorList {
         int abbrInt = (oxfordComma ? 0 : 1);
 
         // Check if we've computed this before:
-        if (authorsLastOnly[abbrInt] != null)
+        if (authorsLastOnly[abbrInt] != null) {
             return authorsLastOnly[abbrInt];
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
             res.append(getAuthor(0).getLastOnly());
             int i = 1;
-            while (i < size() - 1) {
+            while (i < (size() - 1)) {
                 res.append(", ");
                 res.append(getAuthor(i).getLastOnly());
                 i++;
             }
-            if (size() > 2 && oxfordComma)
+            if ((size() > 2) && oxfordComma) {
                 res.append(",");
+            }
             if (size() > 1) {
                 res.append(" and ");
                 res.append(getAuthor(i).getLastOnly());
@@ -752,20 +780,22 @@ public class AuthorList {
         abbrInt += (oxfordComma ? 0 : 2);
 
         // Check if we've computed this before:
-        if (authorsLastFirst[abbrInt] != null)
+        if (authorsLastFirst[abbrInt] != null) {
             return authorsLastFirst[abbrInt];
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
             res.append(getAuthor(0).getLastFirst(abbreviate));
             int i = 1;
-            while (i < size() - 1) {
+            while (i < (size() - 1)) {
                 res.append(", ");
                 res.append(getAuthor(i).getLastFirst(abbreviate));
                 i++;
             }
-            if (size() > 2 && oxfordComma)
+            if ((size() > 2) && oxfordComma) {
                 res.append(",");
+            }
             if (size() > 1) {
                 res.append(" and ");
                 res.append(getAuthor(i).getLastFirst(abbreviate));
@@ -775,6 +805,7 @@ public class AuthorList {
         return authorsLastFirst[abbrInt];
     }
 
+    @Override
     public String toString() {
         return getAuthorsLastFirstAnds(false);
     }
@@ -796,8 +827,9 @@ public class AuthorList {
     public String getAuthorsLastFirstAnds(boolean abbreviate) {
         int abbrInt = (abbreviate ? 0 : 1);
         // Check if we've computed this before:
-        if (authorLastFirstAnds[abbrInt] != null)
+        if (authorLastFirstAnds[abbrInt] != null) {
             return authorLastFirstAnds[abbrInt];
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
@@ -815,8 +847,9 @@ public class AuthorList {
     public String getAuthorsLastFirstFirstLastAnds(boolean abbreviate) {
         int abbrInt = (abbreviate ? 0 : 1);
         // Check if we've computed this before:
-        if (authorsLastFirstFirstLast[abbrInt] != null)
+        if (authorsLastFirstFirstLast[abbrInt] != null) {
             return authorsLastFirstFirstLast[abbrInt];
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
@@ -862,20 +895,22 @@ public class AuthorList {
         abbrInt += (oxfordComma ? 0 : 2);
 
         // Check if we've computed this before:
-        if (authorsFirstFirst[abbrInt] != null)
+        if (authorsFirstFirst[abbrInt] != null) {
             return authorsFirstFirst[abbrInt];
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
             res.append(getAuthor(0).getFirstLast(abbr));
             int i = 1;
-            while (i < size() - 1) {
+            while (i < (size() - 1)) {
                 res.append(", ");
                 res.append(getAuthor(i).getFirstLast(abbr));
                 i++;
             }
-            if (size() > 2 && oxfordComma)
+            if ((size() > 2) && oxfordComma) {
                 res.append(",");
+            }
             if (size() > 1) {
                 res.append(" and ");
                 res.append(getAuthor(i).getFirstLast(abbr));
@@ -890,6 +925,7 @@ public class AuthorList {
      * 
      * Will return true iff the other object is an Author and all fields are identical on a string comparison.
      */
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof AuthorList)) {
             return false;
@@ -915,8 +951,9 @@ public class AuthorList {
      */
     public String getAuthorsFirstFirstAnds() {
         // Check if we've computed this before:
-        if (authorsFirstFirstAnds != null)
+        if (authorsFirstFirstAnds != null) {
             return authorsFirstFirstAnds;
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
@@ -945,8 +982,9 @@ public class AuthorList {
      * @return formatted list of authors
      */
     public String getAuthorsForAlphabetization() {
-        if (authorsAlph != null)
+        if (authorsAlph != null) {
             return authorsAlph;
+        }
 
         StringBuilder res = new StringBuilder();
         if (size() > 0) {
@@ -988,6 +1026,7 @@ public class AuthorList {
          * 
          * Will return true iff the other object is an Author and all fields are identical on a string comparison.
          */
+        @Override
         public boolean equals(Object o) {
             if (!(o instanceof Author)) {
                 return false;
@@ -1070,10 +1109,12 @@ public class AuthorList {
          *   * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
          */
         private String removeStartAndEndBraces(String name) {
-            if (name == null)
+            if (name == null) {
                 return null;
-            if (!name.contains("{"))
+            }
+            if (!name.contains("{")) {
                 return name;
+            }
 
             String[] split = name.split(" ");
             StringBuilder b = new StringBuilder();
@@ -1199,14 +1240,17 @@ public class AuthorList {
          */
         public String getLastFirst(boolean abbr) {
             String res = getLastOnly();
-            if (jr_part != null)
+            if (jr_part != null) {
                 res += ", " + jr_part;
+            }
             if (abbr) {
-                if (first_abbr != null)
+                if (first_abbr != null) {
                     res += ", " + first_abbr;
+                }
             } else {
-                if (first_part != null)
+                if (first_part != null) {
                     res += ", " + first_part;
+                }
             }
             return res;
         }
@@ -1228,8 +1272,9 @@ public class AuthorList {
             } else {
                 res = (first_part == null ? "" : first_part + " ") + res;
             }
-            if (jr_part != null)
+            if (jr_part != null) {
                 res += ", " + jr_part;
+            }
             return res;
         }
 
@@ -1242,8 +1287,9 @@ public class AuthorList {
          */
         public String getNameForAlphabetization() {
             StringBuilder res = new StringBuilder();
-            if (last_part != null)
+            if (last_part != null) {
                 res.append(last_part);
+            }
             if (jr_part != null) {
                 res.append(", ");
                 res.append(jr_part);
@@ -1252,8 +1298,9 @@ public class AuthorList {
                 res.append(", ");
                 res.append(first_abbr);
             }
-            while ((res.length() > 0) && (res.charAt(0) == '{'))
+            while ((res.length() > 0) && (res.charAt(0) == '{')) {
                 res.deleteCharAt(0);
+            }
             return res.toString();
         }
     }// end Author

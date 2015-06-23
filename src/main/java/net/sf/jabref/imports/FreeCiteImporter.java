@@ -115,7 +115,7 @@ public class FreeCiteImporter extends ImportFormat {
                     // fallback type
                     BibtexEntryType type = BibtexEntryType.INPROCEEDINGS;
 
-                    while (!(parser.getEventType() == XMLStreamConstants.END_ELEMENT
+                    while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
                     && parser.getLocalName().equals("citation"))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                             String ln = parser.getLocalName();

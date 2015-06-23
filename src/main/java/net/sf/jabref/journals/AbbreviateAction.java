@@ -40,24 +40,29 @@ public class AbbreviateAction extends AbstractWorker {
         this.iso = iso;
     }
 
+    @Override
     public void init() {
         //  new FieldWeightDialog(frame).setVisible(true);
         panel.output("Abbreviating...");
     }
 
+    @Override
     public void run() {
         //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
 
         BibtexEntry[] entries = panel.getSelectedEntries();
-        if (entries == null)
+        if (entries == null) {
             return;
+        }
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;
         for (BibtexEntry entry : entries) {
-            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso))
+            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso)) {
                 count++;
-            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journaltitle", ce, iso))
+            }
+            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journaltitle", ce, iso)) {
                 count++;
+            }
         }
         if (count > 0) {
             ce.end();
@@ -69,6 +74,7 @@ public class AbbreviateAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         panel.output(message);
     }

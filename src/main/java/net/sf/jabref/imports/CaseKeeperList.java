@@ -985,7 +985,7 @@ public class CaseKeeperList {
             wordListCountries
     };
 
-    private String[][] genericLists = new String[][] {
+    private final String[][] genericLists = new String[][] {
             wordListDayMonth,
             wordListCountries
     };

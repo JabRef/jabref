@@ -46,7 +46,7 @@ public class LayoutHelper {
 
     private static String currentGroup = null;
 
-    private PushbackReader _in;
+    private final PushbackReader _in;
     private final Vector<StringInt> parsedEntries = new Vector<StringInt>();
 
     private boolean _eof = false;
@@ -72,9 +72,9 @@ public class LayoutHelper {
         for (StringInt parsedEntry : parsedEntries) {
             si = parsedEntry;
 
-            if ((si.i == IS_SIMPLE_FIELD) || (si.i == IS_FIELD_START) ||
-                    (si.i == IS_FIELD_END) || (si.i == IS_GROUP_START) ||
-                    (si.i == IS_GROUP_END)) {
+            if ((si.i == LayoutHelper.IS_SIMPLE_FIELD) || (si.i == LayoutHelper.IS_FIELD_START) ||
+                    (si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_START) ||
+                    (si.i == LayoutHelper.IS_GROUP_END)) {
                 si.s = si.s.trim().toLowerCase();
             }
         }
@@ -83,11 +83,11 @@ public class LayoutHelper {
     }
 
     public static String getCurrentGroup() {
-        return currentGroup;
+        return LayoutHelper.currentGroup;
     }
 
     public static void setCurrentGroup(String newGroup) {
-        currentGroup = newGroup;
+        LayoutHelper.currentGroup = newGroup;
     }
 
     private String getBracketedField(int _field) throws IOException
@@ -195,7 +195,7 @@ public class LayoutHelper {
                         tmp = buffer.toString();
                     }
 
-                    parsedEntries.add(new StringInt(tmp, IS_OPTION_FIELD));
+                    parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
 
                     //System.out.println("\nbracketedOptionEOF: " + buffer.toString());
                 }
@@ -211,7 +211,7 @@ public class LayoutHelper {
                     // buffer may be null for parameters
                     //if (buffer != null)
                     //{
-                    if (c == ']' && buffer != null)
+                    if ((c == ']') && (buffer != null))
                     {
                         // changed section end - arudert
                         option = buffer.toString();
@@ -241,7 +241,7 @@ public class LayoutHelper {
                         }
 
                         //System.out.println("FORMAT: '"+tmp+"'");
-                        parsedEntries.add(new StringInt(tmp, IS_OPTION_FIELD));
+                        parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
 
                         return null;
                     }
@@ -258,8 +258,9 @@ public class LayoutHelper {
             else if (c == '"') {
                 inQuotes = !inQuotes;
 
-                if (buffer == null)
+                if (buffer == null) {
                     buffer = new StringBuffer(100);
+                }
                 buffer.append('"');
             }
             else
@@ -305,15 +306,16 @@ public class LayoutHelper {
                  * CO 2006-11-11: Added check for null, otherwise a Layout that
                  * finishs with a curly brace throws a NPE
                  */
-                if (buffer != null)
-                    parsedEntries.add(new StringInt(buffer.toString(), IS_LAYOUT_TEXT));
+                if (buffer != null) {
+                    parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
+                }
 
                 return null;
             }
 
             if ((c == '\\') && (peek() != '\\') && !escaped) {
                 if (buffer != null) {
-                    parsedEntries.add(new StringInt(buffer.toString(), IS_LAYOUT_TEXT));
+                    parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
 
                     buffer = null;
                 }
@@ -383,14 +385,14 @@ public class LayoutHelper {
                     if (name.equalsIgnoreCase("begin"))
                     {
                         // get field name
-                        getBracketedField(IS_FIELD_START);
+                        getBracketedField(LayoutHelper.IS_FIELD_START);
 
                         return;
                     }
                     else if (name.equalsIgnoreCase("begingroup"))
                     {
                         // get field name
-                        getBracketedField(IS_GROUP_START);
+                        getBracketedField(LayoutHelper.IS_GROUP_START);
                         return;
                     }
                 }
@@ -402,14 +404,14 @@ public class LayoutHelper {
                         {
                             // get format parameter
                             // get field name
-                            getBracketedOptionField(IS_OPTION_FIELD);
+                            getBracketedOptionField(LayoutHelper.IS_OPTION_FIELD);
 
                             return;
                         }
                         else
                         {
                             // get field name
-                            getBracketedField(IS_OPTION_FIELD);
+                            getBracketedField(LayoutHelper.IS_OPTION_FIELD);
 
                             return;
                         }
@@ -419,7 +421,7 @@ public class LayoutHelper {
                         // Print the name of the database bib file.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
-                        parsedEntries.add(new StringInt(name, IS_FILENAME));
+                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                         return;
                     }
                     else if (name.equalsIgnoreCase("filepath"))
@@ -427,7 +429,7 @@ public class LayoutHelper {
                         // Print the full path of the database bib file.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
-                        parsedEntries.add(new StringInt(name, IS_FILEPATH));
+                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));
                         return;
                     }
                 }
@@ -436,13 +438,13 @@ public class LayoutHelper {
                     if (name.equalsIgnoreCase("end"))
                     {
                         // get field name
-                        getBracketedField(IS_FIELD_END);
+                        getBracketedField(LayoutHelper.IS_FIELD_END);
                         return;
                     }
                     else if (name.equalsIgnoreCase("endgroup"))
                     {
                         // get field name
-                        getBracketedField(IS_GROUP_END);
+                        getBracketedField(LayoutHelper.IS_GROUP_END);
                         return;
                     }
                     else if (name.equalsIgnoreCase("encoding"))
@@ -450,13 +452,13 @@ public class LayoutHelper {
                         // Print the name of the current encoding used for export.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
-                        parsedEntries.add(new StringInt(name, IS_ENCODING_NAME));
+                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));
                         return;
                     }
                 }
 
                 // for all other cases
-                parsedEntries.add(new StringInt(name, IS_SIMPLE_FIELD));
+                parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_FIELD));
 
                 //System.out.println(name);
                 return;

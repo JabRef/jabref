@@ -62,8 +62,9 @@ public class PluginBasedExportFormat extends ExportFormat {
             ExportFormatTemplateExtension extension) {
         super(displayName, consoleName, layoutFileName, null, fileExtension);
         // Set the overriding encoding, if the plugin supplied one:
-        if (encoding != null)
+        if (encoding != null) {
             setEncoding(encoding);
+        }
         this.extension = extension;
     }
 

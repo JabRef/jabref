@@ -60,35 +60,44 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         TableModel tm = new AbstractTableModel() {
 
+            @Override
             public int getRowCount() {
                 return rowCount;
             }
 
+            @Override
             public int getColumnCount() {
                 return 1;
             }
 
+            @Override
             public Object getValueAt(int row, int column) {
-                if (row >= tableRows.size())
+                if (row >= tableRows.size()) {
                     return "";
+                }
                 Object rowContent = tableRows.elementAt(row);
-                if (rowContent == null)
+                if (rowContent == null) {
                     return "";
+                }
                 return rowContent;
             }
 
+            @Override
             public String getColumnName(int col) {
                 return Globals.lang("Field to filter");
             }
 
+            @Override
             public Class<?> getColumnClass(int column) {
                 return String.class;
             }
 
+            @Override
             public boolean isCellEditable(int row, int col) {
                 return true;
             }
 
+            @Override
             public void setValueAt(Object value, int row, int col) {
                 tableChanged = true;
 
@@ -147,13 +156,15 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         public DeleteRowAction() {
             super("Delete row", GUIGlobals.getImage("remove"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete rows"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] rows = table.getSelectedRows();
-            if (rows.length == 0)
+            if (rows.length == 0) {
                 return;
+            }
 
             for (int i = rows.length - 1; i >= 0; i--) {
                 if (rows[i] < tableRows.size()) {
@@ -161,8 +172,9 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
                 }
             }
             rowCount -= rows.length;
-            if (rows.length > 1)
+            if (rows.length > 1) {
                 table.clearSelection();
+            }
             table.revalidate();
             table.repaint();
             tableChanged = true;
@@ -173,9 +185,10 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         public AddRowAction() {
             super("Add row", GUIGlobals.getImage("add"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Insert rows"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] rows = table.getSelectedRows();
             if (rows.length == 0) {
@@ -186,12 +199,14 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (rows[i] + i < tableRows.size())
+                if ((rows[i] + i) < tableRows.size()) {
                     tableRows.add(rows[i] + i, "");
+                }
             }
             rowCount += rows.length;
-            if (rows.length > 1)
+            if (rows.length > 1) {
                 table.clearSelection();
+            }
             table.revalidate();
             table.repaint();
             tableChanged = true;
@@ -202,6 +217,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     /**
      * Load settings from the preferences and initialize the table.
      */
+    @Override
     public void setValues() {
         tableRows.clear();
         String[] names = JabRefPreferences.getInstance().getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS);
@@ -217,6 +233,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
      * clicks Ok.
      * 
      */
+    @Override
     public void storeSettings() {
 
         if (table.isEditing()) {
@@ -233,8 +250,9 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {
-                if (tableRows.elementAt(i).equals(""))
+                if (tableRows.elementAt(i).equals("")) {
                     tableRows.removeElementAt(i);
+                }
             }
 
             // Finally, we store the new preferences.
@@ -245,10 +263,12 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         JabRefPreferences.getInstance().putBoolean("useXmpPrivacyFilter", privacyFilterCheckBox.isSelected());
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("XMP metadata");
     }

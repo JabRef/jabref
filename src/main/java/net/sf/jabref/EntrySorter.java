@@ -96,13 +96,15 @@ public class EntrySorter implements DatabaseChangeListener {
 
     public int getEntryCount() {
         synchronized (set) {
-            if (entryArray != null)
+            if (entryArray != null) {
                 return entryArray.length;
-            else
+            } else {
                 return 0;
+            }
         }
     }
 
+    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         synchronized (set) {
             int pos;

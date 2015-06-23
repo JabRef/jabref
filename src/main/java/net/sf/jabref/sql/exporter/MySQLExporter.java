@@ -46,9 +46,10 @@ public class MySQLExporter extends DBExporter {
      * @return The singleton instance of the MySQLExporter
      */
     public static MySQLExporter getInstance() {
-        if (instance == null)
-            instance = new MySQLExporter();
-        return instance;
+        if (MySQLExporter.instance == null) {
+            MySQLExporter.instance = new MySQLExporter();
+        }
+        return MySQLExporter.instance;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ public class Bug1283 {
 
     @Test
     public void testBug1283() throws IOException {
-        assertFalse(MonthUtil.getMonth("8,").isValid());
+        Assert.assertFalse(MonthUtil.getMonth("8,").isValid());
     }
 
 }

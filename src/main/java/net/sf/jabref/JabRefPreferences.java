@@ -155,10 +155,10 @@ public class JabRefPreferences {
 
 
     public static JabRefPreferences getInstance() {
-        if (singleton == null) {
-            singleton = new JabRefPreferences();
+        if (JabRefPreferences.singleton == null) {
+            JabRefPreferences.singleton = new JabRefPreferences();
         }
-        return singleton;
+        return JabRefPreferences.singleton;
     }
 
     // Upgrade the preferences for the current version
@@ -166,45 +166,45 @@ public class JabRefPreferences {
     // these preferences, but it is only used when the new preference does not 
     // exist
     private void upgradeOldPreferences() {
-        if (prefs.get(SAVE_IN_SPECIFIED_ORDER, null) == null) {
+        if (prefs.get(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("saveInStandardOrder", false)) {
-                putBoolean(SAVE_IN_SPECIFIED_ORDER, true);
-                put(SAVE_PRIMARY_SORT_FIELD, "author");
-                put(SAVE_SECONDARY_SORT_FIELD, "editor");
-                put(SAVE_TERTIARY_SORT_FIELD, "year");
-                putBoolean(SAVE_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(SAVE_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(SAVE_TERTIARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
+                put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "author");
+                put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "editor");
+                put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "year");
+                putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
             } else if (prefs.getBoolean("saveInTitleOrder", false)) {
                 // saveInTitleOrder => title, author, editor
-                putBoolean(SAVE_IN_SPECIFIED_ORDER, true);
-                put(SAVE_PRIMARY_SORT_FIELD, "title");
-                put(SAVE_SECONDARY_SORT_FIELD, "author");
-                put(SAVE_TERTIARY_SORT_FIELD, "editor");
-                putBoolean(SAVE_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(SAVE_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(SAVE_TERTIARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
+                put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "title");
+                put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "author");
+                put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "editor");
+                putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
             }
         }
 
-        if (prefs.get(EXPORT_IN_SPECIFIED_ORDER, null) == null) {
+        if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
-                putBoolean(EXPORT_IN_SPECIFIED_ORDER, true);
-                put(EXPORT_PRIMARY_SORT_FIELD, "author");
-                put(EXPORT_SECONDARY_SORT_FIELD, "editor");
-                put(EXPORT_TERTIARY_SORT_FIELD, "year");
-                putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
+                put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "author");
+                put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "editor");
+                put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "year");
+                putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             } else if (prefs.getBoolean("exportInTitleOrder", false)) {
                 // exportInTitleOrder => title, author, editor
-                putBoolean(EXPORT_IN_SPECIFIED_ORDER, true);
-                put(EXPORT_PRIMARY_SORT_FIELD, "title");
-                put(EXPORT_SECONDARY_SORT_FIELD, "author");
-                put(EXPORT_TERTIARY_SORT_FIELD, "editor");
-                putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
+                put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "title");
+                put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "author");
+                put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "editor");
+                putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
+                putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             }
         }
     }
@@ -228,9 +228,9 @@ public class JabRefPreferences {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
             //defaults.put("htmlviewer", "/Applications/Safari.app");
-            defaults.put(EMACS_PATH, "emacsclient");
-            defaults.put(EMACS_23, true);
-            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+            defaults.put(JabRefPreferences.EMACS_PATH, "emacsclient");
+            defaults.put(JabRefPreferences.EMACS_23, true);
+            defaults.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put("fontFamily", "SansSerif");
 
         } else if (Globals.osName.toLowerCase().startsWith("windows")) {
@@ -240,9 +240,9 @@ public class JabRefPreferences {
             defaults.put("lookAndFeel", "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
-            defaults.put(EMACS_PATH, "emacsclient.exe");
-            defaults.put(EMACS_23, true);
-            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+            defaults.put(JabRefPreferences.EMACS_PATH, "emacsclient.exe");
+            defaults.put(JabRefPreferences.EMACS_23, true);
+            defaults.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put("fontFamily", "Arial");
 
         } else {
@@ -253,14 +253,14 @@ public class JabRefPreferences {
             defaults.put("fontFamily", "SansSerif");
 
             // linux
-            defaults.put(EMACS_PATH, "gnuclient");
-            defaults.put(EMACS_23, false);
-            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
+            defaults.put(JabRefPreferences.EMACS_PATH, "gnuclient");
+            defaults.put(JabRefPreferences.EMACS_23, false);
+            defaults.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
         }
         defaults.put("useProxy", Boolean.FALSE);
         defaults.put("proxyHostname", "my proxy host");
         defaults.put("proxyPort", "my proxy port");
-        defaults.put(PDF_PREVIEW, Boolean.FALSE);
+        defaults.put(JabRefPreferences.PDF_PREVIEW, Boolean.FALSE);
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
         defaults.put("vim", "vim");
@@ -284,30 +284,30 @@ public class JabRefPreferences {
         defaults.put("showShort", Boolean.TRUE);
 
         // Sorting preferences
-        defaults.put(PRIMARY_SORT_FIELD, "author");
-        defaults.put(PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(SECONDARY_SORT_FIELD, "year");
-        defaults.put(SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(TERTIARY_SORT_FIELD, "author");
-        defaults.put(TERTIARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
-        defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
-        defaults.put(SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
-        defaults.put(SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(SAVE_SECONDARY_SORT_FIELD, "author");
-        defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(SAVE_TERTIARY_SORT_FIELD, "");
-        defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
-        defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
-        defaults.put(EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
-        defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_SECONDARY_SORT_FIELD, "author");
-        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(EXPORT_TERTIARY_SORT_FIELD, "");
-        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(JabRefPreferences.PRIMARY_SORT_FIELD, "author");
+        defaults.put(JabRefPreferences.PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(JabRefPreferences.SECONDARY_SORT_FIELD, "year");
+        defaults.put(JabRefPreferences.SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(JabRefPreferences.TERTIARY_SORT_FIELD, "author");
+        defaults.put(JabRefPreferences.TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
+        defaults.put(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "author");
+        defaults.put(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "");
+        defaults.put(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
+        defaults.put(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "author");
+        defaults.put(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "");
+        defaults.put(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
-        defaults.put(NEWLINE, System.getProperty("line.separator"));
+        defaults.put(JabRefPreferences.NEWLINE, System.getProperty("line.separator"));
 
         defaults.put("sidePaneComponentNames", "");
         defaults.put("sidePaneComponentPreferredPositions", "");
@@ -316,8 +316,8 @@ public class JabRefPreferences {
         defaults.put("columnWidths", "75;280;400;60;100;100;100;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
-        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
-        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
+        defaults.put(JabRefPreferences.XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
+        defaults.put(JabRefPreferences.USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put("numberColWidth", GUIGlobals.NUMBER_COL_LENGTH);
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
@@ -349,14 +349,14 @@ public class JabRefPreferences {
         defaults.put("highLightWords", Boolean.TRUE);
         defaults.put("searchPanePosX", 0);
         defaults.put("searchPanePosY", 0);
-        defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
-        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
+        defaults.put(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
+        defaults.put(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put("autoCompLF", Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, 2);
-        defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        defaults.put(JabRefPreferences.SHORTEST_TO_COMPLETE, 2);
+        defaults.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);
@@ -369,10 +369,10 @@ public class JabRefPreferences {
         defaults.put("groupExpandTree", Boolean.TRUE);
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
-        defaults.put(GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
+        defaults.put(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
         defaults.put("autoAssignGroup", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
-        defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
+        defaults.put(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("toolbarVisible", Boolean.TRUE);
@@ -447,7 +447,7 @@ public class JabRefPreferences {
         defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
 
-        defaults.put(SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, Boolean.FALSE);
+        defaults.put(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, Boolean.FALSE);
 
         defaults.put("useOwner", Boolean.FALSE);
         defaults.put("overwriteOwner", Boolean.FALSE);
@@ -520,18 +520,18 @@ public class JabRefPreferences {
         defaults.put("timeStampFormat", "yyyy.MM.dd");
         //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
-        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
+        defaults.put(JabRefPreferences.UPDATE_TIMESTAMP, Boolean.FALSE);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
 
         // behavior of JabRef before 2.10: both: false
-        defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
-        defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
+        defaults.put(JabRefPreferences.WRITEFIELD_ADDSPACES, Boolean.TRUE);
+        defaults.put(JabRefPreferences.WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         //behavior of JabRef before LWang_AdjustableFieldOrder 1
         //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
-        defaults.put(WRITEFIELD_SORTSTYLE, 0);
-        defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
-        defaults.put(WRITEFIELD_WRAPFIELD, Boolean.FALSE);
+        defaults.put(JabRefPreferences.WRITEFIELD_SORTSTYLE, 0);
+        defaults.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
+        defaults.put(JabRefPreferences.WRITEFIELD_WRAPFIELD, Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", 6050);
@@ -556,7 +556,7 @@ public class JabRefPreferences {
         defaults.put("searchDialogWidth", 650);
         defaults.put("searchDialogHeight", 500);
         defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
-        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
+        defaults.put(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
         defaults.put("numericFields", "mittnum;author");
         defaults.put("runAutomaticFileSearch", Boolean.FALSE);
         defaults.put("useLockFiles", Boolean.TRUE);
@@ -612,9 +612,9 @@ public class JabRefPreferences {
         MARKING_WITH_NUMBER_PATTERN = "\\[" + get("defaultOwner").replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
-        defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
+        defaults.put(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put("useIEEEAbrv", Boolean.TRUE);
         defaults.put("useConvertToEquation", Boolean.FALSE);
         defaults.put("useCaseKeeperOnSearch", Boolean.TRUE);
@@ -634,17 +634,17 @@ public class JabRefPreferences {
     public void setLanguageDependentDefaultValues() {
 
         // Entry editor tab 0:
-        defaults.put(CUSTOM_TAB_NAME + "_def0", Globals.lang("General"));
-        defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
+        defaults.put(JabRefPreferences.CUSTOM_TAB_NAME + "_def0", Globals.lang("General"));
+        defaults.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
                 + "comment;owner;timestamp");
 
         // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", "abstract");
-        defaults.put(CUSTOM_TAB_NAME + "_def1", Globals.lang("Abstract"));
+        defaults.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def1", "abstract");
+        defaults.put(JabRefPreferences.CUSTOM_TAB_NAME + "_def1", Globals.lang("Abstract"));
 
         // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", "review");
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Globals.lang("Review"));
+        defaults.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def2", "review");
+        defaults.put(JabRefPreferences.CUSTOM_TAB_NAME + "_def2", Globals.lang("Review"));
 
     }
 
@@ -689,7 +689,7 @@ public class JabRefPreferences {
     }
 
     public char[] getValueDelimiters() {
-        return VALUE_DELIMITERS[getInt("valueDelimiters")];
+        return JabRefPreferences.VALUE_DELIMITERS[getInt("valueDelimiters")];
     }
 
     /**
@@ -781,7 +781,7 @@ public class JabRefPreferences {
 
         if (value.length > 0) {
             StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < value.length - 1; i++) {
+            for (int i = 0; i < (value.length - 1); i++) {
                 linked.append(makeEscape(value[i]));
                 linked.append(";");
             }
@@ -1005,19 +1005,19 @@ public class JabRefPreferences {
      * parent
      */
     public LabelPattern getKeyPattern() {
-        keyPattern = new LabelPattern();
+        JabRefPreferences.keyPattern = new LabelPattern();
         Preferences pre = Preferences.userNodeForPackage(net.sf.jabref.labelPattern.LabelPattern.class);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    keyPattern.addLabelPattern(key, pre.get(key, null));
+                    JabRefPreferences.keyPattern.addLabelPattern(key, pre.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
             Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
         }
-        return keyPattern;
+        return JabRefPreferences.keyPattern;
     }
 
     /**
@@ -1026,7 +1026,7 @@ public class JabRefPreferences {
      * @param pattern the pattern to store
      */
     public void putKeyPattern(LabelPattern pattern) {
-        keyPattern = pattern;
+        JabRefPreferences.keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
         Preferences pre = Preferences.userNodeForPackage(net.sf.jabref.labelPattern.LabelPattern.class);
@@ -1239,10 +1239,10 @@ public class JabRefPreferences {
      */
     public void storeCustomEntryType(CustomEntryType tp, int number) {
         String nr = "" + number;
-        put(CUSTOM_TYPE_NAME + nr, tp.getName());
-        put(CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());//tp.getRequiredFields());
-        putStringArray(CUSTOM_TYPE_OPT + nr, tp.getOptionalFields());
-        putStringArray(CUSTOM_TYPE_PRIOPT + nr, tp.getPrimaryOptionalFields());
+        put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
+        put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());//tp.getRequiredFields());
+        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, tp.getOptionalFields());
+        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, tp.getPrimaryOptionalFields());
 
     }
 
@@ -1252,8 +1252,8 @@ public class JabRefPreferences {
      */
     public CustomEntryType getCustomEntryType(int number) {
         String nr = "" + number;
-        String name = get(CUSTOM_TYPE_NAME + nr);
-        String[] req = getStringArray(CUSTOM_TYPE_REQ + nr), opt = getStringArray(CUSTOM_TYPE_OPT + nr), priOpt = getStringArray(CUSTOM_TYPE_PRIOPT + nr);
+        String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
+        String[] req = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr), opt = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr), priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
         }
@@ -1434,7 +1434,7 @@ public class JabRefPreferences {
             i++;
         }
         for (ExternalFileType type : defTypes) {
-            array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
+            array[i] = new String[] {type.getName(), JabRefPreferences.FILE_TYPE_REMOVED_FLAG};
             i++;
         }
         //System.out.println("Encoded: '"+Util.encodeStringArray(array)+"'");
@@ -1457,7 +1457,7 @@ public class JabRefPreferences {
         // Read the prefs information for file types:
         String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
         for (String[] val : vals) {
-            if ((val.length == 2) && (val[1].equals(FILE_TYPE_REMOVED_FLAG))) {
+            if ((val.length == 2) && (val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG))) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {
@@ -1504,10 +1504,10 @@ public class JabRefPreferences {
      * @param number or higher.
      */
     public void purgeCustomEntryTypes(int number) {
-        purgeSeries(CUSTOM_TYPE_NAME, number);
-        purgeSeries(CUSTOM_TYPE_REQ, number);
-        purgeSeries(CUSTOM_TYPE_OPT, number);
-        purgeSeries(CUSTOM_TYPE_PRIOPT, number);
+        purgeSeries(JabRefPreferences.CUSTOM_TYPE_NAME, number);
+        purgeSeries(JabRefPreferences.CUSTOM_TYPE_REQ, number);
+        purgeSeries(JabRefPreferences.CUSTOM_TYPE_OPT, number);
+        purgeSeries(JabRefPreferences.CUSTOM_TYPE_PRIOPT, number);
     }
 
     /**

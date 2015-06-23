@@ -49,6 +49,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         return menuItem;
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         try {
             this.init();
@@ -59,6 +60,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         }
     }
 
+    @Override
     public void run() {
         BasePanel panel = frame.basePanel();
         BibtexEntry[] bes = panel.getSelectedEntries();

@@ -85,14 +85,17 @@ public class SidePane extends JPanel {
         repaint();
     }
 
+    @Override
     public void remove(Component c) {
         mainPanel.remove(c);
     }
 
+    @Override
     public Dimension getMaximumSize() {
         return getPreferredSize();
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return PREFERRED_SIZE;
     }

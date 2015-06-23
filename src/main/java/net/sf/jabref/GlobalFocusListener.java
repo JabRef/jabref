@@ -29,11 +29,14 @@ public class GlobalFocusListener implements FocusListener {
     public GlobalFocusListener() {
     }
 
+    @Override
     public void focusGained(FocusEvent e) {
-        if (!e.isTemporary())
+        if (!e.isTemporary()) {
             focused = (Component) e.getSource();
+        }
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
     }
 

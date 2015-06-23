@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -64,10 +63,11 @@ public class EntryEditorTab {
 
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
             boolean addKeyField, boolean compressed, String name) {
-        if (fields != null)
+        if (fields != null) {
             this.fields = fields.toArray(new String[fields.size()]);
-        else
+        } else {
             this.fields = new String[] {};
+        }
 
         this.parent = parent;
 
@@ -120,10 +120,11 @@ public class EntryEditorTab {
         for (int i = 0; i < rows; i++) {
             sb.append("fill:pref:grow, ");
         }
-        if (addKeyField)
+        if (addKeyField) {
             sb.append("4dlu, fill:pref");
-        else if (sb.length() >= 2)
+        } else if (sb.length() >= 2) {
             sb.delete(sb.length() - 2, sb.length());
+        }
         String rowSpec = sb.toString();
 
         DefaultFormBuilder builder = new DefaultFormBuilder
@@ -161,23 +162,26 @@ public class EntryEditorTab {
 
             // Store the editor for later reference:
             editors.put(fields[i], ta);
-            if (i == 0)
+            if (i == 0) {
                 activeField = ta;
+            }
             //System.out.println(fields[i]+": "+BibtexFields.getFieldWeight(fields[i]));
-            if (!compressed)
+            if (!compressed) {
                 ta.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
+            }
             builder.append(ta.getLabel());
-            if (ex == null)
+            if (ex == null) {
                 builder.append(ta.getPane(), 3);
-            else {
+            } else {
                 builder.append(ta.getPane());
                 JPanel pan = new JPanel();
                 pan.setLayout(new BorderLayout());
                 pan.add(ex, BorderLayout.NORTH);
                 builder.append(pan);
             }
-            if ((i + 1) % fieldsPerRow == 0)
+            if (((i + 1) % fieldsPerRow) == 0) {
                 builder.nextLine();
+            }
         }
 
         // Add the edit field for Bibtex-key.
@@ -192,8 +196,9 @@ public class EntryEditorTab {
              * If the key field is the only field, we should have only one
              * editor, and this one should be set as active initially:
              */
-            if (editors.size() == 1)
+            if (editors.size() == 1) {
                 activeField = tf;
+            }
             builder.nextLine();
             builder.append(tf.getLabel());
             builder.append(tf, 3);
@@ -215,7 +220,7 @@ public class EntryEditorTab {
             return getEntry().getField(f.getFieldName()) != null;
         } else {
             Object entryValue = getEntry().getField(f.getFieldName());
-            return entryValue == null || !entryValue.toString().equals(text);
+            return (entryValue == null) || !entryValue.toString().equals(text);
         }
     }
 
@@ -277,8 +282,9 @@ public class EntryEditorTab {
             for (FieldEditor editor : editors.values()) {
                 Object content = entry.getField(editor.getFieldName());
                 String toSet = (content == null) ? "" : content.toString();
-                if (!toSet.equals(editor.getText()))
+                if (!toSet.equals(editor.getText())) {
                     editor.setText(toSet);
+                }
             }
             this.entry = entry;
         } finally {
@@ -287,8 +293,9 @@ public class EntryEditorTab {
     }
 
     public boolean updateField(String field, String content) {
-        if (!editors.containsKey(field))
+        if (!editors.containsKey(field)) {
             return false;
+        }
         FieldEditor ed = editors.get(field);
         ed.setText(content);
         return true;
@@ -299,10 +306,11 @@ public class EntryEditorTab {
             FieldEditor ed = editors.get(field);
             ed.updateFontColor();
             ed.setEnabled(true);
-            if (((Component) ed).hasFocus())
+            if (((Component) ed).hasFocus()) {
                 ed.setActiveBackgroundColor();
-            else
+            } else {
                 ed.setValidBackgroundColor();
+            }
         }
     }
 
@@ -339,9 +347,9 @@ public class EntryEditorTab {
             component.addKeyListener(acl);
             component.addFocusListener(acl);
             acl.setNextFocusListener(fieldListener);
-        }
-        else
+        } else {
             component.addFocusListener(fieldListener);
+        }
 
         InputMap im = component.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap am = component.getActionMap();

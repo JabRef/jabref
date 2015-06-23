@@ -62,6 +62,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
      * Empty implementation of the update() method. Override this method
      * if a callback is needed.
      */
+    @Override
     public void update() {
     }
 }

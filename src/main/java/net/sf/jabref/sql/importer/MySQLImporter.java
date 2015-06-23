@@ -46,9 +46,10 @@ public class MySQLImporter extends DBImporter {
      * @return The singleton instance of the MySQLImporter
      */
     public static MySQLImporter getInstance() {
-        if (instance == null)
-            instance = new MySQLImporter();
-        return instance;
+        if (MySQLImporter.instance == null) {
+            MySQLImporter.instance = new MySQLImporter();
+        }
+        return MySQLImporter.instance;
     }
 
     @Override
@@ -58,6 +59,7 @@ public class MySQLImporter extends DBImporter {
         return statement.getResultSet();
     }
 
+    @Override
     protected Connection connectToDB(DBStrings dbstrings) throws Exception {
         String url = SQLUtil.createJDBCurl(dbstrings, true);
         String drv = "com.mysql.jdbc.Driver";

@@ -155,10 +155,11 @@ public class AuxSubGenerator
         // get the file path
         File dummy = new File(filename);
         String path = dummy.getParent();
-        if (path != null)
+        if (path != null) {
             path = path + File.separator;
-        else
+        } else {
             path = "";
+        }
 
         nestedAuxCounter = -1; // count only the nested reads
 
@@ -240,8 +241,9 @@ public class AuxSubGenerator
                         }
                     }
                 } // line != null
-                else
+ else {
                     weiter = false;
+                }
             } // end of while
 
             if (loopFileOpen) // only close, if open sucessful
@@ -346,8 +348,9 @@ public class AuxSubGenerator
 
     public BibtexDatabase getGeneratedDatabase()
     {
-        if (auxDB == null)
+        if (auxDB == null) {
             auxDB = new BibtexDatabase();
+        }
 
         return auxDB;
     }

@@ -47,6 +47,7 @@ public class FormatNameFunction implements BstFunction {
         this.vm = vm;
     }
 
+    @Override
     public void execute(BstEntry context) {
         Stack<Object> stack = vm.getStack();
 

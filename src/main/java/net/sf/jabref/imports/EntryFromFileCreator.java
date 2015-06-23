@@ -58,6 +58,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
      * of <i>entry creators</i>, that is left to the user.
      * </p>
      */
+    @Override
     public abstract boolean accept(File f);
 
     /**
@@ -79,7 +80,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
      * @return
      */
     public BibtexEntry createEntry(File f, boolean addPathTokensAsKeywords) {
-        if (f == null || !f.exists()) {
+        if ((f == null) || !f.exists()) {
             return null;
         }
         BibtexEntry newEntry = createBibtexEntry(f);
@@ -148,8 +149,9 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     protected void appendToField(BibtexEntry entry, String field, String value) {
-        if (value == null || "".equals(value))
+        if ((value == null) || "".equals(value)) {
             return;
+        }
         String oVal = entry.getField(field);
         if (oVal == null) {
             entry.setField(field, value);
@@ -176,6 +178,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
     }
 
+    @Override
     public String toString() {
         if (externalFileType == null) {
             return "(undefined)";

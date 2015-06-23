@@ -108,6 +108,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         final JComboBox clName = className;
         useDefault.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 clName.setEnabled(((JCheckBox) e.getSource()).isSelected());
             }
@@ -205,6 +206,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void setValues() {
         oldUseDef = _prefs.getBoolean("useDefaultLookAndFeel");
         oldLnf = _prefs.get("lookAndFeel");
@@ -227,6 +229,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useUnitFormatterOnSearch.setSelected(oldUnitFormatterOnSearch);
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getSelectedItem().toString());
@@ -234,8 +237,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
         _prefs.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
-        if (useIEEEAbrv.isSelected())
+        if (useIEEEAbrv.isSelected()) {
             Globals.journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
+        }
         try {
             int port = Integer.parseInt(remoteServerPort.getText());
             if (port != oldPort) {
@@ -286,13 +290,14 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());
     }
 
+    @Override
     public boolean readyToClose() {
 
         try {
             int portNumber = Integer.parseInt(remoteServerPort.getText());
-            if (portNumber > 1024 && portNumber <= 65535)
+            if ((portNumber > 1024) && (portNumber <= 65535)) {
                 return true; // Ok, the number was legal.
-            else {
+            } else {
                 JOptionPane.showMessageDialog
                         (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
                                 Globals.lang("Remote server port") + "'", Globals.lang("Remote server port"),
@@ -309,6 +314,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Advanced");
     }

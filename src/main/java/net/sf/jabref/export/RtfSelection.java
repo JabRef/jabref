@@ -40,16 +40,19 @@ public class RtfSelection implements Transferable {
         }
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return flavor.equals(rtfFlavor) ||
                 flavor.equals(DataFlavor.stringFlavor);
     }
 
+    @Override
     public java.awt.datatransfer.DataFlavor[] getTransferDataFlavors() {
         //System.out.println("..");
         return supportedFlavors;
     }
 
+    @Override
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
 

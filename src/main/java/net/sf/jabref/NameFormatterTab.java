@@ -45,8 +45,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         Map<String, String> result = new HashMap<String, String>();
 
-        String[] names = Globals.prefs.getStringArray(NAME_FORMATER_KEY);
-        String[] formats = Globals.prefs.getStringArray(NAME_FORMATTER_VALUE);
+        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
+        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
 
         if (names == null) {
             names = new String[] {};
@@ -56,10 +56,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         }
 
         for (int i = 0; i < names.length; i++) {
-            if (i < formats.length)
+            if (i < formats.length) {
                 result.put(names[i], formats[i]);
-            else
+            } else {
                 result.put(names[i], NameFormat.DEFAULT_FORMAT);
+            }
         }
 
         return result;
@@ -106,20 +107,25 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         TableModel tm = new AbstractTableModel() {
 
+            @Override
             public int getRowCount() {
                 return rowCount;
             }
 
+            @Override
             public int getColumnCount() {
                 return 2;
             }
 
+            @Override
             public Object getValueAt(int row, int column) {
-                if (row >= tableRows.size())
+                if (row >= tableRows.size()) {
                     return "";
+                }
                 TableRow tr = tableRows.elementAt(row);
-                if (tr == null)
+                if (tr == null) {
                     return "";
+                }
                 switch (column) {
                 case 0:
                     return tr.name;
@@ -129,34 +135,41 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 return null; // Unreachable.
             }
 
+            @Override
             public String getColumnName(int col) {
                 return (col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String"));
             }
 
+            @Override
             public Class<String> getColumnClass(int column) {
-                if (column == 0)
+                if (column == 0) {
                     return String.class;
-                else
+                } else {
                     return String.class;
+                }
             }
 
+            @Override
             public boolean isCellEditable(int row, int col) {
                 return true;
             }
 
+            @Override
             public void setValueAt(Object value, int row, int col) {
                 tableChanged = true;
 
                 // Make sure the vector is long enough.
-                while (row >= tableRows.size())
+                while (row >= tableRows.size()) {
                     tableRows.add(new TableRow());
+                }
 
                 TableRow rowContent = tableRows.elementAt(row);
 
-                if (col == 0)
+                if (col == 0) {
                     rowContent.name = value.toString();
-                else
+                } else {
                     rowContent.format = value.toString();
+                }
             }
         };
 
@@ -201,10 +214,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         tableRows.clear();
-        String[] names = Globals.prefs.getStringArray(NAME_FORMATER_KEY);
-        String[] formats = Globals.prefs.getStringArray(NAME_FORMATTER_VALUE);
+        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
+        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
 
         if (names == null) {
             names = new String[] {};
@@ -214,10 +228,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         }
 
         for (int i = 0; i < names.length; i++) {
-            if (i < formats.length)
+            if (i < formats.length) {
                 tableRows.add(new TableRow(names[i], formats[i]));
-            else
+            } else {
                 tableRows.add(new TableRow(names[i]));
+            }
         }
         rowCount = tableRows.size() + 5;
     }
@@ -227,9 +242,10 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         public DeleteRowAction() {
             super("Delete row", GUIGlobals.getImage("remove"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete rows"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             tableChanged = true;
 
@@ -246,8 +262,9 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             rowCount -= numberDeleted;
 
-            if (selectedRows.length > 1)
+            if (selectedRows.length > 1) {
                 table.clearSelection();
+            }
 
             table.revalidate();
             table.repaint();
@@ -258,9 +275,10 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         public AddRowAction() {
             super("Add row", GUIGlobals.getImage("add"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Insert rows"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] rows = table.getSelectedRows();
             if (rows.length == 0) {
@@ -271,12 +289,14 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (rows[i] + i - 1 < tableRows.size())
-                    tableRows.add(Math.max(0, rows[i] + i - 1), new TableRow());
+                if (((rows[i] + i) - 1) < tableRows.size()) {
+                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
+                }
             }
             rowCount += rows.length;
-            if (rows.length > 1)
+            if (rows.length > 1) {
                 table.clearSelection();
+            }
             table.revalidate();
             table.repaint();
             tableChanged = true;
@@ -289,6 +309,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
      * clicks Ok.
      * 
      */
+    @Override
     public void storeSettings() {
 
         if (table.isEditing()) {
@@ -302,10 +323,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i = 0;
             while (i < tableRows.size()) {
-                if (tableRows.elementAt(i).name.equals(""))
+                if (tableRows.elementAt(i).name.equals("")) {
                     tableRows.removeElementAt(i);
-                else
+                } else {
                     i++;
+                }
             }
             // Then we make arrays
             String[] names = new String[tableRows.size()], formats = new String[tableRows.size()];
@@ -317,15 +339,17 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            Globals.prefs.putStringArray(NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringArray(NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
         }
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Name formatter");
     }

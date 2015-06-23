@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import java.awt.event.*;
 import java.awt.*;
+
 import javax.swing.*;
 
 import net.sf.jabref.undo.UndoablePreambleChange;
@@ -50,16 +51,19 @@ public class PreambleEditor extends JDialog {
 
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 closeAction.actionPerformed(null);
             }
 
+            @Override
             public void windowOpened(WindowEvent e) {
                 ed.requestFocus();
             }
         });
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 
+            @Override
             protected boolean accept(Component c) {
                 return (super.accept(c) && (c instanceof FieldEditor));
             }
@@ -121,9 +125,11 @@ public class PreambleEditor extends JDialog {
         * Focus listener that fires the storeFieldAction when a FieldTextArea
         * loses focus.
         */
+        @Override
         public void focusLost(FocusEvent e) {
-            if (!e.isTemporary())
+            if (!e.isTemporary()) {
                 storeFieldAction.actionPerformed(new ActionEvent(e.getSource(), 0, ""));
+            }
         }
 
     }
@@ -136,14 +142,16 @@ public class PreambleEditor extends JDialog {
 
         public StoreFieldAction() {
             super("Store field value");
-            putValue(SHORT_DESCRIPTION, "Store field value");
+            putValue(Action.SHORT_DESCRIPTION, "Store field value");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             String toSet = null;
             boolean set;
-            if (ed.getText().length() > 0)
+            if (ed.getText().length() > 0) {
                 toSet = ed.getText();
+            }
             // We check if the field has changed, since we don't want to mark the
             // base as changed unless we have a real change.
             if (toSet == null) {
@@ -164,8 +172,9 @@ public class PreambleEditor extends JDialog {
                     ed.setLabelColor(GUIGlobals.nullFieldColor);
                     ed.setValidBackgroundColor();
                 }
-                if (ed.getTextComponent().hasFocus())
+                if (ed.getTextComponent().hasFocus()) {
                     ed.setActiveBackgroundColor();
+                }
                 panel.markBaseChanged();
             }
 
@@ -180,9 +189,10 @@ public class PreambleEditor extends JDialog {
 
         public UndoAction() {
             super("Undo", GUIGlobals.getImage("undo"));
-            putValue(SHORT_DESCRIPTION, "Undo");
+            putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("undo");
@@ -199,9 +209,10 @@ public class PreambleEditor extends JDialog {
 
         public RedoAction() {
             super("Undo", GUIGlobals.getImage("redo"));
-            putValue(SHORT_DESCRIPTION, "Redo");
+            putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 panel.runCommand("redo");
@@ -223,6 +234,7 @@ public class PreambleEditor extends JDialog {
             //putValue(SHORT_DESCRIPTION, "Close window (Ctrl-Q)");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             storeFieldAction.actionPerformed(null);
             panel.preambleEditorClosing();

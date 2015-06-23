@@ -33,14 +33,17 @@ public class UndoableInsertString extends AbstractUndoableEdit {
         this.string = string;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": " + Globals.lang("insert string ");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": " + Globals.lang("insert string ");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -49,6 +52,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
         panel.updateStringDialog();
     }
 
+    @Override
     public void redo() {
         super.redo();
 

@@ -82,6 +82,7 @@ public class MedlineHandler extends DefaultHandler
 
     }
 
+    @Override
     public void startElement(String uri, String localName, String qName, Attributes atts)
     {
         //		public void startElement(String localName, Attributes atts) {
@@ -178,12 +179,13 @@ public class MedlineHandler extends DefaultHandler
         else if (localName.equals("ArticleId")) {
             for (int i = 0; i < atts.getLength(); i++) {
                 String value = atts.getValue(i);
-                if (value.equals("doi"))
+                if (value.equals("doi")) {
                     inDoi = true;
-                else if (value.equals("pii"))
+                } else if (value.equals("pii")) {
                     inPii = true;
-                else if (value.equals("pmc"))
+                } else if (value.equals("pmc")) {
                     inPmc = true;
+                }
 
             }
         }
@@ -212,6 +214,7 @@ public class MedlineHandler extends DefaultHandler
         return out;
     }
 
+    @Override
     public void endElement(String uri, String localName, String qName) {
         if (localName.equals("PubmedArticle")) {
             //bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
@@ -232,52 +235,66 @@ public class MedlineHandler extends DefaultHandler
             for (Iterator<String> iterator = descriptors.iterator(); iterator.hasNext();) {
                 String s = iterator.next();
                 sb.append(s);
-                if (iterator.hasNext())
-                    sb.append(KEYWORD_SEPARATOR);
+                if (iterator.hasNext()) {
+                    sb.append(MedlineHandler.KEYWORD_SEPARATOR);
+                }
             }
             keywords = sb.toString();
 
             BibtexEntry b = new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
             Globals.getEntryType("article")); // id assumes an existing database so don't create one here
             if (!author.equals("")) {
-                b.setField("author", htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
+                b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
                 author = "";
             }
-            if (!title.equals(""))
-                b.setField("title", htmlConverter.formatUnicode(title));
+            if (!title.equals("")) {
+                b.setField("title", MedlineHandler.htmlConverter.formatUnicode(title));
+            }
             // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
-            if (!journal.equals(""))
+            if (!journal.equals("")) {
                 b.setField("journal", journal);
-            if (!year.equals(""))
+            }
+            if (!year.equals("")) {
                 b.setField("year", year);
+            }
             // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
-            if (!page.equals(""))
+            if (!page.equals("")) {
                 b.setField("pages", fixPageRange(page));
-            if (!volume.equals(""))
+            }
+            if (!volume.equals("")) {
                 b.setField("volume", volume);
-            if (!language.equals(""))
+            }
+            if (!language.equals("")) {
                 b.setField("language", language);
-            if (!pst.equals(""))
+            }
+            if (!pst.equals("")) {
                 b.setField("medline-pst", pst);
-            if (!abstractText.equals(""))
+            }
+            if (!abstractText.equals("")) {
                 b.setField("abstract", abstractText.replaceAll("%", "\\\\%"));
-            if (!keywords.equals(""))
+            }
+            if (!keywords.equals("")) {
                 b.setField("keywords", keywords);
-            if (!month.equals(""))
+            }
+            if (!month.equals("")) {
                 b.setField("month", month);
+            }
             //if (!url.equals("")) b.setField("url",url);
-            if (!number.equals(""))
+            if (!number.equals("")) {
                 b.setField("number", number);
+            }
 
             if (!doi.equals("")) {
                 b.setField("doi", doi);
                 b.setField("url", "http://dx.doi.org/" + doi);
             }
-            if (!pii.equals(""))
+            if (!pii.equals("")) {
                 b.setField("pii", pii);
-            if (!pmc.equals(""))
+            }
+            if (!pmc.equals("")) {
                 b.setField("pmc", pmc);
+            }
             if (!affiliation.equals("")) {
                 b.setField("institution", affiliation.replaceAll("#", "\\\\#"));
             }
@@ -286,8 +303,9 @@ public class MedlineHandler extends DefaultHandler
             // Older references do not have doi entries, but every
             // medline entry has a unique pubmed ID (aka primary ID).
             // Add a bibtex field for the pubmed ID for future use.
-            if (!pubmedid.equals(""))
+            if (!pubmedid.equals("")) {
                 b.setField("pmid", pubmedid);
+            }
 
             bibitems.add(b);
 
@@ -360,20 +378,23 @@ public class MedlineHandler extends DefaultHandler
         else if (localName.equals("Author")) {
             // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
             // when above is the case replace it with initials
-            if (forename.length() == 3 && forename.charAt(1) == ' ') {
+            if ((forename.length() == 3) && (forename.charAt(1) == ' ')) {
                 forename = initials;
             }
 
             // Put together name with last name first, and enter suffix in between if present:
-            if (lastname.indexOf(" ") > 0)
+            if (lastname.indexOf(" ") > 0) {
                 author = "{" + lastname + "}";
-            else
+            } else {
                 author = lastname;
+            }
 
-            if (suffix.length() > 0)
+            if (suffix.length() > 0) {
                 author = author + ", " + suffix;
-            if (forename.length() > 0)
+            }
+            if (forename.length() > 0) {
                 author = author + ", " + forename;
+            }
 
             //author = initials + " " + lastname;
             authors.add(author);
@@ -383,16 +404,17 @@ public class MedlineHandler extends DefaultHandler
             lastname = "";
             suffix = "";
         }
-        else if (localName.equals("DescriptorName"))
+        else if (localName.equals("DescriptorName")) {
             inDescriptorName = false;
-        else if (localName.equals("QualifierName"))
+        } else if (localName.equals("QualifierName")) {
             inQualifierName = false;
-        else if (localName.equals("MeshHeading")) {
+        } else if (localName.equals("MeshHeading")) {
             inMeshHeader = false;
-            if (minorTopics.equals(""))
+            if (minorTopics.equals("")) {
                 descriptors.add(majorTopic);
-            else
+            } else {
                 descriptors.add(majorTopic + ", " + minorTopics);
+            }
         }
         else if (localName.equals("LastName")) {
             inLastName = false;
@@ -423,15 +445,17 @@ public class MedlineHandler extends DefaultHandler
             inAffiliation = false;
         }
         else if (localName.equals("ArticleId")) {
-            if (inDoi)
+            if (inDoi) {
                 inDoi = false;
-            else if (inPii)
+            } else if (inPii) {
                 inPii = false;
-            else if (inPmc)
+            } else if (inPmc) {
                 inPmc = false;
+            }
         }
     }
 
+    @Override
     public void characters(char[] data, int start, int length) {
 
         // if stack is not ready, data is not content of recognized element
@@ -481,8 +505,9 @@ public class MedlineHandler extends DefaultHandler
             pubmedid = new String(data, start, length);
         }
         else if (inQualifierName) {
-            if (!minorTopics.equals(""))
+            if (!minorTopics.equals("")) {
                 minorTopics = minorTopics + "/";
+            }
             minorTopics = minorTopics + new String(data, start, length);
         }
         else if (inDescriptorName) {

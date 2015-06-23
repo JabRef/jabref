@@ -41,26 +41,30 @@ public class SimpleSearchRule implements SearchRule {
         m_caseSensitiveSearch = caseSensitive;
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }
 
+    @Override
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         String searchString = searchStrings.values().iterator().next();
 
-        if (!m_caseSensitiveSearch)
+        if (!m_caseSensitiveSearch) {
             searchString = searchString.toLowerCase();
+        }
         int score = 0;
         int counter = 0;
         Object fieldContentAsObject;
         String fieldContent;
         for (String field : bibtexEntry.getAllFields()) {
             fieldContentAsObject = bibtexEntry.getField(field);
-            if (fieldContentAsObject != null)
+            if (fieldContentAsObject != null) {
                 try {
-                    fieldContent = removeBrackets.format(fieldContentAsObject.toString());
-                    if (!m_caseSensitiveSearch)
+                    fieldContent = SimpleSearchRule.removeBrackets.format(fieldContentAsObject.toString());
+                    if (!m_caseSensitiveSearch) {
                         fieldContent = fieldContent.toLowerCase();
+                    }
                     counter = fieldContent.indexOf(searchString, counter);
                     while (counter >= 0) {
                         ++score;
@@ -69,6 +73,7 @@ public class SimpleSearchRule implements SearchRule {
                 } catch (Throwable t) {
                     System.err.println("sorting error: " + t);
                 }
+            }
             counter = 0;
         }
         return score;

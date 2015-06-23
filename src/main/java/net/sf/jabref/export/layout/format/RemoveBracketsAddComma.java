@@ -50,6 +50,7 @@ public class RemoveBracketsAddComma implements LayoutFormatter
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText)
     {
         String fieldEntry = fieldText;

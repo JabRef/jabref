@@ -46,7 +46,7 @@ public class RegExpFileSearch {
         extensions.add("txt");
         List<File> dirs = new ArrayList<File>();
         dirs.add(new File("/home/alver/Desktop/Tromso_2008"));
-        System.out.println(findFiles(entry, extensions, dirs,
+        System.out.println(RegExpFileSearch.findFiles(entry, extensions, dirs,
                 "**/[bibtexkey].*\\\\.[extension]"));
     }
 
@@ -64,7 +64,7 @@ public class RegExpFileSearch {
 
         Map<BibtexEntry, java.util.List<File>> res = new HashMap<BibtexEntry, List<File>>();
         for (BibtexEntry entry : entries) {
-            res.put(entry, findFiles(entry, extensions, directories, regExp));
+            res.put(entry, RegExpFileSearch.findFiles(entry, extensions, directories, regExp));
         }
         return res;
     }
@@ -84,12 +84,13 @@ public class RegExpFileSearch {
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
             sb.append(i.next());
-            if (i.hasNext())
+            if (i.hasNext()) {
                 sb.append("|");
+            }
         }
         String extensionRegExp = "(" + sb.toString() + ")";
 
-        return findFile(entry, null, directories, regularExpression, extensionRegExp, true);
+        return RegExpFileSearch.findFile(entry, null, directories, regularExpression, extensionRegExp, true);
     }
 
     /**
@@ -136,9 +137,10 @@ public class RegExpFileSearch {
             String file, String extensionRegExp, boolean relative) {
         ArrayList<File> res = new ArrayList<File>();
         for (File directory : dirs) {
-            List<File> tmp = findFile(entry, database, directory.getPath(), file, extensionRegExp, relative);
-            if (tmp != null)
+            List<File> tmp = RegExpFileSearch.findFile(entry, database, directory.getPath(), file, extensionRegExp, relative);
+            if (tmp != null) {
                 res.addAll(tmp);
+            }
         }
         return res;
     }
@@ -161,10 +163,10 @@ public class RegExpFileSearch {
         if (!root.exists()) {
             return null;
         }
-        res = findFile(entry, database, root, file, extensionRegExp);
+        res = RegExpFileSearch.findFile(entry, database, root, file, extensionRegExp);
 
         if (res.size() > 0) {
-            for (int i = 0; i < res.size(); i++)
+            for (int i = 0; i < res.size(); i++) {
                 try {
                     /**
                      * [ 1601651 ] PDF subdirectory - missing first character
@@ -174,13 +176,15 @@ public class RegExpFileSearch {
                     // Changed by M. Alver 2007.01.04:
                     // Remove first character if it is a directory separator character:
                     String tmp = res.get(i).getCanonicalPath().substring(root.getCanonicalPath().length());
-                    if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar))
+                    if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
                         tmp = tmp.substring(1);
+                    }
                     res.set(i, new File(tmp));
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
         }
         return res;
     }
@@ -209,12 +213,13 @@ public class RegExpFileSearch {
         file = s.toString();
         String[] fileParts = file.split("/");
 
-        if (fileParts.length == 0)
+        if (fileParts.length == 0) {
             return res;
+        }
 
         if (fileParts.length > 1) {
 
-            for (int i = 0; i < fileParts.length - 1; i++) {
+            for (int i = 0; i < (fileParts.length - 1); i++) {
 
                 String dirToProcess = fileParts[i];
                 dirToProcess = Util.expandBrackets(dirToProcess, entry, database);
@@ -237,7 +242,7 @@ public class RegExpFileSearch {
                         String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
                         for (File subDir : subDirs) {
                             if (subDir.isDirectory()) {
-                                res.addAll(findFile(entry, database, subDir,
+                                res.addAll(RegExpFileSearch.findFile(entry, database, subDir,
                                         restOfFileString, extensionRegExp));
                             }
                         }
@@ -254,15 +259,17 @@ public class RegExpFileSearch {
 
                         // Get all subdirs of each of the elements found in toDo
                         File[] subDirs = toDo.remove(0).listFiles();
-                        if (subDirs == null) // No permission?
+                        if (subDirs == null) {
                             continue;
+                        }
 
                         toDo.addAll(Arrays.asList(subDirs));
 
                         for (File subDir : subDirs) {
-                            if (!subDir.isDirectory())
+                            if (!subDir.isDirectory()) {
                                 continue;
-                            res.addAll(findFile(entry, database, subDir, restOfFileString,
+                            }
+                            res.addAll(RegExpFileSearch.findFile(entry, database, subDir, restOfFileString,
                                     extensionRegExp));
                         }
                     }
@@ -273,20 +280,22 @@ public class RegExpFileSearch {
         }
 
         // Last step: check if the given file can be found in this directory
-        String filePart = fileParts[fileParts.length - 1].replaceAll("\\[extension\\]", EXT_MARKER);
+        String filePart = fileParts[fileParts.length - 1].replaceAll("\\[extension\\]", RegExpFileSearch.EXT_MARKER);
         String filenameToLookFor = Util.expandBrackets(filePart, entry, database)
-                .replaceAll(EXT_MARKER, extensionRegExp);
+                .replaceAll(RegExpFileSearch.EXT_MARKER, extensionRegExp);
         final Pattern toMatch = Pattern.compile("^"
                 + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$", Pattern.CASE_INSENSITIVE);
 
         File[] matches = directory.listFiles(new FilenameFilter() {
 
+            @Override
             public boolean accept(File arg0, String arg1) {
                 return toMatch.matcher(arg1).matches();
             }
         });
-        if (matches != null && (matches.length > 0))
+        if ((matches != null) && (matches.length > 0)) {
             Collections.addAll(res, matches);
+        }
         return res;
     }
 

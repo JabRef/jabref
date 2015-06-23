@@ -42,6 +42,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (verifySelection()) {
                     okPressed = true;
@@ -51,6 +52,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 okPressed = false;
                 dispose();
@@ -58,12 +60,14 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         });
         selectAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setSelectionAll(true);
             }
         });
         deselectAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setSelectionAll(false);
             }
@@ -100,6 +104,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -121,8 +126,9 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     public boolean verifySelection() {
         int selected = 0;
         for (TableEntry entry : entries) {
-            if (entry.isWanted())
+            if (entry.isWanted()) {
                 selected++;
+            }
         }
         if (selected > warningLimit) {
             int result = JOptionPane.showConfirmDialog(this,
@@ -131,15 +137,16 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                             String.valueOf(warningLimit)),
                     Globals.lang("Confirm selection"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             return result == JOptionPane.YES_OPTION;
-        }
-        else
+        } else {
             return true;
+        }
     }
 
     public Map<String, Boolean> getSelection() {
         LinkedHashMap<String, Boolean> selection = new LinkedHashMap<String, Boolean>();
-        for (TableEntry e : entries)
+        for (TableEntry e : entries) {
             selection.put(e.id, e.isWanted());
+        }
         return selection;
     }
 
@@ -193,6 +200,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         final JLabel label = new JLabel();
 
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus,
                 int row, int column) {
@@ -212,6 +220,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
             getTableHeader().setReorderingAllowed(false);
         }
 
+        @Override
         public TableCellRenderer getCellRenderer(int row, int column) {
             return column == 0 ? getDefaultRenderer(Boolean.class) : renderer;
         }
@@ -221,17 +230,21 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
          * getDefaultEditor(Boolean.class); }
          */
 
+        @Override
         public Class<?> getColumnClass(int col) {
-            if (col == 0)
+            if (col == 0) {
                 return Boolean.class;
-            else
+            } else {
                 return JLabel.class;
+            }
         }
 
+        @Override
         public boolean isCellEditable(int row, int column) {
             return column == 0;
         }
 
+        @Override
         public void setValueAt(Object value, int row, int column) {
             // Only column 0, which is controlled by BibtexEntry.searchHit, is
             // editable:
@@ -244,22 +257,27 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     class EntryTableFormat implements TableFormat<TableEntry> {
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public String getColumnName(int i) {
-            if (i == 0)
+            if (i == 0) {
                 return Globals.lang("Keep");
-            else
+            } else {
                 return Globals.lang("Preview");
+            }
         }
 
+        @Override
         public Object getColumnValue(TableEntry entry, int i) {
-            if (i == 0)
+            if (i == 0) {
                 return entry.isWanted() ? Boolean.TRUE : Boolean.FALSE;
-            else
+            } else {
                 return entry.getPreview();
+            }
         }
 
     }
@@ -269,14 +287,17 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         return okPressed;
     }
 
+    @Override
     public void setStatus(String s) {
         frame.setStatus(s);
     }
 
+    @Override
     public void showMessage(Object message, String title, int msgType) {
         JOptionPane.showMessageDialog(this, message, title, msgType);
     }
 
+    @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }

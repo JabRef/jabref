@@ -1,6 +1,8 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,30 +14,33 @@ public class CompositeFormatTest {
 
         {
             LayoutFormatter f = new CompositeFormat();
-            assertEquals("No Change", f.format("No Change"));
+            Assert.assertEquals("No Change", f.format("No Change"));
         }
         {
             LayoutFormatter f = new CompositeFormat(new LayoutFormatter[] {new LayoutFormatter() {
 
+                @Override
                 public String format(String fieldText) {
                     return fieldText + fieldText;
                 }
 
             }, new LayoutFormatter() {
 
+                @Override
                 public String format(String fieldText) {
                     return "A" + fieldText;
                 }
 
             }, new LayoutFormatter() {
 
+                @Override
                 public String format(String fieldText) {
                     return "B" + fieldText;
                 }
 
             }});
 
-            assertEquals("BAff", f.format("f"));
+            Assert.assertEquals("BAff", f.format("f"));
         }
 
         {
@@ -44,8 +49,8 @@ public class CompositeFormatTest {
             LayoutFormatter first = new AuthorOrgSci();
             LayoutFormatter second = new NoSpaceBetweenAbbreviations();
 
-            assertEquals(second.format(first.format("John Flynn and Sabine Gartska")), f.format("John Flynn and Sabine Gartska"));
-            assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")), f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
+            Assert.assertEquals(second.format(first.format("John Flynn and Sabine Gartska")), f.format("John Flynn and Sabine Gartska"));
+            Assert.assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")), f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
         }
     }
 

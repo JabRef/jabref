@@ -105,6 +105,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         content.requestFocus();
     }
 
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             content.setPage(e.getURL());
@@ -119,9 +120,10 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
         public CloseAction() {
             super(Globals.lang("Close"));
             // , new ImageIcon(GUIGlobals.closeIconFile));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Close the help window"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close the help window"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             dispose();
         }
@@ -134,6 +136,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
             // putValue(SHORT_DESCRIPTION, "Show the previous page");
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             setEnabled(content.back());
             forward.setEnabled(true);
@@ -146,6 +149,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
             super("Forward", GUIGlobals.getImage("right"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             setEnabled(content.forward());
             back.setEnabled(true);
@@ -158,6 +162,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
             super("Contents", GUIGlobals.getImage("helpContents"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             content.setPage(GUIGlobals.helpContents, JabRef.class);
             back.setEnabled(true);

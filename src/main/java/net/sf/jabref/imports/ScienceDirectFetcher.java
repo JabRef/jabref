@@ -34,12 +34,12 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     protected static final int MAX_PAGES_TO_LOAD = 8;
     protected static final String WEBSITE_URL = "http://www.sciencedirect.com";
-    protected static final String SEARCH_URL = WEBSITE_URL + "/science/quicksearch?query=";
+    protected static final String SEARCH_URL = ScienceDirectFetcher.WEBSITE_URL + "/science/quicksearch?query=";
 
     protected static final String linkPrefix = "http://www.sciencedirect.com/science?_ob=ArticleURL&";
     protected static final Pattern linkPattern = Pattern.compile(
             "<a href=\"" +
-                    linkPrefix.replaceAll("\\?", "\\\\?") +
+                    ScienceDirectFetcher.linkPrefix.replaceAll("\\?", "\\\\?") +
                     "([^\"]+)\"\"");
 
     protected static final Pattern nextPagePattern = Pattern.compile(
@@ -49,34 +49,41 @@ public class ScienceDirectFetcher implements EntryFetcher {
     protected boolean noAccessFound = false;
 
 
+    @Override
     public String getHelpPage() {
         return "ScienceDirect.html";
     }
 
+    @Override
     public String getKeyName() {
         return "ScienceDirect";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // No Options panel
         return null;
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle("Search ScienceDirect");
     }
 
+    @Override
     public void stopFetching() {
         stopFetching = true;
         noAccessFound = false;
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         stopFetching = false;
         try {
             List<String> citations = getCitations(query);
-            if (citations == null)
+            if (citations == null) {
                 return false;
+            }
             if (citations.size() == 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         query),
@@ -86,11 +93,13 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
             int i = 0;
             for (String cit : citations) {
-                if (stopFetching)
+                if (stopFetching) {
                     break;
+                }
                 BibtexEntry entry = BibsonomyScraper.getEntry(cit);
-                if (entry != null)
+                if (entry != null) {
                     dialog.addEntry(entry);
+                }
                 dialog.setProgress(++i, citations.size());
             }
 
@@ -114,11 +123,11 @@ public class ScienceDirectFetcher implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
-            urlQuery = SEARCH_URL + URLEncoder.encode(query, "UTF-8");
+            urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, "UTF-8");
             int count = 1;
             String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < MAX_PAGES_TO_LOAD)) {
+                    && (count < ScienceDirectFetcher.MAX_PAGES_TO_LOAD)) {
                 urlQuery = nextPage;
                 count++;
             }
@@ -132,12 +141,12 @@ public class ScienceDirectFetcher implements EntryFetcher {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //String entirePage = cont;
-        Matcher m = linkPattern.matcher(cont);
+        Matcher m = ScienceDirectFetcher.linkPattern.matcher(cont);
         if (m.find()) {
             while (m.find()) {
-                ids.add(linkPrefix + m.group(1));
+                ids.add(ScienceDirectFetcher.linkPrefix + m.group(1));
                 cont = cont.substring(m.end());
-                m = linkPattern.matcher(cont);
+                m = ScienceDirectFetcher.linkPattern.matcher(cont);
             }
         }
 

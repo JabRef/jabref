@@ -36,6 +36,7 @@ public class NotFoundFormatter implements LayoutFormatter {
         return notFound;
     }
 
+    @Override
     public String format(String fieldText) {
         return "[" + Globals.lang("Formatter not found: %0", notFound) + "] " + fieldText;
     }

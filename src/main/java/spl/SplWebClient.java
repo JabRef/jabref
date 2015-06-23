@@ -39,11 +39,11 @@ public class SplWebClient {
 
     private static final Client CLIENT = Client.create();
     static {
-        CLIENT.setConnectTimeout(1000);
-        CLIENT.setReadTimeout(70000);
+        SplWebClient.CLIENT.setConnectTimeout(1000);
+        SplWebClient.CLIENT.setReadTimeout(70000);
     }
-    private static final WebResource WEBRESOURCE = CLIENT.resource("http://api.mr-dlib.org/");
-    private static final WebResource INTERNETRESOURCE = CLIENT.resource("http://www.google.com");
+    private static final WebResource WEBRESOURCE = SplWebClient.CLIENT.resource("http://api.mr-dlib.org/");
+    private static final WebResource INTERNETRESOURCE = SplWebClient.CLIENT.resource("http://www.google.com");
     //private static WebResource WEBRESOURCE = CLIENT.resource( "http://localhost:8080/rest/" );
 
     public static Document metadata;
@@ -51,18 +51,18 @@ public class SplWebClient {
 
     public static WebServiceStatus getMetaData(File file) {
         try {
-            if (!isWebServiceAvailable()) {
-                if (isInternetAvailable()) {
+            if (!SplWebClient.isWebServiceAvailable()) {
+                if (SplWebClient.isInternetAvailable()) {
                     return WebServiceStatus.WEBSERVICE_DOWN;
                 }
                 else {
                     return WebServiceStatus.NO_INTERNET;
                 }
             }
-            if (isWebServiceOutDated()) {
+            if (SplWebClient.isWebServiceOutDated()) {
                 return WebServiceStatus.OUTDATED;
             }
-            if (!isMetaDataServiceAvailable()) {
+            if (!SplWebClient.isMetaDataServiceAvailable()) {
                 return WebServiceStatus.UNAVAILABLE;
             }
             FileInputStream fin = new FileInputStream(file);
@@ -74,9 +74,9 @@ public class SplWebClient {
             formDataMultiPart.field("source", "jabref", MediaType.TEXT_PLAIN_TYPE);
             formDataMultiPart.field("filename", file.getName(), MediaType.TEXT_PLAIN_TYPE);
 
-            ClientResponse response = WEBRESOURCE.path("documents").type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formDataMultiPart);
+            ClientResponse response = SplWebClient.WEBRESOURCE.path("documents").type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formDataMultiPart);
             //System.out.println(response.getEntity(String.class));
-            if (response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()) {
+            if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 byte[] bytes = new byte[0];
                 try {
@@ -131,8 +131,8 @@ public class SplWebClient {
 
     public static boolean isWebServiceOutDated() {
         try {
-            ClientResponse response = WEBRESOURCE.path("service/versioncheck/" + Tools.WEBSERVICE_APP_ID + "/current").get(ClientResponse.class);
-            if (response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()) {
+            ClientResponse response = SplWebClient.WEBRESOURCE.path("service/versioncheck/" + Tools.WEBSERVICE_APP_ID + "/current").get(ClientResponse.class);
+            if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 byte[] bytes = entity.getBytes();
                 InputStream is = new ByteArrayInputStream(bytes);
@@ -153,10 +153,10 @@ public class SplWebClient {
 
     public static boolean isMetaDataServiceAvailable() {
         try {
-            ClientResponse response = WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
-            if (response.getClientResponseStatus() == ClientResponse.Status.OK && response.hasEntity()) {
+            ClientResponse response = SplWebClient.WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
+            if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
-                if (entity != null && entity.equalsIgnoreCase("false")) {
+                if ((entity != null) && entity.equalsIgnoreCase("false")) {
                     return false;
                 }
             }
@@ -168,7 +168,7 @@ public class SplWebClient {
 
     public static boolean isWebServiceAvailable() {
         try {
-            ClientResponse response = WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
+            ClientResponse response = SplWebClient.WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
         } catch (Exception e) {
             return false;
         }
@@ -177,7 +177,7 @@ public class SplWebClient {
 
     public static boolean isInternetAvailable() {
         try {
-            ClientResponse response = INTERNETRESOURCE.get(ClientResponse.class);
+            ClientResponse response = SplWebClient.INTERNETRESOURCE.get(ClientResponse.class);
         } catch (Exception e) {
             return false;
         }

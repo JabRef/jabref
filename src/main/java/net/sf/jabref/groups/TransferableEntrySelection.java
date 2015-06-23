@@ -45,7 +45,7 @@ public class TransferableEntrySelection implements Transferable {
         }
         flavorInternal = df1;
         flavorExternal = df2;
-        flavors = new DataFlavor[] {flavorInternal, flavorExternal};
+        flavors = new DataFlavor[] {TransferableEntrySelection.flavorInternal, TransferableEntrySelection.flavorExternal};
     }
 
 
@@ -54,32 +54,38 @@ public class TransferableEntrySelection implements Transferable {
         StringBuffer keys = new StringBuffer();
         for (int i = 0; i < selectedEntries.length; ++i) {
             keys.append(selectedEntries[i].getCiteKey());
-            if (i + 1 < selectedEntries.length)
+            if ((i + 1) < selectedEntries.length) {
                 keys.append(",");
+            }
         }
         selectedEntriesCiteKeys = keys.toString();
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return flavors;
+        return TransferableEntrySelection.flavors;
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor someFlavor) {
-        return someFlavor.equals(flavorInternal)
-                || someFlavor.equals(flavorExternal);
+        return someFlavor.equals(TransferableEntrySelection.flavorInternal)
+                || someFlavor.equals(TransferableEntrySelection.flavorExternal);
     }
 
+    @Override
     public Object getTransferData(DataFlavor someFlavor)
             throws UnsupportedFlavorException, IOException {
-        if (!isDataFlavorSupported(someFlavor))
+        if (!isDataFlavorSupported(someFlavor)) {
             throw new UnsupportedFlavorException(someFlavor);
-        if (someFlavor.equals(flavorInternal))
+        }
+        if (someFlavor.equals(TransferableEntrySelection.flavorInternal)) {
             return this;
+        }
         String s = includeCiteKeyword ?
                 "\\cite{" + selectedEntriesCiteKeys + "}"
                 : selectedEntriesCiteKeys;
         return new ByteArrayInputStream(s.getBytes(
-                flavorExternal.getParameter("charset").trim()));
+                TransferableEntrySelection.flavorExternal.getParameter("charset").trim()));
     }
 
     public BibtexEntry[] getSelection() {

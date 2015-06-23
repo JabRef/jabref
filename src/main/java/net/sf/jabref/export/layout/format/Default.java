@@ -26,11 +26,13 @@ public class Default implements ParamLayoutFormatter {
     String defValue = "";
 
 
+    @Override
     public void setArgument(String arg) {
         this.defValue = arg;
     }
 
+    @Override
     public String format(String fieldText) {
-        return fieldText != null && (fieldText.length() > 0) ? fieldText : defValue;
+        return (fieldText != null) && (fieldText.length() > 0) ? fieldText : defValue;
     }
 }

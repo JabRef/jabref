@@ -101,10 +101,12 @@ public class ColorSetupPanel extends JPanel {
             this.button = button;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             Color chosen = JColorChooser.showDialog(null, button.getName(), button.getColor());
-            if (chosen != null)
+            if (chosen != null) {
                 button.setColor(chosen);
+            }
         }
     }
 
@@ -130,6 +132,7 @@ public class ColorSetupPanel extends JPanel {
             JButton toDefault = new JButton(Globals.lang("Default"));
             toDefault.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setColor(Globals.prefs.getDefaultColor(key));
                     repaint();
@@ -142,6 +145,7 @@ public class ColorSetupPanel extends JPanel {
             return key;
         }
 
+        @Override
         public String getName() {
             return name;
         }
@@ -154,18 +158,21 @@ public class ColorSetupPanel extends JPanel {
             this.color = color;
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Rectangle r = g.getClipBounds();
             g.setColor(color);
             g.fillRect(r.x, r.y, r.width, r.height);
         }
 
+        @Override
         public int getIconWidth() {
-            return ICON_WIDTH;
+            return ColorSetupPanel.ICON_WIDTH;
         }
 
+        @Override
         public int getIconHeight() {
-            return ICON_HEIGHT;
+            return ColorSetupPanel.ICON_HEIGHT;
         }
     }
 

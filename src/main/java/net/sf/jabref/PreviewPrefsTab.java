@@ -152,6 +152,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         def1.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
                 _prefs.remove("preview0");
@@ -161,6 +162,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
         def2.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
                 _prefs.remove("preview1");
@@ -171,10 +173,11 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         test1.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                getTestEntry();
+                PreviewPrefsTab.getTestEntry();
                 try {
-                    PreviewPanel testPanel = new PreviewPanel(null, entry, null, new MetaData(), layout1.getText());
+                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(), layout1.getText());
                     testPanel.setPreferredSize(new Dimension(800, 350));
                     JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
@@ -187,10 +190,11 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         test2.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                getTestEntry();
+                PreviewPrefsTab.getTestEntry();
                 try {
-                    PreviewPanel testPanel = new PreviewPanel(null, entry, null, new MetaData(), layout2.getText());
+                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(), layout2.getText());
                     testPanel.setPreferredSize(new Dimension(800, 350));
                     JOptionPane.showMessageDialog(null, new JScrollPane(testPanel),
                             Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
@@ -203,29 +207,30 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     }
 
     public static BibtexEntry getTestEntry() {
-        if (entry != null)
-            return entry;
-        entry = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
-        entry.setField(BibtexFields.KEY_FIELD, "conceicao1997");
-        entry
+        if (PreviewPrefsTab.entry != null) {
+            return PreviewPrefsTab.entry;
+        }
+        PreviewPrefsTab.entry = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
+        PreviewPrefsTab.entry.setField(BibtexFields.KEY_FIELD, "conceicao1997");
+        PreviewPrefsTab.entry
                 .setField(
                         "author",
                         "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
-        entry
+        PreviewPrefsTab.entry
                 .setField(
                         "title",
                         "Amino acid metabolism and protein turnover in larval turbot (Scophthalmus maximus) fed natural zooplankton or Artemia");
-        entry.setField("year", "1997");
-        entry.setField("journal", "Marine Biology");
-        entry.setField("month", "January");
-        entry.setField("number", "2");
-        entry.setField("volume", "123");
-        entry.setField("pdf", "conceicao1997.pdf");
-        entry.setField("pages", "255--265");
-        entry.setField("keywords", "energetics, artemia, metabolism, amino acid, turbot");
-        entry.setField("url",
+        PreviewPrefsTab.entry.setField("year", "1997");
+        PreviewPrefsTab.entry.setField("journal", "Marine Biology");
+        PreviewPrefsTab.entry.setField("month", "January");
+        PreviewPrefsTab.entry.setField("number", "2");
+        PreviewPrefsTab.entry.setField("volume", "123");
+        PreviewPrefsTab.entry.setField("pdf", "conceicao1997.pdf");
+        PreviewPrefsTab.entry.setField("pages", "255--265");
+        PreviewPrefsTab.entry.setField("keywords", "energetics, artemia, metabolism, amino acid, turbot");
+        PreviewPrefsTab.entry.setField("url",
                 "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
-        entry
+        PreviewPrefsTab.entry
                 .setField(
                         "abstract",
                         "Abstract The present paper studied the influence of different food regimes "
@@ -248,25 +253,29 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                                 + "protein degradation might daily remove and return, respectively, the equivalent of up to 20 and 10 "
                                 + "times the size of the FAA pool. In an early phase (Day 11) high growth rates were associated with a "
                                 + "relatively low protein turnover, while at a later stage (Day 17), a much higher turnover was observed.");
-        return entry;
+        return PreviewPrefsTab.entry;
     }
 
+    @Override
     public void setValues() {
         layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
         layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
         pdfPreview.setSelected(_prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
     }
 
+    @Override
     public void storeSettings() {
         _prefs.put("preview0", layout1.getText().replaceAll("\n", "__NEWLINE__"));
         _prefs.put("preview1", layout2.getText().replaceAll("\n", "__NEWLINE__"));
         _prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Entry preview");
     }

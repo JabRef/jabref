@@ -41,6 +41,7 @@ public class RTFChars implements LayoutFormatter {
     private static final Logger logger = Logger.getLogger(RTFChars.class.toString());
 
 
+    @Override
     public String format(String field) {
 
         StringBuffer sb = new StringBuffer("");
@@ -65,7 +66,7 @@ public class RTFChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c)
                     || (Globals.SPECIAL_COMMAND_CHARS.contains("" + c))) {
@@ -79,8 +80,9 @@ public class RTFChars implements LayoutFormatter {
                             && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1)
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
+                        }
 
                         String command = currentCommand.toString();
                         i++;
@@ -96,8 +98,9 @@ public class RTFChars implements LayoutFormatter {
 
                         String result = Globals.RTFCHARS.get(command + combody);
 
-                        if (result != null)
+                        if (result != null) {
                             sb.append(result);
+                        }
 
                         incommand = false;
                         escaped = false;
@@ -109,9 +112,9 @@ public class RTFChars implements LayoutFormatter {
             } else {
                 // if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
                 testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{')
-                        && (c != '}')))
+                        && (c != '}'))) {
                     sb.append(c);
-                else {
+                } else {
                     assert (incommand);
 
                     // First test for braces that may be part of a LaTeX command:
@@ -133,8 +136,9 @@ public class RTFChars implements LayoutFormatter {
 
                     // Then look for italics etc.,
                     // but first check if we are already at the end of the string.
-                    if (i >= field.length() - 1)
+                    if (i >= (field.length() - 1)) {
                         break testContent;
+                    }
 
                     if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
                         String command = currentCommand.toString();
@@ -149,14 +153,15 @@ public class RTFChars implements LayoutFormatter {
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append("}");
                         } else {
-                            logger.fine("Unknown command " + command);
+                            RTFChars.logger.fine("Unknown command " + command);
                         }
                         if (c == ' ') {
                             // command was separated with the content by ' '
                             // We have to add the space a
                         }
-                    } else
+                    } else {
                         sb.append(c);
+                    }
 
                 }
                 incommand = false;
@@ -168,10 +173,11 @@ public class RTFChars implements LayoutFormatter {
         sb = new StringBuffer();
 
         for (char c : chars) {
-            if (c < 128)
+            if (c < 128) {
                 sb.append(c);
-            else
+            } else {
                 sb.append("\\u").append((long) c).append('?');
+            }
         }
 
         return sb.toString().replaceAll("---", "{\\\\emdash}").replaceAll("--", "{\\\\endash}").replaceAll("``", "{\\\\ldblquote}").replaceAll("''", "{\\\\rdblquote}");

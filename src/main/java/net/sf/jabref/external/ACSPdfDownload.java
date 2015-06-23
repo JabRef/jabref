@@ -31,13 +31,15 @@ public class ACSPdfDownload implements FullTextFinder {
 
     }
 
+    @Override
     public boolean supportsSite(URL url) {
         return url.getHost().toLowerCase().contains("acs.org");
     }
 
+    @Override
     public URL findFullTextURL(URL url) throws IOException {
         try {
-            return new URL(BASE_URL + url.getPath().substring("/doi/abs/".length()));
+            return new URL(ACSPdfDownload.BASE_URL + url.getPath().substring("/doi/abs/".length()));
         } catch (MalformedURLException e) {
             return null;
         }

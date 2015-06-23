@@ -159,10 +159,10 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     private String makeSearchURL() {
-        StringBuffer sb = new StringBuffer(URL_START).append(URL_PART1);
+        StringBuffer sb = new StringBuffer(DBLPFetcher.URL_START).append(DBLPFetcher.URL_PART1);
         String cleanedQuery = helper.cleanDBLPQuery(query);
         sb.append(cleanedQuery);
-        sb.append(URL_END);
+        sb.append(DBLPFetcher.URL_END);
         return sb.toString();
     }
 

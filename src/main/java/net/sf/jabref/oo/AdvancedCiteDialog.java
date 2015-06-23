@@ -47,15 +47,17 @@ public class AdvancedCiteDialog {
         ButtonGroup bg = new ButtonGroup();
         bg.add(inPar);
         bg.add(inText);
-        if (defaultInPar)
+        if (AdvancedCiteDialog.defaultInPar) {
             inPar.setSelected(true);
-        else
+        } else {
             inText.setSelected(true);
+        }
 
         inPar.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent changeEvent) {
-                defaultInPar = inPar.isSelected();
+                AdvancedCiteDialog.defaultInPar = inPar.isSelected();
             }
         });
 
@@ -83,6 +85,7 @@ public class AdvancedCiteDialog {
 
         Action okAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = true;
                 diag.dispose();
@@ -94,6 +97,7 @@ public class AdvancedCiteDialog {
         inText.addActionListener(okAction);
         Action cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = false;
                 diag.dispose();

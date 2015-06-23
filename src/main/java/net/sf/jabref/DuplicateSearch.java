@@ -42,6 +42,7 @@ public class DuplicateSearch implements Runnable {
         panel = bp;
     }
 
+    @Override
     public void run() {
         final NamedCompound ce = new NamedCompound(Globals.lang("duplicate removal"));
         int duplicateCounter = 0;
@@ -49,11 +50,13 @@ public class DuplicateSearch implements Runnable {
         autoRemoveExactDuplicates = false;
         panel.output(Globals.lang("Searching for duplicates..."));
         Object[] keys = panel.database.getKeySet().toArray();
-        if ((keys.length < 2))
+        if ((keys.length < 2)) {
             return;
+        }
         bes = new BibtexEntry[keys.length];
-        for (int i = 0; i < keys.length; i++)
+        for (int i = 0; i < keys.length; i++) {
             bes[i] = panel.database.getEntryById((String) keys[i]);
+        }
 
         SearcherRunnable st = new SearcherRunnable();
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st);
@@ -104,7 +107,9 @@ public class DuplicateSearch implements Runnable {
                             || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
                         toRemove.add(be[1]);
                         if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
+                         {
                             autoRemoveExactDuplicates = true; // Remember choice
+                        }
                     } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
                         toRemove.add(be[0]);
                     } else if (answer == DuplicateResolverDialog.BREAK) {
@@ -119,6 +124,7 @@ public class DuplicateSearch implements Runnable {
         final int dupliC = duplicateCounter;
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 // Now, do the actual removal:
                 if (toRemove.size() > 0) {
@@ -145,8 +151,9 @@ public class DuplicateSearch implements Runnable {
 
         private volatile boolean finished = false;
 
+        @Override
         public void run() {
-            for (int i = 0; (i < bes.length - 1) && !finished; i++) {
+            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
                 for (int j = i + 1; (j < bes.length) && !finished; j++) {
                     boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
@@ -201,6 +208,7 @@ public class DuplicateSearch implements Runnable {
             return reply;
         }
 
+        @Override
         public void update() {
             diag = new DuplicateResolverDialog(frame, one, two, dialogType);
             diag.setVisible(true);

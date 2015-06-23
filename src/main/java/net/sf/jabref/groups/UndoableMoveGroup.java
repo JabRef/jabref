@@ -56,16 +56,19 @@ public class UndoableMoveGroup extends AbstractUndoableEdit {
         m_oldChildIndex = moveNode.getParent().getIndex(moveNode);
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": "
                 + Globals.lang("move group");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": "
                 + Globals.lang("move group");
     }
 
+    @Override
     public void undo() {
         super.undo();
         GroupTreeNode cursor = m_groupsRootHandle
@@ -76,6 +79,7 @@ public class UndoableMoveGroup extends AbstractUndoableEdit {
         m_groupSelector.revalidateGroups();
     }
 
+    @Override
     public void redo() {
         super.redo();
         GroupTreeNode cursor = m_groupsRootHandle

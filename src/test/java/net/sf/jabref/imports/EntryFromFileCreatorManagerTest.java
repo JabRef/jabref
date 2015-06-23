@@ -2,6 +2,8 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -21,11 +23,11 @@ public class EntryFromFileCreatorManagerTest {
     public void testGetCreator() throws Exception {
         EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
         EntryFromFileCreator creator = manager.getEntryCreator(ImportDataTest.NOT_EXISTING_PDF);
-        assertNull(creator);
+        Assert.assertNull(creator);
 
         creator = manager.getEntryCreator(ImportDataTest.FILE_IN_DATABASE);
-        assertNotNull(creator);
-        assertTrue(creator.accept(ImportDataTest.FILE_IN_DATABASE));
+        Assert.assertNotNull(creator);
+        Assert.assertTrue(creator.accept(ImportDataTest.FILE_IN_DATABASE));
     }
 
     @Test
@@ -46,7 +48,7 @@ public class EntryFromFileCreatorManagerTest {
          * One file doesn't exist, so adding it as an entry should lead to an
          * error message.
          */
-        assertEquals(1, errors.size());
+        Assert.assertEquals(1, errors.size());
 
         boolean file1Found = false, file2Found = false;
         for (BibtexEntry entry : database.getEntries()) {
@@ -59,8 +61,8 @@ public class EntryFromFileCreatorManagerTest {
             }
         }
 
-        assertTrue(file1Found);
-        assertFalse(file2Found);
+        Assert.assertTrue(file1Found);
+        Assert.assertFalse(file2Found);
     }
 
 }

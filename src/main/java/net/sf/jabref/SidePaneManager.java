@@ -51,9 +51,11 @@ public class SidePaneManager {
          */
         frame.tabbedPane.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane
                                 .getSelectedComponent());
@@ -94,16 +96,18 @@ public class SidePaneManager {
         Object o = components.get(name);
         if (o != null) {
             show((SidePaneComponent) o);
-        } else
+        } else {
             System.err.println("Side pane component '" + name + "' unknown.");
+        }
     }
 
     public void hide(String name) {
         Object o = components.get(name);
         if (o != null) {
             hideComponent((SidePaneComponent) o);
-        } else
+        } else {
             System.err.println("Side pane component '" + name + "' unknown.");
+        }
     }
 
     public synchronized void register(String name, SidePaneComponent comp) {
@@ -147,8 +151,9 @@ public class SidePaneManager {
 
     public synchronized void hideComponent(String name) {
         SidePaneComponent comp = components.get(name);
-        if (comp == null)
+        if (comp == null) {
             return;
+        }
         if (visible.contains(comp)) {
             comp.componentClosing();
             visible.remove(comp);
@@ -273,14 +278,16 @@ public class SidePaneManager {
             sidep.setVisible(true);
             if (!wasVisible) {
                 int width = Globals.prefs.getInt("sidePaneWidth");
-                if (width > 0)
+                if (width > 0) {
                     frame.contentPane.setDividerLocation(width);
-                else
+                } else {
                     frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+                }
             }
         } else {
-            if (sidep.isVisible())
+            if (sidep.isVisible()) {
                 Globals.prefs.putInt("sidePaneWidth", frame.contentPane.getDividerLocation());
+            }
             sidep.setVisible(false);
 
         }

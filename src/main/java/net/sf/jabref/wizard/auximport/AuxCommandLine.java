@@ -73,8 +73,9 @@ public class AuxCommandLine
                 System.out.println(returnValue);
             }
             int nested = auxParser.getNestedAuxCounter();
-            if (nested > 0)
+            if (nested > 0) {
                 System.out.println(Globals.lang("nested_aux_files") + " " + nested);
+            }
 
         }
         return back;

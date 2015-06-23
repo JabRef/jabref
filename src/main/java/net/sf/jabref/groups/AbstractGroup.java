@@ -36,7 +36,7 @@ public abstract class AbstractGroup {
      * INCLUDING). Defaults to INDEPENDENT, which will be used if and
      * only if the context specified in the constructor is invalid.
      */
-    protected int m_context = INDEPENDENT;
+    protected int m_context = AbstractGroup.INDEPENDENT;
 
 
     public abstract String getTypeId();
@@ -87,14 +87,18 @@ public abstract class AbstractGroup {
      */
     public static AbstractGroup fromString(String s, BibtexDatabase db,
             int version) throws Exception {
-        if (s.startsWith(KeywordGroup.ID))
+        if (s.startsWith(KeywordGroup.ID)) {
             return KeywordGroup.fromString(s, db, version);
-        if (s.startsWith(AllEntriesGroup.ID))
+        }
+        if (s.startsWith(AllEntriesGroup.ID)) {
             return AllEntriesGroup.fromString(s, db, version);
-        if (s.startsWith(SearchGroup.ID))
+        }
+        if (s.startsWith(SearchGroup.ID)) {
             return SearchGroup.fromString(s, db, version);
-        if (s.startsWith(ExplicitGroup.ID))
+        }
+        if (s.startsWith(ExplicitGroup.ID)) {
             return ExplicitGroup.fromString(s, db, version);
+        }
         return null; // unknown group
     }
 
@@ -155,9 +159,11 @@ public abstract class AbstractGroup {
      *         otherwise.
      */
     public boolean containsAny(BibtexEntry[] entries) {
-        for (BibtexEntry entry : entries)
-            if (contains(entry))
+        for (BibtexEntry entry : entries) {
+            if (contains(entry)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -166,9 +172,11 @@ public abstract class AbstractGroup {
      *         otherwise.
      */
     public boolean containsAll(BibtexEntry[] entries) {
-        for (BibtexEntry entry : entries)
-            if (!contains(entry))
+        for (BibtexEntry entry : entries) {
+            if (!contains(entry)) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -183,9 +191,10 @@ public abstract class AbstractGroup {
     /** Sets the groups's hierarchical context. If context is not a valid
      * value, the call is ignored. */
     public void setHierarchicalContext(int context) {
-        if (context != INDEPENDENT && context != REFINING
-                && context != INCLUDING)
+        if ((context != AbstractGroup.INDEPENDENT) && (context != AbstractGroup.REFINING)
+                && (context != AbstractGroup.INCLUDING)) {
             return;
+        }
         m_context = context;
     }
 

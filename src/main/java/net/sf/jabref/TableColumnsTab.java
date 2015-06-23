@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -126,23 +127,29 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         TableModel tm = new AbstractTableModel() {
 
+            @Override
             public int getRowCount() {
                 return rowCount;
             }
 
+            @Override
             public int getColumnCount() {
                 return 2;
             }
 
+            @Override
             public Object getValueAt(int row, int column) {
-                if (row == 0)
+                if (row == 0) {
                     return (column == 0 ? GUIGlobals.NUMBER_COL : "" + ncWidth);
+                }
                 row--;
-                if (row >= tableRows.size())
+                if (row >= tableRows.size()) {
                     return "";
+                }
                 Object rowContent = tableRows.elementAt(row);
-                if (rowContent == null)
+                if (rowContent == null) {
                     return "";
+                }
                 TableRow tr = (TableRow) rowContent;
                 switch (column) {
                 case 0:
@@ -153,26 +160,32 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 return null; // Unreachable.
             }
 
+            @Override
             public String getColumnName(int col) {
                 return (col == 0 ? Globals.lang("Field name") : Globals.lang("Column width"));
             }
 
+            @Override
             public Class<?> getColumnClass(int column) {
-                if (column == 0)
+                if (column == 0) {
                     return String.class;
-                else
+                } else {
                     return Integer.class;
+                }
             }
 
+            @Override
             public boolean isCellEditable(int row, int col) {
                 return !((row == 0) && (col == 0));
             }
 
+            @Override
             public void setValueAt(Object value, int row, int col) {
                 tableChanged = true;
                 // Make sure the vector is long enough.
-                while (row >= tableRows.size())
+                while (row >= tableRows.size()) {
                     tableRows.add(new TableRow("", -1));
+                }
 
                 if ((row == 0) && (col == 1)) {
                     ncWidth = Integer.parseInt(value.toString());
@@ -183,14 +196,16 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
                 if (col == 0) {
                     rowContent.name = value.toString();
-                    if (getValueAt(row, 1).equals(""))
+                    if (getValueAt(row, 1).equals("")) {
                         setValueAt("" + GUIGlobals.DEFAULT_FIELD_LENGTH, row, 1);
+                    }
                 }
                 else {
-                    if (value == null)
+                    if (value == null) {
                         rowContent.length = -1;
-                    else
+                    } else {
                         rowContent.length = Integer.parseInt(value.toString());
+                    }
                 }
             }
 
@@ -281,6 +296,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         //		.concat(". ").concat(Globals.lang("You must restart JabRef for this to come into effect.")));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 boolean isEnabled = specialFieldsEnabled.isSelected();
                 rankingColumn.setEnabled(isEnabled);
@@ -297,6 +313,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         rankingColumn = new JCheckBox(Globals.lang("Show rank"));
         rankingColumn.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 compactRankingColumn.setEnabled(rankingColumn.isSelected());
             }
@@ -377,6 +394,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
         pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
@@ -448,10 +466,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         tableRows.clear();
         String[] names = _prefs.getStringArray("columnNames"), lengths = _prefs.getStringArray("columnWidths");
         for (int i = 0; i < names.length; i++) {
-            if (i < lengths.length)
+            if (i < lengths.length) {
                 tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
-            else
+            } else {
                 tableRows.add(new TableRow(names[i]));
+            }
         }
         rowCount = tableRows.size() + 5;
         ncWidth = _prefs.getInt("numberColWidth");
@@ -463,13 +482,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public DeleteRowAction() {
             super("Delete row", GUIGlobals.getImage("remove"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete rows"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] rows = colSetup.getSelectedRows();
-            if (rows.length == 0)
+            if (rows.length == 0) {
                 return;
+            }
             int offs = 0;
             for (int i = rows.length - 1; i >= 0; i--) {
                 if ((rows[i] <= tableRows.size()) && (rows[i] != 0)) {
@@ -478,8 +499,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 }
             }
             rowCount -= offs;
-            if (rows.length > 1)
+            if (rows.length > 1) {
                 colSetup.clearSelection();
+            }
             colSetup.revalidate();
             colSetup.repaint();
             tableChanged = true;
@@ -490,9 +512,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public AddRowAction() {
             super("Add row", GUIGlobals.getImage("add"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Insert rows"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int[] rows = colSetup.getSelectedRows();
             if (rows.length == 0) {
@@ -503,12 +526,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (rows[i] + i - 1 < tableRows.size())
-                    tableRows.add(Math.max(0, rows[i] + i - 1), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+                if (((rows[i] + i) - 1) < tableRows.size()) {
+                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+                }
             }
             rowCount += rows.length;
-            if (rows.length > 1)
+            if (rows.length > 1) {
                 colSetup.clearSelection();
+            }
             colSetup.revalidate();
             colSetup.repaint();
             tableChanged = true;
@@ -522,10 +547,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         }
 
         protected void swap(int i, int j) {
-            if (i < 0 || i >= tableRows.size())
+            if ((i < 0) || (i >= tableRows.size())) {
                 return;
-            if (j < 0 || j >= tableRows.size())
+            }
+            if ((j < 0) || (j >= tableRows.size())) {
                 return;
+            }
             TableRow tmp = tableRows.get(i);
             tableRows.set(i, tableRows.get(j));
             tableRows.set(j, tmp);
@@ -536,15 +563,16 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public MoveRowUpAction() {
             super("Up", GUIGlobals.getImage("up"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Move up"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Move up"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int selected[] = colSetup.getSelectedRows();
             Arrays.sort(selected);
             // first element (#) not inside tableRows
             // don't move if a selected element is at bounce
-            if (selected.length > 0 && selected[0] > 1) {
+            if ((selected.length > 0) && (selected[0] > 1)) {
                 boolean newSelected[] = new boolean[colSetup.getRowCount()];
                 for (int i : selected) {
                     swap(i - 1, i - 2);
@@ -553,8 +581,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 // select all and remove unselected
                 colSetup.setRowSelectionInterval(0, colSetup.getRowCount() - 1);
                 for (int i = 0; i < colSetup.getRowCount(); i++) {
-                    if (!newSelected[i])
+                    if (!newSelected[i]) {
                         colSetup.removeRowSelectionInterval(i, i);
+                    }
                 }
                 colSetup.revalidate();
                 colSetup.repaint();
@@ -567,16 +596,17 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public MoveRowDownAction() {
             super("Down", GUIGlobals.getImage("down"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Down"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Down"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             int selected[] = colSetup.getSelectedRows();
             Arrays.sort(selected);
             final int last = selected.length - 1;
             boolean newSelected[] = new boolean[colSetup.getRowCount()];
             // don't move if a selected element is at bounce
-            if (selected.length > 0 && selected[last] < tableRows.size()) {
+            if ((selected.length > 0) && (selected[last] < tableRows.size())) {
                 for (int i = last; i >= 0; i--) {
                     swap(selected[i] - 1, selected[i]);
                     newSelected[selected[i] + 1] = true;
@@ -584,8 +614,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 // select all and remove unselected
                 colSetup.setRowSelectionInterval(0, colSetup.getRowCount() - 1);
                 for (int i = 0; i < colSetup.getRowCount(); i++) {
-                    if (!newSelected[i])
+                    if (!newSelected[i]) {
                         colSetup.removeRowSelectionInterval(i, i);
+                    }
                 }
                 colSetup.revalidate();
                 colSetup.repaint();
@@ -600,6 +631,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             super(Globals.lang("Update to current column order"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             BasePanel panel = frame.basePanel();
             if (panel == null) {
@@ -612,16 +644,17 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // first element (#) not inside tableRows
             for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
                 String name = panel.mainTable.getColumnName(i);
-                if (name != null && name.length() != 0) {
+                if ((name != null) && (name.length() != 0)) {
                     map.put(name.toLowerCase(), i);
                 }
             }
             Collections.sort(tableRows, new Comparator<TableRow>() {
 
+                @Override
                 public int compare(TableRow o1, TableRow o2) {
                     Integer n1 = map.get(o1.name);
                     Integer n2 = map.get(o2.name);
-                    if (n1 == null || n2 == null) {
+                    if ((n1 == null) || (n2 == null)) {
                         return 0;
                     }
                     return n1.compareTo(n2);
@@ -642,10 +675,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             //putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             BasePanel panel = frame.basePanel();
-            if (panel == null)
+            if (panel == null) {
                 return;
+            }
             TableColumnModel colMod = panel.mainTable.getColumnModel();
             colSetup.setValueAt("" + colMod.getColumn(0).getWidth(), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
@@ -654,9 +689,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     int width = colMod.getColumn(i).getWidth();
                     //Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
                     //Util.pr("-"+name);
-                    if ((i <= tableRows.size()) && (((String) colSetup.getValueAt(i, 0)).toLowerCase()).equals(name))
+                    if ((i <= tableRows.size()) && (((String) colSetup.getValueAt(i, 0)).toLowerCase()).equals(name)) {
                         colSetup.setValueAt("" + width, i, 1);
-                    else { // Doesn't match; search for a matching col in our table
+                    } else { // Doesn't match; search for a matching col in our table
                         for (int j = 0; j < colSetup.getRowCount(); j++) {
                             if ((j < tableRows.size()) &&
                                     (((String) colSetup.getValueAt(j, 0)).toLowerCase()).equals(name)) {
@@ -681,6 +716,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
      * the user clicks Ok.
      *
      */
+    @Override
     public void storeSettings() {
         _prefs.putBoolean("fileColumn", fileColumn.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
@@ -762,10 +798,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i = 0;
             while (i < tableRows.size()) {
-                if (tableRows.elementAt(i).name.equals(""))
+                if (tableRows.elementAt(i).name.equals("")) {
                     tableRows.removeElementAt(i);
-                else
+                } else {
                     i++;
+                }
             }
             // Then we make arrays
             String[] names = new String[tableRows.size()], widths = new String[tableRows.size()];
@@ -787,10 +824,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Entry table columns");
     }

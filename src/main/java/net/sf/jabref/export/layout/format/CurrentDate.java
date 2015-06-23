@@ -49,10 +49,11 @@ public class CurrentDate implements LayoutFormatter
      *  (non-Javadoc)
      * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
      */
+    @Override
     public String format(String fieldText)
     {
-        String format = defaultFormat;
-        if (fieldText != null && !"".equals(fieldText.trim())) {
+        String format = CurrentDate.defaultFormat;
+        if ((fieldText != null) && !"".equals(fieldText.trim())) {
             format = fieldText;
         }
         return new SimpleDateFormat(format).format(new Date());

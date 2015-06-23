@@ -66,7 +66,7 @@ public class IntegrityMessage implements Cloneable
             public static final int SINLGE_MODE = 2 // print only Message
             ;
 
-    private static int printMode = SINLGE_MODE;
+    private static int printMode = IntegrityMessage.SINLGE_MODE;
 
     private final int type;
     private final BibtexEntry entry;
@@ -78,7 +78,7 @@ public class IntegrityMessage implements Cloneable
 
     public synchronized static void setPrintMode(int newMode)
     {
-        printMode = newMode;
+        IntegrityMessage.printMode = newMode;
     }
 
     public IntegrityMessage(int pType, BibtexEntry pEntry, String pFieldName, Object pAdditionalInfo)
@@ -102,10 +102,11 @@ public class IntegrityMessage implements Cloneable
         return back;
     }
 
+    @Override
     public String toString()
     {
         String back = msg;
-        if (printMode == FULL_MODE)
+        if (IntegrityMessage.printMode == IntegrityMessage.FULL_MODE)
         {
             back = "[" + entry.getCiteKey() + "] " + msg;
         }

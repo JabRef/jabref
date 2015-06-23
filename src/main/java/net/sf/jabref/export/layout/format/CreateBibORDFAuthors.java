@@ -47,6 +47,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText) {
         // Yeah, the format is quite verbose... sorry about that :)
 
@@ -70,8 +71,9 @@ public class CreateBibORDFAuthors implements LayoutFormatter
             for (int i = 0; i < names.length; i++)
             {
                 singleAuthor(sb, names[i], (i + 1));
-                if (i < names.length - 1)
+                if (i < (names.length - 1)) {
                     sb.append("\n");
+                }
             }
         }
 

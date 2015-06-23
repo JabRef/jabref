@@ -69,7 +69,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
         for (int i = 0; i < columnCount; i++) {
             final String name = mainTable.getColumnName(i);
-            if (name == null || name.equals("")) {
+            if ((name == null) || name.equals("")) {
             } else if (name.equals("#")) { // TODO: get "#" from prefs?
                 ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
 
@@ -94,8 +94,9 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
     /**
      * @see javax.swing.event.TableColumnModelListener#columnAdded(javax.swing.event.TableColumnModelEvent)
      */
+    @Override
     public void columnAdded(TableColumnModelEvent e) {
-        assert e != null : simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
         updateColumnPrefs();
     }
@@ -103,8 +104,9 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
     /**
      * @see javax.swing.event.TableColumnModelListener#columnMarginChanged(javax.swing.event.ChangeEvent)
      */
+    @Override
     public void columnMarginChanged(ChangeEvent e) {
-        assert e != null : simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
         updateColumnPrefs();
     }
@@ -112,12 +114,14 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
     /**
      * @see javax.swing.event.TableColumnModelListener#columnMoved(javax.swing.event.TableColumnModelEvent)
      */
+    @Override
     public void columnMoved(TableColumnModelEvent e) {
-        assert e != null : simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
         // not really moved, ignore ...
-        if (e.getFromIndex() == e.getToIndex())
+        if (e.getFromIndex() == e.getToIndex()) {
             return;
+        }
 
         updateColumnPrefs();
 
@@ -126,8 +130,9 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
     /**
      * @see javax.swing.event.TableColumnModelListener#columnRemoved(javax.swing.event.TableColumnModelEvent)
      */
+    @Override
     public void columnRemoved(TableColumnModelEvent e) {
-        assert e != null : simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
         updateColumnPrefs();
 
@@ -136,6 +141,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
     /**
      * @see javax.swing.event.TableColumnModelListener#columnSelectionChanged(javax.swing.event.ListSelectionEvent)
      */
+    @Override
     public void columnSelectionChanged(ListSelectionEvent e) {
         // ignore
     }

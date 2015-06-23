@@ -34,29 +34,34 @@ public class Printed extends SpecialField {
         TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_PRINTED;
     }
 
     public static Printed getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Printed();
+        if (Printed.INSTANCE == null) {
+            Printed.INSTANCE = new Printed();
         }
-        return INSTANCE;
+        return Printed.INSTANCE;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
     }
 
+    @Override
     public String getToolTip() {
         return this.getValues().get(0).getToolTipText();
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Printed");
     }
 
+    @Override
     public boolean isSingleValueField() {
         return true;
     }

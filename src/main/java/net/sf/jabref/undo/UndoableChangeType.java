@@ -37,19 +37,23 @@ public class UndoableChangeType extends AbstractUndoableEdit {
         this.be = be;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return "Undo: change type";
     }
 
+    @Override
     public String getRedoPresentationName() {
         return "Redo: change type";
     }
 
+    @Override
     public void undo() {
         super.undo();
         be.setType(oldType);
     }
 
+    @Override
     public void redo() {
         super.redo();
         be.setType(newType);

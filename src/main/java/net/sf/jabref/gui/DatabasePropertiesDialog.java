@@ -185,6 +185,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -196,6 +197,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 storeSettings();
                 dispose();
@@ -204,6 +206,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -222,6 +225,7 @@ public class DatabasePropertiesDialog extends JDialog {
         bg.add(saveInSpecifiedOrder);
         ActionListener listener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean selected = e.getSource() == saveInSpecifiedOrder;
                 savePriSort.setEnabled(selected);
@@ -258,6 +262,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         savePriSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (savePriSort.getSelectedIndex() > 0) {
                     savePriField.setText(savePriSort.getSelectedItem().toString());
@@ -267,6 +272,7 @@ public class DatabasePropertiesDialog extends JDialog {
         });
         saveSecSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (saveSecSort.getSelectedIndex() > 0) {
                     saveSecField.setText(saveSecSort.getSelectedItem().toString());
@@ -276,6 +282,7 @@ public class DatabasePropertiesDialog extends JDialog {
         });
         saveTerSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (saveTerSort.getSelectedIndex() > 0) {
                     saveTerField.setText(saveTerSort.getSelectedItem().toString());
@@ -290,16 +297,18 @@ public class DatabasePropertiesDialog extends JDialog {
 
     }
 
+    @Override
     public void setVisible(boolean visible) {
-        if (visible)
+        if (visible) {
             setValues();
+        }
         super.setVisible(visible);
     }
 
     public void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
-        Vector<String> storedSaveOrderConfig = metaData.getData(SAVE_ORDER_CONFIG);
+        Vector<String> storedSaveOrderConfig = metaData.getData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
             saveAsConfiguredGlobally.setSelected(true);
@@ -335,57 +344,63 @@ public class DatabasePropertiesDialog extends JDialog {
         saveTerDesc.setEnabled(selected);
 
         Vector<String> fileD = metaData.getData(Globals.prefs.get("userFileDir"));
-        if (fileD == null)
+        if (fileD == null) {
             fileDir.setText("");
-        else {
+        } else {
             // Better be a little careful about how many entries the Vector has:
-            if (fileD.size() >= 1)
+            if (fileD.size() >= 1) {
                 fileDir.setText((fileD.get(0)).trim());
+            }
         }
 
         Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual")); // File dir setting
         Vector<String> fileDIL = metaData.getData(Globals.prefs.get("userFileDirInd_Legacy")); // Legacy file dir setting for backward comp.
         if (fileDI == null) {
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
-            if (fileDIL == null)
+            if (fileDIL == null) {
                 fileDirIndv.setText("");
-            else {
+            } else {
                 // Insert path from legacy setting if possible
                 // Better be a little careful about how many entries the Vector has:
-                if (fileDIL.size() >= 1)
+                if (fileDIL.size() >= 1) {
                     fileDirIndv.setText((fileDIL.get(0)).trim());
+                }
             }
         } else {
             // Better be a little careful about how many entries the Vector has:
-            if (fileDI.size() >= 1)
+            if (fileDI.size() >= 1) {
                 fileDirIndv.setText((fileDI.get(0)).trim());
+            }
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
         }
 
         Vector<String> pdfD = metaData.getData("pdfDirectory");
-        if (pdfD == null)
+        if (pdfD == null) {
             pdfDir.setText("");
-        else {
+        } else {
             // Better be a little careful about how many entries the Vector has:
-            if (pdfD.size() >= 1)
+            if (pdfD.size() >= 1) {
                 pdfDir.setText((pdfD.get(0)).trim());
+            }
         }
 
         Vector<String> psD = metaData.getData("psDirectory");
-        if (psD == null)
+        if (psD == null) {
             psDir.setText("");
-        else {
+        } else {
             // Better be a little careful about how many entries the Vector has:
-            if (psD.size() >= 1)
+            if (psD.size() >= 1) {
                 psDir.setText((psD.get(0)).trim());
+            }
         }
 
         Vector<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
-        if (prot == null)
+        if (prot == null) {
             protect.setSelected(false);
-        else {
-            if (prot.size() >= 1)
+        } else {
+            if (prot.size() >= 1) {
                 protect.setSelected(Boolean.parseBoolean(prot.get(0)));
+            }
         }
 
         // Store original values to see if they get changed:
@@ -398,7 +413,7 @@ public class DatabasePropertiesDialog extends JDialog {
     public void storeSettings() {
         SaveOrderConfig newSaveOrderConfig;
         if (saveAsConfiguredGlobally.isSelected()) {
-            metaData.remove(SAVE_ORDER_CONFIG);
+            metaData.remove(DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             newSaveOrderConfig = null;
         } else {
             SaveOrderConfig saveOrderConfig = new SaveOrderConfig();
@@ -416,7 +431,7 @@ public class DatabasePropertiesDialog extends JDialog {
             saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
 
             Vector<String> serialized = saveOrderConfig.getVector();
-            metaData.putData(SAVE_ORDER_CONFIG, serialized);
+            metaData.putData(DatabasePropertiesDialog.SAVE_ORDER_CONFIG, serialized);
         }
 
         String oldEncoding = panel.getEncoding();
@@ -428,44 +443,44 @@ public class DatabasePropertiesDialog extends JDialog {
         if (text.length() > 0) {
             dir.add(text);
             metaData.putData(Globals.prefs.get("userFileDir"), dir);
-        }
-        else
+        } else {
             metaData.remove(Globals.prefs.get("userFileDir"));
+        }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
         dir = new Vector<String>(1);
         text = fileDirIndv.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
             metaData.putData(Globals.prefs.get("userFileDirIndividual"), dir);
-        }
-        else
+        } else {
             metaData.remove(Globals.prefs.get("userFileDirIndividual"));
+        }
 
         dir = new Vector<String>(1);
         text = pdfDir.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
             metaData.putData("pdfDirectory", dir);
-        }
-        else
+        } else {
             metaData.remove("pdfDirectory");
+        }
 
         dir = new Vector<String>(1);
         text = psDir.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
             metaData.putData("psDirectory", dir);
-        }
-        else
+        } else {
             metaData.remove("psDirectory");
+        }
 
         if (protect.isSelected()) {
             dir = new Vector<String>(1);
             dir.add("true");
             metaData.putData(Globals.PROTECTED_FLAG_META, dir);
-        }
-        else
+        } else {
             metaData.remove(Globals.PROTECTED_FLAG_META);
+        }
 
         // See if any of the values have been modified:
         boolean saveOrderConfigChanged;
@@ -486,7 +501,8 @@ public class DatabasePropertiesDialog extends JDialog {
                 || (oldProtectVal != protect.isSelected());
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
-        if (changed)
+        if (changed) {
             panel.markNonUndoableBaseChanged();
+        }
     }
 }

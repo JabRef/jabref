@@ -66,7 +66,7 @@ public class FileActions {
      * @throws IOException If anthing goes wrong in writing.
      */
     private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
-        previousStringType = BibtexString.Type.AUTHOR;
+        FileActions.previousStringType = BibtexString.Type.AUTHOR;
         List<BibtexString> strings = new ArrayList<BibtexString>();
         for (String s : database.getStringKeySet()) {
             strings.add(database.getString(s));
@@ -82,8 +82,8 @@ public class FileActions {
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
             for (BibtexString bs : strings) {
-                if (remaining.containsKey(bs.getName()) && bs.getType() == t) {
-                    writeString(fw, bs, remaining, maxKeyLength);
+                if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
+                    FileActions.writeString(fw, bs, remaining, maxKeyLength);
                 }
             }
         }
@@ -99,20 +99,20 @@ public class FileActions {
         // that the string order will be acceptable for BibTeX.
         String content = bs.getContent();
         Matcher m;
-        while ((m = refPat.matcher(content)).find()) {
+        while ((m = FileActions.refPat.matcher(content)).find()) {
             String foundLabel = m.group(1);
             int restIndex = content.indexOf(foundLabel) + foundLabel.length();
             content = content.substring(restIndex);
             Object referred = remaining.get(foundLabel.substring(1, foundLabel.length() - 1));
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (referred != null) {
-                writeString(fw, (BibtexString) referred, remaining, maxKeyLength);
+                FileActions.writeString(fw, (BibtexString) referred, remaining, maxKeyLength);
             }
         }
 
-        if (previousStringType != bs.getType()) {
+        if (FileActions.previousStringType != bs.getType()) {
             fw.write(Globals.NEWLINE);
-            previousStringType = bs.getType();
+            FileActions.previousStringType = bs.getType();
         }
 
         String suffix = "";
@@ -193,19 +193,19 @@ public class FileActions {
             VerifyingWriter fw = session.getWriter();
 
             // Write signature.
-            writeBibFileHeader(fw, encoding);
+            FileActions.writeBibFileHeader(fw, encoding);
 
             // Write preamble if there is one.
-            writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(fw, database.getPreamble());
 
             // Write strings if there are any.
-            writeStrings(fw, database);
+            FileActions.writeStrings(fw, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<BibtexEntry> sorter = getSortedEntries(database, metaData, null, true);
+            List<BibtexEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
@@ -224,11 +224,11 @@ public class FileActions {
                 // Check if the entry should be written.
                 boolean write = true;
 
-                if (checkSearch && !nonZeroField(be, BibtexFields.SEARCH)) {
+                if (checkSearch && !FileActions.nonZeroField(be, BibtexFields.SEARCH)) {
                     write = false;
                 }
 
-                if (checkGroup && !nonZeroField(be, BibtexFields.GROUPSEARCH)) {
+                if (checkGroup && !FileActions.nonZeroField(be, BibtexFields.GROUPSEARCH)) {
                     write = false;
                 }
 
@@ -378,20 +378,20 @@ public class FileActions {
 
             if (saveType != DatabaseSaveType.PLAIN_BIBTEX) {
                 // Write signature.
-                writeBibFileHeader(fw, encoding);
+                FileActions.writeBibFileHeader(fw, encoding);
             }
 
             // Write preamble if there is one.
-            writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(fw, database.getPreamble());
 
             // Write strings if there are any.
-            writeStrings(fw, database);
+            FileActions.writeStrings(fw, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<Comparator<BibtexEntry>> comparators = getSaveComparators(true, metaData);
+            List<Comparator<BibtexEntry>> comparators = FileActions.getSaveComparators(true, metaData);
 
             // Use glazed lists to get a sorted view of the entries:
             List<BibtexEntry> sorter = new ArrayList<BibtexEntry>(bes.length);
@@ -416,7 +416,7 @@ public class FileActions {
             }
 
             // Write meta data.
-            if (saveType != DatabaseSaveType.PLAIN_BIBTEX && metaData != null) {
+            if ((saveType != DatabaseSaveType.PLAIN_BIBTEX) && (metaData != null)) {
                 metaData.writeMetaData(fw);
             }
 
@@ -498,7 +498,7 @@ public class FileActions {
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
         } else {
-            comparators = getSaveComparators(isSaveOperation, metaData);
+            comparators = FileActions.getSaveComparators(isSaveOperation, metaData);
         }
 
         FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);

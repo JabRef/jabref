@@ -103,6 +103,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // We need a listener on showSource to enable and disable the source panel-related choices:
         showSource.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 defSource.setEnabled(showSource.isSelected());
             }
@@ -113,6 +114,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // We need a listener on showSource to enable and disable the source panel-related choices:
         emacsMode.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
             }
@@ -124,6 +126,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // autoCompFields text field:
         autoComplete.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 setAutoCompleteElementsEnabled(autoComplete.isSelected());
             }
@@ -176,6 +179,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         autoOpenForm.setSelected(_prefs.getBoolean("autoOpenForm"));
         defSource.setSelected(_prefs.getBoolean("defaultShowSource"));
@@ -187,21 +191,23 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         autoCompFields.setText(_prefs.get("autoCompleteFields"));
         shortestToComplete.setValue(_prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE));
 
-        if (_prefs.getBoolean("autoCompFF"))
+        if (_prefs.getBoolean("autoCompFF")) {
             autoCompFF.setSelected(true);
-        else if (_prefs.getBoolean("autoCompLF"))
+        } else if (_prefs.getBoolean("autoCompLF")) {
             autoCompLF.setSelected(true);
-        else
+        } else {
             autoCompBoth.setSelected(true);
+        }
         oldAutoCompFF = autoCompFF.isSelected();
         oldAutoCompLF = autoCompLF.isSelected();
 
-        if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR))
+        if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
             autoCompFirstNameMode_Abbr.setSelected(true);
-        else if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL))
+        } else if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
             autoCompFirstNameMode_Full.setSelected(true);
-        else
+        } else {
             autoCompFirstNameMode_Both.setSelected(true);
+        }
         // one field less than the option is enough. If one filed changes, another one also changes.
         oldAutoCompFModeAbbr = autoCompFirstNameMode_Abbr.isSelected();
         oldAutoCompFModeFull = autoCompFirstNameMode_Full.isSelected();
@@ -214,6 +220,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         setAutoCompleteElementsEnabled(autoComplete.isSelected());
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean("autoOpenForm", autoOpenForm.isSelected());
         _prefs.putBoolean("defaultShowSource", defSource.isSelected());
@@ -258,12 +265,13 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             _prefs.putBoolean("autoCompFF", false);
             _prefs.putBoolean("autoCompLF", true);
         }
-        if (autoCompFirstNameMode_Abbr.isSelected())
+        if (autoCompFirstNameMode_Abbr.isSelected()) {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);
-        else if (autoCompFirstNameMode_Full.isSelected())
+        } else if (autoCompFirstNameMode_Full.isSelected()) {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
-        else
+        } else {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        }
 
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
@@ -281,10 +289,12 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         AbstractAutoCompleter.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Entry editor");
     }

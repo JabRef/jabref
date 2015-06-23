@@ -144,6 +144,7 @@ class FontSelector extends JButton {
         addActionListener(new ActionHandler());
     }
 
+    @Override
     public void setFont(Font font) {
         super.setFont(font);
         updateText();
@@ -157,16 +158,16 @@ class FontSelector extends JButton {
         String styleString;
         switch (font.getStyle()) {
         case Font.PLAIN:
-            styleString = PLAIN;
+            styleString = FontSelector.PLAIN;
             break;
         case Font.BOLD:
-            styleString = BOLD;
+            styleString = FontSelector.BOLD;
             break;
         case Font.ITALIC:
-            styleString = ITALIC;
+            styleString = FontSelector.ITALIC;
             break;
         case Font.BOLD | Font.ITALIC:
-            styleString = BOLD_ITALIC;
+            styleString = FontSelector.BOLD_ITALIC;
             break;
         default:
             styleString = "UNKNOWN!!!???";
@@ -182,6 +183,7 @@ class FontSelector extends JButton {
      */
     class ActionHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             Font font = new FontSelectorDialog(FontSelector.this, getFont()).getSelectedFont();
             if (font != null) {
@@ -227,7 +229,7 @@ public class FontSelectorDialog extends JDialog {
                 sizeList = new JList(sizes));
         listPanel.add(sizePanel);
 
-        String[] styles = {PLAIN, BOLD, ITALIC, BOLD_ITALIC};
+        String[] styles = {FontSelectorDialog.PLAIN, FontSelectorDialog.BOLD, FontSelectorDialog.ITALIC, FontSelectorDialog.BOLD_ITALIC};
 
         JPanel stylePanel = createTextFieldAndListPanel(
                 Globals.lang("Font Style"),
@@ -262,6 +264,7 @@ public class FontSelectorDialog extends JDialog {
             private static final long serialVersionUID = -4191591634265068189L;
 
 
+            @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint
@@ -317,8 +320,9 @@ public class FontSelectorDialog extends JDialog {
     }
 
     public Font getSelectedFont() {
-        if (!isOK)
+        if (!isOK) {
             return null;
+        }
 
         int size;
         try {
@@ -361,13 +365,15 @@ public class FontSelectorDialog extends JDialog {
             Vector<String> nameVector = new Vector<String>(nameArray.length);
 
             for (int i = 0, j; i < nameArray.length; i++) {
-                for (j = 0; j < HIDEFONTS.length; j++) {
-                    if (nameArray[i].contains(HIDEFONTS[j]))
+                for (j = 0; j < FontSelectorDialog.HIDEFONTS.length; j++) {
+                    if (nameArray[i].contains(FontSelectorDialog.HIDEFONTS[j])) {
                         break;
+                    }
                 }
 
-                if (j == HIDEFONTS.length)
+                if (j == FontSelectorDialog.HIDEFONTS.length) {
                     nameVector.addElement(nameArray[i]);
+                }
             }
 
             String[] _array = new String[nameVector.size()];
@@ -431,33 +437,39 @@ public class FontSelectorDialog extends JDialog {
 
     class ActionHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
-            if (evt.getSource() == ok)
+            if (evt.getSource() == ok) {
                 ok();
-            else if (evt.getSource() == cancel)
+            } else if (evt.getSource() == cancel) {
                 cancel();
+            }
         }
     }
 
     class ListHandler implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent evt)
         {
             Object source = evt.getSource();
             if (source == familyList) {
                 String family = (String) familyList.getSelectedValue();
-                if (family != null)
+                if (family != null) {
                     familyField.setText(family);
+                }
             }
             else if (source == sizeList) {
                 String size = (String) sizeList.getSelectedValue();
-                if (size != null)
+                if (size != null) {
                     sizeField.setText(size);
+                }
             }
             else if (source == styleList) {
                 String style = (String) styleList.getSelectedValue();
-                if (style != null)
+                if (style != null) {
                     styleField.setText(style);
+                }
             }
             updatePreview();
         }

@@ -91,6 +91,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * @see IExportFormat#getConsoleName()
      */
+    @Override
     public String getConsoleName() {
         return consoleName;
     }
@@ -98,6 +99,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * @see IExportFormat#getDisplayName()
      */
+    @Override
     public String getDisplayName() {
         return displayName;
     }
@@ -164,6 +166,7 @@ public class ExportFormat implements IExportFormat {
      * @see net.sf.jabref.export.IExportFormat#performExport(net.sf.jabref.BibtexDatabase,
      *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
      */
+    @Override
     public void performExport(final BibtexDatabase database,
             final MetaData metaData, final String file,
             final String encoding, Set<String> entryIds) throws Exception {
@@ -180,8 +183,9 @@ public class ExportFormat implements IExportFormat {
 
             }
         }
-        if (ss == null)
+        if (ss == null) {
             ss = getSaveSession(encoding, outFile);
+        }
 
         VerifyingWriter ps = ss.getWriter();
 
@@ -240,9 +244,9 @@ public class ExportFormat implements IExportFormat {
             ExportFormats.entryNumber++; // Increment entry counter.
             // Get the layout
             String type = entry.getType().getName().toLowerCase();
-            if (layouts.containsKey(type))
+            if (layouts.containsKey(type)) {
                 layout = layouts.get(type);
-            else {
+            } else {
                 try {
                     // We try to get a type-specific layout for this entry.
                     reader = getReader(lfFileName + "." + type + ".layout");
@@ -251,8 +255,9 @@ public class ExportFormat implements IExportFormat {
                             .getLayoutFromText(Globals.FORMATTER_PACKAGE);
                     layouts.put(type, layout);
                     reader.close();
-                    if (layout != null)
+                    if (layout != null) {
                         missingFormatters.addAll(layout.getMissingFormatters());
+                    }
 
                 } catch (IOException ex) {
                     // The exception indicates that no type-specific layout
@@ -295,8 +300,9 @@ public class ExportFormat implements IExportFormat {
                     append(": ");
             for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
                 sb.append(i.next());
-                if (i.hasNext())
+                if (i.hasNext()) {
                     sb.append(", ");
+                }
             }
             System.err.println(sb.toString());
         }
@@ -327,10 +333,11 @@ public class ExportFormat implements IExportFormat {
                 for (String line1 : lines) {
                     String line = line1.trim();
                     // Do not deal with empty lines:
-                    if (line.length() == 0)
+                    if (line.length() == 0) {
                         continue;
+                    }
                     int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?
-                    if ((index > 0) && (index + 1 < line.length())) {
+                    if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
                         //System.out.println("Name: '"+formatterName+"'");
@@ -343,12 +350,13 @@ public class ExportFormat implements IExportFormat {
                 // TODO: show error message here?
                 ex.printStackTrace();
             } finally {
-                if (in != null)
+                if (in != null) {
                     try {
                         in.close();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+                }
             }
         }
         return formatters;
@@ -362,9 +370,11 @@ public class ExportFormat implements IExportFormat {
     /**
      * @see net.sf.jabref.export.IExportFormat#getFileFilter()
      */
+    @Override
     public FileFilter getFileFilter() {
-        if (fileFilter == null)
+        if (fileFilter == null) {
             fileFilter = new ExportFileFilter(this, extension);
+        }
         return fileFilter;
     }
 

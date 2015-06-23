@@ -36,7 +36,7 @@ public class JSTORFetcher2 implements EntryFetcher {
     protected static int MAX_REFS = 7 * 25;
     protected static final int REFS_PER_PAGE = 25; // This is the current default of JSTOR;
     protected static final String JSTOR_URL = "http://www.jstor.org";
-    protected static final String SEARCH_URL = JSTOR_URL + "/action/doBasicSearch?Query=";
+    protected static final String SEARCH_URL = JSTORFetcher2.JSTOR_URL + "/action/doBasicSearch?Query=";
     protected static final String SEARCH_URL_END = "&x=0&y=0&wc=on";
     protected static final String SINGLE_CIT_ENC =
             //"http://www.jstor.org/action/exportSingleCitation?singleCitation=true&suffix=";
@@ -57,28 +57,34 @@ public class JSTORFetcher2 implements EntryFetcher {
     protected boolean noAccessFound = false;
 
 
+    @Override
     public String getHelpPage() {
         return "JSTOR.html";
     }
 
+    @Override
     public String getKeyName() {
         return "JSTOR";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // No Options panel
         return null;
     }
 
+    @Override
     public String getTitle() {
         return "JSTOR";
     }
 
+    @Override
     public void stopFetching() {
         stopFetching = true;
         noAccessFound = false;
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         stopFetching = false;
         try {
@@ -133,23 +139,24 @@ public class JSTORFetcher2 implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
-            urlQuery = SEARCH_URL + URLEncoder.encode(query, "UTF-8") + SEARCH_URL_END;
+            urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, "UTF-8") + JSTORFetcher2.SEARCH_URL_END;
             int count = 1;
             String numberOfRefs[] = new String[2];
             int refsRequested;
-            int numberOfPagesRequested = MAX_PAGES_TO_LOAD;
+            int numberOfPagesRequested = JSTORFetcher2.MAX_PAGES_TO_LOAD;
 
             String nextPage;
-            while ((count <= Math.min(MAX_PAGES_TO_LOAD, numberOfPagesRequested))
+            while ((count <= Math.min(JSTORFetcher2.MAX_PAGES_TO_LOAD, numberOfPagesRequested))
                     && ((nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null)) {
                 // If user has cancelled the import, return null to signal this:
-                if ((count == 1) && (nextPage.equals(CANCELLED)))
+                if ((count == 1) && (nextPage.equals(JSTORFetcher2.CANCELLED))) {
                     return null;
+                }
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + numberOfRefs[0]);
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + " refsRequested=" + numberOfRefs[1]);
                 refsRequested = Integer.valueOf(numberOfRefs[1]);
                 //System.out.println("JSTORFetcher2 getCitations refsRequested=" + Integer.valueOf(refsRequested));
-                numberOfPagesRequested = ((refsRequested - 1) - (refsRequested - 1) % REFS_PER_PAGE) / REFS_PER_PAGE + 1;
+                numberOfPagesRequested = (((refsRequested - 1) - ((refsRequested - 1) % JSTORFetcher2.REFS_PER_PAGE)) / JSTORFetcher2.REFS_PER_PAGE) + 1;
                 //System.out.println("JSTORFetcher2 getCitations numberOfPagesRequested=" + Integer.valueOf(numberOfPagesRequested));
                 urlQuery = nextPage;
                 //System.out.println("JSTORFetcher2 getcitations count=" + Integer.valueOf(count) + " ids=" + ids);
@@ -174,7 +181,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         int refsRequested;
 
         if (count == 1) { //  Readin the numberofhits (only once)
-            Matcher mn = numberofhits.matcher(pageEntire);
+            Matcher mn = JSTORFetcher2.numberofhits.matcher(pageEntire);
             if (mn.find()) {
                 //System.out.println("JSTORFetcher2 getCitationsFromUrl numberofhits=" + mn.group(1));
                 numberOfRefs[0] = mn.group(1);
@@ -191,7 +198,7 @@ public class JSTORFetcher2 implements EntryFetcher {
 
                 if (strCount == null) {
                     status.setStatus(Globals.lang("JSTOR import cancelled"));
-                    return CANCELLED;
+                    return JSTORFetcher2.CANCELLED;
                 }
 
                 try {
@@ -206,30 +213,30 @@ public class JSTORFetcher2 implements EntryFetcher {
         countOfRefs = Integer.valueOf(numberOfRefs[0]);
         refsRequested = Integer.valueOf(numberOfRefs[1]);
 
-        Matcher m = idPattern.matcher(cont);
+        Matcher m = JSTORFetcher2.idPattern.matcher(cont);
 
-        if (m.find() && (ids.size() + 1 <= refsRequested)) {
+        if (m.find() && ((ids.size() + 1) <= refsRequested)) {
             do {
                 ids.add(m.group(1));
                 cont = cont.substring(m.end());
-                m = idPattern.matcher(cont);
-            } while (m.find() && (ids.size() + 1 <= refsRequested));
-        } else if (entirePage.contains(noAccessIndicator)) {
+                m = JSTORFetcher2.idPattern.matcher(cont);
+            } while (m.find() && ((ids.size() + 1) <= refsRequested));
+        } else if (entirePage.contains(JSTORFetcher2.noAccessIndicator)) {
             noAccessFound = true;
             return null;
         } else {
             return null;
         }
-        m = nextPagePattern.matcher(entirePage);
+        m = JSTORFetcher2.nextPagePattern.matcher(entirePage);
 
         if (m.find()) {
-            return JSTOR_URL + m.group(1);
+            return JSTORFetcher2.JSTOR_URL + m.group(1);
         } else {
             return null;
         }
     }
 
     protected BibtexEntry getSingleCitation(String cit) {
-        return BibsonomyScraper.getEntry(SINGLE_CIT_ENC + cit);
+        return BibsonomyScraper.getEntry(JSTORFetcher2.SINGLE_CIT_ENC + cit);
     }
 }

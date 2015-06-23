@@ -50,6 +50,7 @@ public class RemoveBrackets implements LayoutFormatter
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText)
     {
         String fieldEntry = fieldText;

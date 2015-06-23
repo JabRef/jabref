@@ -56,11 +56,12 @@ public class OOCalcDatabase {
         BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
-        if (keySet == null)
+        if (keySet == null) {
             entryList.addAll(bibtex.getEntries());
-        else {
-            for (String key : keySet)
+        } else {
+            for (String key : keySet) {
                 entryList.add(bibtex.getEntryById(key));
+            }
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));

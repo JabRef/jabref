@@ -45,26 +45,31 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Other";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[0];
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[0];
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return true;
@@ -75,11 +80,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Article";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -88,6 +95,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -96,11 +104,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, JOURNAL and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -114,11 +124,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Booklet";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -127,6 +139,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -135,11 +148,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -153,11 +168,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "InBook";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -167,6 +184,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -181,12 +199,14 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     return new String[] {"author/editor", "title", "chapter/pages", "year", "publisher"};
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE, CHAPTER and/or PAGES, PUBLISHER, YEAR, and an "
                             + "EDITOR and/or AUTHOR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -202,11 +222,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Book";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -216,6 +238,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -224,6 +247,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFieldsForCustomization()
                 {
                     return new String[]
@@ -232,11 +256,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE, PUBLISHER, YEAR, and an EDITOR and/or AUTHOR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -252,11 +278,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "InCollection";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -266,6 +294,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -274,11 +303,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, BOOKTITLE, PUBLISHER and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -294,11 +325,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Conference";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -308,6 +341,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -316,11 +350,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, BOOKTITLE and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -334,11 +370,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "InProceedings";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -348,6 +386,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -356,11 +395,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, BOOKTITLE and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -374,11 +415,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Proceedings";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -388,6 +431,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -396,11 +440,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -414,11 +460,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Manual";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -428,6 +476,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -436,11 +485,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -454,11 +505,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "TechReport";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -467,6 +520,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -475,11 +529,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, INSTITUTION and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -494,11 +550,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "MastersThesis";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -507,6 +565,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -515,11 +574,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, SCHOOL and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -533,11 +594,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "PhdThesis";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -546,6 +609,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -554,11 +618,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE, SCHOOL and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -572,11 +638,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Unpublished";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -585,6 +653,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -593,11 +662,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "AUTHOR, TITLE and NOTE";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -611,11 +682,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Periodical";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -624,6 +697,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -632,11 +706,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE and YEAR";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -650,11 +726,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Patent";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -663,6 +741,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -671,11 +750,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "NATIONALITY, NUMBER, YEAR or YEARFILED";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -691,11 +772,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Standard";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -704,6 +787,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return new String[]
@@ -717,11 +801,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     return new String[] {"title", "organization/institution"};
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "TITLE, ORGANIZATION or INSTITUTION";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -737,11 +823,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Electronic";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -750,16 +838,19 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return null;
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "None";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -773,11 +864,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Misc";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[]
@@ -786,16 +879,19 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return null;
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "None";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return entry.allFieldsPresent(new String[]
@@ -813,11 +909,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "IEEEtranBSTCTL";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return new String[] {
@@ -828,21 +926,25 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                     };
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return null;
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "None";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return true;
                 }
 
+                @Override
                 public boolean isVisibleAtNewEntryDialog() {
                     return false;
                 }
@@ -856,26 +958,31 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
             new BibtexEntryType()
             {
 
+                @Override
                 public String getName()
                 {
                     return "Typeless";
                 }
 
+                @Override
                 public String[] getOptionalFields()
                 {
                     return null;
                 }
 
+                @Override
                 public String[] getRequiredFields()
                 {
                     return null;
                 }
 
+                @Override
                 public String describeRequiredFields()
                 {
                     return "None";
                 }
 
+                @Override
                 public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
                 {
                     return false;
@@ -885,6 +992,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 
     public abstract String getName();
 
+    @Override
     public int compareTo(BibtexEntryType o) {
         return getName().compareTo(o.getName());
     }
@@ -907,21 +1015,27 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 
     public boolean isRequired(String field) {
         String[] req = getRequiredFields();
-        if (req == null)
+        if (req == null) {
             return false;
-        for (String aReq : req)
-            if (aReq.equals(field))
+        }
+        for (String aReq : req) {
+            if (aReq.equals(field)) {
                 return true;
+            }
+        }
         return false;
     }
 
     public boolean isOptional(String field) {
         String[] opt = getOptionalFields();
-        if (opt == null)
+        if (opt == null) {
             return false;
-        for (String anOpt : opt)
-            if (anOpt.equals(field))
+        }
+        for (String anOpt : opt) {
+            if (anOpt.equals(field)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -935,63 +1049,63 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
     static {
         // Put the standard entry types into the type map.
         if (!Globals.prefs.getBoolean("biblatexMode")) {
-            ALL_TYPES.put("article", ARTICLE);
-            ALL_TYPES.put("inbook", INBOOK);
-            ALL_TYPES.put("book", BOOK);
-            ALL_TYPES.put("booklet", BOOKLET);
-            ALL_TYPES.put("incollection", INCOLLECTION);
-            ALL_TYPES.put("conference", CONFERENCE);
-            ALL_TYPES.put("inproceedings", INPROCEEDINGS);
-            ALL_TYPES.put("proceedings", PROCEEDINGS);
-            ALL_TYPES.put("manual", MANUAL);
-            ALL_TYPES.put("mastersthesis", MASTERSTHESIS);
-            ALL_TYPES.put("phdthesis", PHDTHESIS);
-            ALL_TYPES.put("techreport", TECHREPORT);
-            ALL_TYPES.put("unpublished", UNPUBLISHED);
-            ALL_TYPES.put("patent", PATENT);
-            ALL_TYPES.put("standard", STANDARD);
-            ALL_TYPES.put("electronic", ELECTRONIC);
-            ALL_TYPES.put("periodical", PERIODICAL);
-            ALL_TYPES.put("misc", MISC);
-            ALL_TYPES.put("other", OTHER);
-            ALL_TYPES.put("ieeetranbstctl", IEEETRANBSTCTL);
+            BibtexEntryType.ALL_TYPES.put("article", BibtexEntryType.ARTICLE);
+            BibtexEntryType.ALL_TYPES.put("inbook", BibtexEntryType.INBOOK);
+            BibtexEntryType.ALL_TYPES.put("book", BibtexEntryType.BOOK);
+            BibtexEntryType.ALL_TYPES.put("booklet", BibtexEntryType.BOOKLET);
+            BibtexEntryType.ALL_TYPES.put("incollection", BibtexEntryType.INCOLLECTION);
+            BibtexEntryType.ALL_TYPES.put("conference", BibtexEntryType.CONFERENCE);
+            BibtexEntryType.ALL_TYPES.put("inproceedings", BibtexEntryType.INPROCEEDINGS);
+            BibtexEntryType.ALL_TYPES.put("proceedings", BibtexEntryType.PROCEEDINGS);
+            BibtexEntryType.ALL_TYPES.put("manual", BibtexEntryType.MANUAL);
+            BibtexEntryType.ALL_TYPES.put("mastersthesis", BibtexEntryType.MASTERSTHESIS);
+            BibtexEntryType.ALL_TYPES.put("phdthesis", BibtexEntryType.PHDTHESIS);
+            BibtexEntryType.ALL_TYPES.put("techreport", BibtexEntryType.TECHREPORT);
+            BibtexEntryType.ALL_TYPES.put("unpublished", BibtexEntryType.UNPUBLISHED);
+            BibtexEntryType.ALL_TYPES.put("patent", BibtexEntryType.PATENT);
+            BibtexEntryType.ALL_TYPES.put("standard", BibtexEntryType.STANDARD);
+            BibtexEntryType.ALL_TYPES.put("electronic", BibtexEntryType.ELECTRONIC);
+            BibtexEntryType.ALL_TYPES.put("periodical", BibtexEntryType.PERIODICAL);
+            BibtexEntryType.ALL_TYPES.put("misc", BibtexEntryType.MISC);
+            BibtexEntryType.ALL_TYPES.put("other", BibtexEntryType.OTHER);
+            BibtexEntryType.ALL_TYPES.put("ieeetranbstctl", BibtexEntryType.IEEETRANBSTCTL);
         }
         else {
-            ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
-            ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
-            ALL_TYPES.put("inbook", BibLatexEntryTypes.INBOOK);
-            ALL_TYPES.put("bookinbook", BibLatexEntryTypes.BOOKINBOOK);
-            ALL_TYPES.put("suppbook", BibLatexEntryTypes.SUPPBOOK);
-            ALL_TYPES.put("booklet", BibLatexEntryTypes.BOOKLET);
-            ALL_TYPES.put("collection", BibLatexEntryTypes.COLLECTION);
-            ALL_TYPES.put("incollection", BibLatexEntryTypes.INCOLLECTION);
-            ALL_TYPES.put("suppcollection", BibLatexEntryTypes.SUPPCOLLECTION);
-            ALL_TYPES.put("manual", BibLatexEntryTypes.MANUAL);
-            ALL_TYPES.put("misc", BibLatexEntryTypes.MISC);
-            ALL_TYPES.put("online", BibLatexEntryTypes.ONLINE);
-            ALL_TYPES.put("patent", BibLatexEntryTypes.PATENT);
-            ALL_TYPES.put("periodical", BibLatexEntryTypes.PERIODICAL);
-            ALL_TYPES.put("suppperiodical", BibLatexEntryTypes.SUPPPERIODICAL);
-            ALL_TYPES.put("proceedings", BibLatexEntryTypes.PROCEEDINGS);
-            ALL_TYPES.put("inproceedings", BibLatexEntryTypes.INPROCEEDINGS);
-            ALL_TYPES.put("reference", BibLatexEntryTypes.REFERENCE);
-            ALL_TYPES.put("inreference", BibLatexEntryTypes.INREFERENCE);
-            ALL_TYPES.put("report", BibLatexEntryTypes.REPORT);
-            ALL_TYPES.put("set", BibLatexEntryTypes.SET);
-            ALL_TYPES.put("thesis", BibLatexEntryTypes.THESIS);
-            ALL_TYPES.put("unpublished", BibLatexEntryTypes.UNPUBLISHED);
-            ALL_TYPES.put("conference", BibLatexEntryTypes.CONFERENCE);
-            ALL_TYPES.put("electronic", BibLatexEntryTypes.ELECTRONIC);
-            ALL_TYPES.put("mastersthesis", BibLatexEntryTypes.MASTERSTHESIS);
-            ALL_TYPES.put("phdthesis", BibLatexEntryTypes.PHDTHESIS);
-            ALL_TYPES.put("techreport", BibLatexEntryTypes.TECHREPORT);
-            ALL_TYPES.put("www", BibLatexEntryTypes.WWW);
-            ALL_TYPES.put("ieeetranbstctl", BibLatexEntryTypes.IEEETRANBSTCTL);
+            BibtexEntryType.ALL_TYPES.put("article", BibLatexEntryTypes.ARTICLE);
+            BibtexEntryType.ALL_TYPES.put("book", BibLatexEntryTypes.BOOK);
+            BibtexEntryType.ALL_TYPES.put("inbook", BibLatexEntryTypes.INBOOK);
+            BibtexEntryType.ALL_TYPES.put("bookinbook", BibLatexEntryTypes.BOOKINBOOK);
+            BibtexEntryType.ALL_TYPES.put("suppbook", BibLatexEntryTypes.SUPPBOOK);
+            BibtexEntryType.ALL_TYPES.put("booklet", BibLatexEntryTypes.BOOKLET);
+            BibtexEntryType.ALL_TYPES.put("collection", BibLatexEntryTypes.COLLECTION);
+            BibtexEntryType.ALL_TYPES.put("incollection", BibLatexEntryTypes.INCOLLECTION);
+            BibtexEntryType.ALL_TYPES.put("suppcollection", BibLatexEntryTypes.SUPPCOLLECTION);
+            BibtexEntryType.ALL_TYPES.put("manual", BibLatexEntryTypes.MANUAL);
+            BibtexEntryType.ALL_TYPES.put("misc", BibLatexEntryTypes.MISC);
+            BibtexEntryType.ALL_TYPES.put("online", BibLatexEntryTypes.ONLINE);
+            BibtexEntryType.ALL_TYPES.put("patent", BibLatexEntryTypes.PATENT);
+            BibtexEntryType.ALL_TYPES.put("periodical", BibLatexEntryTypes.PERIODICAL);
+            BibtexEntryType.ALL_TYPES.put("suppperiodical", BibLatexEntryTypes.SUPPPERIODICAL);
+            BibtexEntryType.ALL_TYPES.put("proceedings", BibLatexEntryTypes.PROCEEDINGS);
+            BibtexEntryType.ALL_TYPES.put("inproceedings", BibLatexEntryTypes.INPROCEEDINGS);
+            BibtexEntryType.ALL_TYPES.put("reference", BibLatexEntryTypes.REFERENCE);
+            BibtexEntryType.ALL_TYPES.put("inreference", BibLatexEntryTypes.INREFERENCE);
+            BibtexEntryType.ALL_TYPES.put("report", BibLatexEntryTypes.REPORT);
+            BibtexEntryType.ALL_TYPES.put("set", BibLatexEntryTypes.SET);
+            BibtexEntryType.ALL_TYPES.put("thesis", BibLatexEntryTypes.THESIS);
+            BibtexEntryType.ALL_TYPES.put("unpublished", BibLatexEntryTypes.UNPUBLISHED);
+            BibtexEntryType.ALL_TYPES.put("conference", BibLatexEntryTypes.CONFERENCE);
+            BibtexEntryType.ALL_TYPES.put("electronic", BibLatexEntryTypes.ELECTRONIC);
+            BibtexEntryType.ALL_TYPES.put("mastersthesis", BibLatexEntryTypes.MASTERSTHESIS);
+            BibtexEntryType.ALL_TYPES.put("phdthesis", BibLatexEntryTypes.PHDTHESIS);
+            BibtexEntryType.ALL_TYPES.put("techreport", BibLatexEntryTypes.TECHREPORT);
+            BibtexEntryType.ALL_TYPES.put("www", BibLatexEntryTypes.WWW);
+            BibtexEntryType.ALL_TYPES.put("ieeetranbstctl", BibLatexEntryTypes.IEEETRANBSTCTL);
         }
 
         // We need a record of the standard types, in case the user wants
         // to remove a customized version. Therefore we clone the map.
-        STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(ALL_TYPES);
+        STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(BibtexEntryType.ALL_TYPES);
     }
 
 
@@ -1001,11 +1115,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
      */
     public static BibtexEntryType getType(String name) {
         //Util.pr("'"+name+"'");
-        Object o = ALL_TYPES.get(name.toLowerCase(Locale.US));
-        if (o == null)
+        Object o = BibtexEntryType.ALL_TYPES.get(name.toLowerCase(Locale.US));
+        if (o == null) {
             return null;
-        else
+        } else {
             return (BibtexEntryType) o;
+        }
     }
 
     /**
@@ -1014,11 +1129,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
      */
     public static BibtexEntryType getStandardType(String name) {
         //Util.pr("'"+name+"'");
-        Object o = STANDARD_TYPES.get(name.toLowerCase());
-        if (o == null)
+        Object o = BibtexEntryType.STANDARD_TYPES.get(name.toLowerCase());
+        if (o == null) {
             return null;
-        else
+        } else {
             return (BibtexEntryType) o;
+        }
     }
 
     /**
@@ -1031,12 +1147,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         //BibtexEntryType type = getType(name);
         String nm = name.toLowerCase();
         //System.out.println(ALL_TYPES.size());
-        ALL_TYPES.remove(nm);
+        BibtexEntryType.ALL_TYPES.remove(nm);
         //System.out.println(ALL_TYPES.size());
-        if (STANDARD_TYPES.get(nm) != null) {
+        if (BibtexEntryType.STANDARD_TYPES.get(nm) != null) {
             // In this case the user has removed a customized version
             // of a standard type. We reinstate the standard type.
-            ALL_TYPES.put(nm, STANDARD_TYPES.get(nm));
+            BibtexEntryType.ALL_TYPES.put(nm, BibtexEntryType.STANDARD_TYPES.get(nm));
         }
 
     }
@@ -1049,7 +1165,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
         int number = 0;
         CustomEntryType type;
         while ((type = prefs.getCustomEntryType(number)) != null) {
-            ALL_TYPES.put(type.getName().toLowerCase(), type);
+            BibtexEntryType.ALL_TYPES.put(type.getName().toLowerCase(), type);
             number++;
         }
     }
@@ -1060,11 +1176,11 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
      * JabRefFrame when the program closes.
      */
     public static void saveCustomEntryTypes(JabRefPreferences prefs) {
-        Iterator<String> i = ALL_TYPES.keySet().iterator();
+        Iterator<String> i = BibtexEntryType.ALL_TYPES.keySet().iterator();
         int number = 0;
         //Vector customTypes = new Vector(10, 10);
         while (i.hasNext()) {
-            Object o = ALL_TYPES.get(i.next());
+            Object o = BibtexEntryType.ALL_TYPES.get(i.next());
             if (o instanceof CustomEntryType) {
                 // Store this entry type.
                 prefs.storeCustomEntryType((CustomEntryType) o, number);

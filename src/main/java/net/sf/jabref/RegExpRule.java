@@ -45,13 +45,16 @@ public class RegExpRule implements SearchRule {
         m_caseSensitiveSearch = caseSensitive;
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         int score = 0;
         String searchString = searchStrings.values().iterator().next();
 
         int flags = 0;
         if (!m_caseSensitiveSearch)
+         {
             flags = Pattern.CASE_INSENSITIVE; // testing
+        }
         try {
             Pattern pattern = Pattern.compile(searchString, flags);
         } catch (PatternSyntaxException ex) {
@@ -60,6 +63,7 @@ public class RegExpRule implements SearchRule {
         return true;
     }
 
+    @Override
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) throws PatternSyntaxException {
 
         int score = 0;
@@ -67,7 +71,9 @@ public class RegExpRule implements SearchRule {
 
         int flags = 0;
         if (!m_caseSensitiveSearch)
+         {
             flags = Pattern.CASE_INSENSITIVE; // testing
+        }
         //System.out.println(searchString);
         Pattern pattern = Pattern.compile(searchString, flags);
 
@@ -84,9 +90,10 @@ public class RegExpRule implements SearchRule {
                 try {
                     Object value = bibtexEntry.getField(field);
                     if (value != null) {
-                        Matcher m = pattern.matcher(removeBrackets.format((String) value));
-                        if (m.find())
+                        Matcher m = pattern.matcher(RegExpRule.removeBrackets.format((String) value));
+                        if (m.find()) {
                             score++;
+                        }
                     }
                 }
 

@@ -42,14 +42,17 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
         this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": " + Globals.lang("change preamble");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": " + Globals.lang("change preamble");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -60,6 +63,7 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
         panel.updatePreamble();
     }
 
+    @Override
     public void redo() {
         super.redo();
 

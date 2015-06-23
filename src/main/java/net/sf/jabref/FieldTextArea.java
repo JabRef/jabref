@@ -86,6 +86,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
@@ -96,6 +97,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
      * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
      */
 
+    @Override
     public String getFieldName() {
         return fieldName;
     }
@@ -104,56 +106,68 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
         fieldName = newName;
     }
 
+    @Override
     public JLabel getLabel() {
         return label;
     }
 
+    @Override
     public void setLabelColor(Color c) {
         label.setForeground(c);
     }
 
+    @Override
     public JComponent getPane() {
         return sp;
     }
 
+    @Override
     public JComponent getTextComponent() {
         return this;
     }
 
+    @Override
     public void setActiveBackgroundColor() {
         setBackground(GUIGlobals.activeBackground);
     }
 
+    @Override
     public void setValidBackgroundColor() {
         setBackground(GUIGlobals.validFieldBackgroundColor);
     }
 
+    @Override
     public void setInvalidBackgroundColor() {
         setBackground(GUIGlobals.invalidFieldBackgroundColor);
     }
 
+    @Override
     public void updateFontColor() {
         setForeground(GUIGlobals.editorTextColor);
     }
 
+    @Override
     public void updateFont() {
         setFont(GUIGlobals.CURRENTFONT);
     }
 
+    @Override
     public void paste(String textToInsert) {
         int sel = getSelectionEnd() - getSelectionStart();
-        if (sel > 0) // selected text available
+        if (sel > 0) {
             replaceSelection(textToInsert);
-        else {
+        } else {
             int cPos = this.getCaretPosition();
             this.insert(textToInsert, cPos);
         }
     }
 
+    @Override
     public boolean hasUndoInformation() {
         return false;// undo.canUndo();
     }
 
+    @Override
     public void undo() {
         /*
          * try { if (undo.canUndo()) { undo.undo(); } } catch
@@ -162,10 +176,12 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     }
 
+    @Override
     public boolean hasRedoInformation() {
         return false;// undo.canRedo();
     }
 
+    @Override
     public void redo() {
         /*
          * try { if (undo.canRedo()) { undo.redo(); } } catch
@@ -174,14 +190,17 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     }
 
+    @Override
     public void addUndoableEditListener(UndoableEditListener listener) {
         getDocument().addUndoableEditListener(listener);
     }
 
+    @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
         autoCompleteListener = listener;
     }
 
+    @Override
     public void clearAutoCompleteSuggestion() {
         if (autoCompleteListener != null) {
             autoCompleteListener.clearCurrentSuggestion(this);

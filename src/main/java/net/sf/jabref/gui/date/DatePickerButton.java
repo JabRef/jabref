@@ -48,6 +48,7 @@ public class DatePickerButton implements ActionListener {
         editor = pEditor;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         Date date = datePicker.getDate();
         if (date != null) {

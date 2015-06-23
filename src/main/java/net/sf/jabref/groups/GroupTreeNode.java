@@ -50,7 +50,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
             // never happens
         }
         flavor = df;
-        flavors = new DataFlavor[] {flavor};
+        flavors = new DataFlavor[] {GroupTreeNode.flavor};
     }
 
 
@@ -100,8 +100,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      */
     public GroupTreeNode deepCopy() {
         GroupTreeNode copy = new GroupTreeNode(getGroup());
-        for (int i = 0; i < getChildCount(); ++i)
+        for (int i = 0; i < getChildCount(); ++i) {
             copy.add(((GroupTreeNode) getChildAt(i)).deepCopy());
+        }
         return copy;
     }
 
@@ -129,8 +130,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     public int[] getIndexedPath() {
         TreeNode[] path = getPath();
         int[] indexedPath = new int[path.length - 1];
-        for (int i = 1; i < path.length; ++i)
+        for (int i = 1; i < path.length; ++i) {
             indexedPath[i - 1] = path[i - 1].getIndex(path[i]);
+        }
         return indexedPath;
     }
 
@@ -140,8 +142,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      */
     public GroupTreeNode getNode(int[] indexedPath) {
         GroupTreeNode cursor = this;
-        for (int anIndexedPath : indexedPath)
+        for (int anIndexedPath : indexedPath) {
             cursor = (GroupTreeNode) cursor.getChildAt(anIndexedPath);
+        }
         return cursor;
     }
 
@@ -157,8 +160,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      */
     public GroupTreeNode getDescendant(int[] indexedPath) {
         GroupTreeNode cursor = this;
-        for (int i = 0; i < indexedPath.length && cursor != null; ++i)
+        for (int i = 0; (i < indexedPath.length) && (cursor != null); ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
+        }
         return cursor;
     }
 
@@ -177,18 +181,20 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 
     protected SearchRule getSearchRule(int originalContext) {
         final int context = getGroup().getHierarchicalContext();
-        if (context == AbstractGroup.INDEPENDENT)
+        if (context == AbstractGroup.INDEPENDENT) {
             return getGroup().getSearchRule();
+        }
         AndOrSearchRuleSet searchRule = new AndOrSearchRuleSet(
                 context == AbstractGroup.REFINING, false);
         searchRule.addRule(getGroup().getSearchRule());
-        if (context == AbstractGroup.INCLUDING
-                && originalContext != AbstractGroup.REFINING) {
-            for (int i = 0; i < getChildCount(); ++i)
+        if ((context == AbstractGroup.INCLUDING)
+                && (originalContext != AbstractGroup.REFINING)) {
+            for (int i = 0; i < getChildCount(); ++i) {
                 searchRule.addRule(((GroupTreeNode) getChildAt(i))
                         .getSearchRule(originalContext));
-        } else if (context == AbstractGroup.REFINING && !isRoot()
-                && originalContext != AbstractGroup.INCLUDING) {
+            }
+        } else if ((context == AbstractGroup.REFINING) && !isRoot()
+                && (originalContext != AbstractGroup.INCLUDING)) {
             searchRule.addRule(((GroupTreeNode) getParent())
                     .getSearchRule(originalContext));
         }
@@ -230,8 +236,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         AbstractGroup group;
         while (e.hasMoreElements()) {
             group = (e.nextElement()).getGroup();
-            if (group.contains(null, entry)) // first argument is never used
+            if (group.contains(null, entry)) {
                 matchingGroups.add(group);
+            }
         }
         AbstractGroup[] matchingGroupsArray = new AbstractGroup[matchingGroups
                 .size()];
@@ -239,12 +246,12 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     public boolean canMoveUp() {
-        return getPreviousSibling() != null
+        return (getPreviousSibling() != null)
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
-        return getNextSibling() != null
+        return (getNextSibling() != null)
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
@@ -254,7 +261,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     public boolean canMoveRight() {
-        return getPreviousSibling() != null
+        return (getPreviousSibling() != null)
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
@@ -273,7 +280,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     public AbstractUndoableEdit moveDown(GroupSelector groupSelector) {
         final GroupTreeNode myParent = (GroupTreeNode) getParent();
         final int index = myParent.getIndex(this);
-        if (index < parent.getChildCount() - 1) {
+        if (index < (parent.getChildCount() - 1)) {
             UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                     groupSelector.getGroupTreeRoot(), this, myParent, index + 1);
             myParent.insert(this, index + 1);
@@ -287,8 +294,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         final GroupTreeNode myGrandParent = (GroupTreeNode) myParent
                 .getParent();
         // paranoia
-        if (myGrandParent == null)
+        if (myGrandParent == null) {
             return null;
+        }
         final int index = myGrandParent.getIndex(myParent);
         UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                 groupSelector.getGroupTreeRoot(), this, myGrandParent,
@@ -300,8 +308,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     public AbstractUndoableEdit moveRight(GroupSelector groupSelector) {
         final GroupTreeNode myPreviousSibling = (GroupTreeNode) getPreviousSibling();
         // paranoia
-        if (myPreviousSibling == null)
+        if (myPreviousSibling == null) {
             return null;
+        }
         UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                 groupSelector.getGroupTreeRoot(), this, myPreviousSibling,
                 myPreviousSibling.getChildCount());
@@ -318,64 +327,81 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      */
     public GroupTreeNode getChildAt(int[] path) {
         GroupTreeNode cursor = this;
-        for (int i = 0; i < path.length && cursor != null; ++i)
+        for (int i = 0; (i < path.length) && (cursor != null); ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(path[i]);
+        }
         return cursor;
     }
 
     /** Adds the selected entries to this node's group. */
     public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
         if (getGroup() == null)
+         {
             return null; // paranoia
+        }
         AbstractUndoableEdit undo = getGroup().add(entries);
-        if (undo instanceof UndoableChangeAssignment)
+        if (undo instanceof UndoableChangeAssignment) {
             ((UndoableChangeAssignment) undo).setEditedNode(this);
+        }
         return undo;
     }
 
     /** Removes the selected entries from this node's group. */
     public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
         if (getGroup() == null)
+         {
             return null; // paranoia
+        }
         AbstractUndoableEdit undo = getGroup().remove(entries);
-        if (undo instanceof UndoableChangeAssignment)
+        if (undo instanceof UndoableChangeAssignment) {
             ((UndoableChangeAssignment) undo).setEditedNode(this);
+        }
         return undo;
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return flavors;
+        return GroupTreeNode.flavors;
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor someFlavor) {
         return someFlavor.equals(GroupTreeNode.flavor);
     }
 
+    @Override
     public Object getTransferData(DataFlavor someFlavor)
             throws UnsupportedFlavorException, IOException {
-        if (!isDataFlavorSupported(someFlavor))
+        if (!isDataFlavorSupported(someFlavor)) {
             throw new UnsupportedFlavorException(someFlavor);
+        }
         return this;
     }
 
     /**
      * Recursively compares this node's group and all subgroups.
      */
+    @Override
     public boolean equals(Object other) {
-        if (!(other instanceof GroupTreeNode))
+        if (!(other instanceof GroupTreeNode)) {
             return false;
+        }
         final GroupTreeNode otherNode = (GroupTreeNode) other;
-        if (getChildCount() != otherNode.getChildCount())
+        if (getChildCount() != otherNode.getChildCount()) {
             return false;
+        }
         AbstractGroup g1 = getGroup();
         AbstractGroup g2 = otherNode.getGroup();
-        if ((g1 == null && g2 != null) || (g1 != null && g2 == null))
+        if (((g1 == null) && (g2 != null)) || ((g1 != null) && (g2 == null))) {
             return false;
-        if (g1 != null && g2 != null && !g1.equals(g2))
+        }
+        if ((g1 != null) && (g2 != null) && !g1.equals(g2)) {
             return false;
+        }
         for (int i = 0; i < getChildCount(); ++i) {
-            if (!getChildAt(i).equals(otherNode.getChildAt(i)))
+            if (!getChildAt(i).equals(otherNode.getChildAt(i))) {
                 return false;
+            }
         }
         return true;
     }

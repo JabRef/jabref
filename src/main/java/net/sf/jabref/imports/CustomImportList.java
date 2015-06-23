@@ -113,18 +113,22 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
             return new String[] {name, cliId, className, basePath};
         }
 
+        @Override
         public boolean equals(Object o) {
-            return o != null && o instanceof Importer && this.getName().equals(((Importer) o).getName());
+            return (o != null) && (o instanceof Importer) && this.getName().equals(((Importer) o).getName());
         }
 
+        @Override
         public int hashCode() {
             return name.hashCode();
         }
 
+        @Override
         public int compareTo(Importer o) {
             return this.getName().compareTo(o.getName());
         }
 
+        @Override
         public String toString() {
             return this.name;
         }

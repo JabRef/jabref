@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.AbstractWorker;
@@ -71,10 +72,11 @@ public class DbImportAction extends AbstractWorker {
 
         public DbImpAction() {
             super(GUIGlobals.getImage("dbImport"));
-            putValue(NAME, "Import from external SQL database");
+            putValue(Action.NAME, "Import from external SQL database");
 
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Util.runAbstractWorker(DbImportAction.this);
@@ -86,6 +88,7 @@ public class DbImportAction extends AbstractWorker {
 
 
     // run first, in EDT:
+    @Override
     public void init() {
 
         dbs = new DBStrings();
@@ -124,6 +127,7 @@ public class DbImportAction extends AbstractWorker {
     }
 
     // run second, on a different thread:
+    @Override
     public void run() {
         performImport();
     }
@@ -192,9 +196,11 @@ public class DbImportAction extends AbstractWorker {
     }
 
     // run third, on EDT:
+    @Override
     public void update() {
-        if (databases == null)
+        if (databases == null) {
             return;
+        }
         for (Object[] res : databases) {
             database = (BibtexDatabase) res[0];
             metaData = (MetaData) res[1];

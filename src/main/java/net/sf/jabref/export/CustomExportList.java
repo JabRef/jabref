@@ -77,13 +77,15 @@ public class CustomExportList {
     }
 
     private ExportFormat createFormat(String[] s) {
-        if (s.length < 3)
+        if (s.length < 3) {
             return null;
+        }
         String lfFileName;
-        if (s[1].endsWith(".layout"))
+        if (s[1].endsWith(".layout")) {
             lfFileName = s[1].substring(0, s[1].length() - 7);
-        else
+        } else {
             lfFileName = s[1];
+        }
         ExportFormat format = new ExportFormat(s[0], s[0], lfFileName, null,
                 s[2]);
         format.setCustomExport(true);
@@ -110,9 +112,9 @@ public class CustomExportList {
 
     public void store() {
 
-        if (list.size() == 0)
+        if (list.size() == 0) {
             purge(0);
-        else {
+        } else {
             for (int i = 0; i < list.size(); i++) {
                 // System.out.println(i+"..");
                 Globals.prefs.putStringArray("customExportFormat" + i,

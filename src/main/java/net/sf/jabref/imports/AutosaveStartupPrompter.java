@@ -41,6 +41,7 @@ public class AutosaveStartupPrompter implements Runnable {
         this.files = files;
     }
 
+    @Override
     public void run() {
         boolean first = frame.baseCount() == 0;
         List<ParserResult> loaded = new ArrayList<ParserResult>();
@@ -55,8 +56,9 @@ public class AutosaveStartupPrompter implements Runnable {
                         + Globals.lang("Do you want to recover the database from the autosave file?") + "</html>",
                         Globals.lang("Autosave of file '%0'", file.getName()), JOptionPane.YES_NO_OPTION);
                 tryingAutosave = answer == JOptionPane.YES_OPTION;
-            } else
+            } else {
                 tryingAutosave = true;
+            }
 
             if (tryingAutosave) {
                 fileToLoad = AutoSaveManager.getAutoSaveFile(file);
@@ -70,8 +72,9 @@ public class AutosaveStartupPrompter implements Runnable {
                     BasePanel panel = frame.addTab(pr.getDatabase(), file,
                             pr.getMetaData(), pr.getEncoding(), first);
                     location.put(pr, frame.baseCount() - 1);
-                    if (tryingAutosave)
+                    if (tryingAutosave) {
                         panel.markNonUndoableBaseChanged();
+                    }
 
                     first = false;
                     done = true;
@@ -103,10 +106,12 @@ public class AutosaveStartupPrompter implements Runnable {
                 if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
                     StringBuilder wrn = new StringBuilder();
-                    for (int j = 0; j < wrns.length; j++)
+                    for (int j = 0; j < wrns.length; j++) {
                         wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
-                    if (wrn.length() > 0)
+                    }
+                    if (wrn.length() > 0) {
                         wrn.deleteCharAt(wrn.length() - 1);
+                    }
                     frame.showBaseAt(location.get(pr));
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
                             Globals.lang("Warnings"),

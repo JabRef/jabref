@@ -70,7 +70,7 @@ public class WSITools
      */
     public static boolean tokenize(Vector<String> vcr, String buf)
     {
-        return tokenize(vcr, buf, " \t\n");
+        return WSITools.tokenize(vcr, buf, " \t\n");
     }
 
     /**

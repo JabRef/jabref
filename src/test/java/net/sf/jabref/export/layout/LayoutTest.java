@@ -5,6 +5,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,13 +45,13 @@ public class LayoutTest {
     public static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(s));
         Collection<BibtexEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
+        Assert.assertEquals(1, c.size());
         return c.iterator().next();
     }
 
     public String layout(String layoutFile, String entry) throws Exception {
 
-        BibtexEntry be = bibtexString2BibtexEntry(entry);
+        BibtexEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
 
@@ -58,9 +60,9 @@ public class LayoutTest {
 
     @Test
     public void testLayoutBibtextype() throws Exception {
-        assertEquals("Other", layout("\\bibtextype", "@other{bla, author={This\nis\na\ntext}}"));
-        assertEquals("Article", layout("\\bibtextype", "@article{bla, author={This\nis\na\ntext}}"));
-        assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
+        Assert.assertEquals("Other", layout("\\bibtextype", "@other{bla, author={This\nis\na\ntext}}"));
+        Assert.assertEquals("Article", layout("\\bibtextype", "@article{bla, author={This\nis\na\ntext}}"));
+        Assert.assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
     }
 
     @Test
@@ -69,17 +71,17 @@ public class LayoutTest {
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
                 "@other{bla, author={This\nis\na\ntext}}");
 
-        assertEquals("This is a text ", layoutText);
+        Assert.assertEquals("This is a text ", layoutText);
 
         layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author}",
                 "@other{bla, author={This\nis\na\ntext}}");
 
-        assertEquals("This is a text", layoutText);
+        Assert.assertEquals("This is a text", layoutText);
 
         layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
                 "@other{bla, author={This\nis\na\n\ntext}}");
 
-        assertEquals("This is a<br>text ", layoutText);
+        Assert.assertEquals("This is a<br>text ", layoutText);
     }
 
     @Test
@@ -87,7 +89,7 @@ public class LayoutTest {
         String layoutText = layout("\\begin{author}\\format[NameFormatter]{\\author}\\end{author}",
                 "@other{bla, author={Joe Doe and Jane, Moon}}");
 
-        assertEquals("Joe Doe, Moon Jane", layoutText);
+        Assert.assertEquals("Joe Doe, Moon Jane", layoutText);
     }
 
     /**
@@ -103,7 +105,7 @@ public class LayoutTest {
                 "<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>",
                 t1BibtexString());
 
-        assertEquals(
+        Assert.assertEquals(
                 "<font face=\"arial\"><BR><BR><b>Abstract: </b> &ntilde; &ntilde; &iacute; &#305; &#305;</font>",
                 layoutText);
     }

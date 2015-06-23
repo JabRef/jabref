@@ -104,6 +104,7 @@ public class LabelPatternPanel extends JPanel {
         JButton btnDefault = new JButton(Globals.lang("Default"));
         btnDefault.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 defaultPat.setText((String) Globals.prefs.defaults.get("defaultLabelPattern"));
             }
@@ -227,8 +228,9 @@ public class LabelPatternPanel extends JPanel {
         // each entry type
         for (String s1 : textFields.keySet()) {
             String text = textFields.get(s1).getText();
-            if (!"".equals(text.trim()))
+            if (!"".equals(text.trim())) {
                 keypatterns.addLabelPattern(s1, text);
+            }
         }
 
         // default value
@@ -259,9 +261,9 @@ public class LabelPatternPanel extends JPanel {
     }
 
     private void setValue(JTextField tf, String fieldName, LabelPattern keypatterns) {
-        if (keypatterns.isDefaultValue(fieldName))
+        if (keypatterns.isDefaultValue(fieldName)) {
             tf.setText("");
-        else {
+        } else {
             //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
             tf.setText(keypatterns.getValue(fieldName).get(0));
         }

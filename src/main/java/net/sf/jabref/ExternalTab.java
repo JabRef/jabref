@@ -72,6 +72,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
                 + "file directory, prefer the bib file location rather than the file directory set above"));
         bibLocationAsFileDir.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent changeEvent) {
                 bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
             }
@@ -83,6 +84,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
         regExpListener = new ItemListener() {
 
+            @Override
             public void itemStateChanged(ItemEvent e) {
                 regExpTextField.setEditable(useRegExpComboBox.isSelected());
             }
@@ -217,6 +219,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
                 pt.getIcon());
         button.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 PushToApplicationButton.showSettingsDialog(_frame, pt, pt.getSettingsPanel());
             }
@@ -229,6 +232,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         //    b.nextLine();
     }
 
+    @Override
     public void setValues() {
         pdfDir.setText(_prefs.get("pdfDirectory"));
         psDir.setText(_prefs.get("psDirectory"));
@@ -243,14 +247,16 @@ public class ExternalTab extends JPanel implements PrefsTab {
         emailSubject.setText(_prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
-        if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY))
+        if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
             useRegExpComboBox.setSelected(true);
-        else if (_prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY))
+        } else if (_prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY)) {
             matchExactKeyOnly.setSelected(true);
-        else
+        } else {
             matchStartsWithKey.setSelected(true);
+        }
     }
 
+    @Override
     public void storeSettings() {
 
         _prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, useRegExpComboBox.isSelected());
@@ -271,10 +277,12 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("External programs");
     }

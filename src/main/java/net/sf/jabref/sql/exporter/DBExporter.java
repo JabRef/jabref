@@ -201,9 +201,10 @@ public abstract class DBExporter extends DBImporterExporter {
             myID = rs.getInt("groups_id");
         }
         for (Enumeration<GroupTreeNode> e = cursor.children(); e
-                .hasMoreElements();)
+                .hasMoreElements();) {
             currentID = populateEntryGroupsTable(e.nextElement(), myID,
                     currentID, out, database_id);
+        }
         return currentID;
     }
 
@@ -298,10 +299,12 @@ public abstract class DBExporter extends DBImporterExporter {
             reg_exp = ((SearchGroup) group).isRegExp() ? "1" : "0";
         }
         // Protect all quotes in the group descriptions:
-        if (searchField != null)
+        if (searchField != null) {
             searchField = Util.quote(searchField, "'", '\\');
-        if (searchExpr != null)
+        }
+        if (searchExpr != null) {
             searchExpr = Util.quote(searchExpr, "'", '\\');
+        }
 
         SQLUtil.processQuery(
                 out,
@@ -338,9 +341,10 @@ public abstract class DBExporter extends DBImporterExporter {
             myID = rs.getInt("groups_id");
         }
         for (Enumeration<GroupTreeNode> e = cursor.children(); e
-                .hasMoreElements();)
+                .hasMoreElements();) {
             currentID = populateGroupsTable(e.nextElement(), myID, ++currentID,
                     out, database_id);
+        }
         return currentID;
     }
 
@@ -452,8 +456,9 @@ public abstract class DBExporter extends DBImporterExporter {
 
         // open output file
         File outfile = new File(file);
-        if (outfile.exists())
+        if (outfile.exists()) {
             outfile.delete();
+        }
         BufferedOutputStream writer;
         writer = new BufferedOutputStream(new FileOutputStream(outfile));
         PrintStream fout;
@@ -501,8 +506,9 @@ public abstract class DBExporter extends DBImporterExporter {
                 conn.setAutoCommit(true);
             }
             conn.close();
-            if (redisplay)
+            if (redisplay) {
                 exportDatabaseToDBMS(database, metaData, keySet, dbStrings, frame);
+            }
         } catch (SQLException ex) {
             if (conn != null) {
                 if (!conn.getAutoCommit()) {
@@ -545,10 +551,11 @@ public abstract class DBExporter extends DBImporterExporter {
                     }
                 }
             }
-        } else
+        } else {
             dbName = JOptionPane.showInputDialog(frame,
                     "Please enter the desired name:", "SQL Export",
                     JOptionPane.INFORMATION_MESSAGE);
+        }
         return dbName;
     }
 
@@ -572,7 +579,7 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     private boolean isValidDBName(ArrayList<String> dbNames, String desiredName) {
-        return desiredName.trim().length() > 1 && !dbNames.contains(desiredName);
+        return (desiredName.trim().length() > 1) && !dbNames.contains(desiredName);
     }
 
     /**

@@ -115,8 +115,9 @@ public class ContentSelectorDialog2 extends JDialog {
         setupActions();
         Util.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
         int fieldInd = fieldListModel.indexOf(currentField);
-        if (fieldInd >= 0)
+        if (fieldInd >= 0) {
             fieldList.setSelectedIndex(fieldInd);
+        }
 
         pack();
     }
@@ -125,6 +126,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         wordList.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 wordEditField.setText((String) wordList.getSelectedValue());
                 wordEditField.selectAll();
@@ -134,6 +136,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         newWord.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 newWordAction();
             }
@@ -141,6 +144,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         wordEditFieldListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
                 String old = (String) wordList.getSelectedValue(),
@@ -173,19 +177,23 @@ public class ContentSelectorDialog2 extends JDialog {
 
         removeWord.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
-                if (index == -1)
+                if (index == -1) {
                     return;
+                }
                 wordListModel.remove(index);
                 wordEditField.setText("");
-                if (wordListModel.size() > 0)
+                if (wordListModel.size() > 0) {
                     wordList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
+                }
             }
         });
 
         fieldList.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 currentField = (String) fieldList.getSelectedValue();
                 fieldNameField.setText("");
@@ -195,6 +203,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         newField.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {
                     // only add <field name> once
@@ -212,6 +221,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         fieldNameField.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 fieldNameField.transferFocus();
             }
@@ -222,6 +232,7 @@ public class ContentSelectorDialog2 extends JDialog {
             /**
              * Adds the text value to the list
              */
+            @Override
             public void focusLost(FocusEvent e) {
                 String s = fieldNameField.getText();
                 fieldNameField.setText("");
@@ -253,22 +264,26 @@ public class ContentSelectorDialog2 extends JDialog {
 
         removeField.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = fieldList.getSelectedIndex();
-                if (index == -1)
+                if (index == -1) {
                     return;
+                }
                 String fieldName = (String) fieldListModel.get(index);
                 removedFields.add(fieldName);
                 fieldListModel.remove(index);
                 wordListModels.remove(fieldName);
                 fieldNameField.setText("");
-                if (fieldListModel.size() > 0)
+                if (fieldListModel.size() > 0) {
                     fieldList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
+                }
             }
         });
 
         help.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
             }
@@ -276,6 +291,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     applyChanges();
@@ -290,6 +306,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         apply.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // Store if an entry is currently being edited:
                 if (!wordEditField.getText().equals("")) {
@@ -308,6 +325,7 @@ public class ContentSelectorDialog2 extends JDialog {
         @SuppressWarnings("serial")
         Action cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -318,8 +336,9 @@ public class ContentSelectorDialog2 extends JDialog {
 
     private void newWordAction() {
         if ((wordListModel.size() == 0) ||
-                !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT))
+                !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT)) {
             wordListModel.add(0, WORD_FIRSTLINE_TEXT);
+        }
         wordList.setSelectedIndex(0);
         wPane.getVerticalScrollBar().setValue(0);
     }
@@ -338,14 +357,17 @@ public class ContentSelectorDialog2 extends JDialog {
         // Cycle through all fields that we have created listmodels for:
         for (String fieldName : wordListModels.keySet()) {
             // For each field name, store the values:
-            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
+            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName)) {
                 continue;
+            }
             DefaultListModel lm = wordListModels.get(fieldName);
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
-            if (lm.size() > 0)
-                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+            if (lm.size() > 0) {
+                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT)) {
                     start++;
+                }
+            }
             Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
             boolean newField = false;
             if (data == null) {
@@ -353,14 +375,16 @@ public class ContentSelectorDialog2 extends JDialog {
                 data = new Vector<String>();
                 changedFieldSet = true;
 
-            } else
+            } else {
                 data.clear();
+            }
             for (int wrd = start; wrd < lm.size(); wrd++) {
                 String word = (String) lm.get(wrd);
                 data.add(word);
             }
-            if (newField)
+            if (newField) {
                 metaData.putData(Globals.SELECTOR_META_PREFIX + fieldName, data);
+            }
         }
 
         // System.out.println("TODO: remove metadata for removed selector field.");

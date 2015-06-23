@@ -38,10 +38,11 @@ public class EntryChange extends Change {
     public EntryChange(BibtexEntry memEntry, BibtexEntry tmpEntry, BibtexEntry diskEntry) {
         super();
         String key = tmpEntry.getCiteKey();
-        if (key == null)
+        if (key == null) {
             name = "Modified entry";
-        else
+        } else {
             name = "Modified entry: '" + key + "'";
+        }
         this.memEntry = memEntry;
         this.tmpEntry = tmpEntry;
         this.diskEntry = diskEntry;
@@ -83,17 +84,19 @@ public class EntryChange extends Change {
         }
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         boolean allAccepted = true;
 
         @SuppressWarnings("unchecked")
-        Enumeration<Change> e = (Enumeration<Change>) children();
+        Enumeration<Change> e = children();
         for (; e.hasMoreElements();) {
             Change c = e.nextElement();
-            if (c.isAcceptable() && c.isAccepted())
+            if (c.isAcceptable() && c.isAccepted()) {
                 c.makeChange(panel, secondary, undoEdit);
-            else
+            } else {
                 allAccepted = false;
+            }
         }
 
         /*panel.database().removeEntry(memEntry.getId());
@@ -105,6 +108,7 @@ public class EntryChange extends Change {
         return allAccepted;
     }
 
+    @Override
     JComponent description() {
         return new JLabel(name);
     }
@@ -135,16 +139,18 @@ public class EntryChange extends Change {
             text.append("<FONT SIZE=10>");
             text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
-            if ((onDisk != null) && !onDisk.equals(""))
+            if ((onDisk != null) && !onDisk.equals("")) {
                 text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + " ").append(onDisk);
-            else
+            } else {
                 text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+            }
 
-            if ((inMem != null) && !inMem.equals(""))
+            if ((inMem != null) && !inMem.equals("")) {
                 text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + " ").append(inMem);
-            if ((onTmp != null) && !onTmp.equals(""))
+            }
+            if ((onTmp != null) && !onTmp.equals("")) {
                 text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + " ").append(onTmp);
-            else {
+            } else {
                 // No value in memory.
                 /*if ((onTmp != null) && !onTmp.equals(inMem))
                   text.append("<H2>"+Globals.lang("You have cleared this field. Original value")+":</H2>"
@@ -154,6 +160,7 @@ public class EntryChange extends Change {
             tp.setText(text.toString());
         }
 
+        @Override
         public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
             //System.out.println(field+" "+onDisk);
             entry.setField(field, onDisk);
@@ -162,6 +169,7 @@ public class EntryChange extends Change {
             return true;
         }
 
+        @Override
         JComponent description() {
             return sp;
         }

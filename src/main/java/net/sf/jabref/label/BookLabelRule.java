@@ -34,6 +34,7 @@ public class BookLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)
+    @Override
     public String applyRule(BibtexEntry oldEntry) {
         String newLabel = "";
 
@@ -47,8 +48,9 @@ public class BookLabelRule extends DefaultLabelRule {
                 authorTokens = new StringTokenizer(oldEntry.getField("editor"),
                         ",");
             }
-            if (authorTokens != null)
+            if (authorTokens != null) {
                 newLabel += authorTokens.nextToken().toLowerCase();
+            }
         } catch (Throwable t) {
             System.out.println("error getting author/editor: " + t);
         }

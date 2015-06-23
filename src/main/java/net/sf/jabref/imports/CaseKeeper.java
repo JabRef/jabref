@@ -39,6 +39,7 @@ public class CaseKeeper implements LayoutFormatter {
         return text;
     }
 
+    @Override
     public String format(String text) {
         if (text == null) {
             return null;

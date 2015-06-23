@@ -50,10 +50,11 @@ public class MedlineFetcher implements EntryFetcher {
 
 
         public void addID(String id) {
-            if (ids.equals(""))
+            if (ids.equals("")) {
                 ids = id;
-            else
+            } else {
                 ids += "," + id;
+            }
         }
     }
 
@@ -138,27 +139,33 @@ public class MedlineFetcher implements EntryFetcher {
         return result;
     }
 
+    @Override
     public void stopFetching() {
         shouldContinue = false;
     }
 
+    @Override
     public String getHelpPage() {
         return GUIGlobals.medlineHelp;
     }
 
+    @Override
     public String getKeyName() {
         return "Medline";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // No Option Panel
         return null;
     }
 
+    @Override
     public String getTitle() {
         return "Medline";
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
 
         shouldContinue = true;
@@ -194,7 +201,7 @@ public class MedlineFetcher implements EntryFetcher {
             }
 
             int numberToFetch = result.count;
-            if (numberToFetch > PACING) {
+            if (numberToFetch > MedlineFetcher.PACING) {
 
                 while (true) {
                     String strCount = JOptionPane.showInputDialog(Globals.lang("References found") +
@@ -216,11 +223,12 @@ public class MedlineFetcher implements EntryFetcher {
                 }
             }
 
-            for (int i = 0; i < numberToFetch; i += PACING) {
-                if (!shouldContinue)
+            for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
+                if (!shouldContinue) {
                     break;
+                }
 
-                int noToFetch = Math.min(PACING, numberToFetch - i);
+                int noToFetch = Math.min(MedlineFetcher.PACING, numberToFetch - i);
 
                 // get the ids from entrez
                 result = getIds(searchTerm, i, noToFetch);

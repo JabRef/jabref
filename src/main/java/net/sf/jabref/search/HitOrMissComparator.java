@@ -33,14 +33,17 @@ public class HitOrMissComparator implements Comparator<BibtexEntry> {
         this.hitOrMiss = hitOrMiss;
     }
 
+    @Override
     public int compare(BibtexEntry o1, BibtexEntry o2) {
-        if (hitOrMiss == null)
+        if (hitOrMiss == null) {
             return 0;
+        }
 
         boolean hit1 = hitOrMiss.matches(o1), hit2 = hitOrMiss.matches(o2);
-        if (hit1 == hit2)
+        if (hit1 == hit2) {
             return 0;
-        else
+        } else {
             return hit1 ? -1 : 1;
+        }
     }
 }

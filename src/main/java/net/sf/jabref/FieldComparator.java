@@ -45,11 +45,11 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
     static {
         try {
-            collator = new RuleBasedCollator(
+            FieldComparator.collator = new RuleBasedCollator(
                     ((RuleBasedCollator) Collator.getInstance()).getRules()
                             .replaceAll("<'\u005f'", "<' '<'\u005f'"));
         } catch (ParseException e) {
-            collator = Collator.getInstance();
+            FieldComparator.collator = Collator.getInstance();
         }
     }
 
@@ -81,6 +81,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         isNumeric = BibtexFields.isNumeric(this.field[0]);
     }
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
         Object f1, f2;
 
@@ -102,15 +103,18 @@ public class FieldComparator implements Comparator<BibtexEntry> {
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1598777&group_id=92314&atid=600306
          */
         int localMultiplier = multiplier;
-        if (isMonthField)
+        if (isMonthField) {
             localMultiplier = -localMultiplier;
+        }
 
         // Catch all cases involving null:
-        if (f1 == null)
+        if (f1 == null) {
             return f2 == null ? 0 : localMultiplier;
+        }
 
-        if (f2 == null)
+        if (f2 == null) {
             return -localMultiplier;
+        }
 
         // Now we now that both f1 and f2 are != null
         if (isNameField) {
@@ -148,7 +152,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
                 // Parsing failed.
             }
 
-            if (i2 != null && i1 != null) {
+            if ((i2 != null) && (i1 != null)) {
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
@@ -177,7 +181,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
             result = -(((Integer) f1).compareTo(f2AsInteger));
         } else {
             String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
-            result = collator.compare(ours, theirs);//ours.compareTo(theirs);
+            result = FieldComparator.collator.compare(ours, theirs);//ours.compareTo(theirs);
         }
 
         return result * localMultiplier;
@@ -186,8 +190,9 @@ public class FieldComparator implements Comparator<BibtexEntry> {
     private Object getField(BibtexEntry entry) {
         for (String aField : field) {
             Object o = entry.getFieldOrAlias(aField);
-            if (o != null)
+            if (o != null) {
                 return o;
+            }
         }
         return null;
     }

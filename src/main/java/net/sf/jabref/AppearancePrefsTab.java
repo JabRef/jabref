@@ -121,6 +121,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         overrideFonts.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 fontSize.setEnabled(overrideFonts.isSelected());
             }
@@ -128,6 +129,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         fontButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Font f = new FontSelectorDialog
                         (null, GUIGlobals.CURRENTFONT).getSelectedFont();
@@ -152,6 +154,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
         //antialias.setSelected(_prefs.getBoolean("antialias"));
@@ -172,6 +175,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
      * the user clicks Ok.
      *
      */
+    @Override
     public void storeSettings() {
 
         _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
@@ -221,6 +225,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         return true;
     }
 
+    @Override
     public boolean readyToClose() {
         // Test if font size is a number:
         if (validateIntegerField("Menu and label font size", fontSize.getText(), "Changed font settings") == false) {
@@ -236,6 +241,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Appearance");
     }

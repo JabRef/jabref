@@ -45,9 +45,10 @@ public class PostgreSQLImporter extends DBImporter {
      * @return The singleton instance of the MySQLImporter
      */
     public static PostgreSQLImporter getInstance() {
-        if (instance == null)
-            instance = new PostgreSQLImporter();
-        return instance;
+        if (PostgreSQLImporter.instance == null) {
+            PostgreSQLImporter.instance = new PostgreSQLImporter();
+        }
+        return PostgreSQLImporter.instance;
     }
 
     @Override

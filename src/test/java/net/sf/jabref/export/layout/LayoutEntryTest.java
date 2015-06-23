@@ -3,6 +3,8 @@ package net.sf.jabref.export.layout;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -106,7 +108,7 @@ public class LayoutEntryTest {
         String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, new ArrayList<String>());
         String expecting = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices</font>";
 
-        assertEquals(expecting, result);
+        Assert.assertEquals(expecting, result);
     }
 
     /**
@@ -128,7 +130,7 @@ public class LayoutEntryTest {
         String containing = "<span style=\"background-color:#3399FF;\">Google</span>";
 
         // check
-        assertTrue("Actual message: " + result, result.contains(containing));
+        Assert.assertTrue("Actual message: " + result, result.contains(containing));
     }
 
     /**
@@ -153,8 +155,8 @@ public class LayoutEntryTest {
         String containing2 = "<span style=\"background-color:#3399FF;\">study</span>";
 
         // check
-        assertTrue(result.contains(containing));
-        assertTrue(result.contains(containing2));
+        Assert.assertTrue(result.contains(containing));
+        Assert.assertTrue(result.contains(containing2));
     }
 
     /**
@@ -176,7 +178,7 @@ public class LayoutEntryTest {
         String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android <span style=\"background-color:#3399FF;\">google</span> Open-Source Devices</font>";
 
         // check
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     /**
@@ -201,6 +203,6 @@ public class LayoutEntryTest {
         String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal <span style=\"background-color:" + highlightColor + "\">study</span> of security on <span style=\"background-color:" + highlightColor + "\">Android</span>: Google's new <span style=\"background-color:" + highlightColor + "\">open</span>-source platform for mobile devices. Tags: Paper <span style=\"background-color:" + highlightColor + "\">android</span> google <span style=\"background-color:" + highlightColor + "\">Open</span>-Source Devices</font>";
 
         // check
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 }

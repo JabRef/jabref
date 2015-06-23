@@ -65,51 +65,56 @@ public class RightClickMenu extends JPopupMenu
 
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibtexEntry be = null;
-        if (panel.mainTable.getSelectedRowCount() == 1)
+        if (panel.mainTable.getSelectedRowCount() == 1) {
             be = panel.mainTable.getSelected().get(0);
+        }
 
         addPopupMenuListener(this);
 
         add(new AbstractAction(Globals.lang("Copy"), GUIGlobals.getImage("copy")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("copy");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
         add(new AbstractAction(Globals.lang("Paste"), GUIGlobals.getImage("paste")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("paste");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
         add(new AbstractAction(Globals.lang("Cut"), GUIGlobals.getImage("cut")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("cut");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
 
         add(new AbstractAction(Globals.lang("Delete"), GUIGlobals.getImage("delete")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 /*SwingUtilities.invokeLater(new Runnable () {
                 public void run() {*/
                 try {
                     panel.runCommand("delete");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
                 /*}
                 }); */
@@ -119,21 +124,23 @@ public class RightClickMenu extends JPopupMenu
 
         add(new AbstractAction(Globals.lang("Export to clipboard")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("exportToClipboard");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
         add(new AbstractAction(Globals.lang("Send as email")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("sendAsEmail");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -141,17 +148,19 @@ public class RightClickMenu extends JPopupMenu
 
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
         JabRefFrame frame = panel.frame;
-        for (int i = 0; i < Util.MAX_MARKING_LEVEL; i++)
+        for (int i = 0; i < Util.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
+        }
 
         if (multiple) {
             add(new AbstractAction(Globals.lang("Mark entries"), GUIGlobals.getImage("markEntries")) {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("markEntries");
                     } catch (Throwable ex) {
-                        logger.warning(ex.getMessage());
+                        RightClickMenu.logger.warning(ex.getMessage());
                     }
                 }
             });
@@ -160,11 +169,12 @@ public class RightClickMenu extends JPopupMenu
 
             add(new AbstractAction(Globals.lang("Unmark entries"), GUIGlobals.getImage("unmarkEntries")) {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("unmarkEntries");
                     } catch (Throwable ex) {
-                        logger.warning(ex.getMessage());
+                        RightClickMenu.logger.warning(ex.getMessage());
                     }
                 }
             });
@@ -175,11 +185,12 @@ public class RightClickMenu extends JPopupMenu
             if ((marked == null) || (marked.isEmpty())) {
                 add(new AbstractAction(Globals.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
 
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
                             panel.runCommand("markEntries");
                         } catch (Throwable ex) {
-                            logger.warning(ex.getMessage());
+                            RightClickMenu.logger.warning(ex.getMessage());
                         }
                     }
                 });
@@ -189,11 +200,12 @@ public class RightClickMenu extends JPopupMenu
                 add(markSpecific);
                 add(new AbstractAction(Globals.lang("Unmark entry"), GUIGlobals.getImage("unmarkEntries")) {
 
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
                             panel.runCommand("unmarkEntries");
                         } catch (Throwable ex) {
-                            logger.warning(ex.getMessage());
+                            RightClickMenu.logger.warning(ex.getMessage());
                         }
                     }
                 });
@@ -203,7 +215,7 @@ public class RightClickMenu extends JPopupMenu
 
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
-                populateSpecialFieldMenu(this.rankingMenu, Rank.getInstance(), panel.frame);
+                RightClickMenu.populateSpecialFieldMenu(this.rankingMenu, Rank.getInstance(), panel.frame);
                 add(this.rankingMenu);
             }
 
@@ -221,12 +233,12 @@ public class RightClickMenu extends JPopupMenu
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
-                populateSpecialFieldMenu(this.priorityMenu, Priority.getInstance(), panel.frame);
+                RightClickMenu.populateSpecialFieldMenu(this.priorityMenu, Priority.getInstance(), panel.frame);
                 add(this.priorityMenu);
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
-                populateSpecialFieldMenu(this.readStatusMenu, ReadStatus.getInstance(), panel.frame);
+                RightClickMenu.populateSpecialFieldMenu(this.readStatusMenu, ReadStatus.getInstance(), panel.frame);
                 add(this.readStatusMenu);
             }
 
@@ -235,33 +247,36 @@ public class RightClickMenu extends JPopupMenu
 
         add(new AbstractAction(Globals.lang("Open folder"), GUIGlobals.getImage("openFolder")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openFolder");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
 
         add(new AbstractAction(Globals.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openExternalFile");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
 
         add(new AbstractAction(Globals.lang("Attach file"), GUIGlobals.getImage("open")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("addFileLink");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -275,33 +290,36 @@ public class RightClickMenu extends JPopupMenu
 
         add(new AbstractAction(Globals.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("openUrl");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
 
         add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("copyKey");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
 
         add(new AbstractAction(Globals.lang("Copy") + " \\cite{" + Globals.lang("BibTeX key") + "}") {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("copyCiteKey");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -313,11 +331,12 @@ public class RightClickMenu extends JPopupMenu
         add(new AbstractAction(Globals.lang("Plain text import"))
         {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("importPlainText");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -330,6 +349,7 @@ public class RightClickMenu extends JPopupMenu
         groupAdd = new JMenuItem(new AbstractAction(Globals.lang("Add to group"))
         {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("addToGroup");
@@ -338,7 +358,7 @@ public class RightClickMenu extends JPopupMenu
                     //JMenu groupMenu = buildGroupMenu(bes, true, false);
 
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -346,11 +366,12 @@ public class RightClickMenu extends JPopupMenu
         groupRemove = new JMenuItem(new AbstractAction(Globals.lang("Remove from group"))
         {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("removeFromGroup");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -359,11 +380,12 @@ public class RightClickMenu extends JPopupMenu
         groupMoveTo = add(new AbstractAction(Globals.lang("Move to group"))
         {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     panel.runCommand("moveToGroup");
                 } catch (Throwable ex) {
-                    logger.warning(ex.getMessage());
+                    RightClickMenu.logger.warning(ex.getMessage());
                 }
             }
         });
@@ -371,6 +393,7 @@ public class RightClickMenu extends JPopupMenu
 
         floatMarked.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 Globals.prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
                 panel.mainTable.refreshSorting(); // Bad remote access
@@ -406,6 +429,7 @@ public class RightClickMenu extends JPopupMenu
     /**
      * Set the dynamic contents of "Add to group ..." submenu.
      */
+    @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         BibtexEntry[] bes = panel.getSelectedEntries();
         panel.storeCurrentEdit();
@@ -424,8 +448,9 @@ public class RightClickMenu extends JPopupMenu
     }
 
     private JMenu buildGroupMenu(BibtexEntry[] bes, boolean add, boolean move) {
-        if (bes == null)
+        if (bes == null) {
             return null;
+        }
         JMenu groupMenu = new JMenu();
         GroupTreeNode groups = metaData.getGroups();
         if (groups == null) {
@@ -471,8 +496,9 @@ public class RightClickMenu extends JPopupMenu
             JMenuItem menuItem = new JMenuItem(action);
             setGroupFontAndIcon(menuItem, node.getGroup());
             menu.add(menuItem);
-            if (action.isEnabled())
+            if (action.isEnabled()) {
                 menu.setEnabled(true);
+            }
             return;
         }
 
@@ -491,11 +517,13 @@ public class RightClickMenu extends JPopupMenu
             setGroupFontAndIcon(menuItem, node.getGroup());
             submenu.add(menuItem);
             submenu.add(new Separator());
-            for (int i = 0; i < node.getChildCount(); ++i)
+            for (int i = 0; i < node.getChildCount(); ++i) {
                 insertNodes(submenu, (GroupTreeNode) node.getChildAt(i), selection, add, move);
+            }
             menu.add(submenu);
-            if (submenu.isEnabled())
+            if (submenu.isEnabled()) {
                 menu.setEnabled(true);
+            }
         }
     }
 
@@ -537,12 +565,14 @@ public class RightClickMenu extends JPopupMenu
         return action;
     }
 
+    @Override
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
         remove(groupAddMenu);
         remove(groupMoveMenu);
         remove(groupRemoveMenu);
     }
 
+    @Override
     public void popupMenuCanceled(PopupMenuEvent e) {
         // nothing to do
     }
@@ -560,6 +590,7 @@ public class RightClickMenu extends JPopupMenu
             panel = bp;
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             panel.changeType(type);
         }

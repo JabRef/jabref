@@ -42,29 +42,36 @@ public class PushToEmacs implements PushToApplication {
     private boolean couldNotConnect = false, couldNotRunClient = false;
 
 
+    @Override
     public String getName() {
         return Globals.menuTitle("Insert selected citations into Emacs");
     }
 
+    @Override
     public String getApplicationName() {
         return "Emacs";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push selection to Emacs");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("emacs");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return "Push to Emacs";
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
+        }
         citeCommand.setText(Globals.prefs.get("citeCommandEmacs"));
         emacsPath.setText(Globals.prefs.get(JabRefPreferences.EMACS_PATH));
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
@@ -72,6 +79,7 @@ public class PushToEmacs implements PushToApplication {
         return settings;
     }
 
+    @Override
     public void storeSettings() {
         Globals.prefs.put("citeCommandEmacs", citeCommand.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_PATH, emacsPath.getText());
@@ -100,6 +108,7 @@ public class PushToEmacs implements PushToApplication {
         settings = builder.getPanel();
     }
 
+    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
@@ -139,6 +148,7 @@ public class PushToEmacs implements PushToApplication {
 
             Runnable errorListener = new Runnable() {
 
+                @Override
                 public void run() {
                     InputStream out = p.getErrorStream();
                     //                    try {
@@ -149,8 +159,9 @@ public class PushToEmacs implements PushToApplication {
                     int c;
                     StringBuffer sb = new StringBuffer();
                     try {
-                        while ((c = out.read()) != -1)
+                        while ((c = out.read()) != -1) {
                             sb.append((char) c);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -168,8 +179,9 @@ public class PushToEmacs implements PushToApplication {
 
     }
 
+    @Override
     public void operationCompleted(BasePanel panel) {
-        if (couldNotConnect)
+        if (couldNotConnect) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "<HTML>" +
@@ -178,17 +190,18 @@ public class PushToEmacs implements PushToApplication {
                                     + "(by running the command 'server-start'/'gnuserv-start').")
                             + "</HTML>",
                     Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        else if (couldNotRunClient)
+        } else if (couldNotRunClient) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     Globals.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        else {
+        } else {
             panel.output(Globals.lang("Pushed citations to Emacs"));
         }
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }

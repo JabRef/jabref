@@ -56,10 +56,11 @@ public class ErrorConsole extends Handler {
 
 
     public static ErrorConsole getInstance() {
-        if (instance == null)
-            instance = new ErrorConsole();
+        if (ErrorConsole.instance == null) {
+            ErrorConsole.instance = new ErrorConsole();
+        }
 
-        return instance;
+        return ErrorConsole.instance;
     }
 
     private ErrorConsole() {
@@ -128,10 +129,11 @@ public class ErrorConsole extends Handler {
 
         public ErrorConsoleAction(JFrame frame) {
             super(Globals.menuTitle("Show error console"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Display all error messages"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Display all error messages"));
             this.frame = frame;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             displayErrorConsole(frame);
         }
@@ -154,6 +156,7 @@ public class ErrorConsole extends Handler {
             this.out = out2;
         }
 
+        @Override
         public void write(byte buf[], int off, int len) {
             try {
                 super.write(buf, off, len);
@@ -162,6 +165,7 @@ public class ErrorConsole extends Handler {
             }
         }
 
+        @Override
         public void flush() {
             super.flush();
             out.flush();
@@ -183,13 +187,13 @@ public class ErrorConsole extends Handler {
     public void publish(LogRecord record) {
         String msg = fmt.format(record);
         logOutput.add(msg);
-        if (logOutput.size() < MAXLOGLINES) {
+        if (logOutput.size() < ErrorConsole.MAXLOGLINES) {
             // if we did not yet reach MAXLOGLINES, we just append the string to the cache
             logOutputCache = logOutputCache + msg;
         } else {
             // if we reached MAXLOGLINES, we switch to the "real" caching method and remove old lines 
             logOutputCacheRefreshNeeded = true;
-            while (logOutput.size() > MAXLOGLINES) {
+            while (logOutput.size() > ErrorConsole.MAXLOGLINES) {
                 // if log is too large, remove first line
                 // we need a while loop as the formatter may output more than one line
                 logOutput.remove(0);

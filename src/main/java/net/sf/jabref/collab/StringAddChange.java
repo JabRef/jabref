@@ -38,6 +38,7 @@ public class StringAddChange extends Change {
 
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
         if (panel.database().hasStringLabel(string.getName())) {
@@ -61,6 +62,7 @@ public class StringAddChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

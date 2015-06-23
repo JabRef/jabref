@@ -42,14 +42,17 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
         this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return "Undo: insert entry";
     }
 
+    @Override
     public String getRedoPresentationName() {
         return "Redo: insert entry";
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -63,6 +66,7 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
         }
     }
 
+    @Override
     public void redo() {
         super.redo();
 

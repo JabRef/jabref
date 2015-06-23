@@ -110,7 +110,7 @@ public class IntegrityWizard extends JDialog implements ActionListener {
 
         URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath()
                 + GUIGlobals.shortIntegrityCheck);
-        if (infoURL != null)
+        if (infoURL != null) {
             try
             {
                 infoText = new JEditorPane();
@@ -125,6 +125,7 @@ public class IntegrityWizard extends JDialog implements ActionListener {
             {
                 infoText = null;
             }
+        }
 
         // -----------------------------------------------------------------------
 
@@ -143,6 +144,7 @@ public class IntegrityWizard extends JDialog implements ActionListener {
     // ---------------------------------------------------------------------------
     // ---------------------------------------------------------------------------
 
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         Object sender = e.getSource();
@@ -157,6 +159,7 @@ public class IntegrityWizard extends JDialog implements ActionListener {
             Runnable scanWork = new Runnable()
             {
 
+                @Override
                 public void run()
                 {
                     warnPanel.updateView(dbase);

@@ -33,22 +33,27 @@ public class UnknownEntryType extends BibtexEntryType {
         name = name_;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String[] getOptionalFields() {
         return fields;
     }
 
+    @Override
     public String[] getRequiredFields() {
         return fields;
     }
 
+    @Override
     public String describeRequiredFields() {
         return "unknown";
     }
 
+    @Override
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
         return true;
     }

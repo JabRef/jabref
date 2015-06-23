@@ -46,6 +46,7 @@ public class SearchExpression implements SearchRule {
         ast = parser.getAST(); // remember abstract syntax tree
     }
 
+    @Override
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         try {
             return treeParser.apply(ast, bibtexEntry);
@@ -54,6 +55,7 @@ public class SearchExpression implements SearchRule {
         }
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }

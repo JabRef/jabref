@@ -97,15 +97,16 @@ public class StyleSelectDialog {
         bg.add(useDefaultNumerical);
         bg.add(chooseDirectly);
         bg.add(setDirectory);
-        if (Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle"))
+        if (Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle")) {
             useDefaultAuthoryear.setSelected(true);
-        else if (Globals.prefs.getBoolean("ooUseDefaultNumericalStyle"))
+        } else if (Globals.prefs.getBoolean("ooUseDefaultNumericalStyle")) {
             useDefaultNumerical.setSelected(true);
-        else {
-            if (Globals.prefs.getBoolean("ooChooseStyleDirectly"))
+        } else {
+            if (Globals.prefs.getBoolean("ooChooseStyleDirectly")) {
                 chooseDirectly.setSelected(true);
-            else
+            } else {
                 setDirectory.setSelected(true);
+            }
         }
 
         directFile.setText(Globals.prefs.get("ooDirectFile"));
@@ -123,12 +124,14 @@ public class StyleSelectDialog {
 
         showDefaultAuthoryearStyle.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 displayDefaultStyle(true);
             }
         });
         showDefaultNumericalStyle.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 displayDefaultStyle(false);
             }
@@ -136,18 +139,21 @@ public class StyleSelectDialog {
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
         edit.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int i = table.getSelectedRow();
-                if (i == -1)
+                if (i == -1) {
                     return;
+                }
                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
-                    if (type != null)
+                    if (type != null) {
                         Util.openExternalFileAnyFormat(new MetaData(), link, type);
-                    else
+                    } else {
                         Util.openExternalFileUnknown(frame, null, new MetaData(), link,
                                 new UnknownExternalFileType("jstyle"));
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
 
@@ -178,14 +184,16 @@ public class StyleSelectDialog {
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                if (mouseEvent.isPopupTrigger())
+                if (mouseEvent.isPopupTrigger()) {
                     tablePopup(mouseEvent);
+                }
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
-                if (mouseEvent.isPopupTrigger())
+                if (mouseEvent.isPopupTrigger()) {
                     tablePopup(mouseEvent);
+                }
             }
         });
 
@@ -193,16 +201,19 @@ public class StyleSelectDialog {
 
         styleDir.getDocument().addDocumentListener(new DocumentListener() {
 
+            @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 readStyles();
                 setDirectory.setSelected(true);
             }
 
+            @Override
             public void removeUpdate(DocumentEvent documentEvent) {
                 readStyles();
                 setDirectory.setSelected(true);
             }
 
+            @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 readStyles();
                 setDirectory.setSelected(true);
@@ -210,14 +221,17 @@ public class StyleSelectDialog {
         });
         directFile.getDocument().addDocumentListener(new DocumentListener() {
 
+            @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 chooseDirectly.setSelected(true);
             }
 
+            @Override
             public void removeUpdate(DocumentEvent documentEvent) {
                 chooseDirectly.setSelected(true);
             }
 
+            @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 chooseDirectly.setSelected(true);
             }
@@ -257,6 +271,7 @@ public class StyleSelectDialog {
 
         AbstractAction okListener = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 if (!useDefaultAuthoryear.isSelected() && !useDefaultNumerical.isSelected()) {
                     if (chooseDirectly.isSelected()) {
@@ -268,7 +283,7 @@ public class StyleSelectDialog {
                         }
                     }
                     else {
-                        if (table.getRowCount() == 0 || table.getSelectedRowCount() == 0) {
+                        if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
                             JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use a default style."),
                                     Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
                             return;
@@ -284,6 +299,7 @@ public class StyleSelectDialog {
 
         Action cancelListener = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 diag.dispose();
             }
@@ -309,6 +325,7 @@ public class StyleSelectDialog {
         diag.setLocationRelativeTo(frame);
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 contentPane.setDividerLocation(contentPane.getSize().height - 150);
             }
@@ -330,8 +347,9 @@ public class StyleSelectDialog {
 
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
-        if (styleDir.getText().length() > 0)
+        if (styleDir.getText().length() > 0) {
             addStyles(styleDir.getText(), true);
+        }
         styles.getReadWriteLock().writeLock().unlock();
 
         selectLastUsed();
@@ -354,12 +372,14 @@ public class StyleSelectDialog {
                     break;
                 }
             }
-            if (!found && (table.getRowCount() > 0))
+            if (!found && (table.getRowCount() > 0)) {
                 table.setRowSelectionInterval(0, 0);
+            }
         }
         else {
-            if (table.getRowCount() > 0)
+            if (table.getRowCount() > 0) {
                 table.setRowSelectionInterval(0, 0);
+            }
         }
     }
 
@@ -377,7 +397,7 @@ public class StyleSelectDialog {
             File[] files = dirF.listFiles();
             for (File file : files) {
                 // If the file looks like a style file, parse it:
-                if (!file.isDirectory() && (file.getName().endsWith(STYLE_FILE_EXTENSION))) {
+                if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
                     addSingleFile(file);
                 }
                 // If the file is a directory, and we should recurse, do:
@@ -400,8 +420,9 @@ public class StyleSelectDialog {
         try {
             OOBibStyle style = new OOBibStyle(file);
             // Check if the parse was successful before adding it:
-            if (style.isValid() && !styles.contains(style))
+            if (style.isValid() && !styles.contains(style)) {
                 styles.add(style);
+            }
         } catch (Exception e) {
             System.out.println("Unable to read style file: '" + file.getPath() + "'");
             e.printStackTrace();
@@ -429,10 +450,11 @@ public class StyleSelectDialog {
      * @return the selected style, or null if no style is selected.
      */
     public OOBibStyle getSelectedStyle() {
-        if (selectionModel.getSelected().size() > 0)
+        if (selectionModel.getSelected().size() > 0) {
             return selectionModel.getSelected().get(0);
-        else
+        } else {
             return null;
+        }
     }
 
     private void setupPrevEntry() {
@@ -450,10 +472,12 @@ public class StyleSelectDialog {
 
     static class StyleTableFormat implements TableFormat<OOBibStyle> {
 
+        @Override
         public int getColumnCount() {
             return 3;
         }
 
+        @Override
         public String getColumnName(int i) {
             switch (i) {
             case 0:
@@ -467,6 +491,7 @@ public class StyleSelectDialog {
             }
         }
 
+        @Override
         public Object getColumnValue(OOBibStyle style, int i) {
             switch (i) {
             case 0:
@@ -484,8 +509,9 @@ public class StyleSelectDialog {
             StringBuilder sb = new StringBuilder("");
             for (Iterator<String> i = journals.iterator(); i.hasNext();) {
                 sb.append(i.next());
-                if (i.hasNext())
+                if (i.hasNext()) {
                     sb.append(", ");
+                }
             }
             return sb.toString();
         }
@@ -536,6 +562,7 @@ public class StyleSelectDialog {
             dd.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
             ok.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     dd.dispose();
                 }
@@ -555,6 +582,7 @@ public class StyleSelectDialog {
      */
     class EntrySelectionListener implements ListEventListener<OOBibStyle> {
 
+        @Override
         public void listChanged(ListEvent<OOBibStyle> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
                 OOBibStyle style = listEvent.getSourceList().get(0);
@@ -564,6 +592,7 @@ public class StyleSelectDialog {
                 contentPane.setDividerLocation(contentPane.getSize().height - 150);
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         preview.update();
                         preview.scrollRectToVisible(toRect);

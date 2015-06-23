@@ -63,21 +63,23 @@ public class Tools {
 
         Dimension mySize = diag.getSize();
 
-        if (parentSize.width > mySize.width)
+        if (parentSize.width > mySize.width) {
             x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
-        else
+        } else {
             x = topLeft.x;
+        }
 
-        if (parentSize.height > mySize.height)
+        if (parentSize.height > mySize.height) {
             y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
-        else
+        } else {
             y = topLeft.y;
+        }
 
         diag.setLocation(x, y);
     }
 
     public static String getLink(String link, URL mindmapUrl) {
-        if (link == null || link.isEmpty()) {
+        if ((link == null) || link.isEmpty()) {
             return null;
         }
         if (!Tools.isAbsolutePath(link)) {

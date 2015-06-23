@@ -120,7 +120,7 @@ public class VM implements Warn {
     }
 
     public VM(CharStream bst) throws RecognitionException {
-        this(charStream2CommonTree(bst));
+        this(VM.charStream2CommonTree(bst));
     }
 
     public VM(CommonTree tree) {
@@ -135,6 +135,7 @@ public class VM implements Warn {
              * the integer 1 if the second is greater than the first, 0
              * otherwise.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation >");
@@ -142,7 +143,7 @@ public class VM implements Warn {
                 Object o2 = stack.pop();
                 Object o1 = stack.pop();
 
-                if (!(o1 instanceof Integer && o2 instanceof Integer)) {
+                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
                     throw new VMException("Can only compare two integers with >");
                 }
 
@@ -158,6 +159,7 @@ public class VM implements Warn {
         buildInFunctions.put("<", new BstFunction() {
 
             /** Analogous. */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation <");
@@ -165,7 +167,7 @@ public class VM implements Warn {
                 Object o2 = stack.pop();
                 Object o1 = stack.pop();
 
-                if (!(o1 instanceof Integer && o2 instanceof Integer)) {
+                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
                     throw new VMException("Can only compare two integers with <");
                 }
 
@@ -185,6 +187,7 @@ public class VM implements Warn {
              * Pops the top two (both integer or both string) literals, compares
              * them, and pushes the integer 1 if they're equal, 0 otherwise.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation =");
@@ -192,7 +195,7 @@ public class VM implements Warn {
                 Object o1 = stack.pop();
                 Object o2 = stack.pop();
 
-                if (o1 == null ^ o2 == null) {
+                if ((o1 == null) ^ (o2 == null)) {
                     stack.push(VM.FALSE);
                     return;
                 }
@@ -209,6 +212,7 @@ public class VM implements Warn {
         buildInFunctions.put("+", new BstFunction() {
 
             /** Pops the top two (integer) literals and pushes their sum. */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation +");
@@ -216,7 +220,7 @@ public class VM implements Warn {
                 Object o2 = stack.pop();
                 Object o1 = stack.pop();
 
-                if (!(o1 instanceof Integer && o2 instanceof Integer)) {
+                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
                     throw new VMException("Can only compare two integers with +");
                 }
 
@@ -230,6 +234,7 @@ public class VM implements Warn {
              * Pops the top two (integer) literals and pushes their difference
              * (the first subtracted from the second).
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation -");
@@ -237,7 +242,7 @@ public class VM implements Warn {
                 Object o2 = stack.pop();
                 Object o1 = stack.pop();
 
-                if (!(o1 instanceof Integer && o2 instanceof Integer)) {
+                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
                     throw new VMException("Can only subtract two integers with -");
                 }
 
@@ -252,6 +257,7 @@ public class VM implements Warn {
              * order, that is, the order in which pushed), and pushes the
              * resulting string.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation *");
@@ -259,7 +265,7 @@ public class VM implements Warn {
                 Object o2 = stack.pop();
                 Object o1 = stack.pop();
 
-                if (!(o1 instanceof String && o2 instanceof String)) {
+                if (!((o1 instanceof String) && (o2 instanceof String))) {
                     throw new VMException("Can only concatenate two String with *");
                 }
 
@@ -273,6 +279,7 @@ public class VM implements Warn {
              * Pops the top two literals and assigns to the first (which must be
              * a global or entry variable) the value of the second.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Invalid call to operation :=");
@@ -294,6 +301,7 @@ public class VM implements Warn {
              * '}' character isn't a `.', `?', or `!', and pushes this resulting
              * string.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation add.period$");
@@ -312,8 +320,9 @@ public class VM implements Warn {
                     m.appendReplacement(sb, m.group(1));
                     sb.append('.');
                     String group2 = m.group(2);
-                    if (group2 != null)
+                    if (group2 != null) {
                         sb.append(m.group(2));
+                    }
                     stack.push(sb.toString());
                 } else {
                     stack.push(s);
@@ -333,6 +342,7 @@ public class VM implements Warn {
              * one function for each standard entry type as well as a
              * default.type function.
              */
+            @Override
             public void execute(BstEntry context) {
 
                 if (context == null) {
@@ -352,13 +362,14 @@ public class VM implements Warn {
              * character, converts it to the corresponding ASCII integer, and
              * pushes this integer.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation chr.to.int$");
                 }
                 Object o1 = stack.pop();
 
-                if (!(o1 instanceof String && ((String) o1).length() == 1)) {
+                if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
                     throw new VMException("Can only perform chr.to.int$ on string with length 1");
                 }
 
@@ -374,6 +385,7 @@ public class VM implements Warn {
              * Pushes the string that was the \cite-command argument for this
              * entry.
              */
+            @Override
             public void execute(BstEntry context) {
                 stack.push(context.entry.getCiteKey());
             }
@@ -384,6 +396,7 @@ public class VM implements Warn {
             /**
              * Pops the top literal from the stack and pushes two copies of it.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation duplicate$");
@@ -402,6 +415,7 @@ public class VM implements Warn {
              * field or a string having no non-white-space characters, 0
              * otherwise.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation empty$");
@@ -433,6 +447,7 @@ public class VM implements Warn {
              * than 0, it executes the second literal, else it executes the
              * first.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 3) {
                     throw new VMException("Not enough operands on stack for operation =");
@@ -441,8 +456,8 @@ public class VM implements Warn {
                 Object f2 = stack.pop();
                 Object i = stack.pop();
 
-                if (!(f1 instanceof Identifier || f1 instanceof Tree)
-                        && (f2 instanceof Identifier || f2 instanceof Tree) && (i instanceof Integer)) {
+                if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
+                        && ((f2 instanceof Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
                     throw new VMException("Expecting two functions and an integer for if$.");
                 }
 
@@ -463,6 +478,7 @@ public class VM implements Warn {
              * value of a single character, converts it to the corresponding
              * single-character string, and pushes this string.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation int.to.chr$");
@@ -485,6 +501,7 @@ public class VM implements Warn {
              * Pops the top (integer) literal, converts it to its (unique)
              * string equivalent, and pushes this string.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation int.to.str$");
@@ -506,6 +523,7 @@ public class VM implements Warn {
              * Pops the top literal and pushes the integer 1 if it's a missing
              * field, 0 otherwise.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation missing$");
@@ -536,6 +554,7 @@ public class VM implements Warn {
              * function only when you want a blank line or an explicit line
              * break.
              */
+            @Override
             public void execute(BstEntry context) {
                 VM.this.bbl.append('\n');
             }
@@ -549,6 +568,7 @@ public class VM implements Warn {
              * substring "and" (ignoring case differences) surrounded by
              * non-null white-space at the top brace level.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation num.names$");
@@ -570,6 +590,7 @@ public class VM implements Warn {
              * Pops the top of the stack but doesn't print it; this gets rid of
              * an unwanted stack literal.
              */
+            @Override
             public void execute(BstEntry context) {
                 stack.pop();
             }
@@ -584,6 +605,7 @@ public class VM implements Warn {
              * 
              * @PREAMBLE strings read from the database files.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (preamble != null) {
                     stack.push(preamble);
@@ -608,6 +630,7 @@ public class VM implements Warn {
             /**
              * Pushes the string consisting of the double-quote character.
              */
+            @Override
             public void execute(BstEntry context) {
                 stack.push("\"");
             }
@@ -618,6 +641,7 @@ public class VM implements Warn {
             /**
              * Is a no-op.
              */
+            @Override
             public void execute(BstEntry context) {
                 // Nothing to do! Yeah!
             }
@@ -629,6 +653,7 @@ public class VM implements Warn {
              * Pops and prints the whole stack; it's meant to be used for style
              * designers while debugging.
              */
+            @Override
             public void execute(BstEntry context) {
                 while (!stack.empty()) {
                     System.out.println(stack.pop());
@@ -647,6 +672,7 @@ public class VM implements Warn {
              * (including) from the end if start is negative (where the first
              * character from the end is the last character).
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 3) {
                     throw new VMException("Not enough operands on stack for operation substring$");
@@ -665,22 +691,25 @@ public class VM implements Warn {
                 int lenI = len;
                 int startI = start;
 
-                if (lenI > Integer.MAX_VALUE / 2)
+                if (lenI > (Integer.MAX_VALUE / 2)) {
                     lenI = Integer.MAX_VALUE / 2;
+                }
 
-                if (startI > Integer.MAX_VALUE / 2)
+                if (startI > (Integer.MAX_VALUE / 2)) {
                     startI = Integer.MAX_VALUE / 2;
+                }
 
-                if (startI < Integer.MIN_VALUE / 2)
+                if (startI < (Integer.MIN_VALUE / 2)) {
                     startI = -Integer.MIN_VALUE / 2;
+                }
 
                 String s = (String) o3;
 
                 if (startI < 0) {
                     startI += s.length() + 1;
-                    startI = Math.max(1, startI + 1 - lenI);
+                    startI = Math.max(1, (startI + 1) - lenI);
                 }
-                stack.push(s.substring(startI - 1, Math.min(startI - 1 + lenI, s.length())));
+                stack.push(s.substring(startI - 1, Math.min((startI - 1) + lenI, s.length())));
             }
         });
 
@@ -694,6 +723,7 @@ public class VM implements Warn {
              * text character, even if it's missing its matching right brace,
              * and where braces don't count as text characters.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation swap$");
@@ -719,6 +749,7 @@ public class VM implements Warn {
              * BibTEX considers everything contained inside the braces as a
              * single letter.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 1) {
                     throw new VMException("Not enough operands on stack for operation text.length$");
@@ -754,7 +785,8 @@ public class VM implements Warn {
                         // incr(sp_brace_level);
                         braceLevel++;
                         // if ((sp_brace_level = 1) and (sp_ptr < sp_end)) then
-                        if (braceLevel == 1 && i < n)
+                        if ((braceLevel == 1) && (i < n))
+                         {
                             // if (str_pool[sp_ptr] = backslash) then
                             // begin
                             if (c[i] == '\\') {
@@ -762,17 +794,15 @@ public class VM implements Warn {
                                 i++; // skip over backslash
                                 // while ((sp_ptr < sp_end) and (sp_brace_level
                                 // > 0)) do begin
-                                while (i < n && braceLevel > 0) {
+                                while ((i < n) && (braceLevel > 0)) {
                                     // if (str_pool[sp_ptr] = right_brace) then
-                                    if (c[i] == '}')
+                                    if (c[i] == '}') {
                                         // decr(sp_brace_level)
                                         braceLevel--;
-                                    // else if (str_pool[sp_ptr] = left_brace)
-                                    // then
-                                    else if (c[i] == '{')
-
+                                    } else if (c[i] == '{') {
                                         // incr(sp_brace_level);
                                         braceLevel++;
+                                    }
                                     // incr(sp_ptr);
                                     i++;
                                     // end;
@@ -782,20 +812,24 @@ public class VM implements Warn {
                                 // end;
                             }
                         // end
+                        }
                     }
                     // else if (str_pool[sp_ptr-1] = right_brace) then
                     // begin
                     else if (c[i - 1] == '}') {
                         // if (sp_brace_level > 0) then
                         if (braceLevel > 0)
+                         {
                             // decr(sp_brace_level);
                             braceLevel--;
                         // end
+                        }
                     }
                     // else
-                    else
+ else {
                         // incr(num_text_chars);
                         result++;
+                    }
                 }
                 stack.push(result);
             }
@@ -820,6 +854,7 @@ public class VM implements Warn {
              * Pops and prints the top of the stack on the terminal and log
              * file. It's useful for debugging.
              */
+            @Override
             public void execute(BstEntry context) {
                 System.out.println(stack.pop());
             }
@@ -831,6 +866,7 @@ public class VM implements Warn {
              * Pushes the current entry's type (book, article, etc.), but pushes
              * the null string if the type is either unknown or undefined.
              */
+            @Override
             public void execute(BstEntry context) {
                 stack.push(context.entry.getType().getName());
             }
@@ -846,6 +882,7 @@ public class VM implements Warn {
             int warning = 1;
 
 
+            @Override
             public void execute(BstEntry context) {
                 out.println("Warning (#" + (warning++) + "): " + stack.pop());
             }
@@ -858,6 +895,7 @@ public class VM implements Warn {
              * second as long as the (integer) literal left on the stack by
              * executing the first is greater than 0.
              */
+            @Override
             public void execute(BstEntry context) {
                 if (stack.size() < 2) {
                     throw new VMException("Not enough operands on stack for operation while$");
@@ -865,8 +903,8 @@ public class VM implements Warn {
                 Object f2 = stack.pop();
                 Object f1 = stack.pop();
 
-                if (!(f1 instanceof Identifier || f1 instanceof Tree)
-                        && (f2 instanceof Identifier || f2 instanceof Tree)) {
+                if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
+                        && ((f2 instanceof Identifier) || (f2 instanceof Tree))) {
                     throw new VMException("Expecting two functions for while$.");
                 }
 
@@ -895,6 +933,7 @@ public class VM implements Warn {
              * (which will result in stuff being written onto the bbl file when
              * the buffer fills up).
              */
+            @Override
             public void execute(BstEntry context) {
                 String s = (String) stack.pop();
                 System.out.println(s);
@@ -906,14 +945,15 @@ public class VM implements Warn {
 
     protected boolean assign(BstEntry context, Object o1, Object o2) {
 
-        if (!(o1 instanceof Identifier) || !(o2 instanceof String || o2 instanceof Integer))
+        if (!(o1 instanceof Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
             throw new VMException("Invalid parameters");
+        }
 
         String name = ((Identifier) o1).getName();
 
         if (o2 instanceof String) {
 
-            if (context != null && context.strings.containsKey(name)) {
+            if ((context != null) && context.strings.containsKey(name)) {
                 context.strings.put(name, (String) o2);
                 return true;
             }
@@ -926,7 +966,7 @@ public class VM implements Warn {
 
         }
 
-        if (context != null && context.integers.containsKey(name)) {
+        if ((context != null) && context.integers.containsKey(name)) {
             context.integers.put(name, (Integer) o2);
             return true;
         }
@@ -1076,6 +1116,7 @@ public class VM implements Warn {
             this.replacement = replacement;
         }
 
+        @Override
         public void execute(BstEntry context) {
             VM.this.push(replacement);
         }
@@ -1160,6 +1201,7 @@ public class VM implements Warn {
     private void sort(Tree child) {
         Collections.sort(entries, new Comparator<BstEntry>() {
 
+            @Override
             public int compare(BstEntry o1, BstEntry o2) {
                 return (o1.strings.get("sort.key$")).compareTo(o2.strings
                         .get("sort.key$"));
@@ -1195,6 +1237,7 @@ public class VM implements Warn {
             tree = stack;
         }
 
+        @Override
         public void execute(BstEntry context) {
 
             for (int i = 0; i < tree.getChildCount(); i++) {
@@ -1386,6 +1429,7 @@ public class VM implements Warn {
         return stack;
     }
 
+    @Override
     public void warn(String string) {
         System.out.println(string);
     }

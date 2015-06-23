@@ -53,7 +53,7 @@ public class MetaData implements Iterable<String> {
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
 
-        if (inData != null)
+        if (inData != null) {
             for (String key : inData.keySet()) {
                 StringReader data = new StringReader(inData.get(key));
                 String unit;
@@ -67,8 +67,9 @@ public class MetaData implements Iterable<String> {
                     System.err.println("Weird error while parsing meta data.");
                 }
                 if (key.equals("groupsversion")) {
-                    if (orderedData.size() >= 1)
+                    if (orderedData.size() >= 1) {
                         groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
+                    }
                 } else if (key.equals("groupstree")) {
                     groupsTreePresent = true;
                     treeGroupsData = orderedData; // save for later user
@@ -80,12 +81,14 @@ public class MetaData implements Iterable<String> {
                     putData(key, orderedData);
                 }
             }
+        }
 
         // this possibly handles import of a previous groups version
-        if (groupsTreePresent)
+        if (groupsTreePresent) {
             putGroups(treeGroupsData, db, groupsVersionOnDisk);
+        }
 
-        if (!groupsTreePresent && flatGroupsData != null) {
+        if (!groupsTreePresent && (flatGroupsData != null)) {
             try {
                 groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
                 groupTreeValid = true;
@@ -116,6 +119,7 @@ public class MetaData implements Iterable<String> {
     /**
      * @return Iterator on all keys stored in the metadata
      */
+    @Override
     public Iterator<String> iterator() {
         return metaData.keySet().iterator();
     }
@@ -185,24 +189,27 @@ public class MetaData implements Iterable<String> {
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
-                if ((new File(relDir)).exists())
+                if ((new File(relDir)).exists()) {
                     dir = relDir;
+                }
             }
             dirs.add(dir);
         }
         else {
             String dir = Globals.prefs.get(fieldName + "Directory");
-            if (dir != null)
+            if (dir != null) {
                 dirs.add(dir);
+            }
         }
 
         // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
+        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && (getFile() != null)) {
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean("bibLocAsPrimaryDir"))
+            if (Globals.prefs.getBoolean("bibLocAsPrimaryDir")) {
                 dirs.add(0, getFile().getParent());
-            else
+            } else {
                 dirs.add(getFile().getParent());
+            }
         }
 
         return dirs.toArray(new String[dirs.size()]);
@@ -264,7 +271,7 @@ public class MetaData implements Iterable<String> {
         }
         // write groups if present. skip this if only the root node exists 
         // (which is always the AllEntriesGroup).
-        if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
+        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
@@ -319,8 +326,9 @@ public class MetaData implements Iterable<String> {
                 res.append((char) c);
             }
         }
-        if (res.length() > 0)
+        if (res.length() > 0) {
             return res.toString();
+        }
         return null;
     }
 
@@ -358,14 +366,14 @@ public class MetaData implements Iterable<String> {
         labelPattern.setParent(Globals.prefs.getKeyPattern());
 
         for (String key : this) {
-            if (key.startsWith(PREFIX_KEYPATTERN)) {
+            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 Vector<String> value = getData(key);
-                String type = key.substring(PREFIX_KEYPATTERN.length());
+                String type = key.substring(MetaData.PREFIX_KEYPATTERN.length());
                 labelPattern.addLabelPattern(type, value.get(0));
             }
         }
 
-        Vector<String> defaultPattern = getData(KEYPATTERNDEFAULT);
+        Vector<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
             labelPattern.setDefaultValue(defaultPattern.get(0));
         }
@@ -384,14 +392,14 @@ public class MetaData implements Iterable<String> {
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {
             String key = iterator.next();
-            if (key.startsWith(PREFIX_KEYPATTERN)) {
+            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 iterator.remove();
             }
         }
 
         // set new value if it is not a default value
         for (String key : labelPattern.keySet()) {
-            String metaDataKey = PREFIX_KEYPATTERN + key;
+            String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
             ArrayList<String> value = labelPattern.get(key);
             if (value != null) {
                 Vector<String> data = new Vector<String>();
@@ -402,11 +410,11 @@ public class MetaData implements Iterable<String> {
 
         // store default pattern
         if (labelPattern.getDefaultValue() == null) {
-            this.remove(KEYPATTERNDEFAULT);
+            this.remove(MetaData.KEYPATTERNDEFAULT);
         } else {
             Vector<String> data = new Vector<String>();
             data.add(labelPattern.getDefaultValue().get(0));
-            this.putData(KEYPATTERNDEFAULT, data);
+            this.putData(MetaData.KEYPATTERNDEFAULT, data);
         }
 
         this.labelPattern = labelPattern;

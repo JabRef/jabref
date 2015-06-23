@@ -61,28 +61,28 @@ public class FindFullText {
         if ((doiText != null) && (doiText.trim().length() > 0)) {
             doiText = Util.getDOI(doiText);
             FindResult resDoi = lookForFullTextAtURL(Globals.DOI_LOOKUP_PREFIX + doiText);
-            if (resDoi.status == FOUND_PDF)
+            if (resDoi.status == FindFullText.FOUND_PDF) {
                 return resDoi;
-            // The DOI link failed, try falling back on the URL link, if defined:
-            else if ((urlText != null) && (urlText.trim().length() > 0)) {
+            } else if ((urlText != null) && (urlText.trim().length() > 0)) {
                 FindResult resUrl = lookForFullTextAtURL(urlText);
-                if (resUrl.status == FOUND_PDF)
+                if (resUrl.status == FindFullText.FOUND_PDF) {
                     return resUrl;
-                else {
+                } else {
                     return resDoi; // If both URL and DOI fail, we assume that the error code for DOI is
                                    // probably the most relevant.
                 }
-            }
-            else
+            } else {
                 return resDoi;
+            }
         }
         // No DOI? Try URL:
         else if ((urlText != null) && (urlText.trim().length() > 0)) {
             return lookForFullTextAtURL(urlText);
         }
         // No URL either? Return error code.
-        else
-            return new FindResult(NO_URLS_DEFINED, null);
+ else {
+            return new FindResult(FindFullText.NO_URLS_DEFINED, null);
+        }
     }
 
     private FindResult lookForFullTextAtURL(String urlText) {
@@ -105,20 +105,21 @@ public class FindFullText {
                             }
                             else {
                                 new URLDownload(result).downloadToFile(new File("page.html"));
-                                return new FindResult(WRONG_MIME_TYPE, url);
+                                return new FindResult(FindFullText.WRONG_MIME_TYPE, url);
                             }
                         } catch (IOException ex) {
                             ex.printStackTrace();
-                            return new FindResult(IO_EXCEPTION, url);
+                            return new FindResult(FindFullText.IO_EXCEPTION, url);
                         }
                     }
 
                 }
             }
-            if (!domainKnown)
-                return new FindResult(UNKNOWN_DOMAIN, url);
-            else
-                return new FindResult(LINK_NOT_FOUND, url);
+            if (!domainKnown) {
+                return new FindResult(FindFullText.UNKNOWN_DOMAIN, url);
+            } else {
+                return new FindResult(FindFullText.LINK_NOT_FOUND, url);
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
 
@@ -159,13 +160,13 @@ public class FindFullText {
                     // the default page in the case of www.springerlink.com, not the article page. Don't know why.
                 }
 
-            }
-            else
+            } else {
                 return url;
+            }
 
-        }
-        else
+        } else {
             return url;
+        }
     }
 
     public static String loadPage(URL url) throws IOException {
@@ -182,18 +183,22 @@ public class FindFullText {
                 in = new InputStreamReader(huc.getInputStream());
                 StringBuilder sb = new StringBuilder();
                 int c;
-                while ((c = in.read()) != -1)
+                while ((c = in.read()) != -1) {
                     sb.append((char) c);
+                }
                 return sb.toString();
             }
-            else
+            else {
                 return null; // TODO: are other types of connection (https?) relevant?
+            }
         } finally {
             try {
-                if (in != null)
+                if (in != null) {
                     in.close();
-                if (huc != null)
+                }
+                if (huc != null) {
                     huc.disconnect();
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -211,16 +216,18 @@ public class FindFullText {
 
         public FindResult(URL url, URL originalUrl) {
             this.url = url;
-            this.status = FOUND_PDF;
-            if (originalUrl != null)
+            this.status = FindFullText.FOUND_PDF;
+            if (originalUrl != null) {
                 host = originalUrl.getHost();
+            }
         }
 
         public FindResult(int status, URL originalUrl) {
             this.url = null;
             this.status = status;
-            if (originalUrl != null)
+            if (originalUrl != null) {
                 this.host = originalUrl.getHost();
+            }
         }
     }
 

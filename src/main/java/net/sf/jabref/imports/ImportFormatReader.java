@@ -108,14 +108,16 @@ public class ImportFormatReader {
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
-        if (importer == null)
+        if (importer == null) {
             throw new IllegalArgumentException("Unknown import format: " + format);
+        }
 
         List<BibtexEntry> res = importer.importEntries(in, status);
 
         // Remove all empty entries
-        if (res != null)
-            purgeEmptyEntries(res);
+        if (res != null) {
+            ImportFormatReader.purgeEmptyEntries(res);
+        }
 
         return res;
     }
@@ -124,8 +126,9 @@ public class ImportFormatReader {
             throws IOException {
         ImportFormat importer = getByCliId(format);
 
-        if (importer == null)
+        if (importer == null) {
             throw new IllegalArgumentException("Unknown import format: " + format);
+        }
 
         return importFromFile(importer, filename, status);
     }
@@ -137,8 +140,9 @@ public class ImportFormatReader {
             File file = new File(filename);
             stream = new FileInputStream(file);
 
-            if (!importer.isRecognizedFormat(stream))
+            if (!importer.isRecognizedFormat(stream)) {
                 throw new IOException(Globals.lang("Wrong file format"));
+            }
 
             stream = new FileInputStream(file);
 
@@ -153,7 +157,7 @@ public class ImportFormatReader {
     }
 
     public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
-        purgeEmptyEntries(bibentries);
+        ImportFormatReader.purgeEmptyEntries(bibentries);
 
         BibtexDatabase database = new BibtexDatabase();
 
@@ -231,8 +235,9 @@ public class ImportFormatReader {
             sb.append("  ");
             sb.append(imFo.getFormatName());
 
-            for (int j = 0; j < pad; j++)
+            for (int j = 0; j < pad; j++) {
                 sb.append(" ");
+            }
 
             sb.append(" : ");
             sb.append(imFo.getCLIId());
@@ -255,30 +260,34 @@ public class ImportFormatReader {
                 String[] names = authors[i].split(", ");
                 if (names.length > 0) {
                     sb.append(names[0]);
-                    if (names.length > 1)
+                    if (names.length > 1) {
                         sb.append(", ");
+                    }
                 }
                 for (int j = 1; j < names.length; j++) {
-                    if (j == 1)
-                        sb.append(expandAll(names[j]));
-                    else
+                    if (j == 1) {
+                        sb.append(ImportFormatReader.expandAll(names[j]));
+                    } else {
                         sb.append(names[j]);
-                    if (j < names.length - 1)
+                    }
+                    if (j < (names.length - 1)) {
                         sb.append(", ");
+                    }
                 }
 
             } else {
                 String[] names = authors[i].split(" ");
                 if (names.length > 0) {
-                    sb.append(expandAll(names[0]));
+                    sb.append(ImportFormatReader.expandAll(names[0]));
                 }
                 for (int j = 1; j < names.length; j++) {
                     sb.append(" ");
                     sb.append(names[j]);
                 }
             }
-            if (i < authors.length - 1)
+            if (i < (authors.length - 1)) {
                 sb.append(" and ");
+            }
         }
 
         return sb.toString().trim();
@@ -289,12 +298,14 @@ public class ImportFormatReader {
     public static String expandAll(String s) {
         //System.out.println("'"+s+"'");
         // Avoid arrayindexoutof.... :
-        if (s.length() == 0)
+        if (s.length() == 0) {
             return s;
+        }
         // If only one character (uppercase letter), add a dot and return immediately:
         if ((s.length() == 1) && (Character.isLetter(s.charAt(0)) &&
-                Character.isUpperCase(s.charAt(0))))
+                Character.isUpperCase(s.charAt(0)))) {
             return s + ".";
+        }
         StringBuffer sb = new StringBuffer();
         char c = s.charAt(0), d = 0;
         for (int i = 1; i < s.length(); i++) {
@@ -329,17 +340,18 @@ public class ImportFormatReader {
             Globals.logger("Error " + filename + " is not a valid file and|or is not readable.");
 
             return null;
-        } else
-
+        } else {
             return f;
+        }
     }
 
     //==================================================
     // Set a field, unless the string to set is empty.
     //==================================================
     public static void setIfNecessary(BibtexEntry be, String field, String content) {
-        if (!content.equals(""))
+        if (!content.equals("")) {
             be.setField(field, content);
+        }
     }
 
     public static Reader getReader(File f, String encoding)
@@ -368,8 +380,9 @@ public class ImportFormatReader {
             BibtexEntry entry = i.next();
 
             // If there are no fields, remove the entry:
-            if (entry.getAllFields().size() == 0)
+            if (entry.getAllFields().size() == 0) {
                 i.remove();
+            }
         }
     }
 
@@ -418,7 +431,7 @@ public class ImportFormatReader {
                 if (entries == null) {
                     entryCount = 0;
                 } else {
-                    purgeEmptyEntries(entries);
+                    ImportFormatReader.purgeEmptyEntries(entries);
                     entryCount = entries.size();
                 }
 
@@ -445,7 +458,7 @@ public class ImportFormatReader {
             if ((pr.getDatabase().getEntryCount() > 0)
                     || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));
-                return new UnknownFormatImport(BIBTEX_FORMAT, pr);
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }
         } catch (Throwable ex) {
             return null;

@@ -68,6 +68,7 @@ public class StringChange extends Change {
         tp.setText(sb.toString());
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         if (string != null) {
             string.setContent(disk);
@@ -98,6 +99,7 @@ public class StringChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

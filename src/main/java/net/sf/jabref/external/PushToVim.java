@@ -40,35 +40,43 @@ public class PushToVim implements PushToApplication {
     private boolean couldNotConnect = false, couldNotRunClient = false;
 
 
+    @Override
     public String getName() {
         return Globals.lang("Insert selected citations into Vim");
     }
 
+    @Override
     public String getApplicationName() {
         return "Vim";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push selection to Vim");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("vim");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return null;
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
+        }
         vimPath.setText(Globals.prefs.get("vim"));
         vimServer.setText(Globals.prefs.get("vimServer"));
         citeCommand.setText(Globals.prefs.get("citeCommandVim"));
         return settings;
     }
 
+    @Override
     public void storeSettings() {
         Globals.prefs.put("vim", vimPath.getText());
         Globals.prefs.put("vimServer", vimServer.getText());
@@ -94,6 +102,7 @@ public class PushToVim implements PushToApplication {
         settings = builder.getPanel();
     }
 
+    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys,
             MetaData metaData) {
 
@@ -108,13 +117,15 @@ public class PushToVim implements PushToApplication {
 
             Runnable errorListener = new Runnable() {
 
+                @Override
                 public void run() {
                     InputStream out = p.getErrorStream();
                     int c;
                     StringBuffer sb = new StringBuffer();
                     try {
-                        while ((c = out.read()) != -1)
+                        while ((c = out.read()) != -1) {
                             sb.append((char) c);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -132,8 +143,9 @@ public class PushToVim implements PushToApplication {
 
     }
 
+    @Override
     public void operationCompleted(BasePanel panel) {
-        if (couldNotConnect)
+        if (couldNotConnect) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "<HTML>" +
@@ -141,16 +153,17 @@ public class PushToVim implements PushToApplication {
                                     + "Vim is running<BR>with correct server name.")
                             + "</HTML>",
                     Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        else if (couldNotRunClient)
+        } else if (couldNotRunClient) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     Globals.lang("Could not run the 'vim' program."),
                     Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        else {
+        } else {
             panel.output(Globals.lang("Pushed citations to Vim"));
         }
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }

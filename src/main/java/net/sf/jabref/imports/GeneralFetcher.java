@@ -94,12 +94,14 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         }
         fetcherChoice = new JComboBox(choices);
         int defaultFetcher = Globals.prefs.getInt("selectedFetcherIndex");
-        if (defaultFetcher >= fetcherArray.length)
+        if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
+        }
         this.activeFetcher = fetcherArray[defaultFetcher];
         fetcherChoice.setSelectedIndex(defaultFetcher);
-        if (this.activeFetcher.getOptionsPanel() != null)
+        if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
+        }
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
@@ -123,6 +125,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         });*/
         fetcherChoice.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
                 Globals.prefs.putInt("selectedFetcherIndex", fetcherChoice.getSelectedIndex());
@@ -134,8 +137,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                 }
                 optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
                 optPanel.removeAll();
-                if (activeFetcher.getOptionsPanel() != null)
+                if (activeFetcher.getOptionsPanel() != null) {
                     optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
+                }
                 revalidate();
             }
         });
@@ -152,6 +156,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // add action to reset-button. resets tf and requests focus
         reset.addActionListener(new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 tf.setText("");
                 new FocusRequester(tf);
@@ -212,6 +217,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         return action;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (tf.getText().trim().length() == 0) {
             frame.output(Globals.lang("Please enter a search string"));
@@ -234,15 +240,18 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                     pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                @Override
                 public void run() {
                     final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             frame.setProgressBarVisible(false);
                             frame.output("");
-                            if (!result)
+                            if (!result) {
                                 return;
+                            }
                             dialog.setLocationRelativeTo(frame);
                             dialog.setVisible(true);
                             if (dialog.isOkPressed()) {
@@ -253,6 +262,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 d2.setVisible(true);
                                 JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                                    @Override
                                     public void run() {
                                         pFetcher.getEntries(dialog.getSelection(), d2);
                                         d2.entryListComplete();
@@ -277,6 +287,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                @Override
                 public void run() {
                     if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
                         dialog.entryListComplete();
@@ -294,9 +305,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         public FetcherAction() {
             super(Globals.lang("Web search"), GUIGlobals.getImage("www"));
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
-            putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (!sidePaneManager.hasComponent(GeneralFetcher.this.getTitle())) {
                 sidePaneManager.register(GeneralFetcher.this.getTitle(), GeneralFetcher.this);
@@ -327,6 +339,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
     static class EntryFetcherComparator implements Comparator<EntryFetcher> {
 
+        @Override
         public int compare(EntryFetcher entryFetcher, EntryFetcher entryFetcher1) {
             return entryFetcher.getTitle().compareTo(entryFetcher1.getTitle());
         }

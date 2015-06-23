@@ -113,6 +113,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         priSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (priSort.getSelectedIndex() > 0) {
                     priField.setText(priSort.getSelectedItem().toString());
@@ -122,6 +123,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
         secSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (secSort.getSelectedIndex() > 0) {
                     secField.setText(secSort.getSelectedItem().toString());
@@ -131,6 +133,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
         terSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (terSort.getSelectedIndex() > 0) {
                     terField.setText(terSort.getSelectedItem().toString());
@@ -226,6 +229,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         namesNatbib.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent changeEvent) {
                 abbrNames.setEnabled(!namesNatbib.isSelected());
                 lastNamesOnly.setEnabled(!namesNatbib.isSelected());
@@ -234,6 +238,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
     }
 
+    @Override
     public void setValues() {
         autoResizeMode
                 .setSelected((_prefs.getInt("autoResizeMode") == JTable.AUTO_RESIZE_ALL_COLUMNS));
@@ -245,20 +250,22 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
 
-        if (_prefs.getBoolean("namesAsIs"))
+        if (_prefs.getBoolean("namesAsIs")) {
             namesAsIs.setSelected(true);
-        else if (_prefs.getBoolean("namesFf"))
+        } else if (_prefs.getBoolean("namesFf")) {
             namesFf.setSelected(true);
-        else if (_prefs.getBoolean("namesNatbib"))
+        } else if (_prefs.getBoolean("namesNatbib")) {
             namesNatbib.setSelected(true);
-        else
+        } else {
             namesFl.setSelected(true);
-        if (_prefs.getBoolean("abbrAuthorNames"))
+        }
+        if (_prefs.getBoolean("abbrAuthorNames")) {
             abbrNames.setSelected(true);
-        else if (_prefs.getBoolean("namesLastOnly"))
+        } else if (_prefs.getBoolean("namesLastOnly")) {
             lastNamesOnly.setSelected(true);
-        else
+        } else {
             noAbbrNames.setSelected(true);
+        }
         priDesc.setSelected(_prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING));
         secDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
         terDesc.setSelected(_prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
@@ -270,10 +277,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         noAbbrNames.setEnabled(!namesNatbib.isSelected());
 
         String numF = _prefs.get("numericFields");
-        if (numF == null)
+        if (numF == null) {
             numericFields.setText("");
-        else
+        } else {
             numericFields.setText(numF);
+        }
 
     }
 
@@ -282,6 +290,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      * clicks Ok.
      * 
      */
+    @Override
     public void storeSettings() {
 
         _prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
@@ -308,8 +317,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         String oldVal = _prefs.get("numericFields");
         String newVal = numericFields.getText().trim();
-        if (newVal.length() == 0)
+        if (newVal.length() == 0) {
             newVal = null;
+        }
         if (((newVal != null) && (oldVal == null))
                 || ((newVal == null) && (oldVal != null))
                 || ((newVal != null) && !newVal.equals(oldVal))) {
@@ -319,10 +329,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Entry table");
     }

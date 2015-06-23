@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JDialog;
 
 import net.sf.jabref.undo.NamedCompound;
@@ -17,11 +18,12 @@ import net.sf.jabref.undo.NamedCompound;
 public class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
-        putValue(SMALL_ICON, GUIGlobals.getImage("autoGroup"));
-        putValue(NAME, Globals.lang("Automatically set file links"));
-        putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
+        putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));
+        putValue(Action.NAME, Globals.lang("Automatically set file links"));
+        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
@@ -33,6 +35,7 @@ public class AutoLinkFilesAction extends AbstractAction {
         final NamedCompound nc = new NamedCompound(Globals.lang("Automatically set file links"));
         Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getID() > 0) {
                     // entry has been updated in Util.autoSetLinks, only treat nc and status message
@@ -42,9 +45,10 @@ public class AutoLinkFilesAction extends AbstractAction {
                         JabRef.jrf.basePanel().markBaseChanged();
                     }
                     JabRef.jrf.output(Globals.lang("Finished autosetting external links."));
-                } else
+                } else {
                     JabRef.jrf.output(Globals.lang("Finished autosetting external links.")
                             + " " + Globals.lang("No files found."));
+                }
             }
         }, diag);
         JabRefExecutorService.INSTANCE.execute(runnable);

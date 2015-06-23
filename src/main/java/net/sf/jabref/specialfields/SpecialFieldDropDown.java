@@ -38,8 +38,9 @@ public class SpecialFieldDropDown {
         JButton button = new JButton(field.getRepresentingIcon());
         button.setToolTipText(field.getToolTip());
         button.setPreferredSize(buttonDim);
-        if (!Globals.ON_MAC)
+        if (!Globals.ON_MAC) {
             button.setMargin(new Insets(1, 0, 2, 0));
+        }
         button.setBorder(null);
         button.setBorderPainted(false);
         button.setRolloverEnabled(true);
@@ -70,6 +71,7 @@ public class SpecialFieldDropDown {
             this.button = button;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (popup == null) {
                 popup = new JPopupMenu();
@@ -97,6 +99,7 @@ public class SpecialFieldDropDown {
                 this.actionName = actionName;
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 panel.runCommand(actionName);
                 popup.setVisible(false);

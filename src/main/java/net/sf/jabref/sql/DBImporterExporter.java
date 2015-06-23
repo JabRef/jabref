@@ -49,9 +49,9 @@ public class DBImporterExporter {
                     "SELECT database_id FROM jabref_database WHERE database_name='"
                             + dbName + "';");
             ResultSet rs = ((Statement) response).getResultSet();
-            if (rs.next())
+            if (rs.next()) {
                 return rs.getInt("database_id");
-            else {
+            } else {
                 insertJabRefDatabase(metaData, out, dbName);
                 return getDatabaseIDByName(metaData, out, dbName);
             }
@@ -106,10 +106,11 @@ public class DBImporterExporter {
     private void insertJabRefDatabase(final MetaData metaData, Object out,
             String dbName) throws SQLException {
         String path;
-        if (null == metaData.getFile())
+        if (null == metaData.getFile()) {
             path = dbName;
-        else
+        } else {
             path = metaData.getFile().getAbsolutePath();
+        }
         SQLUtil.processQuery(out,
                 "INSERT INTO jabref_database(database_name, md5_path) VALUES ('"
                         + dbName + "', md5('" + path + "'));");

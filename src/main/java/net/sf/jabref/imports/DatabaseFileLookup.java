@@ -46,8 +46,9 @@ public class DatabaseFileLookup {
      *            A {@link BibtexDatabase}.
      */
     public DatabaseFileLookup(BibtexDatabase aDatabase) {
-        if (aDatabase == null)
+        if (aDatabase == null) {
             throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
+        }
         entries = aDatabase.getEntries();
         possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
     }
@@ -100,12 +101,13 @@ public class DatabaseFileLookup {
      */
     public boolean lookupEntry(File aFile, BibtexEntry anEntry) {
 
-        if (aFile == null || anEntry == null)
+        if ((aFile == null) || (anEntry == null)) {
             return false;
+        }
 
         FileListTableModel model = new FileListTableModel();
 
-        String fileField = anEntry.getField(KEY_FILE_FIELD);
+        String fileField = anEntry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
         model.setContent(fileField);
 
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -117,7 +119,8 @@ public class DatabaseFileLookup {
             }
 
             File expandedFilename = Util.expandFilename(link, possibleFilePaths);
-            if (expandedFilename != null // file exists
+            if ((expandedFilename != null // file exists
+)
                     && expandedFilename.equals(aFile)) {
                 return true;
             }

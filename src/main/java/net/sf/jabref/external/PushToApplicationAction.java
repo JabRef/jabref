@@ -18,6 +18,7 @@ package net.sf.jabref.external;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -36,43 +37,48 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
 
     public PushToApplicationAction(JabRefFrame frame, PushToApplication operation) {
         this.frame = frame;
-        putValue(SMALL_ICON, operation.getIcon());
-        putValue(NAME, operation.getName());
-        putValue(SHORT_DESCRIPTION, operation.getTooltip());
-        if (operation.getKeyStrokeName() != null)
-            putValue(ACCELERATOR_KEY, Globals.prefs.getKey(operation.getKeyStrokeName()));
+        putValue(Action.SMALL_ICON, operation.getIcon());
+        putValue(Action.NAME, operation.getName());
+        putValue(Action.SHORT_DESCRIPTION, operation.getTooltip());
+        if (operation.getKeyStrokeName() != null) {
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey(operation.getKeyStrokeName()));
+        }
         this.operation = operation;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         panel = frame.basePanel();
 
         // Check if a BasePanel exists:
-        if (panel == null)
+        if (panel == null) {
             return;
+        }
 
         // Check if any entries are selected:
         entries = panel.getSelectedEntries();
         if (entries.length == 0) {
             JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires one or more entries to be selected."),
-                    (String) getValue(NAME), JOptionPane.ERROR_MESSAGE);
+                    (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // If required, check that all entries have BibTeX keys defined:
-        if (operation.requiresBibtexKeys())
+        if (operation.requiresBibtexKeys()) {
             for (BibtexEntry entry : entries) {
                 if ((entry.getCiteKey() == null) || (entry.getCiteKey().trim().length() == 0)) {
                     JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires all selected entries to have BibTex keys defined."),
-                            (String) getValue(NAME), JOptionPane.ERROR_MESSAGE);
+                            (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
+        }
 
         // All set, call the operation in a new thread:
         JabRefExecutorService.INSTANCE.execute(this);
     }
 
+    @Override
     public void run() {
         // Do the operation:
         operation.pushEntries(panel.database(), entries, getKeyString(entries), panel.metaData());
@@ -80,6 +86,7 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
         // Call the operationCompleted() method on the event dispatch thread:
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 operation.operationCompleted(panel);
             }
@@ -93,8 +100,9 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
         for (BibtexEntry bes : entries) {
             citeKey = bes.getField(BibtexFields.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
-            if (citeKey == null || citeKey.equals(""))
+            if ((citeKey == null) || citeKey.equals("")) {
                 continue;
+            }
             if (first) {
                 result.append(citeKey);
                 first = false;

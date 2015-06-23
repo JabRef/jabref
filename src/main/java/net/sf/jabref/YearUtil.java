@@ -20,7 +20,7 @@ public class YearUtil {
      * @return
      */
     public static String toFourDigitYear(String year) {
-        return toFourDigitYear(year, CURRENT_YEAR);
+        return YearUtil.toFourDigitYear(year, YearUtil.CURRENT_YEAR);
     }
 
     /**
@@ -37,8 +37,9 @@ public class YearUtil {
      * @return
      */
     static String toFourDigitYear(String year, int thisYear) {
-        if (year == null || year.length() != 2)
+        if ((year == null) || (year.length() != 2)) {
             return year;
+        }
 
         try {
             int yearNumber = Integer.parseInt(year);
@@ -66,11 +67,11 @@ public class YearUtil {
             }
             // 20 , 90
             // 99 > 30
-            if ((relativeYear + 100 - yearShort) % 100 > 30) {
+            if ((((relativeYear + 100) - yearShort) % 100) > 30) {
                 if (relativeYear < yearShort) {
                     return century + relativeYear;
                 } else {
-                    return century - 100 + relativeYear;
+                    return (century - 100) + relativeYear;
                 }
             } else {
                 if (relativeYear < yearShort) {

@@ -33,18 +33,20 @@ public class MarkedComparator implements Comparator<BibtexEntry> {
         this.next = next;
     }
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
 
-        if (e1 == e2)
+        if (e1 == e2) {
             return 0;
+        }
 
         int mrk1 = Util.isMarked(e1), mrk2 = Util.isMarked(e2);
 
-        if (mrk1 == mrk2)
+        if (mrk1 == mrk2) {
             return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
-
-        else
+        } else {
             return mrk2 - mrk1;
+        }
 
     }
 

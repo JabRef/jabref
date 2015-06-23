@@ -103,6 +103,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
             private static final long serialVersionUID = 1L;
 
 
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -120,6 +121,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
             table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "exportAction");
             table.getActionMap().put("exportAction", new AbstractAction() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     exportAction();
                 }
@@ -133,6 +135,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
             table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "importAction");
             table.getActionMap().put("importAction", new AbstractAction() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     importAction();
                 }
@@ -163,10 +166,11 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         b.addGlue();
         JButton importButton = new JButton(Globals.lang("Import"));
         JButton exportButton = new JButton(Globals.lang("Export"));
-        if (dialogType.equals(DialogType.IMPORTER))
+        if (dialogType.equals(DialogType.IMPORTER)) {
             b.addButton(importButton);
-        else
+        } else {
             b.addButton(exportButton);
+        }
 
         b.addRelatedGap();
         JButton cancelButton = new JButton(Globals.lang("Cancel"));
@@ -184,6 +188,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
         importButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 importAction();
             }
@@ -191,6 +196,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
         exportButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 exportAction();
             }
@@ -198,6 +204,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
         cancelButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 moreThanOne = false;
                 hasDBSelected = false;
@@ -206,6 +213,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         });
         removeButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 moreThanOne = false;
                 hasDBSelected = true;

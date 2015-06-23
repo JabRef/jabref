@@ -1,9 +1,6 @@
 package net.sf.jabref;
 
-import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -29,20 +26,22 @@ public class UtilFindFiles {
          * Globals.prefs.get("basenamePatternReplacement"); key =
          * key.replaceAll(regex, replacement); }
          */
-        if (!directory.endsWith(System.getProperty("file.separator")))
+        if (!directory.endsWith(System.getProperty("file.separator"))) {
             directory += System.getProperty("file.separator");
-        String found = findInDir(key, directory, off, 0);
-        if (found != null)
+        }
+        String found = UtilFindFiles.findInDir(key, directory, off, 0);
+        if (found != null) {
             return found.substring(directory.length());
-        else
+        } else {
             return null;
+        }
     }
 
     public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
         Set<File> result = new HashSet<File>();
 
         for (File directory : directories) {
-            result.addAll(findFiles(extensions, directory));
+            result.addAll(UtilFindFiles.findFiles(extensions, directory));
         }
 
         return result;
@@ -53,11 +52,13 @@ public class UtilFindFiles {
 
         File[] children = directory.listFiles();
         if (children == null)
+         {
             return result; // No permission?
+        }
 
         for (File child : children) {
             if (child.isDirectory()) {
-                result.addAll(findFiles(extensions, child));
+                result.addAll(UtilFindFiles.findFiles(extensions, child));
             } else {
 
                 String extension = Util.getFileExtension(child);
@@ -83,7 +84,7 @@ public class UtilFindFiles {
      *
      */
     public static String findPdf(BibtexEntry entry, String extension, String directory) {
-        return findPdf(entry, extension, new String[] {directory});
+        return UtilFindFiles.findPdf(entry, extension, new String[] {directory});
     }
 
     /**
@@ -100,7 +101,7 @@ public class UtilFindFiles {
         }
         regularExpression = regularExpression.replaceAll("\\[extension\\]", extension);
 
-        return findFile(entry, null, directories, regularExpression, true);
+        return UtilFindFiles.findFile(entry, null, directories, regularExpression, true);
     }
 
     /**
@@ -117,7 +118,7 @@ public class UtilFindFiles {
             dirs.add(Globals.prefs.get(fileType.getExtension() + "Directory"));
         }
         String[] directories = dirs.toArray(new String[dirs.size()]);
-        return findPdf(entry, fileType.getExtension(), directories);
+        return UtilFindFiles.findPdf(entry, fileType.getExtension(), directories);
     }
 
     /**
@@ -164,7 +165,7 @@ public class UtilFindFiles {
             String file, boolean relative) {
 
         for (String aDirectory : directory) {
-            String result = findFile(entry, database, aDirectory, file, relative);
+            String result = UtilFindFiles.findFile(entry, database, aDirectory, file, relative);
             if (result != null) {
                 return result;
             }
@@ -178,7 +179,7 @@ public class UtilFindFiles {
      * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
      */
     public static String findFile(BibtexEntry entry, BibtexDatabase database, String file) {
-        return findFile(entry, database, (String) null, file, false);
+        return UtilFindFiles.findFile(entry, database, (String) null, file, false);
     }
 
     /**
@@ -195,12 +196,13 @@ public class UtilFindFiles {
         } else {
             root = new File(directory);
         }
-        if (!root.exists())
+        if (!root.exists()) {
             return null;
+        }
 
-        String found = findFile(entry, database, root, file);
+        String found = UtilFindFiles.findFile(entry, database, root, file);
 
-        if (directory == null || !relative) {
+        if ((directory == null) || !relative) {
             return found;
         }
 
@@ -214,8 +216,9 @@ public class UtilFindFiles {
                 // Changed by M. Alver 2007.01.04:
                 // Remove first character if it is a directory separator character:
                 String tmp = found.substring(root.getCanonicalPath().length());
-                if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar))
+                if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
                     tmp = tmp.substring(1);
+                }
                 return tmp;
                 //return found.substring(root.getCanonicalPath().length());
             } catch (IOException e) {
@@ -247,12 +250,13 @@ public class UtilFindFiles {
         file = s.toString();
         String[] fileParts = file.split("/");
 
-        if (fileParts.length == 0)
+        if (fileParts.length == 0) {
             return null;
+        }
 
         if (fileParts.length > 1) {
 
-            for (int i = 0; i < fileParts.length - 1; i++) {
+            for (int i = 0; i < (fileParts.length - 1); i++) {
 
                 String dirToProcess = fileParts[i];
 
@@ -273,16 +277,19 @@ public class UtilFindFiles {
 
                     File[] subDirs = directory.listFiles();
                     if (subDirs == null)
+                     {
                         return null; // No permission?
+                    }
 
                     String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
 
                     for (File subDir : subDirs) {
                         if (subDir.isDirectory()) {
-                            String result = findFile(entry, database, subDir,
+                            String result = UtilFindFiles.findFile(entry, database, subDir,
                                     restOfFileString);
-                            if (result != null)
+                            if (result != null) {
                                 return result;
+                            }
                         }
                     }
                     return null;
@@ -296,25 +303,29 @@ public class UtilFindFiles {
 
                     // Before checking the subdirs, we first check the current
                     // dir
-                    String result = findFile(entry, database, directory, restOfFileString);
-                    if (result != null)
+                    String result = UtilFindFiles.findFile(entry, database, directory, restOfFileString);
+                    if (result != null) {
                         return result;
+                    }
 
                     while (!toDo.isEmpty()) {
 
                         // Get all subdirs of each of the elements found in toDo
                         File[] subDirs = toDo.remove(0).listFiles();
-                        if (subDirs == null) // No permission?
+                        if (subDirs == null) {
                             continue;
+                        }
 
                         toDo.addAll(Arrays.asList(subDirs));
 
                         for (File subDir : subDirs) {
-                            if (!subDir.isDirectory())
+                            if (!subDir.isDirectory()) {
                                 continue;
-                            result = findFile(entry, database, subDir, restOfFileString);
-                            if (result != null)
+                            }
+                            result = UtilFindFiles.findFile(entry, database, subDir, restOfFileString);
+                            if (result != null) {
                                 return result;
+                            }
                         }
                     }
                     // We already did the currentDirectory
@@ -326,17 +337,20 @@ public class UtilFindFiles {
 
                 File[] matches = directory.listFiles(new FilenameFilter() {
 
+                    @Override
                     public boolean accept(File arg0, String arg1) {
                         return toMatch.matcher(arg1).matches();
                     }
                 });
-                if (matches == null || matches.length == 0)
+                if ((matches == null) || (matches.length == 0)) {
                     return null;
+                }
 
                 directory = matches[0];
 
-                if (!directory.exists())
+                if (!directory.exists()) {
                     return null;
+                }
 
             } // End process directory information
         }
@@ -348,12 +362,14 @@ public class UtilFindFiles {
 
         File[] matches = directory.listFiles(new FilenameFilter() {
 
+            @Override
             public boolean accept(File arg0, String arg1) {
                 return toMatch.matcher(arg1).matches();
             }
         });
-        if (matches == null || matches.length == 0)
+        if ((matches == null) || (matches.length == 0)) {
             return null;
+        }
 
         try {
             return matches[0].getCanonicalPath();
@@ -364,25 +380,31 @@ public class UtilFindFiles {
 
     private static String findInDir(String key, String dir, OpenFileFilter off, int count) {
         if (count > 20)
+         {
             return null; // Make sure an infinite loop doesn't occur.
+        }
         File f = new File(dir);
         File[] all = f.listFiles();
         if (all == null)
+         {
             return null; // An error occured. We may not have
         // permission to list the files.
+        }
 
         int numFiles = all.length;
 
         for (File curFile : all) {
             if (curFile.isFile()) {
                 String name = curFile.getName();
-                if (name.startsWith(key + ".") && off.accept(name))
+                if (name.startsWith(key + ".") && off.accept(name)) {
                     return curFile.getPath();
+                }
 
             } else if (curFile.isDirectory()) {
-                String found = findInDir(key, curFile.getPath(), off, count + 1);
-                if (found != null)
+                String found = UtilFindFiles.findInDir(key, curFile.getPath(), off, count + 1);
+                if (found != null) {
                     return found;
+                }
             }
         }
         return null;

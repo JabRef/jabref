@@ -45,6 +45,7 @@ public class CompositeFormat implements LayoutFormatter {
         this.formatters = formatters;
     }
 
+    @Override
     public String format(String fieldText) {
         if (formatters != null) {
             for (LayoutFormatter formatter : formatters) {

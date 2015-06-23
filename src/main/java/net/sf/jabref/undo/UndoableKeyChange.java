@@ -56,6 +56,7 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
         return Globals.lang("Redo") + ": " + Globals.lang("change key");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -63,6 +64,7 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
         set(oldValue);
     }
 
+    @Override
     public void redo() {
         super.redo();
 

@@ -124,6 +124,7 @@ public class FileTab extends JPanel implements PrefsTab {
 
         autoSave.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent changeEvent) {
                 autoSaveInterval.setEnabled(autoSave.isSelected());
                 promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
@@ -275,6 +276,7 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
     }
 
+    @Override
     public void setValues() {
         openLast.setSelected(_prefs.getBoolean("openLastEdited"));
         backup.setSelected(_prefs.getBoolean("backup"));
@@ -313,6 +315,7 @@ public class FileTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void storeSettings() {
         String newline;
         switch (newlineSeparator.getSelectedIndex()) {
@@ -359,8 +362,9 @@ public class FileTab extends JPanel implements PrefsTab {
             updateSpecialFields = true;
         }
         // If either of the two last entries were changed, run the update for special field handling:
-        if (updateSpecialFields)
+        if (updateSpecialFields) {
             _prefs.updateSpecialFieldHandling();
+        }
 
         // See if we should start or stop the auto save manager:
         if (!origAutoSaveSetting && autoSave.isSelected()) {
@@ -372,10 +376,12 @@ public class FileTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("File");
     }

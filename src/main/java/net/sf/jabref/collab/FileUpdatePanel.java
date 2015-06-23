@@ -82,8 +82,9 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
      * Unregister when this component closes. We need that to avoid showing
      * two such external change warnings at the same time, only the latest one.
      */
+    @Override
     public void componentClosing() {
-        manager.unregisterComponent(NAME);
+        manager.unregisterComponent(FileUpdatePanel.NAME);
     }
 
     /**
@@ -92,6 +93,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
      * @param e
      *            ActionEvent
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         // ChangeScanner scanner = new ChangeScanner(frame, panel); //,
@@ -110,6 +112,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
      * scan results to the user.
      * @param resolved true if there were no changes, or if the user has resolved them.
      */
+    @Override
     public void scanResultsResolved(boolean resolved) {
         if (resolved) {
             manager.hideComponent(this);

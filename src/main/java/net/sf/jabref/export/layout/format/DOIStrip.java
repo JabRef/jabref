@@ -27,6 +27,7 @@ import net.sf.jabref.Util;
  */
 public class DOIStrip implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         if (fieldText == null) {
             return null;

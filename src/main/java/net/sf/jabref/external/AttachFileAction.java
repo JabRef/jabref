@@ -23,9 +23,12 @@ public class AttachFileAction extends BaseAction {
         this.panel = panel;
     }
 
+    @Override
     public void action() {
         if (panel.getSelectedEntries().length != 1)
+         {
             return; // TODO: display error message?
+        }
         entry = panel.getSelectedEntries()[0];
         FileListEntry flEntry = new FileListEntry("", "", null);
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
@@ -34,8 +37,9 @@ public class AttachFileAction extends BaseAction {
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();
             String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
-            if (oldVal != null)
+            if (oldVal != null) {
                 model.setContent(oldVal);
+            }
             model.addEntry(model.getRowCount(), flEntry);
             String newVal = model.getStringRepresentation();
 

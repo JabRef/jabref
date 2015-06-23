@@ -38,9 +38,11 @@ public class SysTray {
 
         final ActionListener showJabref = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         SysTray.this.frame.showIfMinimizedToSysTray();
                     }
@@ -72,18 +74,21 @@ public class SysTray {
                 super.mouseReleased(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
         });
-        if (SystemTray.isSupported())
+        if (SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
+        }
     }
 
     public void setTrayIconVisible(boolean visible) {
-        if (tray == null)
+        if (tray == null) {
             return;
+        }
         try {
-            if (visible)
+            if (visible) {
                 tray.add(icon);
-            else
+            } else {
                 tray.remove(icon);
+            }
         } catch (AWTException e) {
             e.printStackTrace();
         }

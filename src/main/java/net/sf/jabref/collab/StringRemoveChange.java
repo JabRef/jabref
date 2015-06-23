@@ -45,6 +45,7 @@ public class StringRemoveChange extends Change {
 
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
         try {
@@ -60,6 +61,7 @@ public class StringRemoveChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

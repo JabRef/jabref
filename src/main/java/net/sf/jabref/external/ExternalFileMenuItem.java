@@ -58,6 +58,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
         this.fieldName = fieldName;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         boolean success = openLink();
         if (!success) {
@@ -80,7 +81,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     // We try to check the extension for the file:
                     String name = file.getName();
                     int pos = name.indexOf('.');
-                    String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
+                    String extension = ((pos >= 0) && (pos < (name.length() - 1))) ? name.substring(pos + 1)
                             .trim().toLowerCase() : null;
                     // Now we know the extension, check if it is one we know about:
                     type = Globals.prefs.getExternalFileTypeByExt(extension);
@@ -88,11 +89,12 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 }
             }
 
-            if (type instanceof UnknownExternalFileType)
+            if (type instanceof UnknownExternalFileType) {
                 return Util.openExternalFileUnknown(frame, entry, metaData, link,
                         (UnknownExternalFileType) type);
-            else
+            } else {
                 return Util.openExternalFileAnyFormat(metaData, link, type);
+            }
 
         } catch (IOException e1) {
             // See if we should show an error message concerning the application to open the

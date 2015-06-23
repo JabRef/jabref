@@ -64,22 +64,24 @@ public class PersonName {
         // Tokenize just the firstName and middleNames as we have the surname
         // before the comma.
         WSITools.tokenize(v, authorMod.substring(endOfLastName + 1).trim(), " \n\r");
-        if (endOfLastName >= 0) // comma is found
+        if (endOfLastName >= 0) {
             v.add(authorMod.substring(0, endOfLastName));
+        }
 
         int amountOfNames = v.size();
 
-        if (amountOfNames == 1)
+        if (amountOfNames == 1) {
             surname = v.get(0);
-        else if (amountOfNames == 2) {
+        } else if (amountOfNames == 2) {
             givenName = v.get(0);
             surname = v.get(1);
         }
         else {
             givenName = v.get(0);
             middleName = "";
-            for (int i = 1; i < amountOfNames - 1; i++)
+            for (int i = 1; i < (amountOfNames - 1); i++) {
                 middleName += " " + v.get(i);
+            }
             middleName = middleName.trim();
             surname = v.get(amountOfNames - 1);
         }
@@ -87,10 +89,12 @@ public class PersonName {
 
     public String getGivenNames() {
         String result = "";
-        if (givenName != null)
+        if (givenName != null) {
             result += givenName;
-        if (middleName != null)
+        }
+        if (middleName != null) {
             result += " " + middleName;
+        }
         return result;
     }
 
@@ -127,16 +131,20 @@ public class PersonName {
     public String getFullname()
     {
         String fullName = "";
-        if (givenName != null && !givenName.equals(""))
+        if ((givenName != null) && !givenName.equals("")) {
             fullName += givenName + " ";
-        if (middleName != null && !middleName.equals(""))
+        }
+        if ((middleName != null) && !middleName.equals("")) {
             fullName += middleName + " ";
-        if (surname != null && !surname.equals(""))
+        }
+        if ((surname != null) && !surname.equals("")) {
             fullName += surname;
+        }
 
         return fullName.trim();
     }
 
+    @Override
     public String toString() {
         return surname;
     }

@@ -53,7 +53,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox useImportInspectorForSingle;
     private final JCheckBox inspectionWarnDupli;
     private final JCheckBox useTimeStamp;
-    private JCheckBox updateTimeStamp;
+    private final JCheckBox updateTimeStamp;
     private final JCheckBox overwriteTimeStamp;
     private final JCheckBox markImportedEntries;
     private final JCheckBox unmarkAllEntriesBeforeImporting;
@@ -120,6 +120,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         // import inspector related choices;
         useImportInspector.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
                 inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
@@ -199,6 +200,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void setValues() {
         allowEditing.setSelected(_prefs.getBoolean("allowTableEditing"));
         defSort.setSelected(_prefs.getBoolean("defaultAutoSort"));
@@ -245,6 +247,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean("useOwner", useOwner.isSelected());
         _prefs.putBoolean("overwriteOwner", overwriteOwner.isSelected());
@@ -293,6 +296,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         }
     }
 
+    @Override
     public boolean readyToClose() {
         try {
             // Test if date format is legal:
@@ -308,6 +312,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("General");
     }

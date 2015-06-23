@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.imports;
 
-import java.net.URL;
-
 import javax.swing.JPanel;
 
 import net.sf.jabref.OutputPrinter;

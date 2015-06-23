@@ -51,6 +51,7 @@ public class AppendDatabaseAction extends BaseAction {
         this.panel = panel;
     }
 
+    @Override
     public void action() {
 
         filesToOpen.clear();
@@ -62,15 +63,18 @@ public class AppendDatabaseAction extends BaseAction {
                     null, false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
-            if (chosen == null)
+            if (chosen == null) {
                 return;
-            for (String aChosen : chosen)
+            }
+            for (String aChosen : chosen) {
                 filesToOpen.add(new File(aChosen));
+            }
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                @Override
                 public void run() {
                     openIt(md.importEntries(), md.importStrings(),
                             md.importGroups(), md.importSelectorWords());
@@ -84,15 +88,16 @@ public class AppendDatabaseAction extends BaseAction {
 
     void openIt(boolean importEntries, boolean importStrings,
             boolean importGroups, boolean importSelectorWords) {
-        if (filesToOpen.size() == 0)
+        if (filesToOpen.size() == 0) {
             return;
+        }
         for (File file : filesToOpen) {
             try {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-                mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
+                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
                 panel.output(Globals.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (Throwable ex) {
@@ -152,8 +157,9 @@ public class AppendDatabaseAction extends BaseAction {
                     ExplicitGroup group = new ExplicitGroup("Imported",
                             AbstractGroup.INDEPENDENT); // JZTODO lyrics
                     newGroups.setGroup(group);
-                    for (BibtexEntry appendedEntry : appendedEntries)
+                    for (BibtexEntry appendedEntry : appendedEntries) {
                         group.addEntry(appendedEntry);
+                    }
                 }
 
                 // groupsSelector is always created, even when no groups
@@ -170,8 +176,9 @@ public class AppendDatabaseAction extends BaseAction {
                 for (Enumeration<GroupTreeNode> e = newGroups
                         .preorderEnumeration(); e.hasMoreElements();) {
                     node = e.nextElement();
-                    if (!(node.getGroup() instanceof ExplicitGroup))
+                    if (!(node.getGroup() instanceof ExplicitGroup)) {
                         continue;
+                    }
                     group = (ExplicitGroup) node.getGroup();
                     for (int i = 0; i < originalEntries.size(); ++i) {
                         entry = originalEntries.get(i);

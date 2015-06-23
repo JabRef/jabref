@@ -75,13 +75,14 @@ public abstract class AbstractAutoCompleter {
      * @see AbstractAutoCompleter#addBibtexEntry(BibtexEntry)
      */
     public String[] complete(String str) {
-        if (stringMinLength(str))
+        if (AbstractAutoCompleter.stringMinLength(str)) {
             return null;
+        }
         String lstr = str.toLowerCase();
 
         if (lstr.equals(str)) {
             // user typed in lower case word -> we do an case-insenstive search
-            String ender = incrementLastCharacter(lstr);
+            String ender = AbstractAutoCompleter.incrementLastCharacter(lstr);
             SortedSet<String> subset = _index_caseinsensitive.subSet(lstr, ender);
 
             // As subset only contains lower case strings, 
@@ -94,7 +95,7 @@ public abstract class AbstractAutoCompleter {
         } else {
             // user typed in a mix of upper case and lower case,
             // we assume user wants to have exact search
-            String ender = incrementLastCharacter(str);
+            String ender = AbstractAutoCompleter.incrementLastCharacter(str);
             SortedSet<String> subset = _index_casesensitive.subSet(str, ender);
             return subset.toArray(new String[subset.size()]);
         }
@@ -115,7 +116,7 @@ public abstract class AbstractAutoCompleter {
     }
 
     public void addWordToIndex(String word) {
-        if (word.length() >= SHORTEST_WORD) {
+        if (word.length() >= AbstractAutoCompleter.SHORTEST_WORD) {
             _index_casesensitive.add(word);
 
             // insensitive treatment

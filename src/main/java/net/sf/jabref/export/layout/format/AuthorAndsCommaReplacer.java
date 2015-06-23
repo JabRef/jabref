@@ -28,6 +28,7 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
     /* (non-Javadoc)
      * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
      */
+    @Override
     public String format(String fieldText) {
 
         String[] authors = fieldText.split(" and ");
@@ -46,7 +47,7 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
             x = authors.length;
             StringBuffer sb = new StringBuffer();
 
-            for (i = 0; i < x - 2; i++) {
+            for (i = 0; i < (x - 2); i++) {
                 sb.append(authors[i]).append(", ");
             }
             sb.append(authors[i]).append(" & ").append(authors[i + 1]);

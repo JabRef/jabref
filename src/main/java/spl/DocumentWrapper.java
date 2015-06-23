@@ -42,7 +42,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasTitle() {
-        return (xmlDocument.getTitle() != null && xmlDocument.getTitle().getValue() != null && !xmlDocument.getTitle().getValue().isEmpty());
+        return ((xmlDocument.getTitle() != null) && (xmlDocument.getTitle().getValue() != null) && !xmlDocument.getTitle().getValue().isEmpty());
     }
 
     public String getAbstract() {
@@ -55,7 +55,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasAbstract() {
-        return (xmlDocument.getAbstract() != null && ((Abstract) xmlDocument.getAbstract()).getValue() != null && !((Abstract) xmlDocument.getAbstract()).getValue().isEmpty());
+        return ((xmlDocument.getAbstract() != null) && (((Abstract) xmlDocument.getAbstract()).getValue() != null) && !((Abstract) xmlDocument.getAbstract()).getValue().isEmpty());
     }
 
     public String getAuthors(String seperator) {
@@ -82,7 +82,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasAuthors() {
-        return (xmlDocument.getAuthors() != null && xmlDocument.getAuthors().getCollection() != null && !xmlDocument.getAuthors().getCollection().isEmpty());
+        return ((xmlDocument.getAuthors() != null) && (xmlDocument.getAuthors().getCollection() != null) && !xmlDocument.getAuthors().getCollection().isEmpty());
     }
 
     /* public String getKeyWords(){
@@ -122,7 +122,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasDoi() {
-        return (xmlDocument.getDoi() != null && this.getSimpleTypeValue(xmlDocument.getDoi()) != null && !this.getSimpleTypeValue(xmlDocument.getDoi()).isEmpty());
+        return ((xmlDocument.getDoi() != null) && (this.getSimpleTypeValue(xmlDocument.getDoi()) != null) && !this.getSimpleTypeValue(xmlDocument.getDoi()).isEmpty());
     }
 
     /*
@@ -176,7 +176,7 @@ public class DocumentWrapper {
     }
 
     public boolean hasYear() {
-        return (this.getSimpleTypeValue(xmlDocument.getYear()) != null && !this.getSimpleTypeValue(xmlDocument.getYear()).isEmpty() && !this.getSimpleTypeValue(xmlDocument.getYear()).equalsIgnoreCase("null"));
+        return ((this.getSimpleTypeValue(xmlDocument.getYear()) != null) && !this.getSimpleTypeValue(xmlDocument.getYear()).isEmpty() && !this.getSimpleTypeValue(xmlDocument.getYear()).equalsIgnoreCase("null"));
     }
 
     /*
@@ -221,28 +221,36 @@ public class DocumentWrapper {
         }*/
 
     private String getNameComplete(Author author) {
-        if (author == null)
+        if (author == null) {
             return "";
+        }
         String result = "";
-        if (getSimpleTypeValue(author.getName_First()) != null)
+        if (getSimpleTypeValue(author.getName_First()) != null) {
             result = result + getSimpleTypeValue(author.getName_First()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Middle()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Middle()) != null) {
             result = result + getSimpleTypeValue(author.getName_Middle()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Last_Prefix()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Last_Prefix()) != null) {
             result = result + getSimpleTypeValue(author.getName_Last_Prefix()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Last()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Last()) != null) {
             result = result + getSimpleTypeValue(author.getName_Last()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Last_Suffix()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Last_Suffix()) != null) {
             result = result + getSimpleTypeValue(author.getName_Last_Suffix()).trim() + " ";
+        }
         return result.trim();
     }
 
     private String getSimpleTypeValue(Bean bean) {
-        if (bean == null || !(bean instanceof SimpleTypeElementBean))
+        if ((bean == null) || !(bean instanceof SimpleTypeElementBean)) {
             return null;
+        }
         SimpleTypeElementBean simpleTypeElementBean = (SimpleTypeElementBean) bean;
-        if (simpleTypeElementBean.getValue() == null || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || simpleTypeElementBean.getValue().length() <= 0)
+        if ((simpleTypeElementBean.getValue() == null) || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || (simpleTypeElementBean.getValue().length() <= 0)) {
             return null;
+        }
         return simpleTypeElementBean.getValue();
     }
 

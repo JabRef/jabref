@@ -112,17 +112,19 @@ public class NameFormat implements LayoutFormatter {
                     } else {
                         s = e = Integer.parseInt(range[0]);
                     }
-                    if (s < 0)
+                    if (s < 0) {
                         s += n + 1;
-                    if (e < 0)
+                    }
+                    if (e < 0) {
                         e += n + 1;
+                    }
                     if (e < s) {
                         int temp = e;
                         e = s;
                         s = temp;
                     }
 
-                    if (s <= i && i <= e) {
+                    if ((s <= i) && (i <= e)) {
                         sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
                         break;
                     }
@@ -137,7 +139,7 @@ public class NameFormat implements LayoutFormatter {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
-        if (parameters == null || parameters.length() == 0) {
+        if ((parameters == null) || (parameters.length() == 0)) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
         }
 
@@ -161,12 +163,13 @@ public class NameFormat implements LayoutFormatter {
         return toFormat;
     }
 
+    @Override
     public String format(String fieldText) {
         return format(fieldText, parameter, null);
     }
 
 
-    String parameter = DEFAULT_FORMAT;
+    String parameter = NameFormat.DEFAULT_FORMAT;
 
 
     public void setParameter(String parameter) {

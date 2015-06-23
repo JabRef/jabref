@@ -77,6 +77,7 @@ public class CitationManager {
 
         Action okAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 try {
                     storeSettings();
@@ -91,6 +92,7 @@ public class CitationManager {
 
         Action cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
@@ -140,22 +142,26 @@ public class CitationManager {
             StringBuilder sb = new StringBuilder();
             for (int j = 0; j < keys.size(); j++) {
                 sb.append(keys.get(j));
-                if (j < keys.size() - 1)
+                if (j < (keys.size() - 1)) {
                     sb.append(", ");
+                }
             }
             keyString = sb.toString();
         }
 
         public boolean pageInfoChanged() {
             if (((pageInfo != null) && (origPageInfo == null))
-                    || ((pageInfo == null) && (origPageInfo != null)))
+                    || ((pageInfo == null) && (origPageInfo != null))) {
                 return true;
-            if (pageInfo != null)
+            }
+            if (pageInfo != null) {
                 return pageInfo.compareTo(origPageInfo) != 0;
-            else
+            } else {
                 return false;
+            }
         }
 
+        @Override
         public int compareTo(CitEntry other) {
             return this.refMarkName.compareTo(other.refMarkName);
         }
@@ -163,10 +169,12 @@ public class CitationManager {
 
     class CitEntryFormat implements TableFormat<CitEntry> {
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public String getColumnName(int i) {
             switch (i) {
             case 0:
@@ -177,6 +185,7 @@ public class CitationManager {
             }
         }
 
+        @Override
         public Object getColumnValue(CitEntry citEntry, int i) {
             switch (i) {
             //case 0: return citEntry.keyString;
@@ -190,6 +199,7 @@ public class CitationManager {
 
     class TableClickListener extends MouseAdapter {
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = table.rowAtPoint(e.getPoint());
@@ -239,12 +249,13 @@ public class CitationManager {
 
             Action okAction = new AbstractAction() {
 
+                @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (pageInfo.getText().trim().length() > 0) {
                         _entry.pageInfo = pageInfo.getText().trim();
-                    }
-                    else
+                    } else {
                         _entry.pageInfo = null;
+                    }
                     tableModel.fireTableDataChanged();
                     diag.dispose();
                 }
@@ -253,6 +264,7 @@ public class CitationManager {
 
             Action cancelAction = new AbstractAction() {
 
+                @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     diag.dispose();
                 }

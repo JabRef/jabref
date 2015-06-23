@@ -33,6 +33,7 @@ import net.sf.jabref.util.XMPUtil;
  */
 public class PdfXmpImporter extends ImportFormat {
 
+    @Override
     public String getFormatName() {
         return Globals.lang("XMP-annotated PDF");
     }
@@ -40,6 +41,7 @@ public class PdfXmpImporter extends ImportFormat {
     /**
      * Returns a list of all BibtexEntries found in the inputstream.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         return XMPUtil.readXMP(in);
     }

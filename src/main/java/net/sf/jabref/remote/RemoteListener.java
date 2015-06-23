@@ -55,6 +55,7 @@ public class RemoteListener implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         while (active) {
             try {
@@ -69,7 +70,7 @@ public class RemoteListener implements Runnable {
 
                 OutputStream out = newSocket.getOutputStream();
                 InputStream in = newSocket.getInputStream();
-                out.write(IDENTIFIER.getBytes());
+                out.write(RemoteListener.IDENTIFIER.getBytes());
                 out.write('\0');
                 out.flush();
 
@@ -91,6 +92,7 @@ public class RemoteListener implements Runnable {
                     // this dialog has to be shown AFTER JabRef has been brought to front
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             JabRef.jrf.showIfMinimizedToSysTray();
                         }
@@ -126,8 +128,9 @@ public class RemoteListener implements Runnable {
                     InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
             return new RemoteListener(jabref, socket);
         } catch (IOException e) {
-            if (!e.getMessage().startsWith("Address already in use"))
+            if (!e.getMessage().startsWith("Address already in use")) {
                 e.printStackTrace();
+            }
             return null;
         }
     }
@@ -155,7 +158,7 @@ public class RemoteListener implements Runnable {
                 System.out.println("Connection timed out.");
             }
 
-            if (!IDENTIFIER.equals(sb.toString())) {
+            if (!RemoteListener.IDENTIFIER.equals(sb.toString())) {
                 String port = String.valueOf(Globals.prefs.getInt("remoteServerPort"));
                 String error = Globals.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
                 System.out.println(error);

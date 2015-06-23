@@ -61,8 +61,9 @@ public class MSBibDatabase {
     }
 
     public MSBibDatabase(BibtexDatabase bibtex, Set<String> keySet) {
-        if (keySet == null)
+        if (keySet == null) {
             keySet = bibtex.getKeySet();
+        }
         addEntries(bibtex, keySet);
     }
 
@@ -86,9 +87,11 @@ public class MSBibDatabase {
             bcol = "";
         }
         if (rootLst.getLength() == 0)
+         {
             return bibitems;
         //    	if(docin!= null && docin.getDocumentElement().getTagName().contains("Sources") == false)
         //    		return bibitems;
+        }
 
         NodeList sourceList = ((Element) (rootLst.item(0))).getElementsByTagName(bcol + "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {

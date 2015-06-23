@@ -49,6 +49,7 @@ public class CreateDocBookEditors extends CreateDocBookAuthors
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText)
     {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>

@@ -42,24 +42,28 @@ public class ReadStatus extends SpecialField {
     }
 
     public static ReadStatus getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ReadStatus();
+        if (ReadStatus.INSTANCE == null) {
+            ReadStatus.INSTANCE = new ReadStatus();
         }
-        return INSTANCE;
+        return ReadStatus.INSTANCE;
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_READ;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return this.icon;
     }
 
+    @Override
     public String getToolTip() {
         return Globals.lang("Read status");
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Read status");
     }

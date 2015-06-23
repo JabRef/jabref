@@ -1,5 +1,6 @@
 package net.sf.jabref.bst;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -21,10 +22,11 @@ public class BibtexPurifyTest {
     }
 
     private void assertPurify(final String string, final String string2) {
-        assertEquals(string, BibtexPurify.purify(string2, new Warn() {
+        Assert.assertEquals(string, BibtexPurify.purify(string2, new Warn() {
 
+            @Override
             public void warn(String s) {
-                fail("Should not Warn (" + s + ")! purify should be " + string + " for " + string2);
+                Assert.fail("Should not Warn (" + s + ")! purify should be " + string + " for " + string2);
             }
         }));
     }

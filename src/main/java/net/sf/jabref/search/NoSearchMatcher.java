@@ -28,6 +28,7 @@ public class NoSearchMatcher implements Matcher<BibtexEntry> {
     public static final Matcher<BibtexEntry> INSTANCE = new NoSearchMatcher();
 
 
+    @Override
     public boolean matches(BibtexEntry object) {
         return true;
     }

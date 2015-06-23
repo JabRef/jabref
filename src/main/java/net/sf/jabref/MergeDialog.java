@@ -100,6 +100,7 @@ public class MergeDialog extends JDialog {
         im.put(parent.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -146,6 +147,7 @@ class MergeDialog_ok_actionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.ok_actionPerformed(e);
     }
@@ -160,6 +162,7 @@ class MergeDialog_Cancel_actionAdapter implements java.awt.event.ActionListener 
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.Cancel_actionPerformed(e);
     }

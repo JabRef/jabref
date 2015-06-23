@@ -66,6 +66,7 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
      * the user clicks Ok.
      *
      */
+    @Override
     public void storeSettings() {
 
         // Set the default value:
@@ -81,9 +82,9 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerateOnImport.isSelected());
         Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
 
-        if (alwaysAddLetter.isSelected())
+        if (alwaysAddLetter.isSelected()) {
             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", true);
-        else if (letterStartA.isSelected()) {
+        } else if (letterStartA.isSelected()) {
             Globals.prefs.putBoolean("keyGenFirstLetterA", true);
             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
         }
@@ -153,6 +154,7 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
 
         dontOverwrite.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 // Warning before overwriting is only relevant if overwriting can happen:
                 warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
@@ -160,10 +162,12 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         });
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public void setValues() {
         super.setValues(_prefs.getKeyPattern());
         defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
@@ -173,12 +177,13 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
 
         boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"), firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
-        if (alwaysAddLetter)
+        if (alwaysAddLetter) {
             this.alwaysAddLetter.setSelected(true);
-        else if (firstLetterA)
+        } else if (firstLetterA) {
             this.letterStartA.setSelected(true);
-        else
+        } else {
             this.letterStartB.setSelected(true);
+        }
 
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
@@ -190,6 +195,7 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("BibTeX key generator");
     }

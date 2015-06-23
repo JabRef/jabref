@@ -39,11 +39,11 @@ public class BibtexNameFormatter {
     public static String formatName(String authorsNameList, int whichName, String formatString, Warn warn) {
         AuthorList al = AuthorList.getAuthorList(authorsNameList);
 
-        if (whichName < 1 && whichName > al.size()) {
+        if ((whichName < 1) && (whichName > al.size())) {
             warn.warn("AuthorList " + authorsNameList + " does not contain an author with number " + whichName);
             return "";
         }
-        return formatName(al.getAuthor(whichName - 1), formatString, warn);
+        return BibtexNameFormatter.formatName(al.getAuthor(whichName - 1), formatString, warn);
     }
 
     /**
@@ -71,7 +71,7 @@ public class BibtexNameFormatter {
                 braceLevel++;
                 StringBuffer level1Chars = new StringBuffer();
                 StringBuffer wholeChar = new StringBuffer();
-                while (i < n && braceLevel > 0) {
+                while ((i < n) && (braceLevel > 0)) {
                     wholeChar.append(c[i]);
                     if (c[i] == '{') {
                         braceLevel++;
@@ -86,10 +86,12 @@ public class BibtexNameFormatter {
                     if (braceLevel == 1) {
                         if (Character.isLetter(c[i])) {
                             if ("fvlj".indexOf(c[i]) == -1) {
-                                if (warn != null)
+                                if (warn != null) {
                                     warn.warn("Format String in format.name$ may only contain fvlj on brace level 1 in group " + group + ": " + format);
-                            } else
+                                }
+                            } else {
                                 level1Chars.append(c[i]);
+                            }
                         }
                     }
                     i++;
@@ -97,11 +99,13 @@ public class BibtexNameFormatter {
                 i--; // unskip last brace (for last i++ at the end)
                 String control = level1Chars.toString().toLowerCase();
 
-                if (control.length() == 0)
+                if (control.length() == 0) {
                     continue;
+                }
 
-                if (control.length() > 2 && warn != null)
+                if ((control.length() > 2) && (warn != null)) {
                     warn.warn("Format String in format.name$ may only be one or two character long on brace level 1 in group " + group + ": " + format);
+                }
 
                 char type = control.charAt(0);
 
@@ -135,14 +139,15 @@ public class BibtexNameFormatter {
                     if (control.charAt(1) == control.charAt(0)) {
                         abbreviateThatIsSingleLetter = false;
                     } else {
-                        if (warn != null)
+                        if (warn != null) {
                             warn.warn("Format String in format.name$ may only contain one type of vlfj on brace level 1 in group " + group + ": " + format);
+                        }
                     }
                 }
 
                 // Now we know what to do
 
-                if (braceLevel == 0 && wholeChar.charAt(wholeChar.length() - 1) == '}') {
+                if ((braceLevel == 0) && (wholeChar.charAt(wholeChar.length() - 1) == '}')) {
                     wholeChar.deleteCharAt(wholeChar.length() - 1);
                 }
 
@@ -154,15 +159,15 @@ public class BibtexNameFormatter {
 
                 for (int j = 0; j < d.length; j++) {
 
-                    if (Character.isLetter(d[j]) && bLevel == 1) {
+                    if (Character.isLetter(d[j]) && (bLevel == 1)) {
                         groupStart = sb.length();
                         if (!abbreviateThatIsSingleLetter) {
                             j++;
                         }
-                        if (j + 1 < d.length) {
+                        if ((j + 1) < d.length) {
                             if (d[j + 1] == '{') {
                                 StringBuffer interTokenSb = new StringBuffer();
-                                j = consumeToMatchingBrace(interTokenSb, d, j + 1);
+                                j = BibtexNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
                                 interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
                             }
                         }
@@ -173,11 +178,12 @@ public class BibtexNameFormatter {
                                 String[] dashes = token.split("-");
 
                                 StringBuffer abbToken = new StringBuffer();
-                                for (int t = 0; t < dashes.length - 1; t++) {
-                                    abbToken.append(getFirstCharOfString(dashes[t])).append(".-");
+                                for (int t = 0; t < (dashes.length - 1); t++) {
+                                    abbToken.append(BibtexNameFormatter.getFirstCharOfString(dashes[t])).append(".-");
                                 }
-                                if (dashes.length > 0)
-                                    abbToken.append(getFirstCharOfString(dashes[dashes.length - 1]));
+                                if (dashes.length > 0) {
+                                    abbToken.append(BibtexNameFormatter.getFirstCharOfString(dashes[dashes.length - 1]));
+                                }
 
                                 token = abbToken.toString();
                             }
@@ -185,7 +191,7 @@ public class BibtexNameFormatter {
                             // Output token
                             sb.append(token);
 
-                            if (k < tokens.length - 1) {
+                            if (k < (tokens.length - 1)) {
                                 // Output Intertoken String
                                 if (interToken == null) {
                                     if (abbreviateThatIsSingleLetter) {
@@ -194,7 +200,7 @@ public class BibtexNameFormatter {
                                     // No clue what this means (What the hell are tokens anyway???
                                     // if (lex_class[name_sep_char[cur_token]] = sep_char) then
                                     //    append_ex_buf_char_and_check (name_sep_char[cur_token])
-                                    if (k == tokens.length - 2 || numberOfChars(sb.substring(groupStart, sb.length()), 3) < 3) {
+                                    if ((k == (tokens.length - 2)) || (BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 3) < 3)) {
                                         sb.append("~");
                                     } else {
                                         sb.append(" ");
@@ -218,24 +224,27 @@ public class BibtexNameFormatter {
                 }
                 if (sb.length() > 0) {
                     boolean noDisTie = false;
-                    if (sb.charAt(sb.length() - 1) == '~' &&
-                            (numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4 ||
-                            (sb.length() > 1 && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
+                    if ((sb.charAt(sb.length() - 1) == '~') &&
+                            ((BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
+                            ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
                         sb.deleteCharAt(sb.length() - 1);
-                        if (!noDisTie)
+                        if (!noDisTie) {
                             sb.append(' ');
+                        }
                     }
                 }
             } else if (c[i] == '}') {
-                if (warn != null)
+                if (warn != null) {
                     warn.warn("Unmatched brace in format string: " + format);
+                }
             } else {
                 sb.append(c[i]); // verbatim
             }
             i++;
         }
-        if (braceLevel != 0)
+        if (braceLevel != 0) {
             warn.warn("Unbalanced brace in format string for nameFormat: " + format);
+        }
 
         return sb.toString();
     }
@@ -284,9 +293,9 @@ public class BibtexNameFormatter {
                 return String.valueOf(c[i]);
             }
             if (c[i] == '{') {
-                if (i + 1 < c.length && c[i + 1] == '\\') {
+                if (((i + 1) < c.length) && (c[i + 1] == '\\')) {
                     StringBuffer sb = new StringBuffer();
-                    consumeToMatchingBrace(sb, c, i);
+                    BibtexNameFormatter.consumeToMatchingBrace(sb, c, i);
                     return sb.toString();
                 }
             }
@@ -296,8 +305,9 @@ public class BibtexNameFormatter {
 
     public static int numberOfChars(String token, int stop) {
 
-        if (stop < 0)
+        if (stop < 0) {
             stop = Integer.MAX_VALUE;
+        }
 
         int result = 0;
         int i = 0;
@@ -305,13 +315,13 @@ public class BibtexNameFormatter {
         int n = c.length;
 
         int braceLevel = 0;
-        while (i < n && result < stop) {
+        while ((i < n) && (result < stop)) {
             i++;
             if (c[i - 1] == '{') {
                 braceLevel++;
-                if (braceLevel == 1 && i < n && c[i] == '\\') {
+                if ((braceLevel == 1) && (i < n) && (c[i] == '\\')) {
                     i++;
-                    while (i < n && braceLevel > 0) {
+                    while ((i < n) && (braceLevel > 0)) {
                         if (c[i] == '}') {
                             braceLevel--;
                         } else if (c[i] == '{') {

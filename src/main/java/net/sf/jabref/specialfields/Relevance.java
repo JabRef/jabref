@@ -35,29 +35,34 @@ public class Relevance extends SpecialField {
         TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_RELEVANCE;
     }
 
     public static Relevance getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Relevance();
+        if (Relevance.INSTANCE == null) {
+            Relevance.INSTANCE = new Relevance();
         }
-        return INSTANCE;
+        return Relevance.INSTANCE;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
     }
 
+    @Override
     public String getToolTip() {
         return this.getValues().get(0).getToolTipText();
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Relevance");
     }
 
+    @Override
     public boolean isSingleValueField() {
         return true;
     }

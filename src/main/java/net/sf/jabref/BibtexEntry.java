@@ -53,29 +53,29 @@ public class BibtexEntry
     public static final Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
 
     static {
-        FieldAliasesOldToNew.put("address", "location");
-        FieldAliasesNewToOld.put("location", "address");
+        BibtexEntry.FieldAliasesOldToNew.put("address", "location");
+        BibtexEntry.FieldAliasesNewToOld.put("location", "address");
 
-        FieldAliasesOldToNew.put("annote", "annotation");
-        FieldAliasesNewToOld.put("annotation", "annote");
+        BibtexEntry.FieldAliasesOldToNew.put("annote", "annotation");
+        BibtexEntry.FieldAliasesNewToOld.put("annotation", "annote");
 
-        FieldAliasesOldToNew.put("archiveprefix", "eprinttype");
-        FieldAliasesNewToOld.put("eprinttype", "archiveprefix");
+        BibtexEntry.FieldAliasesOldToNew.put("archiveprefix", "eprinttype");
+        BibtexEntry.FieldAliasesNewToOld.put("eprinttype", "archiveprefix");
 
-        FieldAliasesOldToNew.put("journal", "journaltitle");
-        FieldAliasesNewToOld.put("journaltitle", "journal");
+        BibtexEntry.FieldAliasesOldToNew.put("journal", "journaltitle");
+        BibtexEntry.FieldAliasesNewToOld.put("journaltitle", "journal");
 
-        FieldAliasesOldToNew.put("key", "sortkey");
-        FieldAliasesNewToOld.put("sortkey", "key");
+        BibtexEntry.FieldAliasesOldToNew.put("key", "sortkey");
+        BibtexEntry.FieldAliasesNewToOld.put("sortkey", "key");
 
-        FieldAliasesOldToNew.put("pdf", "file");
-        FieldAliasesNewToOld.put("file", "pdf");
+        BibtexEntry.FieldAliasesOldToNew.put("pdf", "file");
+        BibtexEntry.FieldAliasesNewToOld.put("file", "pdf");
 
-        FieldAliasesOldToNew.put("primaryclass", "eprintclass");
-        FieldAliasesNewToOld.put("eprintclass", "primaryclass");
+        BibtexEntry.FieldAliasesOldToNew.put("primaryclass", "eprintclass");
+        BibtexEntry.FieldAliasesNewToOld.put("eprintclass", "primaryclass");
 
-        FieldAliasesOldToNew.put("school", "institution");
-        FieldAliasesNewToOld.put("institution", "school");
+        BibtexEntry.FieldAliasesOldToNew.put("school", "institution");
+        BibtexEntry.FieldAliasesNewToOld.put("institution", "school");
     }
 
     private String _id;
@@ -221,7 +221,7 @@ public class BibtexEntry
 
         try
         {
-            firePropertyChangedEvent(ID_FIELD, _id, id);
+            firePropertyChangedEvent(BibtexEntry.ID_FIELD, _id, id);
         } catch (PropertyVetoException pv)
         {
             throw new KeyCollisionException("Couldn't change ID: " + pv);
@@ -269,19 +269,21 @@ public class BibtexEntry
      */
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
-        if (fieldValue != null && fieldValue.length() > 0)
+        if ((fieldValue != null) && (fieldValue.length() > 0)) {
             return fieldValue;
+        }
 
         // No value of this field found, so look at the alias
 
         // Create bidirectional dictionary between field names and their aliases
         Map<String, String> aliases = new HashMap<String, String>();
-        aliases.putAll(FieldAliasesOldToNew);
-        aliases.putAll(FieldAliasesNewToOld);
+        aliases.putAll(BibtexEntry.FieldAliasesOldToNew);
+        aliases.putAll(BibtexEntry.FieldAliasesNewToOld);
 
         String aliasForField = aliases.get(name);
-        if (aliasForField != null)
+        if (aliasForField != null) {
             return getField(aliasForField);
+        }
 
         // So we did not found the field itself or its alias...
         // Finally, handle dates
@@ -301,8 +303,9 @@ public class BibtexEntry
         if (name.equals("year") || name.equals("month"))
         {
             String date = getField("date");
-            if (date == null)
+            if (date == null) {
                 return null;
+            }
 
             // Create date format matching dates with year and month
             DateFormat df = new DateFormat() {
@@ -320,8 +323,9 @@ public class BibtexEntry
 
                 @Override
                 public Date parse(String source, ParsePosition pos) {
-                    if (source.length() - pos.getIndex() == FORMAT1.length())
+                    if ((source.length() - pos.getIndex()) == FORMAT1.length()) {
                         return sdf1.parse(source, pos);
+                    }
                     return sdf2.parse(source, pos);
                 }
             };
@@ -330,10 +334,13 @@ public class BibtexEntry
                 Date parsedDate = df.parse(date);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(parsedDate);
-                if (name.equals("year"))
+                if (name.equals("year")) {
                     return Integer.toString(calendar.get(Calendar.YEAR));
+                }
                 if (name.equals("month"))
+                 {
                     return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
+                }
             } catch (ParseException e) {
                 // So not a date with year and month, try just to parse years
                 df = new SimpleDateFormat("yyyy");
@@ -342,8 +349,9 @@ public class BibtexEntry
                     Date parsedDate = df.parse(date);
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(parsedDate);
-                    if (name.equals("year"))
+                    if (name.equals("year")) {
                         return Integer.toString(calendar.get(Calendar.YEAR));
+                    }
                 } catch (ParseException e2) {
                     return null; // Date field not in valid format
                 }
@@ -377,7 +385,7 @@ public class BibtexEntry
      */
     public void setField(String name, String value) {
 
-        if (ID_FIELD.equals(name)) {
+        if (BibtexEntry.ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name +
                     "' is reserved");
         }
@@ -406,7 +414,7 @@ public class BibtexEntry
      */
     public void clearField(String name) {
 
-        if (ID_FIELD.equals(name)) {
+        if (BibtexEntry.ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name +
                     "' is reserved");
         }
@@ -443,7 +451,7 @@ public class BibtexEntry
     protected boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
         for (String field : fields) {
             String value = BibtexDatabase.getResolvedField(field, this, database);
-            if ((value != null) && value.length() > 0) {
+            if ((value != null) && (value.length() > 0)) {
                 return true;
             }
         }
@@ -489,12 +497,14 @@ public class BibtexEntry
     /**
      * Returns a clone of this entry. Useful for copying.
      */
+    @Override
     public Object clone() {
         BibtexEntry clone = new BibtexEntry(_id, _type);
         clone._fields = new HashMap<String, String>(_fields);
         return clone;
     }
 
+    @Override
     public String toString() {
         return getType().getName() + ":" + getField(BibtexFields.KEY_FIELD);
     }
@@ -526,12 +536,15 @@ public class BibtexEntry
                 getField("author"),
                 getField("title"),
                 getField("year")};
-        for (int i = 0; i < s.length; ++i)
-            if (s[i] == null)
+        for (int i = 0; i < s.length; ++i) {
+            if (s[i] == null) {
                 s[i] = "N/A";
+            }
+        }
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ")";
-        if (maxCharacters <= 0 || text.length() <= maxCharacters)
+        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
+        }
         return text.substring(0, maxCharacters + 1) + "...";
     }
 }

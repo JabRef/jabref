@@ -49,24 +49,28 @@ public class GoogleUrlCleaner {
 
     // clean Google URL
     public static String cleanUrl(String dirty) {
-        if (dirty == null || dirty.length() == 0)
+        if ((dirty == null) || (dirty.length() == 0)) {
             return dirty;
+        }
         try {
             URL u = new URL(dirty);
             // read URL parameters
             String query = u.getQuery();
             // if there is no parameters
-            if (query == null)
+            if (query == null) {
                 return dirty;
+            }
             // split parameters
             String[] pairs = query.split("&");
-            if (pairs == null)
+            if (pairs == null) {
                 return dirty;
+            }
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
                 // "clean" url is decoded value of "url" parameter
-                if (pair.substring(0, idx).equals("url"))
+                if (pair.substring(0, idx).equals("url")) {
                     return URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+                }
             }
         } catch (MalformedURLException e) {
             return dirty;

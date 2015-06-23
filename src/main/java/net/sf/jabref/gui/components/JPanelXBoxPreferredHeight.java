@@ -28,6 +28,7 @@ public class JPanelXBoxPreferredHeight extends JPanelXBox {
         add(c);
     }
 
+    @Override
     public Dimension getMaximumSize() {
         Dimension pref = getPreferredSize();
         pref.width = super.getMaximumSize().width;

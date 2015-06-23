@@ -87,7 +87,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        String urlString = String.format(URL_PATTERN, q);
+        String urlString = String.format(DOItoBibTeXFetcher.URL_PATTERN, q);
 
         // Send the request
         URL url;

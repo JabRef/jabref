@@ -86,6 +86,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         nd.setSelected(true);
         ActionListener okListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ok_pressed = true;
                 dispose();
@@ -146,6 +147,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         field.addCaretListener(this);
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -267,6 +269,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         return remove.getText();
     }
 
+    @Override
     public void caretUpdate(CaretEvent e) {
         updateComponents();
     }

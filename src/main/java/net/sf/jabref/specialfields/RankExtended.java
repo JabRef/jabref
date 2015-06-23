@@ -25,12 +25,13 @@ public class RankExtended extends Rank {
     }
 
     public static RankExtended getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RankExtended();
+        if (RankExtended.INSTANCE == null) {
+            RankExtended.INSTANCE = new RankExtended();
         }
-        return INSTANCE;
+        return RankExtended.INSTANCE;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return this.getValues().get(1).getIcon();
     }

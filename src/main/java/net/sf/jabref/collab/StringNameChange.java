@@ -45,6 +45,7 @@ public class StringNameChange extends Change {
 
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
         if (panel.database().hasStringLabel(disk)) {
@@ -82,6 +83,7 @@ public class StringNameChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return new JLabel(disk + " : " + content);
     }

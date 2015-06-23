@@ -27,6 +27,7 @@ public class InfoPane extends JEditorPane {
         setContentType("text/html");
     }
 
+    @Override
     public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

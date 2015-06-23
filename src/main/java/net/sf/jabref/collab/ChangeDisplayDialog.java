@@ -81,19 +81,23 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
 
         cb.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
-                if (selected != null)
+                if (selected != null) {
                     selected.setAccepted(cb.isSelected());
+                }
             }
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         });
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 // Perform all accepted changes:
@@ -105,16 +109,19 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
                 while (enumer.hasMoreElements()) {
                     Change c = enumer.nextElement();
                     boolean allAccepted = false;
-                    if (c.isAcceptable() && c.isAccepted())
+                    if (c.isAcceptable() && c.isAccepted()) {
                         allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
+                    }
 
-                    if (!allAccepted)
+                    if (!allAccepted) {
                         anyDisabled = true;
+                    }
                 }
                 ce.end();
                 panel.undoManager.addEdit(ce);
-                if (anyDisabled)
+                if (anyDisabled) {
                     panel.markBaseChanged();
+                }
                 panel.setUpdatedExternally(false);
                 dispose();
                 okPressed = true;
@@ -129,8 +136,9 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
     }
 
     private void setInfo(JComponent comp) {
-        if (infoShown != null)
+        if (infoShown != null) {
             infoPanel.remove(infoShown);
+        }
         infoShown = comp;
         infoPanel.add(infoShown, BorderLayout.CENTER);
         infoPanel.revalidate();
@@ -142,6 +150,7 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
      *
      * @param e TreeSelectionEvent
      */
+    @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object o = tree.getLastSelectedPathComponent();
         if (o instanceof Change) {

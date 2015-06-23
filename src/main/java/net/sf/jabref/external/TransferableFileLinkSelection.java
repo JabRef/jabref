@@ -40,8 +40,9 @@ public class TransferableFileLinkSelection implements Transferable {
     public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
         String s = selection[0].getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
-        if (s != null)
+        if (s != null) {
             tm.setContent(s);
+        }
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
             String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
@@ -52,10 +53,12 @@ public class TransferableFileLinkSelection implements Transferable {
 
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] {DataFlavor.javaFileListFlavor};//, DataFlavor.stringFlavor};
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
         System.out.println("Query: " + dataFlavor.getHumanPresentableName() + " , " +
                 dataFlavor.getDefaultRepresentationClass() + " , " + dataFlavor.getMimeType());
@@ -63,6 +66,7 @@ public class TransferableFileLinkSelection implements Transferable {
                 || dataFlavor.equals(DataFlavor.stringFlavor);
     }
 
+    @Override
     public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
         //if (dataFlavor.equals(DataFlavor.javaFileListFlavor))
         return fileList;

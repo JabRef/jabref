@@ -78,6 +78,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         selectFileNamePattern = new JButton(Globals.lang("Choose pattern"));
         selectFileNamePattern.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 openFilePatternMenu();
             }
@@ -125,9 +126,10 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
-        useDefaultPDFImportStyle.setSelected(Globals.prefs.getBoolean(PREF_IMPORT_ALWAYSUSE));
-        int style = Globals.prefs.getInt(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        useDefaultPDFImportStyle.setSelected(Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE));
+        int style = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
         switch (style) {
         case ImportDialog.NOMETA:
             radioButtonNoMeta.setSelected(true);
@@ -152,43 +154,48 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             radioButtonPDFcontent.setSelected(true);
             break;
         }
-        fileNamePattern.setText(Globals.prefs.get(PREF_IMPORT_FILENAMEPATTERN));
+        fileNamePattern.setText(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
     }
 
+    @Override
     public void storeSettings() {
-        Globals.prefs.putBoolean(PREF_IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
-        int style = DEFAULT_STYLE;
-        if (radioButtonNoMeta.isSelected())
+        Globals.prefs.putBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
+        int style = ImportSettingsTab.DEFAULT_STYLE;
+        if (radioButtonNoMeta.isSelected()) {
             style = ImportDialog.NOMETA;
-        else if (radioButtonXmp.isSelected())
+        } else if (radioButtonXmp.isSelected()) {
             style = ImportDialog.XMP;
-        else if (radioButtonPDFcontent.isSelected())
+        } else if (radioButtonPDFcontent.isSelected()) {
             style = ImportDialog.CONTENT;
-        else if (radioButtonMrDlib.isSelected())
+        } else if (radioButtonMrDlib.isSelected()) {
             style = ImportDialog.MRDLIB;
-        else if (radioButtononlyAttachPDF.isSelected())
+        } else if (radioButtononlyAttachPDF.isSelected()) {
             style = ImportDialog.ONLYATTACH;
-        else if (radioButtonUpdateEmptyFields.isSelected())
+        } else if (radioButtonUpdateEmptyFields.isSelected()) {
             style = ImportDialog.UPDATEEMPTYFIELDS;
-        Globals.prefs.putInt(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
-        Globals.prefs.put(PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
+        }
+        Globals.prefs.putInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
+        Globals.prefs.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Import");
     }
 
     private void openFilePatternMenu() {
         JPopupMenu popup = new JPopupMenu();
-        for (int i = 0; i < DEFAULT_FILENAMEPATTERNS.length; i++) {
-            final JMenuItem item = new JMenuItem(DEFAULT_FILENAMEPATTERNS_DISPLAY[i]);
-            final String toSet = DEFAULT_FILENAMEPATTERNS[i];
+        for (int i = 0; i < ImportSettingsTab.DEFAULT_FILENAMEPATTERNS.length; i++) {
+            final JMenuItem item = new JMenuItem(ImportSettingsTab.DEFAULT_FILENAMEPATTERNS_DISPLAY[i]);
+            final String toSet = ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[i];
             item.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     fileNamePattern.setText(toSet);
                 }

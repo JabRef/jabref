@@ -82,6 +82,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public boolean importData(JComponent comp, Transferable t) {
         // If the drop target is the main table, we want to record which
@@ -114,6 +115,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
                 final List<File> theFiles = files;
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         //addAll(files);
                         for (File f : theFiles) {
@@ -165,8 +167,9 @@ public class FileListEditorTransferHandler extends TransferHandler {
         // accept this if any input flavor matches any of our supported flavors
         for (DataFlavor inflav : transferFlavors) {
             if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                    || inflav.match(DataFlavor.javaFileListFlavor))
+                    || inflav.match(DataFlavor.javaFileListFlavor)) {
                 return true;
+            }
         }
 
         // nope, never heard of this type

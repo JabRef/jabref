@@ -34,26 +34,29 @@ public class CiteSeerXFetcher implements EntryFetcher {
     protected static final int MAX_PAGES_TO_LOAD = 8;
     final static String QUERY_MARKER = "___QUERY___";
     final static String URL_START = "http://citeseer.ist.psu.edu";
-    final static String SEARCH_URL = URL_START + "/search?q=" + QUERY_MARKER
+    final static String SEARCH_URL = CiteSeerXFetcher.URL_START + "/search?q=" + CiteSeerXFetcher.QUERY_MARKER
             + "&submit=Search&sort=rlv&t=doc";
     final static Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
 
     protected boolean stopFetching = false;
 
 
+    @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         stopFetching = false;
         try {
             List<String> citations = getCitations(query);
             for (String citation : citations) {
-                if (stopFetching)
+                if (stopFetching) {
                     break;
+                }
                 BibtexEntry entry = getSingleCitation(citation);
                 //BibtexEntry entry = BibsonomyScraper.getEntry(citation);
 
                 //dialog.setProgress(++i, citations.size());
-                if (entry != null)
+                if (entry != null) {
                     inspector.addEntry(entry);
+                }
             }
 
             return true;
@@ -63,22 +66,27 @@ public class CiteSeerXFetcher implements EntryFetcher {
         }
     }
 
+    @Override
     public String getTitle() {
         return "CiteSeerX";
     }
 
+    @Override
     public String getKeyName() {
         return "CiteSeerX";
     }
 
+    @Override
     public String getHelpPage() {
         return "CiteSeerHelp.html";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         return null;
     }
 
+    @Override
     public void stopFetching() {
         stopFetching = true;
     }
@@ -94,15 +102,16 @@ public class CiteSeerXFetcher implements EntryFetcher {
         String urlQuery;
         ArrayList<String> ids = new ArrayList<String>();
         try {
-            urlQuery = SEARCH_URL.replace(QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
+            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
             String nextPage;
             while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < MAX_PAGES_TO_LOAD)) {
+                    && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
                 urlQuery = nextPage;
                 count++;
-                if (stopFetching)
+                if (stopFetching) {
                     break;
+                }
             }
             return ids;
         } catch (UnsupportedEncodingException e) {
@@ -114,19 +123,19 @@ public class CiteSeerXFetcher implements EntryFetcher {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //System.out.println(cont);
-        Matcher m = CITE_LINK_PATTERN.matcher(cont);
+        Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
-            ids.add(URL_START + m.group(1));
+            ids.add(CiteSeerXFetcher.URL_START + m.group(1));
         }
 
         return null;
     }
 
 
-    final static String basePattern = "<meta name=\"" + QUERY_MARKER + "\" content=\"(.*)\" />";
-    final static Pattern titlePattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_title"));
-    final static Pattern authorPattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_authors"));
-    final static Pattern yearPattern = Pattern.compile(basePattern.replace(QUERY_MARKER, "citation_year"));
+    final static String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
+    final static Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
+    final static Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
+    final static Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
     final static Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
 
@@ -136,32 +145,34 @@ public class CiteSeerXFetcher implements EntryFetcher {
         String cont = new URLDownload(url).downloadToString("UTF8");
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
-        Matcher m = titlePattern.matcher(cont);
+        Matcher m = CiteSeerXFetcher.titlePattern.matcher(cont);
         if (m.find()) {
             BibtexEntry entry = new BibtexEntry(Util.createNeutralId());
             entry.setField("title", m.group(1));
 
             // Find authors:
-            m = authorPattern.matcher(cont);
+            m = CiteSeerXFetcher.authorPattern.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
                 entry.setField("author", NameListNormalizer.normalizeAuthorList(authors));
             }
 
             // Find year:
-            m = yearPattern.matcher(cont);
-            if (m.find())
+            m = CiteSeerXFetcher.yearPattern.matcher(cont);
+            if (m.find()) {
                 entry.setField("year", m.group(1));
+            }
 
             // Find abstract:
-            m = abstractPattern.matcher(cont);
-            if (m.find())
+            m = CiteSeerXFetcher.abstractPattern.matcher(cont);
+            if (m.find()) {
                 entry.setField("abstract", m.group(1));
+            }
 
             return entry;
-        }
-        else
+        } else {
             return null;
+        }
 
     }
 

@@ -88,6 +88,7 @@ public class AttachFileDialog extends JDialog {
 
         browse.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 extPan.browseFile(fieldName, editor);
             }
@@ -95,6 +96,7 @@ public class AttachFileDialog extends JDialog {
 
         download.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 extPan.downLoadFile(fieldName, editor, ths);
             }
@@ -102,6 +104,7 @@ public class AttachFileDialog extends JDialog {
 
         auto.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 JabRefExecutorService.INSTANCE.execute(extPan.autoSetFile(fieldName, editor));
             }
@@ -109,6 +112,7 @@ public class AttachFileDialog extends JDialog {
 
         ActionListener okListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 cancelled = false;
                 dispose();
@@ -120,6 +124,7 @@ public class AttachFileDialog extends JDialog {
 
         AbstractAction cancelListener = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 cancelled = true;
                 dispose();

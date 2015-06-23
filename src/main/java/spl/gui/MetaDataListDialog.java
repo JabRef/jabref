@@ -69,6 +69,7 @@ public class MetaDataListDialog extends JDialog {
 
         buttonOK.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
@@ -76,6 +77,7 @@ public class MetaDataListDialog extends JDialog {
 
         buttonCancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -83,6 +85,7 @@ public class MetaDataListDialog extends JDialog {
 
         blankButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onBlank();
             }
@@ -90,14 +93,16 @@ public class MetaDataListDialog extends JDialog {
 
         moreInformationButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onInfo();
             }
         });
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 onCancel();
             }
@@ -105,6 +110,7 @@ public class MetaDataListDialog extends JDialog {
 
         contentPane.registerKeyboardAction(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }

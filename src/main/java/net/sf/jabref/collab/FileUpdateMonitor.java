@@ -38,6 +38,7 @@ public class FileUpdateMonitor implements Runnable {
     final HashMap<String, Entry> entries = new HashMap<String, Entry>();
     volatile boolean running;
 
+    @Override
     public void run() {
         running = true;
 
@@ -48,8 +49,9 @@ public class FileUpdateMonitor implements Runnable {
             for (; i.hasNext();) {
                 Entry e = entries.get(i.next());
                 try {
-                    if (e.hasBeenUpdated())
+                    if (e.hasBeenUpdated()) {
                         e.notifyListener();
+                    }
 
                     //else
                     //System.out.println("File '"+e.file.getPath()+"' not modified.");
@@ -62,7 +64,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                logger.finest("FileUpdateMonitor has been interrupted.");
+                FileUpdateMonitor.logger.finest("FileUpdateMonitor has been interrupted.");
                 /*  the (?) correct way to interrupt threads, according to
                  *  http://www.roseindia.net/javatutorials/shutting_down_threads_cleanly.shtml
                  */
@@ -87,8 +89,9 @@ public class FileUpdateMonitor implements Runnable {
      */
     public String addUpdateListener(FileUpdateListener ul, File file) throws IOException {
         // System.out.println(file.getPath());
-        if (!file.exists())
+        if (!file.exists()) {
             throw new IOException("File not found");
+        }
         no++;
         String key = "" + no;
         entries.put(key, new Entry(ul, file));
@@ -101,8 +104,9 @@ public class FileUpdateMonitor implements Runnable {
      */
     public boolean hasBeenModified(String handle) throws IllegalArgumentException {
         Object o = entries.get(handle);
-        if (o == null)
+        if (o == null) {
             return false;
+        }
         //	    throw new IllegalArgumentException("Entry not found");
         try {
             return ((Entry) o).hasBeenUpdated();
@@ -121,8 +125,9 @@ public class FileUpdateMonitor implements Runnable {
      */
     public void perturbTimestamp(String handle) {
         Object o = entries.get(handle);
-        if (o == null)
+        if (o == null) {
             return;
+        }
         ((Entry) o).timeStamp--;
     }
 
@@ -136,19 +141,22 @@ public class FileUpdateMonitor implements Runnable {
 
     public void updateTimeStamp(String key) throws IllegalArgumentException {
         Object o = entries.get(key);
-        if (o == null)
+        if (o == null) {
             throw new IllegalArgumentException("Entry not found");
+        }
         Entry entry = (Entry) o;
         entry.updateTimeStamp();
 
     }
 
     public void changeFile(String key, File file) throws IOException, IllegalArgumentException {
-        if (!file.exists())
+        if (!file.exists()) {
             throw new IOException("File not found");
+        }
         Object o = entries.get(key);
-        if (o == null)
+        if (o == null) {
             throw new IllegalArgumentException("Entry not found");
+        }
         ((Entry) o).file = file;
     }
 
@@ -161,8 +169,9 @@ public class FileUpdateMonitor implements Runnable {
      */
     public File getTempFile(String key) throws IllegalArgumentException {
         Object o = entries.get(key);
-        if (o == null)
+        if (o == null) {
             throw new IllegalArgumentException("Entry not found");
+        }
         return ((Entry) o).tmpFile;
     }
 
@@ -183,7 +192,7 @@ public class FileUpdateMonitor implements Runnable {
             file = f;
             timeStamp = file.lastModified();
             fileSize = file.length();
-            tmpFile = getTempFile();
+            tmpFile = FileUpdateMonitor.getTempFile();
             tmpFile.deleteOnExit();
             copy();
         }
@@ -196,15 +205,17 @@ public class FileUpdateMonitor implements Runnable {
         public boolean hasBeenUpdated() throws IOException {
             long modified = file.lastModified();
             long fileSizeNow = file.length();
-            if (modified == 0L)
+            if (modified == 0L) {
                 throw new IOException("File deleted");
-            return timeStamp != modified || fileSize != fileSizeNow;
+            }
+            return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
         public void updateTimeStamp() {
             timeStamp = file.lastModified();
-            if (timeStamp == 0L)
+            if (timeStamp == 0L) {
                 notifyFileRemoved();
+            }
             fileSize = file.length();
 
             copy();

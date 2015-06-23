@@ -38,6 +38,7 @@ class ModsExportFormat extends ExportFormat {
         super(Globals.lang("MODS"), "mods", null, null, ".xml");
     }
 
+    @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData,
             final String file, final String encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession("UTF8", new File(file));

@@ -33,14 +33,16 @@ public class PushToLyx implements PushToApplication {
     private boolean couldNotWrite = false;
 
 
+    @Override
     public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
         couldNotFindPipe = false;
         couldNotWrite = false;
 
         String lyxpipeSetting = Globals.prefs.get("lyxpipe");
-        if (!lyxpipeSetting.endsWith(".in"))
+        if (!lyxpipeSetting.endsWith(".in")) {
             lyxpipeSetting = lyxpipeSetting + ".in";
+        }
         File lp = new File(lyxpipeSetting); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
         if (!lp.exists() || !lp.canWrite()) {
             // See if it helps to append ".in":
@@ -55,6 +57,7 @@ public class PushToLyx implements PushToApplication {
 
         JabRefExecutorService.INSTANCE.executeAndWait(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     FileWriter fw = new FileWriter(lyxpipe);
@@ -73,26 +76,32 @@ public class PushToLyx implements PushToApplication {
         });
     }
 
+    @Override
     public String getName() {
         return Globals.lang("Insert selected citations into LyX/Kile");
     }
 
+    @Override
     public String getApplicationName() {
         return "LyX/Kile";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push selection to LyX/Kile");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("lyx");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return "Push to LyX";
     }
 
+    @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotFindPipe) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("verify that LyX is running and that the lyxpipe is valid")
@@ -109,17 +118,21 @@ public class PushToLyx implements PushToApplication {
 
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
+        }
         lyxPipe.setText(Globals.prefs.get("lyxpipe"));
         return settings;
     }
 
+    @Override
     public void storeSettings() {
         Globals.prefs.put("lyxpipe", lyxPipe.getText());
     }

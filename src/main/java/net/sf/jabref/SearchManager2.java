@@ -147,6 +147,7 @@ public class SearchManager2 extends SidePaneComponent
         }
         searchAll.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 boolean state = !searchAll.isSelected();
                 searchReq.setEnabled(state);
@@ -187,11 +188,14 @@ public class SearchManager2 extends SidePaneComponent
         search.addActionListener(this);
         searchField.addFocusListener(new FocusAdapter() {
 
+            @Override
             public void focusGained(FocusEvent e) {
-                if (increment.isSelected())
+                if (increment.isSelected()) {
                     searchField.setText("");
+                }
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 incSearch = false;
                 incSearchPos = -1; // Reset incremental
@@ -210,6 +214,7 @@ public class SearchManager2 extends SidePaneComponent
 
         openset.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (settings.isVisible()) {
                     //System.out.println("oee");
@@ -224,6 +229,7 @@ public class SearchManager2 extends SidePaneComponent
 
         searchAutoComplete.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Globals.prefs.putBoolean("searchAutoComplete", searchAutoComplete.isSelected());
                 if (SearchManager2.this.frame.basePanel() != null) {
@@ -245,16 +251,17 @@ public class SearchManager2 extends SidePaneComponent
         help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.searchHelp, "Help"));
 
         // Select the last used mode of search:
-        if (Globals.prefs.getBoolean("incrementS"))
+        if (Globals.prefs.getBoolean("incrementS")) {
             increment.setSelected(true);
-        else if (Globals.prefs.getBoolean("floatSearch"))
+        } else if (Globals.prefs.getBoolean("floatSearch")) {
             floatSearch.setSelected(true);
-        else if (Globals.prefs.getBoolean("showSearchInDialog"))
+        } else if (Globals.prefs.getBoolean("showSearchInDialog")) {
             showResultsInDialog.setSelected(true);
-        else if (Globals.prefs.getBoolean("searchAllBases"))
+        } else if (Globals.prefs.getBoolean("searchAllBases")) {
             searchAllBases.setSelected(true);
-        else
+        } else {
             hideSearch.setSelected(true);
+        }
 
         JPanel main = new JPanel();
         main.setLayout(gbl);
@@ -303,14 +310,17 @@ public class SearchManager2 extends SidePaneComponent
 
         searchField.getActionMap().put("repeat", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                if (increment.isSelected())
+                if (increment.isSelected()) {
                     repeatIncremental();
+                }
             }
         });
         searchField.getInputMap().put(Globals.prefs.getKey("Clear search"), "escape");
         searchField.getActionMap().put("escape", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 hideAway();
                 //SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
@@ -339,8 +349,9 @@ public class SearchManager2 extends SidePaneComponent
             searchField.addKeyListener(this);
         }
         else {
-            if (searchAutoComplete.isSelected() && autoCompleteListener != null)
+            if (searchAutoComplete.isSelected() && (autoCompleteListener != null)) {
                 searchField.addKeyListener(autoCompleteListener);
+            }
         }
     }
 
@@ -351,10 +362,11 @@ public class SearchManager2 extends SidePaneComponent
      * @param l
      */
     public void addSearchListener(SearchTextListener l) {
-        if (listeners.contains(l))
+        if (listeners.contains(l)) {
             return;
-        else
+        } else {
             listeners.add(l);
+        }
         //fire event for the new subscriber
         l.searchText(getSearchwords(searchField.getText()));
     }
@@ -396,8 +408,9 @@ public class SearchManager2 extends SidePaneComponent
         }
 
         //fire an event for every listener
-        for (SearchTextListener s : listeners)
+        for (SearchTextListener s : listeners) {
             s.searchText(words);
+        }
     }
 
     /** force the search button to be large enough for
@@ -416,8 +429,9 @@ public class SearchManager2 extends SidePaneComponent
      * Instantiate the search dialog, unless it has already been instantiated:
      */
     protected void instantiateSearchDialog() {
-        if (searchDialog == null)
+        if (searchDialog == null) {
             searchDialog = new SearchResultsDialog(frame, Globals.lang("Search results"));
+        }
     }
 
     public void updatePrefs() {
@@ -457,15 +471,15 @@ public class SearchManager2 extends SidePaneComponent
             searchField.selectAll();
             searchField.requestFocus();
         } else {
-            if (increment.isSelected())
+            if (increment.isSelected()) {
                 floatSearch.setSelected(true);
-            else if (floatSearch.isSelected())
+            } else if (floatSearch.isSelected()) {
                 hideSearch.setSelected(true);
-            else if (hideSearch.isSelected())
+            } else if (hideSearch.isSelected()) {
                 showResultsInDialog.setSelected(true);
-            else if (showResultsInDialog.isSelected())
+            } else if (showResultsInDialog.isSelected()) {
                 searchAllBases.setSelected(true);
-            else {
+            } else {
                 increment.setSelected(true);
             }
             increment.revalidate();
@@ -483,6 +497,7 @@ public class SearchManager2 extends SidePaneComponent
 
         Runnable t = new Runnable() {
 
+            @Override
             public void run() {
                 clearSearch();
             }
@@ -491,6 +506,7 @@ public class SearchManager2 extends SidePaneComponent
         SwingUtilities.invokeLater(t);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == escape) {
@@ -556,6 +572,7 @@ public class SearchManager2 extends SidePaneComponent
             this.searchTerm = searchTerm;
         }
 
+        @Override
         public void run() {
             if (!searchAllBases.isSelected()) {
                 // Search only the current database:
@@ -563,8 +580,9 @@ public class SearchManager2 extends SidePaneComponent
 
                     boolean hit = rules.applyRule(searchTerm, entry) > 0;
                     entry.setSearchHit(hit);
-                    if (hit)
+                    if (hit) {
                         hits++;
+                    }
                 }
             }
             else {
@@ -575,13 +593,15 @@ public class SearchManager2 extends SidePaneComponent
 
                         boolean hit = rules.applyRule(searchTerm, entry) > 0;
                         entry.setSearchHit(hit);
-                        if (hit)
+                        if (hit) {
                             hits++;
+                        }
                     }
                 }
             }
         }
 
+        @Override
         public void update() {
             panel.output(Globals.lang("Searched database. Number of hits")
                     + ": " + hits);
@@ -604,8 +624,9 @@ public class SearchManager2 extends SidePaneComponent
                 for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                     BasePanel p = frame.baseAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()) {
-                        if (entry.isSearchHit())
+                        if (entry.isSearchHit()) {
                             searchDialog.addEntry(entry, p);
+                        }
                     }
                 }
                 searchDialog.selectFirstEntry();
@@ -626,8 +647,9 @@ public class SearchManager2 extends SidePaneComponent
                 instantiateSearchDialog();
                 searchDialog.clear();
                 for (BibtexEntry entry : panel.getDatabase().getEntries()) {
-                    if (entry.isSearchHit())
+                    if (entry.isSearchHit()) {
                         searchDialog.addEntry(entry, panel);
+                    }
                 }
                 searchDialog.selectFirstEntry();
                 searchDialog.setVisible(true);
@@ -678,6 +700,7 @@ public class SearchManager2 extends SidePaneComponent
         escape.setEnabled(false);
     }
 
+    @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() == increment) {
             if (startedFilterSearch || startedFloatSearch) {
@@ -701,8 +724,9 @@ public class SearchManager2 extends SidePaneComponent
 
     private void repeatIncremental() {
         incSearchPos++;
-        if (panel != null)
+        if (panel != null) {
             goIncremental();
+        }
     }
 
     /**
@@ -712,12 +736,14 @@ public class SearchManager2 extends SidePaneComponent
      * The variable incSearchPos keeps track of which entry was last
      * checked.
      */
+    @Override
     public void keyTyped(KeyEvent e) {
         if (e.isControlDown()) {
             return;
         }
-        if (panel != null)
+        if (panel != null) {
             goIncremental();
+        }
     }
 
     private void goIncremental() {
@@ -725,6 +751,7 @@ public class SearchManager2 extends SidePaneComponent
         escape.setEnabled(true);
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 String text = searchField.getText();
 
@@ -735,16 +762,18 @@ public class SearchManager2 extends SidePaneComponent
                     return;
                 }
 
-                if (searchField.getText().equals(""))
+                if (searchField.getText().equals("")) {
                     return;
-                if (incSearchPos < 0)
+                }
+                if (incSearchPos < 0) {
                     incSearchPos = 0;
+                }
                 BibtexEntry be = panel.mainTable.getEntryAt(incSearchPos);
                 while (!incSearcher.search(text, be)) {
                     incSearchPos++;
-                    if (incSearchPos < panel.getDatabase().getEntryCount())
+                    if (incSearchPos < panel.getDatabase().getEntryCount()) {
                         be = panel.mainTable.getEntryAt(incSearchPos);
-                    else {
+                    } else {
                         panel.output("'" + text + "' : " +
                                 Globals.lang("Incremental search failed. Repeat to search from top."));
                         incSearchPos = -1;
@@ -762,20 +791,25 @@ public class SearchManager2 extends SidePaneComponent
         });
     }
 
+    @Override
     public void componentClosing() {
         frame.searchToggle.setSelected(false);
         if (panel != null) {
-            if (startedFilterSearch || startedFloatSearch)
+            if (startedFilterSearch || startedFloatSearch) {
                 clearSearch();
+            }
         }
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
     }
 
+    @Override
     public void caretUpdate(CaretEvent e) {
         if (e.getSource() == searchField) {
             updateSearchButtonText();
@@ -786,20 +820,22 @@ public class SearchManager2 extends SidePaneComponent
      * the type of search that will happen on click. */
     private void updateSearchButtonText() {
         search.setText(!increment.isSelected()
-                && SearchExpressionParser.checkSyntax(
+                && (SearchExpressionParser.checkSyntax(
                         searchField.getText(),
                         caseSensitive.isSelected(),
-                        regExpSearch.isSelected()) != null
+                        regExpSearch.isSelected()) != null)
                 ? Globals.lang("Search specified field(s)")
                 : Globals.lang("Search all fields"));
     }
 
+    @Override
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
-        if (panel != null)
+        if (panel != null) {
             escape.setEnabled(panel.isShowingFloatSearch()
                     || panel.isShowingFilterSearch());
-        else
+        } else {
             escape.setEnabled(false);
+        }
     }
 }

@@ -40,6 +40,7 @@ import java.awt.event.MouseListener;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
@@ -69,27 +70,33 @@ public class FieldTextMenu implements MouseListener
         inputMenu.add(new ReplaceAction());
         inputMenu.add(new UrlAction());
 
-        if (myFieldName.getTextComponent() instanceof JTextComponent)
+        if (myFieldName.getTextComponent() instanceof JTextComponent) {
             inputMenu.add(new CaseChangeMenu((JTextComponent) myFieldName.getTextComponent()));
+        }
     }
 
+    @Override
     public void mouseClicked(MouseEvent e)
     {
     }
 
+    @Override
     public void mouseEntered(MouseEvent e)
     {
     }
 
+    @Override
     public void mouseExited(MouseEvent e)
     {
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         maybeShowPopup(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         maybeShowPopup(e);
@@ -106,9 +113,11 @@ public class FieldTextMenu implements MouseListener
                 // enable/disable copy to clipboard if selected text available
                 String txt = myFieldName.getSelectedText();
                 boolean cStat = false;
-                if (txt != null)
-                    if (txt.length() > 0)
+                if (txt != null) {
+                    if (txt.length() > 0) {
                         cStat = true;
+                    }
+                }
 
                 copyAct.setEnabled(cStat);
                 inputMenu.show(e.getComponent(), e.getX(), e.getY());
@@ -124,14 +133,14 @@ public class FieldTextMenu implements MouseListener
         public BasicAction(String text, String description, URL icon)
         {
             super(Globals.lang(text), new ImageIcon(icon));
-            putValue(SHORT_DESCRIPTION, Globals.lang(description));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
         }
 
         public BasicAction(String text, String description, URL icon, KeyStroke key)
         {
             super(Globals.lang(text), new ImageIcon(icon));
-            putValue(ACCELERATOR_KEY, key);
-            putValue(SHORT_DESCRIPTION, Globals.lang(description));
+            putValue(Action.ACCELERATOR_KEY, key);
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
         }
 
         public BasicAction(String text)
@@ -142,9 +151,10 @@ public class FieldTextMenu implements MouseListener
         public BasicAction(String text, KeyStroke key)
         {
             super(Globals.lang(text));
-            putValue(ACCELERATOR_KEY, key);
+            putValue(Action.ACCELERATOR_KEY, key);
         }
 
+        @Override
         public abstract void actionPerformed(ActionEvent e);
     }
 
@@ -171,15 +181,19 @@ public class FieldTextMenu implements MouseListener
                     GUIGlobals.getIconUrl("paste"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             try
             {
                 String data = ClipBoardManager.clipBoard.getClipboardContents();
-                if (data != null)
-                    if (data.length() > 0)
-                        if (myFieldName != null)
+                if (data != null) {
+                    if (data.length() > 0) {
+                        if (myFieldName != null) {
                             myFieldName.paste(data);
+                        }
+                    }
+                }
             } catch (Exception ignored) {
             }
         }
@@ -194,6 +208,7 @@ public class FieldTextMenu implements MouseListener
             super("Copy to clipboard", "Copy to clipboard", GUIGlobals.getIconUrl("copy"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             try
@@ -203,9 +218,11 @@ public class FieldTextMenu implements MouseListener
                 if (myFieldName != null)
                 {
                     String data = myFieldName.getSelectedText();
-                    if (data != null)
-                        if (data.length() > 0)
+                    if (data != null) {
+                        if (data.length() > 0) {
                             ClipBoardManager.clipBoard.setClipboardContents(data);
+                        }
+                    }
                 }
             } catch (Exception ignored) {
             }
@@ -216,9 +233,10 @@ public class FieldTextMenu implements MouseListener
 
         public ReplaceAction() {
             super("Normalize to BibTeX name format");
-            putValue(SHORT_DESCRIPTION, Globals.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             if (myFieldName.getText().equals("")) {
                 return;
@@ -234,9 +252,10 @@ public class FieldTextMenu implements MouseListener
 
         public UrlAction() {
             super("Clean Google URL");
-            putValue(SHORT_DESCRIPTION, Globals.lang("If possible, clean URL that Google search returned"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("If possible, clean URL that Google search returned"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             if (myFieldName.getText().equals("")) {
                 return;

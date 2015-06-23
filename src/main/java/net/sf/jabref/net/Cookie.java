@@ -78,10 +78,10 @@ public class Cookie {
                 this.path = value;
             } else if (name.equalsIgnoreCase("expires")) {
                 try {
-                    this.expires = expiresFormat1.parse(value);
+                    this.expires = Cookie.expiresFormat1.parse(value);
                 } catch (ParseException e) {
                     try {
-                        this.expires = expiresFormat2.parse(value);
+                        this.expires = Cookie.expiresFormat2.parse(value);
                     } catch (ParseException e2) {
                         throw new IllegalArgumentException(
                                 "Bad date format in header: " + value);
@@ -128,6 +128,7 @@ public class Cookie {
         return path.startsWith(this.path);
     }
 
+    @Override
     public String toString() {
         return name + "=" + value;
     }

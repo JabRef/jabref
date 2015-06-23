@@ -98,6 +98,7 @@ class ZipFileChooser extends JDialog {
          *  (non-Javadoc)
          * @see javax.swing.table.TableModel#getColumnCount()
          */
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
@@ -106,6 +107,7 @@ class ZipFileChooser extends JDialog {
          *  (non-Javadoc)
          * @see javax.swing.table.TableModel#getRowCount()
          */
+        @Override
         public int getRowCount() {
             return this.rows.length;
         }
@@ -114,6 +116,7 @@ class ZipFileChooser extends JDialog {
          *  (non-Javadoc)
          * @see javax.swing.table.TableModel#getColumnName(int)
          */
+        @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }
@@ -141,6 +144,7 @@ class ZipFileChooser extends JDialog {
          *  (non-Javadoc)
          * @see javax.swing.table.TableModel#getValueAt(int, int)
          */
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Object value = null;
             ZipEntry entry = getZipEntry(rowIndex);
@@ -157,7 +161,7 @@ class ZipFileChooser extends JDialog {
 
 
     /** table of Zip entries */
-    private JTable table;
+    private final JTable table;
     /** shortcut to preferences */
     private final JabRefPreferences prefs = Globals.prefs;
     /** this */
@@ -170,6 +174,7 @@ class ZipFileChooser extends JDialog {
      *  (non-Javadoc)
      * @see java.awt.Component#getSize()
      */
+    @Override
     public Dimension getSize() {
         return new Dimension(400, 300);
     }
@@ -209,6 +214,7 @@ class ZipFileChooser extends JDialog {
         JButton cancelButton = new JButton(Globals.lang("Cancel"));
         cancelButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -218,6 +224,7 @@ class ZipFileChooser extends JDialog {
         JButton okButton = new JButton(Globals.lang("Ok"));
         okButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row != -1) {

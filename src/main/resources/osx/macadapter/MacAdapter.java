@@ -20,12 +20,6 @@ import java.util.List;
 
 import net.sf.jabref.JabRefFrame;
 
-import com.apple.eawt.*;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.OpenFilesEvent;
-import com.apple.eawt.AppEvent.PreferencesEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
-
 public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler, OpenFilesHandler {
 
 	private JabRefFrame parentFrame = null;
@@ -45,30 +39,34 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
 		if (parentFrame != null) {
 			List<File> files = event.getFiles();
 		
-			for (int i=0; i<files.size(); i++) 
-				parentFrame.openAction(files.get(i).getAbsolutePath());
+			for (int i=0; i<files.size(); i++) {
+                parentFrame.openAction(files.get(i).getAbsolutePath());
+            }
 		}
 	} 
 
 	@Override
 	public void handleQuitRequestWith(QuitEvent evt, QuitResponse resp) {
 		if (parentFrame != null) {
-			if (parentFrame.quit())
-				resp.performQuit();
-			else
-				resp.cancelQuit();
+			if (parentFrame.quit()) {
+                resp.performQuit();
+            } else {
+                resp.cancelQuit();
+            }
 		}
 	}
 
 	@Override
 	public void handleAbout(AboutEvent arg0) {
-		if (parentFrame != null)
-			parentFrame.about();
+		if (parentFrame != null) {
+            parentFrame.about();
+        }
 	}
 
 	@Override
 	public void handlePreferences(PreferencesEvent arg0) {
-		if (parentFrame != null)
-			parentFrame.preferences();
+		if (parentFrame != null) {
+            parentFrame.preferences();
+        }
 	} 	
 }

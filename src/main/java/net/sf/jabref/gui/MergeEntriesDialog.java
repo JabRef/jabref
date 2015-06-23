@@ -143,7 +143,7 @@ public class MergeEntriesDialog extends JDialog {
             JLabel label = new JLabel(columnHeadings[i]);
             Font font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-            this.add(label, cc.xy(1 + i * 2, 1));
+            this.add(label, cc.xy(1 + (i * 2), 1));
 
         }
 
@@ -168,9 +168,10 @@ public class MergeEntriesDialog extends JDialog {
             for (int k = 0; k < 3; k += 2) {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
-                this.add(rb[k][0], cc.xy(5 + k * 2, 3));
+                this.add(rb[k][0], cc.xy(5 + (k * 2), 3));
                 rb[k][0].addChangeListener(new ChangeListener() {
 
+                    @Override
                     public void stateChanged(ChangeEvent e) {
                         updateAll();
                     }
@@ -226,9 +227,10 @@ public class MergeEntriesDialog extends JDialog {
                 for (int k = 0; k < 3; k++) {
                     rb[k][row - 3] = new JRadioButton();
                     rbg[row - 3].add(rb[k][row - 3]);
-                    this.add(rb[k][row - 3], cc.xy(5 + k * 2, row));
+                    this.add(rb[k][row - 3], cc.xy(5 + (k * 2), row));
                     rb[k][row - 3].addChangeListener(new ChangeListener() {
 
+                        @Override
                         public void stateChanged(ChangeEvent e) {
                             updateAll();
                         }
@@ -303,6 +305,7 @@ public class MergeEntriesDialog extends JDialog {
         cancel.setActionCommand("cancel");
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 buttonPressed(e.getActionCommand());
             }
@@ -312,6 +315,7 @@ public class MergeEntriesDialog extends JDialog {
         newentry.setActionCommand("newentry");
         newentry.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 buttonPressed(e.getActionCommand());
             }
@@ -321,6 +325,7 @@ public class MergeEntriesDialog extends JDialog {
         replaceentries.setActionCommand("replace");
         replaceentries.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 buttonPressed(e.getActionCommand());
             }

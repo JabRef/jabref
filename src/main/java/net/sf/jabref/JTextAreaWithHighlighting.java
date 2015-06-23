@@ -78,6 +78,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         // Listen for undo and redo events
         doc.addUndoableEditListener(new UndoableEditListener() {
 
+            @Override
             public void undoableEditHappened(UndoableEditEvent evt) {
                 undo.addEdit(evt.getEdit());
             }
@@ -87,6 +88,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         getActionMap().put("Undo",
                 new AbstractAction("Undo") {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         try {
                             if (undo.canUndo()) {
@@ -104,6 +106,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         getActionMap().put("Redo",
                 new AbstractAction("Redo") {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         try {
                             if (undo.canRedo()) {
@@ -149,12 +152,13 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         // myTa.set
         h.removeAllHighlights();
 
-        if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
+        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
             return;
         }
         String content = getText();
-        if (content.isEmpty())
+        if (content.isEmpty()) {
             return;
+        }
 
         Matcher matcher = Globals.getPatternForWords(words).matcher(content);
 
@@ -175,10 +179,12 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         if (Globals.prefs.getBoolean("highLightWords")) {
             highLight(wordsToHighlight);
         }
-        if (undo != null)
+        if (undo != null) {
             undo.discardAllEdits();
+        }
     }
 
+    @Override
     public void searchText(ArrayList<String> words) {
         // words have to be stored in class variable as 
         // setText() makes use of them

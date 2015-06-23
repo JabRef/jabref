@@ -16,6 +16,7 @@ public class LabelLinkListener implements MouseListener {
         this.component = c;
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         try {
             Util.openExternalViewer(new MetaData(), "http://www.mr-dlib.org/docs/jabref_metadata_extraction_alpha.php", "url");
@@ -24,18 +25,22 @@ public class LabelLinkListener implements MouseListener {
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
 
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
         component.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
         component.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 

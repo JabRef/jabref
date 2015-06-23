@@ -27,7 +27,7 @@ public class TestUtils {
             Component[] children = ((Container) parent).getComponents();
 
             for (Component aChildren : children) {
-                Component child = getChildNamed(aChildren, name);
+                Component child = TestUtils.getChildNamed(aChildren, name);
                 if (child != null) {
                     return child;
                 }

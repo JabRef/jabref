@@ -39,8 +39,9 @@ public class FileHistory extends JMenu implements ActionListener {
             setText(name.substring(0, i) + name.substring(i + 1));
             char mnemonic = Character.toUpperCase(name.charAt(i + 1));
             setMnemonic((int) mnemonic);
-        } else
+        } else {
             setText(name);
+        }
 
         this.prefs = prefs;
         this.frame = frame;
@@ -50,8 +51,9 @@ public class FileHistory extends JMenu implements ActionListener {
                 history.addFirst(old[i]);
             }
             setItems();
-        } else
+        } else {
             setEnabled(false);
+        }
     }
 
     /**
@@ -63,8 +65,9 @@ public class FileHistory extends JMenu implements ActionListener {
     public void newFile(String filename) {
         int i = 0;
         while (i < history.size()) {
-            if (history.get(i).equals(filename))
+            if (history.get(i).equals(filename)) {
                 history.remove(i--);
+            }
             i++;
         }
         history.addFirst(filename);
@@ -72,8 +75,9 @@ public class FileHistory extends JMenu implements ActionListener {
             history.removeLast();
         }
         setItems();
-        if (!isEnabled())
+        if (!isEnabled()) {
             setEnabled(true);
+        }
     }
 
     private void setItems() {
@@ -110,12 +114,14 @@ public class FileHistory extends JMenu implements ActionListener {
     public void storeHistory() {
         if (history.size() > 0) {
             String[] names = new String[history.size()];
-            for (int i = 0; i < names.length; i++)
+            for (int i = 0; i < names.length; i++) {
                 names[i] = history.get(i);
+            }
             prefs.putStringArray("recentFiles", names);
         }
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         String name = ((JMenuItem) e.getSource()).getText();
         int pos = name.indexOf(" ");
@@ -131,6 +137,7 @@ public class FileHistory extends JMenu implements ActionListener {
         }
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
                 frame.open.openIt(fileToOpen, true);
             }

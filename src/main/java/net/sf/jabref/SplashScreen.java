@@ -72,6 +72,7 @@ public class SplashScreen extends Window {
     /**
      * Updates the display area of the window.
      */
+    @Override
     public void update(Graphics g) {
         // Note: Since the paint method is going to draw an
         // image that covers the complete area of the component we
@@ -86,6 +87,7 @@ public class SplashScreen extends Window {
      * Paints the image on the window.
      */
 
+    @Override
     public void paint(Graphics g) {
         g.drawImage(splashImage, 0, 0, this);
 

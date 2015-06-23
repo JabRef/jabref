@@ -56,7 +56,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        String urlString = String.format(URL_PATTERN, q);
+        String urlString = String.format(DiVAtoBibTeXFetcher.URL_PATTERN, q);
 
         // Send the request
         URL url;
@@ -117,9 +117,9 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             inspector.addEntry(entry);
 
             return true;
-        }
-        else
+        } else {
             return false;
+        }
 
     }
 

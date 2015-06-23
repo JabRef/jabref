@@ -34,29 +34,34 @@ public class Quality extends SpecialField {
         TEXT_DONE_PATTERN = "Toggled quality for %0 entries";
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_QUALITY;
     }
 
     public static Quality getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Quality();
+        if (Quality.INSTANCE == null) {
+            Quality.INSTANCE = new Quality();
         }
-        return INSTANCE;
+        return Quality.INSTANCE;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
     }
 
+    @Override
     public String getToolTip() {
         return this.getValues().get(0).getToolTipText();
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Quality");
     }
 
+    @Override
     public boolean isSingleValueField() {
         return true;
     }

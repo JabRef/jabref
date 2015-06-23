@@ -21,14 +21,14 @@ public class TestUtils {
      * @see TestUtils#closeJabRef()
      */
     public static void initJabRef() {
-        disableSystemExit();
+        TestUtils.disableSystemExit();
         try {
-            String[] args = {"-p", " ", PATH_TO_TEST_BIBTEX};
+            String[] args = {"-p", " ", TestUtils.PATH_TO_TEST_BIBTEX};
             JabRef.main(args);
         } catch (ExitException ignored) {
 
         } finally {
-            enableSystemExit();
+            TestUtils.enableSystemExit();
         }
     }
 
@@ -51,6 +51,7 @@ public class TestUtils {
     private static void disableSystemExit() {
         final SecurityManager securityManager = new SecurityManager() {
 
+            @Override
             public void checkPermission(Permission permission) {
                 if (permission.getName().contains("exitVM")) {
                     throw new ExitException();

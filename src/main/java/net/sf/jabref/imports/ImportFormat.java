@@ -145,6 +145,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *  (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return getFormatName().hashCode();
     }
@@ -153,10 +154,11 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *  (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object o) {
-        return o != null
-                && o instanceof ImportFormat
-                && ((ImportFormat) o).getIsCustomImporter() == getIsCustomImporter()
+        return (o != null)
+                && (o instanceof ImportFormat)
+                && (((ImportFormat) o).getIsCustomImporter() == getIsCustomImporter())
                 && ((ImportFormat) o).getFormatName().equals(getFormatName());
     }
 
@@ -164,6 +166,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *  (non-Javadoc)
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return getFormatName();
     }
@@ -172,6 +175,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *  (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
+    @Override
     public int compareTo(ImportFormat importer) {
         int result;
         if (getIsCustomImporter() == importer.getIsCustomImporter()) {

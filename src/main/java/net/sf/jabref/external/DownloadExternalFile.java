@@ -66,8 +66,9 @@ public class DownloadExternalFile {
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
 
-        if (res == null || res.trim().length() == 0)
+        if ((res == null) || (res.trim().length() == 0)) {
             return;
+        }
 
         URL url;
         try {
@@ -116,14 +117,16 @@ public class DownloadExternalFile {
         //System.out.println("Time: "+(System.currentTimeMillis()-time));
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
 
                 try {
                     udlF.downloadToFile(tmp);
                 } catch (IOException e2) {
                     dontShowDialog = true;
-                    if ((editor != null) && (editor.isVisible()))
+                    if ((editor != null) && (editor.isVisible())) {
                         editor.setVisible(false, false);
+                    }
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                                     + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
@@ -134,6 +137,7 @@ public class DownloadExternalFile {
                 // Download finished: call the method that stops the progress bar etc.:
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         downloadFinished();
                     }
@@ -161,10 +165,11 @@ public class DownloadExternalFile {
         String suggestedName = bibtexKey != null ? getSuggestedFileName(suffix) : "";
         String[] fDirectory = getFileDirectory(res);
         final String directory;
-        if (fDirectory.length == 0)
+        if (fDirectory.length == 0) {
             directory = null;
-        else
+        } else {
             directory = fDirectory[0];
+        }
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
         File file = new File(new File(suggestDir), suggestedName);
         FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getCanonicalPath() : "",
@@ -174,6 +179,7 @@ public class DownloadExternalFile {
         editor.setOkEnabled(false);
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
 
+            @Override
             public boolean confirmClose(FileListEntry entry) {
                 File f = directory != null ? expandFilename(directory, entry.getLink())
                         : new File(entry.getLink());
@@ -188,26 +194,30 @@ public class DownloadExternalFile {
                             (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                                     Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
                     == JOptionPane.OK_OPTION;
-                } else
+                } else {
                     return true;
+                }
             }
         });
-        if (!dontShowDialog) // If an error occured with the URL, this flag may have been set
+        if (!dontShowDialog) {
             editor.setVisible(true, false);
-        else
+        } else {
             return;
+        }
         // Editor closed. Go on:
         if (editor.okPressed()) {
             File toFile = directory != null ? expandFilename(directory, entry.getLink())
                     : new File(entry.getLink());
             String dirPrefix;
             if (directory != null) {
-                if (!directory.endsWith(System.getProperty("file.separator")))
+                if (!directory.endsWith(System.getProperty("file.separator"))) {
                     dirPrefix = directory + System.getProperty("file.separator");
-                else
+                } else {
                     dirPrefix = directory;
-            } else
+                }
+            } else {
                 dirPrefix = null;
+            }
 
             try {
                 boolean success = Util.copyFile(tmp, toFile, true);
@@ -231,8 +241,9 @@ public class DownloadExternalFile {
             tmp.delete();
         } else {
             // Cancelled. Just delete the temp file:
-            if (downloadFinished)
+            if (downloadFinished) {
                 tmp.delete();
+            }
         }
 
     }
@@ -269,8 +280,9 @@ public class DownloadExternalFile {
     public String getSuggestedFileName(String suffix) {
 
         String plannedName = bibtexKey;
-        if (suffix.length() > 0)
+        if (suffix.length() > 0) {
             plannedName += "." + suffix;
+        }
 
         /*
         * [ 1548875 ] download pdf produces unsupported filename
@@ -300,7 +312,7 @@ public class DownloadExternalFile {
         try {
             // Try to strip the query string, if any, to get the correct suffix:
             URL url = new URL(link);
-            if ((url.getQuery() != null) && (url.getQuery().length() < link.length() - 1)) {
+            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
         } catch (MalformedURLException e) {
@@ -310,31 +322,35 @@ public class DownloadExternalFile {
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
         int index = strippedLink.lastIndexOf('.');
-        if ((index <= 0) || (index == strippedLink.length() - 1)) // No occurence, or at the end
+        if ((index <= 0) || (index == (strippedLink.length() - 1))) {
             suffix = null;
-        else
+        } else {
             suffix = strippedLink.substring(index + 1);
+        }
         if (Globals.prefs.getExternalFileTypeByExt(suffix) != null) {
             return suffix;
         } else {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == strippedLink.length() - 1)) {
+            if ((index <= 0) || (index == (strippedLink.length() - 1))) {
                 // No occurence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (suffix.indexOf('/') > 0)
+                if (suffix.indexOf('/') > 0) {
                     return "";
-                else
+                }
+                else {
                     return suffix; // return the first one we found, anyway.
+                }
             } else {
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (link.substring(index + 1).indexOf('/') > 0)
+                if (link.substring(index + 1).indexOf('/') > 0) {
                     return "";
-                else
+                } else {
                     return link.substring(index + 1);
+                }
             }
         }
 

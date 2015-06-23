@@ -23,6 +23,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)/(first unique booktitle word)
+    @Override
     public String applyRule(BibtexEntry oldEntry) {
         String newLabel = "";
 
@@ -53,9 +54,9 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
                 String tempString = authorTokens.nextToken();
                 tempString = tempString.replaceAll(",", "");
                 boolean done = false;
-                while (tempString != null && !done) {
+                while ((tempString != null) && !done) {
                     tempString = tempString.replaceAll(",", "").trim();
-                    if (tempString.trim().length() > 3 && !KeyWord.getKeyWord().isKeyWord(tempString)) {
+                    if ((tempString.trim().length() > 3) && !KeyWord.getKeyWord().isKeyWord(tempString)) {
                         done = true;
                     }
                     else {
@@ -68,7 +69,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
                     }
                 }
 
-                if (tempString != null && (!tempString.contains("null"))) {
+                if ((tempString != null) && (!tempString.contains("null"))) {
                     newLabel += String.valueOf(tempString.toLowerCase());
                 }
             }

@@ -39,10 +39,12 @@ public class DefaultAutoCompleter extends AbstractAutoCompleter {
         _fieldName = fieldName;
     }
 
+    @Override
     public boolean isSingleUnitField() {
         return false;
     }
 
+    @Override
     public String[] complete(String s) {
         return super.complete(s);
     }

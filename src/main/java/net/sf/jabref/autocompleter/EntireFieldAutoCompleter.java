@@ -35,10 +35,12 @@ public class EntireFieldAutoCompleter extends AbstractAutoCompleter {
         _fieldName = fieldName;
     }
 
+    @Override
     public boolean isSingleUnitField() {
         return true;
     }
 
+    @Override
     public String[] complete(String s) {
         return super.complete(s);
     }

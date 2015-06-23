@@ -35,10 +35,12 @@ public class CrossrefAutoCompleter extends AbstractAutoCompleter {
         _fieldName = fieldName;
     }
 
+    @Override
     public boolean isSingleUnitField() {
         return false;
     }
 
+    @Override
     public String[] complete(String s) {
         return super.complete(s);
     }
@@ -47,8 +49,9 @@ public class CrossrefAutoCompleter extends AbstractAutoCompleter {
     public void addBibtexEntry(BibtexEntry entry) {
         if (entry != null) {
             String key = entry.getCiteKey();
-            if (key != null)
+            if (key != null) {
                 addWordToIndex(key.trim());
+            }
         }
     }
 }

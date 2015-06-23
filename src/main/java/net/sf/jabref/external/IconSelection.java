@@ -62,6 +62,7 @@ public class IconSelection extends JDialog {
         init(initialSelection);
     }
 
+    @Override
     public void setVisible(boolean visible) {
         if (visible) {
             okPressed = false;
@@ -80,10 +81,11 @@ public class IconSelection extends JDialog {
     }
 
     public String getSelectedIconKey() {
-        if (selected >= 0)
+        if (selected >= 0) {
             return iconKeys.get(selected);
-        else
+        } else {
             return null;
+        }
     }
 
     private void init(String initialSelection) {
@@ -95,8 +97,9 @@ public class IconSelection extends JDialog {
             ImageIcon icon = GUIGlobals.getImage(key);
             if (!iconSet.contains(icon)) {
                 iconKeys.add(key);
-                if (key.equals(initialSelection))
+                if (key.equals(initialSelection)) {
                     initSelIndex = iconKeys.size() - 1;
+                }
             }
             iconSet.add(icon);
 
@@ -118,6 +121,7 @@ public class IconSelection extends JDialog {
                 comp.setHorizontalAlignment(JLabel.CENTER);
             }
 
+            @Override
             public Component getListCellRendererComponent(JList list, Object value, int i,
                     boolean isSelected,
                     boolean hasFocus) {
@@ -137,8 +141,9 @@ public class IconSelection extends JDialog {
             }
         }
 
-        if (initSelIndex >= 0)
+        if (initSelIndex >= 0) {
             icons.setSelectedIndex(initSelIndex);
+        }
         icons.setCellRenderer(new MyRenderer());
         icons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         icons.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -152,15 +157,18 @@ public class IconSelection extends JDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = true;
-                if (icons.getSelectedValue() != null)
+                if (icons.getSelectedValue() != null) {
                     selected = icons.getSelectedIndex();
+                }
                 dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = false;
                 dispose();

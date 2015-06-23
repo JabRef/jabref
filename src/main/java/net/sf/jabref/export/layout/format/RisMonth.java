@@ -20,9 +20,11 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class RisMonth implements LayoutFormatter {
 
+    @Override
     public String format(String month) {
-        if (month == null)
+        if (month == null) {
             return "";
+        }
 
         MonthUtil.Month m = MonthUtil.getMonthByShortName(month);
         if (m.isValid()) {

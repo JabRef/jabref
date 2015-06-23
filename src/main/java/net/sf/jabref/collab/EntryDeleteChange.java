@@ -52,6 +52,7 @@ public class EntryDeleteChange extends Change {
         sp = new JScrollPane(pp);
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         panel.database().removeEntry(memEntry.getId());
         undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
@@ -59,6 +60,7 @@ public class EntryDeleteChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

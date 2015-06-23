@@ -96,6 +96,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     /**
      * This method is called when dragging stuff *from* the table.
      */
+    @Override
     public Transferable createTransferable(JComponent c) {
         if (!draggingFile) {
             /* so we can assume it will never be called if entryTable==null: */
@@ -114,6 +115,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      * database.
      * 
      */
+    @Override
     public boolean importData(JComponent comp, Transferable t) {
 
         // If the drop target is the main table, we want to record which
@@ -211,14 +213,16 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-        if (!DROP_ALLOWED)
+        if (!EntryTableTransferHandler.DROP_ALLOWED) {
             return false;
+        }
 
         // accept this if any input flavor matches any of our supported flavors
         for (DataFlavor inflav : transferFlavors) {
             if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                    || inflav.match(DataFlavor.javaFileListFlavor))
+                    || inflav.match(DataFlavor.javaFileListFlavor)) {
                 return true;
+            }
         }
 
         // System.out.println("drop type forbidden");
@@ -230,6 +234,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     boolean draggingFile = false;
 
 
+    @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         /* TODO: add support for dragging file link from table icon into other apps */
         if (e instanceof MouseEvent) {
@@ -249,11 +254,13 @@ public class EntryTableTransferHandler extends TransferHandler {
         super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
     }
 
+    @Override
     protected void exportDone(JComponent source, Transferable data, int action) {
         // default implementation is OK
         super.exportDone(source, data, action);
     }
 
+    @Override
     public void exportToClipboard(JComponent comp, Clipboard clip, int action) {
         // default implementation is OK
         super.exportToClipboard(comp, clip, action);
@@ -266,8 +273,10 @@ public class EntryTableTransferHandler extends TransferHandler {
             // This appears to be a dragged file link and not a reference
             // format. Check if we can map this to a set of files:
             if (handleDraggedFilenames(dropStr, dropRow))
+             {
                 return true;
             // If not, handle it in the normal way...
+            }
         } else if (dropStr.startsWith("http:")) {
             // This is the way URL links are received on OS X and KDE (Gnome?):
             URL url = new URL(dropStr);
@@ -318,16 +327,18 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
 
             // Unless an exception was thrown, we should have the sanitized path:
-            if (fl != null)
+            if (fl != null) {
                 line = fl.getPath();
-            else if (line.startsWith("file:"))
+            } else if (line.startsWith("file:")) {
                 line = line.substring(5);
-            else
+            } else {
                 continue;
+            }
             // Under Gnome, the link is given as file:///...., so we
             // need to strip the extra slashes:
-            if (line.startsWith("//"))
+            if (line.startsWith("//")) {
                 line = line.substring(2);
+            }
 
             File f = new File(line);
             if (f.exists()) {
@@ -348,7 +359,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     private boolean handleDraggedFilenames(String s, final int dropRow) {
 
-        return handleDraggedFiles(getFilesFromDraggedFilesString(s), dropRow);
+        return handleDraggedFiles(EntryTableTransferHandler.getFilesFromDraggedFilesString(s), dropRow);
 
     }
 
@@ -372,6 +383,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // This process must be spun off into a background thread:
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
                 // Done by MrDlib
                 final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
@@ -435,7 +447,7 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if (fileType != null && dropRow >= 0) {
+            if ((fileType != null) && (dropRow >= 0)) {
 
                 /*
                  * TODO: need to signal if this is a local or autodownloaded

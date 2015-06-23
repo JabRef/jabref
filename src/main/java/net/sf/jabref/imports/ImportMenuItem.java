@@ -61,6 +61,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         addActionListener(this);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         worker = new MyWorker();
         worker.init();
@@ -90,6 +91,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         boolean fileOk = false;
 
 
+        @Override
         public void init() {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
@@ -105,9 +107,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             }
         }
 
+        @Override
         public void run() {
-            if (!fileOk)
+            if (!fileOk) {
                 return;
+            }
 
             // We import all files and collect their results:
             List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<ImportFormatReader.UnknownFormatImport>();
@@ -152,11 +156,13 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 && pr.hasWarnings()) {
                             String[] wrns = pr.warnings();
                             StringBuffer wrn = new StringBuffer();
-                            for (int j = 0; j < wrns.length; j++)
+                            for (int j = 0; j < wrns.length; j++) {
                                 wrn.append(j + 1).append(". ").append(wrns[j])
                                         .append("\n");
-                            if (wrn.length() > 0)
+                            }
+                            if (wrn.length() > 0) {
                                 wrn.deleteCharAt(wrn.length() - 1);
+                            }
                             JOptionPane.showMessageDialog(frame, wrn.toString(),
                                     Globals.lang("Warnings"),
                                     JOptionPane.WARNING_MESSAGE);
@@ -166,9 +172,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             }
         }
 
+        @Override
         public void update() {
-            if (!fileOk)
+            if (!fileOk) {
                 return;
+            }
 
             // TODO: undo is not handled properly here, except for the entries
             // added by
@@ -197,10 +205,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
 
                         // Check if we should unmark entries before adding the new ones:
-                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting"))
+                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
                             for (BibtexEntry entry : toAddTo.getEntries()) {
                                 Util.unmarkEntry(entry, true, toAddTo, ce);
                             }
+                        }
 
                         for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()) {
                             try {
@@ -211,8 +220,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                     int answer = DuplicateResolverDialog.resolveDuplicateInImport
                                             (frame, duplicate, entry);
                                     // The upper entry is the
-                                    if (answer == DuplicateResolverDialog.DO_NOT_IMPORT)
+                                    if (answer == DuplicateResolverDialog.DO_NOT_IMPORT) {
                                         keepEntry = false;
+                                    }
                                     if (answer == DuplicateResolverDialog.IMPORT_AND_DELETE_OLD) {
                                         // Remove the old one and import the new one.
                                         toAddTo.removeEntry(duplicate.getId());
@@ -250,9 +260,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
 
             } else {
-                if (importer == null)
+                if (importer == null) {
                     frame.output(Globals.lang("Could not find a suitable import format."));
-                else {
+                } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError != null) {
                         JOptionPane.showMessageDialog(frame, importError.getMessage(), Globals.lang("Import failed"),
@@ -276,8 +286,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         boolean anythingUseful = false;
 
         for (ImportFormatReader.UnknownFormatImport importResult : imports) {
-            if (importResult == null)
+            if (importResult == null) {
                 continue;
+            }
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // Bibtex result. We must merge it into our main base.
                 ParserResult pr = importResult.parserResult;
@@ -322,8 +333,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             }
         }
 
-        if (!anythingUseful)
+        if (!anythingUseful) {
             return null;
+        }
 
         if ((imports.size() == 1) && (directParserResult != null)) {
             return directParserResult;

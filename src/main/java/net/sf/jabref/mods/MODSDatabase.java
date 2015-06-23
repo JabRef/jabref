@@ -47,8 +47,9 @@ public class MODSDatabase {
     }
 
     public MODSDatabase(BibtexDatabase bibtex, Set<String> keySet) {
-        if (keySet == null)
+        if (keySet == null) {
             keySet = bibtex.getKeySet();
+        }
         addEntries(bibtex, keySet);
     }
 

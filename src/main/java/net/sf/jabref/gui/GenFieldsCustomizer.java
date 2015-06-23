@@ -121,6 +121,7 @@ public class GenFieldsCustomizer extends JDialog {
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 //diag.requestFocus();
@@ -185,8 +186,9 @@ public class GenFieldsCustomizer extends JDialog {
                     .hasNext();) {
                 String field = j.next();
                 sb.append(field);
-                if (j.hasNext())
+                if (j.hasNext()) {
                     sb.append(";");
+                }
             }
             sb.append("\n");
         }
@@ -222,6 +224,7 @@ class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListe
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.ok_actionPerformed(e);
     }
@@ -236,6 +239,7 @@ class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionL
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.cancel_actionPerformed(e);
     }
@@ -250,6 +254,7 @@ class GenFieldsCustomizer_revert_actionAdapter implements java.awt.event.ActionL
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.revert_actionPerformed(e);
     }

@@ -69,6 +69,7 @@ public class ChangeScanner implements Runnable {
         this.f = file;
     }
 
+    @Override
     public void run() {
         try {
             //long startTime = System.currentTimeMillis();
@@ -120,6 +121,7 @@ public class ChangeScanner implements Runnable {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
                     Util.placeDialog(dial, frame);
@@ -142,6 +144,7 @@ public class ChangeScanner implements Runnable {
     private void storeTempDatabase() {
         JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
@@ -169,8 +172,9 @@ public class ChangeScanner implements Runnable {
             } else {
                 // Both exist. Check if they are different:
                 Vector<String> vit = inTemp.getData(key);
-                if (!vod.equals(vit))
+                if (!vod.equals(vit)) {
                     mdc.insertMetaDataChange(key, vod);
+                }
                 // Remember that we've handled this one:
                 handledOnDisk.add(key);
             }
@@ -183,8 +187,9 @@ public class ChangeScanner implements Runnable {
             }
         }
 
-        if (mdc.getChangeCount() > 0)
+        if (mdc.getChangeCount() > 0) {
             changes.add(mdc);
+        }
     }
 
     private void scanEntries(EntrySorter mem, EntrySorter tmp, EntrySorter disk) {
@@ -218,12 +223,13 @@ public class ChangeScanner implements Runnable {
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < disk.getEntryCount() - 1) {
+            if (piv2 < (disk.getEntryCount() - 1)) {
                 for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
-                    if (!used.contains("" + i))
+                    if (!used.contains("" + i)) {
                         comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
-                    else
+                    } else {
                         comp = -1;
+                    }
 
                     if (comp > 1) {
                         used.add("" + i);
@@ -250,14 +256,14 @@ public class ChangeScanner implements Runnable {
                 double bestMatch = 0;
                 double comp;
 
-                if (piv2 < disk.getEntryCount() - 1) {
+                if (piv2 < (disk.getEntryCount() - 1)) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
                         if (!used.contains("" + i)) {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
                                     disk.getEntryAt(i));
-                        }
-                        else
+                        } else {
                             comp = -1;
+                        }
 
                         if (comp > bestMatch) {
                             bestMatch = comp;
@@ -346,8 +352,9 @@ public class ChangeScanner implements Runnable {
                 comp = res;
                 found = i;
             }
-            if (comp > 1)
+            if (comp > 1) {
                 break;
+            }
         }
         return neu.getEntryAt(found);
     }
@@ -355,8 +362,9 @@ public class ChangeScanner implements Runnable {
     private void scanPreamble(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
         String mem = inMem.getPreamble(), tmp = onTmp.getPreamble(), disk = onDisk.getPreamble();
         if (tmp != null) {
-            if ((disk == null) || !tmp.equals(disk))
+            if ((disk == null) || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(tmp, mem, disk));
+            }
         }
         else if ((disk != null) && !disk.equals("")) {
             changes.add(new PreambleChange(tmp, mem, disk));
@@ -365,8 +373,9 @@ public class ChangeScanner implements Runnable {
 
     private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
         int nTmp = onTmp.getStringCount(), nDisk = onDisk.getStringCount();
-        if ((nTmp == 0) && (nDisk == 0))
+        if ((nTmp == 0) && (nDisk == 0)) {
             return;
+        }
 
         HashSet<Object> used = new HashSet<Object>();
         HashSet<Object> usedInMem = new HashSet<Object>();
@@ -386,12 +395,13 @@ public class ChangeScanner implements Runnable {
                         if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
                             BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
-                            if (mem != null)
+                            if (mem != null) {
                                 changes.add(new StringChange(mem, tmp, tmp.getName(),
                                         mem.getContent(),
                                         tmp.getContent(), disk.getContent()));
-                            else
+                            } else {
                                 changes.add(new StringChange(null, tmp, tmp.getName(), null, tmp.getContent(), disk.getContent()));
+                            }
                         }
                         used.add(diskId);
                         //if (j==piv2)
@@ -470,8 +480,9 @@ public class ChangeScanner implements Runnable {
     }
 
     private BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
-        if (!base.hasStringLabel(name))
+        if (!base.hasStringLabel(name)) {
             return null;
+        }
         for (String key : base.getStringKeySet()) {
             BibtexString bs = base.getString(key);
             if (bs.getName().equals(name) && !used.contains(key)) {
@@ -490,9 +501,10 @@ public class ChangeScanner implements Runnable {
     public void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
-        if (groupsTmp == null && groupsDisk == null)
+        if ((groupsTmp == null) && (groupsDisk == null)) {
             return;
-        if ((groupsTmp != null && groupsDisk == null) || (groupsTmp == null)) {
+        }
+        if (((groupsTmp != null) && (groupsDisk == null)) || (groupsTmp == null)) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }

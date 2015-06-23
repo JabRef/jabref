@@ -26,12 +26,13 @@ public class RankCompact extends Rank {
     }
 
     public static RankCompact getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RankCompact();
+        if (RankCompact.INSTANCE == null) {
+            RankCompact.INSTANCE = new RankCompact();
         }
-        return INSTANCE;
+        return RankCompact.INSTANCE;
     }
 
+    @Override
     public ImageIcon getRepresentingIcon() {
         return GUIGlobals.getImage("ranking");
     }

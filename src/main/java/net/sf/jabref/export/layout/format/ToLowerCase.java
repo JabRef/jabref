@@ -47,6 +47,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class ToLowerCase implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         return fieldText.toLowerCase();
     }

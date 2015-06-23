@@ -158,8 +158,9 @@ public class ParserResult {
      * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-        if (!warnings.contains(s))
+        if (!warnings.contains(s)) {
             warnings.add(s);
+        }
     }
 
     public boolean hasWarnings() {
@@ -168,8 +169,9 @@ public class ParserResult {
 
     public String[] warnings() {
         String[] s = new String[warnings.size()];
-        for (int i = 0; i < warnings.size(); i++)
+        for (int i = 0; i < warnings.size(); i++) {
             s[i] = warnings.get(i);
+        }
         return s;
     }
 
@@ -178,8 +180,9 @@ public class ParserResult {
      * @param key The duplicated key
      */
     public void addDuplicateKey(String key) {
-        if (!duplicateKeys.contains(key))
+        if (!duplicateKeys.contains(key)) {
             duplicateKeys.add(key);
+        }
     }
 
     /**

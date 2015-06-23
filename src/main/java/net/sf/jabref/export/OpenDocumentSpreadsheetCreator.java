@@ -43,9 +43,10 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         super(Globals.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
     }
 
+    @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData,
             final String file, final String encoding, Set<String> keySet) throws Exception {
-        exportOpenDocumentSpreadsheet(new File(file), database, keySet);
+        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
     public static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
@@ -78,9 +79,9 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
             // Add manifest (required for OOo 2.0) and "meta.xml": These are in the
             // resource/ods directory, and are copied verbatim into the zip file.
-            addResourceFile("meta.xml", "/resource/ods/meta.xml", out);
+            OpenDocumentSpreadsheetCreator.addResourceFile("meta.xml", "/resource/ods/meta.xml", out);
 
-            addResourceFile("META-INF/manifest.xml", "/resource/ods/manifest.xml", out);
+            OpenDocumentSpreadsheetCreator.addResourceFile("META-INF/manifest.xml", "/resource/ods/manifest.xml", out);
 
             //zipEntry = new ZipEntry()
 
@@ -93,11 +94,11 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
-        exportOpenDocumentSpreadsheetXML(tmpFile, database, keySet);
+        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, keySet);
 
         // Then add the content to the zip file:
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile));
-        storeOpenDocumentSpreadsheetFile(file, in);
+        OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
 
         // Delete the temporary file:
         tmpFile.delete();
@@ -128,7 +129,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {
         ZipEntry zipEntry = new ZipEntry(name);
         out.putNextEntry(zipEntry);
-        addFromResource(resource, out);
+        OpenDocumentSpreadsheetCreator.addFromResource(resource, out);
         out.closeEntry();
     }
 
@@ -140,8 +141,9 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             synchronized (out) {
                 while (true) {
                     int bytesRead = in.read(buffer);
-                    if (bytesRead == -1)
+                    if (bytesRead == -1) {
                         break;
+                    }
                     out.write(buffer, 0, bytesRead);
                 }
             }

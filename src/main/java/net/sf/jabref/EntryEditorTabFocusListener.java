@@ -39,6 +39,7 @@ class EntryEditorTabFocusListener implements FocusListener {
         this.entryEditorTab = entryEditorTab;
     }
 
+    @Override
     public void focusGained(FocusEvent e) {
 
         synchronized (this) {
@@ -63,14 +64,17 @@ class EntryEditorTabFocusListener implements FocusListener {
                         }
                     }
 
+                    @Override
                     public void changedUpdate(DocumentEvent e) {
                         fire();
                     }
 
+                    @Override
                     public void insertUpdate(DocumentEvent e) {
                         fire();
                     }
 
+                    @Override
                     public void removeUpdate(DocumentEvent e) {
                         fire();
                     }
@@ -98,6 +102,7 @@ class EntryEditorTabFocusListener implements FocusListener {
 
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
         synchronized (this) {
             if (c != null) {
@@ -106,7 +111,8 @@ class EntryEditorTabFocusListener implements FocusListener {
                 d = null;
             }
         }
-        if (!e.isTemporary())
+        if (!e.isTemporary()) {
             entryEditorTab.getParent().updateField(e.getSource());
+        }
     }
 }

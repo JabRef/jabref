@@ -30,209 +30,210 @@ public class FormatChars implements LayoutFormatter {
     public static final HashMap<String, String> CHARS = new HashMap<String, String>();
 
     static {
-        CHARS.put("`A", "À"); // #192
-        CHARS.put("'A", "�?"); // #193
-        CHARS.put("^A", "Â"); // #194
-        CHARS.put("~A", "Ã"); // #195
-        CHARS.put("\"A", "Ä"); // #196
-        CHARS.put("AA", "Å"); // #197
-        CHARS.put("AE", "Æ"); // #198
-        CHARS.put("cC", "Ç"); // #199
-        CHARS.put("`E", "È"); // #200
-        CHARS.put("'E", "É"); // #201
-        CHARS.put("^E", "Ê"); // #202
-        CHARS.put("\"E", "Ë"); // #203
-        CHARS.put("`I", "Ì"); // #204
-        CHARS.put("'I", "�?"); // #205
-        CHARS.put("^I", "Î"); // #206
-        CHARS.put("\"I", "�?"); // #207
-        CHARS.put("DH", "�?"); // #208
-        CHARS.put("~N", "Ñ"); // #209
-        CHARS.put("`O", "Ò"); // #210
-        CHARS.put("'O", "Ó"); // #211
-        CHARS.put("^O", "Ô"); // #212
-        CHARS.put("~O", "Õ"); // #213
-        CHARS.put("\"O", "Ö"); // #214
+        FormatChars.CHARS.put("`A", "À"); // #192
+        FormatChars.CHARS.put("'A", "�?"); // #193
+        FormatChars.CHARS.put("^A", "Â"); // #194
+        FormatChars.CHARS.put("~A", "Ã"); // #195
+        FormatChars.CHARS.put("\"A", "Ä"); // #196
+        FormatChars.CHARS.put("AA", "Å"); // #197
+        FormatChars.CHARS.put("AE", "Æ"); // #198
+        FormatChars.CHARS.put("cC", "Ç"); // #199
+        FormatChars.CHARS.put("`E", "È"); // #200
+        FormatChars.CHARS.put("'E", "É"); // #201
+        FormatChars.CHARS.put("^E", "Ê"); // #202
+        FormatChars.CHARS.put("\"E", "Ë"); // #203
+        FormatChars.CHARS.put("`I", "Ì"); // #204
+        FormatChars.CHARS.put("'I", "�?"); // #205
+        FormatChars.CHARS.put("^I", "Î"); // #206
+        FormatChars.CHARS.put("\"I", "�?"); // #207
+        FormatChars.CHARS.put("DH", "�?"); // #208
+        FormatChars.CHARS.put("~N", "Ñ"); // #209
+        FormatChars.CHARS.put("`O", "Ò"); // #210
+        FormatChars.CHARS.put("'O", "Ó"); // #211
+        FormatChars.CHARS.put("^O", "Ô"); // #212
+        FormatChars.CHARS.put("~O", "Õ"); // #213
+        FormatChars.CHARS.put("\"O", "Ö"); // #214
         // According to ISO 8859-1 the "\times" symbol should be placed here
         // (#215).
         // Omitting this, because it is a mathematical symbol.
-        CHARS.put("O", "Ø"); // #216
-        CHARS.put("`U", "Ù"); // #217
-        CHARS.put("'U", "Ú"); // #218
-        CHARS.put("^U", "Û"); // #219
-        CHARS.put("\"U", "Ü"); // #220
-        CHARS.put("'Y", "�?"); // #221
-        CHARS.put("TH", "Þ"); // #222
-        CHARS.put("ss", "ß"); // #223
-        CHARS.put("`a", "à"); // #224
-        CHARS.put("'a", "á"); // #225
-        CHARS.put("^a", "â"); // #226
-        CHARS.put("~a", "ã"); // #227
-        CHARS.put("\"a", "ä"); // #228
-        CHARS.put("aa", "å"); // #229
-        CHARS.put("ae", "æ"); // #230
-        CHARS.put("cc", "ç"); // #231
-        CHARS.put("`e", "è"); // #232
-        CHARS.put("'e", "é"); // #233
-        CHARS.put("^e", "ê"); // #234
-        CHARS.put("\"e", "ë"); // #235
-        CHARS.put("`i", "ì"); // #236
-        CHARS.put("'i", "í"); // #237
-        CHARS.put("^i", "î"); // #238
-        CHARS.put("\"i", "ï"); // #239
-        CHARS.put("dh", "ð"); // #240
-        CHARS.put("~n", "ñ"); // #241
-        CHARS.put("`o", "ò"); // #242
-        CHARS.put("'o", "ó"); // #243
-        CHARS.put("^o", "ô"); // #244
-        CHARS.put("~o", "õ"); // #245
-        CHARS.put("\"o", "ö"); // #246
+        FormatChars.CHARS.put("O", "Ø"); // #216
+        FormatChars.CHARS.put("`U", "Ù"); // #217
+        FormatChars.CHARS.put("'U", "Ú"); // #218
+        FormatChars.CHARS.put("^U", "Û"); // #219
+        FormatChars.CHARS.put("\"U", "Ü"); // #220
+        FormatChars.CHARS.put("'Y", "�?"); // #221
+        FormatChars.CHARS.put("TH", "Þ"); // #222
+        FormatChars.CHARS.put("ss", "ß"); // #223
+        FormatChars.CHARS.put("`a", "à"); // #224
+        FormatChars.CHARS.put("'a", "á"); // #225
+        FormatChars.CHARS.put("^a", "â"); // #226
+        FormatChars.CHARS.put("~a", "ã"); // #227
+        FormatChars.CHARS.put("\"a", "ä"); // #228
+        FormatChars.CHARS.put("aa", "å"); // #229
+        FormatChars.CHARS.put("ae", "æ"); // #230
+        FormatChars.CHARS.put("cc", "ç"); // #231
+        FormatChars.CHARS.put("`e", "è"); // #232
+        FormatChars.CHARS.put("'e", "é"); // #233
+        FormatChars.CHARS.put("^e", "ê"); // #234
+        FormatChars.CHARS.put("\"e", "ë"); // #235
+        FormatChars.CHARS.put("`i", "ì"); // #236
+        FormatChars.CHARS.put("'i", "í"); // #237
+        FormatChars.CHARS.put("^i", "î"); // #238
+        FormatChars.CHARS.put("\"i", "ï"); // #239
+        FormatChars.CHARS.put("dh", "ð"); // #240
+        FormatChars.CHARS.put("~n", "ñ"); // #241
+        FormatChars.CHARS.put("`o", "ò"); // #242
+        FormatChars.CHARS.put("'o", "ó"); // #243
+        FormatChars.CHARS.put("^o", "ô"); // #244
+        FormatChars.CHARS.put("~o", "õ"); // #245
+        FormatChars.CHARS.put("\"o", "ö"); // #246
         // According to ISO 8859-1 the "\div" symbol should be placed here
         // (#247).
         // Omitting this, because it is a mathematical symbol.
-        CHARS.put("o", "ø"); // #248
-        CHARS.put("`u", "ù"); // #249
-        CHARS.put("'u", "ú"); // #250
-        CHARS.put("^u", "û"); // #251
-        CHARS.put("\"u", "ü"); // #252
-        CHARS.put("'y", "ý"); // #253
-        CHARS.put("th", "þ"); // #254
-        CHARS.put("\"y", "ÿ"); // #255
+        FormatChars.CHARS.put("o", "ø"); // #248
+        FormatChars.CHARS.put("`u", "ù"); // #249
+        FormatChars.CHARS.put("'u", "ú"); // #250
+        FormatChars.CHARS.put("^u", "û"); // #251
+        FormatChars.CHARS.put("\"u", "ü"); // #252
+        FormatChars.CHARS.put("'y", "ý"); // #253
+        FormatChars.CHARS.put("th", "þ"); // #254
+        FormatChars.CHARS.put("\"y", "ÿ"); // #255
 
         // HTML special characters without names (UNICODE Latin Extended-A),
         // indicated by UNICODE number
-        CHARS.put("=A", "Ā"); // "Amacr"
-        CHARS.put("=a", "�?"); // "amacr"
-        CHARS.put("uA", "Ă"); // "Abreve"
-        CHARS.put("ua", "ă"); // "abreve"
-        CHARS.put("kA", "Ą"); // "Aogon"
-        CHARS.put("ka", "ą"); // "aogon"
-        CHARS.put("'C", "Ć"); // "Cacute"
-        CHARS.put("'c", "ć"); // "cacute"
-        CHARS.put("^C", "Ĉ"); // "Ccirc"
-        CHARS.put("^c", "ĉ"); // "ccirc"
-        CHARS.put(".C", "Ċ"); // "Cdot"
-        CHARS.put(".c", "ċ"); // "cdot"
-        CHARS.put("vC", "Č"); // "Ccaron"
-        CHARS.put("vc", "�?"); // "ccaron"
-        CHARS.put("vD", "Ď"); // "Dcaron"
+        FormatChars.CHARS.put("=A", "Ā"); // "Amacr"
+        FormatChars.CHARS.put("=a", "�?"); // "amacr"
+        FormatChars.CHARS.put("uA", "Ă"); // "Abreve"
+        FormatChars.CHARS.put("ua", "ă"); // "abreve"
+        FormatChars.CHARS.put("kA", "Ą"); // "Aogon"
+        FormatChars.CHARS.put("ka", "ą"); // "aogon"
+        FormatChars.CHARS.put("'C", "Ć"); // "Cacute"
+        FormatChars.CHARS.put("'c", "ć"); // "cacute"
+        FormatChars.CHARS.put("^C", "Ĉ"); // "Ccirc"
+        FormatChars.CHARS.put("^c", "ĉ"); // "ccirc"
+        FormatChars.CHARS.put(".C", "Ċ"); // "Cdot"
+        FormatChars.CHARS.put(".c", "ċ"); // "cdot"
+        FormatChars.CHARS.put("vC", "Č"); // "Ccaron"
+        FormatChars.CHARS.put("vc", "�?"); // "ccaron"
+        FormatChars.CHARS.put("vD", "Ď"); // "Dcaron"
         // Symbol #271 (d�) has no special Latex command
-        CHARS.put("DJ", "�?"); // "Dstrok"
-        CHARS.put("dj", "đ"); // "dstrok"
-        CHARS.put("=E", "Ē"); // "Emacr"
-        CHARS.put("=e", "ē"); // "emacr"
-        CHARS.put("uE", "Ĕ"); // "Ebreve"
-        CHARS.put("ue", "ĕ"); // "ebreve"
-        CHARS.put(".E", "Ė"); // "Edot"
-        CHARS.put(".e", "ė"); // "edot"
-        CHARS.put("kE", "Ę"); // "Eogon"
-        CHARS.put("ke", "ę"); // "eogon"
-        CHARS.put("vE", "Ě"); // "Ecaron"
-        CHARS.put("ve", "ě"); // "ecaron"
-        CHARS.put("^G", "Ĝ"); // "Gcirc"
-        CHARS.put("^g", "�?"); // "gcirc"
-        CHARS.put("uG", "Ğ"); // "Gbreve"
-        CHARS.put("ug", "ğ"); // "gbreve"
-        CHARS.put(".G", "Ġ"); // "Gdot"
-        CHARS.put(".g", "ġ"); // "gdot"
-        CHARS.put("cG", "Ģ"); // "Gcedil"
-        CHARS.put("'g", "ģ"); // "gacute"
-        CHARS.put("^H", "Ĥ"); // "Hcirc"
-        CHARS.put("^h", "ĥ"); // "hcirc"
-        CHARS.put("Hstrok", "Ħ"); // "Hstrok"
-        CHARS.put("hstrok", "ħ"); // "hstrok"
-        CHARS.put("~I", "Ĩ"); // "Itilde"
-        CHARS.put("~i", "ĩ"); // "itilde"
-        CHARS.put("=I", "Ī"); // "Imacr"
-        CHARS.put("=i", "ī"); // "imacr"
-        CHARS.put("uI", "Ĭ"); // "Ibreve"
-        CHARS.put("ui", "ĭ"); // "ibreve"
-        CHARS.put("kI", "Į"); // "Iogon"
-        CHARS.put("ki", "į"); // "iogon"
-        CHARS.put(".I", "İ"); // "Idot"
-        CHARS.put("i", "ı"); // "inodot"
+        FormatChars.CHARS.put("DJ", "�?"); // "Dstrok"
+        FormatChars.CHARS.put("dj", "đ"); // "dstrok"
+        FormatChars.CHARS.put("=E", "Ē"); // "Emacr"
+        FormatChars.CHARS.put("=e", "ē"); // "emacr"
+        FormatChars.CHARS.put("uE", "Ĕ"); // "Ebreve"
+        FormatChars.CHARS.put("ue", "ĕ"); // "ebreve"
+        FormatChars.CHARS.put(".E", "Ė"); // "Edot"
+        FormatChars.CHARS.put(".e", "ė"); // "edot"
+        FormatChars.CHARS.put("kE", "Ę"); // "Eogon"
+        FormatChars.CHARS.put("ke", "ę"); // "eogon"
+        FormatChars.CHARS.put("vE", "Ě"); // "Ecaron"
+        FormatChars.CHARS.put("ve", "ě"); // "ecaron"
+        FormatChars.CHARS.put("^G", "Ĝ"); // "Gcirc"
+        FormatChars.CHARS.put("^g", "�?"); // "gcirc"
+        FormatChars.CHARS.put("uG", "Ğ"); // "Gbreve"
+        FormatChars.CHARS.put("ug", "ğ"); // "gbreve"
+        FormatChars.CHARS.put(".G", "Ġ"); // "Gdot"
+        FormatChars.CHARS.put(".g", "ġ"); // "gdot"
+        FormatChars.CHARS.put("cG", "Ģ"); // "Gcedil"
+        FormatChars.CHARS.put("'g", "ģ"); // "gacute"
+        FormatChars.CHARS.put("^H", "Ĥ"); // "Hcirc"
+        FormatChars.CHARS.put("^h", "ĥ"); // "hcirc"
+        FormatChars.CHARS.put("Hstrok", "Ħ"); // "Hstrok"
+        FormatChars.CHARS.put("hstrok", "ħ"); // "hstrok"
+        FormatChars.CHARS.put("~I", "Ĩ"); // "Itilde"
+        FormatChars.CHARS.put("~i", "ĩ"); // "itilde"
+        FormatChars.CHARS.put("=I", "Ī"); // "Imacr"
+        FormatChars.CHARS.put("=i", "ī"); // "imacr"
+        FormatChars.CHARS.put("uI", "Ĭ"); // "Ibreve"
+        FormatChars.CHARS.put("ui", "ĭ"); // "ibreve"
+        FormatChars.CHARS.put("kI", "Į"); // "Iogon"
+        FormatChars.CHARS.put("ki", "į"); // "iogon"
+        FormatChars.CHARS.put(".I", "İ"); // "Idot"
+        FormatChars.CHARS.put("i", "ı"); // "inodot"
         // Symbol #306 (IJ) has no special Latex command
         // Symbol #307 (ij) has no special Latex command
-        CHARS.put("^J", "Ĵ"); // "Jcirc"
-        CHARS.put("^j", "ĵ"); // "jcirc"
-        CHARS.put("cK", "Ķ"); // "Kcedil"
-        CHARS.put("ck", "ķ"); // "kcedil"
+        FormatChars.CHARS.put("^J", "Ĵ"); // "Jcirc"
+        FormatChars.CHARS.put("^j", "ĵ"); // "jcirc"
+        FormatChars.CHARS.put("cK", "Ķ"); // "Kcedil"
+        FormatChars.CHARS.put("ck", "ķ"); // "kcedil"
         // Symbol #312 (k) has no special Latex command
-        CHARS.put("'L", "Ĺ"); // "Lacute"
-        CHARS.put("'l", "ĺ"); // "lacute"
-        CHARS.put("cL", "Ļ"); // "Lcedil"
-        CHARS.put("cl", "ļ"); // "lcedil"
+        FormatChars.CHARS.put("'L", "Ĺ"); // "Lacute"
+        FormatChars.CHARS.put("'l", "ĺ"); // "lacute"
+        FormatChars.CHARS.put("cL", "Ļ"); // "Lcedil"
+        FormatChars.CHARS.put("cl", "ļ"); // "lcedil"
         // Symbol #317 (L�) has no special Latex command
         // Symbol #318 (l�) has no special Latex command
-        CHARS.put("Lmidot", "Ŀ"); // "Lmidot"
-        CHARS.put("lmidot", "ŀ"); // "lmidot"
-        CHARS.put("L", "�?"); // "Lstrok"
-        CHARS.put("l", "ł"); // "lstrok"
-        CHARS.put("'N", "Ń"); // "Nacute"
-        CHARS.put("'n", "ń"); // "nacute"
-        CHARS.put("cN", "Ņ"); // "Ncedil"
-        CHARS.put("cn", "ņ"); // "ncedil"
-        CHARS.put("vN", "Ň"); // "Ncaron"
-        CHARS.put("vn", "ň"); // "ncaron"
+        FormatChars.CHARS.put("Lmidot", "Ŀ"); // "Lmidot"
+        FormatChars.CHARS.put("lmidot", "ŀ"); // "lmidot"
+        FormatChars.CHARS.put("L", "�?"); // "Lstrok"
+        FormatChars.CHARS.put("l", "ł"); // "lstrok"
+        FormatChars.CHARS.put("'N", "Ń"); // "Nacute"
+        FormatChars.CHARS.put("'n", "ń"); // "nacute"
+        FormatChars.CHARS.put("cN", "Ņ"); // "Ncedil"
+        FormatChars.CHARS.put("cn", "ņ"); // "ncedil"
+        FormatChars.CHARS.put("vN", "Ň"); // "Ncaron"
+        FormatChars.CHARS.put("vn", "ň"); // "ncaron"
         // Symbol #329 (�n) has no special Latex command
-        CHARS.put("NG", "Ŋ"); // "ENG"
-        CHARS.put("ng", "ŋ"); // "eng"
-        CHARS.put("=O", "Ō"); // "Omacr"
-        CHARS.put("=o", "�?"); // "omacr"
-        CHARS.put("uO", "Ŏ"); // "Obreve"
-        CHARS.put("uo", "�?"); // "obreve"
-        CHARS.put("HO", "�?"); // "Odblac"
-        CHARS.put("Ho", "ő"); // "odblac"
-        CHARS.put("OE", "Œ"); // "OElig"
-        CHARS.put("oe", "œ"); // "oelig"
-        CHARS.put("'R", "Ŕ"); // "Racute"
-        CHARS.put("'r", "ŕ"); // "racute"
-        CHARS.put("cR", "Ŗ"); // "Rcedil"
-        CHARS.put("cr", "ŗ"); // "rcedil"
-        CHARS.put("vR", "Ř"); // "Rcaron"
-        CHARS.put("vr", "ř"); // "rcaron"
-        CHARS.put("'S", "Ś"); // "Sacute"
-        CHARS.put("'s", "ś"); // "sacute"
-        CHARS.put("^S", "Ŝ"); // "Scirc"
-        CHARS.put("^s", "�?"); // "scirc"
-        CHARS.put("cS", "Ş"); // "Scedil"
-        CHARS.put("cs", "ş"); // "scedil"
-        CHARS.put("vS", "Š"); // "Scaron"
-        CHARS.put("vs", "š"); // "scaron"
-        CHARS.put("cT", "Ţ"); // "Tcedil"
-        CHARS.put("ct", "ţ"); // "tcedil"
-        CHARS.put("vT", "Ť"); // "Tcaron"
+        FormatChars.CHARS.put("NG", "Ŋ"); // "ENG"
+        FormatChars.CHARS.put("ng", "ŋ"); // "eng"
+        FormatChars.CHARS.put("=O", "Ō"); // "Omacr"
+        FormatChars.CHARS.put("=o", "�?"); // "omacr"
+        FormatChars.CHARS.put("uO", "Ŏ"); // "Obreve"
+        FormatChars.CHARS.put("uo", "�?"); // "obreve"
+        FormatChars.CHARS.put("HO", "�?"); // "Odblac"
+        FormatChars.CHARS.put("Ho", "ő"); // "odblac"
+        FormatChars.CHARS.put("OE", "Œ"); // "OElig"
+        FormatChars.CHARS.put("oe", "œ"); // "oelig"
+        FormatChars.CHARS.put("'R", "Ŕ"); // "Racute"
+        FormatChars.CHARS.put("'r", "ŕ"); // "racute"
+        FormatChars.CHARS.put("cR", "Ŗ"); // "Rcedil"
+        FormatChars.CHARS.put("cr", "ŗ"); // "rcedil"
+        FormatChars.CHARS.put("vR", "Ř"); // "Rcaron"
+        FormatChars.CHARS.put("vr", "ř"); // "rcaron"
+        FormatChars.CHARS.put("'S", "Ś"); // "Sacute"
+        FormatChars.CHARS.put("'s", "ś"); // "sacute"
+        FormatChars.CHARS.put("^S", "Ŝ"); // "Scirc"
+        FormatChars.CHARS.put("^s", "�?"); // "scirc"
+        FormatChars.CHARS.put("cS", "Ş"); // "Scedil"
+        FormatChars.CHARS.put("cs", "ş"); // "scedil"
+        FormatChars.CHARS.put("vS", "Š"); // "Scaron"
+        FormatChars.CHARS.put("vs", "š"); // "scaron"
+        FormatChars.CHARS.put("cT", "Ţ"); // "Tcedil"
+        FormatChars.CHARS.put("ct", "ţ"); // "tcedil"
+        FormatChars.CHARS.put("vT", "Ť"); // "Tcaron"
         // Symbol #357 (t�) has no special Latex command
-        CHARS.put("Tstrok", "Ŧ"); // "Tstrok"
-        CHARS.put("tstrok", "ŧ"); // "tstrok"
-        CHARS.put("~U", "Ũ"); // "Utilde"
-        CHARS.put("~u", "ũ"); // "utilde"
-        CHARS.put("=U", "Ū"); // "Umacr"
-        CHARS.put("=u", "ū"); // "umacr"
-        CHARS.put("uU", "Ŭ"); // "Ubreve"
-        CHARS.put("uu", "ŭ"); // "ubreve"
-        CHARS.put("rU", "Ů"); // "Uring"
-        CHARS.put("ru", "ů"); // "uring"
-        CHARS.put("HU", "ů"); // "Odblac"
-        CHARS.put("Hu", "ű"); // "odblac"
-        CHARS.put("kU", "Ų"); // "Uogon"
-        CHARS.put("ku", "ų"); // "uogon"
-        CHARS.put("^W", "Ŵ"); // "Wcirc"
-        CHARS.put("^w", "ŵ"); // "wcirc"
-        CHARS.put("^Y", "Ŷ"); // "Ycirc"
-        CHARS.put("^y", "ŷ"); // "ycirc"
-        CHARS.put("\"Y", "Ÿ"); // "Yuml"
-        CHARS.put("'Z", "Ź"); // "Zacute"
-        CHARS.put("'z", "ź"); // "zacute"
-        CHARS.put(".Z", "Ż"); // "Zdot"
-        CHARS.put(".z", "ż"); // "zdot"
-        CHARS.put("vZ", "Ž"); // "Zcaron"
-        CHARS.put("vz", "ž"); // "zcaron"
+        FormatChars.CHARS.put("Tstrok", "Ŧ"); // "Tstrok"
+        FormatChars.CHARS.put("tstrok", "ŧ"); // "tstrok"
+        FormatChars.CHARS.put("~U", "Ũ"); // "Utilde"
+        FormatChars.CHARS.put("~u", "ũ"); // "utilde"
+        FormatChars.CHARS.put("=U", "Ū"); // "Umacr"
+        FormatChars.CHARS.put("=u", "ū"); // "umacr"
+        FormatChars.CHARS.put("uU", "Ŭ"); // "Ubreve"
+        FormatChars.CHARS.put("uu", "ŭ"); // "ubreve"
+        FormatChars.CHARS.put("rU", "Ů"); // "Uring"
+        FormatChars.CHARS.put("ru", "ů"); // "uring"
+        FormatChars.CHARS.put("HU", "ů"); // "Odblac"
+        FormatChars.CHARS.put("Hu", "ű"); // "odblac"
+        FormatChars.CHARS.put("kU", "Ų"); // "Uogon"
+        FormatChars.CHARS.put("ku", "ų"); // "uogon"
+        FormatChars.CHARS.put("^W", "Ŵ"); // "Wcirc"
+        FormatChars.CHARS.put("^w", "ŵ"); // "wcirc"
+        FormatChars.CHARS.put("^Y", "Ŷ"); // "Ycirc"
+        FormatChars.CHARS.put("^y", "ŷ"); // "ycirc"
+        FormatChars.CHARS.put("\"Y", "Ÿ"); // "Yuml"
+        FormatChars.CHARS.put("'Z", "Ź"); // "Zacute"
+        FormatChars.CHARS.put("'z", "ź"); // "zacute"
+        FormatChars.CHARS.put(".Z", "Ż"); // "Zdot"
+        FormatChars.CHARS.put(".z", "ż"); // "zdot"
+        FormatChars.CHARS.put("vZ", "Ž"); // "Zcaron"
+        FormatChars.CHARS.put("vz", "ž"); // "zcaron"
         // Symbol #383 (f) has no special Latex command
-        CHARS.put("%", "%"); // percent sign
+        FormatChars.CHARS.put("%", "%"); // percent sign
     }
 
 
+    @Override
     public String format(String field) {
         int i;
         field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>");
@@ -252,7 +253,7 @@ public class FormatChars implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = CHARS.get(command);
+                    Object result = FormatChars.CHARS.get(command);
                     if (result != null) {
                         sb.append((String) result);
                     } else {
@@ -262,23 +263,23 @@ public class FormatChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
                     || (Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c)))) {
                 escaped = false;
 
-                if (!incommand)
+                if (!incommand) {
                     sb.append(c);
-                // Else we are in a command, and should not keep the letter.
-                else {
+                } else {
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
                             && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1)
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
+                        }
 
                         String command = currentCommand.toString();
                         i++;
@@ -293,18 +294,19 @@ public class FormatChars implements LayoutFormatter {
                             combody = field.substring(i, i + 1);
                             // System.out.println("... "+combody);
                         }
-                        Object result = CHARS.get(command + combody);
+                        Object result = FormatChars.CHARS.get(command + combody);
 
-                        if (result != null)
+                        if (result != null) {
                             sb.append((String) result);
+                        }
 
                         incommand = false;
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if (i + 1 == field.length()) {
+                        if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
-                            Object result = CHARS.get(command);
+                            Object result = FormatChars.CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -336,7 +338,7 @@ public class FormatChars implements LayoutFormatter {
                         argument = part;
                         if (argument != null) {
                             // handle common case of general latex command
-                            Object result = CHARS.get(command + argument);
+                            Object result = FormatChars.CHARS.get(command + argument);
                             // System.out.print("command: "+command+", arg: "+argument);
                             // System.out.print(", result: ");
                             // If found, then use translated version. If not, then keep
@@ -352,7 +354,7 @@ public class FormatChars implements LayoutFormatter {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = CHARS.get(command);
+                        Object result = FormatChars.CHARS.get(command);
                         if (result != null) {
                             sb.append((String) result);
                         } else {
@@ -360,7 +362,7 @@ public class FormatChars implements LayoutFormatter {
                             sb.append(command);
                         }
                     } else {
-                        Object result = CHARS.get(command);
+                        Object result = FormatChars.CHARS.get(command);
                         if (result != null) {
                             sb.append((String) result);
                         } else {

@@ -52,6 +52,7 @@ public class WaitForSaveOperation implements ActionListener {
         bb.addGlue();
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 cancelled = true;
                 t.stop();
@@ -79,6 +80,7 @@ public class WaitForSaveOperation implements ActionListener {
         return cancelled;
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         boolean anySaving = false;
         for (int i = 0; i < frame.baseCount(); i++) {

@@ -53,13 +53,13 @@ public class SQLUtil {
      * fields for this type.
      */
     public static void refreshFields() {
-        if (allFields == null) {
-            allFields = new ArrayList<String>();
+        if (SQLUtil.allFields == null) {
+            SQLUtil.allFields = new ArrayList<String>();
         } else {
-            allFields.clear();
+            SQLUtil.allFields.clear();
         }
-        uniqueInsert(allFields, BibtexFields.getAllFieldNames());
-        uniqueInsert(allFields, BibtexFields.getAllPrivateFieldNames());
+        SQLUtil.uniqueInsert(SQLUtil.allFields, BibtexFields.getAllFieldNames());
+        SQLUtil.uniqueInsert(SQLUtil.allFields, BibtexFields.getAllPrivateFieldNames());
     }
 
     /**
@@ -67,9 +67,10 @@ public class SQLUtil {
      * @return All existent fields for a bibtex entry
      */
     public static ArrayList<String> getAllFields() {
-        if (allFields == null)
-            refreshFields();
-        return allFields;
+        if (SQLUtil.allFields == null) {
+            SQLUtil.refreshFields();
+        }
+        return SQLUtil.allFields;
     }
 
     /**
@@ -80,12 +81,14 @@ public class SQLUtil {
         // create comma separated list of field names
         String fieldstr = "";
         String field;
-        for (int i = 0; i < getAllFields().size(); i++) {
-            field = allFields.get(i);
-            if (i > 0)
+        for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
+            field = SQLUtil.allFields.get(i);
+            if (i > 0) {
                 fieldstr = fieldstr + ", ";
-            if (reservedDBWords.contains(field))
+            }
+            if (SQLUtil.reservedDBWords.contains(field)) {
                 field += "_";
+            }
             fieldstr = fieldstr + field;
         }
         return fieldstr;
@@ -105,9 +108,11 @@ public class SQLUtil {
             String[] array) {
         if (array != null) {
             for (String anArray : array) {
-                if (!list.contains(anArray))
-                    if (!anArray.equals("#"))
+                if (!list.contains(anArray)) {
+                    if (!anArray.equals("#")) {
                         list.add(anArray);
+                    }
+                }
             }
         }
         return list;
@@ -129,11 +134,13 @@ public class SQLUtil {
         ListIterator<String> li = fields.listIterator();
         while (li.hasNext()) {
             field = li.next();
-            if (reservedDBWords.contains(field))
+            if (SQLUtil.reservedDBWords.contains(field)) {
                 field = field + "_";
+            }
             str = str + field + datatype;
-            if (li.hasNext())
+            if (li.hasNext()) {
                 str = str + ", ";
+            }
         }
         return str;
     }
@@ -163,12 +170,13 @@ public class SQLUtil {
         String currentField;
         for (int i = 0; i < allFields.size(); i++) {
             currentField = allFields.get(i);
-            if (reqFields.contains(currentField))
+            if (reqFields.contains(currentField)) {
                 origList.set(i, "req");
-            else if (optFields.contains(currentField))
+            } else if (optFields.contains(currentField)) {
                 origList.set(i, "opt");
-            else if (utiFields.contains(currentField))
+            } else if (utiFields.contains(currentField)) {
                 origList.set(i, "uti");
+            }
         }
         return origList;
     }
@@ -204,7 +212,7 @@ public class SQLUtil {
     public static ResultSet queryAllFromTable(Connection conn, String tableName)
             throws SQLException {
         String query = "SELECT * FROM " + tableName + ";";
-        Statement res = (Statement) processQueryWithResults(conn, query);
+        Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
         return res.getResultSet();
     }
 
@@ -224,7 +232,7 @@ public class SQLUtil {
         }
         if (out instanceof Connection) {
             Connection conn = (Connection) out;
-            executeQuery(conn, dml);
+            SQLUtil.executeQuery(conn, dml);
         }
     }
 
@@ -248,7 +256,7 @@ public class SQLUtil {
         }
         if (out instanceof Connection) {
             Connection conn = (Connection) out;
-            return executeQueryWithResults(conn, query);
+            return SQLUtil.executeQueryWithResults(conn, query);
         }
         return null;
     }
@@ -282,7 +290,7 @@ public class SQLUtil {
      */
     public static String processQueryWithSingleResult(Connection conn,
             String query) throws SQLException {
-        ResultSet rs = executeQueryWithResults(conn, query)
+        ResultSet rs = SQLUtil.executeQueryWithResults(conn, query)
                 .getResultSet();
         rs.next();
         String result = rs.getString(1);

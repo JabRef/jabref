@@ -68,11 +68,13 @@ class ReplaceStringDialog extends JDialog {
         bg.add(field);
         ActionListener okListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 s1 = from.getText();
                 s2 = to.getText();
-                if (s1.equals(""))
+                if (s1.equals("")) {
                     return;
+                }
                 ok_pressed = true;
                 flds = Util.delimToStringArray(fields.getText().toLowerCase(), ";");
                 dispose();
@@ -83,6 +85,7 @@ class ReplaceStringDialog extends JDialog {
         fields.addActionListener(okListener);
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -211,13 +214,15 @@ class ReplaceStringDialog extends JDialog {
         if (allFields()) {
 
             for (String s : be.getAllFields()) {
-                if (!s.equals(BibtexFields.KEY_FIELD))
+                if (!s.equals(BibtexFields.KEY_FIELD)) {
                     counter += replaceField(be, s, ce);
+                }
             }
         } else {
             for (String fld : flds) {
-                if (!fld.equals(BibtexFields.KEY_FIELD))
+                if (!fld.equals(BibtexFields.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
+                }
             }
 
         }
@@ -226,8 +231,9 @@ class ReplaceStringDialog extends JDialog {
 
     public int replaceField(BibtexEntry be, String field, NamedCompound ce) {
         Object o = be.getField(field);
-        if (o == null)
+        if (o == null) {
             return 0;
+        }
         String txt = o.toString();
         StringBuffer sb = new StringBuffer();
         int ind, piv = 0, counter = 0, len1 = s1.length();

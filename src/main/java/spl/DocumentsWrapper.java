@@ -48,7 +48,7 @@ public class DocumentsWrapper {
         }
         if (xmlDocument.getAuthors() != null) {
             List<Bean> authors = xmlDocument.getAuthors().getCollection();
-            authors = sortAuthors(authors);
+            authors = DocumentsWrapper.sortAuthors(authors);
             String value = "";
             int i = 1;
             for (Bean author : authors) {
@@ -66,7 +66,7 @@ public class DocumentsWrapper {
         else {
             vector.add("");
         }
-        if (xmlDocument.getYear() != null && ((Year) xmlDocument.getYear()).getValue() != null && !((Year) xmlDocument.getYear()).getValue().equalsIgnoreCase("null")) {
+        if ((xmlDocument.getYear() != null) && (((Year) xmlDocument.getYear()).getValue() != null) && !((Year) xmlDocument.getYear()).getValue().equalsIgnoreCase("null")) {
             vector.add(((Year) xmlDocument.getYear()).getValue());
         }
         /*if(xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getYear() != null && !xmlDocument.getPublishdate().getYear().equalsIgnoreCase("null")){
@@ -81,28 +81,36 @@ public class DocumentsWrapper {
     }
 
     private String getNameComplete(Author author) {
-        if (author == null)
+        if (author == null) {
             return "";
+        }
         String result = "";
-        if (getSimpleTypeValue(author.getName_First()) != null)
+        if (getSimpleTypeValue(author.getName_First()) != null) {
             result = result + getSimpleTypeValue(author.getName_First()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Middle()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Middle()) != null) {
             result = result + getSimpleTypeValue(author.getName_Middle()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Last_Prefix()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Last_Prefix()) != null) {
             result = result + getSimpleTypeValue(author.getName_Last_Prefix()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Last()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Last()) != null) {
             result = result + getSimpleTypeValue(author.getName_Last()).trim() + " ";
-        if (getSimpleTypeValue(author.getName_Last_Suffix()) != null)
+        }
+        if (getSimpleTypeValue(author.getName_Last_Suffix()) != null) {
             result = result + getSimpleTypeValue(author.getName_Last_Suffix()).trim() + " ";
+        }
         return result.trim();
     }
 
     private String getSimpleTypeValue(Bean bean) {
-        if (bean == null || !(bean instanceof SimpleTypeElementBean))
+        if ((bean == null) || !(bean instanceof SimpleTypeElementBean)) {
             return null;
+        }
         SimpleTypeElementBean simpleTypeElementBean = (SimpleTypeElementBean) bean;
-        if (simpleTypeElementBean.getValue() == null || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || simpleTypeElementBean.getValue().length() <= 0)
+        if ((simpleTypeElementBean.getValue() == null) || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || (simpleTypeElementBean.getValue().length() <= 0)) {
             return null;
+        }
         return simpleTypeElementBean.getValue();
     }
 
@@ -112,13 +120,13 @@ public class DocumentsWrapper {
 
         while (unsorted) {
             unsorted = false;
-            for (int i = 0; i < authors.size() - 1; i++) {
+            for (int i = 0; i < (authors.size() - 1); i++) {
                 int rank = 99;
                 int otherRank = 99;
-                if (((Author) authors.get(i)).getRank() != null && !((Author) authors.get(i)).getRank().equalsIgnoreCase("null")) {
+                if ((((Author) authors.get(i)).getRank() != null) && !((Author) authors.get(i)).getRank().equalsIgnoreCase("null")) {
                     rank = Integer.parseInt(((Author) authors.get(i)).getRank());
                 }
-                if (((Author) authors.get(i + 1)).getRank() != null && !((Author) authors.get(i + 1)).getRank().equalsIgnoreCase("null")) {
+                if ((((Author) authors.get(i + 1)).getRank() != null) && !((Author) authors.get(i + 1)).getRank().equalsIgnoreCase("null")) {
                     otherRank = Integer.parseInt(((Author) authors.get(i + 1)).getRank());
                 }
 

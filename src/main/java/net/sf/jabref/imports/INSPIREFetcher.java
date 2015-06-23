@@ -72,7 +72,7 @@ public class INSPIREFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST)
+        StringBuffer sb = new StringBuffer("http://").append(INSPIREFetcher.INSPIRE_HOST)
                 .append("/");
         sb.append("/search?ln=en&ln=en&p=find+");
         //sb.append("spires/find/hep/www").append("?");
@@ -181,19 +181,23 @@ public class INSPIREFetcher implements EntryFetcher {
     /*
      * @see net.sf.jabref.imports.EntryFetcher
      */
+    @Override
     public String getHelpPage() {
         return "Spires.html";
     }
 
+    @Override
     public String getKeyName() {
         return "INSPIRE";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // we have no additional options
         return null;
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle(getKeyName());
     }
@@ -207,12 +211,14 @@ public class INSPIREFetcher implements EntryFetcher {
     public void done(int entriesImported) {
     }
 
+    @Override
     public void stopFetching() {
     }
 
     /*
      * @see java.lang.Runnable
      */
+    @Override
     public boolean processQuery(String query, ImportInspector dialog,
             OutputPrinter frame) {
         try {
@@ -224,9 +230,11 @@ public class INSPIREFetcher implements EntryFetcher {
 
             frame.setStatus("Adding fetched entries");
             /* add the entry to the inspection dialog */
-            if (bd.getEntryCount() > 0)
-                for (BibtexEntry entry : bd.getEntries())
+            if (bd.getEntryCount() > 0) {
+                for (BibtexEntry entry : bd.getEntries()) {
                     dialog.addEntry(entry);
+                }
+            }
 
             /* update the dialogs progress bar */
             // dialog.setProgress(i + 1, keys.length);

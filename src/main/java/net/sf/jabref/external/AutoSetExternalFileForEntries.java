@@ -58,14 +58,16 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         this.panel = panel;
     }
 
+    @Override
     public void init() {
 
         Collection<BibtexEntry> col = panel.database().getEntries();
         sel = col.toArray(new BibtexEntry[col.size()]);
 
         // Ask about rules for the operation:
-        if (optDiag == null)
+        if (optDiag == null) {
             optDiag = new OptionsDialog(panel.frame(), fieldName);
+        }
         Util.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
@@ -79,6 +81,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
+    @Override
     public void run() {
         if (!goOn) {
             panel.output(Globals.lang("No entries selected."));
@@ -111,8 +114,9 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
-                if ((old != null) && !old.equals("") && !overWriteAllowed)
+                if ((old != null) && !old.equals("") && !overWriteAllowed) {
                     continue;
+                }
                 extPan.setEntry(aSel, panel.getDatabase());
                 editor.setText((old != null) ? old : "");
                 JabRefExecutorService.INSTANCE.executeAndWait(extPan.autoSetFile(fieldName, editor));
@@ -184,9 +188,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
-        if (!goOn)
+        if (!goOn) {
             return;
+        }
 
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
                 new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
@@ -216,6 +222,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             this.fieldName = fieldName;
             ok.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;
                     dispose();
@@ -224,6 +231,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
             Action closeAction = new AbstractAction() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
@@ -287,9 +295,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             pack();
         }
 
+        @Override
         public void setVisible(boolean visible) {
-            if (visible)
+            if (visible) {
                 canceled = true;
+            }
 
             String[] dirs = panel.metaData().getFileDirectory(fieldName);
 

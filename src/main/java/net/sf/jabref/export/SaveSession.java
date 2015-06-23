@@ -59,7 +59,7 @@ public class SaveSession {
     public SaveSession(File file, String encoding, boolean backup) throws IOException,
             UnsupportedCharsetException {
         this.file = file;
-        tmp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
+        tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean("useLockFiles");
         this.backup = backup;
         this.encoding = encoding;
@@ -79,8 +79,9 @@ public class SaveSession {
     }
 
     public void commit() throws SaveException {
-        if (file == null)
+        if (file == null) {
             return;
+        }
         if (file.exists() && backup) {
             String name = file.getName();
             String path = file.getParent();
@@ -98,8 +99,9 @@ public class SaveSession {
                 try {
                     if (createLockFile()) {
                         // Oops, the lock file already existed. Try to wait it out:
-                        if (!Util.waitForFileLock(file, 10))
+                        if (!Util.waitForFileLock(file, 10)) {
                             throw SaveException.FILE_LOCKED;
+                        }
 
                     }
                 } catch (IOException ex) {
@@ -134,7 +136,7 @@ public class SaveSession {
      * @throws IOException if something happens during creation.
      */
     private boolean createLockFile() throws IOException {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (lock.exists()) {
             return true;
         }
@@ -156,7 +158,7 @@ public class SaveSession {
      * @throws IOException if something goes wrong.
      */
     private boolean deleteLockFile() {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;
         }

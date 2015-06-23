@@ -65,6 +65,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
         autoCompFullFirstOnly = Globals.prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
     }
 
+    @Override
     public boolean isSingleUnitField() {
         // quick hack
         // when used at entry fields (!this.lastNameOnlyAndSeparationBySpace), this is a single unit field
@@ -77,6 +78,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
         return !this.lastNameOnlyAndSeparationBySpace;
     }
 
+    @Override
     public void addBibtexEntry(BibtexEntry entry) {
         if (entry != null) {
             for (String fieldName : fieldNames) {
@@ -151,6 +153,7 @@ public class NameFieldAutoCompleter extends AbstractAutoCompleter {
         return str;
     }
 
+    @Override
     public String[] complete(String str) {
         // Normally, one would implement that using 
         // class inheritance. But this seemed to overengineered
