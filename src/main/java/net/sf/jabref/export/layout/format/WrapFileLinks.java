@@ -266,7 +266,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                 // Check if this escape sequence is meaningful:
                 if (c == '\\') {
                     // Escaped backslash: means that we add a backslash:
-                    sb.append(c);
+                    sb.append('\\');
                 } else if (WrapFileLinks.ESCAPE_SEQ.containsKey(c)) {
                     // Ok, we have the code. Add the previous string (if any) and
                     // the entry indicated by the escape sequence:
