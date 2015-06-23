@@ -347,36 +347,6 @@ public class UtilTest {
     }
 
     @Test
-    public void test2to4DigitsYear() {
-        assertEquals("1990", Util.toFourDigitYear("1990"));
-        assertEquals("190", Util.toFourDigitYear("190"));
-        assertEquals("1990", Util.toFourDigitYear("90", 1990));
-        assertEquals("1990", Util.toFourDigitYear("90", 1991));
-        assertEquals("2020", Util.toFourDigitYear("20", 1990));
-        assertEquals("1921", Util.toFourDigitYear("21", 1990));
-        assertEquals("1922", Util.toFourDigitYear("22", 1990));
-        assertEquals("2022", Util.toFourDigitYear("22", 1992));
-        assertEquals("1999", Util.toFourDigitYear("99", 2001));
-        assertEquals("1931", Util.toFourDigitYear("1931", 2001));
-        assertEquals("2031", Util.toFourDigitYear("31", 2001));
-        assertEquals("1932", Util.toFourDigitYear("32", 2001));
-        assertEquals("1944", Util.toFourDigitYear("44", 2001));
-        assertEquals("2011", Util.toFourDigitYear("11", 2001));
-
-        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        int d2 = thisYear % 100;
-
-        NumberFormat f = new DecimalFormat("00");
-
-        for (int i = 0; i <= 30; i++) {
-            assertTrue("" + i, thisYear <= Integer.parseInt(Util.toFourDigitYear(f.format((d2 + i) % 100))));
-        }
-        for (int i = 0; i < 70; i++) {
-            assertTrue("" + i, thisYear >= Integer.parseInt(Util.toFourDigitYear(f.format((d2 - i + 100) % 100))));
-        }
-    }
-
-    @Test
     public void testToUpperCharFirst() {
 
         assertEquals("", Util.toUpperFirstLetter(""));

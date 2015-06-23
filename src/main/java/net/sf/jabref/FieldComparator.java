@@ -122,8 +122,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
              * 
              * http://sourceforge.net/tracker/index.php?func=detail&aid=1285977&group_id=92314&atid=600307
              */
-            f1 = Util.toFourDigitYear((String) f1);
-            f2 = Util.toFourDigitYear((String) f2);
+            f1 = YearUtil.toFourDigitYear((String) f1);
+            f2 = YearUtil.toFourDigitYear((String) f2);
         } else if (isMonthField) {
             /*
              * [ 1535044 ] Month sorting
