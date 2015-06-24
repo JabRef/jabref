@@ -116,6 +116,7 @@ public abstract class DBExporter extends DBImporterExporter{
 	 * @param entries
 	 *            The BibtexEntries to export
 	 * @param out
+	 * 
 	 *            The output (PrintStream or Connection) object to which the DML
 	 *            should be written.
 	 */
@@ -133,17 +134,21 @@ public abstract class DBExporter extends DBImporterExporter{
 			for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
 				query = query + ", ";
 				val = entry.getField(SQLUtil.getAllFields().get(i));
+				
 				if (val != null) {
-					val = val.replace("\\", "\\\\");
-					val = val.replace("\"", "\\\"");
-					val = val.replace("\'", "''");
-					val = val.replace("`", "\\`");
+					if(dbStrings.getServerType().equals("MySQL")){
+						val = val.replace("\\", "\\\\");
+						val = val.replace("\"", "\\\"");
+						val = val.replace("\'", "''");
+						val = val.replace("`", "\\`");
+					}
 					query = query + "'" + val + "'";
 				} else {
 					query = query + "NULL";
 				}
 			}
 			query = query + ", '" + database_id + "');";
+			System.out.println("\nServer Type: " + dbStrings.getServerType());
 			SQLUtil.processQuery(out, query);
 		}
 	}
