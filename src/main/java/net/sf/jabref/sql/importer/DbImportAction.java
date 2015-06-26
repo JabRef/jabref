@@ -52,7 +52,6 @@ public class DbImportAction extends AbstractWorker {
 
     private BibtexDatabase database = null;
     private MetaData metaData = null;
-    private String errorMessage = null;
     private boolean connectToDB = false;
     private final JabRefFrame frame;
     private DBStrings dbs = null;
@@ -183,7 +182,7 @@ public class DbImportAction extends AbstractWorker {
 
             } catch (Exception ex) {
                 String preamble = "Could not import from SQL database for the following reason:";
-                errorMessage = SQLUtil.getExceptionMessage(ex);
+                String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
                 JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
                         + '\n' + errorMessage,
