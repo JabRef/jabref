@@ -2230,11 +2230,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void instantiateSearchAutoCompleter() {
-        AutoCompleter searchCompleter = AutoCompleterFactory.getFor("author", "editor");
+        searchAutoCompleter = AutoCompleterFactory.getFor("author", "editor");
         for (BibtexEntry entry : database.getEntries()) {
-            searchCompleter.addBibtexEntry(entry);
+            searchAutoCompleter.addBibtexEntry(entry);
         }
-        searchCompleteListener = new AutoCompleteListener(searchCompleter);
+        searchCompleteListener = new AutoCompleteListener(searchAutoCompleter);
         searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
 
