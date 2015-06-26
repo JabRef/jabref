@@ -16,6 +16,23 @@ package net.sf.jabref.sql;
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -28,19 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
 /**
- * 
  * @author ifsteinm
  */
-
 public class DBImportExportDialog implements MouseListener, KeyListener {
 
     private final JDialog diag;
@@ -54,33 +61,11 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     public boolean hasDBSelected = false;
     public boolean removeAction = false;
     public int selectedInt = -1;
-    private DialogType dialogType;
-
-
-    public DialogType getDialogType() {
-        return dialogType;
-    }
-
-    public void setDialogType(DialogType dialogType) {
-        this.dialogType = dialogType;
-    }
-
+    private final DialogType dialogType;
 
     public enum DialogType {
-        IMPORTER("IMPORTER"), EXPORTER("EXPORTER");
-
-        private final String dialogType;
-
-
-        DialogType(String dialogType) {
-            this.dialogType = dialogType;
-        }
-
-        public String getDialogType() {
-            return this.dialogType;
-        }
+        IMPORTER, EXPORTER;
     }
-
 
     public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
         this.dialogType = dialogType;
@@ -104,7 +89,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         String dialogTitle;
         String dialogTopMessage;
         int tableSelectionModel;
-        if (dialogType.equals(DialogType.EXPORTER)) {
+        if (isExporter()) {
             dialogTitle = Globals.lang("SQL Database Exporter");
             dialogTopMessage = Globals.lang("Select target SQL database:");
             tableSelectionModel = ListSelectionModel.SINGLE_SELECTION;
@@ -116,9 +101,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
                     exportAction();
                 }
             });
-        }
-        else {
-            this.dialogType = dialogType;
+        } else {
             dialogTitle = Globals.lang("SQL Database Importer");
             dialogTopMessage = Globals.lang("Please select which JabRef databases do you want to import:");
             tableSelectionModel = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
@@ -156,7 +139,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         b.addGlue();
         JButton importButton = new JButton(Globals.lang("Import"));
         JButton exportButton = new JButton(Globals.lang("Export"));
-        if (dialogType.equals(DialogType.IMPORTER)) {
+        if (isImporter()) {
             b.addButton(importButton);
         } else {
             b.addButton(exportButton);
@@ -220,6 +203,14 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         diag.setVisible(true);
     }
 
+    public boolean isImporter() {
+        return this.dialogType.equals(DialogType.IMPORTER);
+    }
+
+    public boolean isExporter() {
+        return this.dialogType.equals(DialogType.EXPORTER);
+    }
+
     public JDialog getDiag() {
         return this.diag;
     }
@@ -242,8 +233,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if ((e.getClickCount() == 2)
-                && this.dialogType.equals(DialogType.EXPORTER)) {
+        if ((e.getClickCount() == 2) && isExporter()) {
             this.exportAction();
         }
     }
