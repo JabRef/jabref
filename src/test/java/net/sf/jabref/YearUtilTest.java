@@ -28,6 +28,8 @@ public class YearUtilTest {
         Assert.assertEquals("1932", YearUtil.toFourDigitYear("32", 2001));
         Assert.assertEquals("1944", YearUtil.toFourDigitYear("44", 2001));
         Assert.assertEquals("2011", YearUtil.toFourDigitYear("11", 2001));
+        Assert.assertEquals("2005a", YearUtil.toFourDigitYear("2005a"));
+        Assert.assertEquals("2005b", YearUtil.toFourDigitYear("2005b"));
 
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         int d2 = thisYear % 100;
