@@ -65,17 +65,14 @@ class AlphanumericComparator implements Comparator<BibtexEntry> {
     }
 
     private int compare(String k1, String k2) {
-        if (k1 != null) {
-            if (k2 != null) {
-                return k1.compareTo(k2);
-            } else {
-                return 1;
-            }
-        }
-        else if (k2 != null) {
-            return -1;
+        if(k1 == null && k2 == null) {
+            return 0; // none
+        } else if(k1 != null && k2 == null) {
+            return 1; // k1 only
+        } else if(k1 == null){
+            return -1; // k2 only
         } else {
-            return 0;
+            return k1.compareTo(k2); // k1 and k2
         }
     }
 }
