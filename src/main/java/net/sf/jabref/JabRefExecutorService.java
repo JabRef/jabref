@@ -10,6 +10,7 @@ public class JabRefExecutorService implements Executor {
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<Thread>();
 
     private JabRefExecutorService() {}
 
@@ -44,17 +45,23 @@ public class JabRefExecutorService implements Executor {
 
     public void executeWithLowPriorityInOwnThread(Runnable runnable) {
         Thread thread = new Thread(runnable);
+        thread.setName("JabRef low prio");
+        startedThreads.add(thread);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
 
     public void executeInOwnThread(Runnable runnable) {
         Thread thread = new Thread(runnable);
+        thread.setName("JabRef normal prio");
+        startedThreads.add(thread);
         thread.start();
     }
 
     public void executeWithLowPriorityInOwnThreadAndWait(Runnable runnable) {
         Thread thread = new Thread(runnable);
+        thread.setName("JabRef low prio");
+        startedThreads.add(thread);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
 
@@ -65,6 +72,13 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void shutdownEverything() {
+        this.executorService.shutdown();
+        for(Thread thread : startedThreads) {
+            thread.interrupt();
         }
     }
 
