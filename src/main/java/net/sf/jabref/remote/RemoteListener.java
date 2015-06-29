@@ -27,98 +27,95 @@ import java.util.Vector;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.Util;
 import net.sf.jabref.imports.ParserResult;
 
 import javax.swing.*;
 
-public class RemoteListener implements Runnable {
+public class RemoteListener extends Thread {
 
     private static final String IDENTIFIER = "jabref";
 
     private final JabRef jabref;
-    private final ServerSocket socket;
+    private final ServerSocket serverSocket;
 
-    private volatile boolean active = true;
-    private volatile boolean toStop = false;
-
-    private RemoteListener(JabRef jabref, ServerSocket socket) {
+    private RemoteListener(JabRef jabref, ServerSocket serverSocket) {
         this.jabref = jabref;
-        this.socket = socket;
+        this.serverSocket = serverSocket;
+        this.setName("JabRef - Remote Listener");
     }
 
-    public void disable() {
-        toStop = true;
+    @Override
+    public void interrupt() {
+        super.interrupt();
+
+        closeServerSocket();
+    }
+
+    public void closeServerSocket() {
+        // need to close the serverSocket to wake up thread to shut it down
         try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            serverSocket.close();
+        } catch (IOException ignored) {
+
         }
     }
 
     @Override
     public void run() {
-        while (active) {
-            try {
-                Socket newSocket = socket.accept();
-
-                newSocket.setSoTimeout(1000);
-
-                if (toStop) {
-                    active = false;
-                    return;
-                }
-
-                OutputStream out = newSocket.getOutputStream();
-                InputStream in = newSocket.getInputStream();
-                out.write(RemoteListener.IDENTIFIER.getBytes());
-                out.write('\0');
-                out.flush();
-
-                int c;
-                StringBuffer sb = new StringBuffer();
+        try {
+            while (!Thread.interrupted()) {
                 try {
-                    while (((c = in.read()) != '\0') && (c >= 0)) {
-                        sb.append((char) c);
-                    }
-                    if (sb.length() == 0) {
-                        continue;
-                    }
-                    String[] args = sb.toString().split("\n");
-                    Vector<ParserResult> loaded = jabref.processArguments(args, false);
+                    Socket socket = serverSocket.accept();
+                    socket.setSoTimeout(1000);
 
-                    // put "bringToFront" in the queue
-                    // it has to happen before the call to import as the import might open a dialog
-                    // --> Globals.prefs.getBoolean("useImportInspectionDialog")
-                    // this dialog has to be shown AFTER JabRef has been brought to front
-                    SwingUtilities.invokeLater(new Runnable() {
+                    if (Thread.interrupted()) {
+                        return;
+                    }
 
-                        @Override
-                        public void run() {
-                            JabRef.jrf.showIfMinimizedToSysTray();
+                    Protocol protocol = new Protocol(socket);
+                    protocol.sendMessage(IDENTIFIER);
+
+                    try {
+                        String message = protocol.receiveMessage();
+                        if (message.isEmpty()) {
+                            continue;
                         }
-                    });
 
-                    for (int i = 0; i < loaded.size(); i++) {
-                        ParserResult pr = loaded.elementAt(i);
-                        JabRef.jrf.addParserResult(pr, (i == 0));
+                        Vector<ParserResult> loaded = jabref.processArguments(message.split("\n"), false);
+                        if (loaded == null) {
+                            return;
+                        }
+
+                        // put "bringToFront" in the queue
+                        // it has to happen before the call to import as the import might open a dialog
+                        // --> Globals.prefs.getBoolean("useImportInspectionDialog")
+                        // this dialog has to be shown AFTER JabRef has been brought to front
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                JabRef.jrf.showIfMinimizedToSysTray();
+                            }
+                        });
+
+                        for (int i = 0; i < loaded.size(); i++) {
+                            ParserResult pr = loaded.elementAt(i);
+                            JabRef.jrf.addParserResult(pr, (i == 0));
+                        }
+
+                    } finally {
+                        protocol.close();
                     }
 
-                    in.close();
-                    out.close();
-                    newSocket.close();
-                } catch (SocketTimeoutException ex) {
-                    //System.out.println("timeout");
-                    in.close();
-                    out.close();
-                    newSocket.close();
+                } catch (SocketException ex) {
+                    return;
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-            } catch (SocketException ex) {
-                active = false;
-                //ex.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } finally {
+            closeServerSocket();
         }
     }
 
@@ -146,39 +143,74 @@ public class RemoteListener implements Runnable {
             Socket socket = new Socket(local, Globals.prefs.getInt("remoteServerPort"));
             socket.setSoTimeout(2000);
 
-            InputStream in = socket.getInputStream();
-            OutputStream out = socket.getOutputStream();
-            int c;
-            StringBuffer sb = new StringBuffer();
+            Protocol protocol = new Protocol(socket);
             try {
-                while (((c = in.read()) != '\0') && (c >= 0)) {
-                    sb.append((char) c);
+                String identifier = protocol.receiveMessage();
+
+                if (!RemoteListener.IDENTIFIER.equals(identifier)) {
+                    String port = String.valueOf(Globals.prefs.getInt("remoteServerPort"));
+                    String error = Globals.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
+                    System.out.println(error);
+                    return false;
                 }
-            } catch (SocketTimeoutException ex) {
-                System.out.println("Connection timed out.");
+                protocol.sendMessage(Util.join(args, "\n"));
+                return true;
+            } finally {
+                protocol.close();
             }
-
-            if (!RemoteListener.IDENTIFIER.equals(sb.toString())) {
-                String port = String.valueOf(Globals.prefs.getInt("remoteServerPort"));
-                String error = Globals.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
-                System.out.println(error);
-                return false;
-            }
-
-            for (String arg : args) {
-                byte[] bytes = arg.getBytes();
-                out.write(bytes);
-                out.write('\n');
-            }
-            out.write('\0');
-            out.flush();
-            in.close();
-            out.close();
-            socket.close();
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
+    /**
+     * Every message is terminated with '\0'.
+     */
+    static class Protocol {
+
+        private final Socket socket;
+        private final OutputStream out;
+        private final InputStream in;
+
+        Protocol(Socket socket) throws IOException {
+            this.socket = socket;
+            this.out = socket.getOutputStream();
+            this.in = socket.getInputStream();
+        }
+
+        public void sendMessage(String message) throws IOException {
+            out.write(message.getBytes());
+            out.write('\0');
+            out.flush();
+        }
+
+        public String receiveMessage() throws IOException {
+            int c;
+            StringBuilder result = new StringBuilder();
+            try {
+                while (((c = in.read()) != '\0') && (c >= 0)) {
+                    result.append((char) c);
+                }
+            } catch (SocketTimeoutException ex) {
+                System.out.println("Connection timed out.");
+            }
+            return result.toString();
+        }
+
+        void close() {
+            try {
+                in.close();
+            } catch (IOException ignored) {}
+
+            try {
+                out.close();
+            } catch (IOException ignored) {}
+
+            try {
+                socket.close();
+            } catch (IOException ignored) {}
+        }
+    }
+
 }

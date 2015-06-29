@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -34,19 +33,18 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.remote.RemoteListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.remote.RemoteListenerLifecycle;
+import net.sf.jabref.remote.RemoteUtil;
 
 public class AdvancedTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences _prefs;
-    JabRefFrame _frame;
     HelpDialog helpDiag;
     private final HelpAction remoteHelp;
-    JPanel pan = new JPanel(),
-            lnf = new JPanel();
+    JPanel pan = new JPanel();
     JLabel lab;
     private final JCheckBox useDefault;
     private final JCheckBox useRemoteServer;
@@ -56,10 +54,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox biblatexMode;
     private final JComboBox className;
     private final JTextField remoteServerPort;
-    JButton def1 = new JButton(Globals.lang("Default")),
-            def2 = new JButton(Globals.lang("Default"));
-    JPanel p1 = new JPanel(),
-            p2 = new JPanel();
+    JPanel p1 = new JPanel();
     private String oldLnf = "";
     private boolean oldUseDef;
     private boolean oldBiblMode = false;
@@ -103,7 +98,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                 // Try to find L&F, throws exception if not successful
                 Class.forName(lf);
                 lookAndFeels.add(lf);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
             }
         }
         className = new JComboBox(lookAndFeels.toArray(new String[lookAndFeels.size()]));
@@ -256,16 +251,10 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             ex.printStackTrace();
         }
         _prefs.putBoolean("useRemoteServer", useRemoteServer.isSelected());
-        if (useRemoteServer.isSelected() && (JabRef.remoteListener == null)) {
-            // Start the listener now.
-
-            JabRef.remoteListener = RemoteListener.openRemoteListener(JabRef.singleton);
-            if (JabRef.remoteListener != null) {
-                JabRefExecutorService.INSTANCE.executeInOwnThread(JabRef.remoteListener);
-            }
-        } else if (!useRemoteServer.isSelected() && (JabRef.remoteListener != null)) {
-            JabRef.remoteListener.disable();
-            JabRef.remoteListener = null;
+        if (useRemoteServer.isSelected()) {
+            RemoteListenerLifecycle.openAndStartRemoteListener(JabRef.singleton);
+        } else {
+            RemoteListenerLifecycle.disableRemoteListener();
         }
 
         _prefs.putBoolean("biblatexMode", biblatexMode.isSelected());
@@ -298,14 +287,10 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
         try {
             int portNumber = Integer.parseInt(remoteServerPort.getText());
-            if ((portNumber > 1024) && (portNumber <= 65535)) {
+            if (RemoteUtil.isValidPartNumber(portNumber)) {
                 return true; // Ok, the number was legal.
             } else {
-                JOptionPane.showMessageDialog
-                        (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                                Globals.lang("Remote server port") + '\'', Globals.lang("Remote server port"),
-                                JOptionPane.ERROR_MESSAGE);
-                return false;
+                throw new NumberFormatException();
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog

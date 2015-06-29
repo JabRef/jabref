@@ -82,7 +82,7 @@ public class XMPUtilTest {
             if (document.isEncrypted()) {
                 System.err
                         .println("Error: Cannot add metadata to encrypted document.");
-                System.exit(1);
+                //System.exit(1);
             }
             PDDocumentCatalog catalog = document.getDocumentCatalog();
 
@@ -437,7 +437,7 @@ public class XMPUtilTest {
             if (document.isEncrypted()) {
                 System.err
                         .println("Error: Cannot add metadata to encrypted document.");
-                System.exit(1);
+                //System.exit(1);
             }
             PDDocumentCatalog catalog = document.getDocumentCatalog();
             PDMetadata meta = catalog.getMetadata();
@@ -1021,7 +1021,7 @@ public class XMPUtilTest {
             if (document.isEncrypted()) {
                 System.err
                         .println("Error: Cannot add metadata to encrypted document.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", document
@@ -1103,7 +1103,7 @@ public class XMPUtilTest {
             if (document.isEncrypted()) {
                 System.err
                         .println("Error: Cannot add metadata to encrypted document.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", document

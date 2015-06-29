@@ -242,14 +242,13 @@ public class Globals {
 
 
     public static void startBackgroundTasks() {
-
         Globals.focusListener = new GlobalFocusListener();
 
         // TODO: Error console initialization here. When should it be used?
         Globals.errorConsole = ErrorConsole.getInstance();
 
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor);
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
     }
 
     /**

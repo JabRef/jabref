@@ -59,7 +59,7 @@ public class DuplicateSearch implements Runnable {
         }
 
         SearcherRunnable st = new SearcherRunnable();
-        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st);
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
         final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();

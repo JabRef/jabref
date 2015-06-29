@@ -32,18 +32,15 @@ public class FileUpdateMonitor implements Runnable {
 
     private static final Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
 
-    private final int WAIT = 4000;
-    static int tmpNum = 0;
-    private int no = 0;
+    private static final int WAIT = 4000;
+
+    private int numberOfUpdateListener = 0;
     private final HashMap<String, Entry> entries = new HashMap<String, Entry>();
-    private volatile boolean running;
 
     @Override
     public void run() {
-        running = true;
-
         // The running variable is used to make the thread stop when needed.
-        while (running) {
+        while (true) {
             //System.out.println("Polling...");
             Iterator<String> i = entries.keySet().iterator();
             for (; i.hasNext();) {
@@ -65,20 +62,9 @@ public class FileUpdateMonitor implements Runnable {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
                 FileUpdateMonitor.logger.finest("FileUpdateMonitor has been interrupted.");
-                /*  the (?) correct way to interrupt threads, according to
-                 *  http://www.roseindia.net/javatutorials/shutting_down_threads_cleanly.shtml
-                 */
-                Thread.currentThread().interrupt(); // very important
-                break;
+                return;
             }
         }
-    }
-
-    /**
-     * Cause the thread to stop monitoring. It will finish the current round before stopping.
-     */
-    public void stopMonitoring() {
-        running = false;
     }
 
     /**
@@ -88,12 +74,11 @@ public class FileUpdateMonitor implements Runnable {
      * @throws IOException if the file does not exist.
      */
     public String addUpdateListener(FileUpdateListener ul, File file) throws IOException {
-        // System.out.println(file.getPath());
         if (!file.exists()) {
             throw new IOException("File not found");
         }
-        no++;
-        String key = "" + no;
+        numberOfUpdateListener++;
+        String key = "" + numberOfUpdateListener;
         entries.put(key, new Entry(ul, file));
         return key;
     }
@@ -147,17 +132,6 @@ public class FileUpdateMonitor implements Runnable {
         Entry entry = (Entry) o;
         entry.updateTimeStamp();
 
-    }
-
-    public void changeFile(String key, File file) throws IOException, IllegalArgumentException {
-        if (!file.exists()) {
-            throw new IOException("File not found");
-        }
-        Object o = entries.get(key);
-        if (o == null) {
-            throw new IllegalArgumentException("Entry not found");
-        }
-        ((Entry) o).file = file;
     }
 
     /**

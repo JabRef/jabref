@@ -48,6 +48,7 @@ import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
+import net.sf.jabref.remote.RemoteListenerLifecycle;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.sun.jna.Native;
@@ -63,7 +64,6 @@ import com.sun.jna.ptr.PointerByReference;
 public class JabRef {
 
     public static JabRef singleton;
-    public static RemoteListener remoteListener = null;
     public static JabRefFrame jrf;
     private static Frame splashScreen = null;
 
@@ -144,9 +144,10 @@ public class JabRef {
 
         // Check for running JabRef
         if (Globals.prefs.getBoolean("useRemoteServer")) {
-            JabRef.remoteListener = RemoteListener.openRemoteListener(this);
 
-            if (JabRef.remoteListener == null) {
+            RemoteListenerLifecycle.openRemoteListener(JabRef.singleton);
+
+            if (!RemoteListenerLifecycle.isRemoteListenerOpen()) {
                 // Unless we are alone, try to contact already running JabRef:
                 if (RemoteListener.sendToActiveJabRefInstance(args)) {
 
@@ -157,12 +158,11 @@ public class JabRef {
                      */
                     System.out.println(
                             Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
-                    System.exit(0);
+                    JabRefExecutorService.INSTANCE.shutdownEverything();
+                    return;
                 }
             } else {
-                // No listener found, thus we are the first instance to be
-                // started.
-                JabRefExecutorService.INSTANCE.executeInOwnThread(JabRef.remoteListener);
+                RemoteListenerLifecycle.startRemoteListener();
             }
         }
 
@@ -195,8 +195,9 @@ public class JabRef {
 
         Vector<ParserResult> loaded = processArguments(args, true);
 
-        if (graphicFailure || cli.isDisableGui() || cli.isShowVersion()) {
-            System.exit(0);
+        if (loaded == null || graphicFailure || cli.isDisableGui() || cli.isShowVersion()) {
+            JabRefExecutorService.INSTANCE.shutdownEverything();
+            return;
         }
 
         openWindow(loaded);
@@ -246,16 +247,16 @@ public class JabRef {
 
         if (initialStartup && cli.isHelp()) {
             cli.printUsage();
-            System.exit(0);
+            return null; // TODO replace with optional one day
         }
 
-        boolean commandmode = cli.isDisableGui() || cli.isFetcherEngine();
+        boolean commandMode = cli.isDisableGui() || cli.isFetcherEngine();
 
         // First we quickly scan the command line parameters for any that signal
         // that the GUI
         // should not be opened. This is used to decide whether we should show the
         // splash screen or not.
-        if (initialStartup && !commandmode && !cli.isDisableSplash()) {
+        if (initialStartup && !commandMode && !cli.isDisableSplash()) {
             try {
                 JabRef.splashScreen = SplashScreen.splash();
             } catch (Throwable ex) {
@@ -397,7 +398,7 @@ public class JabRef {
                     }
                     default: {
                         System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                        System.exit(0);
+                        return null; // TODO replace with optional one day
                     }
                     } //end switch
 

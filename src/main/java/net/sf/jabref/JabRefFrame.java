@@ -15,36 +15,27 @@
 */
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.Vector;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import net.sf.jabref.export.*;
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
+import net.sf.jabref.export.AutoSaveManager;
+import net.sf.jabref.export.ExportCustomizationDialog;
+import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.SaveAllAction;
+import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BibtexKeyPatternDialog;
+import net.sf.jabref.gui.DatabasePropertiesDialog;
+import net.sf.jabref.gui.DragDropPopupPane;
+import net.sf.jabref.gui.EntryCustomizationDialog2;
+import net.sf.jabref.gui.GenFieldsCustomizer;
+import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.SortTabsAction;
+import net.sf.jabref.gui.SysTray;
+import net.sf.jabref.gui.WaitForSaveOperation;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
@@ -83,9 +74,65 @@ import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
 import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.Vector;
 
 /**
  * The main window of the application.
@@ -762,6 +809,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param filenames the file names of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(Vector<String> filenames) {
+        JabRefExecutorService.INSTANCE.shutdownEverything();
+
         dispose();
 
         if (basePanel() != null) {
@@ -815,6 +864,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         prefs.flush();
+
+        // hide systray because the JVM can only shut down when no systray icon is shown
+        if(sysTray != null) {
+            sysTray.hide();
+        }
+
+        // dispose all windows, even if they are not displayed anymore
+        for(Window window: Window.getWindows()) {
+            window.dispose();
+        }
+
+        // shutdown any timers that are may be active
+        if (Globals.autoSaveManager != null) {
+            Globals.stopAutoSaveManager();
+        }
     }
 
     /**
@@ -1864,8 +1928,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * The action concerned with closing the window.
      */
-    class CloseAction
-            extends MnemonicAwareAction {
+    class CloseAction  extends MnemonicAwareAction {
 
         public CloseAction() {
             putValue(Action.NAME, "Quit");
@@ -1878,11 +1941,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (quit()) {
-                // FIXME: tearDownJabRef() does not cancel all threads. Therefore, some threads remain running and prevent JabRef from beeing unloaded completely
-                // QUICKHACK: finally tear down all existing threads
-                System.exit(0);
-            }
+            quit();
         }
     }
 

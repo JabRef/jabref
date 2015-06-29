@@ -9,7 +9,14 @@ public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setName("JabRef CachedThreadPool");
+            return thread;
+        }
+    });
     private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<Thread>();
 
     private JabRefExecutorService() {}
@@ -43,17 +50,17 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    public void executeWithLowPriorityInOwnThread(Runnable runnable) {
+    public void executeWithLowPriorityInOwnThread(Runnable runnable, String name) {
         Thread thread = new Thread(runnable);
-        thread.setName("JabRef low prio");
+        thread.setName("JabRef - " + name + " - low prio");
         startedThreads.add(thread);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
 
-    public void executeInOwnThread(Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        thread.setName("JabRef normal prio");
+    public void executeInOwnThread(Thread thread) {
+        // this is a special case method for Threads that cannot be interrupted so easily
+        // this method should normally not be used
         startedThreads.add(thread);
         thread.start();
     }
@@ -65,6 +72,10 @@ public class JabRefExecutorService implements Executor {
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
 
+        waitForThreadToFinish(thread);
+    }
+
+    public void waitForThreadToFinish(Thread thread) {
         while(true) {
             try {
                 thread.join();
