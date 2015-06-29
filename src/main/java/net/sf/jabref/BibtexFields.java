@@ -398,24 +398,14 @@ public class BibtexFields
         return null;
     }
 
-    public static boolean isWriteableField(String field)
-    {
+    public static boolean isWriteableField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        if (sField != null)
-        {
-            return sField.isWriteable();
-        }
-        return true;
+        return sField == null || sField.isWriteable();
     }
 
-    public static boolean isDisplayableField(String field)
-    {
+    public static boolean isDisplayableField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        if (sField != null)
-        {
-            return sField.isDisplayable();
-        }
-        return true;
+        return sField == null || sField.isDisplayable();
     }
 
     /**
@@ -424,23 +414,14 @@ public class BibtexFields
      * @param field a <code>String</code> value
      * @return a <code>boolean</code> value
      */
-    public static boolean isStandardField(String field)
-    {
+    public static boolean isStandardField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        if (sField != null)
-        {
-            return sField.isStandard();
-        }
-        return false;
+        return sField != null && sField.isStandard();
     }
 
     public static boolean isNumeric(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        if (sField != null)
-        {
-            return sField.isNumeric();
-        }
-        return false;
+        return sField != null && sField.isNumeric();
     }
 
     /** returns an string-array with all fieldnames */
