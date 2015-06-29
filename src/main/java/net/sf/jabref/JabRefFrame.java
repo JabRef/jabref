@@ -2739,7 +2739,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 @Override
                 public void run() {
-                    sysTray.setTrayIconVisible(true);
+                    sysTray.show();
                     JabRefFrame.this.setVisible(false);
                 }
             });
@@ -2753,7 +2753,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (!this.isVisible()) {
             // isVisible() is false if minimized to systray
             if (sysTray != null) {
-                sysTray.setTrayIconVisible(false);
+                sysTray.hide();
             }
             setVisible(true);
             this.isActive();

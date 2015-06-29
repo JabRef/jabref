@@ -79,22 +79,21 @@ public class SysTray {
         }
     }
 
-    public void setTrayIconVisible(boolean visible) {
+    public void show() {
         if (tray == null) {
             return;
         }
         try {
-            if (visible) {
-                tray.add(icon);
-            } else {
-                tray.remove(icon);
-            }
+            tray.add(icon);
         } catch (AWTException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(SystemTray.isSupported());
+    public void hide() {
+        if (tray == null) {
+            return;
+        }
+        tray.remove(icon);
     }
 }
