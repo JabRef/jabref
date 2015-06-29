@@ -682,25 +682,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
-    AboutAction aboutAction = new AboutAction();
-
-
-    class AboutAction
-            extends AbstractAction {
-
-        public AboutAction() {
-            super(Globals.lang("About JabRef"));
-
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            about();
-        }
-    }
-
-
     // General info dialog.  The MacAdapter calls this method when "About"
     // is selected from the application menu.
     public void about() {
