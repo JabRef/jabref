@@ -40,6 +40,11 @@ public class AutoSaveManager {
     }
 
     public void startAutoSaveTimer() {
+        if(t != null) {
+            // shut down any previously set timer to not leak any timers
+            t.cancel();
+        }
+
         TimerTask task = new AutoSaveTask();
         t = new Timer();
         long interval = 60000 * Globals.prefs.getInt("autoSaveInterval");
@@ -63,16 +68,12 @@ public class AutoSaveManager {
                 panels.add(frame.baseAt(i));
             }
 
-            int i = 0;
             for (BasePanel panel : panels) {
                 if (panel.isBaseChanged()) {
                     if (panel.getFile() != null) {
                         AutoSaveManager.autoSave(panel);
                     }
                 }
-                else {
-                }
-                i++;
             }
         }
     }
