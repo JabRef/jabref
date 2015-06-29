@@ -38,7 +38,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class MedlineFetcher implements EntryFetcher {
 
-    protected class SearchResult {
+    class SearchResult {
 
         public int count = 0;
 

@@ -41,25 +41,11 @@ class CustomExportDialog extends JDialog {
             name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
-    private final JLabel
-            nl = new JLabel(Globals.lang("Export name") + ':');
-    private final JLabel nr = new JLabel(Globals.lang("Main layout file") + ':');
-    private final JLabel nf = new JLabel(Globals.lang("File extension") + ':');
-    private final JButton
-            ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JButton browse = new JButton(Globals.lang("Browse"));
-    private final JPanel
-            main = new JPanel();
-    private final JPanel buttons = new JPanel();
     private boolean ok_pressed = false;
     private int index;
     private final JabRefFrame parent;
 
     private String oldName, oldRegexp, oldField;
-
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
 
 
     public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {
@@ -96,6 +82,7 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
+        JButton ok = new JButton(Globals.lang("Ok"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);
@@ -109,8 +96,10 @@ class CustomExportDialog extends JDialog {
             }
         };
 
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(cancelAction);
 
+        JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(new ActionListener() {
 
             @Override
@@ -131,18 +120,21 @@ class CustomExportDialog extends JDialog {
         });
 
         // Key bindings:
+        JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent.prefs().getKey("Close dialog"), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
+        GridBagLayout gbl = new GridBagLayout();
         main.setLayout(gbl);
         main.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
                         Globals.lang("Export properties")));
 
         // Main panel:
+        GridBagConstraints con = new GridBagConstraints();
         con.weightx = 0;
         con.gridwidth = 1;
         con.insets = new Insets(3, 5, 3, 5);
@@ -150,12 +142,15 @@ class CustomExportDialog extends JDialog {
         con.fill = GridBagConstraints.NONE;
         con.gridx = 0;
         con.gridy = 0;
+        JLabel nl = new JLabel(Globals.lang("Export name") + ':');
         gbl.setConstraints(nl, con);
         main.add(nl);
         con.gridy = 1;
+        JLabel nr = new JLabel(Globals.lang("Main layout file") + ':');
         gbl.setConstraints(nr, con);
         main.add(nr);
         con.gridy = 2;
+        JLabel nf = new JLabel(Globals.lang("File extension") + ':');
         gbl.setConstraints(nf, con);
         main.add(nf);
 
@@ -182,6 +177,7 @@ class CustomExportDialog extends JDialog {
         gbl.setConstraints(extension, con);
         main.add(extension);
 
+        JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         bb.addGlue();

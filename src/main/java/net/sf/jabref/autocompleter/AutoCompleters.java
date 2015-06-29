@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 class AutoCompleters {
 
-    protected final HashMap<String, AutoCompleter> autoCompleters = new HashMap<String, AutoCompleter>();
+    final HashMap<String, AutoCompleter> autoCompleters = new HashMap<String, AutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
@@ -15,7 +15,7 @@ class AutoCompleters {
         return autoCompleters.get(fieldName);
     }
 
-    public void addDatabase(BibtexDatabase database) {
+    void addDatabase(BibtexDatabase database) {
         for (BibtexEntry entry : database.getEntries()) {
             addEntry(entry);
         }
@@ -31,7 +31,7 @@ class AutoCompleters {
         }
     }
 
-    public void put(String field, AutoCompleter autoCompleter) {
+    void put(String field, AutoCompleter autoCompleter) {
         autoCompleters.put(field, autoCompleter);
     }
 

@@ -170,7 +170,7 @@ public class CsaImporter extends ImportFormat {
         String year = pm.group(3);
         date.append(year);
 
-        StringBuffer note = new StringBuffer();
+        StringBuilder note = new StringBuilder();
         if ((day != null) && !day.equals("0")) {
             note.append("Source Date: ");
             note.append(date);
@@ -194,7 +194,7 @@ public class CsaImporter extends ImportFormat {
         }
 
         int len = fstr.length();
-        StringBuffer newf = new StringBuffer();
+        StringBuilder newf = new StringBuilder();
         if (pm.start() > 0) {
             newf.append(fstr.substring(0, pm.start()));
         }
@@ -229,7 +229,7 @@ public class CsaImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         HashMap<String, String> hm = new HashMap<String, String>();
 
         BufferedReader in =

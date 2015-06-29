@@ -195,7 +195,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             if (!showsFileInGenFields()) {
                 String gfs = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "0");
                 //System.out.println(gfs);
-                StringBuffer sb = new StringBuffer(gfs);
+                StringBuilder sb = new StringBuilder(gfs);
                 if (gfs.length() > 0) {
                     sb.append(";");
                 }

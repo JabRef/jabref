@@ -106,13 +106,10 @@ public class Authors extends AbstractParamLayoutFormatter {
     private int maxAuthors = -1;
     private int authorNumberEtAl = 1;
 
-    private final String
-            firstFirstSeparator = " ";
     private String lastFirstSeparator = ", ";
     private String separator = Authors.COMMA;
     private String lastSeparator = Authors.AND;
     private String etAlString = " et al.";
-    private final String jrSeparator = " ";
 
 
     @Override
@@ -301,6 +298,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
         String jr = a.getJr();
         if ((jr != null) && (!jr.isEmpty())) {
+            String jrSeparator = " ";
             lastNamePart = lastNamePart + jrSeparator + jr;
         }
 
@@ -334,6 +332,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             sb.append(lastNamePart);
         }
         else if (firstFirst) {
+            String firstFirstSeparator = " ";
             sb.append(firstNamePart).append(firstFirstSeparator);
             sb.append(lastNamePart);
         }

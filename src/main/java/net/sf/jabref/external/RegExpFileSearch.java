@@ -16,7 +16,6 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.*;
-import net.sf.jabref.StringUtil;
 
 import java.io.File;
 import java.io.IOException;

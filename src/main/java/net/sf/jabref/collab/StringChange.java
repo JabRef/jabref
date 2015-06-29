@@ -27,7 +27,6 @@ class StringChange extends Change {
 
     private final BibtexString string;
     private final String mem;
-    private final String tmp;
     private final String disk;
     private final String label;
 
@@ -43,10 +42,9 @@ class StringChange extends Change {
         this.string = string;
         this.label = label;
         this.mem = mem;
-        this.tmp = tmp;
         this.disk = disk;
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<HTML><H2>");
         sb.append(Globals.lang("Modified string"));
         sb.append("</H2><H3>");

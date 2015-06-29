@@ -354,7 +354,7 @@ public class GUIGlobals {
         InputStream in = null;
         try {
             in = file.openStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             int c;
             while ((c = in.read()) != -1) {
                 buffer.append((char) c);

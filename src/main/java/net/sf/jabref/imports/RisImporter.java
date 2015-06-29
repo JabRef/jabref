@@ -77,7 +77,7 @@ public class RisImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
@@ -98,7 +98,7 @@ public class RisImporter extends ImportFormat {
             String[] fields = entry1.split("\n");
 
             for (int j = 0; j < fields.length; j++) {
-                StringBuffer current = new StringBuffer(fields[j]);
+                StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
                 while (!done && (j < (fields.length - 1))) {
                     if ((fields[j + 1].length() >= 6) && !fields[j + 1].substring(2, 6).equals("  - ")) {

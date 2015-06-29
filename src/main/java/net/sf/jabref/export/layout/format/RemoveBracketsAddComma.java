@@ -54,7 +54,7 @@ public class RemoveBracketsAddComma implements LayoutFormatter
     public String format(String fieldText)
     {
         String fieldEntry = fieldText;
-        StringBuffer sb = new StringBuffer(fieldEntry.length());
+        StringBuilder sb = new StringBuilder(fieldEntry.length());
 
         for (int i = 0; i < fieldEntry.length(); i++)
         {

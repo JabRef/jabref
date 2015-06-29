@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
  * @author Michael Wrighton
  *
  */
-public class MODSEntry {
+class MODSEntry {
 
     private String entryType = "mods"; // could also be relatedItem
     private String id;
@@ -51,11 +51,8 @@ public class MODSEntry {
 
     private String publisher = null;
     private String date = null;
-    private String place = null;
 
     private String title = null;
-    // should really be handled with an enum
-    private final String type = "text";
 
     private String number;
     private String volume;
@@ -107,6 +104,7 @@ public class MODSEntry {
             id = bibtex.getField("bibtexkey");
         }
         if (bibtex.getField("place") != null) {
+            String place = null;
             if (CHARFORMAT) {
                 place = chars.format(bibtex.getField("place"));
             } else {
@@ -272,6 +270,7 @@ public class MODSEntry {
 
             }
             Element typeOfResource = d.createElement("typeOfResource");
+            String type = "text";
             typeOfResource.appendChild(d.createTextNode(stripNonValidXMLCharacters(type)));
             mods.appendChild(typeOfResource);
 

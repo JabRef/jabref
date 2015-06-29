@@ -105,7 +105,7 @@ public class IntegrityCheck
     {
         // try to extract the structure of author tag
         // N = name, ","= seperator, "a" = and
-        StringBuffer structure = new StringBuffer();
+        StringBuilder structure = new StringBuilder();
         int len = names.length();
         int mode = -1;
         for (int t = 0; t < len; t++)

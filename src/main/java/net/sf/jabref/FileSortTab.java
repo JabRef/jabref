@@ -41,7 +41,6 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FileSortTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences _prefs;
-    private final JabRefFrame _frame;
     private final JRadioButton saveInOriginalOrder;
     private final JRadioButton saveInTableOrder;
     private final JRadioButton saveInSpecifiedOrder;
@@ -59,7 +58,6 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
     public FileSortTab(JabRefFrame frame, JabRefPreferences prefs) {
         this._prefs = prefs;
-        this._frame = frame;
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.leadingColumnOffset(1);

@@ -2598,7 +2598,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
         if (frame.statusLine.getText().startsWith(Globals.lang("Saved database"))) {
-            ;
         }
         frame.output(" ");
     }

@@ -15,7 +15,6 @@ import net.sf.jabref.undo.UndoableFieldChange;
  */
 public class AttachFileAction implements BaseAction {
 
-    private BibtexEntry entry = null;
     private final BasePanel panel;
 
 
@@ -29,7 +28,7 @@ public class AttachFileAction implements BaseAction {
          {
             return; // TODO: display error message?
         }
-        entry = panel.getSelectedEntries()[0];
+        BibtexEntry entry = panel.getSelectedEntries()[0];
         FileListEntry flEntry = new FileListEntry("", "", null);
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
                 panel.metaData());

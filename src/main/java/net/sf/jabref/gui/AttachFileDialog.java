@@ -42,7 +42,6 @@ public class AttachFileDialog extends JDialog {
     private final AttachFileDialog ths = this;
     private final FieldEditor editor;
     private final String fieldName;
-    private JPanel main;
     private final JButton browse = new JButton(Globals.lang("Browse"));
     private final JButton download = new JButton(Globals.lang("Download"));
     private final JButton auto = new JButton(Globals.lang("Auto"));
@@ -150,7 +149,7 @@ public class AttachFileDialog extends JDialog {
         builder.nextLine();
         builder.appendSeparator();
 
-        main = builder.getPanel();
+        JPanel main = builder.getPanel();
 
         main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 

@@ -75,7 +75,7 @@ public class JabRefExecutorService implements Executor {
         waitForThreadToFinish(thread);
     }
 
-    public void waitForThreadToFinish(Thread thread) {
+    private void waitForThreadToFinish(Thread thread) {
         while(true) {
             try {
                 thread.join();

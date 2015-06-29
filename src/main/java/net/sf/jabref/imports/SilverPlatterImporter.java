@@ -89,7 +89,7 @@ public class SilverPlatterImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         boolean isChapter = false;
         String str;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while ((str = in.readLine()) != null) {
             if (str.length() < 2) {
                 sb.append("__::__").append(str);

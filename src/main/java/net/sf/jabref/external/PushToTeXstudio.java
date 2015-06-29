@@ -132,7 +132,7 @@ public class PushToTeXstudio implements PushToApplication {
                 public void run() {
                     InputStream out = p.getErrorStream();
                     int c;
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     try {
                         while ((c = out.read()) != -1) {
                             sb.append((char) c);

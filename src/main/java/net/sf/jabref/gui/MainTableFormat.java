@@ -85,7 +85,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     private boolean namesFf;
     private boolean namesLf;
     private boolean namesLastOnly;
-    private boolean showShort;
 
 
     public MainTableFormat(BasePanel panel) {
@@ -387,7 +386,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
 
         // Read name format options:
-        showShort = Globals.prefs.getBoolean("showShort"); //MK:
+        boolean showShort = Globals.prefs.getBoolean("showShort");
         namesNatbib = Globals.prefs.getBoolean("namesNatbib"); //MK:
         namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
         namesAsIs = Globals.prefs.getBoolean("namesAsIs");

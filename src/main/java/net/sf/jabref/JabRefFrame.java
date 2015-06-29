@@ -186,8 +186,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private SysTray sysTray = null;
 
-    private LabelMaker labelMaker;
-
     // The help window.
     public final HelpDialog helpDiag = new HelpDialog(this);
 
@@ -1054,7 +1052,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initLabelMaker() {
         // initialize the labelMaker
-        labelMaker = new LabelMaker();
+        LabelMaker labelMaker = new LabelMaker();
         labelMaker.addRule(new ArticleLabelRule(),
                 BibtexEntryType.ARTICLE);
         labelMaker.addRule(new BookLabelRule(),

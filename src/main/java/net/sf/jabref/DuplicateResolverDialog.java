@@ -56,9 +56,6 @@ public class DuplicateResolverDialog extends JDialog {
     private final JTabbedPane tabbed = new JTabbedPane();
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
-    private JButton first;
-    private JButton second;
-    private JButton both;
     private final JButton cancel = new JButton(Globals.lang("Cancel"));
     private JButton removeExact = null;
     private final JPanel options = new JPanel();
@@ -66,7 +63,6 @@ public class DuplicateResolverDialog extends JDialog {
     private final JPanel source = new JPanel();
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private boolean block = true;
-    private TitleLabel lab;
 
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
@@ -82,6 +78,9 @@ public class DuplicateResolverDialog extends JDialog {
     }
 
     private void init(BibtexEntry one, BibtexEntry two, int type) {
+        JButton both;
+        JButton second;
+        JButton first;
         switch (type) {
         case DUPLICATE_SEARCH:
             first = new JButton(Globals.lang("Keep upper"));
@@ -126,7 +125,7 @@ public class DuplicateResolverDialog extends JDialog {
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 1;
         con.weighty = 0;
-        lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ? "" :
+        TitleLabel lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ? "" :
                 Globals.lang("Entry in current database"));
         gbl.setConstraints(lab, con);
         main.add(lab);

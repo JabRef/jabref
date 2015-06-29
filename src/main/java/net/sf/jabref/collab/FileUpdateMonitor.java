@@ -156,7 +156,7 @@ public class FileUpdateMonitor implements Runnable {
     static class Entry {
 
         final FileUpdateListener listener;
-        File file;
+        final File file;
         final File tmpFile;
         long timeStamp, fileSize;
 

@@ -36,25 +36,12 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class DBConnectDialog extends JDialog {
 
-    // labels
-    private final JLabel lblServerType = new JLabel();
-    private final JLabel lblServerHostname = new JLabel();
-    private final JLabel lblDatabase = new JLabel();
-    private final JLabel lblUsername = new JLabel();
-    private final JLabel lblPassword = new JLabel();
-
     // input fields
     private final JComboBox cmbServerType = new JComboBox();
     private final JTextField txtServerHostname = new JTextField(40);
     private final JTextField txtDatabase = new JTextField(40);
     private final JTextField txtUsername = new JTextField(40);
     private final JPasswordField pwdPassword = new JPasswordField(40);
-    private final JButton btnConnect = new JButton();
-    private final JButton btnCancel = new JButton();
-
-    // array for holding components on left-hand and right-hand sides
-    private final ArrayList<JLabel> lhs = new ArrayList<JLabel>();
-    private final ArrayList<JComponent> rhs = new ArrayList<JComponent>();
 
     private DBStrings dbStrings = new DBStrings();
 
@@ -72,12 +59,19 @@ public class DBConnectDialog extends JDialog {
         dbStrings = dbs;
 
         // build collections of components
+        ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+        JLabel lblServerType = new JLabel();
         lhs.add(lblServerType);
+        JLabel lblServerHostname = new JLabel();
         lhs.add(lblServerHostname);
+        JLabel lblDatabase = new JLabel();
         lhs.add(lblDatabase);
+        JLabel lblUsername = new JLabel();
         lhs.add(lblUsername);
+        JLabel lblPassword = new JLabel();
         lhs.add(lblPassword);
 
+        ArrayList<JComponent> rhs = new ArrayList<JComponent>();
         rhs.add(cmbServerType);
         rhs.add(txtServerHostname);
         rhs.add(txtDatabase);
@@ -97,7 +91,9 @@ public class DBConnectDialog extends JDialog {
         }
 
         // set button text
+        JButton btnConnect = new JButton();
         btnConnect.setText(Globals.lang("Connect"));
+        JButton btnCancel = new JButton();
         btnCancel.setText(Globals.lang("Cancel"));
 
         // init input fields to current DB strings

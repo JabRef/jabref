@@ -55,15 +55,13 @@ public class GenFieldsCustomizer extends JDialog {
     private final GridBagLayout gridBagLayout2 = new GridBagLayout();
     private final JabRefFrame parent;
     private final JButton revert = new JButton();
-    //EntryCustomizationDialog diag;
-    private final HelpAction help;
 
 
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
         super(frame, Globals.lang("Set general fields"), false);
         parent = frame;
         //this.diag = diag;
-        help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
+        HelpAction help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
                 "Help", GUIGlobals.getIconUrl("helpSmall"));
         helpBut = new JButton(Globals.lang("Help"));
         helpBut.addActionListener(help);

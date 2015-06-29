@@ -453,7 +453,7 @@ public class LabelPatternUtil {
         LabelPatternUtil._db = database;
         ArrayList<String> _al;
         String _label;
-        StringBuffer _sb = new StringBuffer();
+        StringBuilder _sb = new StringBuilder();
         boolean forceUpper = false, forceLower = false;
 
         try {
@@ -595,7 +595,7 @@ public class LabelPatternUtil {
                 } else if (modifier.equals("abbr")) {
                     // Abbreviate - that is,
                     // System.out.println(_sbvalue.toString());
-                    StringBuffer abbr = new StringBuffer();
+                    StringBuilder abbr = new StringBuilder();
                     String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
                     for (String word1 : words) {
@@ -1151,7 +1151,7 @@ public class LabelPatternUtil {
      */
     private static String authAuthEa(String authorField) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        StringBuffer author = new StringBuffer();
+        StringBuilder author = new StringBuilder();
 
         String[] tokens = authorField.split("\\band\\b");
         if (tokens.length == 0) {
@@ -1184,7 +1184,7 @@ public class LabelPatternUtil {
     private static String authEtal(String authorField, String delim,
             String append) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        StringBuffer author = new StringBuffer();
+        StringBuilder author = new StringBuilder();
 
         String[] tokens = authorField.split("\\band\\b");
         if (tokens.length == 0) {
@@ -1244,7 +1244,7 @@ public class LabelPatternUtil {
      */
     private static String authshort(String authorField) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        StringBuffer author = new StringBuffer();
+        StringBuilder author = new StringBuilder();
         String[] tokens = authorField.split("\\band\\b");
         int i = 0;
 
@@ -1305,7 +1305,7 @@ public class LabelPatternUtil {
         }
 
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        StringBuffer author = new StringBuffer();
+        StringBuilder author = new StringBuilder();
         String[] tokens = authorField.split("\\band\\b");
         int i = 0;
         int charsAll = n / tokens.length;

@@ -59,8 +59,6 @@ public class FileListEntryEditor {
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JButton open = new JButton(Globals.lang("Open"));
 
     private final JComboBox types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
@@ -121,6 +119,7 @@ public class FileListEntryEditor {
         final JButton browseBut = new JButton(Globals.lang("Browse"));
         browseBut.addActionListener(browse);
         builder.append(browseBut);
+        JButton open = new JButton(Globals.lang("Open"));
         if (showOpenButton) {
             builder.append(open);
         }
@@ -143,6 +142,7 @@ public class FileListEntryEditor {
         //bb.addRelatedGap();
         bb.addRelatedGap();
         bb.addButton(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
 

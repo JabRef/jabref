@@ -1188,7 +1188,7 @@ public class JabRefPreferences {
         // true if a ";" is found
         boolean done = false;
 
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
                 if (!escape) {
@@ -1221,7 +1221,7 @@ public class JabRefPreferences {
     }
 
     private String makeEscape(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int c;
         for (int i = 0; i < s.length(); i++) {
             c = s.charAt(i);

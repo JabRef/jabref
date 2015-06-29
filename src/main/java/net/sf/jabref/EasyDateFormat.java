@@ -9,7 +9,7 @@ public class EasyDateFormat {
      * A static Object for date formatting. Please do not create the object
      * here, because there are some references from the Globals class.....
      */
-    static SimpleDateFormat dateFormatter = null;
+    private static SimpleDateFormat dateFormatter = null;
 
     /**
      * Creates a String containing the current date (and possibly time),

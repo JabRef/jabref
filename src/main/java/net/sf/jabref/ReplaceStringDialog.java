@@ -37,34 +37,21 @@ class ReplaceStringDialog extends JDialog {
             fields = new JTextField("", 30);
     private final JTextField from = new JTextField("", 30);
     private final JTextField to = new JTextField("", 30);
-    private final JLabel
-            fl = new JLabel(Globals.lang("Search for") + ":");
-    private final JLabel tl = new JLabel(Globals.lang("Replace with") + ":");
 
-    private final JButton
-            ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JPanel
-            settings = new JPanel();
-    private final JPanel main = new JPanel();
-    private final JPanel opt = new JPanel();
     private final JCheckBox selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
     private final JRadioButton
             allFi = new JRadioButton(Globals.lang("All fields"), true);
     private final JRadioButton field = new JRadioButton(Globals.lang("Limit to fields") + ":", false);
-    private final ButtonGroup bg = new ButtonGroup();
     private boolean ok_pressed = false;
     private String[] flds = null;
     private String s1;
     private String s2;
 
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
-
 
     public ReplaceStringDialog(JabRefFrame parent_) {
         super(parent_, Globals.lang("Replace string"), true);
 
+        ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
         bg.add(field);
         ActionListener okListener = new ActionListener() {
@@ -81,6 +68,7 @@ class ReplaceStringDialog extends JDialog {
                 dispose();
             }
         };
+        JButton ok = new JButton(Globals.lang("Ok"));
         ok.addActionListener(okListener);
         to.addActionListener(okListener);
         fields.addActionListener(okListener);
@@ -91,17 +79,22 @@ class ReplaceStringDialog extends JDialog {
                 dispose();
             }
         };
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(cancelAction);
 
         // Key bindings:
+        JPanel settings = new JPanel();
         ActionMap am = settings.getActionMap();
         InputMap im = settings.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent_.prefs.getKey("Close dialog"), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
+        GridBagLayout gbl = new GridBagLayout();
         settings.setLayout(gbl);
+        JPanel opt = new JPanel();
         opt.setLayout(gbl);
+        JPanel main = new JPanel();
         main.setLayout(gbl);
 
         settings.setBorder(BorderFactory.createTitledBorder
@@ -122,6 +115,7 @@ class ReplaceStringDialog extends JDialog {
         gbl.setConstraints(nf, con);
         settings.add(nf);*/
         //con.weightx = 1;
+        GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.HORIZONTAL;
         //JSeparator sep = new JSeparator()
         con.gridwidth = 2;
@@ -151,9 +145,11 @@ class ReplaceStringDialog extends JDialog {
         con.weightx = 0;
         con.gridx = 0;
         con.gridy = 0;
+        JLabel fl = new JLabel(Globals.lang("Search for") + ":");
         gbl.setConstraints(fl, con);
         main.add(fl);
         con.gridy = 1;
+        JLabel tl = new JLabel(Globals.lang("Replace with") + ":");
         gbl.setConstraints(tl, con);
         main.add(tl);
         con.weightx = 1;
@@ -236,7 +232,7 @@ class ReplaceStringDialog extends JDialog {
             return 0;
         }
         String txt = o.toString();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int ind, piv = 0, counter = 0, len1 = s1.length();
         while ((ind = txt.indexOf(s1, piv)) >= 0) {
             counter++;

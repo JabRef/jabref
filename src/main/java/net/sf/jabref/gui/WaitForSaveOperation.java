@@ -31,8 +31,6 @@ public class WaitForSaveOperation implements ActionListener {
 
     private final JabRefFrame frame;
     private final JDialog diag;
-    private final JProgressBar prog;
-    private final JButton cancel;
     private final Timer t = new Timer(500, this);
     private boolean cancelled = false;
 
@@ -40,8 +38,8 @@ public class WaitForSaveOperation implements ActionListener {
     public WaitForSaveOperation(JabRefFrame frame) {
         this.frame = frame;
 
-        cancel = new JButton(Globals.lang("Cancel"));
-        prog = new JProgressBar(0);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JProgressBar prog = new JProgressBar(0);
         prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag = new JDialog(frame, Globals.lang("Please wait..."), true);

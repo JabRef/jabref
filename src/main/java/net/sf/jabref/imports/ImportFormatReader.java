@@ -228,7 +228,7 @@ public class ImportFormatReader {
      * @return  human readable list of all known import formats
      */
     public String getImportFormatList() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (ImportFormat imFo : formats) {
             int pad = Math.max(0, 14 - imFo.getFormatName().length());
@@ -254,7 +254,7 @@ public class ImportFormatReader {
      */
     public static String expandAuthorInitials(String name) {
         String[] authors = name.split(" and ");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < authors.length; i++) {
             if (authors[i].contains(", ")) {
                 String[] names = authors[i].split(", ");
@@ -306,7 +306,7 @@ public class ImportFormatReader {
                 Character.isUpperCase(s.charAt(0)))) {
             return s + ".";
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char c = s.charAt(0), d = 0;
         for (int i = 1; i < s.length(); i++) {
             d = s.charAt(i);

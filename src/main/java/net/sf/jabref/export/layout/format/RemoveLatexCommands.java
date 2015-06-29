@@ -20,16 +20,15 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class RemoveLatexCommands implements LayoutFormatter {
 
-    private int i;
-
 
     @Override
     public String format(String field) {
 
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
         StringBuffer currentCommand = null;
         char c;
         boolean escaped = false, incommand = false;
+        int i;
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
             if (escaped && (c == '\\')) {

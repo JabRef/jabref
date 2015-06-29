@@ -52,7 +52,7 @@ public class RemoteListener extends Thread {
         closeServerSocket();
     }
 
-    public void closeServerSocket() {
+    private void closeServerSocket() {
         // need to close the serverSocket to wake up thread to shut it down
         try {
             serverSocket.close();

@@ -152,7 +152,7 @@ public class EntryMarker {
             }
         }
         owners.remove(Globals.prefs.get("defaultOwner"));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Object owner : owners) {
             sb.append('[');
             sb.append(owner.toString());

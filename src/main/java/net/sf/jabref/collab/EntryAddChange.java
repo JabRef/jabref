@@ -25,8 +25,6 @@ import net.sf.jabref.undo.UndoableInsertEntry;
 class EntryAddChange extends Change {
 
     private final BibtexEntry diskEntry;
-    //  boolean isModifiedLocally, modificationsAgree;[[[[[[
-    private final PreviewPanel pp;
     private final JScrollPane sp;
 
 
@@ -34,7 +32,7 @@ class EntryAddChange extends Change {
         super("Added entry");
         this.diskEntry = diskEntry;
 
-        pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get("preview0"));
+        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get("preview0"));
         sp = new JScrollPane(pp);
     }
 

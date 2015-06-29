@@ -34,13 +34,8 @@ import net.sf.jabref.undo.NamedCompound;
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
     private BibtexDatabase secondary;
-    private final DefaultMutableTreeNode root;
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
-    private final JPanel buttonPanel = new JPanel();
-    private final JPanel infoBorder = new JPanel();
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
     private final JCheckBox cb = new JCheckBox(Globals.lang("Accept change"));
     private final JLabel rootInfo = new JLabel(Globals.lang("Select the tree nodes to view and accept or reject changes") + '.');
     private Change selected = null;
@@ -57,11 +52,11 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         if (secondary == null) {
             this.secondary = new BibtexDatabase();
         }
-        this.root = root;
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
         JSplitPane pane = new JSplitPane();
         pane.setLeftComponent(new JScrollPane(tree));
+        JPanel infoBorder = new JPanel();
         pane.setRightComponent(infoBorder);
 
         cb.setMargin(new Insets(2, 2, 2, 2));
@@ -73,7 +68,10 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         setInfo(rootInfo);
         infoPanel.add(cb, BorderLayout.SOUTH);
 
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JPanel buttonPanel = new JPanel();
         buttonPanel.add(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         buttonPanel.add(cancel);
 
         getContentPane().add(pane, BorderLayout.CENTER);

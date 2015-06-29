@@ -87,8 +87,6 @@ public class GroupSelector extends SidePaneComponent implements
     private static final Logger logger = Logger.getLogger(GroupSelector.class.getName());
 
     private final JButton newButton = new JButton(GUIGlobals.getImage("new"));
-    private final JButton helpButton = new JButton(
-                    GUIGlobals.getImage("help"));
     private final JButton refresh = new JButton(
                     GUIGlobals.getImage("refresh"));
     private final JButton autoGroup = new JButton(GUIGlobals.getImage("autoGroup"));
@@ -97,9 +95,6 @@ public class GroupSelector extends SidePaneComponent implements
     private GroupsTree groupsTree;
     private DefaultTreeModel groupsTreeModel;
     private GroupTreeNode groupsRoot;
-    private final JScrollPane sp;
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
     final JabRefFrame frame;
     String searchField;
     private final JPopupMenu groupsContextMenu = new JPopupMenu();
@@ -107,10 +102,7 @@ public class GroupSelector extends SidePaneComponent implements
     private final JRadioButtonMenuItem hideNonHits;
     private final JRadioButtonMenuItem grayOut;
     private final JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Globals.lang("Intersection"), true);
-    private final JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
-            false);
     private final JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Globals.lang("Float"), true);
-    private final JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
     private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Globals.lang("Inverted"),
             false);
     private final JCheckBoxMenuItem select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
@@ -120,16 +112,10 @@ public class GroupSelector extends SidePaneComponent implements
             Globals.lang("Show number of elements contained in each group"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Globals.lang("Automatically assign new entry to selected groups"));
-    private final ButtonGroup bgr = new ButtonGroup();
-    private final ButtonGroup visMode = new ButtonGroup();
-    private final ButtonGroup nonHits = new ButtonGroup();
-    private final JButton expand = new JButton(GUIGlobals.getImage("down"));
-    private final JButton reduce = new JButton(GUIGlobals.getImage("up"));
     private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Globals.lang("Edit Group Membership"), false);
     private final Border editModeBorder = BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED),
             "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP, Font.getFont("Default"), Color.RED);
     private boolean editModeIndicator;
-    private final SidePaneManager manager;
 
 
     /**
@@ -142,12 +128,12 @@ public class GroupSelector extends SidePaneComponent implements
         super(manager, GUIGlobals.getIconUrl("toggleGroups"), Globals.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
 
-        this.manager = manager;
         this.frame = frame;
         hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
                 !Globals.prefs.getBoolean("grayOutNonHits"));
         grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
                 Globals.prefs.getBoolean("grayOutNonHits"));
+        ButtonGroup nonHits = new ButtonGroup();
         nonHits.add(hideNonHits);
         nonHits.add(grayOut);
         floatCb.addChangeListener(new ChangeListener() {
@@ -198,6 +184,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         });
 
+        JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
         if (Globals.prefs.getBoolean("groupFloatSelections")) {
 
             floatCb.setSelected(true);
@@ -206,6 +193,8 @@ public class GroupSelector extends SidePaneComponent implements
             highlCb.setSelected(true);
             floatCb.setSelected(false);
         }
+        JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
+                false);
         if (Globals.prefs.getBoolean("groupIntersectSelections")) {
             andCb.setSelected(true);
             orCb.setSelected(false);
@@ -277,6 +266,7 @@ public class GroupSelector extends SidePaneComponent implements
                 }
             }
         });
+        JButton expand = new JButton(GUIGlobals.getImage("down"));
         expand.addActionListener(new ActionListener() {
 
             @Override
@@ -293,6 +283,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             }
         });
+        JButton reduce = new JButton(GUIGlobals.getImage("up"));
         reduce.addActionListener(new ActionListener() {
 
             @Override
@@ -329,6 +320,8 @@ public class GroupSelector extends SidePaneComponent implements
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
+        JButton helpButton = new JButton(
+                GUIGlobals.getImage("help"));
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);
@@ -372,14 +365,18 @@ public class GroupSelector extends SidePaneComponent implements
         expand.setToolTipText(Globals.lang("Show one more row"));
         reduce.setToolTipText(Globals.lang("Show one less rows"));
         editModeCb.setToolTipText(Globals.lang("Click group to toggle membership of selected entries"));
+        ButtonGroup bgr = new ButtonGroup();
         bgr.add(andCb);
         bgr.add(orCb);
+        ButtonGroup visMode = new ButtonGroup();
         visMode.add(floatCb);
         visMode.add(highlCb);
 
         JPanel main = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
         main.setLayout(gbl);
 
+        GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.BOTH;
         //con.insets = new Insets(0, 0, 2, 0);
         con.weightx = 1;
@@ -409,7 +406,7 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree = new GroupsTree(this);
         groupsTree.addTreeSelectionListener(this);
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
-        sp = new JScrollPane(groupsTree,
+        JScrollPane sp = new JScrollPane(groupsTree,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         revalidateGroups();
@@ -459,12 +456,16 @@ public class GroupSelector extends SidePaneComponent implements
         add(main, BorderLayout.CENTER);
         updateBorder(editModeIndicator);
         definePopup();
+        NodeAction moveNodeUpAction = new MoveNodeUpAction();
         moveNodeUpAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
+        NodeAction moveNodeDownAction = new MoveNodeDownAction();
         moveNodeDownAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK));
+        NodeAction moveNodeLeftAction = new MoveNodeLeftAction();
         moveNodeLeftAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK));
+        NodeAction moveNodeRightAction = new MoveNodeRightAction();
         moveNodeRightAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
     }
@@ -1007,10 +1008,6 @@ public class GroupSelector extends SidePaneComponent implements
     private final NodeAction moveNodeDownPopupAction = new MoveNodeDownAction();
     private final NodeAction moveNodeLeftPopupAction = new MoveNodeLeftAction();
     private final NodeAction moveNodeRightPopupAction = new MoveNodeRightAction();
-    private final NodeAction moveNodeUpAction = new MoveNodeUpAction();
-    private final NodeAction moveNodeDownAction = new MoveNodeDownAction();
-    private final NodeAction moveNodeLeftAction = new MoveNodeLeftAction();
-    private final NodeAction moveNodeRightAction = new MoveNodeRightAction();
     private final NodeAction expandSubtreePopupAction = new ExpandSubtreeAction();
     private final NodeAction collapseSubtreePopupAction = new CollapseSubtreeAction();
     private final NodeAction sortDirectSubgroupsPopupAction = new SortDirectSubgroupsAction();

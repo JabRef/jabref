@@ -5,7 +5,7 @@ import net.sf.jabref.JabRefExecutorService;
 
 public class RemoteListenerLifecycle {
 
-    public static RemoteListener remoteListener = null;
+    private static RemoteListener remoteListener = null;
 
     public static void disableRemoteListener() {
         if(isRemoteListenerOpen()) {

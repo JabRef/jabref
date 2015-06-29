@@ -93,7 +93,7 @@ public class NameFormat implements LayoutFormatter {
 
     private String format(String toFormat, AuthorList al, String[] formats) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         int n = al.size();
 

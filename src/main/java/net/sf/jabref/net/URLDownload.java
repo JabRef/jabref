@@ -177,7 +177,7 @@ public class URLDownload {
         }
     }
 
-    protected InputStream monitorInputStream(InputStream in) {
+    private InputStream monitorInputStream(InputStream in) {
         return in;
     }
 

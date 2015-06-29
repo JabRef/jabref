@@ -26,7 +26,6 @@ import net.sf.jabref.undo.UndoablePreambleChange;
 
 class PreambleChange extends Change {
 
-    private final String tmp;
     private final String mem;
     private final String disk;
     private final InfoPane tp = new InfoPane();
@@ -37,9 +36,8 @@ class PreambleChange extends Change {
         super("Changed preamble");
         this.disk = disk;
         this.mem = mem;
-        this.tmp = tmp;
 
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         text.append("<FONT SIZE=3>");
         text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
 

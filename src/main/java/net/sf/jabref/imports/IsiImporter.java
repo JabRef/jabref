@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
-import net.sf.jabref.StringUtil;
 import net.sf.jabref.util.CaseChangers;
 
 /**
@@ -167,7 +166,7 @@ public class IsiImporter extends ImportFormat {
         }
 
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
@@ -406,7 +405,7 @@ public class IsiImporter extends ImportFormat {
             return author;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String last = s[0].trim();
         sb.append(last).append(", ");

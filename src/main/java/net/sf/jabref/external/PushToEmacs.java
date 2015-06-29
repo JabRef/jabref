@@ -157,7 +157,7 @@ public class PushToEmacs implements PushToApplication {
                     //                    } catch (Exception e) {
                     //                    }
                     int c;
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     try {
                         while ((c = out.read()) != -1) {
                             sb.append((char) c);

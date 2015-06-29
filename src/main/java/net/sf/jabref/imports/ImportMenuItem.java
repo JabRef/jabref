@@ -43,7 +43,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     private final JabRefFrame frame;
     private final boolean openInNew;
-    private MyWorker worker = null;
     private final ImportFormat importer;
     private IOException importError = null;
 
@@ -63,7 +62,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        worker = new MyWorker();
+        MyWorker worker = new MyWorker();
         worker.init();
         worker.getWorker().run();
         worker.getCallBack().update();
@@ -155,7 +154,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 .getBoolean("displayKeyWarningDialogAtStartup")
                                 && pr.hasWarnings()) {
                             String[] wrns = pr.warnings();
-                            StringBuffer wrn = new StringBuffer();
+                            StringBuilder wrn = new StringBuilder();
                             for (int j = 0; j < wrns.length; j++) {
                                 wrn.append(j + 1).append(". ").append(wrns[j])
                                         .append("\n");

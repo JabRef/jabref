@@ -93,9 +93,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private final DeleteAction deleteAction = new DeleteAction();
 
     // The action concerned with copying the BibTeX key to the clipboard.
-    private final CopyKeyAction copyKeyAction;
-
-    // The action concerned with copying the BibTeX key to the clipboard.
     final AbstractAction nextEntryAction = new NextEntryAction();
 
     // Actions for switching to next/previous entry.
@@ -125,8 +122,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private final JPanel srcPanel = new JPanel();
 
     EntryEditorTab genPan;
-    private EntryEditorTab optPan;
-    private EntryEditorTab reqPan;
     EntryEditorTab absPan;
 
     JTextField bibtexKey;
@@ -135,13 +130,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private JTextArea source;
 
-    private JToolBar tlb;
-
     private final JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
 
     JLabel lab;
-
-    private TypeButton typeButton;
 
     final JabRefFrame frame;
 
@@ -197,7 +188,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         helpAction = new HelpAction(frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
         closeAction = new CloseAction();
-        copyKeyAction = new CopyKeyAction();
+        CopyKeyAction copyKeyAction = new CopyKeyAction();
         generateKeyAction = new GenerateKeyAction(frame);
         storeFieldAction = new StoreFieldAction();
         writeXmp = new WriteXMPEntryEditorAction(panel_, this);
@@ -225,7 +216,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (fields != null) {
             fieldList = java.util.Arrays.asList(fields);
         }
-        reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Globals.lang("Required fields"));
+        EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Globals.lang("Required fields"));
         if (reqPan.fileListEditor != null) {
             fileListEditor = reqPan.fileListEditor;
         }
@@ -234,6 +225,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         tabs.add(reqPan);
 
         if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
+            EntryEditorTab optPan;
             if (!prefs.getBoolean("biblatexMode")) {
                 optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
                         false, false, Globals.lang("Optional fields"));
@@ -343,7 +335,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupToolBar() {
         JPanel leftPan = new JPanel();
         leftPan.setLayout(new BorderLayout());
-        tlb = new JToolBar(SwingConstants.VERTICAL);
+        JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
         //tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
@@ -385,7 +377,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         // Create type-label
         leftPan.add(new TypeLabel(entry.getType().getName()), BorderLayout.CENTER);
-        typeButton = new TypeButton(entry.getType().getName());
+        TypeButton typeButton = new TypeButton(entry.getType().getName());
 
         tlb.add(typeButton);
         tlb.add(generateKeyAction);
@@ -1152,7 +1144,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    class TabListener implements ChangeListener {
+    private class TabListener implements ChangeListener {
 
         @Override
         public void stateChanged(ChangeEvent e) {

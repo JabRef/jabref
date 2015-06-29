@@ -33,8 +33,6 @@ import java.util.List;
 class ResolveDuplicateLabelDialog {
 
     private final JDialog diag;
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
     private final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
     private boolean okPressed = false;
 
@@ -81,7 +79,9 @@ class ResolveDuplicateLabelDialog {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Globals.lang("Ok"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

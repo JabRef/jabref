@@ -15,16 +15,14 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Util;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
  * in JabRef style. The reformatting must undo all formatting done by JabRef when
  * writing the same fields.
  */
-public class FieldContentParser {
+class FieldContentParser {
 
     /**
      * Performs the reformatting

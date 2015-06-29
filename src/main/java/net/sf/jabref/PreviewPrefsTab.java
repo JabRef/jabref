@@ -35,25 +35,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     JPanel pan = new JPanel();
 
-    private final GridBagLayout gbl = new GridBagLayout();
-
-    private final GridBagConstraints con = new GridBagConstraints();
-
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    private final JButton def1 = new JButton(Globals.lang("Default"));
-    private final JButton def2 = new JButton(Globals.lang("Default"));
-    private final JButton test1 = new JButton(Globals.lang("Test"));
-    private final JButton test2 = new JButton(Globals.lang("Test"));
     JButton help;
-
-    private final JPanel p1 = new JPanel();
-    private final JPanel p2 = new JPanel();
-    private final JPanel p3 = new JPanel(new BorderLayout());
-
-    private final JScrollPane sp1 = new JScrollPane(layout1);
-    private final JScrollPane sp2 = new JScrollPane(layout2);
 
     private final JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
 
@@ -63,12 +48,16 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     public PreviewPrefsTab(JabRefPreferences prefs) {
         _prefs = prefs;
 
+        JPanel p1 = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
         p1.setLayout(gbl);
+        JPanel p2 = new JPanel();
         p2.setLayout(gbl);
 
         setLayout(gbl);
         JLabel lab;
         lab = new JLabel(Globals.lang("Preview") + " 1");
+        GridBagConstraints con = new GridBagConstraints();
         con.anchor = GridBagConstraints.WEST;
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.fill = GridBagConstraints.BOTH;
@@ -78,6 +67,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         gbl.setConstraints(lab, con);
         // p1.add(lab);
         con.weighty = 1;
+        JScrollPane sp1 = new JScrollPane(layout1);
         gbl.setConstraints(sp1, con);
         p1.add(sp1);
         con.weighty = 0;
@@ -85,8 +75,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         con.weightx = 0;
         con.fill = GridBagConstraints.NONE;
         con.anchor = GridBagConstraints.WEST;
+        JButton test1 = new JButton(Globals.lang("Test"));
         gbl.setConstraints(test1, con);
         p1.add(test1);
+        JButton def1 = new JButton(Globals.lang("Default"));
         gbl.setConstraints(def1, con);
         p1.add(def1);
         con.gridwidth = GridBagConstraints.REMAINDER;
@@ -99,14 +91,17 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         // p2.add(lab);
         con.weighty = 1;
         con.fill = GridBagConstraints.BOTH;
+        JScrollPane sp2 = new JScrollPane(layout2);
         gbl.setConstraints(sp2, con);
         p2.add(sp2);
         con.weighty = 0;
         con.weightx = 0;
         con.fill = GridBagConstraints.NONE;
         con.gridwidth = 1;
+        JButton test2 = new JButton(Globals.lang("Test"));
         gbl.setConstraints(test2, con);
         p2.add(test2);
+        JButton def2 = new JButton(Globals.lang("Default"));
         gbl.setConstraints(def2, con);
         p2.add(def2);
         con.gridwidth = 1;
@@ -137,6 +132,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         add(p2);
 
         // PDF Preview button
+        JPanel p3 = new JPanel(new BorderLayout());
         p3.add(pdfPreview, BorderLayout.WEST);
 
         { // Help Button

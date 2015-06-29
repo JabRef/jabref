@@ -113,7 +113,7 @@ public class CustomEntryType extends BibtexEntryType {
 
     @Override
     public String describeRequiredFields() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < req.length; i++) {
             sb.append(req[i]);
             sb.append(((i <= (req.length - 1)) && (req.length > 1)) ? ", " : "");
@@ -122,7 +122,7 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     public String describeOptionalFields() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < opt.length; i++) {
             sb.append(opt[i]);
             sb.append(((i <= (opt.length - 1)) && (opt.length > 1)) ? ", " : "");

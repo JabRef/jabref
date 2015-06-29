@@ -50,7 +50,7 @@ import net.sf.jabref.Util;
  *
  * @author alver
  */
-public class FieldSetComponent extends JPanel implements ActionListener {
+class FieldSetComponent extends JPanel implements ActionListener {
 
     private final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
     final JList list;
@@ -58,7 +58,6 @@ public class FieldSetComponent extends JPanel implements ActionListener {
     DefaultListModel listModel;
     private JComboBox sel;
     private JTextField input;
-    private JLabel title = null;
     private final JButton add;
     final JButton remove;
     private JButton up = null;
@@ -92,8 +91,9 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         add = new JButton(Globals.lang(addText));
         remove = new JButton(Globals.lang(removeText));
         listModel = new DefaultListModel();
+        JLabel title1 = null;
         if (title != null) {
-            this.title = new JLabel(title);
+            title1 = new JLabel(title);
         }
 
         for (String field : fields) {
@@ -110,9 +110,9 @@ public class FieldSetComponent extends JPanel implements ActionListener {
         con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;
         con.gridwidth = GridBagConstraints.REMAINDER;
-        if (this.title != null) {
-            gbl.setConstraints(this.title, con);
-            add(this.title);
+        if (title1 != null) {
+            gbl.setConstraints(title1, con);
+            add(title1);
         }
 
         con.weighty = 1;

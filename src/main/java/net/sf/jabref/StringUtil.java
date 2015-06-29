@@ -56,7 +56,7 @@ public class StringUtil {
         return s;
     }
 
-    public static String rtrim(String s) {
+    private static String rtrim(String s) {
         return s.replaceAll("\\s+$", "");
     }
 
@@ -84,7 +84,7 @@ public class StringUtil {
         from = Math.max(from, 0);
         to = Math.min(strings.length, to);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = from; i < (to - 1); i++) {
             sb.append(strings[i]).append(separator);
         }

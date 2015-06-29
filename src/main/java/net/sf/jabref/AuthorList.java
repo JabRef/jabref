@@ -183,17 +183,6 @@ public class AuthorList {
     // terminator (either " " or
     // "-")
 
-    // private static final int OFFSET_TOKEN_CASE = 3; // Boolean --
-    // true=uppercase, false=lowercase
-    // the following are indices in 'tokens' vector created during parsing of
-    // author name
-    // and later used to properly split author name into parts
-    private int von_start; // first lower-case token (-1 if all tokens upper-case)
-            private int last_start; // first upper-case token after first lower-case token (-1
-            private int// if does not exist)
-            comma_first; // token after first comma (-1 if no commas)
-            private int comma_second; // token after second comma (-1 if no commas or only one
-
     // comma)
 
     // Token types (returned by getToken procedure)
@@ -354,10 +343,10 @@ public class AuthorList {
     private Author getAuthor() {
 
         tokens = new Vector<Object>(); // initialization
-        von_start = -1;
-        last_start = -1;
-        comma_first = -1;
-        comma_second = -1;
+        int von_start = -1;
+        int last_start = -1;
+        int comma_first = -1;
+        int comma_second = -1;
 
         // First step: collect tokens in 'tokens' Vector and calculate indices
         token_loop: while (true) {

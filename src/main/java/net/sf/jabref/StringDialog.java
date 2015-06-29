@@ -59,16 +59,9 @@ class StringDialog extends JDialog {
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final JabRefPreferences prefs;
-    private TreeSet<BibtexString> stringsSet; // Our locally sorted set of strings.
     private Object[] strings;
 
-    // Layout objects.
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    private final Container conPane = getContentPane();
-    private final JToolBar tlb = new JToolBar();
-    private final JPanel pan = new JPanel();
     private final StringTable table;
     private final HelpAction helpAction;
 
@@ -107,7 +100,10 @@ class StringDialog extends JDialog {
         setLocation(prefs.getInt("stringsPosX"), prefs.getInt("stringsPosY"));
         setSize(prefs.getInt("stringsSizeX"), prefs.getInt("stringsSizeY"));
 
+        JPanel pan = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
         pan.setLayout(gbl);
+        GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.BOTH;
         con.weighty = 1;
         con.weightx = 1;
@@ -121,11 +117,14 @@ class StringDialog extends JDialog {
         gbl.setConstraints(table.getPane(), con);
         pan.add(table.getPane());
 
+        JToolBar tlb = new JToolBar();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = tlb.getActionMap();
         im.put(prefs.getKey("String dialog, add string"), "add");
+        NewStringAction newStringAction = new NewStringAction(this);
         am.put("add", newStringAction);
         im.put(prefs.getKey("String dialog, remove string"), "remove");
+        RemoveStringAction removeStringAction = new RemoveStringAction(this);
         am.put("remove", removeStringAction);
         //im.put(prefs.getKey("String dialog, move string up"), "up");
         //am.put("up", stringUpAction);
@@ -136,8 +135,10 @@ class StringDialog extends JDialog {
         im.put(prefs.getKey("Help"), "help");
         am.put("help", helpAction);
         im.put(prefs.getKey("Undo"), "undo");
+        UndoAction undoAction = new UndoAction();
         am.put("undo", undoAction);
         im.put(prefs.getKey("Redo"), "redo");
+        RedoAction redoAction = new RedoAction();
         am.put("redo", redoAction);
 
         //tlb.add(closeAction);
@@ -149,6 +150,7 @@ class StringDialog extends JDialog {
         //tlb.add(stringDownAction);
         tlb.addSeparator();
         tlb.add(helpAction);
+        Container conPane = getContentPane();
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
@@ -195,7 +197,7 @@ class StringDialog extends JDialog {
 
     private void sortStrings() {
         // Rebuild our sorted set of strings:
-        stringsSet = new TreeSet<BibtexString>(new BibtexStringComparator(false));
+        TreeSet<BibtexString> stringsSet = new TreeSet<BibtexString>(new BibtexStringComparator(false));
         for (String s : base.getStringKeySet()) {
             stringsSet.add(base.getString(s));
         }
@@ -371,9 +373,6 @@ class StringDialog extends JDialog {
     }
 
 
-    private final NewStringAction newStringAction = new NewStringAction(this);
-
-
     class NewStringAction extends AbstractAction {
 
         final StringDialog parent;
@@ -461,9 +460,6 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
         }
     }
-
-
-    private final RemoveStringAction removeStringAction = new RemoveStringAction(this);
 
 
     class RemoveStringAction extends AbstractAction {
@@ -590,8 +586,6 @@ class StringDialog extends JDialog {
     }
     }*/
 
-    private final UndoAction undoAction = new UndoAction();
-
 
     class UndoAction extends AbstractAction {
 
@@ -608,9 +602,6 @@ class StringDialog extends JDialog {
             }
         }
     }
-
-
-    private final RedoAction redoAction = new RedoAction();
 
 
     class RedoAction extends AbstractAction {

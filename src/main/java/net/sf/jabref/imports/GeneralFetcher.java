@@ -54,14 +54,8 @@ import net.sf.jabref.help.HelpAction;
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
     private final JTextField tf = new JTextField();
-    private final JPanel pan = new JPanel();
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
-    private final JButton go = new JButton(Globals.lang("Fetch"));
     private final JButton helpBut = new JButton(
             GUIGlobals.getImage("helpSmall"));
-    private final JButton reset = new JButton(
-            Globals.lang("Reset"));
     private final JComboBox fetcherChoice;
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
@@ -154,6 +148,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         tf.setName("tf");
         // add action to reset-button. resets tf and requests focus
+        JButton reset = new JButton(
+                Globals.lang("Reset"));
         reset.addActionListener(new AbstractAction() {
 
             @Override
@@ -164,7 +160,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         });
 
         JPanel main = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
         main.setLayout(gbl);
+        GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.BOTH;
         con.insets = new Insets(0, 0, 2, 0);
         con.gridwidth = GridBagConstraints.REMAINDER;
@@ -181,6 +179,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // Go Button
         con.weighty = 0;
         con.gridwidth = 1;
+        JButton go = new JButton(Globals.lang("Fetch"));
         gbl.setConstraints(go, con);
         main.add(go);
 
@@ -194,6 +193,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         gbl.setConstraints(helpBut, con);
         main.add(helpBut);
 
+        JPanel pan = new JPanel();
         if (pan != null) {
             gbl.setConstraints(optPanel, con);
             main.add(optPanel);

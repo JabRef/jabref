@@ -45,13 +45,9 @@ public class RightClickMenu extends JPopupMenu
     private final JMenu groupAddMenu = new JMenu(Globals.lang("Add to group"));
     private final JMenu groupRemoveMenu = new JMenu(Globals.lang("Remove from group"));
     private final JMenu groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")); // JZTODO lyrics
-            private final JMenu rankingMenu = new JMenu();
-    private final JMenu priorityMenu = new JMenu();
-    private final JMenu readStatusMenu = new JMenu();
     private final JMenu typeMenu = new JMenu(Globals.lang("Change entry type"));
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
-    private final JMenuItem groupMoveTo;
     private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
             Globals.prefs.getBoolean("floatMarkedEntries"));
 
@@ -215,8 +211,9 @@ public class RightClickMenu extends JPopupMenu
 
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
-                RightClickMenu.populateSpecialFieldMenu(this.rankingMenu, Rank.getInstance(), panel.frame);
-                add(this.rankingMenu);
+                JMenu rankingMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), panel.frame);
+                add(rankingMenu);
             }
 
             // TODO: multiple handling for relevance and quality-assurance
@@ -233,13 +230,15 @@ public class RightClickMenu extends JPopupMenu
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
-                RightClickMenu.populateSpecialFieldMenu(this.priorityMenu, Priority.getInstance(), panel.frame);
-                add(this.priorityMenu);
+                JMenu priorityMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), panel.frame);
+                add(priorityMenu);
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
-                RightClickMenu.populateSpecialFieldMenu(this.readStatusMenu, ReadStatus.getInstance(), panel.frame);
-                add(this.readStatusMenu);
+                JMenu readStatusMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), panel.frame);
+                add(readStatusMenu);
             }
 
             addSeparator();
@@ -377,8 +376,7 @@ public class RightClickMenu extends JPopupMenu
         });
         add(groupRemove);
 
-        groupMoveTo = add(new AbstractAction(Globals.lang("Move to group"))
-        {
+        JMenuItem groupMoveTo = add(new AbstractAction(Globals.lang("Move to group")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -38,7 +38,6 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
 
     private final JabRefFrame frame;
     private File file = null;
-    private final String FILENAME = "/EndNote.zip";
 
 
     /** Creates a new instance of ExpandEndnoteFilters */
@@ -82,6 +81,7 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
      */
     @Override
     public void run() {
+        String FILENAME = "/EndNote.zip";
         ResourceExtractor re = new ResourceExtractor(frame, FILENAME, file);
         re.run();
         frame.output(Globals.lang("Unpacked file."));

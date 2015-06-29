@@ -111,7 +111,7 @@ class EntryEditorTab {
         String colSpec = compressed ? "fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref, "
                 + "8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref"
                 : "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int rows = (int) Math.ceil((double) fields.length / fieldsPerRow);
         for (int i = 0; i < rows; i++) {
             sb.append("fill:pref:grow, ");

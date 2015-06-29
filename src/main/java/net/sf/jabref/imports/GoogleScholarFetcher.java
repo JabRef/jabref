@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
-    private final boolean clearKeys = true; // Should we clear the keys so new ones can be generated?
     private static final int MAX_ENTRIES_TO_LOAD = 50;
     private final static String QUERY_MARKER = "___QUERY___";
     private final static String URL_START = "http://scholar.google.com";
@@ -266,6 +265,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                 Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
                 if (entries.size() == 1) {
                     BibtexEntry entry = entries.iterator().next();
+                    boolean clearKeys = true;
                     if (clearKeys) {
                         entry.setField(BibtexFields.KEY_FIELD, null);
                     }

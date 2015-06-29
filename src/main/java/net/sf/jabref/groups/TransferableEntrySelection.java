@@ -51,7 +51,7 @@ class TransferableEntrySelection implements Transferable {
 
     public TransferableEntrySelection(BibtexEntry[] selectedEntries) {
         this.selectedEntries = selectedEntries;
-        StringBuffer keys = new StringBuffer();
+        StringBuilder keys = new StringBuilder();
         for (int i = 0; i < selectedEntries.length; ++i) {
             keys.append(selectedEntries[i].getCiteKey());
             if ((i + 1) < selectedEntries.length) {

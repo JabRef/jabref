@@ -48,7 +48,6 @@ class IconSelection extends JDialog {
 
     private JList icons;
     private List<String> iconKeys;
-    private DefaultListModel listModel;
     private final JButton ok = new JButton(Globals.lang("Ok"));
     private final JButton cancel = new JButton(Globals.lang("Cancel"));
     private boolean okPressed = false;
@@ -105,7 +104,7 @@ class IconSelection extends JDialog {
 
         }
 
-        listModel = new DefaultListModel();
+        DefaultListModel listModel = new DefaultListModel();
         icons = new JList(listModel);
         for (ImageIcon anIconSet : iconSet) {
             listModel.addElement(new JLabel(anIconSet));

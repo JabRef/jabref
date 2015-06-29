@@ -54,9 +54,6 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JRadioButton editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
     private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JPanel main = new JPanel();
-    private final JPanel opt = new JPanel();
     private boolean ok_pressed = false;
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
@@ -152,9 +149,11 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 dispose();
             }
         };
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(cancelAction);
         ok.addActionListener(okListener);
         // Key bindings:
+        JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(frame.prefs().getKey("Close dialog"), "close");
@@ -186,6 +185,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.append(editors, 5);
         b.nextLine();
 
+        JPanel opt = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(opt);
         bb.addGlue();
         bb.addButton(ok);

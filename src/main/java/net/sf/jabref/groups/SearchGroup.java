@@ -278,7 +278,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     public static String getDescriptionForPreview(String expr, AST ast,
             boolean caseSensitive, boolean regExp) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (ast == null) {
             sb.append(regExp ? Globals.lang(
                     "This group contains entries in which any field contains the regular expression <b>%0</b>",
@@ -305,7 +305,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     private static String describeNode(AST node, boolean regExp,
                                        boolean not, boolean and, boolean or) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         switch (node.getType()) {
         case SearchExpressionTreeParserTokenTypes.And:
             if (not) {
@@ -407,7 +407,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public String getShortDescription() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<b>");
         if (Globals.prefs.getBoolean("groupShowDynamic")) {
             sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");

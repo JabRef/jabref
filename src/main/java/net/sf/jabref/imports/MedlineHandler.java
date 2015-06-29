@@ -42,8 +42,6 @@ class MedlineHandler extends DefaultHandler
     private boolean inSuffix = false;
     private boolean inInitials = false;
     private boolean inMedlinePgn = false;
-    private final boolean inMedlineID = false;
-    private final boolean inURL = false;
     private boolean inIssue = false;
     private boolean inPubDate = false;
     private boolean inUrl = false;
@@ -62,7 +60,6 @@ class MedlineHandler extends DefaultHandler
     private boolean inPst = false;
     private String title = "";
     private String journal = "";
-    private String keywords = "";
     private String author = "";
     private String lastName = "";
     private String suffix = "";
@@ -76,8 +73,6 @@ class MedlineHandler extends DefaultHandler
     private String initials = "";
     private String number = "";
     private String page = "";
-    private String medlineID = "";
-    private String url = "";
     private String MedlineDate = "";
     String series = "";
     String editor = "";
@@ -223,7 +218,7 @@ class MedlineHandler extends DefaultHandler
     }
 
     private String join(Object[] sa, String delim) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(sa[0].toString());
         for (int i = 1; i < sa.length; i++)
         {
@@ -258,7 +253,7 @@ class MedlineHandler extends DefaultHandler
             }
 
             // Build a string from the collected keywords:
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (Iterator<String> iterator = descriptors.iterator(); iterator.hasNext();) {
                 String s = iterator.next();
                 sb.append(s);
@@ -266,7 +261,7 @@ class MedlineHandler extends DefaultHandler
                     sb.append(MedlineHandler.KEYWORD_SEPARATOR);
                 }
             }
-            keywords = sb.toString();
+            String keywords = sb.toString();
 
             BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
             Globals.getEntryType("article")); // id assumes an existing database so don't create one here
@@ -362,8 +357,8 @@ class MedlineHandler extends DefaultHandler
             initials = "";
             number = "";
             page = "";
-            medlineID = "";
-            url = "";
+            String medlineID = "";
+            String url = "";
             MedlineDate = "";
             descriptors.clear();
         }
@@ -486,6 +481,8 @@ class MedlineHandler extends DefaultHandler
     public void characters(char[] data, int start, int length) {
 
         // if stack is not ready, data is not content of recognized element
+        boolean inURL = false;
+        boolean inMedlineID = false;
         if (inTitle) {
             title += new String(data, start, length);
         }
@@ -523,9 +520,11 @@ class MedlineHandler extends DefaultHandler
             page += new String(data, start, length);
         }
         else if (inMedlineID) {
+            String medlineID = "";
             medlineID += new String(data, start, length);
         }
         else if (inURL) {
+            String url = "";
             url += new String(data, start, length);
         }
         else if (inPubMedID) {

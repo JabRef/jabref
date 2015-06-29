@@ -31,8 +31,6 @@ import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 public abstract class SidePaneComponent extends SimpleInternalFrame {
 
     protected final JButton close = new JButton(GUIGlobals.getImage("close"));
-    private final JButton up = new JButton(GUIGlobals.getImage("up"));
-    private final JButton down = new JButton(GUIGlobals.getImage("down"));
 
     private boolean visible = false;
 
@@ -49,7 +47,9 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
         close.setMargin(new Insets(0, 0, 0, 0));
         // tlb.setOpaque(false);
         close.setBorder(null);
+        JButton up = new JButton(GUIGlobals.getImage("up"));
         up.setMargin(new Insets(0, 0, 0, 0));
+        JButton down = new JButton(GUIGlobals.getImage("down"));
         down.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
         down.setBorder(null);

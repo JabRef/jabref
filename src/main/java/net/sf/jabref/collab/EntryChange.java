@@ -28,12 +28,6 @@ import net.sf.jabref.undo.UndoableFieldChange;
 
 class EntryChange extends Change {
 
-    private final BibtexEntry memEntry;
-    private final BibtexEntry tmpEntry;
-    private final BibtexEntry diskEntry;
-    private final boolean isModifiedLocally;
-    private final boolean modificationsAgree;
-
 
     public EntryChange(BibtexEntry memEntry, BibtexEntry tmpEntry, BibtexEntry diskEntry) {
         super();
@@ -43,17 +37,14 @@ class EntryChange extends Change {
         } else {
             name = "Modified entry: '" + key + '\'';
         }
-        this.memEntry = memEntry;
-        this.tmpEntry = tmpEntry;
-        this.diskEntry = diskEntry;
 
         // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
         // locally as well, since last tempfile was saved.
-        isModifiedLocally = !(DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry) > 1);
+        boolean isModifiedLocally = !(DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry) > 1);
 
         // Another (unlikely?) possibility is that both disk and mem version has been modified
         // in the same way. Check for this, too.
-        modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
+        boolean modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
 
         //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
         //        +" Modifications agree: "+modificationsAgree);
@@ -132,7 +123,7 @@ class EntryChange extends Change {
             this.onTmp = onTmp;
             this.onDisk = onDisk;
 
-            StringBuffer text = new StringBuffer();
+            StringBuilder text = new StringBuilder();
             text.append("<FONT SIZE=10>");
             text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 

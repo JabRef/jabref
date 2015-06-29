@@ -46,7 +46,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
             "<a href=\"(.*)\">Next &gt;");
 
     private boolean stopFetching = false;
-    private boolean noAccessFound = false;
 
 
     @Override
@@ -73,7 +72,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
     @Override
     public void stopFetching() {
         stopFetching = true;
-        noAccessFound = false;
+        boolean noAccessFound = false;
     }
 
     @Override

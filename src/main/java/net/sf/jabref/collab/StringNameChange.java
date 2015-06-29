@@ -27,7 +27,6 @@ class StringNameChange extends Change {
 
     private final BibtexString string;
     private final String mem;
-    private final String tmp;
     private final String disk;
     private final String content;
     private final BibtexString tmpString;
@@ -40,7 +39,6 @@ class StringNameChange extends Change {
         this.string = string;
         this.content = content;
         this.mem = mem;
-        this.tmp = tmp;
         this.disk = disk;
 
     }

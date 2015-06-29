@@ -204,7 +204,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(ExplicitGroup.ID).append(StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(m_context).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
@@ -248,7 +248,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public String getShortDescription() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<b>").append(getName()).append("</b> -").append(Globals.lang("static group"));
         switch (getHierarchicalContext()) {
         case AbstractGroup.INCLUDING:

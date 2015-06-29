@@ -32,7 +32,7 @@ public class HTMLChars implements LayoutFormatter {
         field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{2,}", "<p>")
                 .replaceAll("\\n", "<br>");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
 
         char c;

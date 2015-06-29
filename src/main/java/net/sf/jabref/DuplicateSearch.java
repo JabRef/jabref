@@ -35,7 +35,6 @@ public class DuplicateSearch implements Runnable {
     private final BasePanel panel;
     private BibtexEntry[] bes;
     private final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
-    private boolean autoRemoveExactDuplicates = false;
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -47,7 +46,7 @@ public class DuplicateSearch implements Runnable {
         final NamedCompound ce = new NamedCompound(Globals.lang("duplicate removal"));
         int duplicateCounter = 0;
 
-        autoRemoveExactDuplicates = false;
+        boolean autoRemoveExactDuplicates = false;
         panel.output(Globals.lang("Searching for duplicates..."));
         Object[] keys = panel.database.getKeySet().toArray();
         if ((keys.length < 2)) {

@@ -27,8 +27,6 @@ public class LatexFieldFormatter implements FieldFormatter {
 
 
     private StringBuffer sb;
-    private int col; // First line usually starts about so much further to the right.
-    private final int STARTCOL = 4;
 
     private final boolean neverFailOnHashes;
 
@@ -136,7 +134,6 @@ public class LatexFieldFormatter implements FieldFormatter {
         int pivot = 0;
         int pos1;
         int pos2;
-        col = STARTCOL;
         // Here we assume that the user encloses any bibtex strings in #, e.g.:
         // #jan# - #feb#
         // ...which will be written to the file like this:
@@ -212,7 +209,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         sb.append(valueDelimitersZero);
         boolean escape = false, inCommandName = false, inCommand = false, inCommandOption = false;
         int nestedEnvironments = 0;
-        StringBuffer commandName = new StringBuffer();
+        StringBuilder commandName = new StringBuilder();
         char c;
         for (int i = start_pos; i < end_pos; i++) {
             c = text.charAt(i);

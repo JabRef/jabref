@@ -49,8 +49,6 @@ public class ExternalTab extends JPanel implements PrefsTab {
     private final JCheckBox runAutoFileSearch;
     private final JCheckBox allowFileAutoOpenBrowse;
     private final JCheckBox openFoldersOfAttachedFiles;
-    private final JButton editFileTypes;
-    private final ItemListener regExpListener;
 
     private final JRadioButton useRegExpComboBox;
     private final JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key"));
@@ -77,12 +75,12 @@ public class ExternalTab extends JPanel implements PrefsTab {
                 bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
             }
         });
-        editFileTypes = new JButton(Globals.lang("Manage external file types"));
+        JButton editFileTypes = new JButton(Globals.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Globals.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
-        regExpListener = new ItemListener() {
+        ItemListener regExpListener = new ItemListener() {
 
             @Override
             public void itemStateChanged(ItemEvent e) {

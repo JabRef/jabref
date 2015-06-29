@@ -72,7 +72,7 @@ public class INSPIREFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        StringBuffer sb = new StringBuffer("http://").append(INSPIREFetcher.INSPIRE_HOST)
+        StringBuilder sb = new StringBuilder("http://").append(INSPIREFetcher.INSPIRE_HOST)
                 .append("/");
         sb.append("/search?ln=en&ln=en&p=find+");
         //sb.append("spires/find/hep/www").append("?");

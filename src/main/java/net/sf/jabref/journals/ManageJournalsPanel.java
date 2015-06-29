@@ -68,13 +68,6 @@ class ManageJournalsPanel extends JPanel {
 
     private final JButton add = new JButton(GUIGlobals.getImage("add"));
     private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JButton help = new JButton(Globals.lang("Help"));
-    private final JButton browseOld = new JButton(Globals.lang("Browse"));
-    private final JButton browseNew = new JButton(Globals.lang("Browse"));
-    private final JButton addExt = new JButton(GUIGlobals.getImage("add"));
-    private final JButton viewBuiltin = new JButton(Globals.lang("View"));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -86,6 +79,7 @@ class ManageJournalsPanel extends JPanel {
         group.add(newFile);
         group.add(oldFile);
         addExtPan.setLayout(new BorderLayout());
+        JButton addExt = new JButton(GUIGlobals.getImage("add"));
         addExtPan.add(addExt, BorderLayout.EAST);
         addExtPan.setToolTipText(Globals.lang("Add"));
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
@@ -105,18 +99,21 @@ class ManageJournalsPanel extends JPanel {
                         + "well as linking to external journal lists.") + "</HTML>");
         description.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         builder.add(description, cc.xyw(2, 2, 6));
+        JButton viewBuiltin = new JButton(Globals.lang("View"));
         builder.add(viewBuiltin, cc.xy(7, 2));
         builder.addSeparator(Globals.lang("Personal journal list"), cc.xyw(2, 3, 6));
 
         //builder.add(description, cc.xyw(2,1,6));
         builder.add(newFile, cc.xy(3, 4));
         builder.add(newNameTf, cc.xy(5, 4));
+        JButton browseNew = new JButton(Globals.lang("Browse"));
         builder.add(browseNew, cc.xy(7, 4));
         builder.add(oldFile, cc.xy(3, 5));
         builder.add(personalFile, cc.xy(5, 5));
         //BrowseAction action = new BrowseAction(personalFile, false);
         //JButton browse = new JButton(Globals.lang("Browse"));
         //browse.addActionListener(action);
+        JButton browseOld = new JButton(Globals.lang("Browse"));
         builder.add(browseOld, cc.xy(7, 5));
 
         userPanel.setLayout(new BorderLayout());
@@ -139,9 +136,12 @@ class ManageJournalsPanel extends JPanel {
         add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Globals.lang("Ok"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addUnrelatedGap();
+        JButton help = new JButton(Globals.lang("Help"));
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

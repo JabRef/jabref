@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
@@ -87,7 +86,7 @@ public class MedlinePlainImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
@@ -112,7 +111,7 @@ public class MedlinePlainImporter extends ImportFormat {
                     continue;
                 }
 
-                StringBuffer current = new StringBuffer(fields[j]);
+                StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
 
                 while (!done && (j < (fields.length - 1))) {
@@ -268,9 +267,8 @@ public class MedlinePlainImporter extends ImportFormat {
                     toRemove.add(key);
                 }
             }
-            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext();) {
-                hm.remove(iterator.next());
-
+            for (Object aToRemove : toRemove) {
+                hm.remove(aToRemove);
             }
 
             // create one here

@@ -192,7 +192,7 @@ public class RTFChars implements LayoutFormatter {
     private IntAndString getPart(String text, int i, boolean commandNestedInBraces) {
         char c;
         int count = 0;
-        StringBuffer part = new StringBuffer();
+        StringBuilder part = new StringBuilder();
         loop: while ((count >= 0) && (i < text.length())) {
             i++;
             c = text.charAt(i);

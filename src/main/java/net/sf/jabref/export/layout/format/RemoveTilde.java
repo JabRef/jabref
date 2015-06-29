@@ -52,7 +52,7 @@ public class RemoveTilde implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
 
-        StringBuffer result = new StringBuffer(fieldText.length());
+        StringBuilder result = new StringBuilder(fieldText.length());
 
         char[] c = fieldText.toCharArray();
 

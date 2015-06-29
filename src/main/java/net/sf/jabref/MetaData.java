@@ -313,7 +313,7 @@ public class MetaData implements Iterable<String> {
     private String getNextUnit(Reader reader) throws IOException {
         int c;
         boolean escape = false;
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         while ((c = reader.read()) != -1) {
             if (escape) {
                 res.append((char) c);

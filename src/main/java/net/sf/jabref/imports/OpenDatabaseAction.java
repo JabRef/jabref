@@ -309,7 +309,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 @Override
                 public void run() {
-                    StringBuffer wrn = new StringBuffer();
+                    StringBuilder wrn = new StringBuilder();
                     for (int i = 0; i < wrns.length; i++) {
                         wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
                     }
@@ -404,7 +404,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     private static String checkForEncoding(Reader reader) {
         String suppliedEncoding = null;
-        StringBuffer headerText = new StringBuffer();
+        StringBuilder headerText = new StringBuilder();
         try {
             boolean keepon = true;
             int piv = 0, offset = 0;
@@ -459,7 +459,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // If ok, then read the rest of the line, which should contain the
                     // name
                     // of the encoding:
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
 
                     while ((c = reader.read()) != '\n') {
                         sb.append((char) c);

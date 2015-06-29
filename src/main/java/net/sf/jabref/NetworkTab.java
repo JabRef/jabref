@@ -34,14 +34,12 @@ public class NetworkTab extends JPanel implements PrefsTab {
     private final JTextField defProxyHostname;
     private final JTextField defProxyPort;
     private final JabRefPreferences _prefs;
-    private final JabRefFrame _frame;
 
 
     //    private HelpAction ownerHelp, timeStampHelp;
 
     public NetworkTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
-        _frame = frame;
 
         setLayout(new BorderLayout());
 

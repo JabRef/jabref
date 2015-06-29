@@ -238,7 +238,7 @@ public class FormatChars implements LayoutFormatter {
         int i;
         field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
 
         char c;

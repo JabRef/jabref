@@ -226,7 +226,7 @@ class LayoutEntry {
                 if (type == LayoutHelper.IS_GROUP_START) {
                     LayoutHelper.setCurrentGroup(field);
                 }
-                StringBuffer sb = new StringBuffer(100);
+                StringBuilder sb = new StringBuilder(100);
                 String fieldText;
                 boolean previousSkipped = false;
 

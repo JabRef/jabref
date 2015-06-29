@@ -82,7 +82,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      * complete reconstruction of this object and its children.
      */
     public String getTreeAsString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Enumeration<GroupTreeNode> e = preorderEnumeration();
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {

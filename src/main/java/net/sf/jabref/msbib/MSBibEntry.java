@@ -150,8 +150,6 @@ class MSBibEntry {
 
     private final String bcol = "b:";
 
-    private final boolean FORMATXML = false;
-
 
     private MSBibEntry() {
     }
@@ -538,6 +536,7 @@ class MSBibEntry {
             editors = getAuthors(bibtex.getField("editor"));
         }
 
+        boolean FORMATXML = false;
         if (FORMATXML)
         {
             title = format(title);
@@ -1318,7 +1317,7 @@ class MSBibEntry {
      * @return The in String, stripped of non-valid characters.
      */
     private String stripNonValidXMLCharacters(String in) {
-        StringBuffer out = new StringBuffer(); // Used to hold the output.
+        StringBuilder out = new StringBuilder(); // Used to hold the output.
         char current; // Used to reference the current character.
 
         if ((in == null) || (in != null && in.isEmpty()))

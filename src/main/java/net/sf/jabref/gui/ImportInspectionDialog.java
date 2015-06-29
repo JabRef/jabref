@@ -112,8 +112,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final JProgressBar progressBar = new JProgressBar(SwingConstants.HORIZONTAL);
 
     private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(
-            Globals.lang("Cancel"));
     private final JButton generate = new JButton(Globals.lang("Generate now"));
 
     private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
@@ -131,21 +129,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final boolean newDatabase;
 
-    private final JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
-
     private final JPopupMenu popup = new JPopupMenu();
-
-    private final JButton selectAll = new JButton(Globals.lang("Select all"));
-
-    private final JButton deselectAll = new JButton(Globals.lang("Deselect all"));
 
     private final JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
 
     private final JButton stop = new JButton(Globals.lang("Stop"));
-
-    private final JButton delete = new JButton(Globals.lang("Delete"));
-
-    private final JButton help = new JButton(Globals.lang("Help"));
 
     private final PreviewPanel preview;
 
@@ -246,6 +234,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         popup.addSeparator();
         if (!newDatabase) {
             GroupTreeNode node = metaData.getGroups();
+            JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are
             // groups that can be added to.
             insertNodes(groupsAdd, node);
@@ -265,17 +254,23 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(stop);
+        JButton cancel = new JButton(
+                Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addRelatedGap();
+        JButton help = new JButton(Globals.lang("Help"));
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
+        JButton selectAll = new JButton(Globals.lang("Select all"));
         builder.addButton(selectAll);
+        JButton deselectAll = new JButton(Globals.lang("Deselect all"));
         builder.addButton(deselectAll);
         builder.addButton(deselectAllDuplicates);
         builder.addRelatedGap();
+        JButton delete = new JButton(Globals.lang("Delete"));
         builder.addButton(delete);
         builder.addRelatedGap();
         builder.addFixed(autoGenerate);

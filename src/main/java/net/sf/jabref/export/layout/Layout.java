@@ -128,7 +128,7 @@ public class Layout
      */
     public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight)
     {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
             String fieldText = layoutEntry.doLayout(bibtex, database, wordsToHighlight);
@@ -156,7 +156,7 @@ public class Layout
     public String doLayout(BibtexDatabase database, String encoding)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         String fieldText;
         boolean previousSkipped = false;
 

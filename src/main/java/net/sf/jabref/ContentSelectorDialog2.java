@@ -63,7 +63,6 @@ class ContentSelectorDialog2 extends JDialog {
     private final MetaData metaData;
     private String currentField = null;
     TreeSet<String> fieldSet;
-    private TreeSet<String> wordSet;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final JButton help = new JButton(Globals.lang("Help"));
@@ -453,7 +452,7 @@ class ContentSelectorDialog2 extends JDialog {
             // wordListModel.addElement(WORD_FIRSTLINE_TEXT);
             Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
             if (items != null) {
-                wordSet = new TreeSet<String>(items);
+                TreeSet<String> wordSet = new TreeSet<String>(items);
                 int index = 0;
                 for (String s : wordSet) {
                     wordListModel.add(index, s);

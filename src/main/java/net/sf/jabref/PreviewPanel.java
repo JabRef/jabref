@@ -397,7 +397,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     public void update() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
         if (entry != null) {
             sb.append(layout.doLayout(entry, database, wordsToHighlight));

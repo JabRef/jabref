@@ -26,7 +26,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
 
 
     public OpenFileFilter(String[] extensions) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         int numExt = extensions.length;
 
         if (numExt > 0) {

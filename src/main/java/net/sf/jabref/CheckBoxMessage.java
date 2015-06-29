@@ -24,14 +24,14 @@ import java.awt.Insets;
 public class CheckBoxMessage extends JPanel {
 
     BorderLayout borderLayout1 = new BorderLayout();
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
     private final JCheckBox cb;
 
 
     public CheckBoxMessage(String message, String cbText, boolean defaultValue) {
         cb = new JCheckBox(cbText, defaultValue);
+        GridBagLayout gbl = new GridBagLayout();
         setLayout(gbl);
+        GridBagConstraints con = new GridBagConstraints();
         con.gridwidth = GridBagConstraints.REMAINDER;
 
         JLabel lab = new JLabel(message + '\n');

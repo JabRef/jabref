@@ -3,7 +3,6 @@ package net.sf.jabref;
 import net.sf.jabref.export.SaveSession;
 
 import java.io.File;
-import java.io.IOException;
 
 public class FileBasedLock {
 

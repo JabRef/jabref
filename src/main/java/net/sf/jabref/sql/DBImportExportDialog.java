@@ -64,7 +64,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     private final DialogType dialogType;
 
     public enum DialogType {
-        IMPORTER, EXPORTER;
+        IMPORTER, EXPORTER
     }
 
     public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
@@ -203,7 +203,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         diag.setVisible(true);
     }
 
-    public boolean isImporter() {
+    private boolean isImporter() {
         return this.dialogType.equals(DialogType.IMPORTER);
     }
 

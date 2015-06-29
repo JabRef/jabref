@@ -26,10 +26,6 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     private final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
     //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JButton selectAll = new JButton(Globals.lang("Select all"));
-    private final JButton deselectAll = new JButton(Globals.lang("Deselect all"));
     private boolean okPressed = false;
     private final JabRefFrame frame;
     private final int warningLimit;
@@ -40,6 +36,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         this.frame = frame;
         this.warningLimit = warningLimit;
 
+        JButton ok = new JButton(Globals.lang("Ok"));
         ok.addActionListener(new ActionListener() {
 
             @Override
@@ -50,6 +47,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                 }
             }
         });
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
             @Override
@@ -58,6 +56,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                 dispose();
             }
         });
+        JButton selectAll = new JButton(Globals.lang("Select all"));
         selectAll.addActionListener(new ActionListener() {
 
             @Override
@@ -65,6 +64,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                 setSelectionAll(true);
             }
         });
+        JButton deselectAll = new JButton(Globals.lang("Deselect all"));
         deselectAll.addActionListener(new ActionListener() {
 
             @Override

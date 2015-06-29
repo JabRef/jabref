@@ -55,8 +55,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
 
-    private ImportInspector dialog = null;
-    private OutputPrinter status;
     private final HTMLConverter htmlConverter = new HTMLConverter();
 
     private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
@@ -91,7 +89,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     Pattern abstractLinkPattern = Pattern.compile(
             "<a href=\'(.+)\'>\\s*<span class=\"more\">View full.*</span> </a>");
-    private final String abrvPattern = ".*[^,] '?\\d+\\)?";
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
@@ -140,8 +137,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
-        this.dialog = dialog;
-        this.status = status;
         terms = query;
         piv = 0;
         shouldContinue = true;
@@ -321,7 +316,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         out.close();
 
         BufferedReader bufr = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char[] buffer = new char[256];
         while (true) {
             int bytesRead = bufr.read(buffer);
@@ -492,6 +487,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             Matcher m1 = publicationPattern.matcher(fullName);
+            String abrvPattern = ".*[^,] '?\\d+\\)?";
             if (m1.find()) {
                 String prefix = m1.group(2).trim();
                 String postfix = m1.group(1).trim();
@@ -775,7 +771,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private String getResults(URL source) throws IOException {
 
         InputStream in = source.openStream();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while (true) {
             int bytesRead = in.read(buffer);
@@ -797,7 +793,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
      */
     public String getResultsFromFile(File f) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(f));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while (true) {
             int bytesRead = in.read(buffer);

@@ -27,16 +27,9 @@ class PreambleEditor extends JDialog {
     // A reference to the entry this object works on.
     private final BibtexDatabase base;
     private final BasePanel panel;
-    private final JabRefFrame baseFrame;
     private final JabRefPreferences prefs;
 
-    // Layout objects.
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    private final Container conPane = getContentPane();
-    //JToolBar tlb = new JToolBar();
-    private final JPanel pan = new JPanel();
     private FieldEditor ed;
 
 
@@ -44,7 +37,7 @@ class PreambleEditor extends JDialog {
             BasePanel panel, BibtexDatabase base,
             JabRefPreferences prefs) {
         super(baseFrame);
-        this.baseFrame = baseFrame;
+        JabRefFrame baseFrame1 = baseFrame;
         this.panel = panel;
         this.base = base;
         this.prefs = prefs;
@@ -72,7 +65,10 @@ class PreambleEditor extends JDialog {
         int prefHeight = (int) (GUIGlobals.PE_HEIGHT * GUIGlobals.FORM_HEIGHT[prefs.getInt("entryTypeFormHeightFactor")]);
         setSize(GUIGlobals.FORM_WIDTH[prefs.getInt("entryTypeFormWidth")], prefHeight);
 
+        JPanel pan = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
         pan.setLayout(gbl);
+        GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.BOTH;
         con.weighty = 1;
         con.insets = new Insets(10, 5, 10, 5);
@@ -93,6 +89,7 @@ class PreambleEditor extends JDialog {
 
         //tlb.add(closeAction);
         //conPane.add(tlb, BorderLayout.NORTH);
+        Container conPane = getContentPane();
         conPane.add(pan, BorderLayout.CENTER);
         setTitle(Globals.lang("Edit preamble"));
     }

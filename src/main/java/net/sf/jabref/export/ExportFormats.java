@@ -160,7 +160,7 @@ public class ExportFormats {
      */
     public static String getConsoleExportList(int maxLineLength, int firstLineSubtr,
             String linePrefix) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int lastBreak = -firstLineSubtr;
 
         for (String name : ExportFormats.exportFormats.keySet()) {

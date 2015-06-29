@@ -29,15 +29,9 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     public static final String NAME = "fileUpdate";
 
-    private final JButton test = new JButton(Globals.lang("Review changes"));
-
     private final BasePanel panel;
 
-    private final JabRefFrame frame;
-
     private final SidePaneManager manager;
-
-    private final JLabel message;
 
     private final ChangeScanner scanner;
 
@@ -47,18 +41,18 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
         super(manager, GUIGlobals.getIconUrl("save"), Globals.lang("File changed"));
         close.setEnabled(false);
         this.panel = panel;
-        this.frame = frame;
         this.manager = manager;
         this.scanner = scanner;
 
         JPanel main = new JPanel();
         main.setLayout(new BorderLayout());
 
-        message = new JLabel("<html><center>"
+        JLabel message = new JLabel("<html><center>"
                 + Globals.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
                 + "</center></html>", SwingConstants.CENTER);
 
         main.add(message, BorderLayout.CENTER);
+        JButton test = new JButton(Globals.lang("Review changes"));
         main.add(test, BorderLayout.SOUTH);
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 

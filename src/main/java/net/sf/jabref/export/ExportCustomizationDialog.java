@@ -43,14 +43,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 public class ExportCustomizationDialog extends JDialog {
 
     private final JabRefFrame frame;
-    private final JButton addExport = new JButton(Globals.lang("Add new"));
-    private final JButton modify = new JButton(Globals.lang("Modify"));
-    private final JButton remove = new JButton(Globals.lang("Remove"));
-    private final JButton close = new JButton(Globals.lang("Close"));
-    private final JButton help = new JButton(Globals.lang("Help"));
 
-    private final JPanel buttons = new JPanel();
-    private final JPanel main = new JPanel();
     private JTable table;
 
 
@@ -58,6 +51,7 @@ public class ExportCustomizationDialog extends JDialog {
 
         super(frame_, Globals.lang("Manage custom exports"), false);
         frame = frame_;
+        JButton addExport = new JButton(Globals.lang("Add new"));
         addExport.addActionListener(new ActionListener() {
 
             @Override
@@ -65,13 +59,14 @@ public class ExportCustomizationDialog extends JDialog {
                 CustomExportDialog ecd = new CustomExportDialog(frame);
                 ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
                 if (ecd.okPressed()) {
-                    String[] newFormat = new String[] {ecd.name(), ecd.layoutFile(), ecd.extension()};
+                    String[] newFormat = new String[]{ecd.name(), ecd.layoutFile(), ecd.extension()};
                     Globals.prefs.customExports.addFormat(newFormat);
                     Globals.prefs.customExports.store();
                 }
             }
         });
 
+        JButton modify = new JButton(Globals.lang("Modify"));
         modify.addActionListener(new ActionListener() {
 
             @Override
@@ -94,6 +89,7 @@ public class ExportCustomizationDialog extends JDialog {
             }
         });
 
+        JButton remove = new JButton(Globals.lang("Remove"));
         remove.addActionListener(new ActionListener() {
 
             @Override
@@ -121,8 +117,10 @@ public class ExportCustomizationDialog extends JDialog {
             }
         };
 
+        JButton close = new JButton(Globals.lang("Close"));
         close.addActionListener(closeAction);
 
+        JButton help = new JButton(Globals.lang("Help"));
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
                 "Help"));
 
@@ -142,6 +140,7 @@ public class ExportCustomizationDialog extends JDialog {
         }
 
         // Key bindings:
+        JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(frame.prefs().getKey("Close dialog"), "close");
@@ -152,6 +151,7 @@ public class ExportCustomizationDialog extends JDialog {
         //am.put("close", closeAction);
         main.setLayout(new BorderLayout());
         main.add(sp, BorderLayout.CENTER);
+        JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         bb.addGlue();

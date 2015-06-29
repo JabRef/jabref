@@ -36,7 +36,6 @@ import net.sf.jabref.imports.ParserResult;
 
 public class ChangeScanner implements Runnable {
 
-    private final double MATCH_THRESHOLD = 0.4;
     private final String[] sortBy = new String[] {"year", "author", "title"};
 
     private final File f;
@@ -272,6 +271,7 @@ public class ChangeScanner implements Runnable {
                     }
                 }
 
+                double MATCH_THRESHOLD = 0.4;
                 if (bestMatch > MATCH_THRESHOLD) {
                     used.add("" + bestMatchI);
                     it.remove();

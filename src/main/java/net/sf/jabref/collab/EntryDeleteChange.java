@@ -27,9 +27,6 @@ class EntryDeleteChange extends Change {
     private final BibtexEntry memEntry;
     private final BibtexEntry tmpEntry;
     BibtexEntry diskEntry;
-    private final boolean isModifiedLocally;
-    private final double matchWithTmp;
-    private final PreviewPanel pp;
     private final JScrollPane sp;
 
 
@@ -40,15 +37,15 @@ class EntryDeleteChange extends Change {
 
         // Compare the deleted entry in memory with the one in the tmpfile. The
         // entry could have been removed in memory.
-        matchWithTmp = DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry);
+        double matchWithTmp = DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry);
 
         // Check if it has been modified locally, since last tempfile was saved.
-        isModifiedLocally = !(matchWithTmp > 1);
+        boolean isModifiedLocally = !(matchWithTmp > 1);
 
         //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
         //        +" Modifications agree: "+modificationsAgree);
 
-        pp = new PreviewPanel(null, memEntry, null, new MetaData(), Globals.prefs.get("preview0"));
+        PreviewPanel pp = new PreviewPanel(null, memEntry, null, new MetaData(), Globals.prefs.get("preview0"));
         sp = new JScrollPane(pp);
     }
 
