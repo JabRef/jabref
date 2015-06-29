@@ -55,8 +55,6 @@ public class FieldContentSelector extends JComponent {
 
     private final Window owner;
 
-    private final BasePanel panel;
-
     private final AbstractAction action;
     private final String delimiter;
 
@@ -93,7 +91,6 @@ public class FieldContentSelector extends JComponent {
         this.frame = frame;
         this.editor = editor;
         this.metaData = metaData;
-        this.panel = panel;
         this.owner = owner;
         this.action = action;
         this.delimiter = delimiter;

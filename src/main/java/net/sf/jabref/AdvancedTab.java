@@ -43,7 +43,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences _prefs;
     HelpDialog helpDiag;
-    private final HelpAction remoteHelp;
     JPanel pan = new JPanel();
     JLabel lab;
     private final JCheckBox useDefault;
@@ -58,9 +57,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private String oldLnf = "";
     private boolean oldUseDef;
     private boolean oldBiblMode = false;
-    private boolean oldConvertToEquation;
-    private boolean oldCaseKeeperOnSearch;
-    private boolean oldUnitFormatterOnSearch;
     private int oldPort = -1;
 
     public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation";
@@ -74,7 +70,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag) {
         _prefs = prefs;
 
-        remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
+        HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
         useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port") + ':');
@@ -219,12 +215,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
-        oldConvertToEquation = Globals.prefs.getBoolean("useConvertToEquation");
-        useConvertToEquation.setSelected(oldConvertToEquation);
-        oldCaseKeeperOnSearch = Globals.prefs.getBoolean("useCaseKeeperOnSearch");
-        useCaseKeeperOnSearch.setSelected(oldCaseKeeperOnSearch);
-        oldUnitFormatterOnSearch = Globals.prefs.getBoolean("useUnitFormatterOnSearch");
-        useUnitFormatterOnSearch.setSelected(oldUnitFormatterOnSearch);
+        useConvertToEquation.setSelected(Globals.prefs.getBoolean("useConvertToEquation"));
+        useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean("useCaseKeeperOnSearch"));
+        useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean("useUnitFormatterOnSearch"));
     }
 
     @Override

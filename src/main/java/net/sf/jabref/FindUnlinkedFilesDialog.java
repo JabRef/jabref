@@ -108,7 +108,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JPanel panelButtons;
     private JPanel panelEntryTypesSelection;
     private JPanel panelImportArea;
-    private JPanel mainArea;
 
     private JButton buttonBrowse;
     private JButton buttonScan;
@@ -765,7 +764,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         panelEntryTypesSelection = new JPanel();
         panelButtons = new JPanel();
         panelImportArea = new JPanel();
-        mainArea = new JPanel();
 
         buttonBrowse = new JButton(Globals.lang("Browse..."));
         buttonBrowse.setMnemonic('B');

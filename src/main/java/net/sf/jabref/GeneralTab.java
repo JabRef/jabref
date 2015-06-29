@@ -62,14 +62,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampFormat;
     private final JTextField timeStampField;
     private final JabRefPreferences _prefs;
-    private final JabRefFrame _frame;
     private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[0]));
     private final JComboBox encodings = new JComboBox(Globals.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
-        _frame = frame;
         setLayout(new BorderLayout());
 
         allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"));
