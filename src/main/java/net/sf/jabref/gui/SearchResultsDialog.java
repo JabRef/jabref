@@ -437,7 +437,7 @@ public class SearchResultsDialog {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return Util.nCase(fields[column - PAD]);
+                return StringUtil.nCase(fields[column - PAD]);
             } else {
                 return "";
             }

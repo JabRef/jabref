@@ -167,7 +167,7 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        File file = Util.expandFilename(flEntry.getLink(), dirsS);
+                        File file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
                         if ((file == null) || !file.exists()) {
                             int answer;
                             if (!removeAllBroken) {

@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.collab;
 
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 
 import java.util.HashMap;
 import java.io.File;
@@ -200,7 +200,7 @@ public class FileUpdateMonitor implements Runnable {
             //Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
             boolean res = false;
             try {
-                res = Util.copyFile(file, tmpFile, true);
+                res = FileUtil.copyFile(file, tmpFile, true);
             } catch (IOException ex) {
                 Globals.logger("Cannot copy to temporary file '" + tmpFile.getPath() + '\'');
             }

@@ -125,7 +125,7 @@ public class AccessLinksForEntries {
             }
 
             String[] dirs = al.toArray(new String[al.size()]);
-            File tmp = Util.expandFilename(entry.getLink(), dirs);
+            File tmp = FileUtil.expandFilename(entry.getLink(), dirs);
             if (tmp != null) {
                 file = tmp;
             }
@@ -142,7 +142,7 @@ public class AccessLinksForEntries {
                     if (!destination.equals(file)) {
                         try {
                             // Copy the file:
-                            Util.copyFile(file, destination, false);
+                            FileUtil.copyFile(file, destination, false);
                             // Delete the original file if requested:
                             if (deleteOriginalFiles) {
                                 file.delete();

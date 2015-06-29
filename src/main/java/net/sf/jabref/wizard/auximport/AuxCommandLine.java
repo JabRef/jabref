@@ -37,7 +37,7 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 
 public class AuxCommandLine
 {
@@ -48,7 +48,7 @@ public class AuxCommandLine
 
     public AuxCommandLine(String auxFileName, BibtexDatabase refDBase)
     {
-        auxName = Util.getCorrectFileName(auxFileName, "aux");
+        auxName = StringUtil.getCorrectFileName(auxFileName, "aux");
         bib = refDBase;
     }
 

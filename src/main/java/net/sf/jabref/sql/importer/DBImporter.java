@@ -214,8 +214,8 @@ public abstract class DBImporter extends DBImporterExporter {
                 System.out.println("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new KeywordGroup(rsGroups.getString("label"),
-                        Util.unquote(rsGroups.getString("search_field"), '\\'),
-                        Util.unquote(rsGroups.getString("search_expression"),
+                        StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
+                        StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
                         rsGroups.getInt("hierarchical_context"));
@@ -223,7 +223,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 System.out.println("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new SearchGroup(rsGroups.getString("label"),
-                        Util.unquote(rsGroups.getString("search_expression"),
+                        StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
                         rsGroups.getInt("hierarchical_context"));

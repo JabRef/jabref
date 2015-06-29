@@ -77,7 +77,7 @@ class ReplaceStringDialog extends JDialog {
                     return;
                 }
                 ok_pressed = true;
-                flds = Util.delimToStringArray(fields.getText().toLowerCase(), ";");
+                flds = StringUtil.split(fields.getText().toLowerCase(), ";");
                 dispose();
             }
         };
@@ -202,7 +202,7 @@ class ReplaceStringDialog extends JDialog {
     }
 
     public String[] fields() {
-        return Util.delimToStringArray(field.getText(), ";");
+        return StringUtil.split(field.getText(), ";");
     }
 
     /**

@@ -71,7 +71,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         this.metaData = metaData;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
+        label = new FieldNameLabel(" " + StringUtil.nCase(fieldName) + " ");
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);

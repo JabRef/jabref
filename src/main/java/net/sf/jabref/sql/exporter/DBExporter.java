@@ -39,7 +39,7 @@ import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
@@ -301,10 +301,10 @@ public abstract class DBExporter extends DBImporterExporter {
         }
         // Protect all quotes in the group descriptions:
         if (searchField != null) {
-            searchField = Util.quote(searchField, "'", '\\');
+            searchField = StringUtil.quote(searchField, "'", '\\');
         }
         if (searchExpr != null) {
-            searchExpr = Util.quote(searchExpr, "'", '\\');
+            searchExpr = StringUtil.quote(searchExpr, "'", '\\');
         }
 
         SQLUtil.processQuery(
@@ -403,14 +403,14 @@ public abstract class DBExporter extends DBImporterExporter {
 
         if (database.getPreamble() != null) {
             String dml = insert + "'@PREAMBLE', " + '\''
-                    + Util.quote(database.getPreamble(), "'", '\\') + "', "
+                    + StringUtil.quote(database.getPreamble(), "'", '\\') + "', "
                     + '\'' + database_id + "');";
             SQLUtil.processQuery(out, dml);
         }
         for (String key : database.getStringKeySet()) {
             BibtexString string = database.getString(key);
-            String dml = insert + '\'' + Util.quote(string.getName(), "'", '\\')
-                    + "', " + '\'' + Util.quote(string.getContent(), "'", '\\')
+            String dml = insert + '\'' + StringUtil.quote(string.getName(), "'", '\\')
+                    + "', " + '\'' + StringUtil.quote(string.getContent(), "'", '\\')
                     + "', " + '\'' + database_id + '\'' + ");";
             SQLUtil.processQuery(out, dml);
         }

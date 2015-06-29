@@ -27,7 +27,7 @@ import java.util.Vector;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.imports.ParserResult;
 
 import javax.swing.*;
@@ -153,7 +153,7 @@ public class RemoteListener extends Thread {
                     System.out.println(error);
                     return false;
                 }
-                protocol.sendMessage(Util.join(args, "\n"));
+                protocol.sendMessage(StringUtil.join(args, "\n"));
                 return true;
             } finally {
                 protocol.close();

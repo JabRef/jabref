@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 
@@ -174,7 +174,7 @@ public class LabelPatternPanel extends JPanel {
 
     private JTextField addEntryType(Container c, String name, int y) {
 
-        JLabel lab = new JLabel(Util.nCase(name));
+        JLabel lab = new JLabel(StringUtil.nCase(name));
         name = name.toLowerCase();
         con.gridx = 0;
         con.gridy = y;

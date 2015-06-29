@@ -17,7 +17,6 @@ package net.sf.jabref;
 
 import java.awt.Color;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -1259,14 +1258,14 @@ public class JabRefPreferences {
             return null;
         }
         if (priOpt == null) {
-            return new CustomEntryType(Util.nCase(name), req, opt);
+            return new CustomEntryType(StringUtil.nCase(name), req, opt);
         }
         ArrayList<String> secOpt = new ArrayList<String>();
         Collections.addAll(secOpt, opt);
         for (String aPriOpt : priOpt) {
             secOpt.remove(aPriOpt);
         }
-        return new CustomEntryType(Util.nCase(name), req, priOpt,
+        return new CustomEntryType(StringUtil.nCase(name), req, priOpt,
                 secOpt.toArray(new String[secOpt.size()]));
 
     }

@@ -34,7 +34,7 @@ package net.sf.jabref.util;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -123,10 +123,10 @@ public class CaseChangers {
             String[] result = new String[words.length];
 
             for (int i = 0; i < words.length; i++) {
-                result[i] = Util.nCase(words[i]);
+                result[i] = StringUtil.nCase(words[i]);
             }
 
-            return Util.join(result, CaseChangers.SPACE_SEPARATOR);
+            return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
         }
     }
 
@@ -162,15 +162,15 @@ public class CaseChangers {
                 boolean alwaysCapitalizeFirstWord = i == 0;
                 boolean alwaysCapitalizeLastWord = i == (words.length - 1);
                 if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord) {
-                    result[i] = Util.nCase(word);
+                    result[i] = StringUtil.nCase(word);
                 } else if (TitleCaseChanger.notToCapitalize.contains(word)) {
                     result[i] = word;
                 } else {
-                    result[i] = Util.nCase(word);
+                    result[i] = StringUtil.nCase(word);
                 }
             }
 
-            return Util.join(result, CaseChangers.SPACE_SEPARATOR);
+            return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
         }
 
     }

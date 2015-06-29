@@ -87,7 +87,7 @@ public class BibtexEntryWriter {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
-        String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
@@ -151,7 +151,7 @@ public class BibtexEntryWriter {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 
-        String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
@@ -196,7 +196,7 @@ public class BibtexEntryWriter {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
-        String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);

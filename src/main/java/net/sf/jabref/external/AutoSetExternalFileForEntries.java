@@ -139,7 +139,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     // Get an absolute path representation:
-                    File file = Util.expandFilename(old, dirs);
+                    File file = FileUtil.expandFilename(old, dirs);
 
                     if ((file == null) || !file.exists()) {
 

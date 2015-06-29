@@ -83,8 +83,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             String field = tok.nextToken();
             String expression = tok.nextToken();
             // assume caseSensitive=false and regExp=true for old groups
-            return new KeywordGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
-                    .unquote(field, AbstractGroup.QUOTE_CHAR), Util.unquote(expression,
+            return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
                     AbstractGroup.QUOTE_CHAR), false, true, AbstractGroup.INDEPENDENT);
         }
         case 1:
@@ -94,8 +94,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             String expression = tok.nextToken();
             boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
             boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            return new KeywordGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
-                    .unquote(field, AbstractGroup.QUOTE_CHAR), Util.unquote(expression,
+            return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
                     AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
                     AbstractGroup.INDEPENDENT);
         }
@@ -106,8 +106,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             String expression = tok.nextToken();
             boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
             boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            return new KeywordGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
-                    .unquote(field, AbstractGroup.QUOTE_CHAR), Util.unquote(expression,
+            return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
                     AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, context);
         }
         default:
@@ -129,10 +129,10 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + Util.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+        return KeywordGroup.ID + StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + m_context + AbstractGroup.SEPARATOR
-                + Util.quote(m_searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + Util.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + StringUtil.quote(m_searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + StringUtil.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + (m_caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
                 + (m_regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
     }
@@ -371,10 +371,10 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             boolean caseSensitive, boolean regExp) {
         return (regExp ? Globals.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
-                field, Util.quoteForHTML(expr))
+                field, StringUtil.quoteForHTML(expr))
                 : Globals.lang(
                         "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
-                        field, Util.quoteForHTML(expr))) + " (" + (caseSensitive ? Globals.lang("case sensitive")
+                        field, StringUtil.quoteForHTML(expr))) + " (" + (caseSensitive ? Globals.lang("case sensitive")
                 : Globals.lang("case insensitive")) + "). " + (regExp ?
                 Globals.lang("Entries cannot be manually assigned to or removed from this group.")
                 : Globals.lang(
@@ -387,7 +387,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                                 + "then using the context menu. "
                                 + "This process removes the term <b>%1</b> from "
                                 + "each entry's <b>%0</b> field.",
-                        field, Util.quoteForHTML(expr)));
+                        field, StringUtil.quoteForHTML(expr)));
     }
 
     @Override
@@ -395,9 +395,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         StringBuffer sb = new StringBuffer();
         sb.append("<b>");
         if (Globals.prefs.getBoolean("groupShowDynamic")) {
-            sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
+            sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
         } else {
-            sb.append(Util.quoteForHTML(getName()));
+            sb.append(StringUtil.quoteForHTML(getName()));
         }
         sb.append("</b> - ");
         sb.append(Globals.lang("dynamic group"));
@@ -406,7 +406,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         sb.append("</b>");
         sb.append(Globals.lang("contains"));
         sb.append(" <b>");
-        sb.append(Util.quoteForHTML(m_searchExpression));
+        sb.append(StringUtil.quoteForHTML(m_searchExpression));
         sb.append("</b>)");
         switch (getHierarchicalContext()) {
         case AbstractGroup.INCLUDING:

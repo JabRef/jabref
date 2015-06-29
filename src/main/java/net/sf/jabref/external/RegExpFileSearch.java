@@ -16,6 +16,7 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.*;
+import net.sf.jabref.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -239,7 +240,7 @@ public class RegExpFileSearch {
 
                     File[] subDirs = directory.listFiles();
                     if (subDirs != null) {
-                        String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
+                        String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
                         for (File subDir : subDirs) {
                             if (subDir.isDirectory()) {
                                 res.addAll(RegExpFileSearch.findFile(entry, database, subDir,
@@ -253,7 +254,7 @@ public class RegExpFileSearch {
                     List<File> toDo = new LinkedList<File>();
                     toDo.add(directory);
 
-                    String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
+                    String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
                     while (!toDo.isEmpty()) {
 

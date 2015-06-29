@@ -138,7 +138,7 @@ public class AttachFileDialog extends JDialog {
         FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         //builder.append(Util.nCase(fieldName));//(editor.getLabel());
-        builder.appendSeparator(Util.nCase(fieldName));
+        builder.appendSeparator(StringUtil.nCase(fieldName));
         builder.append(editor.getTextComponent());
         builder.append(browse);
 

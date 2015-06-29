@@ -74,7 +74,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     private void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
         BibtexEntry[] entries;
         while (tok.hasMoreTokens()) {
-            entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
+            entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(),
                     AbstractGroup.QUOTE_CHAR));
             Collections.addAll(m_entries, entries);
         }
@@ -205,7 +205,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(ExplicitGroup.ID).append(Util.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(m_context).append(AbstractGroup.SEPARATOR);
+        sb.append(ExplicitGroup.ID).append(StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(m_context).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<String>();
@@ -216,7 +216,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
             }
         }
         for (String sortedKey : sortedKeys) {
-            sb.append(Util.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR);
+            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR);
         }
         return sb.toString();
     }

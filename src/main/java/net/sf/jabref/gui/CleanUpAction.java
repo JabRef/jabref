@@ -481,7 +481,7 @@ public class CleanUpAction extends AbstractWorker {
         for (int i = 0; i < flModel.getRowCount(); i++) {
             FileListEntry flEntry = flModel.getEntry(i);
             String oldFileName = flEntry.getLink();
-            String newFileName = Util.shortenFileName(new File(oldFileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            String newFileName = FileUtil.shortenFileName(new File(oldFileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
             if (!oldFileName.equals(newFileName)) {
                 flEntry.setLink(newFileName);
                 changed = true;
@@ -523,7 +523,7 @@ public class CleanUpAction extends AbstractWorker {
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
-            File expandedOldFile = Util.expandFilename(realOldFilename, panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+            File expandedOldFile = FileUtil.expandFilename(realOldFilename, panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
             if (expandedOldFile.getParent() == null) {
                 // something went wrong. Just skipt his entry
                 continue;
@@ -537,7 +537,7 @@ public class CleanUpAction extends AbstractWorker {
             }
 
             //do rename
-            boolean renameSuccesfull = Util.renameFile(expandedOldFile.toString(), newPath);
+            boolean renameSuccesfull = FileUtil.renameFile(expandedOldFile.toString(), newPath);
 
             if (renameSuccesfull) {
                 changed = true;

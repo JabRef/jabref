@@ -30,6 +30,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -371,7 +372,7 @@ public class FileListEntryEditor {
 
                 // If the file is below the file directory, make the path relative:
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-                newFile = Util.shortenFileName(newFile, dirsS);
+                newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());
                 comp.requestFocus();

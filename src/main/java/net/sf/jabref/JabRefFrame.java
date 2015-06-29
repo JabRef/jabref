@@ -1271,13 +1271,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public NewEntryAction(String type_) {
             // This action leads to the creation of a specific entry.
-            putValue(Action.NAME, Util.nCase(type_));
+            putValue(Action.NAME, StringUtil.nCase(type_));
             type = type_;
         }
 
         public NewEntryAction(String type_, KeyStroke key) {
             // This action leads to the creation of a specific entry.
-            putValue(Action.NAME, Util.nCase(type_));
+            putValue(Action.NAME, StringUtil.nCase(type_));
             putValue(Action.ACCELERATOR_KEY, key);
             type = type_;
         }
@@ -2599,7 +2599,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public EditAction(String command, URL icon) {
             super(new ImageIcon(icon));
             this.command = command;
-            String nName = Util.nCase(command);
+            String nName = StringUtil.nCase(command);
             putValue(Action.NAME, nName);
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(nName));
             putValue(Action.SHORT_DESCRIPTION, Globals.lang(nName));

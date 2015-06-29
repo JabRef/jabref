@@ -27,7 +27,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.SearchRuleSet;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
@@ -123,7 +123,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (disName != null) {
                     sb.append(disName);
                 } else {
-                    sb.append(Util.nCase(fld[i]));
+                    sb.append(StringUtil.nCase(fld[i]));
                 }
             }
             return sb.toString();

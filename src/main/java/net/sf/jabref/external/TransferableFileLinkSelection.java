@@ -16,8 +16,8 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Util;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -46,7 +46,7 @@ public class TransferableFileLinkSelection implements Transferable {
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
             String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            File expLink = Util.expandFilename(tm.getEntry(0).getLink(), dirs);
+            File expLink = FileUtil.expandFilename(tm.getEntry(0).getLink(), dirs);
             fileList.add(expLink);
 
         }

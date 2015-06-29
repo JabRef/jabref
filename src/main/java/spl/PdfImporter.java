@@ -170,7 +170,7 @@ public class PdfImporter {
                     FileListTableModel tm = new FileListTableModel();
                     File toLink = new File(fileName);
                     tm.addEntry(0, new FileListEntry(toLink.getName(),
-                            Util.shortenFileName(toLink, dirsS).getPath(),
+                            FileUtil.shortenFileName(toLink, dirsS).getPath(),
                             Globals.prefs.getExternalFileTypeByName("pdf")));
                     entry.setField(GUIGlobals.FILE_FIELD, tm.getStringRepresentation());
                     res.add(entry);

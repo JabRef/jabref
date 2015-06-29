@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.export.layout.format;
 
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Util;
 
 import java.util.*;
 import java.io.File;
@@ -150,7 +150,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
                         }
 
-                        File f = Util.expandFilename(flEntry.getLink(), dirs);
+                        File f = FileUtil.expandFilename(flEntry.getLink(), dirs);
 
                         /*
                          * Stumbled over this while investigating

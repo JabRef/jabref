@@ -124,7 +124,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
             // version 0 contained 4 additional booleans to specify search
             // fields; these are ignored now, all fields are always searched
-            return new SearchGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
+            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
                     .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
                     AbstractGroup.INDEPENDENT);
         }
@@ -136,7 +136,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
             // version 0 contained 4 additional booleans to specify search
             // fields; these are ignored now, all fields are always searched
-            return new SearchGroup(Util.unquote(name, AbstractGroup.QUOTE_CHAR), Util
+            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
                     .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
                     context);
         }
@@ -164,9 +164,9 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public String toString() {
-        return SearchGroup.ID + Util.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+        return SearchGroup.ID + StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + m_context + AbstractGroup.SEPARATOR
-                + Util.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + StringUtil.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + (m_caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
                 + (m_regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
     }
@@ -282,10 +282,10 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         if (ast == null) {
             sb.append(regExp ? Globals.lang(
                     "This group contains entries in which any field contains the regular expression <b>%0</b>",
-                    Util.quoteForHTML(expr))
+                    StringUtil.quoteForHTML(expr))
                     : Globals.lang(
                             "This group contains entries in which any field contains the term <b>%0</b>",
-                            Util.quoteForHTML(expr)));
+                            StringUtil.quoteForHTML(expr)));
             sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
                     : Globals.lang("case insensitive")).append("). ");
             sb.append(Globals.lang(
@@ -348,11 +348,11 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             node = node.getNextSibling();
             final int type = node.getType();
             node = node.getNextSibling();
-            final String termQuoted = Util.quoteForHTML(node.getText());
+            final String termQuoted = StringUtil.quoteForHTML(node.getText());
             final String fieldSpecQuoted = regExpFieldSpec ? Globals.lang(
                     "any field that matches the regular expression <b>%0</b>",
-                    Util.quoteForHTML(field)) : Globals.lang("the field <b>%0</b>",
-                    Util.quoteForHTML(field));
+                    StringUtil.quoteForHTML(field)) : Globals.lang("the field <b>%0</b>",
+                    StringUtil.quoteForHTML(field));
             switch (type) {
             case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
             case SearchExpressionTreeParserTokenTypes.EQUAL:
@@ -410,16 +410,16 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         StringBuffer sb = new StringBuffer();
         sb.append("<b>");
         if (Globals.prefs.getBoolean("groupShowDynamic")) {
-            sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
+            sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
         } else {
-            sb.append(Util.quoteForHTML(getName()));
+            sb.append(StringUtil.quoteForHTML(getName()));
         }
         sb.append("</b> - ");
         sb.append(Globals.lang("dynamic group"));
         sb.append(" (");
         sb.append(Globals.lang("search expression"));
         sb.append(" <b>").
-                append(Util.quoteForHTML(m_searchExpression)).append("</b>)");
+                append(StringUtil.quoteForHTML(m_searchExpression)).append("</b>)");
         switch (getHierarchicalContext()) {
         case AbstractGroup.INCLUDING:
             sb.append(", ").append(Globals.lang("includes subgroups"));

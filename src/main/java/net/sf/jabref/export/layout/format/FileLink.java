@@ -17,9 +17,9 @@ package net.sf.jabref.export.layout.format;
 
 import java.io.File;
 
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 import net.sf.jabref.export.layout.ParamLayoutFormatter;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -75,7 +75,7 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
         }
 
-        File f = Util.expandFilename(link, dirs);
+        File f = FileUtil.expandFilename(link, dirs);
 
         /*
          * Stumbled over this while investigating

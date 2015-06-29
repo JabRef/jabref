@@ -36,6 +36,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -189,7 +190,7 @@ public class MergeEntriesDialog extends JDialog {
         int row = 4;
         for (String field : joint) {
             jointStrings[row - 4] = field;
-            label = new JLabel(Util.toUpperFirstLetter(field));
+            label = new JLabel(StringUtil.toUpperFirstLetter(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             this.add(label, cc.xy(1, row));

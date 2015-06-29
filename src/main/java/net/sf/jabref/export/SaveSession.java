@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.export;
 
+import net.sf.jabref.FileBasedLock;
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 import net.sf.jabref.GUIGlobals;
 
 import java.io.File;
@@ -88,7 +89,7 @@ public class SaveSession {
             String path = file.getParent();
             File backupFile = new File(path, name + GUIGlobals.backupExt);
             try {
-                Util.copyFile(file, backupFile, true);
+                FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
                 ex.printStackTrace();
                 throw SaveException.BACKUP_CREATION;
@@ -100,7 +101,7 @@ public class SaveSession {
                 try {
                     if (createLockFile()) {
                         // Oops, the lock file already existed. Try to wait it out:
-                        if (!Util.waitForFileLock(file, 10)) {
+                        if (!FileBasedLock.waitForFileLock(file, 10)) {
                             throw SaveException.FILE_LOCKED;
                         }
 
@@ -111,7 +112,7 @@ public class SaveSession {
                 }
             }
 
-            Util.copyFile(tmp, file, true);
+            FileUtil.copyFile(tmp, file, true);
         } catch (IOException ex2) {
             // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that

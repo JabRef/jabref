@@ -523,7 +523,7 @@ public class JabRef {
                     // write an output, if something could be resolved
                     if (newBase != null) {
                         if (newBase.getEntryCount() > 0) {
-                            String subName = Util.getCorrectFileName(data[1], "bib");
+                            String subName = StringUtil.getCorrectFileName(data[1], "bib");
 
                             try {
                                 System.out.println(Globals.lang("Saving") + ": "
@@ -928,7 +928,7 @@ public class JabRef {
                 }
             }
 
-            if (!Util.waitForFileLock(file, 10)) {
+            if (!FileBasedLock.waitForFileLock(file, 10)) {
                 System.out.println(Globals.lang("Error opening file") + " '" + name + "'. " +
                         "File is locked by another JabRef instance.");
                 return ParserResult.FILE_LOCKED;

@@ -70,7 +70,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
@@ -105,38 +104,11 @@ public class Util {
 
 
 
-    private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
 
     public static void pr(String s) {
         Globals.logger(s);
-    }
-
-    public static String nCase(String s) {
-        // Make first character of String uppercase, and the
-        // rest lowercase.
-        if (s.length() > 1) {
-            return s.substring(0, 1).toUpperCase() + s.substring(1, s.length()).toLowerCase();
-        } else {
-            return s.toUpperCase();
-        }
-
-    }
-
-    /**
-     * Append '.bib' to the string unless it ends with that.
-     *
-     * makeBibtexExtension("asfd") => "asdf.bib"
-     * makeBibtexExtension("asdf.bib") => "asdf.bib"
-     *
-     * @param s the string
-     * @return s or s + ".bib"
-     */
-    public static String makeBibtexExtension(String s) {
-        if(!s.toLowerCase().endsWith(".bib")) {
-            return s + ".bib";
-        }
-        return s;
     }
 
     /**
@@ -155,36 +127,41 @@ public class Util {
      * references are enclosed in a pair of '#' characters.
      */
     public static String parseField(String content) {
-
         if (content.length() == 0) {
             return content;
         }
 
         String[] strings = content.split("#");
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String string : strings) {
             String s = string.trim();
             if (s.length() > 0) {
                 char c = s.charAt(0);
                 // String reference or not?
                 if ((c == '{') || (c == '"')) {
-                    result.append(Util.shaveString(string));
+                    result.append(StringUtil.shaveString(string));
                 } else {
                     // This part should normally be a string reference, but if it's
                     // a pure number, it is not.
-                    String s2 = Util.shaveString(s);
-                    try {
-                        Integer.parseInt(s2);
-                        // If there's no exception, it's a number.
+                    String s2 = StringUtil.shaveString(s);
+                    if(isInteger(s2)) {
                         result.append(s2);
-                    } catch (NumberFormatException ex) {
-                        // otherwise append with hashes...
-                        result.append("#").append(s2).append("#");
+                    } else {
+                        result.append('#').append(s2).append('#');
                     }
                 }
             }
         }
         return result.toString();
+    }
+
+    public static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
@@ -212,59 +189,6 @@ public class Util {
             }
         }
         return year;
-    }
-
-    public static String shaveString(String s) {
-        // returns the string, after shaving off whitespace at the beginning
-        // and end, and removing (at most) one pair of braces or " surrounding
-        // it.
-        if (s == null) {
-            return null;
-        }
-        char ch, ch2;
-        int beg = 0, end = s.length();
-        // We start out assuming nothing will be removed.
-        boolean begok = false, endok = false;
-        while (!begok) {
-            if (beg < s.length()) {
-                ch = s.charAt(beg);
-                if (Character.isWhitespace(ch)) {
-                    beg++;
-                } else {
-                    begok = true;
-                }
-            } else {
-                begok = true;
-            }
-
-        }
-        while (!endok) {
-            if (end > (beg + 1)) {
-                ch = s.charAt(end - 1);
-                if (Character.isWhitespace(ch)) {
-                    end--;
-                } else {
-                    endok = true;
-                }
-            } else {
-                endok = true;
-            }
-        }
-
-        if (end > (beg + 1)) {
-            ch = s.charAt(beg);
-            ch2 = s.charAt(end - 1);
-            if (((ch == '{') && (ch2 == '}')) || ((ch == '"') && (ch2 == '"'))) {
-                beg++;
-                end--;
-            }
-        }
-        s = s.substring(beg, end);
-        return s;
-    }
-
-    public static String rtrim(String s) {
-        return s.replaceAll("\\s+$", "");
     }
 
     /**
@@ -322,70 +246,6 @@ public class Util {
         return s;
     }
 
-    static public String _wrap2(String in, int wrapAmount) {
-        // The following line cuts out all whitespace and replaces them with
-        // single
-        // spaces:
-        // in = in.replaceAll("[ ]+"," ").replaceAll("[\\t]+"," ");
-        // StringBuffer out = new StringBuffer(in);
-        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+", " "));
-
-        int p = in.length() - wrapAmount;
-        int lastInserted = -1;
-        while (p > 0) {
-            p = out.lastIndexOf(" ", p);
-            if ((p <= 0) || (p <= 20)) {
-                break;
-            }
-            int lbreak = out.indexOf("\n", p);
-            System.out.println(lbreak + " " + lastInserted);
-            if ((lbreak > p) && ((lastInserted >= 0) && (lbreak < lastInserted))) {
-                p = lbreak - wrapAmount;
-            } else {
-                out.insert(p, "\n\t");
-                lastInserted = p;
-                p -= wrapAmount;
-            }
-        }
-        return out.toString();
-    }
-
-    static public String wrap2(String in, int wrapAmount) {
-        return net.sf.jabref.imports.FieldContentParser.wrap(in, wrapAmount);
-    }
-
-    static public String __wrap2(String in, int wrapAmount) {
-        // The following line cuts out all whitespace except line breaks, and
-        // replaces
-        // with single spaces. Line breaks are padded with a tab character:
-        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+", " "));
-
-        int p = 0;
-        // int lastInserted = -1;
-        while (p < out.length()) {
-            int q = out.indexOf(" ", p + wrapAmount);
-            if ((q < 0) || (q >= out.length())) {
-                break;
-            }
-            int lbreak = out.indexOf("\n", p);
-            // System.out.println(lbreak);
-            if ((lbreak > p) && (lbreak < q)) {
-                p = lbreak + 1;
-                int piv = lbreak + 1;
-                if ((out.length() > piv) && !(out.charAt(piv) == '\t')) {
-                    out.insert(piv, "\n\t");
-                }
-
-            } else {
-                // System.out.println(q+" "+out.length());
-                out.deleteCharAt(q);
-                out.insert(q, "\n\t");
-                p = q + 1;
-            }
-        }
-        return out.toString();// .replaceAll("\n", "\n\t");
-    }
-
     public static TreeSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field,
             String deliminator) {
         TreeSet<String> res = new TreeSet<String>();
@@ -397,7 +257,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(Util.nCase(tok.nextToken().trim()));
+                    res.add(StringUtil.nCase(tok.nextToken().trim()));
                 }
             }
         }
@@ -425,7 +285,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(Util.nCase(tok.nextToken().trim()));
+                    res.add(StringUtil.nCase(tok.nextToken().trim()));
                 }
             }
         }
@@ -462,85 +322,6 @@ public class Util {
     }
 
     /**
-     * Takes a String array and returns a string with the array's elements
-     * delimited by a certain String.
-     * 
-     * @param strs
-     *            String array to convert.
-     * @param delimiter
-     *            String to use as delimiter.
-     * @return Delimited String.
-     */
-    public static String stringArrayToDelimited(String[] strs, String delimiter) {
-        if ((strs == null) || (strs.length == 0)) {
-            return "";
-        }
-        if (strs.length == 1) {
-            return strs[0];
-        }
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < (strs.length - 1); i++) {
-            sb.append(strs[i]);
-            sb.append(delimiter);
-        }
-        sb.append(strs[strs.length - 1]);
-        return sb.toString();
-    }
-
-    /**
-     * Takes a delimited string, splits it and returns
-     * 
-     * @param names
-     *            a <code>String</code> value
-     * @return a <code>String[]</code> value
-     */
-    public static String[] delimToStringArray(String names, String delimiter) {
-        if (names == null) {
-            return null;
-        }
-        return names.split(delimiter);
-    }
-
-    /**
-     * Creates a substring from a text
-     *
-     * @param text
-     * @param i
-     * @param terminateOnEndBraceOnly
-     * @return
-     */
-    public static String getPart(String text, int i, boolean terminateOnEndBraceOnly) {
-        char c;
-        int count = 0;
-
-        StringBuffer part = new StringBuffer();
-
-        // advance to first char and skip whitespace
-        i++;
-        while ((i < text.length()) && Character.isWhitespace(text.charAt(i))) {
-            i++;
-        }
-
-        // then grab whathever is the first token (counting braces)
-        while (i < text.length()) {
-            c = text.charAt(i);
-            if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
-                i--; // end argument and leave whitespace for further
-                // processing
-                break;
-            }
-            if ((c == '}') && (--count < 0)) {
-                break;
-            } else if (c == '{') {
-                count++;
-            }
-            part.append(c);
-            i++;
-        }
-        return part.toString();
-    }
-
-    /**
      * Open a http/pdf/ps viewer for the given link string.
      */
     public static void openExternalViewer(MetaData metaData, String link, String fieldName)
@@ -551,7 +332,7 @@ public class Util {
             // Find the default directory for this field type:
             String[] dir = metaData.getFileDirectory(fieldName);
 
-            File file = Util.expandFilename(link, dir);
+            File file = FileUtil.expandFilename(link, dir);
 
             // Check that the file exists:
             if ((file == null) || !file.exists()) {
@@ -722,14 +503,14 @@ public class Util {
 
         boolean httpLink = false;
 
-        if (Util.remoteLinkPattern.matcher(link.toLowerCase()).matches()) {
+        if (Util.REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
             httpLink = true;
         }
         /*if (link.toLowerCase().startsWith("file://")) {
             link = link.substring(7);
         }
         final String ln = link;
-        if (remoteLinkPattern.matcher(link.toLowerCase()).matches()) {
+        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
             (new Thread(new Runnable() {
                 public void run() {
                     openRemoteExternalFile(metaData, ln, fileType);
@@ -746,7 +527,7 @@ public class Util {
         File file = new File(link);
 
         if (!httpLink) {
-            File tmp = Util.expandFilename(metaData, link);
+            File tmp = FileUtil.expandFilename(metaData, link);
             if (tmp != null) {
                 file = tmp;
             }
@@ -958,20 +739,6 @@ public class Util {
         }
     }
 
-    /**
-     * Returns the extension of a file or null if the file does not have one (no . in name).
-     * 
-     * @param file
-     * 
-     * @return The extension, trimmed and in lowercase.
-     */
-    public static String getFileExtension(File file) {
-        String name = file.getName();
-        int pos = name.lastIndexOf('.');
-        return ((pos >= 0) && (pos < (name.length() - 1))) ? name.substring(pos + 1)
-                .trim().toLowerCase() : null;
-    }
-
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
         ArrayList<String[]> result = new ArrayList<String[]>();
@@ -1080,211 +847,6 @@ public class Util {
     }
 
     /**
-     * Concatenate all strings in the array from index 'from' to 'to' (excluding
-     * to) with the given separator.
-     * 
-     * Example:
-     * 
-     * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
-     * "ab\\cd\\ed"
-     * 
-     * @param strings
-     * @param separator
-     * @param from
-     * @param to
-     *            Excluding strings[to]
-     * @return
-     */
-    public static String join(String[] strings, String separator, int from, int to) {
-        if ((strings.length == 0) || (from >= to)) {
-            return "";
-        }
-
-        from = Math.max(from, 0);
-        to = Math.min(strings.length, to);
-
-        StringBuffer sb = new StringBuffer();
-        for (int i = from; i < (to - 1); i++) {
-            sb.append(strings[i]).append(separator);
-        }
-        return sb.append(strings[to - 1]).toString();
-    }
-
-    public static String join(String[] strings, String separator) {
-        return Util.join(strings, separator, 0, strings.length);
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.<br/>
-     * 
-     * Uses <ul>
-     * <li>the default directory associated with the extension of the file</li>
-     * <li>the standard file directory</li>
-     * <li>the directory of the bib file</li>
-     * </ul>
-     * 
-     * @param metaData
-     *            The MetaData for the database this file belongs to.
-     * @param name
-     *            The file name, may also be a relative path to the file
-     */
-    public static File expandFilename(final MetaData metaData, String name) {
-        int pos = name.lastIndexOf('.');
-        String extension = ((pos >= 0) && (pos < (name.length() - 1))) ? name
-                .substring(pos + 1).trim().toLowerCase() : null;
-        // Find the default directory for this field type, if any:
-        String[] dir = metaData.getFileDirectory(extension);
-        // Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
-        // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<String>();
-        for (String aDir : dir) {
-            if (!al.contains(aDir)) {
-                al.add(aDir);
-            }
-        }
-        for (String aFileDir : fileDir) {
-            if (!al.contains(aFileDir)) {
-                al.add(aFileDir);
-            }
-        }
-        String[] dirs = al.toArray(new String[al.size()]);
-        return Util.expandFilename(name, dirs);
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.
-     * 
-     * Will look in each of the given dirs starting from the beginning and
-     * returning the first found file to match if any.
-     */
-    public static File expandFilename(String name, String[] dir) {
-
-        for (String aDir : dir) {
-            if (aDir != null) {
-                File result = Util.expandFilename(name, aDir);
-                if (result != null) {
-                    return result;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.
-     */
-    public static File expandFilename(String name, String dir) {
-
-        File file;
-        if ((name == null) || (name.length() == 0)) {
-            return null;
-        } else {
-            file = new File(name);
-        }
-
-        if (!file.exists() && (dir != null)) {
-            if (dir.endsWith(System.getProperty("file.separator"))) {
-                name = dir + name;
-            } else {
-                name = dir + System.getProperty("file.separator") + name;
-            }
-
-            // System.out.println("expanded to: "+name);
-            // if (name.startsWith("ftp"))
-
-            file = new File(name);
-
-            if (file.exists()) {
-                return file;
-            }
-            // Ok, try to fix / and \ problems:
-            if (Globals.ON_WIN) {
-                // workaround for catching Java bug in regexp replacer
-                // and, why, why, why ... I don't get it - wegner 2006/01/22
-                try {
-                    name = name.replaceAll("/", "\\\\");
-                } catch (java.lang.StringIndexOutOfBoundsException exc) {
-                    System.err
-                            .println("An internal Java error was caused by the entry " +
-                                    "\"" + name + "\"");
-                }
-            } else {
-                name = name.replaceAll("\\\\", "/");
-            }
-            // System.out.println("expandFilename: "+name);
-            file = new File(name);
-            if (!file.exists()) {
-                file = null;
-            }
-        }
-        return file;
-    }
-
-    /**
-     * Converts an absolute filename to a relative one, if necessary.
-     * Returns the parameter fileName itself if no shortening is possible 
-     * 
-     * This method works correctly only if dirs are sorted decent in their length
-     * i.e. /home/user/literature/important before /home/user/literature 
-     *
-     * @param fileName the file name to be shortened
-     * @param dirs directories to check.
-     */
-    public static File shortenFileName(File fileName, String[] dirs) {
-        if ((fileName == null) || (fileName.length() == 0)) {
-            return fileName;
-        }
-        if (!fileName.isAbsolute() || (dirs == null)) {
-            return fileName;
-        }
-
-        for (String dir : dirs) {
-            if (dir != null) {
-                File result = Util.shortenFileName(fileName, dir);
-                if ((result != null) && (!result.equals(fileName))) {
-                    return result;
-                }
-            }
-        }
-        return fileName;
-    }
-
-    private static File shortenFileName(File fileName, String dir) {
-        if ((fileName == null) || (fileName.length() == 0)) {
-            return fileName;
-        }
-        if (!fileName.isAbsolute() || (dir == null)) {
-            return fileName;
-        }
-
-        String longName;
-        if (Globals.ON_WIN) {
-            // case-insensitive matching on Windows
-            longName = fileName.toString().toLowerCase();
-            dir = dir.toLowerCase();
-        } else {
-            longName = fileName.toString();
-        }
-
-        if (!dir.endsWith(System.getProperty("file.separator"))) {
-            dir = dir.concat(System.getProperty("file.separator"));
-        }
-
-        if (longName.startsWith(dir)) {
-            // result is based on original name, not on lower-cased name
-            String newName = fileName.toString().substring(dir.length());
-            return new File(newName);
-        } else {
-            return fileName;
-        }
-    }
-
-    /**
      * Sets empty or non-existing owner fields of bibtex entries inside a List
      * to a specified default value. Timestamp field is also set. Preferences
      * are checked to see if these options are enabled.
@@ -1361,54 +923,6 @@ public class Util {
         if (setTimeStamp) {
             entry.setField(timeStampField, timeStamp);
         }
-    }
-
-    /**
-     * Copies a file.
-     * 
-     * @param source
-     *            File Source file
-     * @param dest
-     *            File Destination file
-     * @param deleteIfExists
-     *            boolean Determines whether the copy goes on even if the file
-     *            exists.
-     * @throws IOException
-     * @return boolean Whether the copy succeeded, or was stopped due to the
-     *         file already existing.
-     */
-    public static boolean copyFile(File source, File dest, boolean deleteIfExists)
-            throws IOException {
-
-        BufferedInputStream in = null;
-        BufferedOutputStream out = null;
-        try {
-            // Check if the file already exists.
-            if (dest.exists()) {
-                if (!deleteIfExists)
-                 {
-                    return false;
-                // else dest.delete();
-                }
-            }
-
-            in = new BufferedInputStream(new FileInputStream(source));
-            out = new BufferedOutputStream(new FileOutputStream(dest));
-            int el;
-            // int tell = 0;
-            while ((el = in.read()) >= 0) {
-                out.write(el);
-            }
-        } finally {
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
-            if (in != null) {
-                in.close();
-            }
-        }
-        return true;
     }
 
     /**
@@ -1492,150 +1006,6 @@ public class Util {
         }
         ce.end();
         return ce;
-    }
-
-    // -------------------------------------------------------------------------------
-
-    /**
-     * extends the filename with a default Extension, if no Extension '.x' could
-     * be found
-     */
-    public static String getCorrectFileName(String orgName, String defaultExtension) {
-        if (orgName == null) {
-            return "";
-        }
-
-        String back = orgName;
-        int t = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
-        if (t < 1) {
-            back = back + "." + defaultExtension;
-        }
-
-        return back;
-    }
-
-    /**
-     * Quotes each and every character, e.g. '!' as &#33;. Used for verbatim
-     * display of arbitrary strings that may contain HTML entities.
-     */
-    public static String quoteForHTML(String s) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < s.length(); ++i) {
-            sb.append("&#").append((int) s.charAt(i)).append(";");
-        }
-        return sb.toString();
-    }
-
-    public static String quote(String s, String specials, char quoteChar) {
-        return Util.quote(s, specials, quoteChar, 0);
-    }
-
-    /**
-     * Quote special characters.
-     * 
-     * @param s
-     *            The String which may contain special characters.
-     * @param specials
-     *            A String containing all special characters except the quoting
-     *            character itself, which is automatically quoted.
-     * @param quoteChar
-     *            The quoting character.
-     * @param linewrap
-     *            The number of characters after which a linebreak is inserted
-     *            (this linebreak is undone by unquote()). Set to 0 to disable.
-     * @return A String with every special character (including the quoting
-     *         character itself) quoted.
-     */
-    private static String quote(String s, String specials, char quoteChar, int linewrap) {
-        StringBuffer sb = new StringBuffer();
-        char c;
-        int linelength = 0;
-        boolean isSpecial;
-        for (int i = 0; i < s.length(); ++i) {
-            c = s.charAt(i);
-            isSpecial = (specials.indexOf(c) >= 0) || (c == quoteChar);
-            // linebreak?
-            if ((linewrap > 0)
-                    && ((++linelength >= linewrap) || (isSpecial && (linelength >= (linewrap - 1))))) {
-                sb.append(quoteChar);
-                sb.append('\n');
-                linelength = 0;
-            }
-            if (isSpecial) {
-                sb.append(quoteChar);
-                ++linelength;
-            }
-            sb.append(c);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Unquote special characters.
-     * 
-     * @param s
-     *            The String which may contain quoted special characters.
-     * @param quoteChar
-     *            The quoting character.
-     * @return A String with all quoted characters unquoted.
-     */
-    public static String unquote(String s, char quoteChar) {
-        StringBuffer sb = new StringBuffer();
-        char c;
-        boolean quoted = false;
-        for (int i = 0; i < s.length(); ++i) {
-            c = s.charAt(i);
-            if (quoted) { // append literally...
-                if (c != '\n') {
-                    sb.append(c);
-                }
-                quoted = false;
-            } else if (c != quoteChar) {
-                sb.append(c);
-            } else { // quote char
-                quoted = true;
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Quote all regular expression meta characters in s, in order to search for
-     * s literally.
-     */
-    public static String quoteMeta(String s) {
-        // work around a bug: trailing backslashes have to be quoted
-        // individually
-        int i = s.length() - 1;
-        StringBuffer bs = new StringBuffer("");
-        while ((i >= 0) && (s.charAt(i) == '\\')) {
-            --i;
-            bs.append("\\\\");
-        }
-        s = s.substring(0, i + 1);
-        return "\\Q" + s.replaceAll("\\\\E", "\\\\E\\\\\\\\E\\\\Q") + "\\E" + bs.toString();
-    }
-
-    /**
-     * This method "tidies" up e.g. a keyword string, by alphabetizing the words
-     * and removing all duplicates.
-     *
-     * Currently not used anywhere
-     */
-    public static String sortWordsAndRemoveDuplicates(String text) {
-        ArrayList<String> words = Util.getSeparatedKeywords(text);
-        // by adding the words to a set, they are automatically sorted
-        TreeSet<String> set = new TreeSet<String>(words);
-        StringBuffer sb = new StringBuffer();
-        for (String aSet : set) {
-            sb.append(aSet);
-            sb.append(", ");
-        }
-        if (sb.length() > 2) {
-            sb.delete(sb.length() - 2, sb.length());
-        }
-        String result = sb.toString();
-        return result.length() > 2 ? result : "";
     }
 
     /**
@@ -1733,7 +1103,7 @@ public class Util {
 
         boolean inString = false, isBracing = false, escaped = false;
         int inBrace = 0;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             // Update variables based on special characters:
             int c = s.charAt(i);
@@ -1786,7 +1156,7 @@ public class Util {
     }
 
 
-    private static final Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
+    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
 
     /**
@@ -1816,7 +1186,7 @@ public class Util {
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
-        Matcher mcr = Util.bracedTitleCapitalPattern.matcher(s);
+        Matcher mcr = Util.BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
         while (mcr.find()) {
             String replaceStr = mcr.group();
@@ -1839,7 +1209,7 @@ public class Util {
         String s = BibtexFields.getFieldExtras(fieldName);
         final String ext = "." + fieldName.toLowerCase();
         final OpenFileFilter off;
-        if (s.equals("browseDocZip")) {
+        if ("browseDocZip".equals(s)) {
             off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
         } else {
             off = new OpenFileFilter(new String[] {ext});
@@ -1894,39 +1264,6 @@ public class Util {
         pan.add(details, "details");
         // pass the scrollpane to the joptionpane.
         JOptionPane.showMessageDialog(parent, pan, title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    public static String wrapHTML(String s, final int lineWidth) {
-        StringBuffer sb = new StringBuffer();
-        StringTokenizer tok = new StringTokenizer(s);
-        int charsLeft = lineWidth;
-        while (tok.hasMoreTokens()) {
-            String word = tok.nextToken();
-            if (charsLeft == lineWidth) { // fresh line
-                sb.append(word);
-                charsLeft -= word.length();
-                if (charsLeft <= 0) {
-                    sb.append("<br>\n");
-                    charsLeft = lineWidth;
-                }
-            } else { // continue previous line
-                if (charsLeft < (word.length() + 1)) {
-                    sb.append("<br>\n");
-                    sb.append(word);
-                    if (word.length() >= (lineWidth - 1)) {
-                        sb.append("<br>\n");
-                        charsLeft = lineWidth;
-                    } else {
-                        sb.append(" ");
-                        charsLeft = lineWidth - word.length() - 1;
-                    }
-                } else {
-                    sb.append(' ').append(word);
-                    charsLeft -= word.length() + 1;
-                }
-            }
-        }
-        return sb.toString();
     }
 
     /**
@@ -2168,29 +1505,6 @@ public class Util {
     }
 
     /**
-     * Returns the given string but with the first character turned into an
-     * upper case character.
-     * 
-     * Example: testTest becomes TestTest
-     * 
-     * @param string
-     *            The string to change the first character to upper case to.
-     * @return A string has the first character turned to upper case and the
-     *         rest unchanged from the given one.
-     */
-    public static String toUpperFirstLetter(String string) {
-        if (string == null) {
-            throw new IllegalArgumentException();
-        }
-
-        if (string.length() == 0) {
-            return string;
-        }
-
-        return Character.toUpperCase(string.charAt(0)) + string.substring(1);
-    }
-
-    /**
      * Run an AbstractWorker's methods using Spin features to put each method
      * on the correct thread.
      * @param worker The worker to run.
@@ -2214,65 +1528,6 @@ public class Util {
         // without freezing the GUI. The magic is that THIS line
         // of execution will not continue until run() is finished.
         clb.update(); // Runs the update() method on the EDT.
-    }
-
-    /**
-     * This method checks whether there is a lock file for the given file. If
-     * there is, it waits for 500 ms. This is repeated until the lock is gone
-     * or we have waited the maximum number of times.
-     *
-     * @param file The file to check the lock for.
-     * @param maxWaitCount The maximum number of times to wait.
-     * @return true if the lock file is gone, false if it is still there.
-     */
-    public static boolean waitForFileLock(File file, int maxWaitCount) {
-        // Check if the file is locked by another JabRef user:
-        int lockCheckCount = 0;
-        while (Util.hasLockFile(file)) {
-
-            if (lockCheckCount++ == maxWaitCount) {
-                return false;
-            }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ignored) {
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Check whether a lock file exists for this file.
-     * @param file The file to check.
-     * @return true if a lock file exists, false otherwise.
-     */
-    public static boolean hasLockFile(File file) {
-        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
-        return lock.exists();
-    }
-
-    /**
-     * Find the lock file's last modified time, if it has a lock file.
-     * @param file The file to check.
-     * @return the last modified time if lock file exists, -1 otherwise.
-     */
-    public static long getLockFileTimeStamp(File file) {
-        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
-        return lock.exists() ? lock.lastModified() : -1;
-    }
-
-    /**
-     * Check if a lock file exists, and delete it if it does.
-     * @return true if the lock file existed, false otherwise.
-     * @throws IOException if something goes wrong.
-     */
-    public static boolean deleteLockFile(File file) {
-        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
-        if (!lock.exists()) {
-            return false;
-        }
-        lock.delete();
-        return true;
     }
 
     /**
@@ -2321,24 +1576,6 @@ public class Util {
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
-    }
-
-    /**
-     * 
-     * @param fileName
-     * @param destFilename
-     * @return
-     */
-    public static boolean renameFile(String fileName, String destFilename)
-    {
-        // File (or directory) with old name
-        File fromFile = new File(fileName);
-
-        // File (or directory) with new name
-        File toFile = new File(destFilename);
-
-        // Rename file (or directory)
-        return fromFile.renameTo(toFile);
     }
 
     public static ArrayList<String> getSeparatedKeywords(String keywords) {
@@ -2571,7 +1808,7 @@ public class Util {
                     }
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
-                        f = Util.shortenFileName(f, dirsS);
+                        f = FileUtil.shortenFileName(f, dirsS);
                         boolean alreadyHas = false;
                         //System.out.println("File: "+f.getPath());
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
@@ -2726,7 +1963,7 @@ public class Util {
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
 
-                File f = Util.expandFilename(flEntry.getLink(), fileDirs);
+                File f = FileUtil.expandFilename(flEntry.getLink(), fileDirs);
                 if (f != null) {
                     res.add(f);
                 }
@@ -2795,7 +2032,7 @@ public class Util {
     public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry,
             BibtexDatabase database) {
 
-        fieldAndFormat = Util.stripBrackets(fieldAndFormat);
+        fieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 
         int colon = fieldAndFormat.indexOf(':');
 
@@ -2832,18 +2069,6 @@ public class Util {
         fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
 
         return fieldValue;
-    }
-
-    /**
-     * Removes optional square brackets from the string s
-     *
-     * @param s
-     * @return
-     */
-    public static String stripBrackets(String s) {
-        int beginIndex = (s.startsWith("[") ? 1 : 0);
-        int endIndex = (s.endsWith("]") ? s.length() - 1 : s.length());
-        return s.substring(beginIndex, endIndex);
     }
 
     /**

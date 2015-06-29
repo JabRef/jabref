@@ -19,7 +19,7 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to
@@ -104,7 +104,7 @@ public class VersionHandling {
                     } else {
                         s = "";
                     }
-                    newNode = new GroupTreeNode(AbstractGroup.fromString(Util
+                    newNode = new GroupTreeNode(AbstractGroup.fromString(StringUtil
                             .unquote(g, '\\'), db, version));
                 }
                 if (root == null) {

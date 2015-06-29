@@ -40,6 +40,7 @@ import net.sf.jabref.FieldContentSelector;
 import net.sf.jabref.FieldTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.Util;
 import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
@@ -519,11 +520,11 @@ class GroupDialog extends JDialog {
             if (i > 0) {
                 sb.append("<br>");
             }
-            sb.append(Util.quoteForHTML(sa[i]));
+            sb.append(StringUtil.quoteForHTML(sa[i]));
         }
         String s = Globals.lang(
                 "The regular expression <b>%0</b> is invalid%c",
-                Util.quoteForHTML(regExp))
+                StringUtil.quoteForHTML(regExp))
                 + "<p><tt>"
                 + sb.toString()
                 + "</tt>";

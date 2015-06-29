@@ -174,7 +174,7 @@ public class ExternalFilePanel extends JPanel {
                 String[] dirs = metaData.getFileDirectory(fieldName);
                 File file = null;
                 if (dirs.length > 0) {
-                    File tmp = Util.expandFilename(editor.getText(), dirs);
+                    File tmp = FileUtil.expandFilename(editor.getText(), dirs);
                     if (tmp != null) {
                         file = tmp;
                     }

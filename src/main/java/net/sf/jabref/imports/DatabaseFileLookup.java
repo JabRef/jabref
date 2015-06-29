@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.FileUtil;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -118,7 +118,7 @@ class DatabaseFileLookup {
                 break;
             }
 
-            File expandedFilename = Util.expandFilename(link, possibleFilePaths);
+            File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
             if ((expandedFilename != null // file exists
 )
                     && expandedFilename.equals(aFile)) {

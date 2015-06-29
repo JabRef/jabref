@@ -59,7 +59,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         // First check the (legacy) "pdf" field:
         String pdf = entry.getField("pdf");
         String[] dirs = panel.metaData().getFileDirectory("pdf");
-        File f = Util.expandFilename(pdf, dirs);
+        File f = FileUtil.expandFilename(pdf, dirs);
         if (f != null) {
             files.add(f);
         }
@@ -73,7 +73,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
                 if ((flEntry.getType() != null) && (flEntry.getType().getName().toLowerCase().equals("pdf"))) {
-                    f = Util.expandFilename(flEntry.getLink(), dirs);
+                    f = FileUtil.expandFilename(flEntry.getLink(), dirs);
                     if (f != null) {
                         files.add(f);
                     }

@@ -83,7 +83,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         @Override
                         public void run() {
 
-                            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+                            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                                 // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                                 System.err.println("File locked, this will be trouble.");
                             }
@@ -170,7 +170,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                 success = false;
                 fileLockedError = true;
             }

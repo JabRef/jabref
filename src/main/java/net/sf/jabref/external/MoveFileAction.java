@@ -75,7 +75,7 @@ public class MoveFileAction extends AbstractAction {
         }
         File file = new File(ln);
         if (!file.isAbsolute()) {
-            file = Util.expandFilename(ln, dirs);
+            file = FileUtil.expandFilename(ln, dirs);
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
@@ -146,7 +146,7 @@ public class MoveFileAction extends AbstractAction {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {
-                        success = Util.copyFile(file, newFile, true);
+                        success = FileUtil.copyFile(file, newFile, true);
                     }
                     if (success) {
                         // Remove the original file:

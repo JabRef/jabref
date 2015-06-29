@@ -16,7 +16,7 @@
 package net.sf.jabref.oo;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import java.util.HashMap;
 
@@ -290,7 +290,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         // System.out.println("next: "+(char)c);
                         String combody;
                         if (c == '{') {
-                            String part = Util.getPart(field, i, false);
+                            String part = StringUtil.getPart(field, i, false);
                             i += part.length();
                             combody = part;
                         } else {
@@ -339,16 +339,16 @@ public class OOPreFormatter implements LayoutFormatter {
                     // command.
                     // If so, handle.
                     if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
 
                         i += part.length();
                         sb.append("<em>").append(part).append("</em>");
                     } else if (command.equals("textbf")) {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         sb.append("<b>").append(part).append("</b>");
                     } else if (c == '{') {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         argument = part;
                         if (argument != null) {

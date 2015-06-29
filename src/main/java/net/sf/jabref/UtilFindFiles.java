@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.external.ExternalFileType;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class UtilFindFiles {
                 result.addAll(UtilFindFiles.findFiles(extensions, child));
             } else {
 
-                String extension = Util.getFileExtension(child);
+                String extension = FileUtil.getFileExtension(child);
 
                 if (extension != null) {
                     if (extensions.contains(extension)) {
@@ -281,7 +282,7 @@ public class UtilFindFiles {
                         return null; // No permission?
                     }
 
-                    String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
+                    String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
                     for (File subDir : subDirs) {
                         if (subDir.isDirectory()) {
@@ -299,7 +300,7 @@ public class UtilFindFiles {
                     List<File> toDo = new LinkedList<File>();
                     toDo.add(directory);
 
-                    String restOfFileString = Util.join(fileParts, "/", i + 1, fileParts.length);
+                    String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
                     // Before checking the subdirs, we first check the current
                     // dir

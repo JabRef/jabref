@@ -122,7 +122,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             //            else
             //             currently, we do not do any more wrapping
             if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
-                sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
+                sb.append(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH));
             } else {
                 sb.append(text);
             }
@@ -196,7 +196,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         // currently, we do not add newlines and new formatting
         if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
             //             introduce a line break to be read at the parser
-            return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
+            return StringUtil.wrap(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
 
         } else {
             return sb.toString();
@@ -279,14 +279,14 @@ if ((c == '&') && !escape &&
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
             boolean first, boolean last) {
-        //sb.append(Util.wrap2((first ? "" : " # ") + text.substring(start_pos, end_pos)
+        //sb.append(Util.wrap((first ? "" : " # ") + text.substring(start_pos, end_pos)
         //		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
         putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
                 + (last ? "" : " # "));
     }
 
     private void putIn(String s) {
-        sb.append(Util.wrap2(s, GUIGlobals.LINE_LENGTH));
+        sb.append(StringUtil.wrap(s, GUIGlobals.LINE_LENGTH));
     }
 
     private void checkBraces(String text) throws IllegalArgumentException {

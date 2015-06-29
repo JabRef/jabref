@@ -19,10 +19,10 @@ public class UtilTest {
 
     @Test
     public void testNCase() {
-        Assert.assertEquals("", Util.nCase(""));
-        Assert.assertEquals("Hello world", Util.nCase("Hello World"));
-        Assert.assertEquals("A", Util.nCase("a"));
-        Assert.assertEquals("Aa", Util.nCase("AA"));
+        Assert.assertEquals("", StringUtil.nCase(""));
+        Assert.assertEquals("Hello world", StringUtil.nCase("Hello World"));
+        Assert.assertEquals("A", StringUtil.nCase("a"));
+        Assert.assertEquals("Aa", StringUtil.nCase("AA"));
     }
 
     @Test
@@ -50,11 +50,11 @@ public class UtilTest {
 
     @Test
     public void testMakeBibtexExtension() {
-        Assert.assertEquals("aa.bib", Util.makeBibtexExtension("aa"));
-        Assert.assertEquals(".bib", Util.makeBibtexExtension(""));
-        Assert.assertEquals("a.bib", Util.makeBibtexExtension("a.bib"));
-        Assert.assertEquals("a.bib", Util.makeBibtexExtension("a"));
-        Assert.assertEquals("a.bb.bib", Util.makeBibtexExtension("a.bb"));
+        Assert.assertEquals("aa.bib", StringUtil.makeBibtexExtension("aa"));
+        Assert.assertEquals(".bib", StringUtil.makeBibtexExtension(""));
+        Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a.bib"));
+        Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a"));
+        Assert.assertEquals("a.bb.bib", StringUtil.makeBibtexExtension("a.bb"));
     }
 
     @Test
@@ -97,14 +97,14 @@ public class UtilTest {
     @Test
     public void testShaveString() {
 
-        Assert.assertEquals(null, Util.shaveString(null));
-        Assert.assertEquals("", Util.shaveString(""));
-        Assert.assertEquals("aaa", Util.shaveString("   aaa\t\t\n\r"));
-        Assert.assertEquals("a", Util.shaveString("  {a}    "));
-        Assert.assertEquals("a", Util.shaveString("  \"a\"    "));
-        Assert.assertEquals("{a}", Util.shaveString("  {{a}}    "));
-        Assert.assertEquals("{a}", Util.shaveString("  \"{a}\"    "));
-        Assert.assertEquals("\"{a\"}", Util.shaveString("  \"{a\"}    "));
+        Assert.assertEquals(null, StringUtil.shaveString(null));
+        Assert.assertEquals("", StringUtil.shaveString(""));
+        Assert.assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
+        Assert.assertEquals("a", StringUtil.shaveString("  {a}    "));
+        Assert.assertEquals("a", StringUtil.shaveString("  \"a\"    "));
+        Assert.assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
+        Assert.assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
+        Assert.assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
     }
 
     @Test
@@ -128,31 +128,31 @@ public class UtilTest {
     @Test
     public void testJoin() {
         String[] s = "ab/cd/ed".split("/");
-        Assert.assertEquals("ab\\cd\\ed", Util.join(s, "\\", 0, s.length));
+        Assert.assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
 
-        Assert.assertEquals("cd\\ed", Util.join(s, "\\", 1, s.length));
+        Assert.assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
 
-        Assert.assertEquals("ed", Util.join(s, "\\", 2, s.length));
+        Assert.assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
 
-        Assert.assertEquals("", Util.join(s, "\\", 3, s.length));
+        Assert.assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
-        Assert.assertEquals("", Util.join(new String[] {}, "\\", 0, 0));
+        Assert.assertEquals("", StringUtil.join(new String[]{}, "\\", 0, 0));
     }
 
     @Test
     public void testStripBrackets() {
-        Assert.assertEquals("foo", Util.stripBrackets("[foo]"));
-        Assert.assertEquals("[foo]", Util.stripBrackets("[[foo]]"));
-        Assert.assertEquals("foo", Util.stripBrackets("foo]"));
-        Assert.assertEquals("foo", Util.stripBrackets("[foo"));
-        Assert.assertEquals("", Util.stripBrackets(""));
-        Assert.assertEquals("", Util.stripBrackets("[]"));
-        Assert.assertEquals("", Util.stripBrackets("["));
-        Assert.assertEquals("", Util.stripBrackets("]"));
-        Assert.assertEquals("f[]f", Util.stripBrackets("f[]f"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo]"));
+        Assert.assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("foo]"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo"));
+        Assert.assertEquals("", StringUtil.stripBrackets(""));
+        Assert.assertEquals("", StringUtil.stripBrackets("[]"));
+        Assert.assertEquals("", StringUtil.stripBrackets("["));
+        Assert.assertEquals("", StringUtil.stripBrackets("]"));
+        Assert.assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
 
         try {
-            Util.stripBrackets(null);
+            StringUtil.stripBrackets(null);
             Assert.fail();
         } catch (NullPointerException ignored) {
 
@@ -338,12 +338,12 @@ public class UtilTest {
     @Test
     public void testToUpperCharFirst() {
 
-        Assert.assertEquals("", Util.toUpperFirstLetter(""));
-        Assert.assertEquals("A", Util.toUpperFirstLetter("a"));
-        Assert.assertEquals("A", Util.toUpperFirstLetter("A"));
-        Assert.assertEquals("An", Util.toUpperFirstLetter("an"));
-        Assert.assertEquals("AN", Util.toUpperFirstLetter("AN"));
-        Assert.assertEquals("TestTest", Util.toUpperFirstLetter("testTest"));
+        Assert.assertEquals("", StringUtil.toUpperFirstLetter(""));
+        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("a"));
+        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("A"));
+        Assert.assertEquals("An", StringUtil.toUpperFirstLetter("an"));
+        Assert.assertEquals("AN", StringUtil.toUpperFirstLetter("AN"));
+        Assert.assertEquals("TestTest", StringUtil.toUpperFirstLetter("testTest"));
 
     }
 

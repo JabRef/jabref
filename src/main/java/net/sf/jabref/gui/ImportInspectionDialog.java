@@ -1485,7 +1485,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Globals.lang("Keep");
             }
             if (i >= PAD) {
-                return Util.nCase(fields[i - PAD]);
+                return StringUtil.nCase(fields[i - PAD]);
             }
             return "";
         }

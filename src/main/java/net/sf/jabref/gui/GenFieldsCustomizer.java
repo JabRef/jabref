@@ -162,7 +162,7 @@ public class GenFieldsCustomizer extends JDialog {
         /*
         String delimStr = fieldsArea.getText().replaceAll("\\s+","")
           .replaceAll("\\n+","").trim();
-        parent.prefs.putStringArray("generalFields", Util.delimToStringArray(delimStr, ";"));
+        parent.prefs.putStringArray("generalFields", Util.split(delimStr, ";"));
         */
 
         parent.removeCachedEntryEditors();

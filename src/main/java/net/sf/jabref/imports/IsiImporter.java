@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.StringUtil;
 import net.sf.jabref.util.CaseChangers;
 
 /**
@@ -450,7 +451,7 @@ public class IsiImporter extends ImportFormat {
 
     public static String isiAuthorsConvert(String authors) {
         String[] s = IsiImporter.isiAuthorsConvert(authors.split(" and |;"));
-        return Util.join(s, " and ");
+        return StringUtil.join(s, " and ");
     }
 
 }

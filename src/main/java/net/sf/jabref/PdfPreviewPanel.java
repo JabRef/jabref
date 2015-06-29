@@ -139,7 +139,7 @@ class PdfPreviewPanel extends JPanel {
         }
 
         if (flEntry != null) {
-            File pdfFile = Util.expandFilename(metaData, flEntry.getLink());
+            File pdfFile = FileUtil.expandFilename(metaData, flEntry.getLink());
             if (pdfFile != null) {
                 renderPDFFile(pdfFile);
             } else {

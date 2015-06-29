@@ -259,7 +259,7 @@ public class MetaData implements Iterable<String> {
             if (orderedData.size() >= 0) {
                 sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
                 for (int j = 0; j < orderedData.size(); j++) {
-                    sb.append(Util.quote(orderedData.elementAt(j), ";", '\\')).append(";");
+                    sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
                 }
                 sb.append("}");
             }
@@ -289,7 +289,7 @@ public class MetaData implements Iterable<String> {
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
                 StringBuffer s =
-                        new StringBuffer(Util.quote(tok.nextToken(), ";", '\\') + ";");
+                        new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
                 wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
