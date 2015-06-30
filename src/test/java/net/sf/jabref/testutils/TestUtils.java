@@ -2,8 +2,6 @@ package net.sf.jabref.testutils;
 
 import net.sf.jabref.JabRef;
 
-import java.security.Permission;
-
 /**
  * UtilsClass for UnitTests.
  *
@@ -13,7 +11,6 @@ public class TestUtils {
 
     public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
 
-
     /**
      * Initialize JabRef. Can be cleaned up with
      * {@link TestUtils#closeJabRef()}
@@ -21,15 +18,8 @@ public class TestUtils {
      * @see TestUtils#closeJabRef()
      */
     public static void initJabRef() {
-        TestUtils.disableSystemExit();
-        try {
-            String[] args = {"-p", " ", TestUtils.PATH_TO_TEST_BIBTEX};
-            JabRef.main(args);
-        } catch (ExitException ignored) {
-
-        } finally {
-            TestUtils.enableSystemExit();
-        }
+        String[] args = {"-p", " ", TestUtils.PATH_TO_TEST_BIBTEX};
+        JabRef.main(args);
     }
 
     /**
@@ -40,29 +30,6 @@ public class TestUtils {
         if (jabref != null) {
             JabRef.jrf.dispose();
         }
-    }
-
-
-    @SuppressWarnings("serial")
-    private static class ExitException extends SecurityException {
-    }
-
-
-    private static void disableSystemExit() {
-        final SecurityManager securityManager = new SecurityManager() {
-
-            @Override
-            public void checkPermission(Permission permission) {
-                if (permission.getName().contains("exitVM")) {
-                    throw new ExitException();
-                }
-            }
-        };
-        System.setSecurityManager(securityManager);
-    }
-
-    private static void enableSystemExit() {
-        System.setSecurityManager(null);
     }
 
 }
