@@ -354,6 +354,14 @@ public class ImportFormatReader {
         }
     }
 
+    public static Reader getUTF8Reader(File f) throws IOException {
+        return getReader(f, "UTF8");
+    }
+
+    public static Reader getUTF16Reader(File f) throws IOException {
+        return getReader(f, "UTF-16");
+    }
+
     public static Reader getReader(File f, String encoding)
             throws IOException {
         InputStreamReader reader;

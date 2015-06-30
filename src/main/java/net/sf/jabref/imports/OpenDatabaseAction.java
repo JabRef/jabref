@@ -356,12 +356,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
         // read it regardless of encoding, with either UTF8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
-        Reader utf8Reader = ImportFormatReader.getReader(fileToOpen, "UTF8");
+        Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen);
         String suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf8Reader);
         utf8Reader.close();
         // Now if that didn't get us anywhere, we check with the 16 bit encoding:
         if (suppliedEncoding == null) {
-            Reader utf16Reader = ImportFormatReader.getReader(fileToOpen, "UTF-16");
+            Reader utf16Reader = ImportFormatReader.getUTF16Reader(fileToOpen);
             suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf16Reader);
             utf16Reader.close();
             //System.out.println("Result of UTF-16 test: "+suppliedEncoding);

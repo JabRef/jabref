@@ -45,8 +45,9 @@ public class CopacImporterTest {
     }
 
     @Test
-    @Ignore
     public void testImportEntries() throws IOException {
+        Globals.prefs.put("defaultEncoding", "UTF8");
+
         CopacImporter importer = new CopacImporter();
 
         List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
