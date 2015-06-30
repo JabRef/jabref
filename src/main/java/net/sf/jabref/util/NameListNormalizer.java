@@ -27,21 +27,10 @@ public class NameListNormalizer {
     private static final Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
     private static final Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     private static final Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
-    private static final Pattern singleName = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
-
-
-    /*public static void main(String[] args) {
-        normalizeAuthorList("Staci D. Bilbo and Smith SH and Jaclyn M Schwarz");
-        //System.out.println(normalizeAuthorList("Ølver MA"));
-        //System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y. and Olsen Y. Y."));
-        //System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y., Olsen Y. Y."));
-        //System.out.println(normalizeAuthorList("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y."));
-        //System.out.println(normalizeAuthorList("Alver, MA; Alfredsen, JA; Olsen Y.Y."));
-    }*/
+    private static final Pattern SINGLE_NAME = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
     public static String normalizeAuthorList(String in) {
-        boolean andSep = false, semicolonSep = false, commaSep = false;
-        String author;
+        boolean andSep = false;
         String[] authors = in.split("( |,)and ", -1);
         if (authors.length > 1) {
             andSep = true;
@@ -54,13 +43,11 @@ public class NameListNormalizer {
             */
             String[] a2 = in.split("; ");
             if (a2.length > 1) {
-                semicolonSep = true;
                 authors = a2;
             }
             else {
                 a2 = in.split(", ");
                 if (a2.length > 3) { // Probably more than a single author, so we split by commas.
-                    commaSep = true;
                     authors = a2;
                 } else {
                     if (a2.length == 3) {
@@ -216,7 +203,7 @@ public class NameListNormalizer {
                 }
             } else {
                 // Only a single part. Check if it looks like a name or initials:
-                Matcher m2 = NameListNormalizer.singleName.matcher(fParts[0]);
+                Matcher m2 = NameListNormalizer.SINGLE_NAME.matcher(fParts[0]);
                 if (m2.matches()) {
                     sb.append(fParts[0]);
                 } else {
@@ -238,7 +225,7 @@ public class NameListNormalizer {
             String[] parts = name.split(" +");
             boolean allNames = true;
             for (String part : parts) {
-                m = NameListNormalizer.singleName.matcher(part);
+                m = NameListNormalizer.SINGLE_NAME.matcher(part);
                 if (!m.matches()) {
                     allNames = false;
                     break;
