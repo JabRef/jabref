@@ -19,7 +19,7 @@ import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 
-public class ArticleLabelRule extends DefaultLabelRule {
+public class ArticleLabelRule implements LabelRule {
 
     // this is the rule used handle articles
     // we try (first author last name)/(year)/(first unique journal word)

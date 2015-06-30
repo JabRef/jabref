@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
 
 import net.sf.jabref.BibtexEntry;
 
-public class InproceedingsLabelRule extends DefaultLabelRule {
+public class InproceedingsLabelRule implements LabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)/(first unique booktitle word)

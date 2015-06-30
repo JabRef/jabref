@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
 
 import net.sf.jabref.BibtexEntry;
 
-public class BookLabelRule extends DefaultLabelRule {
+public class BookLabelRule implements LabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)
