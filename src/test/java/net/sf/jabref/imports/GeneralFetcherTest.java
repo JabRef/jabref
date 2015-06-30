@@ -8,6 +8,7 @@ import net.sf.jabref.TestUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.swing.*;
@@ -36,7 +37,7 @@ public class GeneralFetcherTest {
      *
      * @throws Exception
      */
-    @Test
+    @Test @Ignore
     public void testResetButton() throws Exception {
         String testString = "test string";
         JTextField tf = (JTextField) TestUtils.getChildNamed(GeneralFetcherTest.gf, "tf");
