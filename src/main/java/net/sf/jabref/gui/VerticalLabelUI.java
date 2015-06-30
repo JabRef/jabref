@@ -29,7 +29,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 
 /**
- * A UI delegate for JLabel that rotates the label 90�
+ * A UI delegate for JLabel that rotates the label 90°
  * <P>
  * Extends {@link BasicLabelUI}.
  * <P>

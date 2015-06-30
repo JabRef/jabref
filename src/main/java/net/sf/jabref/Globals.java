@@ -567,7 +567,7 @@ public class Globals {
         Globals.HTMLCHARS.put("vC", "&#268;"); // "Ccaron"
         Globals.HTMLCHARS.put("vc", "&#269;"); // "ccaron"
         Globals.HTMLCHARS.put("vD", "&#270;"); // "Dcaron"
-        // Symbol #271 (d�) has no special Latex command
+        // Symbol #271 (d) has no special Latex command
         Globals.HTMLCHARS.put("DJ", "&#272;"); // "Dstrok"
         Globals.HTMLCHARS.put("dj", "&#273;"); // "dstrok"
         Globals.HTMLCHARS.put("=E", "&#274;"); // "Emacr"
@@ -613,8 +613,8 @@ public class Globals {
         Globals.HTMLCHARS.put("'l", "&#314;"); // "lacute"
         Globals.HTMLCHARS.put("cL", "&#315;"); // "Lcedil"
         Globals.HTMLCHARS.put("cl", "&#316;"); // "lcedil"
-        // Symbol #317 (L�) has no special Latex command
-        // Symbol #318 (l�) has no special Latex command
+        // Symbol #317 (L) has no special Latex command
+        // Symbol #318 (l) has no special Latex command
         Globals.HTMLCHARS.put("Lmidot", "&#319;"); // "Lmidot"
         Globals.HTMLCHARS.put("lmidot", "&#320;"); // "lmidot"
         Globals.HTMLCHARS.put("L", "&#321;"); // "Lstrok"
@@ -625,7 +625,7 @@ public class Globals {
         Globals.HTMLCHARS.put("cn", "&#326;"); // "ncedil"
         Globals.HTMLCHARS.put("vN", "&#327;"); // "Ncaron"
         Globals.HTMLCHARS.put("vn", "&#328;"); // "ncaron"
-        // Symbol #329 (�n) has no special Latex command
+        // Symbol #329 (n) has no special Latex command
         Globals.HTMLCHARS.put("NG", "&#330;"); // "ENG"
         Globals.HTMLCHARS.put("ng", "&#331;"); // "eng"
         Globals.HTMLCHARS.put("=O", "&#332;"); // "Omacr"
@@ -653,7 +653,7 @@ public class Globals {
         Globals.HTMLCHARS.put("cT", "&#354;"); // "Tcedil"
         Globals.HTMLCHARS.put("ct", "&#355;"); // "tcedil"
         Globals.HTMLCHARS.put("vT", "&#356;"); // "Tcaron"
-        // Symbol #357 (t�) has no special Latex command
+        // Symbol #357 (t) has no special Latex command
         Globals.HTMLCHARS.put("Tstrok", "&#358;"); // "Tstrok"
         Globals.HTMLCHARS.put("tstrok", "&#359;"); // "tstrok"
         Globals.HTMLCHARS.put("~U", "&#360;"); // "Utilde"
@@ -1181,7 +1181,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         Globals.RTFCHARS.put("vC", "\\u268C"); // "Ccaron"
         Globals.RTFCHARS.put("vc", "\\u269c"); // "ccaron"
         Globals.RTFCHARS.put("vD", "\\u270D"); // "Dcaron"
-        // Symbol #271 (d�) has no special Latex command
+        // Symbol #271 (d) has no special Latex command
         Globals.RTFCHARS.put("DJ", "\\u272D"); // "Dstrok"
         Globals.RTFCHARS.put("dj", "\\u273d"); // "dstrok"
         Globals.RTFCHARS.put("=E", "\\u274E"); // "Emacr"
@@ -1227,8 +1227,8 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         Globals.RTFCHARS.put("'l", "\\u314l"); // "lacute"
         Globals.RTFCHARS.put("cL", "\\u315L"); // "Lcedil"
         Globals.RTFCHARS.put("cl", "\\u316l"); // "lcedil"
-        // Symbol #317 (L�) has no special Latex command
-        // Symbol #318 (l�) has no special Latex command
+        // Symbol #317 (L) has no special Latex command
+        // Symbol #318 (l) has no special Latex command
         Globals.RTFCHARS.put("Lmidot", "\\u319L"); // "Lmidot"
         Globals.RTFCHARS.put("lmidot", "\\u320l"); // "lmidot"
         Globals.RTFCHARS.put("L", "\\u321L"); // "Lstrok"
@@ -1239,7 +1239,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         Globals.RTFCHARS.put("cn", "\\u326n"); // "ncedil"
         Globals.RTFCHARS.put("vN", "\\u327N"); // "Ncaron"
         Globals.RTFCHARS.put("vn", "\\u328n"); // "ncaron"
-        // Symbol #329 (�n) has no special Latex command
+        // Symbol #329 (n) has no special Latex command
         Globals.RTFCHARS.put("NG", "\\u330G"); // "ENG"
         Globals.RTFCHARS.put("ng", "\\u331g"); // "eng"
         Globals.RTFCHARS.put("=O", "\\u332O"); // "Omacr"
@@ -1267,7 +1267,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         Globals.RTFCHARS.put("cT", "\\u354T"); // "Tcedil"
         Globals.RTFCHARS.put("ct", "\\u355t"); // "tcedil"
         Globals.RTFCHARS.put("vT", "\\u356T"); // "Tcaron"
-        // Symbol #357 (t�) has no special Latex command
+        // Symbol #357 (t) has no special Latex command
         Globals.RTFCHARS.put("Tstrok", "\\u358T"); // "Tstrok"
         Globals.RTFCHARS.put("tstrok", "\\u359t"); // "tstrok"
         Globals.RTFCHARS.put("~U", "\\u360U"); // "Utilde"

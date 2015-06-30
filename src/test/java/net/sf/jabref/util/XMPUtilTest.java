@@ -1529,7 +1529,7 @@ public class XMPUtilTest {
      * A better testcase for resolveStrings. Makes sure that also the document
      * information and dublin core are written correctly.
      * <p/>
-     * Data was contributed by Philip K.F. H�lzenspies (p.k.f.holzenspies [at] utwente.nl).
+     * Data was contributed by Philip K.F. Hölzenspies (p.k.f.holzenspies [at] utwente.nl).
      *
      * @throws IOException
      * @throws TransformerException

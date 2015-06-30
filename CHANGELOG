@@ -862,7 +862,7 @@
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
         - Fixed bug that made explicit groups appear empty after updating group tree from external
           change.
-        - New windows installer thanks to Uwe St�hr.
+        - New windows installer thanks to Uwe Stöhr.
         - [ 1641247 ] Fixed: No update of preview after generating bibtex key
         - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
@@ -875,7 +875,7 @@
           dropdown menu in the file dialog.
         - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
         - Added warning dialog when exporting failed.
-        - Added fix for exporting special chars in RTF like ���...
+        - Added fix for exporting special chars in RTF like ï¿½ï¿½ï¿½...
         - Added NameFormat LayoutFormatter based on Bibtex method name.format$
         - Added Fetch from ArXiv.org to Web Search
           [ 1587342 ] Quering ArXiv (and any OAI2 Repository)
