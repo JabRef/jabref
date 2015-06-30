@@ -34,6 +34,8 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.oo.sorting.AuthorYearTitleComparator;
+import net.sf.jabref.oo.sorting.YearAuthorTitleComparator;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,8 +78,8 @@ class OOBibBase {
     private XPropertySet propertySet = null;
 
     private final boolean atEnd;
-    private final AlphanumericComparator entryComparator = new AlphanumericComparator();
-    private final YearComparator yearComparator = new YearComparator();
+    private final AuthorYearTitleComparator entryComparator = new AuthorYearTitleComparator();
+    private final YearAuthorTitleComparator yearAuthorTitleComparator = new YearAuthorTitleComparator();
 
     private final HashMap<String, String> uniquefiers = new HashMap<String, String>();
 
@@ -270,7 +272,7 @@ class OOBibBase {
 
             if (entries.length > 1) {
                 if (style.getBooleanCitProperty("MultiCiteChronological")) {
-                    Arrays.sort(entries, yearComparator);
+                    Arrays.sort(entries, yearAuthorTitleComparator);
                 } else {
                     Arrays.sort(entries, entryComparator);
                 }
@@ -526,7 +528,7 @@ class OOBibBase {
 
                     if (cEntries.length > 1) {
                         if (style.getBooleanCitProperty("MultiCiteChronological")) {
-                            Arrays.sort(cEntries, yearComparator);
+                            Arrays.sort(cEntries, yearAuthorTitleComparator);
                         } else {
                             Arrays.sort(cEntries, entryComparator);
                         }

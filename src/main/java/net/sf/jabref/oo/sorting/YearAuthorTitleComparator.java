@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.oo;
+package net.sf.jabref.oo.sorting;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FieldComparator;
@@ -23,17 +23,14 @@ import java.util.Comparator;
 /**
  * Comparator for sorting bibliography entries according to publication year. This is used to
  * sort entries in multiple citations where the oldest publication should appear first.
+ *
+ * Sort by ascending: YEAR, AUTHOR, TITLE
  */
-class YearComparator implements Comparator<BibtexEntry> {
+public class YearAuthorTitleComparator implements Comparator<BibtexEntry> {
 
     private final FieldComparator authComp = new FieldComparator("author");
-    private final FieldComparator editorComp = new FieldComparator("editor");
+    private final FieldComparator titleComp = new FieldComparator("title");
     private final FieldComparator yearComp = new FieldComparator("year");
-
-
-    public YearComparator() {
-
-    }
 
     @Override
     public int compare(BibtexEntry o1, BibtexEntry o2) {
@@ -42,14 +39,14 @@ class YearComparator implements Comparator<BibtexEntry> {
         if (comp != 0) {
             return comp;
         }
-        // TODO: Is it a good idea to try editor if author fields are equal?
+
         // Author as next criterion:
         comp = authComp.compare(o1, o2);
         if (comp != 0) {
             return comp;
         }
-        // Editor as next criterion:
-        return editorComp.compare(o1, o2);
 
+        // Editor as next criterion:
+        return titleComp.compare(o1, o2);
     }
 }

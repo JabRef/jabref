@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.oo;
+package net.sf.jabref.oo.sorting;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FieldComparator;
@@ -23,19 +23,13 @@ import java.util.Comparator;
 /**
  * Comparator for sorting bibliography entries.
  *
- * TODO: is it sufficient with a hardcoded sort algorithm for the bibliography?
+ * Sort by ascending: AUTHOR, YEAR, TITLE
  */
-class AlphanumericComparator implements Comparator<BibtexEntry> {
+public class AuthorYearTitleComparator implements Comparator<BibtexEntry> {
 
     private final FieldComparator authComp = new FieldComparator("author");
-    private final FieldComparator editorComp = new FieldComparator("editor");
     private final FieldComparator yearComp = new FieldComparator("year");
     private final FieldComparator titleComp = new FieldComparator("title");
-
-
-    public AlphanumericComparator() {
-
-    }
 
     @Override
     public int compare(BibtexEntry o1, BibtexEntry o2) {
@@ -44,35 +38,14 @@ class AlphanumericComparator implements Comparator<BibtexEntry> {
         if (comp != 0) {
             return comp;
         }
-        // Editor as second criterion:
-        comp = editorComp.compare(o1, o2);
-        if (comp != 0) {
-            return comp;
-        }
+
         // Year as next criterion:
         comp = yearComp.compare(o1, o2);
         if (comp != 0) {
             return comp;
         }
+
         // Title as next criterion:
-        comp = titleComp.compare(o1, o2);
-        if (comp != 0) {
-            return comp;
-        }
-        // Bibtex key as next criterion:
-        return compare(o1.getCiteKey(), o2.getCiteKey());
-
-    }
-
-    private int compare(String k1, String k2) {
-        if(k1 == null && k2 == null) {
-            return 0; // none
-        } else if(k1 != null && k2 == null) {
-            return 1; // k1 only
-        } else if(k1 == null){
-            return -1; // k2 only
-        } else {
-            return k1.compareTo(k2); // k1 and k2
-        }
+        return titleComp.compare(o1, o2);
     }
 }
