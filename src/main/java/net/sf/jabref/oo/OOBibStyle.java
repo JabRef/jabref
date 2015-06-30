@@ -77,7 +77,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private final static String DEFAULT_MARK = "default";
     private File styleFile = null;
     private static long styleFileModificationTime = Long.MIN_VALUE;
-    private final String COMBINED_ENTRIES_SEPARATOR = "-";
 
     //private Pattern quoted = Pattern.compile("\".*^\\\\\"");
     private final Pattern quoted = Pattern.compile("\".*\"");

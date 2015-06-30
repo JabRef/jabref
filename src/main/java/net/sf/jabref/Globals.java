@@ -446,7 +446,6 @@ public class Globals {
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
-    public static HashMap<String, String> HTML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> HTMLCHARS = new HashMap<String, String>();
     public static final HashMap<String, String> XML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
@@ -479,55 +478,6 @@ public class Globals {
         Globals.URL_CHARS.put(" ", "%20");
         Globals.URL_CHARS.put("&", "%26");
         Globals.URL_CHARS.put("$", "%24");
-
-        // HTMLCHARS.put("\"a", "&auml;");
-        // HTMLCHARS.put("\"A", "&Auml;");
-        // HTMLCHARS.put("\"e", "&euml;");
-        // HTMLCHARS.put("\"E", "&Euml;");
-        // HTMLCHARS.put("\"i", "&iuml;");
-        // HTMLCHARS.put("\"I", "&Iuml;");
-        // HTMLCHARS.put("\"o", "&ouml;");
-        // HTMLCHARS.put("\"O", "&Ouml;");
-        // HTMLCHARS.put("\"u", "&uuml;");
-        // HTMLCHARS.put("\"U", "&Uuml;");
-        // HTMLCHARS.put("`a", "&agrave;");
-        // HTMLCHARS.put("`A", "&Agrave;");
-        // HTMLCHARS.put("`e", "&egrave;");
-        // HTMLCHARS.put("`E", "&Egrave;");
-        // HTMLCHARS.put("`i", "&igrave;");
-        // HTMLCHARS.put("`I", "&Igrave;");
-        // HTMLCHARS.put("`o", "&ograve;");
-        // HTMLCHARS.put("`O", "&Ograve;");
-        // HTMLCHARS.put("`u", "&ugrave;");
-        // HTMLCHARS.put("`U", "&Ugrave;");
-        // HTMLCHARS.put("'e", "&eacute;");
-        // HTMLCHARS.put("'E", "&Eacute;");
-        // HTMLCHARS.put("'i", "&iacute;");
-        // HTMLCHARS.put("'I", "&Iacute;");
-        // HTMLCHARS.put("'o", "&oacute;");
-        // HTMLCHARS.put("'O", "&Oacute;");
-        // HTMLCHARS.put("'u", "&uacute;");
-        // HTMLCHARS.put("'U", "&Uacute;");
-        // HTMLCHARS.put("'a", "&aacute;");
-        // HTMLCHARS.put("'A", "&Aacute;");
-        // HTMLCHARS.put("^a", "&ocirc;");
-        // HTMLCHARS.put("^A", "&Ocirc;");
-        // HTMLCHARS.put("^o", "&ocirc;");
-        // HTMLCHARS.put("^O", "&Ocirc;");
-        // HTMLCHARS.put("^u", "&ucirc;");
-        // HTMLCHARS.put("^U", "&Ucirc;");
-        // HTMLCHARS.put("^e", "&ecirc;");
-        // HTMLCHARS.put("^E", "&Ecirc;");
-        // HTMLCHARS.put("^i", "&icirc;");
-        // HTMLCHARS.put("^I", "&Icirc;");
-        // HTMLCHARS.put("~o", "&otilde;");
-        // HTMLCHARS.put("~O", "&Otilde;");
-        // HTMLCHARS.put("~n", "&ntilde;");
-        // HTMLCHARS.put("~N", "&Ntilde;");
-        // HTMLCHARS.put("~a", "&atilde;");
-        // HTMLCHARS.put("~A", "&Atilde;");
-        // HTMLCHARS.put("cc", "&ccedil;");
-        // HTMLCHARS.put("cC", "&Ccedil;");
 
         // Following character definitions contributed by Ervin Kolenovic:
         // HTML named entities from #192 - #255 (UNICODE Latin-1)
