@@ -48,11 +48,6 @@ import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.journals.ManageJournalsAction;
-import net.sf.jabref.label.ArticleLabelRule;
-import net.sf.jabref.label.BookLabelRule;
-import net.sf.jabref.label.IncollectionLabelRule;
-import net.sf.jabref.label.InproceedingsLabelRule;
-import net.sf.jabref.label.LabelMaker;
 import net.sf.jabref.oo.OpenOfficePanel;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.PluginInstallerAction;
@@ -519,8 +514,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
         });
-
-        initLabelMaker();
 
         initSidePane();
 
@@ -1048,19 +1041,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setTransferHandler(xfer);
         mb.setTransferHandler(xfer);
         sidePaneManager.getPanel().setTransferHandler(xfer);
-    }
-
-    private void initLabelMaker() {
-        // initialize the labelMaker
-        LabelMaker labelMaker = new LabelMaker();
-        labelMaker.addRule(new ArticleLabelRule(),
-                BibtexEntryType.ARTICLE);
-        labelMaker.addRule(new BookLabelRule(),
-                BibtexEntryType.BOOK);
-        labelMaker.addRule(new IncollectionLabelRule(),
-                BibtexEntryType.INCOLLECTION);
-        labelMaker.addRule(new InproceedingsLabelRule(),
-                BibtexEntryType.INPROCEEDINGS);
     }
 
     /**

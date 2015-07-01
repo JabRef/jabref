@@ -1032,7 +1032,6 @@ public class LabelPatternUtil {
      */
     private static String allAuthors(String authorField) {
         String author = "";
-        // This code was part of 'ApplyRule' in 'ArticleLabelRule'
         String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
         int i = 0;
         while (tokens.length > i) {
@@ -1095,7 +1094,6 @@ public class LabelPatternUtil {
      */
     private static String NAuthors(String authorField, int n) {
         String author = "";
-        // This code was part of 'ApplyRule' in 'ArticleLabelRule'
         String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
         int i = 0;
         while ((tokens.length > i) && (i < n)) {
@@ -1122,7 +1120,6 @@ public class LabelPatternUtil {
         final int CHARS_OF_FIRST = 5;
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
         String author = "";
-        // This code was part of 'ApplyRule' in 'ArticleLabelRule'
         String[] tokens = authorField.split("\\band\\b");
         int i = 1;
         if (tokens.length == 0) {

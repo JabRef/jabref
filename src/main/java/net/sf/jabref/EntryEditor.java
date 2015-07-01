@@ -1519,7 +1519,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         @Override
         public void actionPerformed(ActionEvent e) {
             // 1. get Bitexentry for selected index (already have)
-            // 2. run the LabelMaker by it
+            // 2. update label
             try {
                 // Store the current edit in case this action is called during the
                 // editing of a field:
