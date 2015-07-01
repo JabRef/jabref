@@ -34,7 +34,7 @@ import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
-import net.sf.jabref.label.HandleDuplicateWarnings;
+import net.sf.jabref.HandleDuplicateWarnings;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 // The action concerned with opening an existing database.
