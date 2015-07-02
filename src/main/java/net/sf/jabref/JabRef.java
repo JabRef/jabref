@@ -167,7 +167,7 @@ public class JabRef {
         if (Globals.ON_WIN) {
             // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
             // Based on http://stackoverflow.com/a/1928830
-            JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.VERSION);
+            JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
             //System.out.println(getCurrentProcessExplicitAppUserModelID());
         }
 

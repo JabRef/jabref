@@ -39,7 +39,7 @@ import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.util.ErrorConsole;
-import net.sf.jabref.util.TBuildInfo;
+import net.sf.jabref.util.BuildInfo;
 
 public class Globals {
 
@@ -109,8 +109,6 @@ public class Globals {
     private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
             INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
-    private static final String buildInfos = "/resource/build.properties";
-
     public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
     /*
      * some extra field definitions
@@ -127,17 +125,7 @@ public class Globals {
 
     public static ErrorConsole errorConsole;
 
-    public static final String VERSION;
-    private static final String BUILD;
-    private static final String BUILD_DATE;
-
-    static {
-        TBuildInfo bi = new TBuildInfo(Globals.buildInfos);
-        VERSION = bi.getBUILD_VERSION();
-        BUILD = bi.getBUILD_NUMBER();
-        BUILD_DATE = bi.getBUILD_DATE();
-
-    }
+    public static final BuildInfo BUILD_INFO = new BuildInfo();
 
     private static Locale locale;
 

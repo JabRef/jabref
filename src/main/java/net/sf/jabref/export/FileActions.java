@@ -139,7 +139,7 @@ public class FileActions {
     private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
         out.write("% ");
         out.write(GUIGlobals.SIGNATURE);
-        out.write(' ' + GUIGlobals.version + '.' + Globals.NEWLINE + "% "
+        out.write(' ' + Globals.BUILD_INFO.getVersion() + '.' + Globals.NEWLINE + "% "
                 + GUIGlobals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE);
     }
 
