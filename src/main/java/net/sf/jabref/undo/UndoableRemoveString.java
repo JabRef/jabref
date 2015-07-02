@@ -21,47 +21,50 @@ import net.sf.jabref.*;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private BibtexString string;
-    private BasePanel panel;
+    private final BibtexDatabase base;
+    private final BibtexString string;
+    private final BasePanel panel;
+
 
     public UndoableRemoveString(BasePanel panel,
-				BibtexDatabase base, BibtexString string) {
-	this.base = base;
-	this.string = string;
-	this.panel = panel;
+            BibtexDatabase base, BibtexString string) {
+        this.base = base;
+        this.string = string;
+        this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+Globals.lang("remove string ");
+        return Globals.lang("Undo") + ": " + Globals.lang("remove string ");
     }
 
+    @Override
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+Globals.lang("remove string ");
+        return Globals.lang("Redo") + ": " + Globals.lang("remove string ");
     }
 
+    @Override
     public void undo() {
-	super.undo();
-	
-	// Revert the change.
-	try {
-	    base.addString(string);
-	} catch (KeyCollisionException ex) {
-	    ex.printStackTrace();
-	}
+        super.undo();
 
-	panel.updateStringDialog();
+        // Revert the change.
+        try {
+            base.addString(string);
+        } catch (KeyCollisionException ex) {
+            ex.printStackTrace();
+        }
+
+        panel.updateStringDialog();
     }
 
+    @Override
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	base.removeString(string.getId());
+        // Redo the change.
+        base.removeString(string.getId());
 
-	panel.updateStringDialog();
+        panel.updateStringDialog();
     }
-
-
 
 }

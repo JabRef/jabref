@@ -27,9 +27,11 @@ import net.sf.jabref.util.QuotedStringTokenizer;
  *
  */
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
+
     public static final String ID = "ExplicitGroup:";
 
     private final Set<BibtexEntry> m_entries;
+
 
     public ExplicitGroup(String name, int context) {
         super(name, context);
@@ -38,14 +40,15 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     public static AbstractGroup fromString(String s, BibtexDatabase db,
             int version) throws Exception {
-        if (!s.startsWith(ID))
+        if (!s.startsWith(ExplicitGroup.ID)) {
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
                             + s
                             + "\". "
                             + "Please report this on www.sf.net/projects/jabref");
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
-                .length()), SEPARATOR, QUOTE_CHAR);
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID
+                .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
         switch (version) {
         case 0:
         case 1:
@@ -68,30 +71,36 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     /** Called only when created fromString */
-    protected void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
+    private void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
         BibtexEntry[] entries;
         while (tok.hasMoreTokens()) {
-            entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
-                    QUOTE_CHAR));
+            entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(),
+                    AbstractGroup.QUOTE_CHAR));
             Collections.addAll(m_entries, entries);
         }
     }
 
+    @Override
     public SearchRule getSearchRule() {
         return this;
     }
 
+    @Override
     public boolean supportsAdd() {
         return true;
     }
 
+    @Override
     public boolean supportsRemove() {
         return true;
     }
 
+    @Override
     public AbstractUndoableEdit add(BibtexEntry[] entries) {
         if (entries.length == 0)
+         {
             return null; // nothing to do
+        }
 
         HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(m_entries);
         Collections.addAll(m_entries, entries);
@@ -103,12 +112,17 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return m_entries.add(entry);
     }
 
+    @Override
     public AbstractUndoableEdit remove(BibtexEntry[] entries) {
         if (entries.length == 0)
+         {
             return null; // nothing to do
+        }
 
         HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(m_entries);
-        for (BibtexEntry entry : entries) m_entries.remove(entry);
+        for (BibtexEntry entry : entries) {
+            m_entries.remove(entry);
+        }
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
     }
@@ -117,35 +131,44 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return m_entries.remove(entry);
     }
 
+    @Override
     public boolean contains(BibtexEntry entry) {
         return m_entries.contains(entry);
     }
 
+    @Override
     public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
         return contains(entry);
     }
 
+    @Override
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         return contains(searchStrings, bibtexEntry) ? 1 : 0;
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }
 
+    @Override
     public AbstractGroup deepCopy() {
         ExplicitGroup copy = new ExplicitGroup(m_name, m_context);
         copy.m_entries.addAll(m_entries);
         return copy;
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ExplicitGroup))
+        if (!(o instanceof ExplicitGroup)) {
             return false;
+        }
         ExplicitGroup other = (ExplicitGroup) o;
         // compare entries assigned to both groups
         if (m_entries.size() != other.m_entries.size())
+         {
             return false; // add/remove
+        }
         HashSet<String> keys = new HashSet<String>();
         BibtexEntry entry;
         String key;
@@ -153,20 +176,24 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         for (BibtexEntry m_entry1 : m_entries) {
             entry = m_entry1;
             key = entry.getCiteKey();
-            if (key != null)
+            if (key != null) {
                 keys.add(key);
+            }
         }
         for (BibtexEntry m_entry : other.m_entries) {
             entry = m_entry;
             key = entry.getCiteKey();
-            if (key != null)
-                if (!keys.remove(key))
+            if (key != null) {
+                if (!keys.remove(key)) {
                     return false;
+                }
+            }
         }
-        if (!keys.isEmpty())
+        if (!keys.isEmpty()) {
             return false;
+        }
         return other.m_name.equals(m_name)
-                && other.getHierarchicalContext() == getHierarchicalContext();
+                && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
     /**
@@ -175,19 +202,21 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
      * are not included in the representation and will thus not be available
      * upon recreation.
      */
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(ID).append(Util.quote(m_name, SEPARATOR, QUOTE_CHAR)).append(SEPARATOR).append(m_context).append(SEPARATOR);
+        StringBuilder sb = new StringBuilder();
+        sb.append(ExplicitGroup.ID).append(StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(m_context).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<String>();
         for (BibtexEntry m_entry : m_entries) {
             s = m_entry.getCiteKey();
-            if (s != null && !s.equals("")) // entries without a key are lost
+            if ((s != null) && !s.isEmpty()) {
                 sortedKeys.add(s);
+            }
         }
         for (String sortedKey : sortedKeys) {
-            sb.append(Util.quote(sortedKey, SEPARATOR, QUOTE_CHAR)).append(SEPARATOR);
+            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR);
         }
         return sb.toString();
     }
@@ -197,33 +226,36 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         m_entries.clear();
     }
 
+    @Override
     public boolean isDynamic() {
         return false;
     }
 
+    @Override
     public String getDescription() {
-        return getDescriptionForPreview();
+        return ExplicitGroup.getDescriptionForPreview();
     }
 
     public static String getDescriptionForPreview() {
         return Globals.lang("This group contains entries based on manual assignment. "
-                        + "Entries can be assigned to this group by selecting them "
-                        + "then using either drag and drop or the context menu. "
-                        + "Entries can be removed from this group by selecting them "
-                        + "then using the context menu. Every entry assigned to this group "
-                        + "must have a unique key. The key may be changed at any time "
-                        + "as long as it remains unique.");
+                + "Entries can be assigned to this group by selecting them "
+                + "then using either drag and drop or the context menu. "
+                + "Entries can be removed from this group by selecting them "
+                + "then using the context menu. Every entry assigned to this group "
+                + "must have a unique key. The key may be changed at any time "
+                + "as long as it remains unique.");
     }
 
+    @Override
     public String getShortDescription() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("<b>").append(getName()).append("</b> -").append(Globals.lang("static group"));
         switch (getHierarchicalContext()) {
         case AbstractGroup.INCLUDING:
             sb.append(", ").append(Globals.lang("includes subgroups"));
             break;
         case AbstractGroup.REFINING:
-        	sb.append(", ").append(Globals.lang("refines supergroup"));
+            sb.append(", ").append(Globals.lang("refines supergroup"));
             break;
         default:
             break;
@@ -240,31 +272,33 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
      *
      * @param db The database to refresh for.
      */
-        public void refreshForNewDatabase(BibtexDatabase db) {
-            Set<BibtexEntry> newSet = new HashSet<BibtexEntry>();
-            for (BibtexEntry entry : m_entries) {
-                BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
-                /*if (sameEntry == null) {
-                    System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
-                } else {
-                    System.out.println("'"+entry.getCiteKey()+"' ok");
-                }*/
-                newSet.add(sameEntry);
-            }
-            m_entries.clear();
-            m_entries.addAll(newSet);
+    @Override
+    public void refreshForNewDatabase(BibtexDatabase db) {
+        Set<BibtexEntry> newSet = new HashSet<BibtexEntry>();
+        for (BibtexEntry entry : m_entries) {
+            BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
+            /*if (sameEntry == null) {
+                System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
+            } else {
+                System.out.println("'"+entry.getCiteKey()+"' ok");
+            }*/
+            newSet.add(sameEntry);
         }
-
-		public Set<BibtexEntry> getEntries(){
-			return m_entries;
-		}
-
-    public String getTypeId() {
-        return ID;
+        m_entries.clear();
+        m_entries.addAll(newSet);
     }
 
-	public int getNumEntries() {
-		return m_entries.size();
-	}
+    public Set<BibtexEntry> getEntries() {
+        return m_entries;
+    }
+
+    @Override
+    public String getTypeId() {
+        return ExplicitGroup.ID;
+    }
+
+    public int getNumEntries() {
+        return m_entries.size();
+    }
 
 }

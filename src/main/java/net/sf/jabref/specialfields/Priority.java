@@ -23,45 +23,50 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 
 public class Priority extends SpecialField {
-	
-	private static Priority INSTANCE = null;
-	
-	private ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("priority"));
-	
-	public Priority() {
-		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-		values.add(new SpecialFieldValue(this, null, "clearPriority", Globals.lang("Clear priority"), null, Globals.lang("No priority information")));
-		ImageIcon icon;
-		icon = GUIGlobals.getImage("red");
-		values.add(new SpecialFieldValue(this, "prio1", "setPriority1", Globals.lang("Set priority to high"), icon, Globals.lang("Priority high")));
-		icon = GUIGlobals.getImage("orange");
-		values.add(new SpecialFieldValue(this, "prio2", "setPriority2", Globals.lang("Set priority to medium"), icon, Globals.lang("Priority medium")));
-		icon = GUIGlobals.getImage("green");
-		values.add(new SpecialFieldValue(this, "prio3", "setPriority3", Globals.lang("Set priority to low"), icon, Globals.lang("Priority low")));
-		this.setValues(values);
-		TEXT_DONE_PATTERN = "Set priority %0 for %1 entries";
-	}
-	
-	public static Priority getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new Priority();
-		}
-		return INSTANCE;
-	}
-	
-	public String getFieldName() {
-		return SpecialFieldsUtils.FIELDNAME_PRIORITY;
-	}
-	
-	public ImageIcon getRepresentingIcon() {
-		return this.icon;
-	}
-	
-	public String getToolTip() {
-		return Globals.lang("Priority");
-	}
-	
-	public String getMenuString() {
-		return Globals.lang("Priority");
-	}
+
+    private static Priority INSTANCE = null;
+
+    private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("priority"));
+
+
+    private Priority() {
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearPriority", Globals.lang("Clear priority"), null, Globals.lang("No priority information")));
+        ImageIcon icon;
+        icon = GUIGlobals.getImage("red");
+        values.add(new SpecialFieldValue(this, Globals.lang("prio1"), "setPriority1", Globals.lang("Set priority to high"), icon, Globals.lang("Priority high")));
+        icon = GUIGlobals.getImage("orange");
+        values.add(new SpecialFieldValue(this, Globals.lang("prio2"), "setPriority2", Globals.lang("Set priority to medium"), icon, Globals.lang("Priority medium")));
+        icon = GUIGlobals.getImage("green");
+        values.add(new SpecialFieldValue(this, Globals.lang("prio3"), "setPriority3", Globals.lang("Set priority to low"), icon, Globals.lang("Priority low")));
+        this.setValues(values);
+        TEXT_DONE_PATTERN = "Set priority to '%0' for %1 entries";
+    }
+
+    public static Priority getInstance() {
+        if (Priority.INSTANCE == null) {
+            Priority.INSTANCE = new Priority();
+        }
+        return Priority.INSTANCE;
+    }
+
+    @Override
+    public String getFieldName() {
+        return SpecialFieldsUtils.FIELDNAME_PRIORITY;
+    }
+
+    @Override
+    public ImageIcon getRepresentingIcon() {
+        return this.icon;
+    }
+
+    @Override
+    public String getToolTip() {
+        return Globals.lang("Priority");
+    }
+
+    @Override
+    public String getMenuString() {
+        return Globals.lang("Priority");
+    }
 }

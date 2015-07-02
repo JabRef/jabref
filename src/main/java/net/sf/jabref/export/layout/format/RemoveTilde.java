@@ -49,26 +49,27 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class RemoveTilde implements LayoutFormatter {
 
-	public String format(String fieldText) {
-		
-		StringBuffer result = new StringBuffer(fieldText.length());
+    @Override
+    public String format(String fieldText) {
 
-		char[] c = fieldText.toCharArray();
-		
-		for (int i = 0; i < c.length; i++) {
+        StringBuilder result = new StringBuilder(fieldText.length());
 
-			if (c[i] != '~'){
-				result.append(c[i]);
-				// Skip the next character if the current one is a backslash
-				if (c[i] == '\\' && i + 1 < c.length){
-					i++;
-					result.append(c[i]);
-				}
-			} else {
-				result.append(' ');
-			}
-		}
-		
-		return result.toString();
-	}
+        char[] c = fieldText.toCharArray();
+
+        for (int i = 0; i < c.length; i++) {
+
+            if (c[i] != '~') {
+                result.append(c[i]);
+                // Skip the next character if the current one is a backslash
+                if ((c[i] == '\\') && ((i + 1) < c.length)) {
+                    i++;
+                    result.append(c[i]);
+                }
+            } else {
+                result.append(' ');
+            }
+        }
+
+        return result.toString();
+    }
 }

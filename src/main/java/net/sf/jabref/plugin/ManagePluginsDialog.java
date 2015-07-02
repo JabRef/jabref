@@ -44,12 +44,13 @@ import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
  *
  * @author alver
  */
-public class ManagePluginsDialog {
+class ManagePluginsDialog {
 
-    private JabRefFrame frame;
-    private JDialog diag;
+    private final JabRefFrame frame;
+    private final JDialog diag;
     private SortedList<NameAndVersion> plugins;
-    private JTable table, tableOther;
+    private final JTable table;
+    private final JTable tableOther;
 
 
     public ManagePluginsDialog(JabRefFrame frame) {
@@ -62,8 +63,8 @@ public class ManagePluginsDialog {
 
         JLabel lab = new JLabel
                 (Globals.lang("Plugins installed in your user plugin directory (%0):",
-                PluginCore.userPluginDir.getPath()));
-        lab.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+                        PluginCore.userPluginDir.getPath()));
+        lab.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         pan.add(lab, BorderLayout.NORTH);
 
         // Table for user dir plugins:
@@ -81,12 +82,12 @@ public class ManagePluginsDialog {
         pan = new JPanel();
         pan.setLayout(new BorderLayout());
         lab = new JLabel(Globals.lang("Plugins installed in other locations:"));
-        lab.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        lab.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         pan.add(lab, BorderLayout.NORTH);
         pan.add(new JScrollPane(tableOther), BorderLayout.CENTER);
 
         diag.getContentPane().add(pan, BorderLayout.CENTER);
-        
+
         ButtonBarBuilder b = new ButtonBarBuilder();
         b.addGlue();
         JButton install = new JButton(Globals.lang("Install plugin"));
@@ -99,38 +100,46 @@ public class ManagePluginsDialog {
         b.addButton(close);
         b.addRelatedGap();
         b.addButton(help);
-        
+
         b.addGlue();
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(b.getPanel(), BorderLayout.SOUTH);
         diag.pack();
         diag.setLocationRelativeTo(frame);
-        
+
         install.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 installPlugin();
             }
         });
-        
+
         download.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 downloadPlugin();
             }
         });
-        
+
         Action closeListener = new AbstractAction() {
+
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 diag.dispose();
             }
         };
         close.addActionListener(closeListener);
-        
+
         remove.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 removeSelected();
             }
         });
-        
+
         // Key bindings:
         ActionMap am = b.getPanel().getActionMap();
         InputMap im = b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -138,7 +147,7 @@ public class ManagePluginsDialog {
         am.put("close", closeListener);
 
     }
-    
+
     private void removeSelected() {
         int[] sel = table.getSelectedRows();
         if (sel.length > 0) {
@@ -149,8 +158,9 @@ public class ManagePluginsDialog {
                 title = Globals.lang("Delete plugin");
             }
             int reply = JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION);
-            if (reply != JOptionPane.YES_OPTION)
+            if (reply != JOptionPane.YES_OPTION) {
                 return;
+            }
             boolean success = true;
             for (int aSel : sel) {
                 NameAndVersion nav = plugins.get(aSel);
@@ -167,7 +177,7 @@ public class ManagePluginsDialog {
             buildList();
         }
     }
-    
+
     private void buildList() {
         plugins = new SortedList<NameAndVersion>(PluginInstaller.findInstalledPlugins());
         // Move those plugins that are not installed in the user plugin dir to another list:
@@ -194,19 +204,20 @@ public class ManagePluginsDialog {
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
         table.getColumnModel().getColumn(2).setPreferredWidth(50);
     }
-    
+
     public void setVisible(boolean visible) {
         diag.setVisible(visible);
     }
-    
-    public void installPlugin() {
+
+    private void installPlugin() {
         String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
-            ".jar", JFileChooser.OPEN_DIALOG, false);
-        if (filename == null)
+                ".jar", JFileChooser.OPEN_DIALOG, false);
+        if (filename == null) {
             return;
+        }
         File f = new File(filename);
         if (!f.exists()) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+".",
+            JOptionPane.showMessageDialog(frame, Globals.lang("File not found") + ".",
                     Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
         } else {
             installFromFile(f);
@@ -214,10 +225,11 @@ public class ManagePluginsDialog {
 
     }
 
-    public void downloadPlugin() {
+    private void downloadPlugin() {
         String url = JOptionPane.showInputDialog(Globals.lang("Enter download URL"));
-        if (url == null)
+        if (url == null) {
             return;
+        }
         try {
             installFromURL(new URL(url));
         } catch (MalformedURLException e) {
@@ -225,63 +237,73 @@ public class ManagePluginsDialog {
                     Globals.lang("Plugin installer"), JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void installFromURL(URL url) {
+
+    private void installFromURL(URL url) {
         try {
             File tmpFile = File.createTempFile("jabref-plugin", ".jar");
             tmpFile.deleteOnExit();
-            URLDownload ud = new URLDownload(frame, url, tmpFile);
-            ud.download();
+            URLDownload ud = URLDownload.buildMonitoredDownload(frame, url);
+            ud.downloadToFile(tmpFile);
             String path = url.getPath();
             int pos = path.lastIndexOf('/');
-            if ((pos >= 0) && (pos < path.length()-1))
-                path = path.substring(pos+1);
+            if ((pos >= 0) && (pos < (path.length() - 1))) {
+                path = path.substring(pos + 1);
+            }
             PluginInstaller.installPlugin(frame, tmpFile, path);
             tmpFile.delete();
             buildList();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
 
-    public void installFromFile(File file) {
+    private void installFromFile(File file) {
         PluginInstaller.installPlugin(frame, file, null);
         buildList();
     }
-    
-    class PluginTableFormat implements TableFormat<NameAndVersion> {
 
+
+    private class PluginTableFormat implements TableFormat<NameAndVersion> {
+
+        @Override
         public int getColumnCount() {
             return 3;
         }
 
+        @Override
         public String getColumnName(int col) {
-            if (col == 0)
+            if (col == 0) {
                 return Globals.lang("Plugin name");
-            else if (col == 1)
+            } else if (col == 1) {
                 return Globals.lang("Version");
-            else return Globals.lang("Status");
+            } else {
+                return Globals.lang("Status");
+            }
         }
 
+        @Override
         public Object getColumnValue(NameAndVersion nav, int col) {
-            if (col == 0)
+            if (col == 0) {
                 return nav.name;
-            else if (col == 1) {
-                if (!nav.version.equals(PluginInstaller.VersionNumber.ZERO))
+            } else if (col == 1) {
+                if (!nav.version.equals(PluginInstaller.VersionNumber.ZERO)) {
                     return nav.version.toString();
-                else return Globals.lang("Unknown");
+                } else {
+                    return Globals.lang("Unknown");
+                }
             }
             else {
                 int status = nav.getStatus();
-                if (status == 0)
+                if (status == 0) {
                     return Globals.lang("Not loaded");
-                else if (status == 1)
+                } else if (status == 1) {
                     return Globals.lang("Loaded");
-                else
+                } else {
                     return Globals.lang("Error");
+                }
             }
         }
-        
+
     }
 }

@@ -33,41 +33,50 @@ import java.io.InputStream;
 public class PushToVim implements PushToApplication {
 
     private JPanel settings = null;
-    private JTextField vimPath = new JTextField(30),
-        vimServer = new JTextField(30),
-        citeCommand = new JTextField(30);
+    private final JTextField vimPath = new JTextField(30);
+    private final JTextField vimServer = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
 
-    private boolean couldNotConnect=false, couldNotRunClient=false;
+    private boolean couldNotConnect = false, couldNotRunClient = false;
 
+
+    @Override
     public String getName() {
-        return Globals.lang("Insert selected citations into Vim") ;
+        return Globals.lang("Insert selected citations into Vim");
     }
 
+    @Override
     public String getApplicationName() {
         return "Vim";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push selection to Vim");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("vim");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return null;
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
+        }
         vimPath.setText(Globals.prefs.get("vim"));
         vimServer.setText(Globals.prefs.get("vimServer"));
         citeCommand.setText(Globals.prefs.get("citeCommandVim"));
         return settings;
     }
-    
+
+    @Override
     public void storeSettings() {
         Globals.prefs.put("vim", vimPath.getText());
         Globals.prefs.put("vimServer", vimServer.getText());
@@ -80,7 +89,7 @@ public class PushToVim implements PushToApplication {
 
         builder.append(new JLabel(Globals.lang("Path to Vim") + ":"));
         builder.append(vimPath);
-        BrowseAction action = new BrowseAction(null, vimPath, false);
+        BrowseAction action = BrowseAction.buildForFile(vimPath);
         JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
@@ -93,68 +102,68 @@ public class PushToVim implements PushToApplication {
         settings = builder.getPanel();
     }
 
+    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys,
-                            MetaData metaData) {
+            MetaData metaData) {
 
-        couldNotConnect=false;
-        couldNotRunClient=false;
+        couldNotConnect = false;
+        couldNotRunClient = false;
         try {
-                String[] com = new String[] {Globals.prefs.get("vim"), "--servername", Globals.prefs.get("vimServer"), "--remote-send",
-                "<C-\\><C-N>a" + Globals.prefs.get("citeCommandVim") +
-                       "{" + keys + "}"};
+            String[] com = new String[] {Globals.prefs.get("vim"), "--servername", Globals.prefs.get("vimServer"), "--remote-send",
+                    "<C-\\><C-N>a" + Globals.prefs.get("citeCommandVim") +
+                            "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);
 
             Runnable errorListener = new Runnable() {
+
+                @Override
                 public void run() {
                     InputStream out = p.getErrorStream();
                     int c;
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     try {
-                        while ((c = out.read()) != -1)
+                        while ((c = out.read()) != -1) {
                             sb.append((char) c);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (sb.toString().trim().length() > 0) {
-			System.out.println(sb.toString());
+                        System.out.println(sb.toString());
                         couldNotConnect = true;
                     }
                 }
             };
-            Thread t = new Thread(errorListener);
-            t.start();
-            t.join();
-        }
-        catch (IOException excep) {
+            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
+        } catch (IOException excep) {
             couldNotRunClient = true;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
     }
 
-
+    @Override
     public void operationCompleted(BasePanel panel) {
-        if (couldNotConnect)
+        if (couldNotConnect) {
             JOptionPane.showMessageDialog(
-                panel.frame(),
-                "<HTML>"+
-                Globals.lang("Could not connect to Vim server. Make sure that "
-														 +"Vim is running<BR>with correct server name.")
-                +"</HTML>",
-                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        else if (couldNotRunClient)
+                    panel.frame(),
+                    "<HTML>" +
+                            Globals.lang("Could not connect to Vim server. Make sure that "
+                                    + "Vim is running<BR>with correct server name.")
+                            + "</HTML>",
+                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+        } else if (couldNotRunClient) {
             JOptionPane.showMessageDialog(
-                panel.frame(),
-                Globals.lang("Could not run the 'vim' program."),
-                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        else {
+                    panel.frame(),
+                    Globals.lang("Could not run the 'vim' program."),
+                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+        } else {
             panel.output(Globals.lang("Pushed citations to Vim"));
         }
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }

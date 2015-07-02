@@ -41,25 +41,26 @@ import net.sf.jabref.Globals;
  * Date: Mar 1, 2006
  * Time: 11:13:03 PM
  */
-public class ErrorConsole  extends Handler {
+public class ErrorConsole extends Handler {
 
-    ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
-    ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-    
-    ArrayList<String> logOutput = new ArrayList<String>();
-    String logOutputCache = "";
-    boolean logOutputCacheRefreshNeeded = true;
-    SimpleFormatter fmt = new SimpleFormatter();
+    private final ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+
+    private final ArrayList<String> logOutput = new ArrayList<String>();
+    private String logOutputCache = "";
+    private boolean logOutputCacheRefreshNeeded = true;
+    private final SimpleFormatter fmt = new SimpleFormatter();
     private static final int MAXLOGLINES = 500;
-    
+
     private static ErrorConsole instance = null;
 
 
     public static ErrorConsole getInstance() {
-        if (instance == null)
-            instance = new ErrorConsole();
+        if (ErrorConsole.instance == null) {
+            ErrorConsole.instance = new ErrorConsole();
+        }
 
-        return instance;
+        return ErrorConsole.instance;
     }
 
     private ErrorConsole() {
@@ -78,18 +79,18 @@ public class ErrorConsole  extends Handler {
     private String getOutput() {
         return outByteStream.toString();
     }
-    
+
     private String getLog() {
-    	if (logOutputCacheRefreshNeeded) {
-    		StringBuilder sb = new StringBuilder();
-    		for(String line: logOutput) {
-    			sb.append(line);
-    		}
-    		logOutputCache = sb.toString();
-    	}
-    	return logOutputCache;
+        if (logOutputCacheRefreshNeeded) {
+            StringBuilder sb = new StringBuilder();
+            for (String line : logOutput) {
+                sb.append(line);
+            }
+            logOutputCache = sb.toString();
+        }
+        return logOutputCache;
     }
-    
+
     /**
      * 
      * @param tabbed the tabbed pane to add the tab to
@@ -99,90 +100,105 @@ public class ErrorConsole  extends Handler {
     private void addTextArea(JTabbedPane tabbed, String title, String output, String ifEmpty) {
         JTextArea ta = new JTextArea(output);
         ta.setEditable(false);
-        if ((ifEmpty!=null) && (ta.getText().length() == 0)) {
+        if ((ifEmpty != null) && (ta.getText().isEmpty())) {
             ta.setText(ifEmpty);
         }
         JScrollPane sp = new JScrollPane(ta);
         tabbed.addTab(title, sp);
     }
-    
-    public void displayErrorConsole(JFrame parent) {
+
+    private void displayErrorConsole(JFrame parent) {
         JTabbedPane tabbed = new JTabbedPane();
-        
+
         addTextArea(tabbed, Globals.lang("Output"), getOutput(), null);
         addTextArea(tabbed, Globals.lang("Exceptions"), getErrorMessages(),
-        		Globals.lang("No exceptions have ocurred."));
+                Globals.lang("No exceptions have ocurred."));
         addTextArea(tabbed, Globals.lang("Log"), getLog(), null);
 
-        tabbed.setPreferredSize(new Dimension(500,500));
+        tabbed.setPreferredSize(new Dimension(500, 500));
 
-        JOptionPane.showMessageDialog(parent,  tabbed,
+        JOptionPane.showMessageDialog(parent, tabbed,
                 Globals.lang("Program output"), JOptionPane.ERROR_MESSAGE);
     }
 
+
     class ErrorConsoleAction extends AbstractAction {
-        JFrame frame;
+
+        final JFrame frame;
+
+
         public ErrorConsoleAction(JFrame frame) {
             super(Globals.menuTitle("Show error console"));
-            putValue(SHORT_DESCRIPTION, Globals.lang("Display all error messages"));
+            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Display all error messages"));
             this.frame = frame;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             displayErrorConsole(frame);
         }
     }
 
+
     public AbstractAction getAction(JFrame parent) {
         return new ErrorConsoleAction(parent);
     }
 
+
     // All writes to this print stream are copied to two print streams
-    public class TeeStream extends PrintStream {
-        PrintStream out;
+    public static class TeeStream extends PrintStream {
+
+        final PrintStream out;
+
+
         public TeeStream(PrintStream out1, PrintStream out2) {
             super(out1);
             this.out = out2;
         }
-        public void write(byte buf[], int off, int len) {
+
+        @Override
+        public void write(byte[] buf, int off, int len) {
             try {
                 super.write(buf, off, len);
                 out.write(buf, off, len);
             } catch (Exception ignored) {
             }
         }
+
+        @Override
         public void flush() {
             super.flush();
             out.flush();
         }
     }
-    
+
+
     /* * * methods for Logging (required by Handler) * * */
 
-	@Override
+    @Override
     public void close() throws SecurityException {
     }
 
-	@Override
+    @Override
     public void flush() {
     }
 
-	@Override
+    @Override
     public void publish(LogRecord record) {
-		String msg = fmt.format(record);
-		logOutput.add(msg);
-		if (logOutput.size() < MAXLOGLINES) {
-			// if we did not yet reach MAXLOGLINES, we just append the string to the cache
-			logOutputCache = logOutputCache + msg;
-		} else {
-			// if we reached MAXLOGLINES, we switch to the "real" caching method and remove old lines 
-			logOutputCacheRefreshNeeded = true;
-			while (logOutput.size() > MAXLOGLINES) {
-				// if log is too large, remove first line
-				// we need a while loop as the formatter may output more than one line
-				logOutput.remove(0);
-			}
-		}
-		logOutputCacheRefreshNeeded = true;
+        String msg = fmt.format(record);
+        logOutput.add(msg);
+        if (logOutput.size() < ErrorConsole.MAXLOGLINES) {
+            // if we did not yet reach MAXLOGLINES, we just append the string to the cache
+            logOutputCache = logOutputCache + msg;
+        } else {
+            // if we reached MAXLOGLINES, we switch to the "real" caching method and remove old lines 
+            logOutputCacheRefreshNeeded = true;
+            while (logOutput.size() > ErrorConsole.MAXLOGLINES) {
+                // if log is too large, remove first line
+                // we need a while loop as the formatter may output more than one line
+                logOutput.remove(0);
+            }
+        }
+        logOutputCacheRefreshNeeded = true;
     }
 }

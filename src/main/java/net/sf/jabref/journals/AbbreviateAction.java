@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -29,33 +29,40 @@ import net.sf.jabref.undo.NamedCompound;
  * To browseOld this template use File | Settings | File Templates.
  */
 public class AbbreviateAction extends AbstractWorker {
-    BasePanel panel;
-    String message = "";
-    boolean iso;
+
+    private final BasePanel panel;
+    private String message = "";
+    private final boolean iso;
+
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
         this.panel = panel;
         this.iso = iso;
     }
 
-
+    @Override
     public void init() {
         //  new FieldWeightDialog(frame).setVisible(true);
         panel.output("Abbreviating...");
     }
 
+    @Override
     public void run() {
         //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
 
-
         BibtexEntry[] entries = panel.getSelectedEntries();
-        if (entries == null)
+        if (entries == null) {
             return;
+        }
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;
         for (BibtexEntry entry : entries) {
-            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso))
+            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso)) {
                 count++;
+            }
+            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journaltitle", ce, iso)) {
+                count++;
+            }
         }
         if (count > 0) {
             ce.end();
@@ -67,6 +74,7 @@ public class AbbreviateAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         panel.output(message);
     }

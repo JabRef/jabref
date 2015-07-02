@@ -32,6 +32,7 @@ import net.sf.jabref.AuthorList;
  */
 public class AuthorFirstLastCommas implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         return AuthorList.fixAuthor_firstNameFirstCommas(fieldText, false, false);
     }

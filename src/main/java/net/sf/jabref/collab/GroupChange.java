@@ -26,18 +26,21 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableModifySubtree;
 import net.sf.jabref.undo.NamedCompound;
 
-public class GroupChange extends Change {
+class GroupChange extends Change {
+
     private final GroupTreeNode m_changedGroups;
-    private GroupTreeNode tmpGroupRoot;
+    private final GroupTreeNode tmpGroupRoot;
+
 
     public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
-        super(changedGroups != null ? 
+        super(changedGroups != null ?
                 "Modified groups tree"
                 : "Removed all groups"); // JZTODO lyrics
         m_changedGroups = changedGroups;
         this.tmpGroupRoot = tmpGroupRoot;
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.metaData().getGroups();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
@@ -50,33 +53,37 @@ public class GroupChange extends Change {
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(m_changedGroups.getGroup());
-            for (int i = 0; i < m_changedGroups.getChildCount(); ++i)        
+            for (int i = 0; i < m_changedGroups.getChildCount(); ++i) {
                 root.add(((GroupTreeNode) m_changedGroups.getChildAt(i)).deepCopy());
+            }
             // the group tree is now appled to a different BibtexDatabase than it was created
             // for, which affects groups such as ExplicitGroup (which links to BibtexEntry objects).
             // We must traverse the tree and refresh all groups:
             root.refreshGroupsForNewDatabase(panel.database());
         }
 
-        if (panel.getGroupSelector().getGroupTreeRoot() == root)
+        if (panel.getGroupSelector().getGroupTreeRoot() == root) {
             panel.getGroupSelector().revalidateGroups();
+        }
         undoEdit.addEdit(undo);
-        
+
         // Update tmp database:
         GroupTreeNode copied = m_changedGroups.deepCopy();
         tmpGroupRoot.removeAllChildren();
         tmpGroupRoot.setGroup(copied.getGroup());
-        for (int i = 0; i < copied.getChildCount(); ++i)
+        for (int i = 0; i < copied.getChildCount(); ++i) {
             tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
+        }
         tmpGroupRoot.refreshGroupsForNewDatabase(secondary);
         return true;
     }
 
+    @Override
     JComponent description() {
-        return new JLabel("<html>" + name + "." + (m_changedGroups != null ? " " 
+        return new JLabel("<html>" + name + '.' + (m_changedGroups != null ? ' '
                 + "Accepting the change replaces the complete " +
-                "groups tree with the externally modified groups tree." : "") 
-                + "</html>"); 
+                "groups tree with the externally modified groups tree." : "")
+                + "</html>");
         // JZTODO lyrics
     }
 }

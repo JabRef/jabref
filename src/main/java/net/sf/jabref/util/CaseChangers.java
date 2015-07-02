@@ -34,7 +34,7 @@ package net.sf.jabref.util;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -49,45 +49,57 @@ import java.util.regex.Matcher;
  */
 public class CaseChangers {
 
-    public static final String SPACE_SEPARATOR = " ";
+    private static final String SPACE_SEPARATOR = " ";
 
-    public static interface CaseChanger {
+
+    public interface CaseChanger {
+
         String getName();
 
         String changeCase(String input);
     }
 
     public static class LowerCaseChanger implements CaseChanger {
+
+        @Override
         public String getName() {
             return "lower";
         }
 
+        @Override
         public String changeCase(String input) {
             return input.toLowerCase();
         }
     }
 
     public static class UpperCaseChanger implements CaseChanger {
+
+        @Override
         public String getName() {
             return "UPPER";
         }
 
+        @Override
         public String changeCase(String input) {
             return input.toUpperCase();
         }
     }
 
     public static class UpperFirstCaseChanger implements CaseChanger {
+
         private final static Pattern UF_PATTERN = Pattern.compile("\\b\\w");
 
+
+        @Override
         public String getName() {
             return "Upper first";
         }
 
+        @Override
         public String changeCase(String input) {
             String s = input.toLowerCase();
 
-            Matcher matcher = UF_PATTERN.matcher(s);
+            Matcher matcher = UpperFirstCaseChanger.UF_PATTERN.matcher(s);
 
             if (matcher.find()) {
                 return matcher.replaceFirst(matcher.group(0).toUpperCase());
@@ -99,20 +111,22 @@ public class CaseChangers {
 
     public static class UpperEachFirstCaseChanger implements CaseChanger {
 
+        @Override
         public String getName() {
             return "Upper Each First";
         }
 
+        @Override
         public String changeCase(String input) {
             String s = input.toLowerCase();
             String[] words = s.split("\\s+");
             String[] result = new String[words.length];
 
             for (int i = 0; i < words.length; i++) {
-                result[i] = Util.nCase(words[i]);
+                result[i] = StringUtil.nCase(words[i]);
             }
 
-            return Util.join(result, SPACE_SEPARATOR);
+            return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
         }
     }
 
@@ -130,10 +144,13 @@ public class CaseChangers {
             notToCapitalize = Collections.unmodifiableSet(smallerWords);
         }
 
+
+        @Override
         public String getName() {
             return "Title";
         }
 
+        @Override
         public String changeCase(String input) {
             String s = input.toLowerCase();
             String[] words = s.split("\\s+");
@@ -143,19 +160,21 @@ public class CaseChangers {
                 String word = words[i];
                 // first word is Always capitalized
                 boolean alwaysCapitalizeFirstWord = i == 0;
-                boolean alwaysCapitalizeLastWord = i == words.length - 1;
-                if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord)
-                    result[i] = Util.nCase(word);
-                else if (notToCapitalize.contains(word))
+                boolean alwaysCapitalizeLastWord = i == (words.length - 1);
+                if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord) {
+                    result[i] = StringUtil.nCase(word);
+                } else if (TitleCaseChanger.notToCapitalize.contains(word)) {
                     result[i] = word;
-                else
-                    result[i] = Util.nCase(word);
+                } else {
+                    result[i] = StringUtil.nCase(word);
+                }
             }
 
-            return Util.join(result, SPACE_SEPARATOR);
+            return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
         }
 
     }
+
 
     public final static LowerCaseChanger LOWER = new LowerCaseChanger();
     public final static UpperCaseChanger UPPER = new UpperCaseChanger();
@@ -163,5 +182,5 @@ public class CaseChangers {
     public final static UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
     public final static TitleCaseChanger TITLE = new TitleCaseChanger();
 
-    public final static List<CaseChanger> ALL = Arrays.asList(LOWER, UPPER, UPPER_FIRST, UPPER_EACH_FIRST, TITLE);
+    public final static List<CaseChanger> ALL = Arrays.asList(CaseChangers.LOWER, CaseChangers.UPPER, CaseChangers.UPPER_FIRST, CaseChangers.UPPER_EACH_FIRST, CaseChangers.TITLE);
 }

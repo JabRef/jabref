@@ -39,18 +39,18 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class AttachFileDialog extends JDialog {
 
-    AttachFileDialog ths = this;
-    FieldEditor editor;
-    String fieldName;
-    JPanel main;
-    JButton browse = new JButton(Globals.lang("Browse")),
-        download = new JButton(Globals.lang("Download")),
-        auto = new JButton(Globals.lang("Auto")),
-        ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
-    BibtexEntry entry;
-    MetaData metaData;
+    private final AttachFileDialog ths = this;
+    private final FieldEditor editor;
+    private final String fieldName;
+    private final JButton browse = new JButton(Globals.lang("Browse"));
+    private final JButton download = new JButton(Globals.lang("Download"));
+    private final JButton auto = new JButton(Globals.lang("Auto"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final BibtexEntry entry;
+    private final MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
+
 
     public AttachFileDialog(Frame parent, MetaData metaData, BibtexEntry entry, String fieldName) {
         super(parent, true);
@@ -83,28 +83,35 @@ public class AttachFileDialog extends JDialog {
     private void initGui() {
 
         final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
-                      editor, Util.getFileFilterForField(fieldName));
+                editor, Util.getFileFilterForField(fieldName));
 
-        browse.addActionListener(new ActionListener () {
+        browse.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent event) {
                 extPan.browseFile(fieldName, editor);
             }
         });
 
-        download.addActionListener(new ActionListener () {
+        download.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent event) {
                 extPan.downLoadFile(fieldName, editor, ths);
             }
         });
 
-        auto.addActionListener(new ActionListener () {
-                    public void actionPerformed(ActionEvent event) {
-                        extPan.autoSetFile(fieldName, editor);
-                    }
-                });
+        auto.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                JabRefExecutorService.INSTANCE.execute(extPan.autoSetFile(fieldName, editor));
+            }
+        });
 
-        ActionListener okListener = new ActionListener () {
+        ActionListener okListener = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent event) {
                 cancelled = false;
                 dispose();
@@ -112,9 +119,11 @@ public class AttachFileDialog extends JDialog {
         };
 
         ok.addActionListener(okListener);
-        ((JTextField)editor.getTextComponent()).addActionListener(okListener);
+        ((JTextField) editor.getTextComponent()).addActionListener(okListener);
 
-        AbstractAction cancelListener = new AbstractAction () {
+        AbstractAction cancelListener = new AbstractAction() {
+
+            @Override
             public void actionPerformed(ActionEvent event) {
                 cancelled = true;
                 dispose();
@@ -123,12 +132,12 @@ public class AttachFileDialog extends JDialog {
 
         cancel.addActionListener(cancelListener);
         editor.getTextComponent().getInputMap().put(Globals.prefs.getKey("Close dialog"), "close");
-	    editor.getTextComponent().getActionMap().put("close", cancelListener);
+        editor.getTextComponent().getActionMap().put("close", cancelListener);
 
-        FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref","");
-	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref", "");
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         //builder.append(Util.nCase(fieldName));//(editor.getLabel());
-        builder.appendSeparator(Util.nCase(fieldName));
+        builder.appendSeparator(StringUtil.nCase(fieldName));
         builder.append(editor.getTextComponent());
         builder.append(browse);
 
@@ -140,16 +149,15 @@ public class AttachFileDialog extends JDialog {
         builder.nextLine();
         builder.appendSeparator();
 
-        main = builder.getPanel();
+        JPanel main = builder.getPanel();
 
-        main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-
 
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

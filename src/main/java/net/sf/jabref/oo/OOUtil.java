@@ -15,31 +15,41 @@
 */
 package net.sf.jabref.oo;
 
-import com.sun.star.beans.XPropertySet;
-import com.sun.star.beans.Property;
-import com.sun.star.text.*;
-import com.sun.star.uno.UnoRuntime;
-import com.sun.star.frame.XDesktop;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.export.layout.Layout;
-
-import javax.swing.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
+import net.sf.jabref.export.layout.Layout;
+
+import com.sun.star.beans.Property;
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.frame.XDesktop;
+import com.sun.star.text.ControlCharacter;
+import com.sun.star.text.XParagraphCursor;
+import com.sun.star.text.XText;
+import com.sun.star.text.XTextCursor;
+import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.UnoRuntime;
 
 /**
  * Utility methods for processing OO Writer documents.
  */
-public class OOUtil {
+class OOUtil {
 
-    
-    static Pattern htmlTag = Pattern.compile("</?[a-z]+>");
+    private static final Pattern htmlTag = Pattern.compile("</?[a-z]+>");
 
-    static OOPreFormatter postformatter = new OOPreFormatter();
+    static final OOPreFormatter postformatter = new OOPreFormatter();
+
 
     /**
      * Insert a reference, formatted using a Layout, at the position of a given cursor.
@@ -71,12 +81,12 @@ public class OOUtil {
         entry.setField(UNIQUEFIER_FIELD, oldUniqVal);
 
         // Insert the formatted text:
-        insertOOFormattedTextAtCurrentLocation(text, cursor, lText, parStyle);
+        OOUtil.insertOOFormattedTextAtCurrentLocation(text, cursor, lText, parStyle);
     }
 
     /**
      * Insert a text with formatting indicated by HTML-like tags, into a text at
-         * the position given by a cursor.
+     * the position given by a cursor.
      * @param text The text to insert in.
      * @param cursor The cursor giving the insert location.
      * @param lText The marked-up text to insert.
@@ -84,68 +94,68 @@ public class OOUtil {
      * @throws Exception
      */
     public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
-              String lText, String parStyle) throws Exception {
+            String lText, String parStyle) throws Exception {
 
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
-            XParagraphCursor.class, cursor);
+                XParagraphCursor.class, cursor);
         XPropertySet props = UnoRuntime.queryInterface(
-            XPropertySet.class, parCursor);
+                XPropertySet.class, parCursor);
 
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
         } catch (com.sun.star.lang.IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
-        
+
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
         int italic = 0, bold = 0, sup = 0, sub = 0, mono = 0, smallCaps = 0;
         //insertTextAtCurrentLocation(text, cursor, "_",
         //    false, false, false, false, false, false);
         //cursor.goLeft((short)1, true);
-        Matcher m = htmlTag.matcher(lText);
+        Matcher m = OOUtil.htmlTag.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (ss.length() > 0) {
-                insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
                         mono > 0, smallCaps > 0, sup > 0, sub > 0);
             }
             String tag = m.group();
             // Handle tags:
-            if (tag.equals("<b>"))
+            if (tag.equals("<b>")) {
                 bold++;
-            else if (tag.equals("</b>"))
+            } else if (tag.equals("</b>")) {
                 bold--;
-            else if (tag.equals("<i>") || tag.equals("<em>"))
+            } else if (tag.equals("<i>") || tag.equals("<em>")) {
                 italic++;
-            else if (tag.equals("</i>") || tag.equals("</em>"))
+            } else if (tag.equals("</i>") || tag.equals("</em>")) {
                 italic--;
-            else if (tag.equals("</monospace>"))
+            } else if (tag.equals("</monospace>")) {
                 mono = 0;
-            else if (tag.equals("<monospace>"))
+            } else if (tag.equals("<monospace>")) {
                 mono = 1;
-            else if (tag.equals("</smallcaps>"))
+            } else if (tag.equals("</smallcaps>")) {
                 smallCaps = 0;
-            else if (tag.equals("<smallcaps>"))
+            } else if (tag.equals("<smallcaps>")) {
                 smallCaps = 1;
-            else if (tag.equals("</sup>"))
+            } else if (tag.equals("</sup>")) {
                 sup = 0;
-            else if (tag.equals("<sup>"))
+            } else if (tag.equals("<sup>")) {
                 sup = 1;
-            else if (tag.equals("</sub>"))
+            } else if (tag.equals("</sub>")) {
                 sub = 0;
-            else if (tag.equals("<sub>"))
+            } else if (tag.equals("<sub>")) {
                 sub = 1;
+            }
 
             piv = m.end();
-            
+
         }
 
-        if (piv < lText.length())
-            insertTextAtCurrentLocation(text, cursor,lText.substring(piv),
+        if (piv < lText.length()) {
+            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
                     (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
-
-
+        }
 
         cursor.collapseToEnd();
     }
@@ -156,34 +166,36 @@ public class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-                   boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
-                   boolean subscript) throws Exception {
+            boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
+            boolean subscript) throws Exception {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
-            XPropertySet.class, cursor);
-        if (bold)
+                XPropertySet.class, cursor);
+        if (bold) {
             xCursorProps.setPropertyValue("CharWeight",
                     com.sun.star.awt.FontWeight.BOLD);
-        else
+        } else {
             xCursorProps.setPropertyValue("CharWeight",
                     com.sun.star.awt.FontWeight.NORMAL);
+        }
 
-        if (italic)
+        if (italic) {
             xCursorProps.setPropertyValue("CharPosture",
-                            com.sun.star.awt.FontSlant.ITALIC);
-        else
+                    com.sun.star.awt.FontSlant.ITALIC);
+        } else {
             xCursorProps.setPropertyValue("CharPosture",
-                            com.sun.star.awt.FontSlant.NONE);
+                    com.sun.star.awt.FontSlant.NONE);
+        }
 
         if (smallCaps) {
             xCursorProps.setPropertyValue("CharCaseMap",
-                            com.sun.star.style.CaseMap.SMALLCAPS);
+                    com.sun.star.style.CaseMap.SMALLCAPS);
         }
         else {
             xCursorProps.setPropertyValue("CharCaseMap",
-                            com.sun.star.style.CaseMap.NONE);
+                    com.sun.star.style.CaseMap.NONE);
         }
 
         // TODO: the <monospace> tag doesn't work
@@ -198,21 +210,21 @@ public class OOUtil {
         } */
         if (subscript) {
             xCursorProps.setPropertyValue("CharEscapement",
-                    (byte)-101);
+                    (byte) -101);
             xCursorProps.setPropertyValue("CharEscapementHeight",
-                    (byte)58);
+                    (byte) 58);
         }
         else if (superscript) {
             xCursorProps.setPropertyValue("CharEscapement",
-                    (byte)101);
+                    (byte) 101);
             xCursorProps.setPropertyValue("CharEscapementHeight",
-                    (byte)58);
+                    (byte) 58);
         }
         else {
             xCursorProps.setPropertyValue("CharEscapement",
-                    (byte)0);
+                    (byte) 0);
             xCursorProps.setPropertyValue("CharEscapementHeight",
-                    (byte)100);
+                    (byte) 100);
         }
 
         cursor.collapseToEnd();
@@ -220,14 +232,14 @@ public class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-                                                   String parStyle) throws Exception {
+            String parStyle) throws Exception {
         text.insertString(cursor, string, true);
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
-            XParagraphCursor.class, cursor);
+                XParagraphCursor.class, cursor);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
         XPropertySet props = UnoRuntime.queryInterface(
-            XPropertySet.class, parCursor);
+                XPropertySet.class, parCursor);
         try {
             props.setPropertyValue("ParaStyleName", parStyle);
         } catch (com.sun.star.lang.IllegalArgumentException ex) {
@@ -236,8 +248,6 @@ public class OOUtil {
         cursor.collapseToEnd();
 
     }
-
-
 
     public static Object getProperty(Object o, String property) throws Exception {
         XPropertySet props = UnoRuntime.queryInterface(
@@ -256,19 +266,21 @@ public class OOUtil {
 
     public static XTextDocument selectComponent(JFrame parent, XDesktop xDesktop, List<XTextDocument> list) throws Exception {
         String[] values = new String[list.size()];
-        int ii=0;
+        int ii = 0;
         for (XTextDocument doc : list) {
-            values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
+            values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
+            ii++;
         }
-        JList<String> sel = new JList<String>(values);
+        JList sel = new JList(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
         int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Globals.lang("Select document"),
                 JOptionPane.OK_CANCEL_OPTION);
         if (ans == JOptionPane.OK_OPTION) {
             return list.get(sel.getSelectedIndex());
+        } else {
+            return null;
         }
-        else return null;
     }
 
     /**
@@ -280,17 +292,20 @@ public class OOUtil {
      * @return the cloned and processed entry
      */
     public static BibtexEntry createAdaptedEntry(BibtexEntry entry) {
-        if (entry == null)
+        if (entry == null) {
             return null;
-        BibtexEntry e = (BibtexEntry)entry.clone();
+        }
+        BibtexEntry e = (BibtexEntry) entry.clone();
         for (String field : e.getAllFields()) {
-            if (field.equals(BibtexFields.KEY_FIELD))
+            if (field.equals(BibtexFields.KEY_FIELD)) {
                 continue;
+            }
             String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (value != null))
-                e.setField(field, postformatter.format(value));
+            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
+                e.setField(field, OOUtil.postformatter.format(value));
+            }
         }
         return e;
     }

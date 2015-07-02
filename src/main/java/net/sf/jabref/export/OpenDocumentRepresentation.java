@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2014 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -40,12 +40,14 @@ import ca.odell.glazedlists.SortedList;
  * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
  *
  */
-public class OpenDocumentRepresentation {
-    protected Collection<BibtexEntry> entries;
-    private BibtexDatabase database;
+class OpenDocumentRepresentation {
+
+    private final Collection<BibtexEntry> entries;
+    private final BibtexDatabase database;
+
 
     @SuppressWarnings("unchecked")
-	public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
+    public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
         this.database = database;
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
@@ -57,15 +59,17 @@ public class OpenDocumentRepresentation {
 
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
-        if (keySet == null)
+        if (keySet == null) {
             entryList.addAll(database.getEntries());
-        else {
-            for (String key : keySet)
+        } else {
+            for (String key : keySet) {
                 entryList.add(database.getEntryById(key));
+            }
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
     }
+
     public Document getDOMrepresentation() {
         Document result = null;
         try {
@@ -104,9 +108,7 @@ public class OpenDocumentRepresentation {
             el.appendChild(el2);
             collection.appendChild(el);
 
-            Element body = result.createElement("office:body"),
-                    spreadsheet = result.createElement("office:spreadsheet"),
-                    table = result.createElement("table:table");
+            Element body = result.createElement("office:body"), spreadsheet = result.createElement("office:spreadsheet"), table = result.createElement("table:table");
             table.setAttribute("table:name", "biblio");
             table.setAttribute("table.style-name", "ta1");
 
@@ -115,27 +117,35 @@ public class OpenDocumentRepresentation {
             addTableCell(result, row, "Identifier");
             addTableCell(result, row, "Type");
             addTableCell(result, row, "Address");
+            addTableCell(result, row, "Assignee");
             addTableCell(result, row, "Annote");
             addTableCell(result, row, "Author");
             addTableCell(result, row, "Booktitle");
             addTableCell(result, row, "Chapter");
+            addTableCell(result, row, "Day");
+            addTableCell(result, row, "Dayfiled");
             addTableCell(result, row, "Edition");
             addTableCell(result, row, "Editor");
             addTableCell(result, row, "Howpublish");
-            addTableCell(result, row, "Institutn");
+            addTableCell(result, row, "Institution");
             addTableCell(result, row, "Journal");
+            addTableCell(result, row, "Language");
             addTableCell(result, row, "Month");
+            addTableCell(result, row, "Monthfiled");
+            addTableCell(result, row, "Nationality");
             addTableCell(result, row, "Note");
             addTableCell(result, row, "Number");
-            addTableCell(result, row, "Organizat");
+            addTableCell(result, row, "Organization");
             addTableCell(result, row, "Pages");
             addTableCell(result, row, "Publisher");
+            addTableCell(result, row, "Revision");
             addTableCell(result, row, "School");
             addTableCell(result, row, "Series");
             addTableCell(result, row, "Title");
             addTableCell(result, row, "RepType");
             addTableCell(result, row, "Volume");
             addTableCell(result, row, "Year");
+            addTableCell(result, row, "Yearfiled");
             addTableCell(result, row, "URL");
             addTableCell(result, row, "Custom1");
             addTableCell(result, row, "Custom2");
@@ -145,32 +155,40 @@ public class OpenDocumentRepresentation {
             addTableCell(result, row, "ISBN");
             table.appendChild(row);
 
-            for(BibtexEntry e : entries){
+            for (BibtexEntry e : entries) {
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, getField(e, BibtexFields.KEY_FIELD));
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "address"));
+                addTableCell(result, row, getField(e, "assignee"));
                 addTableCell(result, row, getField(e, "annote"));
                 addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
                 addTableCell(result, row, getField(e, "booktitle"));
                 addTableCell(result, row, getField(e, "chapter"));
+                addTableCell(result, row, getField(e, "day"));
+                addTableCell(result, row, getField(e, "dayfiled"));
                 addTableCell(result, row, getField(e, "edition"));
                 addTableCell(result, row, getField(e, "editor"));//new AuthorLastFirst().format(getField(e, "editor")));
                 addTableCell(result, row, getField(e, "howpublished"));
                 addTableCell(result, row, getField(e, "institution"));
                 addTableCell(result, row, getField(e, "journal"));
+                addTableCell(result, row, getField(e, "language"));
                 addTableCell(result, row, getField(e, "month"));
+                addTableCell(result, row, getField(e, "monthfiled"));
+                addTableCell(result, row, getField(e, "nationality"));
                 addTableCell(result, row, getField(e, "note"));
                 addTableCell(result, row, getField(e, "number"));
                 addTableCell(result, row, getField(e, "organization"));
                 addTableCell(result, row, getField(e, "pages"));
                 addTableCell(result, row, getField(e, "publisher"));
+                addTableCell(result, row, getField(e, "revision"));
                 addTableCell(result, row, getField(e, "school"));
                 addTableCell(result, row, getField(e, "series"));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
                 addTableCell(result, row, getField(e, "reporttype"));
                 addTableCell(result, row, getField(e, "volume"));
                 addTableCell(result, row, getField(e, "year"));
+                addTableCell(result, row, getField(e, "yearfiled"));
                 addTableCell(result, row, getField(e, "url"));
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
@@ -193,16 +211,15 @@ public class OpenDocumentRepresentation {
         return result;
     }
 
-    protected String getField(BibtexEntry e, String field) {
+    private String getField(BibtexEntry e, String field) {
         String s = BibtexDatabase.getResolvedField(field, e, database);
         return s == null ? "" : s;
     }
 
-    protected void addTableCell(Document doc, Element parent, String content) {
-        Element cell = doc.createElement("table:table-cell"),
-                text = doc.createElement("text:p");
-    Text textNode = doc.createTextNode(content);
-    text.appendChild(textNode);
+    private void addTableCell(Document doc, Element parent, String content) {
+        Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
+        Text textNode = doc.createTextNode(content);
+        text.appendChild(textNode);
         //text.setTextContent(content);
         cell.appendChild(text);
         parent.appendChild(cell);

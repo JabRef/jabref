@@ -19,11 +19,13 @@ import net.sf.jabref.external.ExternalFileType;
 
 /**
  * This class represents a file link for a Bibtex entry.
-*/
+ */
 public class FileListEntry {
+
     private String link;
     private String description;
     private ExternalFileType type;
+
 
     public FileListEntry(String description, String link, ExternalFileType type) {
         this.link = link;
@@ -55,8 +57,9 @@ public class FileListEntry {
         this.type = type;
     }
 
+    @Override
     public String toString() {
-        return description+" : "+link+" : "+type;
+        return description + " : " + link + " : " + type;
     }
 
 }

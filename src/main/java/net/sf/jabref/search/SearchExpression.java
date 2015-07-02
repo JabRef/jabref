@@ -28,30 +28,34 @@ import antlr.TokenStreamException;
 import antlr.collections.AST;
 
 public class SearchExpression implements SearchRule {
-	private SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
-	private AST ast = null;
+
+    private final SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
+    private AST ast = null;
+
 
     public SearchExpression(JabRefPreferences prefs, Hashtable<String, String> searchOptions)
-		throws TokenStreamException, RecognitionException,
-		PatternSyntaxException {
+            throws TokenStreamException, RecognitionException,
+            PatternSyntaxException {
         // parse search expression
-		SearchExpressionParser parser = new SearchExpressionParser(
-			new SearchExpressionLexer(new StringReader(searchOptions.elements()
-				.nextElement()))); // supports only single entry
-		parser.caseSensitive = prefs.getBoolean("caseSensitiveSearch");
-		parser.regex = prefs.getBoolean("regExpSearch");
-		parser.searchExpression(); // this is the "global" rule
-		ast = parser.getAST(); // remember abstract syntax tree
-	}
+        SearchExpressionParser parser = new SearchExpressionParser(
+                new SearchExpressionLexer(new StringReader(searchOptions.elements()
+                        .nextElement()))); // supports only single entry
+        parser.caseSensitive = prefs.getBoolean("caseSensitiveSearch");
+        parser.regex = prefs.getBoolean("regExpSearch");
+        parser.searchExpression(); // this is the "global" rule
+        ast = parser.getAST(); // remember abstract syntax tree
+    }
 
-	public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
-		try {
-			return treeParser.apply(ast, bibtexEntry);
-		} catch (RecognitionException e) {
-			return 0; // this should never occur
-		}
-	}
+    @Override
+    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+        try {
+            return treeParser.apply(ast, bibtexEntry);
+        } catch (RecognitionException e) {
+            return 0; // this should never occur
+        }
+    }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }

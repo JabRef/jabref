@@ -1,6 +1,8 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +31,7 @@ public class RISImporterTest {
     public void testIsRecognizedFormat() throws IOException {
 
         RisImporter importer = new RisImporter();
-        assertTrue(importer.isRecognizedFormat(RISImporterTest.class
+        Assert.assertTrue(importer.isRecognizedFormat(RISImporterTest.class
                 .getResourceAsStream("RisImporterTest1.ris")));
     }
 
@@ -39,43 +41,43 @@ public class RISImporterTest {
         HashMap<String, String> hm = new HashMap<String, String>();
         hm.put("title", "/sub 3/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$_3$", hm.get("title"));
+        Assert.assertEquals("$_3$", hm.get("title"));
 
         hm.put("title", "/sub   3   /");
         IsiImporter.processSubSup(hm);
-        assertEquals("$_3$", hm.get("title"));
+        Assert.assertEquals("$_3$", hm.get("title"));
 
         hm.put("title", "/sub 31/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$_{31}$", hm.get("title"));
+        Assert.assertEquals("$_{31}$", hm.get("title"));
 
         hm.put("abstract", "/sub 3/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$_3$", hm.get("abstract"));
+        Assert.assertEquals("$_3$", hm.get("abstract"));
 
         hm.put("review", "/sub 31/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$_{31}$", hm.get("review"));
+        Assert.assertEquals("$_{31}$", hm.get("review"));
 
         hm.put("title", "/sup 3/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$^3$", hm.get("title"));
+        Assert.assertEquals("$^3$", hm.get("title"));
 
         hm.put("title", "/sup 31/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$^{31}$", hm.get("title"));
+        Assert.assertEquals("$^{31}$", hm.get("title"));
 
         hm.put("abstract", "/sup 3/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$^3$", hm.get("abstract"));
+        Assert.assertEquals("$^3$", hm.get("abstract"));
 
         hm.put("review", "/sup 31/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$^{31}$", hm.get("review"));
+        Assert.assertEquals("$^{31}$", hm.get("review"));
 
         hm.put("title", "/sub $Hello/");
         IsiImporter.processSubSup(hm);
-        assertEquals("$_{\\$Hello}$", hm.get("title"));
+        Assert.assertEquals("$_{\\$Hello}$", hm.get("title"));
     }
 
     @Test
@@ -84,20 +86,20 @@ public class RISImporterTest {
 
         List<BibtexEntry> entries = importer.importEntries(RISImporterTest.class
                 .getResourceAsStream("RisImporterTest1.ris"), new OutputPrinterToNull());
-        assertEquals(1, entries.size());
+        Assert.assertEquals(1, entries.size());
         BibtexEntry entry = entries.get(0);
-        assertEquals("Editorial: Open Source and Empirical Software Engineering", entry
+        Assert.assertEquals("Editorial: Open Source and Empirical Software Engineering", entry
                 .getField("title"));
-        assertEquals(
+        Assert.assertEquals(
                 "Harrison, Warren",
                 entry.getField("author"));
 
-        assertEquals(BibtexEntryType.ARTICLE, entry.getType());
-        assertEquals("Empirical Software Engineering", entry.getField("journal"));
-        assertEquals("2001", entry.getField("year"));
-        assertEquals("6", entry.getField("volume"));
-        assertEquals("3", entry.getField("number"));
-        assertEquals("193--194", entry.getField("pages"));
-        assertEquals("#sep#", entry.getField("month"));
+        Assert.assertEquals(BibtexEntryType.ARTICLE, entry.getType());
+        Assert.assertEquals("Empirical Software Engineering", entry.getField("journal"));
+        Assert.assertEquals("2001", entry.getField("year"));
+        Assert.assertEquals("6", entry.getField("volume"));
+        Assert.assertEquals("3", entry.getField("number"));
+        Assert.assertEquals("193--194", entry.getField("pages"));
+        Assert.assertEquals("#sep#", entry.getField("month"));
     }
 }

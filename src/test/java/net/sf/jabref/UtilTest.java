@@ -2,75 +2,63 @@ package net.sf.jabref;
 
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.StringReader;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class UtilTest {
 
     @Test
     public void testNCase() {
-        assertEquals("", Util.nCase(""));
-        assertEquals("Hello world", Util.nCase("Hello World"));
-        assertEquals("A", Util.nCase("a"));
-        assertEquals("Aa", Util.nCase("AA"));
+        Assert.assertEquals("", StringUtil.nCase(""));
+        Assert.assertEquals("Hello world", StringUtil.nCase("Hello World"));
+        Assert.assertEquals("A", StringUtil.nCase("a"));
+        Assert.assertEquals("Aa", StringUtil.nCase("AA"));
     }
 
     @Test
     public void testGetPublicationDate() {
 
-        assertEquals("2003-02", Util.getPublicationDate(BibtexParser
+        Assert.assertEquals("2003-02", Util.getPublicationDate(BibtexParser
                 .singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }")));
 
-        assertEquals("2003-03", Util.getPublicationDate(BibtexParser
+        Assert.assertEquals("2003-03", Util.getPublicationDate(BibtexParser
                 .singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")));
 
-        assertEquals("2003", Util.getPublicationDate(BibtexParser
+        Assert.assertEquals("2003", Util.getPublicationDate(BibtexParser
                 .singleFromString("@ARTICLE{HipKro03, year = {2003}}")));
 
-        assertEquals(null, Util.getPublicationDate(BibtexParser
+        Assert.assertEquals(null, Util.getPublicationDate(BibtexParser
                 .singleFromString("@ARTICLE{HipKro03, month = 3 }")));
 
-        assertEquals(null, Util.getPublicationDate(BibtexParser
+        Assert.assertEquals(null, Util.getPublicationDate(BibtexParser
                 .singleFromString("@ARTICLE{HipKro03, author={bla}}")));
 
-        assertEquals("2003-12", Util.getPublicationDate(BibtexParser
+        Assert.assertEquals("2003-12", Util.getPublicationDate(BibtexParser
                 .singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }")));
 
     }
 
     @Test
-    public void testCheckName() {
-        assertEquals("aa.bib", Util.checkName("aa"));
-        assertEquals(".bib", Util.checkName(""));
-        assertEquals("a.bib", Util.checkName("a.bib"));
-        assertEquals("a.bib", Util.checkName("a"));
-        assertEquals("a.bb.bib", Util.checkName("a.bb"));
+    public void testMakeBibtexExtension() {
+        Assert.assertEquals("aa.bib", StringUtil.makeBibtexExtension("aa"));
+        Assert.assertEquals(".bib", StringUtil.makeBibtexExtension(""));
+        Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a.bib"));
+        Assert.assertEquals("a.bib", StringUtil.makeBibtexExtension("a"));
+        Assert.assertEquals("a.bb.bib", StringUtil.makeBibtexExtension("a.bb"));
     }
 
     @Test
-    public void testCreateNeutralId() {
-
-        HashSet<String> set = new HashSet<String>();
-        for (int i = 0; i < 10000; i++) {
-            String string = Util.createNeutralId();
-            assertFalse(set.contains(string));
-            set.add(string);
-        }
-
-    }
-
-    @Test @Ignore
+    @Ignore
     public void testPlaceDialog() {
         Dialog d = new JDialog();
         d.setSize(50, 50);
@@ -78,99 +66,100 @@ public class UtilTest {
         c.setBounds(100, 200, 100, 50);
 
         Util.placeDialog(d, c);
-        assertEquals(125, d.getX());
-        assertEquals(200, d.getY());
+        Assert.assertEquals(125, d.getX());
+        Assert.assertEquals(200, d.getY());
 
         // Test upper left corner
         c.setBounds(0, 0, 100, 100);
         d.setSize(200, 200);
 
         Util.placeDialog(d, c);
-        assertEquals(0, d.getX());
-        assertEquals(0, d.getY());
+        Assert.assertEquals(0, d.getX());
+        Assert.assertEquals(0, d.getY());
     }
 
     @Test
     public void testParseField() {
 
-        assertEquals("", Util.parseField(""));
+        Assert.assertEquals("", Util.parseField(""));
 
         // Three basic types (references, { } and " ")
-        assertEquals("#hallo#", Util.parseField("hallo"));
-        assertEquals("hallo", Util.parseField("{hallo}"));
-        assertEquals("bye", Util.parseField("\"bye\""));
+        Assert.assertEquals("#hallo#", Util.parseField("hallo"));
+        Assert.assertEquals("hallo", Util.parseField("{hallo}"));
+        Assert.assertEquals("bye", Util.parseField("\"bye\""));
 
         // Concatenation
-        assertEquals("longlonglonglong", Util.parseField("\"long\" # \"long\" # \"long\" # \"long\""));
+        Assert.assertEquals("longlonglonglong", Util.parseField("\"long\" # \"long\" # \"long\" # \"long\""));
 
-        assertEquals("hallo#bye#", Util.parseField("{hallo} # bye"));
+        Assert.assertEquals("hallo#bye#", Util.parseField("{hallo} # bye"));
     }
 
     @Test
     public void testShaveString() {
 
-        assertEquals(null, Util.shaveString(null));
-        assertEquals("", Util.shaveString(""));
-        assertEquals("aaa", Util.shaveString("   aaa\t\t\n\r"));
-        assertEquals("a", Util.shaveString("  {a}    "));
-        assertEquals("a", Util.shaveString("  \"a\"    "));
-        assertEquals("{a}", Util.shaveString("  {{a}}    "));
-        assertEquals("{a}", Util.shaveString("  \"{a}\"    "));
-        assertEquals("\"{a\"}", Util.shaveString("  \"{a\"}    "));
+        Assert.assertEquals(null, StringUtil.shaveString(null));
+        Assert.assertEquals("", StringUtil.shaveString(""));
+        Assert.assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
+        Assert.assertEquals("a", StringUtil.shaveString("  {a}    "));
+        Assert.assertEquals("a", StringUtil.shaveString("  \"a\"    "));
+        Assert.assertEquals("{a}", StringUtil.shaveString("  {{a}}    "));
+        Assert.assertEquals("{a}", StringUtil.shaveString("  \"{a}\"    "));
+        Assert.assertEquals("\"{a\"}", StringUtil.shaveString("  \"{a\"}    "));
     }
 
-    @Test @Ignore
+    @Test
     public void testCheckLegalKey() {
-
-        assertEquals("AAAA", Util.checkLegalKey("AA AA"));
-        assertEquals("SPECIALCHARS", Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^"));
-        assertEquals("AeaeaAAA", Util.checkLegalKey("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
-        assertEquals("", Util.checkLegalKey("\n\t\r"));
+        Assert.assertEquals("AAAA", Util.checkLegalKey("AA AA"));
+        Assert.assertEquals("SPECIALCHARS", Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^"));
+        Assert.assertEquals("", Util.checkLegalKey("\n\t\r"));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testReplaceSpecialCharacters() {
+        Assert.assertEquals("Hallo Arger", Util.replaceSpecialCharacters("Hallo Arger"));
         // Shouldn't German ï¿½ be resolved to Ae
-        assertEquals("AeaeaAAA", Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
-        assertEquals("Hallo Arger", Util.replaceSpecialCharacters("Hallo Arger"));
+        Assert.assertEquals("AeaeaAAA", Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
     }
 
     @Test
     public void testJoin() {
         String[] s = "ab/cd/ed".split("/");
-        assertEquals("ab\\cd\\ed", Util.join(s, "\\", 0, s.length));
+        Assert.assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
 
-        assertEquals("cd\\ed", Util.join(s, "\\", 1, s.length));
+        Assert.assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
 
-        assertEquals("ed", Util.join(s, "\\", 2, s.length));
+        Assert.assertEquals("ed", StringUtil.join(s, "\\", 2, s.length));
 
-        assertEquals("", Util.join(s, "\\", 3, s.length));
+        Assert.assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
-        assertEquals("", Util.join(new String[]{}, "\\", 0, 0));
+        Assert.assertEquals("", StringUtil.join(new String[]{}, "\\", 0, 0));
     }
 
     @Test
     public void testStripBrackets() {
-        assertEquals("foo", Util.stripBrackets("[foo]"));
-        assertEquals("[foo]", Util.stripBrackets("[[foo]]"));
-        assertEquals("foo", Util.stripBrackets("foo]"));
-        assertEquals("foo", Util.stripBrackets("[foo"));
-        assertEquals("", Util.stripBrackets(""));
-        assertEquals("", Util.stripBrackets("[]"));
-        assertEquals("", Util.stripBrackets("["));
-        assertEquals("", Util.stripBrackets("]"));
-        assertEquals("f[]f", Util.stripBrackets("f[]f"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo]"));
+        Assert.assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("foo]"));
+        Assert.assertEquals("foo", StringUtil.stripBrackets("[foo"));
+        Assert.assertEquals("", StringUtil.stripBrackets(""));
+        Assert.assertEquals("", StringUtil.stripBrackets("[]"));
+        Assert.assertEquals("", StringUtil.stripBrackets("["));
+        Assert.assertEquals("", StringUtil.stripBrackets("]"));
+        Assert.assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
 
         try {
-            Util.stripBrackets(null);
-            fail();
+            StringUtil.stripBrackets(null);
+            Assert.fail();
         } catch (NullPointerException ignored) {
 
         }
     }
 
+
     BibtexDatabase database;
     BibtexEntry entry;
+
 
     @Before
     public void setUp() {
@@ -189,82 +178,84 @@ public class UtilTest {
                         "  issn = {1526-5455}," + "\n" +
                         "  publisher = {INFORMS}" + "\n" +
                         "}"
-        );
+                );
 
         BibtexParser parser = new BibtexParser(reader);
         ParserResult result = null;
         try {
             result = parser.parse();
         } catch (Exception e) {
-            fail();
+            Assert.fail();
         }
         database = result.getDatabase();
         entry = database.getEntriesByKey("HipKro03")[0];
 
-        assertNotNull(database);
-        assertNotNull(entry);
+        Assert.assertNotNull(database);
+        Assert.assertNotNull(entry);
     }
 
     @Test
     public void testParseMethodCalls() {
 
-        assertEquals(1, Util.parseMethodsCalls("bla").size());
-        assertEquals("bla", ((Util.parseMethodsCalls("bla").get(0)))[0]);
+        Assert.assertEquals(1, Util.parseMethodsCalls("bla").size());
+        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla").get(0)))[0]);
 
-        assertEquals(1, Util.parseMethodsCalls("bla,").size());
-        assertEquals("bla", ((Util.parseMethodsCalls("bla,").get(0)))[0]);
+        Assert.assertEquals(1, Util.parseMethodsCalls("bla,").size());
+        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla,").get(0)))[0]);
 
-        assertEquals(1, Util.parseMethodsCalls("_bla.bla.blub,").size());
-        assertEquals("_bla.bla.blub", ((Util.parseMethodsCalls("_bla.bla.blub,").get(0)))[0]);
+        Assert.assertEquals(1, Util.parseMethodsCalls("_bla.bla.blub,").size());
+        Assert.assertEquals("_bla.bla.blub", ((Util.parseMethodsCalls("_bla.bla.blub,").get(0)))[0]);
 
+        Assert.assertEquals(2, Util.parseMethodsCalls("bla,foo").size());
+        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla,foo").get(0)))[0]);
+        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla,foo").get(1)))[0]);
 
-        assertEquals(2, Util.parseMethodsCalls("bla,foo").size());
-        assertEquals("bla", ((Util.parseMethodsCalls("bla,foo").get(0)))[0]);
-        assertEquals("foo", ((Util.parseMethodsCalls("bla,foo").get(1)))[0]);
+        Assert.assertEquals(2, Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
+        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[0]);
+        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[0]);
+        Assert.assertEquals("test", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[1]);
+        Assert.assertEquals("fark", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[1]);
 
-        assertEquals(2, Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        assertEquals("bla", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[0]);
-        assertEquals("foo", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[0]);
-        assertEquals("test", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[1]);
-        assertEquals("fark", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[1]);
-
-        assertEquals(2, Util.parseMethodsCalls("bla(test),foo(fark)").size());
-        assertEquals("bla", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[0]);
-        assertEquals("foo", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[0]);
-        assertEquals("test", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[1]);
-        assertEquals("fark", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[1]);
+        Assert.assertEquals(2, Util.parseMethodsCalls("bla(test),foo(fark)").size());
+        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[0]);
+        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[0]);
+        Assert.assertEquals("test", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[1]);
+        Assert.assertEquals("fark", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[1]);
     }
 
-
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testFieldAndFormat() {
-        assertEquals("Eric von Hippel and Georg von Krogh", Util.getFieldAndFormat("[author]", entry, database));
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh", Util.getFieldAndFormat("[author]", entry, database));
 
-        assertEquals("Eric von Hippel and Georg von Krogh", Util.getFieldAndFormat("author", entry, database));
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh", Util.getFieldAndFormat("author", entry, database));
 
-        assertEquals(null, Util.getFieldAndFormat("[unknownkey]", entry, database));
+        Assert.assertEquals(null, Util.getFieldAndFormat("[unknownkey]", entry, database));
 
-        assertEquals(null, Util.getFieldAndFormat("[:]", entry, database));
+        Assert.assertEquals(null, Util.getFieldAndFormat("[:]", entry, database));
 
-        assertEquals(null, Util.getFieldAndFormat("[:lower]", entry, database));
+        Assert.assertEquals(null, Util.getFieldAndFormat("[:lower]", entry, database));
 
-        assertEquals("eric von hippel and georg von krogh", Util.getFieldAndFormat("[author:lower]", entry, database));
+        Assert.assertEquals("eric von hippel and georg von krogh", Util.getFieldAndFormat("[author:lower]", entry, database));
 
-        assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey]", entry, database));
+        Assert.assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey]", entry, database));
 
-        assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey:]", entry, database));
+        Assert.assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey:]", entry, database));
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void testUserFieldAndFormat() {
 
         String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
-        if (names == null)
-            names = new String[]{};
+        if (names == null) {
+            names = new String[] {};
+        }
 
         String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
-        if (formats == null)
-            formats = new String[]{};
+        if (formats == null) {
+            formats = new String[] {};
+        }
 
         try {
 
@@ -280,7 +271,7 @@ public class UtilTest {
             Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, newNames);
             Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, newFormats);
 
-            assertEquals("testtest", Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
+            Assert.assertEquals("testtest", Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
 
         } finally {
             Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, names);
@@ -288,211 +279,69 @@ public class UtilTest {
         }
     }
 
-
     @Test
     public void testExpandBrackets() {
 
-        assertEquals("", Util.expandBrackets("", entry, database));
+        Assert.assertEquals("", Util.expandBrackets("", entry, database));
 
-        assertEquals("dropped", Util.expandBrackets("drop[unknownkey]ped", entry, database));
+        Assert.assertEquals("dropped", Util.expandBrackets("drop[unknownkey]ped", entry, database));
 
-        assertEquals("Eric von Hippel and Georg von Krogh",
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
                 Util.expandBrackets("[author]", entry, database));
 
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
                 Util.expandBrackets("[author] are two famous authors.", entry, database));
 
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
                 Util.expandBrackets("[author] are two famous authors.", entry, database));
 
-        assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
     }
 
     @Test
     public void testSanitizeUrl() {
 
-        assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
-        assertEquals("http://www.vg.no/fil%20e.html",
+        Assert.assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html",
                 Util.sanitizeUrl("http://www.vg.no/fil e.html"));
-        assertEquals("http://www.vg.no/fil%20e.html",
+        Assert.assertEquals("http://www.vg.no/fil%20e.html",
                 Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
-        assertEquals("www.vg.no/fil%20e.html",
+        Assert.assertEquals("www.vg.no/fil%20e.html",
                 Util.sanitizeUrl("www.vg.no/fil%20e.html"));
 
-        assertEquals("www.vg.no/fil%20e.html",
+        Assert.assertEquals("www.vg.no/fil%20e.html",
                 Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
 
         /**
          * DOI Test cases
          */
-        assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
-        assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
-        assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
-        assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
+        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
+        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
+        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
+        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
 
         /**
          * Additional testcases provided by Hannes Restel and Micha Beckmann.
          */
-        assertEquals("ftp://www.vg.no", Util.sanitizeUrl("ftp://www.vg.no"));
-        assertEquals("file://doof.txt", Util.sanitizeUrl("file://doof.txt"));
-        assertEquals("file:///", Util.sanitizeUrl("file:///"));
-        assertEquals("/src/doof.txt", Util.sanitizeUrl("/src/doof.txt"));
-        assertEquals("/", Util.sanitizeUrl("/"));
-        assertEquals("/home/user/example.txt", Util.sanitizeUrl("/home/user/example.txt"));
-    }
-
-    @Test
-    public void test2to4DigitsYear() {
-        assertEquals("1990", Util.toFourDigitYear("1990"));
-        assertEquals("190", Util.toFourDigitYear("190"));
-        assertEquals("1990", Util.toFourDigitYear("90", 1990));
-        assertEquals("1990", Util.toFourDigitYear("90", 1991));
-        assertEquals("2020", Util.toFourDigitYear("20", 1990));
-        assertEquals("1921", Util.toFourDigitYear("21", 1990));
-        assertEquals("1922", Util.toFourDigitYear("22", 1990));
-        assertEquals("2022", Util.toFourDigitYear("22", 1992));
-        assertEquals("1999", Util.toFourDigitYear("99", 2001));
-        assertEquals("1931", Util.toFourDigitYear("1931", 2001));
-        assertEquals("2031", Util.toFourDigitYear("31", 2001));
-        assertEquals("1932", Util.toFourDigitYear("32", 2001));
-        assertEquals("1944", Util.toFourDigitYear("44", 2001));
-        assertEquals("2011", Util.toFourDigitYear("11", 2001));
-
-        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        int d2 = thisYear % 100;
-
-        NumberFormat f = new DecimalFormat("00");
-
-        for (int i = 0; i <= 30; i++) {
-            assertTrue("" + i, thisYear <= Integer.parseInt(Util.toFourDigitYear(f.format((d2 + i) % 100))));
-        }
-        for (int i = 0; i < 70; i++) {
-            assertTrue("" + i, thisYear >= Integer.parseInt(Util.toFourDigitYear(f.format((d2 - i + 100) % 100))));
-        }
-    }
-
-    @Test
-    public void testToMonthNumber() {
-
-        assertEquals(0, Util.getMonthNumber("jan"));
-        assertEquals(1, Util.getMonthNumber("feb"));
-        assertEquals(2, Util.getMonthNumber("mar"));
-        assertEquals(3, Util.getMonthNumber("apr"));
-        assertEquals(4, Util.getMonthNumber("may"));
-        assertEquals(5, Util.getMonthNumber("jun"));
-        assertEquals(6, Util.getMonthNumber("jul"));
-        assertEquals(7, Util.getMonthNumber("aug"));
-        assertEquals(8, Util.getMonthNumber("sep"));
-        assertEquals(9, Util.getMonthNumber("oct"));
-        assertEquals(10, Util.getMonthNumber("nov"));
-        assertEquals(11, Util.getMonthNumber("dec"));
-
-        assertEquals(0, Util.getMonthNumber("#jan#"));
-        assertEquals(1, Util.getMonthNumber("#feb#"));
-        assertEquals(2, Util.getMonthNumber("#mar#"));
-        assertEquals(3, Util.getMonthNumber("#apr#"));
-        assertEquals(4, Util.getMonthNumber("#may#"));
-        assertEquals(5, Util.getMonthNumber("#jun#"));
-        assertEquals(6, Util.getMonthNumber("#jul#"));
-        assertEquals(7, Util.getMonthNumber("#aug#"));
-        assertEquals(8, Util.getMonthNumber("#sep#"));
-        assertEquals(9, Util.getMonthNumber("#oct#"));
-        assertEquals(10, Util.getMonthNumber("#nov#"));
-        assertEquals(11, Util.getMonthNumber("#dec#"));
-
-        assertEquals(0, Util.getMonthNumber("January"));
-        assertEquals(1, Util.getMonthNumber("February"));
-        assertEquals(2, Util.getMonthNumber("March"));
-        assertEquals(3, Util.getMonthNumber("April"));
-        assertEquals(4, Util.getMonthNumber("May"));
-        assertEquals(5, Util.getMonthNumber("June"));
-        assertEquals(6, Util.getMonthNumber("July"));
-        assertEquals(7, Util.getMonthNumber("August"));
-        assertEquals(8, Util.getMonthNumber("September"));
-        assertEquals(9, Util.getMonthNumber("October"));
-        assertEquals(10, Util.getMonthNumber("November"));
-        assertEquals(11, Util.getMonthNumber("Decembre"));
-
-        assertEquals(0, Util.getMonthNumber("01"));
-        assertEquals(1, Util.getMonthNumber("02"));
-        assertEquals(2, Util.getMonthNumber("03"));
-        assertEquals(3, Util.getMonthNumber("04"));
-        assertEquals(4, Util.getMonthNumber("05"));
-        assertEquals(5, Util.getMonthNumber("06"));
-        assertEquals(6, Util.getMonthNumber("07"));
-        assertEquals(7, Util.getMonthNumber("08"));
-        assertEquals(8, Util.getMonthNumber("09"));
-        assertEquals(9, Util.getMonthNumber("10"));
-
-        assertEquals(0, Util.getMonthNumber("1"));
-        assertEquals(1, Util.getMonthNumber("2"));
-        assertEquals(2, Util.getMonthNumber("3"));
-        assertEquals(3, Util.getMonthNumber("4"));
-        assertEquals(4, Util.getMonthNumber("5"));
-        assertEquals(5, Util.getMonthNumber("6"));
-        assertEquals(6, Util.getMonthNumber("7"));
-        assertEquals(7, Util.getMonthNumber("8"));
-        assertEquals(8, Util.getMonthNumber("9"));
-
-        assertEquals(10, Util.getMonthNumber("11"));
-        assertEquals(11, Util.getMonthNumber("12"));
-
-        assertEquals(-1, Util.getMonthNumber(";lkjasdf"));
-        assertEquals(-1, Util.getMonthNumber("3.2"));
-        assertEquals(-1, Util.getMonthNumber("#test#"));
-        assertEquals(-1, Util.getMonthNumber(""));
+        Assert.assertEquals("ftp://www.vg.no", Util.sanitizeUrl("ftp://www.vg.no"));
+        Assert.assertEquals("file://doof.txt", Util.sanitizeUrl("file://doof.txt"));
+        Assert.assertEquals("file:///", Util.sanitizeUrl("file:///"));
+        Assert.assertEquals("/src/doof.txt", Util.sanitizeUrl("/src/doof.txt"));
+        Assert.assertEquals("/", Util.sanitizeUrl("/"));
+        Assert.assertEquals("/home/user/example.txt", Util.sanitizeUrl("/home/user/example.txt"));
     }
 
     @Test
     public void testToUpperCharFirst() {
 
-        assertEquals("", Util.toUpperFirstLetter(""));
-        assertEquals("A", Util.toUpperFirstLetter("a"));
-        assertEquals("A", Util.toUpperFirstLetter("A"));
-        assertEquals("An", Util.toUpperFirstLetter("an"));
-        assertEquals("AN", Util.toUpperFirstLetter("AN"));
-        assertEquals("TestTest", Util.toUpperFirstLetter("testTest"));
+        Assert.assertEquals("", StringUtil.toUpperFirstLetter(""));
+        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("a"));
+        Assert.assertEquals("A", StringUtil.toUpperFirstLetter("A"));
+        Assert.assertEquals("An", StringUtil.toUpperFirstLetter("an"));
+        Assert.assertEquals("AN", StringUtil.toUpperFirstLetter("AN"));
+        Assert.assertEquals("TestTest", StringUtil.toUpperFirstLetter("testTest"));
 
-    }
-
-    /**
-     * Tests Util.checkForDOI(...) for right functionality
-     */
-    @Test
-    public void testCheckForDoi() {
-        assertEquals(true, Util.checkForDOIwithHTTPprefix("http://doi.acm.org/10.1145/1294928.1294933"));
-        assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.doi.org/10.1007/978-3-642-15618-2_19"));
-        assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.doi.org/10.1000/182"));
-
-        assertEquals(false, Util.checkForDOIwithHTTPprefix("http://www.xyz.com"));
-        assertEquals(false, Util.checkForDOIwithHTTPprefix("http://dx.doing.org/fjdlfdsjfdlfdj.htm"));
-        assertEquals(false, Util.checkForDOIwithHTTPprefix("thfjtfjglkjjlkkölm5476576658796"));
-
-        assertEquals(true, Util.checkForDOIwithHTTPprefix("http://doii.acm.org/10.1145/1294928.1294933"));
-        assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.ddoi.org/10.1007/978-3-642-15618-2_19"));
-        assertEquals(true, Util.checkForDOIwithHTTPprefix("http://dx.eoi.org/10.1000/182"));
-    }
-
-    /**
-     * Tests Util.parseDOI(...) for right functionality
-     */
-    @Test
-    public void testParseDoi() {
-        assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.org/10.1145/1294928.1294933"));
-        assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.net/10.1145/1294928.1294933"));
-        assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.com/10.1145/1294928.1294933"));
-        assertEquals("10.1145/1294928.1294933", Util.getDOI("http://doi.acm.de/10.1145/1294928.1294933"));
-
-        assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.org/10.1007/978-3-642-15618-2_19"));
-        assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.net/10.1007/978-3-642-15618-2_19"));
-        assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.com/10.1007/978-3-642-15618-2_19"));
-        assertEquals("10.1007/978-3-642-15618-2_19", Util.getDOI("http://dx.doi.de/10.1007/978-3-642-15618-2_19"));
-
-        assertEquals("10.1000/182", Util.getDOI("http://dx.doi.org/10.1000/182"));
-
-        assertEquals("10.4108/ICST.COLLABORATECOM2009.8275", Util.getDOI("http://dx.doi.org/10.4108/ICST.COLLABORATECOM2009.8275"));
-        assertEquals("10.1109/MIC.2012.43", Util.getDOI("http://doi.ieeecomputersociety.org/10.1109/MIC.2012.43"));
     }
 
 }

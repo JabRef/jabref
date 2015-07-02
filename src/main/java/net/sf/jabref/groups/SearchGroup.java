@@ -38,371 +38,402 @@ import antlr.collections.AST;
  * Preferences - Java - Code Style - Code Templates
  */
 public class SearchGroup extends AbstractGroup implements SearchRule {
-	public static final String ID = "SearchGroup:";
 
-	private final String m_searchExpression;
+    public static final String ID = "SearchGroup:";
 
-	private final boolean m_caseSensitive;
+    private final String m_searchExpression;
 
-	private final boolean m_regExp;
+    private final boolean m_caseSensitive;
 
-	private final AST m_ast;
+    private final boolean m_regExp;
 
-	private static final SearchExpressionTreeParser m_treeParser = new SearchExpressionTreeParser();
+    private final AST m_ast;
 
-	/**
-	 * If m_searchExpression is in valid syntax for advanced search, <b>this
-	 * </b> will do the search; otherwise, either <b>RegExpRule </b> or
-	 * <b>SimpleSearchRule </b> will be used.
-	 */
-	private final SearchRule m_searchRule;
+    private static final SearchExpressionTreeParser m_treeParser = new SearchExpressionTreeParser();
 
-	/**
-	 * Creates a SearchGroup with the specified properties.
-	 */
-	public SearchGroup(String name, String searchExpression,
-			boolean caseSensitive, boolean regExp, int context) {
-		super(name, context);
-		m_searchExpression = searchExpression;
-		m_caseSensitive = caseSensitive;
-		m_regExp = regExp;
+    /**
+     * If m_searchExpression is in valid syntax for advanced search, <b>this
+     * </b> will do the search; otherwise, either <b>RegExpRule </b> or
+     * <b>SimpleSearchRule </b> will be used.
+     */
+    private final SearchRule m_searchRule;
 
-		// create AST
-		AST ast = null;
-		try {
-			SearchExpressionParser parser = new SearchExpressionParser(
-					new SearchExpressionLexer(new StringReader(
-							m_searchExpression)));
-			parser.caseSensitive = m_caseSensitive;
-			parser.regex = m_regExp;
-			parser.searchExpression();
-			ast = parser.getAST();
-		} catch (Exception e) {
-			ast = null;
-			// nothing to do; set m_ast to null -> regular plaintext search
-		}
-		m_ast = ast;
 
-		if (m_ast != null) { // do advanced search
-			m_searchRule = this;
-		} else { // do plaintext search
-			if (m_regExp)
-				m_searchRule = new RegExpRule(m_caseSensitive);
-			else
-				m_searchRule = new SimpleSearchRule(m_caseSensitive);
-		}
+    /**
+     * Creates a SearchGroup with the specified properties.
+     */
+    public SearchGroup(String name, String searchExpression,
+            boolean caseSensitive, boolean regExp, int context) {
+        super(name, context);
+        m_searchExpression = searchExpression;
+        m_caseSensitive = caseSensitive;
+        m_regExp = regExp;
 
-	}
+        // create AST
+        AST ast;
+        try {
+            SearchExpressionParser parser = new SearchExpressionParser(
+                    new SearchExpressionLexer(new StringReader(
+                            m_searchExpression)));
+            parser.caseSensitive = m_caseSensitive;
+            parser.regex = m_regExp;
+            parser.searchExpression();
+            ast = parser.getAST();
+        } catch (Exception e) {
+            ast = null;
+            // nothing to do; set m_ast to null -> regular plaintext search
+        }
+        m_ast = ast;
 
-	/**
-	 * Parses s and recreates the SearchGroup from it.
-	 * 
-	 * @param s
-	 *            The String representation obtained from
-	 *            SearchGroup.toString(), or null if incompatible
-	 */
-	public static AbstractGroup fromString(String s, BibtexDatabase db,
-			int version) throws Exception {
-		if (!s.startsWith(ID))
-			throw new Exception(
-					"Internal error: SearchGroup cannot be created from \"" + s
-					+ "\". "
-					+ "Please report this on www.sf.net/projects/jabref");
-		QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
-				.length()), SEPARATOR, QUOTE_CHAR);
-		switch (version) {
-		case 0:
-		case 1:
-		case 2: {
-			String name = tok.nextToken();
-			String expression = tok.nextToken();
-			boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-			boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-			// version 0 contained 4 additional booleans to specify search
-			// fields; these are ignored now, all fields are always searched
-			return new SearchGroup(Util.unquote(name, QUOTE_CHAR), Util
-					.unquote(expression, QUOTE_CHAR), caseSensitive, regExp,
-					AbstractGroup.INDEPENDENT);
-		}
-		case 3: {
-			String name = tok.nextToken();
-			int context = Integer.parseInt(tok.nextToken());
-			String expression = tok.nextToken();
-			boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-			boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-			// version 0 contained 4 additional booleans to specify search
-			// fields; these are ignored now, all fields are always searched
-			return new SearchGroup(Util.unquote(name, QUOTE_CHAR), Util
-					.unquote(expression, QUOTE_CHAR), caseSensitive, regExp,
-					context);
-		}
-		default:
-			throw new UnsupportedVersionException("SearchGroup", version);
-		}
-	}
+        if (m_ast != null) { // do advanced search
+            m_searchRule = this;
+        } else { // do plaintext search
+            if (m_regExp) {
+                m_searchRule = new RegExpRule(m_caseSensitive);
+            } else {
+                m_searchRule = new SimpleSearchRule(m_caseSensitive);
+            }
+        }
 
-    public String getTypeId() {
-        return ID;
     }
 
     /**
-	 * @see net.sf.jabref.groups.AbstractGroup#getSearchRule()
-	 */
-	public SearchRule getSearchRule() {
-		return this;
-	}
+     * Parses s and recreates the SearchGroup from it.
+     * 
+     * @param s
+     *            The String representation obtained from
+     *            SearchGroup.toString(), or null if incompatible
+     */
+    public static AbstractGroup fromString(String s, BibtexDatabase db,
+            int version) throws Exception {
+        if (!s.startsWith(SearchGroup.ID)) {
+            throw new Exception(
+                    "Internal error: SearchGroup cannot be created from \"" + s
+                            + "\". "
+                            + "Please report this on www.sf.net/projects/jabref");
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID
+                .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
+        switch (version) {
+        case 0:
+        case 1:
+        case 2: {
+            String name = tok.nextToken();
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            // version 0 contained 4 additional booleans to specify search
+            // fields; these are ignored now, all fields are always searched
+            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                    AbstractGroup.INDEPENDENT);
+        }
+        case 3: {
+            String name = tok.nextToken();
+            int context = Integer.parseInt(tok.nextToken());
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            // version 0 contained 4 additional booleans to specify search
+            // fields; these are ignored now, all fields are always searched
+            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                    context);
+        }
+        default:
+            throw new UnsupportedVersionException("SearchGroup", version);
+        }
+    }
 
-	/**
-	 * Returns a String representation of this object that can be used to
-	 * reconstruct it.
-	 */
-	public String toString() {
-		return ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR
-				+ m_context + SEPARATOR
-				+ Util.quote(m_searchExpression, SEPARATOR, QUOTE_CHAR)
-				+ SEPARATOR + (m_caseSensitive ? "1" : "0") + SEPARATOR
-				+ (m_regExp ? "1" : "0") + SEPARATOR;
-	}
+    @Override
+    public String getTypeId() {
+        return SearchGroup.ID;
+    }
 
-	public String getSearchExpression() {
-		return m_searchExpression;
-	}
+    /**
+     * @see net.sf.jabref.groups.AbstractGroup#getSearchRule()
+     */
+    @Override
+    public SearchRule getSearchRule() {
+        return this;
+    }
 
-	public boolean supportsAdd() {
-		return false;
-	}
+    /**
+     * Returns a String representation of this object that can be used to
+     * reconstruct it.
+     */
+    @Override
+    public String toString() {
+        return SearchGroup.ID + StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + m_context + AbstractGroup.SEPARATOR
+                + StringUtil.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + (m_caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
+                + (m_regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
+    }
 
-	public boolean supportsRemove() {
-		return false;
-	}
+    public String getSearchExpression() {
+        return m_searchExpression;
+    }
 
-	public AbstractUndoableEdit add(BibtexEntry[] entries) {
-		// nothing to do, add is not supported
-		return null;
-	}
+    @Override
+    public boolean supportsAdd() {
+        return false;
+    }
 
-	public AbstractUndoableEdit remove(BibtexEntry[] entries) {
-		// nothing to do, remove is not supported
-		return null;
-	}
+    @Override
+    public boolean supportsRemove() {
+        return false;
+    }
 
-	public boolean equals(Object o) {
-		if (!(o instanceof SearchGroup))
-			return false;
-		SearchGroup other = (SearchGroup) o;
-		return m_name.equals(other.m_name)
-				&& m_searchExpression.equals(other.m_searchExpression)
-				&& m_caseSensitive == other.m_caseSensitive
-				&& m_regExp == other.m_regExp
-                && getHierarchicalContext() == other.getHierarchicalContext();
-	}
+    @Override
+    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+        // nothing to do, add is not supported
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
-	 *      net.sf.jabref.BibtexEntry)
-	 */
-	public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
-		return applyRule(searchOptions, entry) != 0;
-	}
+    @Override
+    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+        // nothing to do, remove is not supported
+        return null;
+    }
 
-	public boolean contains(BibtexEntry entry) {
-		// use dummy map
-		return contains(new HashMap<String, String>(), entry);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SearchGroup)) {
+            return false;
+        }
+        SearchGroup other = (SearchGroup) o;
+        return m_name.equals(other.m_name)
+                && m_searchExpression.equals(other.m_searchExpression)
+                && (m_caseSensitive == other.m_caseSensitive)
+                && (m_regExp == other.m_regExp)
+                && (getHierarchicalContext() == other.getHierarchicalContext());
+    }
 
-	public int applyRule(Map<String, String> searchOptions, BibtexEntry entry) {
-		if (m_ast == null) {
-			// the searchOptions object is a dummy; we need to insert
-			// the actual search expression.
-			searchOptions.put("option", m_searchExpression);
-			return m_searchRule.applyRule(searchOptions, entry);
-		}
-		try {
-			return m_treeParser.apply(m_ast, entry);
-		} catch (RecognitionException e) {
-			return 0; // this should never occur
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
+     *      net.sf.jabref.BibtexEntry)
+     */
+    @Override
+    public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
+        return applyRule(searchOptions, entry) != 0;
+    }
 
-	public AbstractGroup deepCopy() {
-		try {
-			return new SearchGroup(m_name, m_searchExpression, m_caseSensitive,
-					m_regExp, m_context);
-		} catch (Throwable t) {
-			// this should never happen, because the constructor obviously
-			// succeeded in creating _this_ instance!
-			System.err.println("Internal error: Exception " + t
-					+ " in SearchGroup.deepCopy(). "
-					+ "Please report this on www.sf.net/projects/jabref");
-			return null;
-		}
-	}
+    @Override
+    public boolean contains(BibtexEntry entry) {
+        // use dummy map
+        return contains(new HashMap<String, String>(), entry);
+    }
 
-	public boolean isCaseSensitive() {
-		return m_caseSensitive;
-	}
+    @Override
+    public int applyRule(Map<String, String> searchOptions, BibtexEntry entry) {
+        if (m_ast == null) {
+            // the searchOptions object is a dummy; we need to insert
+            // the actual search expression.
+            searchOptions.put("option", m_searchExpression);
+            return m_searchRule.applyRule(searchOptions, entry);
+        }
+        try {
+            return SearchGroup.m_treeParser.apply(m_ast, entry);
+        } catch (RecognitionException e) {
+            return 0; // this should never occur
+        }
+    }
 
-	public boolean isRegExp() {
-		return m_regExp;
-	}
+    @Override
+    public AbstractGroup deepCopy() {
+        try {
+            return new SearchGroup(m_name, m_searchExpression, m_caseSensitive,
+                    m_regExp, m_context);
+        } catch (Throwable t) {
+            // this should never happen, because the constructor obviously
+            // succeeded in creating _this_ instance!
+            System.err.println("Internal error: Exception " + t
+                    + " in SearchGroup.deepCopy(). "
+                    + "Please report this on www.sf.net/projects/jabref");
+            return null;
+        }
+    }
 
-	public boolean isDynamic() {
-		return true;
-	}
-	
-	public String getDescription() {
-		return getDescriptionForPreview(m_searchExpression, m_ast, m_caseSensitive,
-				m_regExp);
-	}
-	
-	public static String getDescriptionForPreview(String expr, AST ast,
-			boolean caseSensitive, boolean regExp) {
-		StringBuffer sb = new StringBuffer();
-		if (ast == null) {
-			sb.append(regExp ? Globals.lang(
-			        "This group contains entries in which any field contains the regular expression <b>%0</b>",
-                    Util.quoteForHTML(expr))
+    public boolean isCaseSensitive() {
+        return m_caseSensitive;
+    }
+
+    public boolean isRegExp() {
+        return m_regExp;
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return true;
+    }
+
+    @Override
+    public String getDescription() {
+        return SearchGroup.getDescriptionForPreview(m_searchExpression, m_ast, m_caseSensitive,
+                m_regExp);
+    }
+
+    public static String getDescriptionForPreview(String expr, AST ast,
+            boolean caseSensitive, boolean regExp) {
+        StringBuilder sb = new StringBuilder();
+        if (ast == null) {
+            sb.append(regExp ? Globals.lang(
+                    "This group contains entries in which any field contains the regular expression <b>%0</b>",
+                    StringUtil.quoteForHTML(expr))
                     : Globals.lang(
                             "This group contains entries in which any field contains the term <b>%0</b>",
-                            Util.quoteForHTML(expr)));
+                            StringUtil.quoteForHTML(expr)));
             sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
                     : Globals.lang("case insensitive")).append("). ");
-			sb.append(Globals.lang(
+            sb.append(Globals.lang(
                     "Entries cannot be manually assigned to or removed from this group."));
             sb.append("<p><br>").append(Globals.lang(
                     "Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>"));
-			return sb.toString();
-		}
-		// describe advanced search expression
-        sb.append(Globals.lang("This group contains entries in which")).append(" ");
-		sb.append(describeNode(ast, regExp, false, false, false));
-		sb.append(". ");
-		sb.append(caseSensitive ? Globals.lang("The search is case sensitive.")
-				: Globals.lang("The search is case insensitive."));
-		return sb.toString();
-	}
+            return sb.toString();
+        }
+        // describe advanced search expression
+        sb.append(Globals.lang("This group contains entries in which")).append(' ');
+        sb.append(SearchGroup.describeNode(ast, regExp, false, false, false));
+        sb.append(". ");
+        sb.append(caseSensitive ? Globals.lang("The search is case sensitive.")
+                : Globals.lang("The search is case insensitive."));
+        return sb.toString();
+    }
 
-	protected static String describeNode(AST node, boolean regExp,
-			boolean not, boolean and, boolean or) {
-		StringBuffer sb = new StringBuffer();
-		switch (node.getType()) {
-		case SearchExpressionTreeParserTokenTypes.And:
-			if (not)
-                sb.append(Globals.lang("not")).append(" ");
-			// if there was an "or" in this subtree so far, braces may be needed
-			if (or || not)
-				sb.append("(");
-            sb.append(describeNode(node.getFirstChild(), regExp,
-                    false, true, false)).append(" ").append(Globals.lang("and")).append(" ").append(describeNode(node.getFirstChild()
+    private static String describeNode(AST node, boolean regExp,
+                                       boolean not, boolean and, boolean or) {
+        StringBuilder sb = new StringBuilder();
+        switch (node.getType()) {
+        case SearchExpressionTreeParserTokenTypes.And:
+            if (not) {
+                sb.append(Globals.lang("not")).append(' ');
+            }
+            // if there was an "or" in this subtree so far, braces may be needed
+            if (or || not) {
+                sb.append('(');
+            }
+            sb.append(SearchGroup.describeNode(node.getFirstChild(), regExp,
+                    false, true, false)).append(' ').append(Globals.lang("and")).append(' ').append(SearchGroup.describeNode(node.getFirstChild()
                     .getNextSibling(), regExp, false, true, false));
-			if (or || not)
-				sb.append(")");
-			return sb.toString();
-		case SearchExpressionTreeParserTokenTypes.Or:
-			if (not)
-                sb.append(Globals.lang("not")).append(" ");
-			// if there was an "and" in this subtree so far, braces may be
-			// needed
-			if (and || not)
-				sb.append("(");
-            sb.append(describeNode(node.getFirstChild(), regExp,
-                    false, false, true)).append(" ").append(Globals.lang("or")).append(" ").append(describeNode(node.getFirstChild()
+            if (or || not) {
+                sb.append(')');
+            }
+            return sb.toString();
+        case SearchExpressionTreeParserTokenTypes.Or:
+            if (not) {
+                sb.append(Globals.lang("not")).append(' ');
+            }
+            // if there was an "and" in this subtree so far, braces may be
+            // needed
+            if (and || not) {
+                sb.append('(');
+            }
+            sb.append(SearchGroup.describeNode(node.getFirstChild(), regExp,
+                    false, false, true)).append(' ').append(Globals.lang("or")).append(' ').append(SearchGroup.describeNode(node.getFirstChild()
                     .getNextSibling(), regExp, false, false, true));
-			if (and || not)
-				sb.append(")");
-			return sb.toString();
-		case SearchExpressionTreeParserTokenTypes.Not:
-			return describeNode(node.getFirstChild(), regExp, !not,
-					and, or);
-		default:
-			node = node.getFirstChild();
-			final String field = node.getText();
-			final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
-			node = node.getNextSibling();
-			final int type = node.getType();
-			node = node.getNextSibling();
-			final String termQuoted = Util.quoteForHTML(node.getText());
-			final String fieldSpecQuoted = regExpFieldSpec ? Globals.lang(
-					"any field that matches the regular expression <b>%0</b>",
-                    Util.quoteForHTML(field)) : Globals.lang("the field <b>%0</b>", 
-                            Util.quoteForHTML(field));
-			switch (type) {
-			case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
-			case SearchExpressionTreeParserTokenTypes.EQUAL:
-				if (regExp)
-					return not ? Globals.lang(
-					        "%0 doesn't contain the Regular Expression <b>%1</b>",
+            if (and || not) {
+                sb.append(')');
+            }
+            return sb.toString();
+        case SearchExpressionTreeParserTokenTypes.Not:
+            return SearchGroup.describeNode(node.getFirstChild(), regExp, !not,
+                    and, or);
+        default:
+            node = node.getFirstChild();
+            final String field = node.getText();
+            final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
+            node = node.getNextSibling();
+            final int type = node.getType();
+            node = node.getNextSibling();
+            final String termQuoted = StringUtil.quoteForHTML(node.getText());
+            final String fieldSpecQuoted = regExpFieldSpec ? Globals.lang(
+                    "any field that matches the regular expression <b>%0</b>",
+                    StringUtil.quoteForHTML(field)) : Globals.lang("the field <b>%0</b>",
+                    StringUtil.quoteForHTML(field));
+            switch (type) {
+            case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
+            case SearchExpressionTreeParserTokenTypes.EQUAL:
+                if (regExp) {
+                    return not ? Globals.lang(
+                            "%0 doesn't contain the Regular Expression <b>%1</b>",
                             fieldSpecQuoted, termQuoted)
-							: Globals.lang(
-							        "%0 contains the Regular Expression <b>%1</b>",
+                            : Globals.lang(
+                                    "%0 contains the Regular Expression <b>%1</b>",
                                     fieldSpecQuoted, termQuoted);
-				return not ? Globals.lang(
-						"%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,
+                }
+                return not ? Globals.lang(
+                        "%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,
                         termQuoted) : Globals.lang("%0 contains the term <b>%1</b>",
-                                fieldSpecQuoted, termQuoted);
-			case SearchExpressionTreeParserTokenTypes.LITERAL_matches:
-			case SearchExpressionTreeParserTokenTypes.EEQUAL:
-				if (regExp)
-					return not ? Globals.lang(
-					        "%0 doesn't match the Regular Expression <b>%1</b>",
+                        fieldSpecQuoted, termQuoted);
+            case SearchExpressionTreeParserTokenTypes.LITERAL_matches:
+            case SearchExpressionTreeParserTokenTypes.EEQUAL:
+                if (regExp) {
+                    return not ? Globals.lang(
+                            "%0 doesn't match the Regular Expression <b>%1</b>",
                             fieldSpecQuoted, termQuoted)
-							: Globals.lang(
+                            : Globals.lang(
                                     "%0 matches the Regular Expression <b>%1</b>",
                                     fieldSpecQuoted, termQuoted);
-				return not ? Globals.lang(
-						"%0 doesn't match the term <b>%1</b>", 
+                }
+                return not ? Globals.lang(
+                        "%0 doesn't match the term <b>%1</b>",
                         fieldSpecQuoted, termQuoted)
-						: Globals.lang("%0 matches the term <b>%1</b>",
-                                fieldSpecQuoted, 
+                        : Globals.lang("%0 matches the term <b>%1</b>",
+                                fieldSpecQuoted,
                                 termQuoted);
-			case SearchExpressionTreeParserTokenTypes.NEQUAL:
-				if (regExp)
-					return not ? Globals.lang(
-							"%0 contains the Regular Expression <b>%1</b>",
+            case SearchExpressionTreeParserTokenTypes.NEQUAL:
+                if (regExp) {
+                    return not ? Globals.lang(
+                            "%0 contains the Regular Expression <b>%1</b>",
                             fieldSpecQuoted, termQuoted)
-							: Globals.lang(
+                            : Globals.lang(
                                     "%0 doesn't contain the Regular Expression <b>%1</b>",
                                     fieldSpecQuoted, termQuoted);
-				return not ? Globals.lang("%0 contains the term <b>%1</b>",
+                }
+                return not ? Globals.lang("%0 contains the term <b>%1</b>",
                         fieldSpecQuoted, termQuoted) : Globals.lang(
-						"%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,
+                        "%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,
                         termQuoted);
-			default:
-				return "Internal error: Unknown AST node type. "
-						+ "Please report this on www.sf.net/projects/jabref";
-				// this should never happen
-			}
-		}
-	}
+            default:
+                return "Internal error: Unknown AST node type. "
+                        + "Please report this on www.sf.net/projects/jabref";
+                // this should never happen
+            }
+        }
+    }
 
-	public String getShortDescription() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("<b>");
-		if (Globals.prefs.getBoolean("groupShowDynamic"))
-            sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
-		else
-			sb.append(Util.quoteForHTML(getName()));
-			sb.append("</b> - ");
-			sb.append(Globals.lang("dynamic group"));
-			sb.append(" (");
-			sb.append(Globals.lang("search expression"));
-			sb.append(" <b>").
-            append(Util.quoteForHTML(m_searchExpression)).append("</b>)");
-		switch (getHierarchicalContext()) {
-		case AbstractGroup.INCLUDING:
+    @Override
+    public String getShortDescription() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<b>");
+        if (Globals.prefs.getBoolean("groupShowDynamic")) {
+            sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
+        } else {
+            sb.append(StringUtil.quoteForHTML(getName()));
+        }
+        sb.append("</b> - ");
+        sb.append(Globals.lang("dynamic group"));
+        sb.append(" (");
+        sb.append(Globals.lang("search expression"));
+        sb.append(" <b>").
+                append(StringUtil.quoteForHTML(m_searchExpression)).append("</b>)");
+        switch (getHierarchicalContext()) {
+        case AbstractGroup.INCLUDING:
             sb.append(", ").append(Globals.lang("includes subgroups"));
-			break;
-		case AbstractGroup.REFINING:
-        	sb.append(", ").append(Globals.lang("refines supergroup"));
-			break;
-		default:
-			break;
-		}
-		return sb.toString();
-	}
+            break;
+        case AbstractGroup.REFINING:
+            sb.append(", ").append(Globals.lang("refines supergroup"));
+            break;
+        default:
+            break;
+        }
+        return sb.toString();
+    }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }

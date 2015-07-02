@@ -9,6 +9,7 @@ import java.awt.*;
  * @author Dennis Hartrampf, Ines Moosdorf
  */
 public class TestUtils {
+
     /**
      * Get a Component by name.
      *
@@ -26,7 +27,7 @@ public class TestUtils {
             Component[] children = ((Container) parent).getComponents();
 
             for (Component aChildren : children) {
-                Component child = getChildNamed(aChildren, name);
+                Component child = TestUtils.getChildNamed(aChildren, name);
                 if (child != null) {
                     return child;
                 }

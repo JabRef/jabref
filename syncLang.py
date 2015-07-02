@@ -291,7 +291,7 @@ def lookForDuplicates(file, displayKeys):
 ############# Main part ###################
 
 if len(sys.argv) == 1:
-    print """This program must be run from the "src" directory right below the jabref base directory.
+    print """This program must be run from the jabref base directory.
     
 Usage: syncLang.py option   
 Option can be one of the following:

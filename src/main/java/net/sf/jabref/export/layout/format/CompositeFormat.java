@@ -27,30 +27,32 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class CompositeFormat implements LayoutFormatter {
 
-	LayoutFormatter[] formatters;
+    private LayoutFormatter[] formatters;
 
-	/**
-	 * If called with this constructor, this formatter does nothing.
-	 */
-	public CompositeFormat() {
-		// Nothing
-	}
 
-	public CompositeFormat(LayoutFormatter first, LayoutFormatter second) {
-		formatters = new LayoutFormatter[] { first, second };
-	}
+    /**
+     * If called with this constructor, this formatter does nothing.
+     */
+    public CompositeFormat() {
+        // Nothing
+    }
 
-	public CompositeFormat(LayoutFormatter[] formatters) {
-		this.formatters = formatters;
-	}
+    public CompositeFormat(LayoutFormatter first, LayoutFormatter second) {
+        formatters = new LayoutFormatter[] {first, second};
+    }
 
-	public String format(String fieldText) {
-		if (formatters != null) {
+    public CompositeFormat(LayoutFormatter[] formatters) {
+        this.formatters = formatters;
+    }
+
+    @Override
+    public String format(String fieldText) {
+        if (formatters != null) {
             for (LayoutFormatter formatter : formatters) {
                 fieldText = formatter.format(fieldText);
             }
-		}
-		return fieldText;
-	}
+        }
+        return fieldText;
+    }
 
 }

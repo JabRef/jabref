@@ -37,11 +37,13 @@ import net.sf.jabref.OutputPrinter;
  */
 public class MedlineImporter extends ImportFormat {
 
-	private static Logger logger = Logger.getLogger(MedlineImporter.class.toString());
-	
+    private static final Logger logger = Logger.getLogger(MedlineImporter.class.toString());
+
+
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "Medline";
     }
@@ -51,6 +53,7 @@ public class MedlineImporter extends ImportFormat {
      * 
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "medline";
     }
@@ -58,20 +61,22 @@ public class MedlineImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
-        int i=0;
+        int i = 0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-			if (str.toLowerCase().contains("<pubmedarticle>"))
-				return true;
+            if (str.toLowerCase().contains("<pubmedarticle>")) {
+                return true;
+            }
 
             i++;
         }
 
-		return false;
+        return false;
     }
 
     /**
@@ -83,7 +88,7 @@ public class MedlineImporter extends ImportFormat {
      */
     public static List<BibtexEntry> fetchMedline(String id, OutputPrinter status) {
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" +
-            id;
+                id;
         try {
             URL url = new URL(baseUrl);
             URLConnection data = url.openConnection();
@@ -97,6 +102,7 @@ public class MedlineImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         // Obtain a factory object for creating SAX parsers
@@ -131,16 +137,16 @@ public class MedlineImporter extends ImportFormat {
             // When you're done, report the results stored by your handler
             // object
             bibItems = handler.getItems();
-    	}catch (javax.xml.parsers.ParserConfigurationException e1){
-    		logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
-    		status.showMessage(e1.getLocalizedMessage());
-    	}catch (org.xml.sax.SAXException e2){
-    		logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
-    		status.showMessage(e2.getLocalizedMessage());
-    	}catch (java.io.IOException e3){
-    		logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
-    		status.showMessage(e3.getLocalizedMessage());
-    	}
+        } catch (javax.xml.parsers.ParserConfigurationException e1) {
+            MedlineImporter.logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+            status.showMessage(e1.getLocalizedMessage());
+        } catch (org.xml.sax.SAXException e2) {
+            MedlineImporter.logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+            status.showMessage(e2.getLocalizedMessage());
+        } catch (java.io.IOException e3) {
+            MedlineImporter.logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
+            status.showMessage(e3.getLocalizedMessage());
+        }
 
         return bibItems;
     }

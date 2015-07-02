@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -40,16 +40,17 @@ import net.sf.jabref.undo.UndoableFieldChange;
  */
 public class JournalAbbreviations {
 
-    static String TOOLTIPTEXT = "<HTML>"+Globals.lang("Switches between full and abbreviated journal name "
-        +"if the journal name is known.")
-        +"<BR>"+Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>")+".</HTML>";
-    TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
-    HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
-    HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
-    TreeMap<String, String> all = new TreeMap<String, String>();
+    private static final String TOOLTIPTEXT = "<HTML>" + Globals.lang("Switches between full and abbreviated journal name "
+            + "if the journal name is known.")
+            + "<BR>" + Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>") + ".</HTML>";
+    private final TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
+    private final HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
+    private final HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
+    private final TreeMap<String, String> all = new TreeMap<String, String>();
+
 
     public JournalAbbreviations() {
-        
+
     }
 
     public JournalAbbreviations(String resource) {
@@ -64,21 +65,21 @@ public class JournalAbbreviations {
      * Get an iterator for the known journals in alphabetical order.
      * @return Iterator for journal full names
      */
-    public Iterator<String> fullNameIterator() {
+    private Iterator<String> fullNameIterator() {
         return fullNameKeyed.keySet().iterator();
     }
 
-    public boolean isKnownName(String journalName) {
+    private boolean isKnownName(String journalName) {
         String s = journalName.toLowerCase();
         return ((fullNameKeyed.get(s) != null) || (abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
-    public boolean isAbbreviatedName(String journalName) {
+    private boolean isAbbreviatedName(String journalName) {
         String s = journalName.toLowerCase();
         return ((abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
-    public String dotsToNodots(String name) {
+    private String dotsToNodots(String name) {
         return name.replaceAll("\\.", " ").replaceAll("  ", " ").trim();
     }
 
@@ -91,7 +92,7 @@ public class JournalAbbreviations {
      * @return The abbreviated name, or null if it couldn't be found.
      */
     public String getAbbreviatedName(String journalName, boolean withDots) {
-        String s = journalName.toLowerCase();
+        String s = journalName.toLowerCase().trim();
         String abbr;
         if (fullNameKeyed.containsKey(s)) {
             abbr = fullNameKeyed.get(s);
@@ -101,8 +102,9 @@ public class JournalAbbreviations {
         }
         else if (abbrNoDotsToAbbr.containsKey(s)) {
             abbr = abbrNoDotsToAbbr.get(s);
-        } else
+        } else {
             return null;
+        }
 
         if (!withDots) {
             abbr = dotsToNodots(abbr);
@@ -117,21 +119,23 @@ public class JournalAbbreviations {
      * @param journalName The abbreviation to resolve.
      * @return The full name, or null if it couldn't be found.
      */
-    public String getFullName(String journalName) {
+    private String getFullName(String journalName) {
         // Normalize name first:
         String s = getAbbreviatedName(journalName, true);
-	if (s != null) 
-	    s = s.toLowerCase();
-	else
-	    return null;
+        if (s != null) {
+            s = s.toLowerCase();
+        } else {
+            return null;
+        }
         Object o = abbrNameKeyed.get(s);
         if (o == null) {
-            if (fullNameKeyed.containsKey(s))
+            if (fullNameKeyed.containsKey(s)) {
                 o = s;
-            else
+            } else {
                 return null;
+            }
         }
-        s = (String)o;
+        s = (String) o;
         return s;//caseChanger.changeCase(s, CaseChangers.UPPER_EACH_FIRST);
     }
 
@@ -155,14 +159,15 @@ public class JournalAbbreviations {
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
      * @param in
      */
-    public void readJournalList(Reader in) {
+    private void readJournalList(Reader in) {
         BufferedReader reader = new BufferedReader(in);
         try {
             String line;
             while ((line = reader.readLine()) != null) {
                 //System.out.println(line);
-                if (line.startsWith("#"))
+                if (line.startsWith("#")) {
                     continue;
+                }
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
                     String fullName = parts[0].trim();
@@ -176,7 +181,7 @@ public class JournalAbbreviations {
                     String abbrNoDots = dotsToNodots(abbrName);
                     String abbrNoDotsLC = abbrNoDots.toLowerCase();
                     //System.out.println(abbrNoDots);
-                    if ((fullName.length()>0) && (abbrName.length()>0)) {
+                    if ((fullName.length() > 0) && (abbrName.length() > 0)) {
                         //System.out.println("'"+fullName+"' : '"+abbrNoDots+"'");
                         fullNameKeyed.put(fullNameLC, abbrName);
                         abbrNameKeyed.put(abbrNameLC, fullName);
@@ -207,17 +212,20 @@ public class JournalAbbreviations {
      * @return true if the entry was changed, false otherwise.
      */
     public boolean abbreviate(BibtexDatabase database, BibtexEntry entry,
-                              String fieldName, CompoundEdit ce, boolean withDots) {
+            String fieldName, CompoundEdit ce, boolean withDots) {
         String text = entry.getField(fieldName);
-        if (text == null)
+        if (text == null) {
             return false;
+        }
         String origText = text;
-        if (database != null)
+        if (database != null) {
             text = database.resolveForStrings(text);
+        }
         if (isKnownName(text) && !isAbbreviatedName(text)) {
             String newText = getAbbreviatedName(text, withDots);
-            if (newText == null)
+            if (newText == null) {
                 return false;
+            }
             entry.setField(fieldName, newText);
             ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
             return true;
@@ -225,13 +233,15 @@ public class JournalAbbreviations {
             String unabbr = getFullName(text);
             if (unabbr != null) {
                 String newText = getAbbreviatedName(unabbr, withDots);
-                if (newText == null)
+                if (newText == null) {
                     return false;
+                }
                 entry.setField(fieldName, newText);
                 ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
                 return true;
-            } else
+            } else {
                 return false;
+            }
         }
     }
 
@@ -243,24 +253,27 @@ public class JournalAbbreviations {
      * @return true if the entry was changed, false otherwise.
      */
     public boolean unabbreviate(BibtexDatabase database, BibtexEntry entry,
-                                String fieldName, CompoundEdit ce) {
+            String fieldName, CompoundEdit ce) {
         String text = entry.getField(fieldName);
-        if (text == null)
+        if (text == null) {
             return false;
+        }
         String origText = text;
-        if (database != null)
+        if (database != null) {
             text = database.resolveForStrings(text);
+        }
         if (isKnownName(text) && isAbbreviatedName(text)) {
             String newText = getFullName(text);
-            if (newText == null)
+            if (newText == null) {
                 return false;
+            }
             entry.setField(fieldName, newText);
             ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));
             return true;
-        } else
+        } else {
             return false;
+        }
     }
-
 
     public Map<String, String> getJournals() {
         return Collections.unmodifiableMap(all);
@@ -273,11 +286,15 @@ public class JournalAbbreviations {
      * @return The control panel for the entry editor.
      */
     public static JComponent getNameSwitcher(final EntryEditor entryEditor, final FieldEditor editor,
-                                      final UndoManager undoManager) {
+            final UndoManager undoManager) {
         JButton button = new JButton(Globals.lang("Toggle abbreviation"));
-        button.setToolTipText(TOOLTIPTEXT);
+        button.setToolTipText(JournalAbbreviations.TOOLTIPTEXT);
         button.addActionListener(new ActionListener() {
+
             boolean withDots = true;
+
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String text = editor.getText();
                 if (Globals.journalAbbrev.isKnownName(text)) {
@@ -312,21 +329,21 @@ public class JournalAbbreviations {
     public TableModel getTableModel() {
         Object[][] cells = new Object[fullNameKeyed.size()][2];
         int row = 0;
-        for (Iterator<String> i=fullNameIterator(); i.hasNext();) {
+        for (Iterator<String> i = fullNameIterator(); i.hasNext();) {
             String name = i.next();
             cells[row][0] = getFullName(name);
             cells[row][1] = getAbbreviatedName(name, true);
             row++;
         }
-        DefaultTableModel tableModel = new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
-            Globals.lang("Abbreviation")}) {
 
+        return new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
+                Globals.lang("Abbreviation")}) {
+
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
-        return tableModel;
     }
 
 }

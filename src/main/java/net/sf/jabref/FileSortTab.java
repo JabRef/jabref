@@ -15,18 +15,24 @@
  */
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.ArrayList;
 
 /**
  * Preference tab for file sorting options.
@@ -34,27 +40,30 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class FileSortTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
-    private JRadioButton saveInOriginalOrder, saveInTableOrder, saveInSpecifiedOrder;
+    private final JabRefPreferences _prefs;
+    private final JRadioButton saveInOriginalOrder;
+    private final JRadioButton saveInTableOrder;
+    private final JRadioButton saveInSpecifiedOrder;
     private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
     private JTextField savePriField, saveSecField, saveTerField;
-    private JComboBox<String> savePriSort, saveSecSort, saveTerSort;
+    private JComboBox savePriSort, saveSecSort, saveTerSort;
 
-    private JRadioButton exportInOriginalOrder, exportInTableOrder, exportInSpecifiedOrder;
+    private final JRadioButton exportInOriginalOrder;
+    private final JRadioButton exportInTableOrder;
+    private final JRadioButton exportInSpecifiedOrder;
     private JCheckBox exportPriDesc, exportSecDesc, exportTerDesc;
     private JTextField exportPriField, exportSecField, exportTerField;
-    private JComboBox<String> exportPriSort, exportSecSort, exportTerSort;
+    private JComboBox exportPriSort, exportSecSort, exportTerSort;
+
 
     public FileSortTab(JabRefFrame frame, JabRefPreferences prefs) {
         this._prefs = prefs;
-        this._frame = frame;
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.leadingColumnOffset(1);
 
         { // SAVE SORT ORDER
-            // create Components
+          // create Components
             saveInOriginalOrder = new JRadioButton(Globals.lang("Save entries in their original order"));
             saveInTableOrder = new JRadioButton(Globals.lang("Save in current table sort order"));
             saveInSpecifiedOrder = new JRadioButton(Globals.lang("Save entries ordered as specified"));
@@ -65,6 +74,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
             bg.add(saveInSpecifiedOrder);
 
             ActionListener listener = new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean selected = e.getSource() == saveInSpecifiedOrder;
                     savePriSort.setEnabled(selected);
@@ -86,9 +97,9 @@ public class FileSortTab extends JPanel implements PrefsTab {
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
             String[] allPlusKey = v.toArray(new String[v.size()]);
-            savePriSort = new JComboBox<String>(allPlusKey);
-            saveSecSort = new JComboBox<String>(allPlusKey);
-            saveTerSort = new JComboBox<String>(allPlusKey);
+            savePriSort = new JComboBox(allPlusKey);
+            saveSecSort = new JComboBox(allPlusKey);
+            saveTerSort = new JComboBox(allPlusKey);
 
             savePriField = new JTextField(10);
             saveSecField = new JTextField(10);
@@ -99,6 +110,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
             saveTerSort.insertItemAt(Globals.lang("<select>"), 0);
 
             savePriSort.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (savePriSort.getSelectedIndex() > 0) {
                         savePriField.setText(savePriSort.getSelectedItem().toString());
@@ -107,6 +120,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
                 }
             });
             saveSecSort.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (saveSecSort.getSelectedIndex() > 0) {
                         saveSecField.setText(saveSecSort.getSelectedItem().toString());
@@ -115,6 +130,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
                 }
             });
             saveTerSort.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (saveTerSort.getSelectedIndex() > 0) {
                         saveTerField.setText(saveTerSort.getSelectedItem().toString());
@@ -166,7 +183,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
         }
 
         { // EXPORT SORT ORDER
-            // create Components
+          // create Components
             exportInOriginalOrder = new JRadioButton(Globals.lang("Export entries in their original order"));
             exportInTableOrder = new JRadioButton(Globals.lang("Export in current table sort order"));
             exportInSpecifiedOrder = new JRadioButton(Globals.lang("Export entries ordered as specified"));
@@ -175,8 +192,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
             bg.add(exportInOriginalOrder);
             bg.add(exportInTableOrder);
             bg.add(exportInSpecifiedOrder);
-            
+
             ActionListener listener = new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean selected = e.getSource() == exportInSpecifiedOrder;
                     exportPriSort.setEnabled(selected);
@@ -198,9 +217,9 @@ public class FileSortTab extends JPanel implements PrefsTab {
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
             String[] allPlusKey = v.toArray(new String[v.size()]);
-            exportPriSort = new JComboBox<String>(allPlusKey);
-            exportSecSort = new JComboBox<String>(allPlusKey);
-            exportTerSort = new JComboBox<String>(allPlusKey);
+            exportPriSort = new JComboBox(allPlusKey);
+            exportSecSort = new JComboBox(allPlusKey);
+            exportTerSort = new JComboBox(allPlusKey);
 
             exportPriField = new JTextField(10);
             exportSecField = new JTextField(10);
@@ -211,6 +230,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
             exportTerSort.insertItemAt(Globals.lang("<select>"), 0);
 
             exportPriSort.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (exportPriSort.getSelectedIndex() > 0) {
                         exportPriField.setText(exportPriSort.getSelectedItem().toString());
@@ -219,6 +240,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
                 }
             });
             exportSecSort.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (exportSecSort.getSelectedIndex() > 0) {
                         exportSecField.setText(exportSecSort.getSelectedItem().toString());
@@ -227,6 +250,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
                 }
             });
             exportTerSort.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (exportTerSort.getSelectedIndex() > 0) {
                         exportTerField.setText(exportTerSort.getSelectedItem().toString());
@@ -239,7 +264,6 @@ public class FileSortTab extends JPanel implements PrefsTab {
             exportSecDesc = new JCheckBox(Globals.lang("Descending"));
             exportTerDesc = new JCheckBox(Globals.lang("Descending"));
 
-
             // create GUI
             JLabel lab;
 
@@ -250,7 +274,6 @@ public class FileSortTab extends JPanel implements PrefsTab {
             builder.nextLine();
             builder.append(exportInSpecifiedOrder, 1);
             builder.nextLine();
-            
 
             // Create a new panel with its own FormLayout for these items:
             FormLayout layout2 = new FormLayout(
@@ -285,6 +308,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         if (_prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER)) {
             saveInOriginalOrder.setSelected(true);
@@ -353,6 +377,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
         exportTerDesc.setSelected(_prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING));
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, saveInOriginalOrder.isSelected());
         _prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, saveInSpecifiedOrder.isSelected());
@@ -378,10 +403,12 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("File Sorting");
     }

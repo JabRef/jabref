@@ -37,65 +37,76 @@ public class InspecImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "INSPEC";
     }
 
-  /*
-   *  (non-Javadoc)
-   * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-   */
-  public String getCLIId() {
-    return "inspec";
-  }
-
-  /**
-   * Check whether the source is in the correct format for this importer.
-   */
-  public boolean isRecognizedFormat(InputStream stream)
-    throws IOException {
-    // Our strategy is to look for the "PY <year>" line.
-    BufferedReader in =
-      new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-    //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
-    Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
-
-    //was PY \\\\d{4}? before
-    String str;
-
-    while ((str = in.readLine()) != null) {
-      //Inspec and IEEE seem to have these strange " - " between key and value
-      //str = str.replace(" - ", "");
-      //System.out.println(str);
-
-      if (pat1.matcher(str).find())
-        return true;
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    @Override
+    public String getCLIId() {
+        return "inspec";
     }
 
-    return false;
-  }
+    /**
+     * Check whether the source is in the correct format for this importer.
+     */
+    @Override
+    public boolean isRecognizedFormat(InputStream stream)
+            throws IOException {
+        // Our strategy is to look for the "PY <year>" line.
+        BufferedReader in =
+                new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
+        Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
+
+        //was PY \\\\d{4}? before
+        String str;
+
+        while ((str = in.readLine()) != null) {
+            //Inspec and IEEE seem to have these strange " - " between key and value
+            //str = str.replace(" - ", "");
+            //System.out.println(str);
+
+            if (pat1.matcher(str).find()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
-        while ((str = in.readLine()) != null){
-            if (str.length() < 2) continue;
-            if (str.indexOf("Record") == 0) sb.append("__::__").append(str);
-            else
-            sb.append("__NEWFIELD__").append(str);
+        while ((str = in.readLine()) != null) {
+            if (str.length() < 2) {
+                continue;
+            }
+            if (str.indexOf("Record") == 0) {
+                sb.append("__::__").append(str);
+            } else {
+                sb.append("__NEWFIELD__").append(str);
+            }
         }
         in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
         HashMap<String, String> h = new HashMap<String, String>();
         for (String entry : entries) {
-            if (entry.indexOf("Record") != 0) continue;
+            if (entry.indexOf("Record") != 0) {
+                continue;
+            }
             h.clear();
 
             String[] fields = entry.split("__NEWFIELD__");
@@ -103,15 +114,20 @@ public class InspecImporter extends ImportFormat {
                 //System.out.println(fields[j]);
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
-                if (f3.equals("TI")) h.put("title", frest);
-                else if (f3.equals("PY")) h.put("year", frest);
-                else if (f3.equals("AU")) h.put("author",
-                        AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
-                                ";", " and "))
-                );
-                else if (f3.equals("AB")) h.put("abstract", frest);
-                else if (f3.equals("ID")) h.put("keywords", frest);
-                else if (f3.equals("SO")) {
+                if (f3.equals("TI")) {
+                    h.put("title", frest);
+                } else if (f3.equals("PY")) {
+                    h.put("year", frest);
+                } else if (f3.equals("AU")) {
+                    h.put("author",
+                            AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
+                                    ";", " and "))
+                            );
+                } else if (f3.equals("AB")) {
+                    h.put("abstract", frest);
+                } else if (f3.equals("ID")) {
+                    h.put("keywords", frest);
+                } else if (f3.equals("SO")) {
                     int m = frest.indexOf(".");
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
@@ -133,10 +149,14 @@ public class InspecImporter extends ImportFormat {
 
                 } else if (f3.equals("RT")) {
                     frest = frest.trim();
-                    if (frest.equals("Journal-Paper")) Type = "article";
-                    else if (frest.equals("Conference-Paper")
-                            || frest.equals("Conference-Paper; Journal-Paper")) Type = "inproceedings";
-                    else Type = frest.replaceAll(" ", "");
+                    if (frest.equals("Journal-Paper")) {
+                        Type = "article";
+                    } else if (frest.equals("Conference-Paper")
+                            || frest.equals("Conference-Paper; Journal-Paper")) {
+                        Type = "inproceedings";
+                    } else {
+                        Type = frest.replaceAll(" ", "");
+                    }
                 }
             }
             BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals

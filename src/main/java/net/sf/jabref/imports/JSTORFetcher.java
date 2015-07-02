@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
@@ -53,56 +52,59 @@ public class JSTORFetcher implements EntryFetcher {
     /**
      * cookies can't save more than 200 citations
      */
-    protected static int MAX_CITATIONS = 200;
+    private static final int MAX_CITATIONS = 200;
 
     /**
      * Cookie key for Jstor ticket (authentication)
      */
-    protected static final String COOKIE_TICKET = "Jstor_Ticket";
+    private static final String COOKIE_TICKET = "Jstor_Ticket";
 
     /**
      * location where the ticket is obtained
      * 
      */
-    protected static final String URL_TICKET = "http://www.jstor.org/search";
+    private static final String URL_TICKET = "http://www.jstor.org/search";
 
     /**
      * Cookie key for citations to be fetched
      * 
      */
-    protected static final String COOKIE_CITATIONS = "Jstor_citations0";
+    private static final String COOKIE_CITATIONS = "Jstor_citations0";
 
     /**
      * location where to obtain the citations cookie
      * 
      */
-    protected static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
+    private static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
 
+
+    @Override
     public String getHelpPage() {
         return "JSTOR.html";
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
+    @Override
     public String getKeyName() {
         return "JSTOR";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // No Options panel
         return null;
     }
 
+    @Override
     public String getTitle() {
         return "JSTOR";
     }
-    
+
+    @Override
     public void stopFetching() {
         // cannot be interrupted
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
 
         try {
@@ -114,15 +116,15 @@ public class JSTORFetcher implements EntryFetcher {
 
             // Last retrieve the Bibtex-entries of the citations found
             Collection<BibtexEntry> entries = getBibtexEntries(ticket, citations);
-            
-            if (entries.size() == 0){
+
+            if (entries.size() == 0) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         query),
                         Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
-            
-            for (BibtexEntry entry : entries){
+
+            for (BibtexEntry entry : entries) {
                 dialog.addEntry(entry);
             }
             return true;
@@ -144,16 +146,16 @@ public class JSTORFetcher implements EntryFetcher {
      * @throws IOException
      *             Most probably related to a problem connecting to JStor.
      */
-    protected Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
-        throws IOException {
+    private Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
+            throws IOException {
         try {
-            URL url = new URL(URL_BIBTEX);
+            URL url = new URL(JSTORFetcher.URL_BIBTEX);
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("Cookie", ticket + "; " + citations);
             conn.connect();
 
             BibtexParser parser = new BibtexParser(new BufferedReader(new InputStreamReader(conn
-                .getInputStream())));
+                    .getInputStream())));
             return parser.parse().getDatabase().getEntries();
         } catch (MalformedURLException e) {
             // Propagate...
@@ -166,10 +168,10 @@ public class JSTORFetcher implements EntryFetcher {
      * @return a Jstor ticket ID
      * @throws IOException
      */
-    protected String openTicket() throws IOException {
-        URL url = new URL(URL_TICKET);
+    private String openTicket() throws IOException {
+        URL url = new URL(JSTORFetcher.URL_TICKET);
         URLConnection conn = url.openConnection();
-        return getCookie(COOKIE_TICKET, conn);
+        return JSTORFetcher.getCookie(JSTORFetcher.COOKIE_TICKET, conn);
     }
 
     /**
@@ -183,12 +185,12 @@ public class JSTORFetcher implements EntryFetcher {
      *         search is empty or ticket is invalid
      * @throws IOException
      */
-    protected String getCitations(String ticket, String query) throws IOException {
+    private String getCitations(String ticket, String query) throws IOException {
         String urlQuery;
         try {
-            urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + MAX_CITATIONS +
-                "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query=" + URLEncoder.encode(query, "UTF-8") +
-                "&wc=on&citationAction=saveAll";
+            urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS +
+                    "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query=" + URLEncoder.encode(query, "UTF-8") +
+                    "&wc=on&citationAction=saveAll";
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -196,7 +198,7 @@ public class JSTORFetcher implements EntryFetcher {
         URL url = new URL(urlQuery);
         URLConnection conn = url.openConnection();
         conn.setRequestProperty("Cookie", ticket);
-        return getCookie(COOKIE_CITATIONS, conn);
+        return JSTORFetcher.getCookie(JSTORFetcher.COOKIE_CITATIONS, conn);
     }
 
     /**
@@ -209,17 +211,17 @@ public class JSTORFetcher implements EntryFetcher {
      * @return cookie value referenced by the key. null if key not found
      * @throws IOException
      */
-    public static String getCookie(String name, URLConnection conn) {
+    private static String getCookie(String name, URLConnection conn) {
 
         for (int i = 0;; i++) {
             String headerName = conn.getHeaderFieldKey(i);
             String headerValue = conn.getHeaderField(i);
 
-            if (headerName == null && headerValue == null) {
+            if ((headerName == null) && (headerValue == null)) {
                 // No more headers
                 break;
             }
-            if (headerName != null && headerName.equals("Set-Cookie")) {
+            if ((headerName != null) && headerName.equals("Set-Cookie")) {
                 if (headerValue.startsWith(name)) {
                     // several key-value-pairs are separated by ';'
                     StringTokenizer st = new StringTokenizer(headerValue, "; ");

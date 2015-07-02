@@ -38,71 +38,73 @@ import com.jgoodies.forms.layout.FormLayout;
  * The Preferences panel for key generation.
  */
 public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
-	
-	private JabRefPreferences _prefs;
-	
-    private JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys")),
-        warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys")),
-        generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)")),
-        autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
 
-    private JRadioButton
-    letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)")),
-    letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)")),
-    alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
+    private final JabRefPreferences _prefs;
 
-    private JTextField KeyPatternRegex = new JTextField(20);
-    private JTextField KeyPatternReplacement = new JTextField(20);
+    private final JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys"));
+    private final JCheckBox warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys"));
+    private final JCheckBox generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)"));
+    private final JCheckBox autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
 
-	public TabLabelPattern(JabRefPreferences prefs, HelpDialog helpDiag) {
-	    super(helpDiag);
-		_prefs = prefs;
-		appendKeyGeneratorSettings();
-	}
+    private final JRadioButton
+            letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)"));
+    private final JRadioButton letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)"));
+    private final JRadioButton alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
 
-	/**
-	 * Store changes to table preferences. This method is called when
-	 * the user clicks Ok.
-	 *
-	 */
-	public void storeSettings() {
+    private final JTextField KeyPatternRegex = new JTextField(20);
+    private final JTextField KeyPatternReplacement = new JTextField(20);
 
-         // Set the default value:
-         Globals.prefs.put("defaultLabelPattern", defaultPat.getText());
 
-         Globals.prefs.putBoolean("warnBeforeOverwritingKey", warnBeforeOverwriting.isSelected());
-         Globals.prefs.putBoolean("avoidOverwritingKey", dontOverwrite.isSelected());
+    public TabLabelPattern(JabRefPreferences prefs, HelpDialog helpDiag) {
+        super(helpDiag);
+        _prefs = prefs;
+        appendKeyGeneratorSettings();
+    }
 
-         //Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
-         //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
-         Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
-         Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
-         Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerateOnImport.isSelected());
-         Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
+    /**
+     * Store changes to table preferences. This method is called when
+     * the user clicks Ok.
+     *
+     */
+    @Override
+    public void storeSettings() {
 
-         if (alwaysAddLetter.isSelected())
-             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", true);
-         else if (letterStartA.isSelected()) {
-             Globals.prefs.putBoolean("keyGenFirstLetterA", true);
-             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
-         }
-         else {
+        // Set the default value:
+        Globals.prefs.put("defaultLabelPattern", defaultPat.getText());
+
+        Globals.prefs.putBoolean("warnBeforeOverwritingKey", warnBeforeOverwriting.isSelected());
+        Globals.prefs.putBoolean("avoidOverwritingKey", dontOverwrite.isSelected());
+
+        //Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
+        //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
+        Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
+        Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
+        Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerateOnImport.isSelected());
+        Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
+
+        if (alwaysAddLetter.isSelected()) {
+            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", true);
+        } else if (letterStartA.isSelected()) {
+            Globals.prefs.putBoolean("keyGenFirstLetterA", true);
+            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+        }
+        else {
             Globals.prefs.putBoolean("keyGenFirstLetterA", false);
             Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
-         }
-        
-         LabelPatternUtil.updateDefaultPattern();
+        }
+
+        LabelPatternUtil.updateDefaultPattern();
 
         // fetch the old parent from the currently stored patterns
-	    LabelPattern defKeyPattern = _prefs.getKeyPattern().getParent();
-	    // fetch entries from GUI
-	    LabelPattern keypatterns = getLabelPattern();
-	    // restore old parent
-	    keypatterns.setParent(defKeyPattern);
-	    // store new patterns globally
-	    _prefs.putKeyPattern(keypatterns);
-	}
-	
+        LabelPattern defKeyPattern = _prefs.getKeyPattern().getParent();
+        // fetch entries from GUI
+        LabelPattern keypatterns = getLabelPattern();
+        // restore old parent
+        keypatterns.setParent(defKeyPattern);
+        // store new patterns globally
+        _prefs.putKeyPattern(keypatterns);
+    }
+
     private void appendKeyGeneratorSettings() {
         ButtonGroup bg = new ButtonGroup();
         bg.add(letterStartA);
@@ -111,9 +113,9 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
 
         // Build a panel for checkbox settings:
         FormLayout layout = new FormLayout
-	        ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");//, 8dlu, 20dlu, 8dlu, fill:pref", "");
+                ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");//, 8dlu, 20dlu, 8dlu, fill:pref", "");
         JPanel pan = new JPanel();
-	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.appendSeparator(Globals.lang("Key generator settings"));
 
         builder.nextLine();
@@ -130,20 +132,20 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         builder.append(alwaysAddLetter);
         builder.nextLine();
         builder.append(pan);
-        builder.append(generateOnSave);        
+        builder.append(generateOnSave);
         builder.nextLine();
         builder.append(pan);
-        builder.append(Globals.lang("Replace (regular expression)")+":");
-        builder.append(Globals.lang("by")+":");
+        builder.append(Globals.lang("Replace (regular expression)") + ':');
+        builder.append(Globals.lang("by") + ':');
 
         builder.nextLine();
         builder.append(pan);
         builder.append(KeyPatternRegex);
         builder.append(KeyPatternReplacement);
 
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         con.gridx = 1;
-	    con.gridy = 3;
+        con.gridy = 3;
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 1;
         con.fill = GridBagConstraints.BOTH;
@@ -151,17 +153,21 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         add(builder.getPanel());
 
         dontOverwrite.addChangeListener(new ChangeListener() {
+
+            @Override
             public void stateChanged(ChangeEvent event) {
                 // Warning before overwriting is only relevant if overwriting can happen:
                 warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
             }
         });
-	}
-	
+    }
+
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public void setValues() {
         super.setValues(_prefs.getKeyPattern());
         defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
@@ -170,14 +176,14 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         autoGenerateOnImport.setSelected(Globals.prefs.getBoolean("generateKeysAfterInspection"));
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
 
-        boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"),
-                firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
-        if (alwaysAddLetter)
+        boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"), firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
+        if (alwaysAddLetter) {
             this.alwaysAddLetter.setSelected(true);
-        else if (firstLetterA)
+        } else if (firstLetterA) {
             this.letterStartA.setSelected(true);
-        else
+        } else {
             this.letterStartB.setSelected(true);
+        }
 
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
@@ -185,11 +191,12 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         KeyPatternRegex.setText(Globals.prefs.get("KeyPatternRegex"));
         KeyPatternReplacement.setText(Globals.prefs.get("KeyPatternReplacement"));
 
-	    //basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
-	    //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
+        //basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
+        //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
     }
 
-	public String getTabName() {
-	    return Globals.lang("BibTeX key generator");
-	}
+    @Override
+    public String getTabName() {
+        return Globals.lang("BibTeX key generator");
+    }
 }

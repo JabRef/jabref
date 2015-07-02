@@ -15,58 +15,76 @@
 */
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class ContentSelectorDialog2 extends JDialog {
+class ContentSelectorDialog2 extends JDialog {
 
-    ActionListener wordEditFieldListener = null;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JPanel fieldPan = new JPanel(),
-	wordPan = new JPanel(),
-	buttonPan = new JPanel(),
-	fieldNamePan = new JPanel(),
-	wordEditPan = new JPanel();
+    private ActionListener wordEditFieldListener = null;
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
+    private final JPanel fieldPan = new JPanel();
+    private final JPanel wordPan = new JPanel();
+    private final JPanel buttonPan = new JPanel();
+    private final JPanel fieldNamePan = new JPanel();
+    private final JPanel wordEditPan = new JPanel();
 
     final String
-	WORD_EMPTY_TEXT = Globals.lang("<no field>"),
-	WORD_FIRSTLINE_TEXT = Globals.lang("<select word>"),
-	FIELD_FIRST_LINE = Globals.lang("<field name>");
-    MetaData metaData;
-    String currentField = null;
-    TreeSet<String> fieldSet, wordSet;
-    JabRefFrame frame;
-    BasePanel panel;
-    JButton help = new JButton(Globals.lang("Help")),
-	newField = new JButton(Globals.lang("New")),
-	removeField = new JButton(Globals.lang("Remove")),
-	newWord = new JButton(Globals.lang("New")),
-	removeWord = new JButton(Globals.lang("Remove")),
-	ok = new JButton(Globals.lang("Ok")),
-	cancel = new JButton(),
-	apply = new JButton(Globals.lang("Apply"));
-    DefaultListModel<String> fieldListModel = new DefaultListModel<String>(),
-	wordListModel = new DefaultListModel<String>();
-    JList<String> fieldList = new JList<String>(fieldListModel),
-	wordList = new JList<String>(wordListModel);
-    JTextField fieldNameField = new JTextField("", 20),
-	wordEditField = new JTextField("", 20);
-    JScrollPane fPane = new JScrollPane(fieldList),
-	wPane = new JScrollPane(wordList);
+            WORD_EMPTY_TEXT = Globals.lang("<no field>");
+    private final String WORD_FIRSTLINE_TEXT = Globals.lang("<select word>");
+    private final String FIELD_FIRST_LINE = Globals.lang("<field name>");
+    private final MetaData metaData;
+    private String currentField = null;
+    TreeSet<String> fieldSet;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final JButton help = new JButton(Globals.lang("Help"));
+    private final JButton newField = new JButton(Globals.lang("New"));
+    private final JButton removeField = new JButton(Globals.lang("Remove"));
+    private final JButton newWord = new JButton(Globals.lang("New"));
+    private final JButton removeWord = new JButton(Globals.lang("Remove"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton();
+    private final JButton apply = new JButton(Globals.lang("Apply"));
+    private final DefaultListModel fieldListModel = new DefaultListModel();
+    private DefaultListModel wordListModel = new DefaultListModel();
+    private final JList fieldList = new JList(fieldListModel);
+    private final JList wordList = new JList(wordListModel);
+    private final JTextField fieldNameField = new JTextField("", 20);
+    private final JTextField wordEditField = new JTextField("", 20);
+    private final JScrollPane fPane = new JScrollPane(fieldList);
+    private final JScrollPane wPane = new JScrollPane(wordList);
 
-    HashMap<String, DefaultListModel<String>> wordListModels = new HashMap<String, DefaultListModel<String>>();
-    ArrayList<String> removedFields = new ArrayList<String>();
+    private final HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
+    private final ArrayList<String> removedFields = new ArrayList<String>();
+
 
     /**
      * 
@@ -78,7 +96,7 @@ public class ContentSelectorDialog2 extends JDialog {
      * @param fieldName the field this selector is initialized for. May be null.
      */
     public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
-              String fieldName) {
+            String fieldName) {
         super(owner, Globals.lang("Setup selectors"));
         this.setModal(modal);
         this.metaData = metaData;
@@ -91,222 +109,265 @@ public class ContentSelectorDialog2 extends JDialog {
         //help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
         initLayout();
         //  wordSelector.addItem(WORD_EMPTY_TEXT);
-    
+
         setupFieldSelector();
         setupWordSelector();
         setupActions();
         Util.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
         int fieldInd = fieldListModel.indexOf(currentField);
-        if (fieldInd >= 0)
+        if (fieldInd >= 0) {
             fieldList.setSelectedIndex(fieldInd);
-    
+        }
+
         pack();
     }
 
-
     private void setupActions() {
 
-	wordList.addListSelectionListener(new ListSelectionListener() {
-		public void valueChanged(ListSelectionEvent e) {
-		    wordEditField.setText(wordList.getSelectedValue());
-		    wordEditField.selectAll();
-		    new FocusRequester(wordEditField);
-		}
-	    });
+        wordList.addListSelectionListener(new ListSelectionListener() {
 
-	newWord.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    newWordAction();
-		}
-	    });
-                
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                wordEditField.setText((String) wordList.getSelectedValue());
+                wordEditField.selectAll();
+                new FocusRequester(wordEditField);
+            }
+        });
+
+        newWord.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newWordAction();
+            }
+        });
+
         wordEditFieldListener = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
-                String old = wordList.getSelectedValue(),
-            	newVal = wordEditField.getText();
+                String old = (String) wordList.getSelectedValue(),
+                newVal = wordEditField.getText();
                 if (newVal.equals("") || newVal.equals(old)) {
                     return; // Empty string or no change.
                 }
                 if (wordListModel.contains(newVal)) {
-                	// ensure that word already in list is visible
-                	index = wordListModel.indexOf(newVal);
-                	wordList.ensureIndexIsVisible(index);
-                	return;
+                    // ensure that word already in list is visible
+                    index = wordListModel.indexOf(newVal);
+                    wordList.ensureIndexIsVisible(index);
+                    return;
                 }
 
                 int newIndex = findPos(wordListModel, newVal);
                 if (index >= 0) {
-                	// initiate replacement of selected word
+                    // initiate replacement of selected word
                     wordListModel.remove(index);
                     if (newIndex > index) {
-                    	// newIndex has to be adjusted after removal of previous entry
-                    	newIndex--;
+                        // newIndex has to be adjusted after removal of previous entry
+                        newIndex--;
                     }
                 }
                 wordListModel.add(newIndex, newVal);
                 wordList.ensureIndexIsVisible(newIndex);
                 wordEditField.selectAll();
             }
-	};
+        };
         wordEditField.addActionListener(wordEditFieldListener);
-        
-	removeWord.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    int index = wordList.getSelectedIndex();
-		    if (index == -1)
-			return;
-		    wordListModel.remove(index);
-		    wordEditField.setText("");
-		    if (wordListModel.size() > 0)
-			wordList.setSelectedIndex(Math.min(index, wordListModel.size()-1));
-		}
-	    });
 
+        removeWord.addActionListener(new ActionListener() {
 
-	fieldList.addListSelectionListener(new ListSelectionListener() {
-		public void valueChanged(ListSelectionEvent e) {
-		    currentField = fieldList.getSelectedValue();
-		    fieldNameField.setText("");
-		    setupWordSelector();
-		}
-	    });
-
-	newField.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {
-				// only add <field name> once
-				fieldListModel.add(0, FIELD_FIRST_LINE);
-			}
-		    fieldList.setSelectedIndex(0);
-		    fPane.getVerticalScrollBar().setValue(0);
-		    fieldNameField.setEnabled(true);
-		    fieldNameField.setText(currentField);
-		    fieldNameField.selectAll();
-
-		    new FocusRequester(fieldNameField);
-		}
-	    });
-
-	fieldNameField.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    fieldNameField.transferFocus();
-		}
-	    });
-
-	fieldNameField.addFocusListener(new FocusAdapter() {
-		
-		/**
-		 * Adds the text value to the list
-		 */
-		public void focusLost(FocusEvent e) {
-		    String s = fieldNameField.getText();
-		    fieldNameField.setText("");
-		    fieldNameField.setEnabled(false);
-		    if (!FIELD_FIRST_LINE.equals(s) && !"".equals(s)) {
-		    	// user has typed something
-		    	
-			    // remove "<first name>" from list
-				fieldListModel.remove(0);
-				
-				int pos;
-				if (fieldListModel.contains(s)) {
-					// field already exists, scroll to that field (below)
-					pos = fieldListModel.indexOf(s);
-				} else {
-					// Add new field.
-					pos = findPos(fieldListModel, s);
-					fieldListModel.add(Math.max(0, pos), s);
-				}
-				fieldList.setSelectedIndex(pos);
-				fieldList.ensureIndexIsVisible(pos);
-				currentField = s;
-				setupWordSelector();
-				newWordAction();
-				//new FocusRequester(wordEditField);
-		    }
-		}
-	    });
-
-	removeField.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    int index = fieldList.getSelectedIndex();
-		    if (index == -1)
-			return;
-		    String fieldName = fieldListModel.get(index);
-		    removedFields.add(fieldName);
-		    fieldListModel.remove(index);
-		    wordListModels.remove(fieldName);
-		    fieldNameField.setText("");
-		    if (fieldListModel.size() > 0)
-			fieldList.setSelectedIndex(Math.min(index, wordListModel.size()-1));
-		}
-	    });
-
-	help.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
-		}
-	    });
-
-	ok.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    applyChanges();
-		    dispose();
-		}
-	    });
-
-	apply.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-            // Store if an entry is currently being edited:
-            if (!wordEditField.getText().equals("")) {
-                wordEditFieldListener.actionPerformed(null);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index = wordList.getSelectedIndex();
+                if (index == -1) {
+                    return;
+                }
+                wordListModel.remove(index);
+                wordEditField.setText("");
+                if (wordListModel.size() > 0) {
+                    wordList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
+                }
             }
-		    applyChanges();
-		}
-	    });
-	
-	@SuppressWarnings("serial")
-    Action cancelAction = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    dispose();
-		}
-	};
-	cancelAction.putValue(Action.NAME, Globals.lang("Cancel"));
-	cancel.setAction(cancelAction);
+        });
+
+        fieldList.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                currentField = (String) fieldList.getSelectedValue();
+                fieldNameField.setText("");
+                setupWordSelector();
+            }
+        });
+
+        newField.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {
+                    // only add <field name> once
+                    fieldListModel.add(0, FIELD_FIRST_LINE);
+                }
+                fieldList.setSelectedIndex(0);
+                fPane.getVerticalScrollBar().setValue(0);
+                fieldNameField.setEnabled(true);
+                fieldNameField.setText(currentField);
+                fieldNameField.selectAll();
+
+                new FocusRequester(fieldNameField);
+            }
+        });
+
+        fieldNameField.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fieldNameField.transferFocus();
+            }
+        });
+
+        fieldNameField.addFocusListener(new FocusAdapter() {
+
+            /**
+             * Adds the text value to the list
+             */
+            @Override
+            public void focusLost(FocusEvent e) {
+                String s = fieldNameField.getText();
+                fieldNameField.setText("");
+                fieldNameField.setEnabled(false);
+                if (!FIELD_FIRST_LINE.equals(s) && !"".equals(s)) {
+                    // user has typed something
+
+                    // remove "<first name>" from list
+                    fieldListModel.remove(0);
+
+                    int pos;
+                    if (fieldListModel.contains(s)) {
+                        // field already exists, scroll to that field (below)
+                        pos = fieldListModel.indexOf(s);
+                    } else {
+                        // Add new field.
+                        pos = findPos(fieldListModel, s);
+                        fieldListModel.add(Math.max(0, pos), s);
+                    }
+                    fieldList.setSelectedIndex(pos);
+                    fieldList.ensureIndexIsVisible(pos);
+                    currentField = s;
+                    setupWordSelector();
+                    newWordAction();
+                    //new FocusRequester(wordEditField);
+                }
+            }
+        });
+
+        removeField.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index = fieldList.getSelectedIndex();
+                if (index == -1) {
+                    return;
+                }
+                String fieldName = (String) fieldListModel.get(index);
+                removedFields.add(fieldName);
+                fieldListModel.remove(index);
+                wordListModels.remove(fieldName);
+                fieldNameField.setText("");
+                if (fieldListModel.size() > 0) {
+                    fieldList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
+                }
+            }
+        });
+
+        help.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
+            }
+        });
+
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    applyChanges();
+                    dispose();
+                }
+                catch (Exception ex) {
+                    Globals.logger("Could not apply changes in \"Setup selectors\"");
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
+                }
+            }
+        });
+
+        apply.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Store if an entry is currently being edited:
+                if (!wordEditField.getText().equals("")) {
+                    wordEditFieldListener.actionPerformed(null);
+                }
+                try {
+                    applyChanges();
+                }
+                catch (Exception ex) {
+                    Globals.logger("Could not apply changes in \"Setup selectors\"");
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
+                }
+            }
+        });
+
+        @SuppressWarnings("serial")
+        Action cancelAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        };
+        cancelAction.putValue(Action.NAME, Globals.lang("Cancel"));
+        cancel.setAction(cancelAction);
     }
 
     private void newWordAction() {
-	if ((wordListModel.size() == 0) || 
-	    !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT))
-	    wordListModel.add(0, WORD_FIRSTLINE_TEXT);
-	wordList.setSelectedIndex(0);
-	wPane.getVerticalScrollBar().setValue(0);
+        if ((wordListModel.size() == 0) ||
+                !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT)) {
+            wordListModel.add(0, WORD_FIRSTLINE_TEXT);
+        }
+        wordList.setSelectedIndex(0);
+        wPane.getVerticalScrollBar().setValue(0);
     }
 
-
     private void applyChanges() {
-	boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
+        boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
 
-	// First remove the mappings for fields that have been deleted.
-	// If these were re-added, they will be added below, so it doesn't
-	// cause any harm to remove them here.
+        // First remove the mappings for fields that have been deleted.
+        // If these were re-added, they will be added below, so it doesn't
+        // cause any harm to remove them here.
         for (String fieldName : removedFields) {
             metaData.remove(Globals.SELECTOR_META_PREFIX + fieldName);
             changedFieldSet = true;
         }
 
-	// Cycle through all fields that we have created listmodels for:
+        // Cycle through all fields that we have created listmodels for:
         for (String fieldName : wordListModels.keySet()) {
             // For each field name, store the values:
-            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
+            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName)) {
                 continue;
-            DefaultListModel<String> lm = wordListModels.get(fieldName);
+            }
+            DefaultListModel lm = wordListModels.get(fieldName);
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
-            if (lm.size() > 0)
-                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+            if (lm.size() > 0) {
+                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT)) {
                     start++;
+                }
+            }
             Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
             boolean newField = false;
             if (data == null) {
@@ -314,27 +375,29 @@ public class ContentSelectorDialog2 extends JDialog {
                 data = new Vector<String>();
                 changedFieldSet = true;
 
-            } else
+            } else {
                 data.clear();
+            }
             for (int wrd = start; wrd < lm.size(); wrd++) {
-                String word = lm.get(wrd);
+                String word = (String) lm.get(wrd);
                 data.add(word);
             }
-            if (newField)
+            if (newField) {
                 metaData.putData(Globals.SELECTOR_META_PREFIX + fieldName, data);
+            }
         }
 
-	// System.out.println("TODO: remove metadata for removed selector field.");
-	panel.markNonUndoableBaseChanged();
+        // System.out.println("TODO: remove metadata for removed selector field.");
+        panel.markNonUndoableBaseChanged();
 
-	// Update all selectors in the current BasePanel.
-	if (changedFieldSet) {
-	    panel.rebuildAllEntryEditors();
-    } else {
-	    panel.updateAllContentSelectors();
-	}
-    panel.addContentSelectorValuesToAutoCompleters();
-        
+        // Update all selectors in the current BasePanel.
+        if (changedFieldSet) {
+            panel.rebuildAllEntryEditors();
+        } else {
+            panel.updateAllContentSelectors();
+        }
+        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.metaData);
+
     }
 
     /**
@@ -342,167 +405,164 @@ public class ContentSelectorDialog2 extends JDialog {
      *
      */
     private void setupFieldSelector() {
-		fieldListModel.clear();
-		SortedSet<String> contents = new TreeSet<String>();
-		for (String s : metaData) {
-		    if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-		    	contents.add(s.substring(Globals.SELECTOR_META_PREFIX.length()));
-		    }
-		}
-		if (contents.size() == 0) {
-			// if nothing was added, put the default fields (as described in the help)
-			fieldListModel.addElement("author");
-			fieldListModel.addElement("journal");
-			fieldListModel.addElement("keywords");
-			fieldListModel.addElement("publisher");
-		} else {
-			for (String s : contents) {
-				fieldListModel.addElement(s);
-			}
-		}
-		
-		if (currentField == null) {
-			// if dialog is created for the whole database,
-			// select the first field to avoid confusions in GUI usage
-			fieldList.setSelectedIndex(0); 
-		} else {
-			// a specific field has been chosen at the constructur
-			// select this field
-			int i = fieldListModel.indexOf(currentField);
-			if (i != -1) {
-				// field has been found in list, select it
-				fieldList.setSelectedIndex(i);
-			}
-		}
-    }
+        fieldListModel.clear();
+        SortedSet<String> contents = new TreeSet<String>();
+        for (String s : metaData) {
+            if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
+                contents.add(s.substring(Globals.SELECTOR_META_PREFIX.length()));
+            }
+        }
+        if (contents.size() == 0) {
+            // if nothing was added, put the default fields (as described in the help)
+            fieldListModel.addElement("author");
+            fieldListModel.addElement("journal");
+            fieldListModel.addElement("keywords");
+            fieldListModel.addElement("publisher");
+        } else {
+            for (String s : contents) {
+                fieldListModel.addElement(s);
+            }
+        }
 
+        if (currentField == null) {
+            // if dialog is created for the whole database,
+            // select the first field to avoid confusions in GUI usage
+            fieldList.setSelectedIndex(0);
+        } else {
+            // a specific field has been chosen at the constructur
+            // select this field
+            int i = fieldListModel.indexOf(currentField);
+            if (i != -1) {
+                // field has been found in list, select it
+                fieldList.setSelectedIndex(i);
+            }
+        }
+    }
 
     private void setupWordSelector() {
 
-		// Have we already created a listmodel for this field?
-    	wordListModel = wordListModels.get(currentField);
-		if (wordListModel != null) {
-			wordList.setModel(wordListModel);
-		} else {
-			wordListModel = new DefaultListModel<String>();
-			wordList.setModel(wordListModel);
-			wordListModels.put(currentField, wordListModel);
-			// wordListModel.addElement(WORD_FIRSTLINE_TEXT);
-			Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
-			if (items != null) {
-				wordSet = new TreeSet<String>(items);
-				int index = 0;
-				for (String s : wordSet){
-					wordListModel.add(index, s);
-					index++;
-				}
-			}
-		}
-	}
+        // Have we already created a listmodel for this field?
+        wordListModel = wordListModels.get(currentField);
+        if (wordListModel != null) {
+            wordList.setModel(wordListModel);
+        } else {
+            wordListModel = new DefaultListModel();
+            wordList.setModel(wordListModel);
+            wordListModels.put(currentField, wordListModel);
+            // wordListModel.addElement(WORD_FIRSTLINE_TEXT);
+            Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
+            if (items != null) {
+                TreeSet<String> wordSet = new TreeSet<String>(items);
+                int index = 0;
+                for (String s : wordSet) {
+                    wordListModel.add(index, s);
+                    index++;
+                }
+            }
+        }
+    }
 
-    private int findPos(DefaultListModel<String> lm, String item) {
-	for (int i=0; i<lm.size(); i++) {
-	    String s = lm.get(i);
-	    if (item.compareToIgnoreCase(s) < 0) { // item precedes s
-		return i;
-	    }
-	}
-	return lm.size();
+    private int findPos(DefaultListModel lm, String item) {
+        for (int i = 0; i < lm.size(); i++) {
+            String s = (String) lm.get(i);
+            if (item.compareToIgnoreCase(s) < 0) { // item precedes s
+                return i;
+            }
+        }
+        return lm.size();
     }
 
     private void initLayout() {
-	fieldNameField.setEnabled(false);
-	fieldList.setVisibleRowCount(4);
-	wordList.setVisibleRowCount(10);
-	final String VAL = "Uren luren himmelturen, ja Besseggen.";
-	fieldList.setPrototypeCellValue(VAL);
-	wordList.setPrototypeCellValue(VAL);
+        fieldNameField.setEnabled(false);
+        fieldList.setVisibleRowCount(4);
+        wordList.setVisibleRowCount(10);
+        final String VAL = "Uren luren himmelturen, ja Besseggen.";
+        fieldList.setPrototypeCellValue(VAL);
+        wordList.setPrototypeCellValue(VAL);
 
-	fieldPan.setBorder(BorderFactory.createTitledBorder
-			       (BorderFactory.createEtchedBorder(),
-				Globals.lang("Field name")));
-	wordPan.setBorder(BorderFactory.createTitledBorder
-			       (BorderFactory.createEtchedBorder(),
-				Globals.lang("Keyword")));
-	fieldPan.setLayout(gbl);
-	wordPan.setLayout(gbl);
-	con.insets = new Insets(2, 2, 2, 2);
-	con.fill = GridBagConstraints.BOTH;
-	con.gridwidth = 2;
-	con.weightx = 1;
-	con.weighty = 1;
-	con.gridx = 0;
-	con.gridy = 0;
-	gbl.setConstraints(fPane, con);
-	fieldPan.add(fPane);
-	gbl.setConstraints(wPane, con);
-	wordPan.add(wPane);
-	con.gridwidth = 1;
-	con.gridx = 2;
-	//con.weightx = 0.7;
-	con.gridheight = 2;
-	gbl.setConstraints(fieldNamePan, con);
-	fieldPan.add(fieldNamePan);
-	gbl.setConstraints(wordEditPan, con);
-	wordPan.add(wordEditPan);
-	con.gridx = 0;
-	con.gridy = 1;
-	con.weightx = 0;
-	con.weighty = 0;
-	con.gridwidth = 1;
-	con.gridheight = 1;
-	con.fill = GridBagConstraints.NONE;
-	con.anchor = GridBagConstraints.WEST;
-    gbl.setConstraints(newField, con);
-	fieldPan.add(newField);
-	gbl.setConstraints(newWord, con);
-	wordPan.add(newWord);
-	con.gridx = 1;
-	//con.anchor = GridBagConstraints.EAST;
-	gbl.setConstraints(removeField, con);
-	fieldPan.add(removeField);
-	gbl.setConstraints(removeWord, con);
-	wordPan.add(removeWord);
-	con.anchor = GridBagConstraints.WEST;
-	con.gridx = 0;
-	con.gridy = 0;
-	gbl.setConstraints(fieldNameField, con);
-	fieldNamePan.add(fieldNameField);
-	gbl.setConstraints(wordEditField, con);
-	wordEditPan.add(wordEditField);
+        fieldPan.setBorder(BorderFactory.createTitledBorder
+                (BorderFactory.createEtchedBorder(),
+                        Globals.lang("Field name")));
+        wordPan.setBorder(BorderFactory.createTitledBorder
+                (BorderFactory.createEtchedBorder(),
+                        Globals.lang("Keyword")));
+        fieldPan.setLayout(gbl);
+        wordPan.setLayout(gbl);
+        con.insets = new Insets(2, 2, 2, 2);
+        con.fill = GridBagConstraints.BOTH;
+        con.gridwidth = 2;
+        con.weightx = 1;
+        con.weighty = 1;
+        con.gridx = 0;
+        con.gridy = 0;
+        gbl.setConstraints(fPane, con);
+        fieldPan.add(fPane);
+        gbl.setConstraints(wPane, con);
+        wordPan.add(wPane);
+        con.gridwidth = 1;
+        con.gridx = 2;
+        //con.weightx = 0.7;
+        con.gridheight = 2;
+        gbl.setConstraints(fieldNamePan, con);
+        fieldPan.add(fieldNamePan);
+        gbl.setConstraints(wordEditPan, con);
+        wordPan.add(wordEditPan);
+        con.gridx = 0;
+        con.gridy = 1;
+        con.weightx = 0;
+        con.weighty = 0;
+        con.gridwidth = 1;
+        con.gridheight = 1;
+        con.fill = GridBagConstraints.NONE;
+        con.anchor = GridBagConstraints.WEST;
+        gbl.setConstraints(newField, con);
+        fieldPan.add(newField);
+        gbl.setConstraints(newWord, con);
+        wordPan.add(newWord);
+        con.gridx = 1;
+        //con.anchor = GridBagConstraints.EAST;
+        gbl.setConstraints(removeField, con);
+        fieldPan.add(removeField);
+        gbl.setConstraints(removeWord, con);
+        wordPan.add(removeWord);
+        con.anchor = GridBagConstraints.WEST;
+        con.gridx = 0;
+        con.gridy = 0;
+        gbl.setConstraints(fieldNameField, con);
+        fieldNamePan.add(fieldNameField);
+        gbl.setConstraints(wordEditField, con);
+        wordEditPan.add(wordEditField);
 
-	// Add buttons:
+        // Add buttons:
         ButtonBarBuilder bsb = new ButtonBarBuilder(buttonPan);
         bsb.addGlue();
         bsb.addButton(ok);
-	    bsb.addButton(apply);
+        bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
         bsb.addButton(help);
         bsb.addGlue();
 
-    // Add panels to dialog:
-	con.fill = GridBagConstraints.BOTH;
-	getContentPane().setLayout(gbl);
-	con.weightx = 1;
-	con.weighty = 0.5;
-	con.gridwidth = 1;
-	con.gridheight = 1;
-	con.gridx = 0;
-	con.gridy = 0;
-	gbl.setConstraints(fieldPan, con);
-	getContentPane().add(fieldPan);
-	con.gridy = 1;
-	gbl.setConstraints(wordPan, con);
-	getContentPane().add(wordPan);
-	con.weighty = 0;
-	con.gridy = 2;
-	con.insets = new Insets(12, 2, 2, 2);
-	gbl.setConstraints(buttonPan, con);
-	getContentPane().add(buttonPan);
-
+        // Add panels to dialog:
+        con.fill = GridBagConstraints.BOTH;
+        getContentPane().setLayout(gbl);
+        con.weightx = 1;
+        con.weighty = 0.5;
+        con.gridwidth = 1;
+        con.gridheight = 1;
+        con.gridx = 0;
+        con.gridy = 0;
+        gbl.setConstraints(fieldPan, con);
+        getContentPane().add(fieldPan);
+        con.gridy = 1;
+        gbl.setConstraints(wordPan, con);
+        getContentPane().add(wordPan);
+        con.weighty = 0;
+        con.gridy = 2;
+        con.insets = new Insets(12, 2, 2, 2);
+        gbl.setConstraints(buttonPan, con);
+        getContentPane().add(buttonPan);
 
     }
-
 
 }

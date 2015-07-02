@@ -28,7 +28,6 @@ import net.sf.jabref.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;
 
-
 /**
  * Importer for the MS Office 2007 XML bibliography format
  * By S. M. Mahbub Murshed
@@ -37,6 +36,7 @@ import org.w3c.dom.Document;
  */
 public class MsBibImporter extends ImportFormat {
 
+    @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
 
         /*
@@ -49,43 +49,44 @@ public class MsBibImporter extends ImportFormat {
             not of the MsBib type, and true otherwise. Returning true is the safe choice
             if not certain.
          */
-    	Document docin = null;
-    	try {
-    	DocumentBuilder dbuild = DocumentBuilderFactory.
-    								newInstance().
-    								newDocumentBuilder();
-   		docin = dbuild.parse(in);   		
-    	} catch (Exception e) {
-	   		return false;
-    	}
-    	if(docin!= null && !docin.getDocumentElement().getTagName().contains("Sources"))
-    		return false;
-//   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
-//   		if(rootLst.getLength()==0)
-//   			rootLst = docin.getElementsByTagName("Sources");
-//   		if(rootLst.getLength()==0)
-//   			return false;
-    	// System.out.println(docin.getDocumentElement().getTagName());
+        Document docin;
+        try {
+            DocumentBuilder dbuild = DocumentBuilderFactory.
+                    newInstance().
+                    newDocumentBuilder();
+            docin = dbuild.parse(in);
+        } catch (Exception e) {
+            return false;
+        }
+        if ((docin != null) && !docin.getDocumentElement().getTagName().contains("Sources")) {
+            return false;
+        }
+        //   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
+        //   		if(rootLst.getLength()==0)
+        //   			rootLst = docin.getElementsByTagName("Sources");
+        //   		if(rootLst.getLength()==0)
+        //   			return false;
+        // System.out.println(docin.getDocumentElement().getTagName());
         return true;
     }
 
     /**
-	 * String used to identify this import filter on the command line.
-	 * @return "msbib"
-	 */
-	public String getCLIid() {
-		return "msbib";
-	}
+     * String used to identify this import filter on the command line.
+     * @return "msbib"
+     */
+    public String getCLIid() {
+        return "msbib";
+    }
 
+    @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
 
         MSBibDatabase dbase = new MSBibDatabase();
 
-        List<BibtexEntry> entries = dbase.importEntries(in);
-
-        return entries;
+        return dbase.importEntries(in);
     }
 
+    @Override
     public String getFormatName() {
         // This method should return the name of this import format.
         return "MSBib";

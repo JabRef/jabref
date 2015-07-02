@@ -1,21 +1,39 @@
+// must appear before any plugins blocks - see http://gradle.org/docs/2.4/userguide/plugins.html#sec:plugins_block
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
+    }
+}
+
+plugins {
+    //The format plugin requires Java 1.8. As JabRef currently supports Java 1.6, the formatter plugin is disabled.
+    //id "com.github.youribonnaffe.gradle.format" version "1.2"
+
+    // Version 0.3 requires Java 1.7, therefore we use version 0.2
+    // This version, however, is not available as plugin directly from gradle
+    // id "eu.appsatori.fatjar" version "0.3"
+}
+
+apply plugin: "fatjar"
 apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "application"
-apply plugin: 'project-report'
-apply plugin: 'pmd'
+apply plugin: "project-report"
 
-
-// enables fatjar, the creation of a jar with all dependencies bundled inside
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
-    }
+/* disabled, because plugin requires Java 1.8
+format {
+    configurationFile = file('formatter_settings.xml')
+    // default: reformat main and test
+    //files = sourceSets.main.java
 }
-apply plugin: 'fatjar'
+*/
+
 fatJar {
     classifier 'fat'
     manifest {
@@ -32,7 +50,7 @@ test {
 version = "2.11dev"
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 sourceSets {
@@ -61,8 +79,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:1.7.1'
     compile 'org.apache.pdfbox:jempbox:1.7.1'
 
-    // option parser
-    compile fileTree(dir: 'lib/ritopt/', includes: ['*.jar']) // instead of having the source code inside
+    compile 'commons-cli:commons-cli:1.3.1'
 
     compile 'org.openoffice:juh:3.2.1'
     compile 'org.openoffice:jurt:3.2.1'
@@ -76,27 +93,41 @@ dependencies {
     compile 'mysql:mysql-connector-java:5.0.7'
     compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
 
-    compile fileTree(dir: 'lib', includes: ['glazedlists-1.8.0_java15.jar', 'jayatana-1.2.4.jar', 'microba.jar', 'spin.jar'])
+    compile 'net.java.dev.glazedlists:glazedlists_java15:1.8.0'
+    compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
 
+    compile 'net.java.dev.jna:jna:4.1.0'
+
+    compile 'commons-logging:commons-logging:1.0.2'
     // not available in maven repository
-    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'commons-logging.jar', 'JPFCodeGenerator-rt.jar'])
+    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
-    compile fileTree(dir: 'lib/spl/jersey', includes: ['*.jar'])
+    compile 'com.sun.jersey:jersey-client:1.14'
+    compile 'com.sun.jersey:jersey-core:1.14'
+    compile 'com.sun.jersey.contribs:jersey-multipart:1.14'
+
     compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
 
-    compile 'junit:junit:4.11'
+    compile 'junit:junit:4.12'
 
     generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
 }
 
 // use ant targets with prefix antTargets.XXXXX
 ant.importBuild "build-wrapper.xml"
+// add jars from this classpath to the classpath for the ant build
+if (org.gradle.internal.os.OperatingSystem.current().windows) {
+    // according to the discussion at https://github.com/JabRef/jabref/pull/58, the separators are different on Windows and Linux
+    ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
+} else {
+    ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
+}
 
 sourceCompatibility = 1.6
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.4'
 }
 
 compileJava {
@@ -124,12 +155,12 @@ compileJava.dependsOn "generateSource"
 
 task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchTreeParserSource"]) {
     group = 'JabRef'
-    description = 'Generates all Java source files.'
+    description 'Generates all Java source files.'
 }
 
 task generatePluginSource(type: JavaExec) {
-    group = 'JabRef'
-    description = 'Generates _JabRefPlugin.java with JPF.'
+    group 'JabRef'
+    description 'Generates _JabRefPlugin.java with JPF.'
 
     ext.pluginsDir = "src/main/resources/plugins"
 
@@ -142,8 +173,8 @@ task generatePluginSource(type: JavaExec) {
 }
 
 task generateBstGrammarSource(type: JavaExec) {
-    group = 'JabRef'
-    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr.'
+    group 'JabRef'
+    description 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
     File antlrSource = file('src/main/antlr3/net/sf/jabref/bst/Bst.g')
 
@@ -159,8 +190,8 @@ task generateBstGrammarSource(type: JavaExec) {
 task generateSearchLexerSource(type: JavaExec) {
     String grammarFile = "Lexer"
 
-    group = 'JabRef'
-    description = "Generates java files for ${grammarFile}.g antlr2."
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr2."
 
     String packagePath = "net/sf/jabref/search"
     File antlr2Path = file("src/main/antlr2")
@@ -183,8 +214,8 @@ task generateSearchLexerSource(type: JavaExec) {
 task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerSource") {
     String grammarFile = "Parser"
 
-    group = 'JabRef'
-    description = "Generates java files for ${grammarFile}.g antlr2."
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr2."
 
     String packagePath = "net/sf/jabref/search"
     File antlr2Path = file("src/main/antlr2")
@@ -207,8 +238,8 @@ task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerS
 task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchParserSource") {
     String grammarFile = "TreeParser"
 
-    group = 'JabRef'
-    description = "Generates java files for ${grammarFile}.g antlr2."
+    group 'JabRef'
+    description "Generates java files for ${grammarFile}.g antlr2."
 
     String packagePath = "net/sf/jabref/search"
     File antlr2Path = file("src/main/antlr2")
@@ -232,5 +263,15 @@ task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchPa
 idea.project.ipr {
     withXml { provider ->
         provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
+    }
+}
+
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
     }
 }

@@ -23,11 +23,12 @@ import java.io.IOException;
 /**
  * 
  */
-public class CookieHandlerImpl extends CookieHandler {
+class CookieHandlerImpl extends CookieHandler {
 
     // "Long" term storage for cookies, not serialized so only
     // for current JVM instance
-    private List<Cookie> cache = new LinkedList<Cookie>();
+    private final List<Cookie> cache = new LinkedList<Cookie>();
+
 
     /**
      * Saves all applicable cookies present in the response
@@ -39,6 +40,7 @@ public class CookieHandlerImpl extends CookieHandler {
      *                        values representing the response header fields returned
      */
 
+    @Override
     public void put(
             URI uri,
             Map<String, List<String>> responseHeaders)
@@ -55,8 +57,8 @@ public class CookieHandlerImpl extends CookieHandler {
                     Cookie existingCookie = i.next();
                     if (/*(cookie.getURI().equals(
                             existingCookie.getURI()))*/
-                        (cookie.domain.equals(existingCookie.domain))
-                        &&
+                    (cookie.domain.equals(existingCookie.domain))
+                            &&
                             (cookie.getName().equals(
                                     existingCookie.getName()))) {
                         i.remove();
@@ -82,6 +84,7 @@ public class CookieHandlerImpl extends CookieHandler {
      *         of cookies
      */
 
+    @Override
     public Map<String, List<String>> get(
             URI uri,
             Map<String, List<String>> requestHeaders)
@@ -91,7 +94,7 @@ public class CookieHandlerImpl extends CookieHandler {
         // Put in comma-separated list
         StringBuilder cookies = new StringBuilder();
         for (Iterator<Cookie> i = cache.iterator(); i.hasNext();) {
-        //for (Cookie cookie : cache) {
+            //for (Cookie cookie : cache) {
             Cookie cookie = i.next();
             // Remove cookies that have expired
             if (cookie.hasExpired()) {

@@ -22,8 +22,9 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class ToUpperCase implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
-		return fieldText.toUpperCase();
-	}
+        return fieldText.toUpperCase();
+    }
 
 }

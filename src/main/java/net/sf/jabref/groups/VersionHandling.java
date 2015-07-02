@@ -19,7 +19,7 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.StringUtil;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to
@@ -28,7 +28,9 @@ import net.sf.jabref.Util;
  * @author jzieren (10.04.2005)
  */
 public class VersionHandling {
+
     public static final int CURRENT_VERSION = 3;
+
 
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
@@ -43,8 +45,8 @@ public class VersionHandling {
         String name, field, regexp;
         for (int i = 0; i < number; ++i) {
             field = groups.get(3 * i);
-            name = groups.get(3 * i + 1);
-            regexp = groups.get(3 * i + 2);
+            name = groups.get((3 * i) + 1);
+            regexp = groups.get((3 * i) + 2);
             root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
                     false, true, AbstractGroup.INDEPENDENT)));
         }
@@ -66,8 +68,10 @@ public class VersionHandling {
         }
     }
 
+
     /** Imports groups version 0 and 1. */
     private static class Version0_1 {
+
         /**
          * Parses the textual representation obtained from
          * GroupTreeNode.toString() and recreates that node and all of its
@@ -84,8 +88,8 @@ public class VersionHandling {
             String g;
             while (s.length() > 0) {
                 if (s.startsWith("(")) {
-                    String subtree = getSubtree(s);
-                    newNode = fromString(subtree, db, version);
+                    String subtree = Version0_1.getSubtree(s);
+                    newNode = Version0_1.fromString(subtree, db, version);
                     // continue after this subtree by removing it
                     // and the leading/trailing braces, and
                     // the comma (that makes 3) that always trails it
@@ -93,19 +97,21 @@ public class VersionHandling {
                     i = 3 + subtree.length();
                     s = i >= s.length() ? "" : s.substring(i);
                 } else {
-                    i = indexOfUnquoted(s, ',');
+                    i = Version0_1.indexOfUnquoted(s, ',');
                     g = i < 0 ? s : s.substring(0, i);
-                    if (i >= 0)
+                    if (i >= 0) {
                         s = s.substring(i + 1);
-                    else
+                    } else {
                         s = "";
-                    newNode = new GroupTreeNode(AbstractGroup.fromString(Util
+                    }
+                    newNode = new GroupTreeNode(AbstractGroup.fromString(StringUtil
                             .unquote(g, '\\'), db, version));
                 }
-                if (root == null) // first node will be root
+                if (root == null) {
                     root = newNode;
-                else
+                } else {
                     root.add(newNode);
+                }
             }
             return root;
         }
@@ -129,8 +135,9 @@ public class VersionHandling {
                     break;
                 case ')':
                     --level;
-                    if (level == 0)
+                    if (level == 0) {
                         return s.substring(1, i);
+                    }
                     break;
                 }
                 ++i;
@@ -155,16 +162,18 @@ public class VersionHandling {
                 if (s.charAt(i) == '\\') {
                     ++i; // skip quoted special
                 } else {
-                    if (s.charAt(i) == c)
+                    if (s.charAt(i) == c) {
                         return i;
+                    }
                 }
                 ++i;
             }
             return -1;
         }
     }
-    
+
     private static class Version2_3 {
+
         private static GroupTreeNode fromString(Vector<String> data, BibtexDatabase db,
                 int version) throws Exception {
             GroupTreeNode cursor = null;
@@ -176,15 +185,18 @@ public class VersionHandling {
             String s;
             for (int i = 0; i < data.size(); ++i) {
                 s = data.elementAt(i);
-                
+
                 // This allows to read databases that have been modified by, e.g., BibDesk
                 s = s.trim();
-                if (s.length() == 0)
-                	continue;
-                
+                if (s.length() == 0) {
+                    continue;
+                }
+
                 spaceIndex = s.indexOf(' ');
                 if (spaceIndex <= 0)
+                 {
                     throw new Exception("bad format"); // JZTODO lyrics
+                }
                 level = Integer.parseInt(s.substring(0, spaceIndex));
                 group = AbstractGroup.fromString(s.substring(spaceIndex + 1),
                         db, version);
@@ -195,8 +207,9 @@ public class VersionHandling {
                     root = cursor;
                 } else {
                     // insert at desired location
-                    while (level <= cursor.getLevel())
+                    while (level <= cursor.getLevel()) {
                         cursor = (GroupTreeNode) cursor.getParent();
+                    }
                     cursor.add(newNode);
                     cursor = newNode;
                 }

@@ -47,15 +47,17 @@ import net.sf.jabref.Globals;
  */
 public class JournalAbbreviator implements LayoutFormatter
 {
+
+    @Override
     public String format(String fieldText)
     {
         String strJournal = Globals.journalAbbrev.getAbbreviatedName(fieldText, true);
         if (null == strJournal)
         {
-    	    // no abbreviation found => use unabbreviated journal name
-    	    strJournal = fieldText;
+            // no abbreviation found => use unabbreviated journal name
+            strJournal = fieldText;
         }
-        
-	return strJournal;
+
+        return strJournal;
     }
 }

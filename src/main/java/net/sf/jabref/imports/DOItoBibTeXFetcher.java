@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2014 JabRef contributors.
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -26,66 +26,58 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.Util;
 
-
 public class DOItoBibTeXFetcher implements EntryFetcher {
-	
-    private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
-    
-	@Override
+
+    private static final String URL_PATTERN = "http://dx.doi.org/%s";
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
+
+
+    @Override
     public void stopFetching() {
-		// nothing needed as the fetching is a single HTTP GET
+        // nothing needed as the fetching is a single HTTP GET
     }
 
-	@Override
+    @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
 
-       BibtexEntry entry = getEntryFromDOI(query, status);
-       if (entry != null)
-       {
+        BibtexEntry entry = getEntryFromDOI(query, status);
+        if (entry != null)
+        {
             inspector.addEntry(entry);
-	    return true;
+            return true;
         } else {
             return false;
         }
-        
+
     }
 
-	@Override
+    @Override
     public String getTitle() {
-	    return "DOI to BibTeX";
+        return "DOI to BibTeX";
     }
 
-	@Override
+    @Override
     public String getKeyName() {
-	    return "DOItoBibTeX";
+        return "DOItoBibTeX";
     }
 
-	@Override
-    public URL getIcon() {
-		// no special icon for this fetcher available.
-		// Therefore, we return some kind of default icon
-	    return GUIGlobals.getIconUrl("www");
-    }
-
-	@Override
+    @Override
     public String getHelpPage() {
-	    return "DOItoBibTeXHelp.html";
+        return "DOItoBibTeXHelp.html";
     }
 
-	@Override
+    @Override
     public JPanel getOptionsPanel() {
-		// no additional options available
-	    return null;
+        // no additional options available
+        return null;
     }
 
-    public BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
+    private BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
         String q;
         try {
             q = URLEncoder.encode(doi, "UTF-8");
@@ -95,7 +87,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        String urlString = String.format(URL_PATTERN, q);
+        String urlString = String.format(DOItoBibTeXFetcher.URL_PATTERN, q);
 
         // Send the request
         URL url;
@@ -114,12 +106,11 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        conn.setRequestProperty("Accept", "text/bibliography; style=bibtex");
-
+        conn.setRequestProperty("Accept", "application/x-bibtex");
 
         String bibtexString;
         try {
-            bibtexString = Util.getResults(conn);
+            bibtexString = Util.getResultsWithEncoding(conn, "UTF8");
         } catch (FileNotFoundException e) {
 
             if (status != null) {
@@ -133,8 +124,9 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-
-
+        //Usually includes an en-dash in the page range. Char is in cp1252 but not 
+        // ISO 8859-1 (which is what latex expects). For convenience replace here.
+        bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
 
         if (entry != null) {

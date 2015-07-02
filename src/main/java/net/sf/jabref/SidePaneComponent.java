@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
@@ -29,85 +30,124 @@ import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 
 public abstract class SidePaneComponent extends SimpleInternalFrame {
 
-	protected JButton close = new JButton(GUIGlobals.getImage("close"));
+    protected final JButton close = new JButton(GUIGlobals.getImage("close"));
 
-	protected boolean visible = false;
+    private boolean visible = false;
 
-	protected SidePaneManager manager;
+    private final SidePaneManager manager;
 
-	protected BasePanel panel = null;
+    protected BasePanel panel = null;
 
-	public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
-		super(new ImageIcon(icon), title);
-		this.manager = manager;
-		setSelected(true);
-		JToolBar tlb = new JToolBar();
-		close.setMargin(new Insets(0, 0, 0, 0));
-		// tlb.setOpaque(false);
-		close.setBorder(null);
+
+    public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
+        super(new ImageIcon(icon), title);
+        this.manager = manager;
+        setSelected(true);
+        JToolBar tlb = new JToolBar();
+        close.setMargin(new Insets(0, 0, 0, 0));
+        // tlb.setOpaque(false);
+        close.setBorder(null);
+        JButton up = new JButton(GUIGlobals.getImage("up"));
+        up.setMargin(new Insets(0, 0, 0, 0));
+        JButton down = new JButton(GUIGlobals.getImage("down"));
+        down.setMargin(new Insets(0, 0, 0, 0));
+        up.setBorder(null);
+        down.setBorder(null);
+        up.addActionListener(new UpButtonListener());
+        down.addActionListener(new DownButtonListener());
         tlb.setFloatable(false);
-		tlb.add(close);
-		close.addActionListener(new CloseButtonListener());
-		setToolBar(tlb);
-		// setBorder(BorderFactory.createEtchedBorder());
+        tlb.add(up);
+        tlb.add(down);
+        tlb.add(close);
+        close.addActionListener(new CloseButtonListener());
+        setToolBar(tlb);
+        // setBorder(BorderFactory.createEtchedBorder());
+        setBorder(BorderFactory.createEmptyBorder());
+        // setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
+        // setPreferredSize(new java.awt.Dimension
+        // (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
+        // Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
+    }
 
-		// setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
-		// setPreferredSize(new java.awt.Dimension
-		// (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
-		// Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
-	}
+    void hideAway() {
+        manager.hideComponent(this);
+    }
 
-	public void hideAway() {
-		manager.hideComponent(this);
-	}
+    private void moveUp() {
+        manager.moveUp(this);
+    }
 
-	/**
-	 * Used by SidePaneManager only, to keep track of visibility.
-	 * 
-	 */
-	void setVisibility(boolean vis) {
-		visible = vis;
-	}
+    private void moveDown() {
+        manager.moveDown(this);
+    }
 
-	/**
-	 * Used by SidePaneManager only, to keep track of visibility.
-	 * 
-	 */
-	boolean hasVisibility() {
-		return visible;
-	}
+    /**
+     * Used by SidePaneManager only, to keep track of visibility.
+     * 
+     */
+    void setVisibility(boolean vis) {
+        visible = vis;
+    }
 
-	public void setActiveBasePanel(BasePanel panel) {
-		this.panel = panel;
-	}
+    /**
+     * Used by SidePaneManager only, to keep track of visibility.
+     * 
+     */
+    boolean hasVisibility() {
+        return visible;
+    }
 
-	public BasePanel getActiveBasePanel() {
-		return panel;
-	}
+    public void setActiveBasePanel(BasePanel panel) {
+        this.panel = panel;
+    }
 
-	/**
-	 * Override this method if the component needs to make any changes before it
-	 * can close.
-	 */
-	public void componentClosing() {
+    public BasePanel getActiveBasePanel() {
+        return panel;
+    }
 
-	}
+    /**
+     * Override this method if the component needs to make any changes before it
+     * can close.
+     */
+    public void componentClosing() {
 
-	/**
-	 * Override this method if the component needs to do any actions when
-	 * opening.
-	 */
-	public void componentOpening() {
+    }
 
-	}
+    /**
+     * Override this method if the component needs to do any actions when
+     * opening.
+     */
+    public void componentOpening() {
 
-	public Dimension getMinimumSize() {
-		return getPreferredSize();
-	}
+    }
 
-	class CloseButtonListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			hideAway();
-		}
-	}
+    @Override
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+
+
+    private class CloseButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            hideAway();
+        }
+    }
+
+    private class UpButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            moveUp();
+        }
+    }
+
+    private class DownButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            moveDown();
+        }
+    }
 }

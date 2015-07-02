@@ -24,6 +24,7 @@
  */
 package net.sf.jabref.export.layout.format;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,10 +41,9 @@ public class AuthorFirstFirstTest {
      */
     @Test
     public void testFormat() {
-        assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
+        Assert.assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
                 new AuthorFirstFirst()
-                        .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter")
-        );
+                        .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
     }
 
 }
