@@ -2,6 +2,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.TestUtils;
 
@@ -56,7 +57,7 @@ public class GeneralFetcherTest {
      */
     @Before
     public void setUp() {
-        JabRef.main(new String[0]);
+        JabRefMain.main(new String[0]);
         GeneralFetcherTest.jrf = JabRef.jrf;
         GeneralFetcherTest.spm = GeneralFetcherTest.jrf.sidePaneManager;
         GeneralFetcherTest.acmpf = new ACMPortalFetcher();

@@ -147,6 +147,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
+    private final JabRef jabRef;
 
 
     class ToolBar extends JToolBar {
@@ -484,7 +485,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     };
 
 
-    public JabRefFrame() {
+    public JabRefFrame(JabRef jabRef) {
+        this.jabRef = jabRef;
         init();
         updateEnabledState();
 
@@ -770,7 +772,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             public void run() {
                 output(Globals.lang("Opening preferences..."));
                 if (prefsDialog == null) {
-                    prefsDialog = new PrefsDialog3(JabRefFrame.this);
+                    prefsDialog = new PrefsDialog3(JabRefFrame.this, jabRef);
                     Util.placeDialog(prefsDialog, JabRefFrame.this);
                 } else {
                     prefsDialog.setValues();

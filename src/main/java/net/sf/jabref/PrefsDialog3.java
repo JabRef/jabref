@@ -58,10 +58,12 @@ class PrefsDialog3 extends JDialog {
     private final JPanel main;
 
     private final JabRefFrame frame;
+    private final JabRef jabRef;
 
 
-    public PrefsDialog3(JabRefFrame parent) {
+    public PrefsDialog3(JabRefFrame parent, JabRef jabRef) {
         super(parent, Globals.lang("JabRef preferences"), false);
+        this.jabRef = jabRef;
         final JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
@@ -100,7 +102,7 @@ class PrefsDialog3 extends JDialog {
         tabs.add(new NameFormatterTab(parent.helpDiag));
         tabs.add(new ImportSettingsTab());
         tabs.add(new XmpPrefsTab());
-        tabs.add(new AdvancedTab(prefs, parent.helpDiag));
+        tabs.add(new AdvancedTab(prefs, parent.helpDiag, jabRef));
 
         Iterator<PrefsTab> it = tabs.iterator();
         String[] names = new String[tabs.size()];

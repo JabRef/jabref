@@ -19,7 +19,6 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
 
 import java.awt.Font;
-import java.awt.Frame;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -49,6 +48,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.remote.RemoteListenerLifecycle;
+import net.sf.jabref.splash.SplashScreenLifecycle;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.sun.jna.Native;
@@ -59,28 +59,18 @@ import com.sun.jna.ptr.PointerByReference;
 
 /**
  * JabRef Main Class - The application gets started here.
- *
  */
 public class JabRef {
 
-    public static JabRef singleton;
     public static JabRefFrame jrf;
-    private static Frame splashScreen = null;
-
-    private boolean graphicFailure = false;
 
     private static final int MAX_DIALOG_WARNINGS = 10;
+
+    private boolean graphicFailure = false;
     private JabRefCLI cli;
+    private SplashScreenLifecycle splashScreen = new SplashScreenLifecycle();
 
-
-    public static void main(String[] args) {
-        new JabRef(args);
-    }
-
-    protected JabRef(String[] args) {
-
-        JabRef.singleton = this;
-
+    public void start(String[] args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // See if there are plugins scheduled for deletion:
@@ -110,19 +100,7 @@ public class JabRef {
         Globals.startBackgroundTasks();
         Globals.setupLogging();
         Globals.prefs = prefs;
-        String langStr = prefs.get("language");
-        String[] parts = langStr.split("_");
-        String language, country;
-        if (parts.length == 1) {
-            language = langStr;
-            country = "";
-        }
-        else {
-            language = parts[0];
-            country = parts[1];
-        }
-
-        Globals.setLanguage(language, country);
+        setLanguage(prefs);
         Globals.prefs.setLanguageDependentDefaultValues();
         /*
          * The Plug-in System is started automatically on the first call to
@@ -145,7 +123,7 @@ public class JabRef {
         // Check for running JabRef
         if (Globals.prefs.getBoolean("useRemoteServer")) {
 
-            RemoteListenerLifecycle.openRemoteListener(JabRef.singleton);
+            RemoteListenerLifecycle.openRemoteListener(this);
 
             if (!RemoteListenerLifecycle.isRemoteListenerOpen()) {
                 // Unless we are alone, try to contact already running JabRef:
@@ -203,6 +181,22 @@ public class JabRef {
         openWindow(loaded);
     }
 
+    private void setLanguage(JabRefPreferences prefs) {
+        String langStr = prefs.get("language");
+        String[] parts = langStr.split("_");
+        String language, country;
+        if (parts.length == 1) {
+            language = langStr;
+            country = "";
+        }
+        else {
+            language = parts[0];
+            country = parts[1];
+        }
+
+        Globals.setLanguage(language, country);
+    }
+
     // Do not use this code in release version, it contains some memory leaks
     public static String getCurrentProcessExplicitAppUserModelID()
     {
@@ -258,7 +252,7 @@ public class JabRef {
         // splash screen or not.
         if (initialStartup && !commandMode && !cli.isDisableSplash()) {
             try {
-                JabRef.splashScreen = SplashScreen.splash();
+                splashScreen.show();
             } catch (Throwable ex) {
                 graphicFailure = true;
                 System.err.println(Globals.lang("Unable to create graphical interface")
@@ -752,7 +746,7 @@ public class JabRef {
                         Globals.prefs.getInt("fontSize"));
 
         //Util.pr(": Initializing frame");
-        JabRef.jrf = new JabRefFrame();
+        JabRef.jrf = new JabRefFrame(this);
 
         // Add all loaded databases to the frame:
 
@@ -795,10 +789,7 @@ public class JabRef {
                     JabRef.jrf, 0, ""));
         }
 
-        if (JabRef.splashScreen != null) {// do this only if splashscreen was actually created
-            JabRef.splashScreen.dispose();
-            JabRef.splashScreen = null;
-        }
+        splashScreen.hide();
 
         /*JOptionPane.showMessageDialog(null, Globals.lang("Please note that this "
             +"is an early beta version. Do not use it without backing up your files!"),

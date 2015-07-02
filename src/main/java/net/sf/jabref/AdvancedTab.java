@@ -65,9 +65,11 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
+    private final JabRef jabRef;
 
 
-    public AdvancedTab(JabRefPreferences prefs, HelpDialog diag) {
+    public AdvancedTab(JabRefPreferences prefs, HelpDialog diag, JabRef jabRef) {
+        this.jabRef = jabRef;
         _prefs = prefs;
 
         HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
@@ -245,7 +247,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         }
         _prefs.putBoolean("useRemoteServer", useRemoteServer.isSelected());
         if (useRemoteServer.isSelected()) {
-            RemoteListenerLifecycle.openAndStartRemoteListener(JabRef.singleton);
+            RemoteListenerLifecycle.openAndStartRemoteListener(jabRef);
         } else {
             RemoteListenerLifecycle.disableRemoteListener();
         }
