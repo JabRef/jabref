@@ -101,6 +101,7 @@ public class LabelPatternUtilTest {
      *
      * @see net.sf.jabref.Util#checkLegalKey(String)
      */
+    @Test
     public void testCheckLegalKey() {
         // not tested/ not in hashmap UNICODE_CHARS:
         // Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů	Ǣ ǣ ǖ ǘ ǚ ǜ
