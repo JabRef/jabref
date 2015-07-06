@@ -64,6 +64,7 @@ import net.sf.jabref.sql.importer.DbImportAction;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.ErrorConsoleAction;
 import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
@@ -400,7 +401,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction manageJournals = new ManageJournalsAction(this);
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-    private final AbstractAction errorConsole = Globals.errorConsole.getAction(this);
+    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, Globals.handler);
     AbstractAction test = new GeneralAction("test", "Test");
 
     private final AbstractAction dbConnect = new GeneralAction("dbConnect", "Connect to external SQL database",

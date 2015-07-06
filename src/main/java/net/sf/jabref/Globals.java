@@ -38,10 +38,14 @@ import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.util.ErrorConsole;
+import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
+import net.sf.jabref.util.logging.CachebleHandler;
+import net.sf.jabref.util.logging.StdoutConsoleHandler;
 
 public class Globals {
+
+
 
     /**
      * {@link Control} class allowing properties bundles to be in different encodings.
@@ -123,7 +127,8 @@ public class Globals {
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
-    public static ErrorConsole errorConsole;
+    public static StreamEavesdropper streamEavesdropper;
+    public static CachebleHandler handler;
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
@@ -232,8 +237,7 @@ public class Globals {
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
 
-        // TODO: Error console initialization here. When should it be used?
-        Globals.errorConsole = ErrorConsole.getInstance();
+        Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
 
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
@@ -1349,30 +1353,6 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
     }
 
 
-    /**
-     * With Java 7, one could directly set a format for the SimpleFormatter
-     * (http://stackoverflow.com/a/10722260/873282) and use that in a StreamHandler.
-     * As JabRef is compatible with Java6, we have to write our own Handler
-     */
-    private static class StdoutConsoleHandler extends Handler {
-
-        @Override
-        public void close() throws SecurityException {
-        }
-
-        @Override
-        public void flush() {
-            System.out.flush();
-        }
-
-        @Override
-        public void publish(LogRecord record) {
-            System.out.println(record.getMessage());
-            System.out.flush();
-        }
-    }
-
-
     public static void setupLogging() {
         // get the root logger. It is NOT GLOBAL_LOGGER_NAME
         Logger rootLogger = Logger.getLogger("");
@@ -1387,7 +1367,8 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         StdoutConsoleHandler h = new StdoutConsoleHandler();
         rootLogger.addHandler(h);
 
-        rootLogger.addHandler(Globals.errorConsole);
+        Globals.handler = new CachebleHandler();
+        rootLogger.addHandler(handler);
     }
 
 }
