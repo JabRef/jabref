@@ -45,6 +45,8 @@ import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 public class JabRefPreferences {
 

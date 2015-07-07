@@ -18,7 +18,7 @@ package net.sf.jabref.journals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
 

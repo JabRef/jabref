@@ -39,6 +39,8 @@ import javax.xml.transform.TransformerException;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.UtilFindFiles;
 import net.sf.jabref.util.XMPUtil;
 
 /**

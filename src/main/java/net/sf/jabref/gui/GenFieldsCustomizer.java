@@ -27,6 +27,7 @@ import net.sf.jabref.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
+import net.sf.jabref.util.Util;
 
 /**
  * <p>Title: </p>

@@ -26,6 +26,8 @@ import javax.swing.*;
 
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the

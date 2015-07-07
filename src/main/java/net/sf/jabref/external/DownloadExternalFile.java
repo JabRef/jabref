@@ -19,6 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.util.FileUtil;
 
 import javax.swing.*;
 import java.io.File;

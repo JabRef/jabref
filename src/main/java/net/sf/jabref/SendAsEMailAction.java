@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.util.Util;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp

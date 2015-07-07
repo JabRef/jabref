@@ -1,7 +1,7 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.FileBasedTestCase;
+import net.sf.jabref.BibtexTestData;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -19,8 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class XMPSchemaBibtexTest {
 
@@ -240,7 +238,7 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        BibtexEntry e = FileBasedTestCase.getBibtexEntry();
+        BibtexEntry e = BibtexTestData.getBibtexEntry();
         bibtex.setBibtexEntry(e, null);
 
         BibtexEntry e2 = bibtex.getBibtexEntry();

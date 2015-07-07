@@ -49,6 +49,8 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemoteListener;
 import net.sf.jabref.remote.RemoteListenerLifecycle;
 import net.sf.jabref.splash.SplashScreenLifecycle;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.sun.jna.Native;

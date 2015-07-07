@@ -31,6 +31,8 @@ import net.sf.jabref.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the

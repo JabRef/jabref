@@ -27,7 +27,7 @@ import java.util.Vector;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.StringUtil;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.imports.ParserResult;
 
 import javax.swing.*;

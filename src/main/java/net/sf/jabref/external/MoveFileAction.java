@@ -19,6 +19,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEditor;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

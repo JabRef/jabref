@@ -1,9 +1,8 @@
-package net.sf.jabref;
+package net.sf.jabref.util;
 
+import net.sf.jabref.util.DOIUtil;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class DOIUtilTest {
 
@@ -18,7 +17,7 @@ public class DOIUtilTest {
 
         Assert.assertEquals(false, DOIUtil.checkForDOIwithHTTPprefix("http://www.xyz.com"));
         Assert.assertEquals(false, DOIUtil.checkForDOIwithHTTPprefix("http://dx.doing.org/fjdlfdsjfdlfdj.htm"));
-        Assert.assertEquals(false, DOIUtil.checkForDOIwithHTTPprefix("thfjtfjglkjjlkkölm5476576658796"));
+        Assert.assertEquals(false, DOIUtil.checkForDOIwithHTTPprefix("thfjtfjglkjjlkkï¿½lm5476576658796"));
 
         Assert.assertEquals(true, DOIUtil.checkForDOIwithHTTPprefix("http://doii.acm.org/10.1145/1294928.1294933"));
         Assert.assertEquals(true, DOIUtil.checkForDOIwithHTTPprefix("http://dx.ddoi.org/10.1007/978-3-642-15618-2_19"));

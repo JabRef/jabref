@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.util;
 
 import java.util.Calendar;
 

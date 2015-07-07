@@ -35,6 +35,8 @@ Modified for use in JabRef
 
 package net.sf.jabref;
 
+import net.sf.jabref.util.Util;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;

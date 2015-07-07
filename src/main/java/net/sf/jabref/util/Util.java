@@ -18,7 +18,7 @@
 
 // created by : Morten O. Alver 2003
 
-package net.sf.jabref;
+package net.sf.jabref.util;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -70,6 +70,23 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.AuthorList;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.CallBack;
+import net.sf.jabref.EasyDateFormat;
+import net.sf.jabref.EntryMarker;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.ImportSettingsTab;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.MonthUtil;
+import net.sf.jabref.OpenFileFilter;
+import net.sf.jabref.Worker;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
@@ -85,7 +102,6 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.util.FileNameCleaner;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -95,12 +111,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class Util {
 
-    /*
-     * Integer values for indicating result of duplicate check (for entries):
-     * 
-     */
-    final static int TYPE_MISMATCH = -1, NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2,
-            EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
+
 
 
 

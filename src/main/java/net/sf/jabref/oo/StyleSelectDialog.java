@@ -30,6 +30,7 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.util.Util;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

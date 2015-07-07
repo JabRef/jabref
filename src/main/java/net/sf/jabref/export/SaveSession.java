@@ -16,7 +16,7 @@
 package net.sf.jabref.export;
 
 import net.sf.jabref.FileBasedLock;
-import net.sf.jabref.FileUtil;
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
 

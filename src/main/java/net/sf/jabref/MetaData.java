@@ -23,6 +23,7 @@ import net.sf.jabref.groups.VersionHandling;
 import net.sf.jabref.labelPattern.LabelPattern;
 
 import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.util.StringUtil;
 
 public class MetaData implements Iterable<String> {
 

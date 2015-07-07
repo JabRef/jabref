@@ -44,7 +44,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 /**
  *

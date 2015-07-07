@@ -68,6 +68,7 @@ import net.sf.jabref.undo.UndoableChangeType;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.Util;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry (i.e. the

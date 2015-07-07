@@ -44,6 +44,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.Util;
 
 /**
  * Dialog to manage custom importers.

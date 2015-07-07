@@ -53,7 +53,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.

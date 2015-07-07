@@ -34,6 +34,7 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.Util;
 
 /* 
  * TODO: could separate the "menu item" functionality from the importing functionality

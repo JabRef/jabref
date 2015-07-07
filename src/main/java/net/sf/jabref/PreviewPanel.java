@@ -36,6 +36,7 @@ import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.gui.PreviewPanelTransferHandler;
+import net.sf.jabref.util.Util;
 
 /**
  * Displays an BibtexEntry using the given layout format.

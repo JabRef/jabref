@@ -1,5 +1,6 @@
-package net.sf.jabref;
+package net.sf.jabref.util;
 
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 

@@ -24,6 +24,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.util.QuotedStringTokenizer;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * @author jzieren

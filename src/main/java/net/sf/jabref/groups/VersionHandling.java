@@ -19,7 +19,7 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.StringUtil;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to

@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.*;
 import net.sf.jabref.AuthorList.Author;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.util.Util;
 
 /**
  *

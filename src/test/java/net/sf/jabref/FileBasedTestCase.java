@@ -1,16 +1,10 @@
 package net.sf.jabref;
 
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.ParserResult;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
 import java.io.File;
-import java.io.StringReader;
-
-import static org.junit.Assert.*;
 
 /**
  * A base class for Testing in JabRef that comes along with some useful
@@ -18,117 +12,13 @@ import static org.junit.Assert.*;
  */
 public class FileBasedTestCase {
 
-    /**
-     * Creates a temp directory in the System temp directory.
-     * <p/>
-     * Taken from
-     * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
-     * <p/>
-     * Author: jfbriere
-     *
-     * @return returns null if directory could not created.
-     */
-    public static File createTempDir(String prefix) {
-        return FileBasedTestCase.createTempDir(prefix, null);
-    }
-
-    /**
-     * Creates a temp directory in a given directory.
-     * <p/>
-     * Taken from
-     * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
-     * <p/>
-     * Author: jfbriere
-     *
-     * @param directory MayBeNull - null indicates that the system tmp directory
-     *                  should be used.
-     * @return returns null if directory could not created.
-     */
-    public static File createTempDir(String prefix, File directory) {
-        try {
-            File tempFile = File.createTempFile(prefix, "", directory);
-
-            if (!tempFile.delete()) {
-                return null;
-            }
-            if (!tempFile.mkdir()) {
-                return null;
-            }
-
-            return tempFile;
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Deletes a directory or file
-     * <p/>
-     * Taken from
-     * http://forum.java.sun.com/thread.jspa?threadID=470197&messageID=2169110
-     * <p/>
-     * Author: jfbriere
-     *
-     * @param file
-     */
-    public static void deleteRecursive(File file) {
-        if (file.isDirectory()) {
-            File[] fileArray = file.listFiles();
-
-            if (fileArray != null) {
-                for (File aFileArray : fileArray) {
-                    FileBasedTestCase.deleteRecursive(aFileArray);
-                }
-            }
-        }
-        file.delete();
-    }
-
-
-    static BibtexDatabase database;
-
-    static BibtexEntry entry;
-
-    File root;
+    protected BibtexDatabase database;
+    protected BibtexEntry entry;
+    protected File root;
 
     private String oldPdfDirectory;
-
     private boolean oldUseRegExp;
-
     private boolean oldAutoLinkExcatKeyOnly;
-
-
-    public static BibtexEntry getBibtexEntry() {
-
-        if (FileBasedTestCase.database == null) {
-
-            StringReader reader = new StringReader(
-                    "@ARTICLE{HipKro03,\n"
-                            + "  author = {Eric von Hippel and Georg von Krogh},\n"
-                            + "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},\n"
-                            + "  journal = {Organization Science},\n"
-                            + "  year = {2003},\n"
-                            + "  volume = {14},\n"
-                            + "  pages = {209--223},\n"
-                            + "  number = {2},\n"
-                            + "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
-                            + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
-                            + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}"
-                    );
-
-            BibtexParser parser = new BibtexParser(reader);
-            ParserResult result = null;
-            try {
-                result = parser.parse();
-            } catch (Exception e) {
-                Assert.fail();
-            }
-            FileBasedTestCase.database = result.getDatabase();
-            FileBasedTestCase.entry = FileBasedTestCase.database.getEntriesByKey("HipKro03")[0];
-        }
-        return FileBasedTestCase.entry;
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -140,13 +30,12 @@ public class FileBasedTestCase {
         Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
         Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, false);
 
-        FileBasedTestCase.getBibtexEntry();
-        Assert.assertNotNull(FileBasedTestCase.database);
-        Assert.assertNotNull(FileBasedTestCase.entry);
+        database = BibtexTestData.getBibtexDatabase();
+        entry = database.getEntries().iterator().next();
 
         // Create file structure
         try {
-            root = FileBasedTestCase.createTempDir("UtilFindFileTest");
+            root = FileBasedTestHelper.createTempDir("UtilFindFileTest");
 
             Globals.prefs.put("pdfDirectory", root.getPath());
 
@@ -214,7 +103,7 @@ public class FileBasedTestCase {
 
     @After
     public void tearDown() {
-        FileBasedTestCase.deleteRecursive(root);
+        FileBasedTestHelper.deleteRecursive(root);
         Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
         Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
         Globals.prefs.put("pdfDirectory", oldPdfDirectory);

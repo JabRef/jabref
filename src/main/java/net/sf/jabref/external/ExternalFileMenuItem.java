@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.util.Util;
 
 /**
  * The menu item used in the popup menu for opening external resources associated

@@ -44,6 +44,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 /**
  * Created by Morten O. Alver 2007.02.22

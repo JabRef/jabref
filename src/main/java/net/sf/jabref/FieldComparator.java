@@ -16,6 +16,8 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.util.YearUtil;
 
 import java.text.Collator;
 import java.text.ParseException;

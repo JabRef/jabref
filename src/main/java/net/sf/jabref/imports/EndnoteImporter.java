@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.util.Util;
 
 /**
  * Importer for the Refer/Endnote format.

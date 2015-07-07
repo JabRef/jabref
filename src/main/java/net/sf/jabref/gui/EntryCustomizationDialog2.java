@@ -29,6 +29,8 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 

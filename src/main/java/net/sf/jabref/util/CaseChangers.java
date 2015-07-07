@@ -34,8 +34,6 @@ package net.sf.jabref.util;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import net.sf.jabref.StringUtil;
-
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;

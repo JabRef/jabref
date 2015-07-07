@@ -22,7 +22,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
 

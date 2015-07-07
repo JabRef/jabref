@@ -33,6 +33,7 @@ import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.util.Util;
 
 public class ChangeScanner implements Runnable {
 

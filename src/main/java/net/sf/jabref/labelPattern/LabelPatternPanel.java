@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.StringUtil;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 

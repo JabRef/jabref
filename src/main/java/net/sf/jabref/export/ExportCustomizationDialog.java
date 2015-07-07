@@ -30,6 +30,7 @@ import net.sf.jabref.help.HelpAction;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
+import net.sf.jabref.util.Util;
 
 /**
  * <p>Title: </p>

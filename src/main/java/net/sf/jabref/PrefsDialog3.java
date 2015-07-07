@@ -43,6 +43,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.Util;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in

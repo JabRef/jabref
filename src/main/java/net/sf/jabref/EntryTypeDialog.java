@@ -27,6 +27,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.StringUtil;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 

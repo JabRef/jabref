@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.util.CaseChangers;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.

@@ -28,7 +28,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.StringUtil;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its

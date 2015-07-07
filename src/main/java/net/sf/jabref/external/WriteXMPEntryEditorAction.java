@@ -16,6 +16,7 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.*;
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.XMPUtil;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;

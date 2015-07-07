@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.export.layout.format.CreateDocBookAuthors;
+import net.sf.jabref.util.Util;
 
 import java.util.Vector;
 import java.util.WeakHashMap;

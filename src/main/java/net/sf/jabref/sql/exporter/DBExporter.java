@@ -39,7 +39,7 @@ import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.StringUtil;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
