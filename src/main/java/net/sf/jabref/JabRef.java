@@ -82,19 +82,19 @@ public class JabRef {
 
         if (prefs.getBoolean("useProxy")) {
             // NetworkTab.java ensures that proxyHostname and proxyPort are not null
-            System.getProperties().put("http.proxyHost", prefs.get("proxyHostname"));
-            System.getProperties().put("http.proxyPort", prefs.get("proxyPort"));
+            System.setProperty("http.proxyHost", prefs.get("proxyHostname"));
+            System.setProperty("http.proxyPort", prefs.get("proxyPort"));
 
             // currently, the following cannot be configured
             if (prefs.get("proxyUsername") != null) {
-                System.getProperties().put("http.proxyUser", prefs.get("proxyUsername"));
-                System.getProperties().put("http.proxyPassword", prefs.get("proxyPassword"));
+                System.setProperty("http.proxyUser", prefs.get("proxyUsername"));
+                System.setProperty("http.proxyPassword", prefs.get("proxyPassword"));
             }
         } else {
             // The following two lines signal that the system proxy settings
             // should be used:
             System.setProperty("java.net.useSystemProxies", "true");
-            System.getProperties().put("proxySet", "true");
+            System.setProperty("proxySet", "true");
         }
 
         Globals.startBackgroundTasks();
