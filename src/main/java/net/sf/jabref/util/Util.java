@@ -111,12 +111,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class Util {
 
-
-
-
-
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
 
     public static void pr(String s) {
         Globals.logger(s);

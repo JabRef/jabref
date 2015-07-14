@@ -35,7 +35,6 @@ public class ManageJournalsAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
 
-
     public ManageJournalsAction(JabRefFrame frame) {
         super();
         putValue(Action.NAME, Globals.menuTitle("Manage journal abbreviations"));

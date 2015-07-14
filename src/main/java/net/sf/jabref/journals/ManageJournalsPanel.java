@@ -33,6 +33,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.journals.logic.Abbreviation;
+import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.net.URLDownload;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -166,8 +168,9 @@ class ManageJournalsPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JournalAbbreviations abbr = new JournalAbbreviations(Globals.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(abbr.getTableModel());
+                JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+                abbr.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
+                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
                 JScrollPane pane = new JScrollPane(table);
                 JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
             }
@@ -318,17 +321,17 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupUserTable() {
-        JournalAbbreviations userAbbr = new JournalAbbreviations();
+        JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
         String filename = personalFile.getText();
         if (!filename.equals("") && (new File(filename)).exists()) {
             try {
-                userAbbr.readJournalList(new File(filename));
+                userAbbr.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
 
-        tableModel.setJournals(userAbbr.getJournals());
+        tableModel.setJournals(userAbbr.getAbbreviations());
         userTable = new JTable(tableModel);
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
@@ -497,22 +500,22 @@ class ManageJournalsPanel extends JPanel {
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
         final String[] names = new String[] {Globals.lang("Journal name"), Globals.lang("Abbreviation")};
-        ArrayList<JournalEntry> journals = null;
+        List<JournalEntry> journals = null;
 
 
         public AbbreviationsTableModel() {
 
         }
 
-        public void setJournals(Map<String, String> journals) {
+        public void setJournals(SortedSet<Abbreviation> journals) {
             this.journals = new ArrayList<JournalEntry>();
-            for (Map.Entry<String, String> entry : journals.entrySet()) {
-                this.journals.add(new JournalEntry(entry.getKey(), entry.getValue()));
+            for (Abbreviation abbreviation : journals) {
+                this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }
             fireTableDataChanged();
         }
 
-        public ArrayList<JournalEntry> getJournals() {
+        public List<JournalEntry> getJournals() {
             return journals;
         }
 
@@ -650,8 +653,9 @@ class ManageJournalsPanel extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        JournalAbbreviations abbr = new JournalAbbreviations(new File(tf.getText()));
-                        JTable table = new JTable(abbr.getTableModel());
+                        JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+                        abbr.readJournalListFromFile(new File(tf.getText()));
+                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
                         JScrollPane pane = new JScrollPane(table);
                         JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
                     } catch (FileNotFoundException ex) {
@@ -669,7 +673,6 @@ class ManageJournalsPanel extends JPanel {
                 }
             });
             clear.setToolTipText(Globals.lang("Remove"));
-
         }
 
         public JPanel getPanel() {
@@ -684,7 +687,6 @@ class ManageJournalsPanel extends JPanel {
     static class JournalEntry implements Comparable<JournalEntry> {
 
         String name, abbreviation;
-
 
         public JournalEntry(String name, String abbreviation) {
             this.name = name;

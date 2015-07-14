@@ -3,9 +3,9 @@ package net.sf.jabref.autocompleter;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.journals.logic.Abbreviation;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 public class ContentAutoCompleters extends AutoCompleters {
@@ -48,9 +48,8 @@ public class ContentAutoCompleters extends AutoCompleters {
     public void addJournalListToAutoCompleter() {
         AutoCompleter autoCompleter = get("journal");
         if(autoCompleter != null) {
-            Set<String> journals = Globals.journalAbbrev.getJournals().keySet();
-            for (String journal : journals) {
-                autoCompleter.addWordToIndex(journal);
+            for(Abbreviation abbreviation : Globals.journalAbbrev.getAbbreviations()) {
+                autoCompleter.addWordToIndex(abbreviation.getName());
             }
         }
     }

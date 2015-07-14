@@ -32,7 +32,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
-import net.sf.jabref.journals.JournalAbbreviations;
+import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -231,7 +231,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
         _prefs.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
         if (useIEEEAbrv.isSelected()) {
-            Globals.journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
+            Globals.journalAbbrev = new JournalAbbreviationRepository();
+            Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
         }
         try {
             int port = Integer.parseInt(remoteServerPort.getText());

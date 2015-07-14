@@ -153,8 +153,7 @@ public class JabRef {
         String personalJournalList = prefs.get("personalJournalList");
         if ((personalJournalList != null) && !personalJournalList.isEmpty()) {
             try {
-                Globals.journalAbbrev.readJournalList(new File(
-                        personalJournalList));
+                Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
             } catch (FileNotFoundException e) {
                 JOptionPane.showMessageDialog(null, Globals.lang("Journal file not found") + ": " + e.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                 Globals.prefs.put("personalJournalList", "");
