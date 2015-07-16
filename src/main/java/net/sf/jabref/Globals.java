@@ -38,6 +38,7 @@ import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
+import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
 import net.sf.jabref.util.logging.CachebleHandler;
@@ -47,6 +48,7 @@ public class Globals {
 
 
     public static final String JOURNALS_IEEE_INTERNAL_LIST = "/resource/IEEEJournalList.txt";
+    public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
     /**
      * {@link Control} class allowing properties bundles to be in different encodings.

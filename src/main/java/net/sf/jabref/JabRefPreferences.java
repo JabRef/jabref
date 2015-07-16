@@ -44,6 +44,7 @@ import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
 import net.sf.jabref.labelPattern.LabelPattern;
+import net.sf.jabref.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
@@ -535,8 +536,8 @@ public class JabRefPreferences {
         defaults.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
         defaults.put(JabRefPreferences.WRITEFIELD_WRAPFIELD, Boolean.FALSE);
 
-        defaults.put("useRemoteServer", Boolean.FALSE);
-        defaults.put("remoteServerPort", 6050);
+        defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.FALSE);
+        defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
 
         defaults.put("personalJournalList", null);
         defaults.put("externalJournalLists", null);

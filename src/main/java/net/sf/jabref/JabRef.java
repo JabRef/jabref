@@ -46,8 +46,9 @@ import net.sf.jabref.plugin.SidePanePlugin;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
-import net.sf.jabref.remote.RemoteListener;
-import net.sf.jabref.remote.RemoteListenerLifecycle;
+import net.sf.jabref.remote.RemotePreferences;
+import net.sf.jabref.remote.client.RemoteListenerClient;
+import net.sf.jabref.remote.JabRefMessageHandler;
 import net.sf.jabref.splash.SplashScreenLifecycle;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
@@ -123,26 +124,25 @@ public class JabRef {
         Globals.initializeJournalNames();
 
         // Check for running JabRef
-        if (Globals.prefs.getBoolean("useRemoteServer")) {
+        RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
+        if (remotePreferences.useRemoteServer()) {
 
-            RemoteListenerLifecycle.openRemoteListener(this);
+            Globals.remoteListener.open(new JabRefMessageHandler(this), remotePreferences.getPort());
 
-            if (!RemoteListenerLifecycle.isRemoteListenerOpen()) {
-                // Unless we are alone, try to contact already running JabRef:
-                if (RemoteListener.sendToActiveJabRefInstance(args)) {
-
+            if (Globals.remoteListener.isOpen()) {
+                Globals.remoteListener.start(); // we are alone, we start the server
+            } else {
+                // we are not alone, there is already a server out there, try to contact already running JabRef:
+                if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
                     /*
                      * We have successfully sent our command line options
                      * through the socket to another JabRef instance. So we
                      * assume it's all taken care of, and quit.
                      */
-                    System.out.println(
-                            Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    System.out.println(Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     JabRefExecutorService.INSTANCE.shutdownEverything();
                     return;
                 }
-            } else {
-                RemoteListenerLifecycle.startRemoteListener();
             }
         }
 
