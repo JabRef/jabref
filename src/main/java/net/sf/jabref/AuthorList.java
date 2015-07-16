@@ -1021,6 +1021,23 @@ public class AuthorList {
         private final String jr_part;
 
 
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result
+                    + ((first_abbr == null) ? 0 : first_abbr.hashCode());
+            result = prime * result
+                    + ((first_part == null) ? 0 : first_part.hashCode());
+            result = prime * result
+                    + ((jr_part == null) ? 0 : jr_part.hashCode());
+            result = prime * result
+                    + ((last_part == null) ? 0 : last_part.hashCode());
+            result = prime * result
+                    + ((von_part == null) ? 0 : von_part.hashCode());
+            return result;
+        }
+
         /**
          * Compare this object with the given one. 
          * 
