@@ -28,9 +28,9 @@ class Cookie {
     private Date expires;
     private String path;
 
-    private static final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
+    private final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
 
-    private static final DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
+    private final DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
 
 
     /**
@@ -78,10 +78,10 @@ class Cookie {
                 this.path = value;
             } else if (name.equalsIgnoreCase("expires")) {
                 try {
-                    this.expires = Cookie.expiresFormat1.parse(value);
+                    this.expires = expiresFormat1.parse(value);
                 } catch (ParseException e) {
                     try {
-                        this.expires = Cookie.expiresFormat2.parse(value);
+                        this.expires = expiresFormat2.parse(value);
                     } catch (ParseException e2) {
                         throw new IllegalArgumentException(
                                 "Bad date format in header: " + value);
