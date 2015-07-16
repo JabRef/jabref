@@ -17,8 +17,8 @@ public class EasyDateFormat {
      *
      * @return The date string.
      */
-    public String easyDateFormat() {
-        return easyDateFormat(new Date());
+    public String getCurrentDate() {
+        return getDateAt(new Date());
     }
 
     /**
@@ -27,7 +27,7 @@ public class EasyDateFormat {
      *
      * @return The formatted date string.
      */
-    public String easyDateFormat(Date date) {
+    public String getDateAt(Date date) {
         // first use, create an instance
         if (dateFormatter == null) {
             String format = Globals.prefs.get("timeStampFormat");

@@ -868,7 +868,7 @@ public class Util {
         String timeStampField = Globals.prefs.get("timeStampField");
 
         String defaultOwner = Globals.prefs.get("defaultOwner");
-        String timestamp = dateFormatter.easyDateFormat();
+        String timestamp = dateFormatter.getCurrentDate();
         boolean globalSetOwner = Globals.prefs.getBoolean("useOwner"), globalSetTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
 
         // Do not need to do anything if all options are disabled
@@ -905,7 +905,7 @@ public class Util {
     public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner,
             boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get("defaultOwner");
-        String timestamp = dateFormatter.easyDateFormat();
+        String timestamp = dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get("timeStampField");
         boolean setOwner = Globals.prefs.getBoolean("useOwner") &&
                 (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
@@ -1724,7 +1724,7 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get("timeStampField");
-        String timestamp = dateFormatter.easyDateFormat();
+        String timestamp = dateFormatter.getCurrentDate();
         Util.updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }
