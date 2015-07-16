@@ -92,10 +92,6 @@ public class CustomExportList {
         return format;
     }
 
-    public String[] getElementAt(int pos) {
-        return (String[]) (array[pos]);
-    }
-
     public void addFormat(String[] s) {
         list.add(s);
         ExportFormat format = createFormat(s);
