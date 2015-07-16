@@ -880,7 +880,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     	if(o != null) {
             return styleFile.equals(((OOBibStyle) o).styleFile);
     	} else {
-    		return false;
+            return false;
     	}
     }
 
