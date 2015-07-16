@@ -42,7 +42,7 @@ Open `About.html` and add yourself below `Contributions from:`.
 
 The headers of each `.java` file state the authors.
 These entries should match the modifications done.
-If you do not want to add your real name, add yourself as `JabRef contriubtors`.
+If you do not want to add your real name, add yourself as `JabRef contributors`.
 
 For instance,
 
