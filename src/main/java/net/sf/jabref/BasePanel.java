@@ -215,8 +215,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //GroupSelector groupSelector;
 
     private boolean showingSearch = false;
-    @SuppressWarnings("unused")
-    private boolean showingGroup = false;
+
     public boolean sortingBySearchResults = false;
     public boolean coloringBySearchResults = false;
     public boolean hidingNonHits = false;
@@ -2672,7 +2671,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void setGroupMatcher(Matcher<BibtexEntry> matcher) {
         groupFilterList.setMatcher(matcher);
-        showingGroup = true;
     }
 
     public void stopShowingSearchResults() {
@@ -2682,7 +2680,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void stopShowingGroup() {
         groupFilterList.setMatcher(NoSearchMatcher.INSTANCE);
-        showingGroup = false;
     }
 
     /**
