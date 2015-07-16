@@ -257,13 +257,11 @@ public class MetaData implements Iterable<String> {
         for (String key : metaData.keySet()) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
-            if (orderedData.size() >= 0) {
-                sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
-                for (int j = 0; j < orderedData.size(); j++) {
-                    sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
-                }
-                sb.append("}");
+            sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
+            for (int j = 0; j < orderedData.size(); j++) {
+                sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
+            sb.append("}");
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
