@@ -97,7 +97,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
         entriesChanged = 0;
-        int brokenLinks = 0;
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
@@ -176,7 +175,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                             // Cancel
                             break mainLoop;
                         }
-                        brokenLinks++;
                     }
 
                 }
@@ -207,6 +205,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     class OptionsDialog extends JDialog {
 
+        private static final long serialVersionUID = 1L;
         final JRadioButton autoSetUnset;
         final JRadioButton autoSetAll;
         final JRadioButton autoSetNone;
@@ -233,6 +232,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
             Action closeAction = new AbstractAction() {
 
+                private static final long serialVersionUID = 1L;
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
@@ -246,7 +247,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             im.put(Globals.prefs.getKey("Close dialog"), "close");
             am.put("close", closeAction);
 
-            fieldName = fieldName.toUpperCase();
             autoSetUnset = new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
             autoSetAll = new JRadioButton(Globals.lang("Autoset %0 links. Allow overwriting existing links.", fn), false);
             autoSetNone = new JRadioButton(Globals.lang("Do not autoset"), false);
