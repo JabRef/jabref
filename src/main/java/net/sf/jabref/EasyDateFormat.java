@@ -6,10 +6,9 @@ import java.util.Date;
 public class EasyDateFormat {
 
     /**
-     * A static Object for date formatting. Please do not create the object
-     * here, because there are some references from the Globals class.....
+     * The formatter objects
      */
-    private static SimpleDateFormat dateFormatter = null;
+    private SimpleDateFormat dateFormatter = null;
 
     /**
      * Creates a String containing the current date (and possibly time),
@@ -18,7 +17,7 @@ public class EasyDateFormat {
      *
      * @return The date string.
      */
-    public static String easyDateFormat() {
+    public String easyDateFormat() {
         return easyDateFormat(new Date());
     }
 
@@ -28,7 +27,7 @@ public class EasyDateFormat {
      *
      * @return The formatted date string.
      */
-    public static String easyDateFormat(Date date) {
+    public String easyDateFormat(Date date) {
         // first use, create an instance
         if (dateFormatter == null) {
             String format = Globals.prefs.get("timeStampFormat");
