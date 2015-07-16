@@ -118,6 +118,8 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = Logger.getLogger(BasePanel.class.getName());
 
     public final static int SHOWING_NOTHING = 0;
@@ -213,6 +215,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //GroupSelector groupSelector;
 
     private boolean showingSearch = false;
+    @SuppressWarnings("unused")
     private boolean showingGroup = false;
     public boolean sortingBySearchResults = false;
     public boolean coloringBySearchResults = false;
@@ -235,22 +238,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private ContentAutoCompleters autoCompleters;
-
-
-    /**
-     * Create a new BasePanel with an empty database.
-     * @param frame The application window.
-     */
-    private BasePanel(JabRefFrame frame) {
-        this.sidePaneManager = Globals.sidePaneManager;
-        database = new BibtexDatabase();
-        metaData = new MetaData();
-        metaData.initializeNewDatabase();
-        this.frame = frame;
-        setupActions();
-        setupMainPanel();
-        encoding = Globals.prefs.get("defaultEncoding");
-    }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
             MetaData metaData, String encoding) {
@@ -2062,6 +2049,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         mainTable.getActionMap().put("cut", new AbstractAction() {
 
+            private static final long serialVersionUID = 1L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -2073,6 +2062,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
         mainTable.getActionMap().put("copy", new AbstractAction() {
 
+            private static final long serialVersionUID = 1L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -2083,6 +2074,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
         mainTable.getActionMap().put("paste", new AbstractAction() {
+
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -2435,7 +2428,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param editor The entry editor to add.
      */
     public void showEntryEditor(EntryEditor editor) {
-        int oldSplitterLocation = -1;
         if (mode == BasePanel.SHOWING_EDITOR) {
             Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
         } else if (mode == BasePanel.SHOWING_PREVIEW) {
