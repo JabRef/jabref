@@ -23,6 +23,9 @@ import java.util.Collection;
 
 import javax.swing.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.AttachFileDialog;
 import net.sf.jabref.undo.NamedCompound;
@@ -31,6 +34,7 @@ import net.sf.jabref.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 
@@ -45,6 +49,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private OptionsDialog optDiag = null;
+    
+    private static final Log log = LogFactory.getLog(AutoSetExternalFileForEntries.class);
 
     private final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
@@ -97,6 +103,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
         entriesChanged = 0;
+        int brokenLinks = 0;
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
@@ -175,12 +182,18 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                             // Cancel
                             break mainLoop;
                         }
+                        brokenLinks++;
                     }
 
                 }
             }
         }
-
+        
+        //log brokenLinks if some were found
+        if(brokenLinks > 0) {
+            log.warn("Found " + brokenLinks + " broken links");
+        }
+        
         if (entriesChanged > 0) {
             // Add the undo edit:
             ce.end();
