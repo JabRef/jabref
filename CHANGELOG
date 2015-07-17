@@ -3,6 +3,7 @@
     - Fix for bug #1288: Emacs keybindings: Rebinding of C-f can now be configured
     - Antialiasing is now enabled and set to LCD
     - Special fields: .bib files edited with 2.11 beta 3 are not compatible with this release. Other versions are not affected.
+    - Journal abbreviation lists: in case entries are defined more than once, a message is output on the console
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
