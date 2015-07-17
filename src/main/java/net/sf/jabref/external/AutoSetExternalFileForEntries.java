@@ -190,7 +190,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         //log brokenLinks if some were found
         if (brokenLinks > 0) {
-            log.warn(Globals.lang("Found " + brokenLinks + " broken links"));
+            log.warn(Globals.lang("Found %0 broken links", brokenLinks + ""));
         }
 
         if (entriesChanged > 0) {
