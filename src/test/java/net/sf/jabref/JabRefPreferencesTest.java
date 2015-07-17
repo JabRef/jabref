@@ -2,14 +2,16 @@ package net.sf.jabref;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.io.Files;
 
 public class JabRefPreferencesTest {
 
@@ -28,13 +30,15 @@ public class JabRefPreferencesTest {
 
     @Test
     public void testPreferencesExport() throws IOException {
-        String tmpFile = "src/test/resources/net/sf/jabref/preferencesTest.xml";
-        prefs.exportPreferences(tmpFile);
+        File tmpFile = new File("src/test/resources/net/sf/jabref/preferencesTest.xml");
+        File expectedFile = new File("src/test/resources/net/sf/jabref/defaultPreferences.xml");
+        
+        prefs.exportPreferences(tmpFile.getAbsolutePath());
 
-        List<String> actual = Files.readAllLines(Paths.get(tmpFile));
-        List<String> expected = Files.readAllLines(Paths.get("src/test/resources/net/sf/jabref/defaultPreferences.xml"));
+        List<String> actual = Files.readLines(tmpFile, Charset.defaultCharset());
+        List<String> expected = Files.readLines(expectedFile, Charset.defaultCharset());
       
-        Files.delete(Paths.get(tmpFile));
+        tmpFile.delete();
 
         assertEquals(expected, actual);
     }
