@@ -254,7 +254,8 @@ public class MetaData implements Iterable<String> {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        for (String key : metaData.keySet()) {
+        SortedSet<String> sortedKeys = new TreeSet<String>(metaData.keySet());
+        for (String key : sortedKeys) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
             if (orderedData.size() >= 0) {
