@@ -394,7 +394,6 @@ public class JabRefPreferences {
         defaults.put("useCustomIconTheme", Boolean.FALSE);
         defaults.put("customIconThemeFile", "/home/alver/div/crystaltheme_16/Icons.properties");
 
-        //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", 8);
         defaults.put("fontStyle", java.awt.Font.PLAIN);
         defaults.put("fontSize", 12);
@@ -712,7 +711,6 @@ public class JabRefPreferences {
     }
 
     public String get(String key) {
-        //System.out.println("READ PREF [" + key + "]=" + result);
         return prefs.get(key, (String) defaults.get(key));
     }
 
