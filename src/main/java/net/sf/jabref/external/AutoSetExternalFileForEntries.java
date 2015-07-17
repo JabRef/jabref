@@ -39,9 +39,8 @@ import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 
 /**
- * This action goes through all selected entries in the BasePanel, and attempts to autoset the
- * given external file (pdf, ps, ...) based on the same algorithm used for the "Auto" button in
- * EntryEditor.
+ * This action goes through all selected entries in the BasePanel, and attempts to autoset the given external file (pdf,
+ * ps, ...) based on the same algorithm used for the "Auto" button in EntryEditor.
  */
 public class AutoSetExternalFileForEntries extends AbstractWorker {
 
@@ -49,7 +48,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private OptionsDialog optDiag = null;
-    
+
     private static final Log log = LogFactory.getLog(AutoSetExternalFileForEntries.class);
 
     private final Object[] brokenLinkOptions =
@@ -188,12 +187,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 }
             }
         }
-        
+
         //log brokenLinks if some were found
-        if(brokenLinks > 0) {
-            log.warn("Found " + brokenLinks + " broken links");
+        if (brokenLinks > 0) {
+            log.warn(Globals.lang("Found " + brokenLinks + " broken links"));
         }
-        
+
         if (entriesChanged > 0) {
             // Add the undo edit:
             ce.end();
@@ -246,6 +245,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             Action closeAction = new AbstractAction() {
 
                 private static final long serialVersionUID = 1L;
+
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
