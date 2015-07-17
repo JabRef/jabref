@@ -28,8 +28,11 @@ class Cookie {
     private Date expires;
     private String path;
 
+    /**
+     * DateFormats should not be reused among instances (or rather among threads), because they are not thread-safe.
+     * If they are shared, their usage should be synchronized.
+     */
     private final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
-
     private final DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
 
 
