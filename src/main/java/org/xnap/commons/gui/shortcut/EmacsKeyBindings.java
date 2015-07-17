@@ -1,4 +1,6 @@
 /*
+ *  Copyright (C) 2015  Oliver Kopp
+ *
  *  This file is part of JabRef and is based on XNap Commons.
  *  This file may be used under the LGPL 2.1 license if used without JabRef.
 
@@ -68,8 +70,6 @@ import org.apache.commons.logging.LogFactory;
  * JTextComponent}s.
  * 
  * The inner class actions can also be used independently.
- *
- * @author Felix Berger
  */
 public class EmacsKeyBindings
 {
@@ -130,12 +130,6 @@ public class EmacsKeyBindings
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_F,
                     InputEvent.ALT_MASK),
                     DefaultEditorKit.nextWordAction),
-            // CTRL+F is also used for "search", which is used more often than going forward one letter
-            // Therefore, we just disalbe this key
-            //		new JTextComponent.
-            //			KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-            //											  InputEvent.CTRL_MASK),
-            //					   DefaultEditorKit.forwardAction),
             new JTextComponent.
             KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_B,
                     InputEvent.CTRL_MASK),
@@ -204,6 +198,10 @@ public class EmacsKeyBindings
     private static final JTextComponent.KeyBinding EMACS_KEY_BINDING_C_A = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_A,
             InputEvent.CTRL_MASK),
             DefaultEditorKit.beginLineAction);
+
+    private static final JTextComponent.KeyBinding EMACS_KEY_BINDING_C_F = new JTextComponent.KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_F,
+            InputEvent.CTRL_MASK),
+            DefaultEditorKit.forwardAction);
 
     private static final TextAction[] EMACS_ACTIONS = {
             new KillWordAction(EmacsKeyBindings.killWordAction),
@@ -311,11 +309,33 @@ public class EmacsKeyBindings
             Keymap k = JTC.getKeymap();
 
             JTextComponent.KeyBinding[] keybindings;
-            if (JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA)) {
-                int size = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length + 1;
+            boolean rebindCA = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA);
+            boolean rebindCF = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF);
+            if (rebindCA || rebindCF) {
+                // if we additionally rebind C-a or C-f, we have to add the shortcuts to EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE
+
+                // determine size of new array and position of the new key bindings in the array
+                int size = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length;
+                int CAPos = -1;
+                int CFPos = -1;
+                if (rebindCA) {
+                    CAPos = size;
+                    size++;
+                }
+                if (rebindCF) {
+                    CFPos = size;
+                    size++;
+                }
+
+                // generate new array
                 keybindings = new JTextComponent.KeyBinding[size];
                 System.arraycopy(EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE, 0, keybindings, 0, EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length);
-                keybindings[EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE.length] = EmacsKeyBindings.EMACS_KEY_BINDING_C_A;
+                if (rebindCA) {
+                    keybindings[CAPos] = EmacsKeyBindings.EMACS_KEY_BINDING_C_A;
+                }
+                if (rebindCF) {
+                    keybindings[CFPos] = EmacsKeyBindings.EMACS_KEY_BINDING_C_F;
+                }
             } else {
                 keybindings = EmacsKeyBindings.EMACS_KEY_BINDINGS_BASE;
             }
