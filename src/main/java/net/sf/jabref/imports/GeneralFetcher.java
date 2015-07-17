@@ -40,6 +40,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.util.Util;
 
 /**
  * <p>Title: </p>

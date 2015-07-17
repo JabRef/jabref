@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.collab;
 
-import net.sf.jabref.FileUtil;
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
 
 import java.util.HashMap;

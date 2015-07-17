@@ -1,4 +1,8 @@
-package net.sf.jabref;
+package net.sf.jabref.util;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -23,7 +23,7 @@ import javax.swing.Action;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 @SuppressWarnings("serial")
 public class ForkMeOnGitHubAction extends AbstractAction {

@@ -41,6 +41,9 @@ import net.sf.jabref.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.util.DOIUtil;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {
 
@@ -254,7 +257,7 @@ public class CleanUpAction extends AbstractWorker {
         // first upgrade the external links
         // we have to use it separately as the Utils function generates a separate Named Compound
         if (choiceCleanUpUpgradeExternalLinks) {
-            NamedCompound ce = Util.upgradePdfPsToFile(Arrays.asList(panel.getSelectedEntries()), new String[] {"pdf", "ps"});
+            NamedCompound ce = Util.upgradePdfPsToFile(Arrays.asList(panel.getSelectedEntries()), new String[]{"pdf", "ps"});
             if (ce.hasEdits()) {
                 panel.undoManager.addEdit(ce);
                 panel.markBaseChanged();

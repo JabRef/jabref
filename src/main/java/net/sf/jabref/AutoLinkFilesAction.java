@@ -10,6 +10,7 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 
 import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.util.Util;
 
 /**
  * This Action may only be used in a menu or button.

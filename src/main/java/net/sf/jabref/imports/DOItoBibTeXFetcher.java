@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 

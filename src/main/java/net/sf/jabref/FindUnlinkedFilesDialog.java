@@ -68,6 +68,7 @@ import net.sf.jabref.imports.UnlinkedFilesCrawler;
 import net.sf.jabref.imports.UnlinkedPDFFileFilter;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.Util;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".

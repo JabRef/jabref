@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.*;
+import net.sf.jabref.util.Util;
 
 public class RisKeywords implements LayoutFormatter {
 

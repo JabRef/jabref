@@ -28,6 +28,7 @@ import net.sf.jabref.export.layout.format.NotFoundFormatter;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.LayoutFormatterExtension;
+import net.sf.jabref.util.Util;
 
 /**
  * DOCUMENT ME!

@@ -41,6 +41,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.jabref.*;
+import net.sf.jabref.util.Util;
 
 /**
  * Class for importing BibTeX-files.

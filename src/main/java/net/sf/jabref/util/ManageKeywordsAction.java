@@ -46,7 +46,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Util;
 import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.specialfields.Printed;

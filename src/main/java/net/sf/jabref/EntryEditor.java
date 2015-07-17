@@ -60,7 +60,7 @@ import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.journals.JournalAbbreviations;
+import net.sf.jabref.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.undo.NamedCompound;
@@ -68,6 +68,7 @@ import net.sf.jabref.undo.UndoableChangeType;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.Util;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
@@ -480,7 +481,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 contentSelectors.add(ws);
                 controls.add(ws, BorderLayout.NORTH);
             }
-            controls.add(JournalAbbreviations.getNameSwitcher(this, ed, panel.undoManager),
+            controls.add(JournalAbbreviationsUtil.getNameSwitcher(this, ed, panel.undoManager),
                     BorderLayout.SOUTH);
             return controls;
         } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + ed.getFieldName()) != null) {

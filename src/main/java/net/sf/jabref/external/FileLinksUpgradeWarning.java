@@ -26,6 +26,7 @@ import net.sf.jabref.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.util.Util;
 
 /**
  * This class defines the warning that can be offered when opening a pre-2.3

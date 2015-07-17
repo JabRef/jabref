@@ -1,5 +1,10 @@
-package net.sf.jabref;
+package net.sf.jabref.util;
 
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OpenFileFilter;
 import net.sf.jabref.external.ExternalFileType;
 
 import java.io.File;

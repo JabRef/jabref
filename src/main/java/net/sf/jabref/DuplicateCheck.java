@@ -23,6 +23,12 @@ import java.util.HashSet;
  */
 public class DuplicateCheck {
 
+    /*
+     * Integer values for indicating result of duplicate check (for entries):
+     *
+     */
+    final static int NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2, EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
+
     public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
     // Non-required fields are investigated only if the required fields give a value within
     // the doubt range of the threshold:
@@ -59,7 +65,7 @@ public class DuplicateCheck {
         String[] fields = one.getType().getRequiredFields();
         double[] req;
         if (fields == null) {
-            req = new double[] {0., 0.};
+            req = new double[]{0., 0.};
         } else {
             req = DuplicateCheck.compareFieldSet(fields, one, two);
         }
@@ -67,8 +73,7 @@ public class DuplicateCheck {
         if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.doubtRange) {
             // Far from the threshold value, so we base our decision on the req. fields only
             return req[0] >= DuplicateCheck.duplicateThreshold;
-        }
-        else {
+        } else {
             // Close to the threshold value, so we take a look at the optional fields, if any:
             fields = one.getType().getOptionalFields();
             if (fields != null) {
@@ -95,17 +100,17 @@ public class DuplicateCheck {
             totWeights += weight;
             int result = DuplicateCheck.compareSingleField(field, one, two);
             //System.out.println("Field: "+fields[i]+": "+result);
-            if (result == Util.EQUAL) {
+            if (result == EQUAL) {
                 res += weight;
-            } else if (result == Util.EMPTY_IN_BOTH) {
+            } else if (result == EMPTY_IN_BOTH) {
                 totWeights -= weight;
             }
         }
         if (totWeights > 0) {
-            return new double[] {res / totWeights, totWeights};
+            return new double[]{res / totWeights, totWeights};
         } else {
             // no fields present. This points to a possible duplicate?
-            return new double[] {0.5, 0.0};
+            return new double[]{0.5, 0.0};
         }
     }
 
@@ -113,12 +118,12 @@ public class DuplicateCheck {
         String s1 = one.getField(field), s2 = two.getField(field);
         if (s1 == null) {
             if (s2 == null) {
-                return Util.EMPTY_IN_BOTH;
+                return EMPTY_IN_BOTH;
             } else {
-                return Util.EMPTY_IN_ONE;
+                return EMPTY_IN_ONE;
             }
         } else if (s2 == null) {
-            return Util.EMPTY_IN_TWO;
+            return EMPTY_IN_TWO;
         }
 
         // Util.pr(field+": '"+s1+"' vs '"+s2+"'");
@@ -131,9 +136,9 @@ public class DuplicateCheck {
             //System.out.println(correlateByWords(auth1, auth2));
             double similarity = DuplicateCheck.correlateByWords(auth1, auth2, false);
             if (similarity > 0.8) {
-                return Util.EQUAL;
+                return EQUAL;
             } else {
-                return Util.NOT_EQUAL;
+                return NOT_EQUAL;
             }
 
         } else if (field.equals("pages")) {
@@ -143,9 +148,9 @@ public class DuplicateCheck {
             s1 = s1.replaceAll("[- ]+", "-");
             s2 = s2.replaceAll("[- ]+", "-");
             if (s1.equals(s2)) {
-                return Util.EQUAL;
+                return EQUAL;
             } else {
-                return Util.NOT_EQUAL;
+                return NOT_EQUAL;
             }
 
         } else if (field.equals("journal")) {
@@ -157,18 +162,18 @@ public class DuplicateCheck {
             //System.out.println(s1+" :: "+s2);
             double similarity = DuplicateCheck.correlateByWords(s1, s2, true);
             if (similarity > 0.8) {
-                return Util.EQUAL;
+                return EQUAL;
             } else {
-                return Util.NOT_EQUAL;
+                return NOT_EQUAL;
             }
         } else {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
             double similarity = DuplicateCheck.correlateByWords(s1, s2, false);
             if (similarity > 0.8) {
-                return Util.EQUAL;
+                return EQUAL;
             } else {
-                return Util.NOT_EQUAL;
+                return NOT_EQUAL;
             /*if (s1.trim().equals(s2.trim()))
                 return Util.EQUAL;
             else
@@ -192,8 +197,8 @@ public class DuplicateCheck {
         }
         if (score == allFields.size()) {
             return 1.01; // Just to make sure we can
-        // use score>1 without
-        // trouble.
+            // use score>1 without
+            // trouble.
         } else {
             return ((double) score) / allFields.size();
         }
@@ -211,8 +216,7 @@ public class DuplicateCheck {
      */
     public static BibtexEntry containsDuplicate(BibtexDatabase database, BibtexEntry entry) {
         for (BibtexEntry other : database.getEntries()) {
-            if (DuplicateCheck.isDuplicate(entry, other))
-             {
+            if (DuplicateCheck.isDuplicate(entry, other)) {
                 return other; // Duplicate found.
             }
         }
@@ -221,10 +225,11 @@ public class DuplicateCheck {
 
     /**
      * Compare two strings on the basis of word-by-word correlation analysis.
-     * @param s1 The first string
-     * @param s2 The second string
+     *
+     * @param s1       The first string
+     * @param s2       The second string
      * @param truncate if true, always truncate the longer of two words to be compared to
-     *   harmonize their length. If false, use interpolation to harmonize the strings.
+     *                 harmonize their length. If false, use interpolation to harmonize the strings.
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
     private static double correlateByWords(String s1, String s2, boolean truncate) {
@@ -247,11 +252,9 @@ public class DuplicateCheck {
         int minLength = Math.min(s1.length(), s2.length());
         if (truncate && (minLength == 1)) {
             return s1.charAt(0) == s2.charAt(0) ? 1.0 : 0.0;
-        }
-        else if ((s1.length() == 1) && (s2.length() == 1)) {
+        } else if ((s1.length() == 1) && (s2.length() == 1)) {
             return s1.equals(s2) ? 1.0 : 0.0;
-        }
-        else if (minLength == 0) {
+        } else if (minLength == 0) {
             return (s1.isEmpty()) && (s2.isEmpty()) ? 1.0 : 0;
         }
 
@@ -328,10 +331,12 @@ public class DuplicateCheck {
     }
 
     public static void main(String[] args) {
-        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea", d2 = "Characterization of Calunus finmarchicus habitat in the North Sea", d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
+        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
+        String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
+        String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
+
         System.out.println(DuplicateCheck.correlateByWords(d1, d2, false));
         System.out.println(DuplicateCheck.correlateByWords(d1, d3, false));
         System.out.println(DuplicateCheck.correlateByWords(d2, d3, false));
-
     }
 }

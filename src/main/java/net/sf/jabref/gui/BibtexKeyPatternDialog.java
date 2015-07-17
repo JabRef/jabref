@@ -33,7 +33,7 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternPanel;
 

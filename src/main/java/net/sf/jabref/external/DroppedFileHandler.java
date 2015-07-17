@@ -31,6 +31,8 @@ import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;

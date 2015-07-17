@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.util.FileUtil;
 
 /**
  * This class handles the task of looking up all external files linked for a set

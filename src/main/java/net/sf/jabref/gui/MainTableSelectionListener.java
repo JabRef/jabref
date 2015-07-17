@@ -40,6 +40,7 @@ import java.util.List;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.util.Util;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the

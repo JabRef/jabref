@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.util.Util;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

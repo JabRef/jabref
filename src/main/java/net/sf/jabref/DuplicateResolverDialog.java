@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import javax.swing.*;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.util.Util;
 
 // created by : ?
 //

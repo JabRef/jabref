@@ -17,7 +17,7 @@ package net.sf.jabref.sql;
 
 import net.sf.jabref.BaseAction;
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.sql.exporter.DBExporter;
 

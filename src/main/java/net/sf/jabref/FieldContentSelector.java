@@ -32,6 +32,7 @@ import javax.swing.KeyStroke;
 
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;
+import net.sf.jabref.util.Util;
 
 /**
  * A combo-box and a manage button that will add selected strings to an

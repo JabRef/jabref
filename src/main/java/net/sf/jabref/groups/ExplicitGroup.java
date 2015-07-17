@@ -21,6 +21,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.util.QuotedStringTokenizer;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * @author jzieren

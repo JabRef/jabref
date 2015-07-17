@@ -37,11 +37,18 @@ import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
-import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.util.ErrorConsole;
+import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
+import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
+import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
+import net.sf.jabref.util.logging.CachebleHandler;
+import net.sf.jabref.util.logging.StdoutConsoleHandler;
 
 public class Globals {
+
+
+    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/resource/IEEEJournalList.txt";
+    public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
     /**
      * {@link Control} class allowing properties bundles to be in different encodings.
@@ -123,7 +130,8 @@ public class Globals {
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
-    public static ErrorConsole errorConsole;
+    public static StreamEavesdropper streamEavesdropper;
+    public static CachebleHandler handler;
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
@@ -232,8 +240,7 @@ public class Globals {
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
 
-        // TODO: Error console initialization here. When should it be used?
-        Globals.errorConsole = ErrorConsole.getInstance();
+        Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
 
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
@@ -303,8 +310,7 @@ public class Globals {
     }
 
 
-    public static JournalAbbreviations journalAbbrev;
-
+    public static JournalAbbreviationRepository journalAbbrev;
 
     public static String lang(String key, String[] params) {
         String translation = null;
@@ -1290,9 +1296,10 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
     public static void initializeJournalNames() {
 
         // Read internal lists:
-        Globals.journalAbbrev = new JournalAbbreviations(Globals.JOURNALS_FILE_BUILTIN);
+        Globals.journalAbbrev = new JournalAbbreviationRepository();
+        Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
         if (Globals.prefs.getBoolean("useIEEEAbrv")) {
-            Globals.journalAbbrev.readJournalList("/resource/IEEEJournalList.txt");
+            Globals.journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_INTERNAL_LIST);
         }
 
         // Read external lists, if any (in reverse order, so the upper lists
@@ -1301,7 +1308,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         if ((lists != null) && (lists.length > 0)) {
             for (int i = lists.length - 1; i >= 0; i--) {
                 try {
-                    Globals.journalAbbrev.readJournalList(new File(lists[i]));
+                    Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
                     Globals.logger(e.getMessage());
@@ -1312,7 +1319,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         // Read personal list, if set up:
         if (Globals.prefs.get("personalJournalList") != null) {
             try {
-                Globals.journalAbbrev.readJournalList(new File(Globals.prefs.get("personalJournalList")));
+                Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get("personalJournalList")));
             } catch (FileNotFoundException e) {
                 Globals.logger("Personal journal list file '" + Globals.prefs.get("personalJournalList")
                         + "' not found.");
@@ -1349,30 +1356,6 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
     }
 
 
-    /**
-     * With Java 7, one could directly set a format for the SimpleFormatter
-     * (http://stackoverflow.com/a/10722260/873282) and use that in a StreamHandler.
-     * As JabRef is compatible with Java6, we have to write our own Handler
-     */
-    private static class StdoutConsoleHandler extends Handler {
-
-        @Override
-        public void close() throws SecurityException {
-        }
-
-        @Override
-        public void flush() {
-            System.out.flush();
-        }
-
-        @Override
-        public void publish(LogRecord record) {
-            System.out.println(record.getMessage());
-            System.out.flush();
-        }
-    }
-
-
     public static void setupLogging() {
         // get the root logger. It is NOT GLOBAL_LOGGER_NAME
         Logger rootLogger = Logger.getLogger("");
@@ -1387,7 +1370,8 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         StdoutConsoleHandler h = new StdoutConsoleHandler();
         rootLogger.addHandler(h);
 
-        rootLogger.addHandler(Globals.errorConsole);
+        Globals.handler = new CachebleHandler();
+        rootLogger.addHandler(handler);
     }
 
 }

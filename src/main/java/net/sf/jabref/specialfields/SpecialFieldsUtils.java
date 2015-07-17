@@ -18,7 +18,7 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;

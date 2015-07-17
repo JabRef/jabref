@@ -42,6 +42,8 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 import com.jgoodies.uif_lite.component.UIFSplitPane;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with

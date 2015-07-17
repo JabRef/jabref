@@ -31,6 +31,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.util.Util;
 
 /**
  * Created by IntelliJ IDEA.

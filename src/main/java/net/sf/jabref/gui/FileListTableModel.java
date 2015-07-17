@@ -24,7 +24,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 

@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.util.StringUtil;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

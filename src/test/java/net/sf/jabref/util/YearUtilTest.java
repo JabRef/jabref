@@ -1,5 +1,6 @@
-package net.sf.jabref;
+package net.sf.jabref.util;
 
+import net.sf.jabref.util.YearUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

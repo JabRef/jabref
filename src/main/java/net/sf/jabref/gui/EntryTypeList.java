@@ -28,7 +28,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.CustomEntryType;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the

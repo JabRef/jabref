@@ -27,7 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

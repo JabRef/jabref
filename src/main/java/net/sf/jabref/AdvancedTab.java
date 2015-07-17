@@ -30,18 +30,20 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.google.common.base.Optional;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
-import net.sf.jabref.journals.JournalAbbreviations;
+import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.remote.RemoteListenerLifecycle;
+import net.sf.jabref.remote.RemotePreferences;
 import net.sf.jabref.remote.RemoteUtil;
+import net.sf.jabref.remote.JabRefMessageHandler;
 
 public class AdvancedTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences preferences;
     HelpDialog helpDiag;
     JPanel pan = new JPanel();
     JLabel lab;
@@ -66,11 +68,13 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
     private final JabRef jabRef;
+    private RemotePreferences remotePreferences;
 
 
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag, JabRef jabRef) {
         this.jabRef = jabRef;
-        _prefs = prefs;
+        preferences = prefs;
+        this.remotePreferences = new RemotePreferences(preferences);
 
         HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
@@ -204,13 +208,13 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        oldUseDef = _prefs.getBoolean("useDefaultLookAndFeel");
-        oldLnf = _prefs.get("lookAndFeel");
+        oldUseDef = preferences.getBoolean("useDefaultLookAndFeel");
+        oldLnf = preferences.get("lookAndFeel");
         useDefault.setSelected(!oldUseDef);
         className.setSelectedItem(oldLnf);
         className.setEnabled(!oldUseDef);
-        useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
-        oldPort = _prefs.getInt("remoteServerPort");
+        useRemoteServer.setSelected(remotePreferences.useRemoteServer());
+        oldPort = remotePreferences.getPort();
         remoteServerPort.setText(String.valueOf(oldPort));
         useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
         filechooserDisableRename.setSelected(Globals.prefs.getBoolean("filechooserDisableRename"));
@@ -224,35 +228,19 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
-        _prefs.put("lookAndFeel", className.getSelectedItem().toString());
-        _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
-        _prefs.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());
+        preferences.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
+        preferences.put("lookAndFeel", className.getSelectedItem().toString());
+        preferences.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
+        preferences.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
-        _prefs.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
+        preferences.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
         if (useIEEEAbrv.isSelected()) {
-            Globals.journalAbbrev = new JournalAbbreviations("/resource/IEEEJournalList.txt");
+            Globals.journalAbbrev = new JournalAbbreviationRepository();
+            Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
         }
-        try {
-            int port = Integer.parseInt(remoteServerPort.getText());
-            if (port != oldPort) {
-                _prefs.putInt("remoteServerPort", port);
-                /*JOptionPane.showMessageDialog(null, Glbals.lang("You have changed the menu and label font size. "
-                        + "You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
-                        JOptionPane.WARNING_MESSAGE);*/
-            }
+        storeRemoteSettings();
 
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
-        _prefs.putBoolean("useRemoteServer", useRemoteServer.isSelected());
-        if (useRemoteServer.isSelected()) {
-            RemoteListenerLifecycle.openAndStartRemoteListener(jabRef);
-        } else {
-            RemoteListenerLifecycle.disableRemoteListener();
-        }
-
-        _prefs.putBoolean("biblatexMode", biblatexMode.isSelected());
+        preferences.putBoolean("biblatexMode", biblatexMode.isSelected());
 
         if ((useDefault.isSelected() == oldUseDef) ||
                 !oldLnf.equals(className.getSelectedItem().toString())) {
@@ -272,9 +260,41 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                     Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
 
-        _prefs.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
-        _prefs.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
-        _prefs.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());
+        preferences.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
+        preferences.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
+        preferences.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());
+    }
+
+    public void storeRemoteSettings() {
+        Optional<Integer> newPort = getPortAsInt();
+        if(newPort.isPresent()) {
+            if (remotePreferences.isDifferentPort(newPort.get())) {
+                remotePreferences.setPort(newPort.get());
+
+                if(remotePreferences.useRemoteServer()) {
+                    JOptionPane.showMessageDialog(null,
+                            Globals.lang("Remote server port")
+                                    .concat(" ")
+                                    .concat("You must restart JabRef for this change to come into effect."),
+                            Globals.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        }
+
+        remotePreferences.setUseRemoteServer(useRemoteServer.isSelected());
+        if (remotePreferences.useRemoteServer()) {
+            Globals.remoteListener.openAndStart(new JabRefMessageHandler(jabRef), remotePreferences.getPort());
+        } else {
+            Globals.remoteListener.stop();
+        }
+    }
+
+    public Optional<Integer> getPortAsInt() {
+        try {
+            return Optional.of(Integer.parseInt(remoteServerPort.getText()));
+        } catch (NumberFormatException ex) {
+            return Optional.absent();
+        }
     }
 
     @Override

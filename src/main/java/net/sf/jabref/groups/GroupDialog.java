@@ -40,8 +40,8 @@ import net.sf.jabref.FieldContentSelector;
 import net.sf.jabref.FieldTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.StringUtil;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 

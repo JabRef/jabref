@@ -30,6 +30,7 @@ import net.sf.jabref.search.SearchExpressionTreeParserTokenTypes;
 import net.sf.jabref.util.QuotedStringTokenizer;
 import antlr.RecognitionException;
 import antlr.collections.AST;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * @author jzieren
