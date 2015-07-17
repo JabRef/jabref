@@ -25,9 +25,6 @@ import javax.swing.JScrollPane;
 /**
  * The side pane is displayed at the right side of JabRef and shows instances of
  * SidePaneComponents, for instance the GroupSelector, or the SearchManager2.
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class SidePane extends JPanel {
 

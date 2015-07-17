@@ -49,9 +49,6 @@ import org.antlr.runtime.tree.Tree;
  * 
  * http://texcatalogue.sarovar.org/entries/bibtex.html#Download
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 
 public class VM implements Warn {

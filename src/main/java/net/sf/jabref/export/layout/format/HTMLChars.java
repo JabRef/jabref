@@ -21,8 +21,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * This formatter escapes characters so they are suitable for HTML.
- * 
- * @version $Revision$ ($Date$)
  */
 public class HTMLChars implements LayoutFormatter {
 

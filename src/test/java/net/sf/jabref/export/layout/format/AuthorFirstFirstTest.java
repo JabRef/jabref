@@ -27,12 +27,6 @@ package net.sf.jabref.export.layout.format;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-/**
- * @author $Author$
- * @version $Revision$ ($Date$)
- */
 public class AuthorFirstFirstTest {
 
     /**

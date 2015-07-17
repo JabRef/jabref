@@ -41,9 +41,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class OAI2Fetcher implements EntryFetcher {
 

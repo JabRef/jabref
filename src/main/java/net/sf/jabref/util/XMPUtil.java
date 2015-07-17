@@ -48,8 +48,6 @@ import org.apache.pdfbox.pdmodel.common.PDMetadata;
  * TODO:
  * 
  * Synchronization
- * 
- * @version $Revision$ ($Date$)
  */
 public class XMPUtil {
 

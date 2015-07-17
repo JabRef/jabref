@@ -45,14 +45,9 @@ import net.sf.jabref.AuthorList;
 
 /**
  * Create DocBook authors formatter.
- *
- * @author $author$
- * @version $Revision$
  */
 public class CreateDocBookAuthors implements LayoutFormatter
 {
-
-    //~ Methods ////////////////////////////////////////////////////////////////
 
     private static final XMLChars xc = new XMLChars();
 
@@ -183,6 +178,3 @@ public class CreateDocBookAuthors implements LayoutFormatter
         }
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

@@ -21,9 +21,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * A layout formatter that is the composite of the given Formatters executed in
  * order.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class CompositeFormat implements LayoutFormatter {
 

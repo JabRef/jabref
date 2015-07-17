@@ -43,9 +43,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * Replace a non-command tilde ~ by a space.
  * 
  * Usefull for formatting Latex code.
- * 
- * @author $author$
- * @version $Revision$
  */
 public class RemoveTilde implements LayoutFormatter {
 

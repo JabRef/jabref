@@ -49,8 +49,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class GetOpenOfficeType implements LayoutFormatter
 {
 
-    //~ Methods ////////////////////////////////////////////////////////////////
-
     @Override
     public String format(String fieldText)
     {
@@ -100,6 +98,3 @@ public class GetOpenOfficeType implements LayoutFormatter
         return "10";
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

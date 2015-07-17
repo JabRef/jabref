@@ -30,16 +30,7 @@ import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.LayoutFormatterExtension;
 import net.sf.jabref.util.Util;
 
-/**
- * DOCUMENT ME!
- * 
- * @author $author$
- * @version $Revision$
- */
 class LayoutEntry {
-
-    // ~ Instance fields
-    // ////////////////////////////////////////////////////////
 
     private LayoutFormatter[] option;
 
@@ -56,9 +47,6 @@ class LayoutEntry {
 
     private ArrayList<String> invalidFormatter = null;
 
-
-    // ~ Constructors
-    // ///////////////////////////////////////////////////////////
 
     public LayoutEntry(StringInt si, String classPrefix_) throws Exception {
         type = si.i;

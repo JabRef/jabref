@@ -31,10 +31,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * <p>
  * See Testcase for more examples.
  * <p>
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class NoSpaceBetweenAbbreviations implements LayoutFormatter {
 

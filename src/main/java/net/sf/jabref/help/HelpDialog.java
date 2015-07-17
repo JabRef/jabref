@@ -32,9 +32,6 @@ import net.sf.jabref.util.Util;
  * 
  * This is a non-modal help Dialog. The contents of the help is specified by
  * calling showPage().
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class HelpDialog extends JDialog implements HyperlinkListener {
 

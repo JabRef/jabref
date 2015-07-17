@@ -13,16 +13,12 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
  * Test for OAI2-Handler and Fetcher.
  *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  * @author Christopher Oezbek
- * @version $Revision$ ($Date$)
  */
 public class OAI2ImportTest {
 

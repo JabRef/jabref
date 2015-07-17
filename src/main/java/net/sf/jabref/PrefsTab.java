@@ -19,10 +19,6 @@ package net.sf.jabref;
  * A prefsTab is a component displayed in the PreferenceDialog.
  * 
  * It needs to extend from Component.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- *
  */
 public interface PrefsTab {
 

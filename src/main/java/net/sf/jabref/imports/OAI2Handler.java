@@ -27,9 +27,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  * @author Christopher Oezbek
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class OAI2Handler extends DefaultHandler {
 

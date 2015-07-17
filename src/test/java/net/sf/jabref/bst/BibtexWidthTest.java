@@ -3,9 +3,6 @@ package net.sf.jabref.bst;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 /**
  * How to create these test using Bibtex:
  * <p/>
@@ -32,9 +29,6 @@ import static org.junit.Assert.fail;
  * \bibdata{test}
  * \bibcite{canh05}{CMM{$^{+}$}05}
  * </code>
- *
- * @author $Author$
- * @version $Revision$ ($Date$)
  */
 public class BibtexWidthTest {
 

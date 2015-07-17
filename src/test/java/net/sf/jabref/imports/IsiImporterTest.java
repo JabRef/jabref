@@ -10,14 +10,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * Test cases for the IsiImporter
- *
- * @author $Author$
- * @version $Revision$ ($Date$)
  */
 public class IsiImporterTest {
 

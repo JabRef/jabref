@@ -33,11 +33,6 @@ import java.util.Comparator;
  * @author alver
  * @version Date: Oct 13, 2005 Time: 10:10:04 PM To
  * 
- * Current Version:
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  * TODO: Testcases
  * 
  */

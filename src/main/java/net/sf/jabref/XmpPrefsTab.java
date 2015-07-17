@@ -33,10 +33,6 @@ import com.jgoodies.forms.layout.FormLayout;
  * Preference Tab for XMP.
  * 
  * Allows the user to enable and configure the XMP privacy filter.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 class XmpPrefsTab extends JPanel implements PrefsTab {
 

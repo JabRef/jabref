@@ -81,9 +81,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * Yeah this is trouble-some to write, but should work.
  * 
  * For more examples see the test-cases.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
  *
  */
 public class NameFormat implements LayoutFormatter {

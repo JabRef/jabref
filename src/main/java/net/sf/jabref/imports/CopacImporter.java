@@ -33,10 +33,6 @@ import net.sf.jabref.OutputPrinter;
  * Documentation can be found online at:
  * 
  * http://copac.ac.uk/faq/#format
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class CopacImporter extends ImportFormat {
 

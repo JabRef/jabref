@@ -39,10 +39,6 @@ import net.sf.jabref.util.Util;
  * associated entry editor.
  * 
  * Used to manage keywords and authors for instance.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class FieldContentSelector extends JComponent {
 

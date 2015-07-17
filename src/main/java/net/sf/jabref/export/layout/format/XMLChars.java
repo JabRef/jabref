@@ -44,9 +44,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Changes {\^o} or {\^{o}} to ?
- * 
- * @author $author$
- * @version $Revision$
  */
 public class XMLChars implements LayoutFormatter {
 

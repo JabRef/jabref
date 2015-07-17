@@ -29,9 +29,6 @@ import net.sf.jabref.bst.VM.BstFunction;
  * pushes the resulting string. If the literal isn't a string, it complains and
  * pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class PurifyFunction implements BstFunction {
 

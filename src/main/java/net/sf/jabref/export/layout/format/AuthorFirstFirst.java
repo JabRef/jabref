@@ -33,10 +33,6 @@ import net.sf.jabref.AuthorList;
 /**
  * Author First First prints ....
  * 
- * 
- * @author  $Author$
- * @version $Revision$ $Date$
- * 
  */
 public class AuthorFirstFirst implements LayoutFormatter
 {

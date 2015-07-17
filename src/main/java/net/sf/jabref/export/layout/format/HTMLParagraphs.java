@@ -23,10 +23,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 /**
  * Will interpret two consecutive newlines as the start of a new paragraph and thus
  * wrap the paragraph in HTML-p-tags.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class HTMLParagraphs implements LayoutFormatter {
 

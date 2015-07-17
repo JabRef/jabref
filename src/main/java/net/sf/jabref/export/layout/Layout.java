@@ -23,21 +23,14 @@ import net.sf.jabref.BibtexEntry;
 
 /**
  * Main class for formatting DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision$
  */
 public class Layout
 {
-
-    //~ Instance fields ////////////////////////////////////////////////////////
 
     private final LayoutEntry[] layoutEntries;
 
     private final ArrayList<String> missingFormatters = new ArrayList<String>();
 
-
-    //~ Constructors ///////////////////////////////////////////////////////////
 
     public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception
     {
@@ -194,6 +187,3 @@ public class Layout
         return missingFormatters;
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

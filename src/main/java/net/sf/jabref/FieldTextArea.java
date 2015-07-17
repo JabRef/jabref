@@ -27,10 +27,6 @@ import javax.swing.event.UndoableEditListener;
 /**
  * An implementation of the FieldEditor backed by a JTextArea. Used for
  * multi-line input.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEditor {
 

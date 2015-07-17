@@ -37,7 +37,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * If none is given, the format pattern will be <code>yyyy.MM.dd hh:mm:ss z</code></p>
  *
  * @author andreas_sf at rudert-home dot de
- * @version $Revision$
  */
 public class CurrentDate implements LayoutFormatter
 {

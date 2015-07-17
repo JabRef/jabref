@@ -43,7 +43,6 @@ import java.util.regex.Matcher;
  * strings.
  *
  * @author Moritz Ringler, Simon Harrer
- * @version $Revision$ ($Date$)
  */
 public class CaseChangers {
 

@@ -40,10 +40,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * 
  * This action goes through all selected entries in the BasePanel, and attempts
  * to write the XMP data to the external pdf.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class WriteXMPAction extends AbstractWorker {
 

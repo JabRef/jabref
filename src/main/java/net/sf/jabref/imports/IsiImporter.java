@@ -44,10 +44,6 @@ import net.sf.jabref.util.StringUtil;
  * http://web.mit.edu/emilio/www/utils.html</li>
  * <li>Deal with capitalization correctly</li>
  * </ul>
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class IsiImporter extends ImportFormat {
 

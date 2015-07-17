@@ -40,14 +40,9 @@ import net.sf.jabref.AuthorList;
 
 /**
  * Create DocBook editors formatter.
- *
- * @author $author$
- * @version $Revision$
  */
 public class CreateDocBookEditors extends CreateDocBookAuthors
 {
-
-    //~ Methods ////////////////////////////////////////////////////////////////
 
     @Override
     public String format(String fieldText)
@@ -61,6 +56,3 @@ public class CreateDocBookEditors extends CreateDocBookAuthors
     }
 
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

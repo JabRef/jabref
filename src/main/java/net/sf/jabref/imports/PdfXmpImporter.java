@@ -26,10 +26,6 @@ import net.sf.jabref.util.XMPUtil;
 
 /**
  * Wraps the XMPUtility function to be used as an ImportFormat.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class PdfXmpImporter extends ImportFormat {
 

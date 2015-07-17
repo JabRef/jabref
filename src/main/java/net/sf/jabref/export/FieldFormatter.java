@@ -15,12 +15,6 @@
 */
 package net.sf.jabref.export;
 
-/**
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
- */
 public interface FieldFormatter {
 
     String format(String s, String fieldName) throws IllegalArgumentException;

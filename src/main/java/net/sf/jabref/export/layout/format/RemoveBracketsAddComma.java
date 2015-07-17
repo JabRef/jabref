@@ -41,14 +41,9 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Remove brackets formatter.
- *
- * @author $author$
- * @version $Revision$
  */
 public class RemoveBracketsAddComma implements LayoutFormatter
 {
-
-    //~ Methods ////////////////////////////////////////////////////////////////
 
     @Override
     public String format(String fieldText)
@@ -74,6 +69,3 @@ public class RemoveBracketsAddComma implements LayoutFormatter
         return fieldEntry;
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

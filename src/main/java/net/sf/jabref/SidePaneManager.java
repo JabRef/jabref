@@ -24,9 +24,6 @@ import javax.swing.event.ChangeListener;
 /**
  * Manages visibility of SideShowComponents in a given newly constructed
  * sidePane.
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class SidePaneManager {
 
