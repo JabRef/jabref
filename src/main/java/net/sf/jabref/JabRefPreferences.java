@@ -635,6 +635,12 @@ public class JabRefPreferences {
             defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + '-' + get("defaultOwner"));
         }
     }
+    
+
+    public void resetToDefaultPreferences() {
+        JabRefPreferences.singleton = new JabRefPreferences();
+    }
+
 
     public void setLanguageDependentDefaultValues() {
 
@@ -1550,7 +1556,11 @@ public class JabRefPreferences {
         try {
             prefs.exportSubtree(os);
         } catch (BackingStoreException ex) {
-            throw new IOException(ex.getMessage());
+            throw new IOException(ex);
+        } finally {
+            if(os != null) {
+                os.close();
+            }
         }
     }
 
