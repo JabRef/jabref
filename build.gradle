@@ -25,6 +25,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "application"
 apply plugin: "project-report"
+apply plugin: "sonar-runner"
 
 /* disabled, because plugin requires Java 1.8
 format {
