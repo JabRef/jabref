@@ -30,4 +30,13 @@ public class JabRefCLITest {
         Assert.assertEquals("some/export/file", cli.getFileExport());
     }
 
+    @Test
+    public void testPreferencesExport() {
+        JabRefCLI cli = new JabRefCLI(new String[] {"-n", "-x=some/file"});
+
+        Assert.assertEquals("[]", Arrays.toString(cli.getLeftOver()));
+        Assert.assertEquals("some/file", cli.getPreferencesExport());
+        Assert.assertTrue(cli.isDisableGui());
+    }
+
 }
