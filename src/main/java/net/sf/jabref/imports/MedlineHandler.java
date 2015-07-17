@@ -14,332 +14,555 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 package net.sf.jabref.imports;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeSet;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class MedlineHandler extends DefaultHandler
+class MedlineHandler extends DefaultHandler
 {
-    static HTMLConverter htmlConverter = new HTMLConverter();
-    ArrayList<BibtexEntry> bibitems= new ArrayList<BibtexEntry>();
-    boolean inTitle=false,			inYear = false,
-		inJournal = false,			inMonth = false,
-		inVolume = false,			inAuthorList = false,
-		inAuthor =false,			inLastName = false,
-        inSuffix = false,
-		inInitials = false,			inMedlinePgn = false,
-		inMedlineID = false,		inURL=false,
-		inIssue = false,			inPubDate = false,
-        inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
-		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false,inPmc=false,
-        inAffiliation=false, inMeshHeader=false, inQualifierName=false,
-        inLanguage=false, inPst=false;
-    String title="", journal="", keywords ="",author="",
-		lastName="",suffix="",year="",forename="", abstractText="", affiliation="";
-    String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
-    String series="",editor="",booktitle="",type="article",key="",address="",
-        pubmedid="",doi="",pii="", pmc="",majorTopic = "", minorTopics = "", language = "", pst= "";
-    ArrayList<String> authors=new ArrayList<String>();
-    TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
-    int rowNum=0;
+
+    private static final HTMLConverter htmlConverter = new HTMLConverter();
+    private final ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+    private boolean inTitle = false;
+    private boolean inYear = false;
+    private boolean inJournal = false;
+    private boolean inMonth = false;
+    private boolean inVolume = false;
+    private boolean inAuthorList = false;
+    private boolean inAuthor = false;
+    private boolean inLastName = false;
+    private boolean inSuffix = false;
+    private boolean inInitials = false;
+    private boolean inMedlinePgn = false;
+    private boolean inIssue = false;
+    private boolean inPubDate = false;
+    private boolean inUrl = false;
+    private boolean inForename = false;
+    private boolean inAbstractText = false;
+    private boolean inMedlineDate = false;
+    private boolean inPubMedID = false;
+    private boolean inDescriptorName = false;
+    private boolean inDoi = false;
+    private boolean inPii = false;
+    private boolean inPmc = false;
+    private boolean inAffiliation = false;
+    private boolean inMeshHeader = false;
+    private boolean inQualifierName = false;
+    private boolean inLanguage = false;
+    private boolean inPst = false;
+    private String title = "";
+    private String journal = "";
+    private String author = "";
+    private String lastName = "";
+    private String suffix = "";
+    private String year = "";
+    private String forename = "";
+    private String abstractText = "";
+    private String affiliation = "";
+    private String month = "";
+    private String volume = "";
+    private String lastname = "";
+    private String initials = "";
+    private String number = "";
+    private String page = "";
+    private String MedlineDate = "";
+    String series = "";
+    String editor = "";
+    String booktitle = "";
+    String type = "article";
+    String key = "";
+    String address = "";
+    private String pubmedid = "";
+    private String doi = "";
+    private String pii = "";
+    private String pmc = "";
+    private String majorTopic = "";
+    private String minorTopics = "";
+    private String language = "";
+    private String pst = "";
+    private final ArrayList<String> authors = new ArrayList<String>();
+    private final TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
+    int rowNum = 0;
 
     private static final String KEYWORD_SEPARATOR = "; ";
 
-    public ArrayList<BibtexEntry> getItems(){ return bibitems;}
 
-    public MedlineHandler(){
-		super();
+    public ArrayList<BibtexEntry> getItems() {
+        return bibitems;
+    }
+
+    public MedlineHandler() {
+        super();
 
     }
-    public void startElement(String uri, String localName, String qName,  Attributes atts)
+
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes atts)
     {
-		//		public void startElement(String localName, Attributes atts) {
-		// Get the number of attribute
-		if(localName.equals("PubmedArticle")){}
-		else if(localName.equals("ArticleTitle")){ inTitle=true; title="";}
-		else if(localName.equals("PubDate")){inPubDate=true;}
-		else if(localName.equals("Year") && inPubDate){inYear=true;}
-		else if( localName.equals("MedlineDate") && inPubDate){inMedlineDate=true;} // medline date does not have 4 digit dates instead it has multiyear etc
-		else if(localName.equals("MedlineTA")){inJournal=true;journal="";} //journal name
-		else if(localName.equals("Month") && inPubDate){inMonth=true;}
-		else if(localName.equals("Volume")){inVolume=true;}
-        else if(localName.equals("Language")){inLanguage=true;}
-        else if(localName.equals("PublicationStatus")){inPst=true;}
-		else if(localName.equals("AuthorList")){
-			inAuthorList=true;
-			authors.clear();}
+        //		public void startElement(String localName, Attributes atts) {
+        // Get the number of attribute
+        if (localName.equals("PubmedArticle")) {
+        }
+        else if (localName.equals("ArticleTitle")) {
+            inTitle = true;
+            title = "";
+        }
+        else if (localName.equals("PubDate")) {
+            inPubDate = true;
+        }
+        else if (localName.equals("Year") && inPubDate) {
+            inYear = true;
+        }
+        else if (localName.equals("MedlineDate") && inPubDate) {
+            inMedlineDate = true;
+        } // medline date does not have 4 digit dates instead it has multiyear etc
+        else if (localName.equals("MedlineTA")) {
+            inJournal = true;
+            journal = "";
+        } //journal name
+        else if (localName.equals("Month") && inPubDate) {
+            inMonth = true;
+        }
+        else if (localName.equals("Volume")) {
+            inVolume = true;
+        }
+        else if (localName.equals("Language")) {
+            inLanguage = true;
+        }
+        else if (localName.equals("PublicationStatus")) {
+            inPst = true;
+        }
+        else if (localName.equals("AuthorList")) {
+            inAuthorList = true;
+            authors.clear();
+        }
         else if (localName.equals("MeshHeading")) {
             inMeshHeader = true;
             majorTopic = "";
             minorTopics = "";
         }
-        else if(localName.equals("DescriptorName")){
-			inDescriptorName=true;
-		}
-        else if (localName.equals("QualifierName")) {
-            inQualifierName=true;
+        else if (localName.equals("DescriptorName")) {
+            inDescriptorName = true;
         }
-                else if(localName.equals("Author")){inAuthor=true;author="";}
-                else if(localName.equals("CollectiveName")){inForename=true;forename="";} // Morten A. 20040513.
-		else if(localName.equals("PMID")){
+        else if (localName.equals("QualifierName")) {
+            inQualifierName = true;
+        }
+        else if (localName.equals("Author")) {
+            inAuthor = true;
+            author = "";
+        }
+        else if (localName.equals("CollectiveName")) {
+            inForename = true;
+            forename = "";
+        } // Morten A. 20040513.
+        else if (localName.equals("PMID")) {
             // Set PMID only once, because there can be <CommentIn> tags later on that
             // contain IDs of different articles.
             if (pubmedid.length() == 0) {
-                inPubMedID=true;
-                pubmedid="";
+                inPubMedID = true;
+                pubmedid = "";
             }
         }
-		else if(localName.equals("LastName")){inLastName=true; lastName="";}
-		else if(localName.equals("ForeName") || localName.equals("FirstName")) {
-			inForename=true; forename="";
-		}
+        else if (localName.equals("LastName")) {
+            inLastName = true;
+            lastName = "";
+        }
+        else if (localName.equals("ForeName") || localName.equals("FirstName")) {
+            inForename = true;
+            forename = "";
+        }
         else if (localName.equals("Suffix")) {
             inSuffix = true;
             suffix = "";
         }
-		else if(localName.equals("Issue")){inIssue=true;}
-		else if(localName.equals("MedlinePgn")){inMedlinePgn=true;
-		}//pagenumber
-		else if(localName.equals("URL")){inUrl=true;}
-		else if(localName.equals("Initials")){inInitials=true;}
-		else if(localName.equals("AbstractText")){ inAbstractText=true;}
-		else if(localName.equals("ArticleId")){
-			for (int i = 0; i < atts.getLength(); i++) {
-				String value = atts.getValue(i);
-				if(value.equals("doi"))
-					inDoi=true;
-				else if(value.equals("pii"))
-					inPii=true;
-				else if(value.equals("pmc"))
-					inPmc=true;
+        else if (localName.equals("Issue")) {
+            inIssue = true;
+        }
+        else if (localName.equals("MedlinePgn")) {
+            inMedlinePgn = true;
+        }//pagenumber
+        else if (localName.equals("URL")) {
+            inUrl = true;
+        }
+        else if (localName.equals("Initials")) {
+            inInitials = true;
+        }
+        else if (localName.equals("AbstractText")) {
+            inAbstractText = true;
+        }
+        else if (localName.equals("ArticleId")) {
+            for (int i = 0; i < atts.getLength(); i++) {
+                String value = atts.getValue(i);
+                if (value.equals("doi")) {
+                    inDoi = true;
+                } else if (value.equals("pii")) {
+                    inPii = true;
+                } else if (value.equals("pmc")) {
+                    inPmc = true;
+                }
 
-			}
-		}
-        else if(localName.equals("Affiliation")){ inAffiliation=true; }
-
+            }
+        }
+        else if (localName.equals("Affiliation")) {
+            inAffiliation = true;
+        }
 
     }
-    String join(Object[] sa,String delim){
-		StringBuffer sb=new StringBuffer();
-		sb.append( sa[0].toString() );
-		for(int i=1; i<sa.length; i++)
-	    {
-			sb.append( delim );
-			sb.append( sa[i].toString() );
-	    }
-		return sb.toString();
+
+    private String join(Object[] sa, String delim) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(sa[0].toString());
+        for (int i = 1; i < sa.length; i++)
+        {
+            sb.append(delim);
+            sb.append(sa[i].toString());
+        }
+        return sb.toString();
     }
-    String makeBibtexString(){
-		String out  = "";
-                // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
-		out= "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year +
-			"},\n volume = { " + volume + "},\n number = { "+ number + "},\n pages = { " + fixPageRange(page) + "},\n abstract = { " + abstractText + "},\n}";
-		return out;
+
+    String makeBibtexString() {
+        String out;
+        // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
+        out = "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year +
+                "},\n volume = { " + volume + "},\n number = { " + number + "},\n pages = { " + fixPageRange(page) + "},\n abstract = { " + abstractText + "},\n}";
+        return out;
     }
-    public void endElement( String uri, String localName, String qName ) {
-		if(localName.equals("PubmedArticle")){
-			//bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
-			// check if year ="" then give medline date instead
-			if(year.equals("")){
-				if(!MedlineDate.equals("")) {
-					// multi-year date format
-					//System.out.println(MedlineDate);
-					year = MedlineDate.substring(0,4);
-					//Matcher m = Pattern.compile("\\b[0-9]{4}\\b").matcher(MedlineDate);
-					//if(m.matches())
-					//year = m.group();
-				}
-			}
-			
-			// Build a string from the collected keywords:
-            StringBuffer sb = new StringBuffer();
+
+    @Override
+    public void endElement(String uri, String localName, String qName) {
+        if (localName.equals("PubmedArticle")) {
+            //bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
+            // check if year ="" then give medline date instead
+            if (year.equals("")) {
+                if (!MedlineDate.equals("")) {
+                    // multi-year date format
+                    //System.out.println(MedlineDate);
+                    year = MedlineDate.substring(0, 4);
+                    //Matcher m = Pattern.compile("\\b[0-9]{4}\\b").matcher(MedlineDate);
+                    //if(m.matches())
+                    //year = m.group();
+                }
+            }
+
+            // Build a string from the collected keywords:
+            StringBuilder sb = new StringBuilder();
             for (Iterator<String> iterator = descriptors.iterator(); iterator.hasNext();) {
                 String s = iterator.next();
                 sb.append(s);
-                if (iterator.hasNext())
-                    sb.append(KEYWORD_SEPARATOR);
+                if (iterator.hasNext()) {
+                    sb.append(MedlineHandler.KEYWORD_SEPARATOR);
+                }
             }
-            keywords = sb.toString();
-            
-			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
-			if (!author.equals("")) { 
-			    b.setField("author",htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
-			    // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
-			    author = "";
-			}
-			if (!title.equals("")) b.setField("title",htmlConverter.formatUnicode(title));
-			// if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
-			if (!journal.equals("")) b.setField("journal",journal);
-			if (!year.equals("")) b.setField("year",year);
-                        // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
-			if (!page.equals("")) b.setField("pages",fixPageRange(page));
-			if (!volume.equals("")) b.setField("volume",volume);
-            if (!language.equals("")) b.setField("language",language);
-            if (!pst.equals("")) b.setField("medline-pst", pst);
-			if (!abstractText.equals("")) b.setField("abstract",abstractText.replaceAll("%","\\\\%"));
-			if (!keywords.equals("")) b.setField("keywords",keywords);
-			if (!month.equals("")) b.setField("month",month);
-			//if (!url.equals("")) b.setField("url",url);
-			if (!number.equals("")) b.setField("number",number);
+            String keywords = sb.toString();
 
-			if(!doi.equals("")){
-			    b.setField("doi",doi);
-			    b.setField("url","http://dx.doi.org/"+doi);
-			}
-			if(!pii.equals(""))
-			    b.setField("pii",pii);
-			if(!pmc.equals(""))
-			    b.setField("pmc",pmc);
-            if(!affiliation.equals("")) {
-                b.setField("institution",affiliation.replaceAll("#", "\\\\#"));
+            BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
+            Globals.getEntryType("article")); // id assumes an existing database so don't create one here
+            if (!author.equals("")) {
+                b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
+                // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
+                author = "";
+            }
+            if (!title.equals("")) {
+                b.setField("title", MedlineHandler.htmlConverter.formatUnicode(title));
+            }
+            // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
+            if (!journal.equals("")) {
+                b.setField("journal", journal);
+            }
+            if (!year.equals("")) {
+                b.setField("year", year);
+            }
+            // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
+            if (!page.equals("")) {
+                b.setField("pages", fixPageRange(page));
+            }
+            if (!volume.equals("")) {
+                b.setField("volume", volume);
+            }
+            if (!language.equals("")) {
+                b.setField("language", language);
+            }
+            if (!pst.equals("")) {
+                b.setField("medline-pst", pst);
+            }
+            if (!abstractText.equals("")) {
+                b.setField("abstract", abstractText.replaceAll("%", "\\\\%"));
+            }
+            if (!keywords.equals("")) {
+                b.setField("keywords", keywords);
+            }
+            if (!month.equals("")) {
+                b.setField("month", month);
+            }
+            //if (!url.equals("")) b.setField("url",url);
+            if (!number.equals("")) {
+                b.setField("number", number);
+            }
+
+            if (!doi.equals("")) {
+                b.setField("doi", doi);
+                b.setField("url", "http://dx.doi.org/" + doi);
+            }
+            if (!pii.equals("")) {
+                b.setField("pii", pii);
+            }
+            if (!pmc.equals("")) {
+                b.setField("pmc", pmc);
+            }
+            if (!affiliation.equals("")) {
+                b.setField("institution", affiliation.replaceAll("#", "\\\\#"));
             }
 
             // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field
             // Older references do not have doi entries, but every
             // medline entry has a unique pubmed ID (aka primary ID).
             // Add a bibtex field for the pubmed ID for future use.
-            if (!pubmedid.equals(""))
-                b.setField("pmid",pubmedid);
-                        
-			bibitems.add( b  );
+            if (!pubmedid.equals("")) {
+                b.setField("pmid", pubmedid);
+            }
 
-			abstractText = "";
-			author = "";
-			title="";
-			journal="";
-			keywords ="";
-                        doi=""; pii=""; pmc="";
-			year="";
-			forename="";
-			lastName="";
-			suffix = "";
-			abstractText="";
-            affiliation="";
-            pubmedid="";
+            bibitems.add(b);
+
+            abstractText = "";
+            author = "";
+            title = "";
+            journal = "";
+            keywords = "";
+            doi = "";
+            pii = "";
+            pmc = "";
+            year = "";
+            forename = "";
+            lastName = "";
+            suffix = "";
+            abstractText = "";
+            affiliation = "";
+            pubmedid = "";
             majorTopic = "";
             minorTopics = "";
-            month="";volume="";language="";pst="";lastname=""; suffix="";
-            initials="";number="";page="";medlineID="";url="";
-			MedlineDate="";
+            month = "";
+            volume = "";
+            language = "";
+            pst = "";
+            lastname = "";
+            suffix = "";
+            initials = "";
+            number = "";
+            page = "";
+            String medlineID = "";
+            String url = "";
+            MedlineDate = "";
             descriptors.clear();
         }
 
-		else if(localName.equals("ArticleTitle")){inTitle=false;}
-		else if(localName.equals("PubDate")){inPubDate=false;}
-		else if(localName.equals("Year")){inYear=false;}
-		else if(localName.equals("PMID")){inPubMedID=false;}
-		else if(localName.equals("MedlineDate")){inMedlineDate=false;}
-		else if(localName.equals("MedlineTA")){inJournal=false;} //journal name
-		else if(localName.equals("Month")){inMonth=false;}
-		else if(localName.equals("Volume")){inVolume=false;}
-        else if(localName.equals("Language")){inLanguage=false;}
-        else if(localName.equals("PublicationStatus")){inPst=false;}
-		else if(localName.equals("AuthorList")){
-			author = join( authors.toArray(), " and " );
-			inAuthorList = false;
-		}
-		else if(localName.equals("Author")){
-			// forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
-			// when above is the case replace it with initials
-			if(forename.length()==3 && forename.charAt(1)==' '){
-				forename=initials;
-			}
+        else if (localName.equals("ArticleTitle")) {
+            inTitle = false;
+        }
+        else if (localName.equals("PubDate")) {
+            inPubDate = false;
+        }
+        else if (localName.equals("Year")) {
+            inYear = false;
+        }
+        else if (localName.equals("PMID")) {
+            inPubMedID = false;
+        }
+        else if (localName.equals("MedlineDate")) {
+            inMedlineDate = false;
+        }
+        else if (localName.equals("MedlineTA")) {
+            inJournal = false;
+        } //journal name
+        else if (localName.equals("Month")) {
+            inMonth = false;
+        }
+        else if (localName.equals("Volume")) {
+            inVolume = false;
+        }
+        else if (localName.equals("Language")) {
+            inLanguage = false;
+        }
+        else if (localName.equals("PublicationStatus")) {
+            inPst = false;
+        }
+        else if (localName.equals("AuthorList")) {
+            author = join(authors.toArray(), " and ");
+            inAuthorList = false;
+        }
+        else if (localName.equals("Author")) {
+            // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
+            // when above is the case replace it with initials
+            if ((forename.length() == 3) && (forename.charAt(1) == ' ')) {
+                forename = initials;
+            }
 
             // Put together name with last name first, and enter suffix in between if present:
-            if (lastname.indexOf(" ") > 0)
-                author = "{"+lastname+"}";
-            else
+            if (lastname.indexOf(" ") > 0) {
+                author = "{" + lastname + "}";
+            } else {
                 author = lastname;
+            }
 
-            if (suffix.length() > 0)
-                author = author+", "+suffix;
-            if (forename.length() > 0)
-                author = author+", "+forename;
+            if (suffix.length() > 0) {
+                author = author + ", " + suffix;
+            }
+            if (forename.length() > 0) {
+                author = author + ", " + forename;
+            }
 
-			//author = initials + " " + lastname;
-			authors.add(author);
-			inAuthor=false;
-			forename = "";
-			initials = "";
-			lastname = "";
-			suffix = "";
-		}
-		else if(localName.equals("DescriptorName")) inDescriptorName=false;
-        else if(localName.equals("QualifierName")) inQualifierName=false;
-        else if(localName.equals("MeshHeading")) {
-            inMeshHeader = false;
-            if (minorTopics.equals(""))
-                descriptors.add(majorTopic);
-            else
-                descriptors.add(majorTopic+", "+minorTopics);
+            //author = initials + " " + lastname;
+            authors.add(author);
+            inAuthor = false;
+            forename = "";
+            initials = "";
+            lastname = "";
+            suffix = "";
         }
-        else if(localName.equals("LastName")){inLastName=false;}
-        else if(localName.equals("Suffix")){inSuffix=false;}
-		else if(localName.equals("ForeName")||localName.equals("FirstName")){ inForename=false;}
-		else if(localName.equals("Issue")){ inIssue = false;}
-		else if(localName.equals("MedlinePgn")){inMedlinePgn=false;}//pagenumber
-		else if(localName.equals("URL")){ inUrl=false;}
-		else if(localName.equals("Initials")){
-			//initials= '.' + initials + '.';
-			inInitials=false;
-		}
-		else if(localName.equals("AbstractText")){ inAbstractText=false;}
-        else if(localName.equals("Affiliation")){ inAffiliation=false; }
-        else if(localName.equals("ArticleId")){
-			if(inDoi)
-				inDoi=false;
-			else if(inPii)
-				inPii=false;
-			else if(inPmc)
-				inPmc=false;}
+        else if (localName.equals("DescriptorName")) {
+            inDescriptorName = false;
+        } else if (localName.equals("QualifierName")) {
+            inQualifierName = false;
+        } else if (localName.equals("MeshHeading")) {
+            inMeshHeader = false;
+            if (minorTopics.equals("")) {
+                descriptors.add(majorTopic);
+            } else {
+                descriptors.add(majorTopic + ", " + minorTopics);
+            }
+        }
+        else if (localName.equals("LastName")) {
+            inLastName = false;
+        }
+        else if (localName.equals("Suffix")) {
+            inSuffix = false;
+        }
+        else if (localName.equals("ForeName") || localName.equals("FirstName")) {
+            inForename = false;
+        }
+        else if (localName.equals("Issue")) {
+            inIssue = false;
+        }
+        else if (localName.equals("MedlinePgn")) {
+            inMedlinePgn = false;
+        }//pagenumber
+        else if (localName.equals("URL")) {
+            inUrl = false;
+        }
+        else if (localName.equals("Initials")) {
+            //initials= '.' + initials + '.';
+            inInitials = false;
+        }
+        else if (localName.equals("AbstractText")) {
+            inAbstractText = false;
+        }
+        else if (localName.equals("Affiliation")) {
+            inAffiliation = false;
+        }
+        else if (localName.equals("ArticleId")) {
+            if (inDoi) {
+                inDoi = false;
+            } else if (inPii) {
+                inPii = false;
+            } else if (inPmc) {
+                inPmc = false;
+            }
+        }
     }
 
-    public void characters( char[] data, int start, int length ) {
+    @Override
+    public void characters(char[] data, int start, int length) {
 
-		// if stack is not ready, data is not content of recognized element
-		if( inTitle ){ title += new String( data, start, length);}
-		else if(inYear){ year+=new String(data,start,length);}
-		else if(inJournal){journal += new String(data,start,length);}
-		else if(inMonth){month += new String(data,start,length);}
-		else if(inVolume){volume += new String(data,start,length);}
-        else if(inLanguage){language += new String(data,start,length).toLowerCase();}
-        else if(inPst){pst += new String(data,start,length);}
-		else if(inLastName){lastname += new String(data,start,length);}
-		else if(inSuffix){suffix += new String(data,start,length);}
-		else if(inInitials){initials += new String(data,start,length);}
-		else if(inIssue){number += new String(data,start,length);}
-		else if(inMedlinePgn){ page += new String(data,start,length);}
-		else if(inMedlineID){medlineID += new String(data,start,length);}
-		else if(inURL){url += new String(data,start,length);}
-		else if(inPubMedID){pubmedid = new String(data,start,length);}
-        else if(inQualifierName) {
-            if (!minorTopics.equals(""))
-                minorTopics = minorTopics+"/";
-            minorTopics = minorTopics + new String(data,start,length);
+        // if stack is not ready, data is not content of recognized element
+        boolean inURL = false;
+        boolean inMedlineID = false;
+        if (inTitle) {
+            title += new String(data, start, length);
         }
-        else if(inDescriptorName) {
-            majorTopic = new String(data,start,length);
+        else if (inYear) {
+            year += new String(data, start, length);
+        }
+        else if (inJournal) {
+            journal += new String(data, start, length);
+        }
+        else if (inMonth) {
+            month += new String(data, start, length);
+        }
+        else if (inVolume) {
+            volume += new String(data, start, length);
+        }
+        else if (inLanguage) {
+            language += new String(data, start, length).toLowerCase();
+        }
+        else if (inPst) {
+            pst += new String(data, start, length);
+        }
+        else if (inLastName) {
+            lastname += new String(data, start, length);
+        }
+        else if (inSuffix) {
+            suffix += new String(data, start, length);
+        }
+        else if (inInitials) {
+            initials += new String(data, start, length);
+        }
+        else if (inIssue) {
+            number += new String(data, start, length);
+        }
+        else if (inMedlinePgn) {
+            page += new String(data, start, length);
+        }
+        else if (inMedlineID) {
+            String medlineID = "";
+            medlineID += new String(data, start, length);
+        }
+        else if (inURL) {
+            String url = "";
+            url += new String(data, start, length);
+        }
+        else if (inPubMedID) {
+            pubmedid = new String(data, start, length);
+        }
+        else if (inQualifierName) {
+            if (!minorTopics.equals("")) {
+                minorTopics = minorTopics + "/";
+            }
+            minorTopics = minorTopics + new String(data, start, length);
+        }
+        else if (inDescriptorName) {
+            majorTopic = new String(data, start, length);
         }
 
-            //keywords += new String(data,start,length) + ", ";
-		else if(inForename){
-			forename += new String(data,start,length);
-			//System.out.println("IN FORENAME: " + forename);
-		}
-		else if(inAbstractText){ abstractText += new String(data,start,length);}
-		else if(inMedlineDate){ MedlineDate += new String(data,start,length);}
-		else if(inDoi){ doi=new String(data,start,length);}
-		else if(inPii){ pii=new String(data,start,length);}
-		else if(inPmc){ pmc=new String(data,start,length);}
-        else if(inAffiliation){ affiliation = new String(data,start,length);}
+        //keywords += new String(data,start,length) + ", ";
+        else if (inForename) {
+            forename += new String(data, start, length);
+            //System.out.println("IN FORENAME: " + forename);
+        }
+        else if (inAbstractText) {
+            abstractText += new String(data, start, length);
+        }
+        else if (inMedlineDate) {
+            MedlineDate += new String(data, start, length);
+        }
+        else if (inDoi) {
+            doi = new String(data, start, length);
+        }
+        else if (inPii) {
+            pii = new String(data, start, length);
+        }
+        else if (inPmc) {
+            pmc = new String(data, start, length);
+        }
+        else if (inAffiliation) {
+            affiliation = new String(data, start, length);
+        }
     }
 
     // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added fixPageRange method
@@ -348,16 +571,16 @@ public class MedlineHandler extends DefaultHandler
     //   The last page is reported using only the digits which
     //   differ from the first page. 
     //      i.e. 12345-51 refers to the actual range 12345-12351
-    public String fixPageRange(String pageRange) {
+    private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');
         if (minusPos < 0) {
             return pageRange;
         }
         String first = pageRange.substring(0, minusPos).trim();
-        String last = pageRange.substring(minusPos+1).trim();
+        String last = pageRange.substring(minusPos + 1).trim();
         int llast = last.length(), lfirst = first.length();
         if (llast < lfirst) {
-            last = first.substring(0, lfirst-llast) + last;
+            last = first.substring(0, lfirst - llast) + last;
         }
         return first + "--" + last;
     }

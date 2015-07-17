@@ -35,14 +35,15 @@ import net.sf.jabref.msbib.MSBibDatabase;
  */
 class MSBibExportFormat extends ExportFormat {
 
-	public MSBibExportFormat() {
+    public MSBibExportFormat() {
         super(Globals.lang("MS Office 2007"), "MSBib", null, null, ".xml");
     }
 
+    @Override
     public void performExport(final BibtexDatabase database, final MetaData metaData,
-                              final String file, final String encoding, Set<String> keySet) throws IOException {
-    	// forcing to use UTF8 output format for some problems with
-    	// xml export in other encodings
+            final String file, final String encoding, Set<String> keySet) throws IOException {
+        // forcing to use UTF8 output format for some problems with
+        // xml export in other encodings
         SaveSession ss = getSaveSession("UTF8", new File(file));
         VerifyingWriter ps = ss.getWriter();
         MSBibDatabase md = new MSBibDatabase(database, keySet);
@@ -55,8 +56,7 @@ class MSBibExportFormat extends ExportFormat {
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new Error(e);
         }
 

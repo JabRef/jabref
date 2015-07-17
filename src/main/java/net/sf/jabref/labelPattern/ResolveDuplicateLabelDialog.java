@@ -30,15 +30,13 @@ import java.util.List;
 /**
  * Dialog box for resolving duplicate bibte keys
  */
-public class ResolveDuplicateLabelDialog {
+class ResolveDuplicateLabelDialog {
 
-    JDialog diag;
-    JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
-    List<JCheckBox> cbs = new ArrayList<JCheckBox>();
+    private final JDialog diag;
+    private final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
     private boolean okPressed = false;
 
-    final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
+    private final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
             "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n" +
             "\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}\n" +
             "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n" +
@@ -51,15 +49,16 @@ public class ResolveDuplicateLabelDialog {
             "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}\n" +
             "<p></p></font>";
 
+
     public ResolveDuplicateLabelDialog(BasePanel panel, String key,
-                                       List<BibtexEntry> entries) {
+            List<BibtexEntry> entries) {
         diag = new JDialog(panel.frame(), Globals.lang("Duplicate BibTeX key"), true);
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 4dlu, fill:pref", ""));
-        b.append(new JLabel(Globals.lang("Duplicate key")+": "+key), 3);
+        b.append(new JLabel(Globals.lang("Duplicate key") + ": " + key), 3);
         b.nextLine();
-        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         boolean first = true;
         for (BibtexEntry entry : entries) {
@@ -69,22 +68,23 @@ public class ResolveDuplicateLabelDialog {
             //pan.add(cb, BorderLayout.NORTH);
             //cb.add(new JPanel(), BorderLayout.CENTER);
             b.append(cb);
-            PreviewPanel pp = new PreviewPanel(null, entry, null , new MetaData(), layout);
+            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), ResolveDuplicateLabelDialog.layout);
             pp.setPreferredSize(new Dimension(800, 90));
             //pp.setBorder(BorderFactory.createEtchedBorder());
-			b.append(new JScrollPane(pp));
+            b.append(new JScrollPane(pp));
             b.nextLine();
             cbs.add(cb);
             first = false;
         }
 
-
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Globals.lang("Ok"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -92,19 +92,24 @@ public class ResolveDuplicateLabelDialog {
         diag.pack();
 
         ok.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = true;
                 diag.dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
         });
 
-
         AbstractAction closeAction = new AbstractAction() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
@@ -115,7 +120,7 @@ public class ResolveDuplicateLabelDialog {
         am.put("close", closeAction);
     }
 
-/**
+    /**
      * After the dialog has been closed, this query answers whether the dialog was okPressed
      * (by cancel button or by closing the dialog directly).
      * @return true if it was okPressed, false if Ok was pressed.

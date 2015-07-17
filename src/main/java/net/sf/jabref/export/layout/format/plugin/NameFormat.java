@@ -88,53 +88,62 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class NameFormat implements LayoutFormatter {
 
-	public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
+    public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
 
-	public String format(String toFormat, AuthorList al, String[] formats){
-		
-		StringBuffer sb = new StringBuffer();
-		
-		int n = al.size();
-		
-		for (int i = 1; i <= al.size(); i++){
-			for (int j = 1; j < formats.length; j+=2){
-				if (formats[j].equals("*")){
-					sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j+1], null));
-					break;
-				} else {
-					String[] range = formats[j].split("\\.\\.");
-					
-					int s,e;
-					if (range.length == 2){
-						s = Integer.parseInt(range[0]);
-						e = Integer.parseInt(range[1]);
-					} else {
-						s = e = Integer.parseInt(range[0]); 
-					}
-					if (s < 0) s += n + 1;
-					if (e < 0) e += n + 1;
-					if (e < s) { int temp = e; e = s; s = temp; }
 
-					if (s <= i && i <= e){
-						sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j+1], null));
-						break;
-					}
-				}
-			}
-		}	
-		return sb.toString();
-		
-	}
-	
-	public String format(String toFormat, String parameters, BibtexEntry currentEntry) {
-		
-		AuthorList al = AuthorList.getAuthorList(toFormat);
-		
-		if (parameters == null || parameters.length() == 0){
-			parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
-		}
-		
-		String[] cases = parameters.split("@@");
+    private String format(String toFormat, AuthorList al, String[] formats) {
+
+        StringBuilder sb = new StringBuilder();
+
+        int n = al.size();
+
+        for (int i = 1; i <= al.size(); i++) {
+            for (int j = 1; j < formats.length; j += 2) {
+                if (formats[j].equals("*")) {
+                    sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
+                    break;
+                } else {
+                    String[] range = formats[j].split("\\.\\.");
+
+                    int s, e;
+                    if (range.length == 2) {
+                        s = Integer.parseInt(range[0]);
+                        e = Integer.parseInt(range[1]);
+                    } else {
+                        s = e = Integer.parseInt(range[0]);
+                    }
+                    if (s < 0) {
+                        s += n + 1;
+                    }
+                    if (e < 0) {
+                        e += n + 1;
+                    }
+                    if (e < s) {
+                        int temp = e;
+                        e = s;
+                        s = temp;
+                    }
+
+                    if ((s <= i) && (i <= e)) {
+                        sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
+                        break;
+                    }
+                }
+            }
+        }
+        return sb.toString();
+
+    }
+
+    public String format(String toFormat, String parameters, BibtexEntry currentEntry) {
+
+        AuthorList al = AuthorList.getAuthorList(toFormat);
+
+        if ((parameters == null) || (parameters.isEmpty())) {
+            parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
+        }
+
+        String[] cases = parameters.split("@@");
         for (String aCase : cases) {
             String[] formatString = aCase.split("@");
 
@@ -151,16 +160,19 @@ public class NameFormat implements LayoutFormatter {
                 }
             }
         }
-		return toFormat;
-	}
+        return toFormat;
+    }
 
-	public String format(String fieldText) {
-		return format(fieldText, parameter, null);
-	}
+    @Override
+    public String format(String fieldText) {
+        return format(fieldText, parameter, null);
+    }
 
-	String parameter = DEFAULT_FORMAT;
-	
-	public void setParameter(String parameter) {
-		this.parameter = parameter;
-	}
+
+    private String parameter = NameFormat.DEFAULT_FORMAT;
+
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
+    }
 }

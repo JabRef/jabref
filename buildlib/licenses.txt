@@ -1,5 +1,11 @@
+Path:    appbundler-1.0.jar
+Project: Mac OS X AppBundler ANT Task
+URL:     https://java.net/projects/appbundler
+License: GPLv2
+Note:    Required to build Mac OS X App
+
 Path:    jarbundler-2.2.0.jar
 Project: Mac OS X JarBundler ANT Task
 URL:     http://informagen.com/JarBundler/index.html
 License: GPLv2
-Note:    Required to build Mac OS X Jar
+Note:    Required to build Mac OS X App

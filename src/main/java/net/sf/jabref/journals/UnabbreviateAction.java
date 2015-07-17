@@ -29,33 +29,38 @@ import net.sf.jabref.undo.NamedCompound;
  * To browseOld this template use File | Settings | File Templates.
  */
 public class UnabbreviateAction extends AbstractWorker {
-    BasePanel panel;
-    String message = "";
+
+    private final BasePanel panel;
+    private String message = "";
+
 
     public UnabbreviateAction(BasePanel panel) {
         this.panel = panel;
     }
 
-
+    @Override
     public void init() {
         //  new FieldWeightDialog(frame).setVisible(true);
         panel.output("Unabbreviating...");
     }
 
+    @Override
     public void run() {
         //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
 
-
         BibtexEntry[] entries = panel.getSelectedEntries();
-        if (entries == null)
+        if (entries == null) {
             return;
+        }
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
         int count = 0;
         for (BibtexEntry entry : entries) {
-            if (Globals.journalAbbrev.unabbreviate(panel.database(), entry, "journal", ce))
+            if (Globals.journalAbbrev.unabbreviate(panel.database(), entry, "journal", ce)) {
                 count++;
-            if (Globals.journalAbbrev.unabbreviate(panel.database(), entry, "journaltitle", ce))
+            }
+            if (Globals.journalAbbrev.unabbreviate(panel.database(), entry, "journaltitle", ce)) {
                 count++;
+            }
         }
         if (count > 0) {
             ce.end();
@@ -67,6 +72,7 @@ public class UnabbreviateAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         panel.output(message);
     }

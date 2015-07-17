@@ -28,16 +28,18 @@ import net.sf.jabref.Util;
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
 
-    private BibtexEntry entry;
-    private String field;
-    private String oldValue, newValue;
+    private final BibtexEntry entry;
+    private final String field;
+    private final String oldValue;
+    private final String newValue;
+
 
     public UndoableFieldChange(BibtexEntry entry, String field,
-			       String oldValue, String newValue) {
-	this.entry = entry;
-	this.field = field;
-	this.oldValue = oldValue;
-	this.newValue = newValue;
+            String oldValue, String newValue) {
+        this.entry = entry;
+        this.field = field;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
     }
 
     @Override
@@ -47,44 +49,46 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-    return Globals.lang("Undo")+": "+Globals.lang("change field");
+        return Globals.lang("Undo") + ": " + Globals.lang("change field");
     }
 
     @Override
     public String getRedoPresentationName() {
-    return Globals.lang("Redo")+": "+Globals.lang("change field");
+        return Globals.lang("Redo") + ": " + Globals.lang("change field");
     }
 
+    @Override
     public void undo() {
-	super.undo();
+        super.undo();
 
-	// Revert the change.
-	try {
-          if (oldValue != null)
-            entry.setField(field, oldValue);
-          else
-            entry.clearField(field);
+        // Revert the change.
+        try {
+            if (oldValue != null) {
+                entry.setField(field, oldValue);
+            } else {
+                entry.clearField(field);
+            }
 
-	} catch (Throwable ex) {
-	    Util.pr(ex.getMessage());
-	}
+        } catch (Throwable ex) {
+            Util.pr(ex.getMessage());
+        }
     }
 
+    @Override
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	try {
-          if (newValue != null)
-            entry.setField(field, newValue);
-          else
-            entry.clearField(field);
+        // Redo the change.
+        try {
+            if (newValue != null) {
+                entry.setField(field, newValue);
+            } else {
+                entry.clearField(field);
+            }
 
-	} catch (Throwable ex) {
-	    Util.pr(ex.getMessage());
-	}
+        } catch (Throwable ex) {
+            Util.pr(ex.getMessage());
+        }
     }
-
-
 
 }

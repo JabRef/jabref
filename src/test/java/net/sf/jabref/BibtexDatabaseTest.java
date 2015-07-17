@@ -2,6 +2,10 @@ package net.sf.jabref;
 
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -11,6 +15,16 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 public class BibtexDatabaseTest {
+
+    @Before
+    public void setup() {
+        Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
+    }
+
+    @After
+    public void teardown() {
+        Globals.prefs = null;
+    }
 
     /**
      * Some basic test cases for resolving strings.
@@ -25,14 +39,13 @@ public class BibtexDatabaseTest {
 
         BibtexDatabase db = result.getDatabase();
 
-        assertEquals("Arvind", db.resolveForStrings("#Arvind#"));
-        assertEquals("Patterson, David", db.resolveForStrings("#Patterson#"));
-        assertEquals("Arvind and Patterson, David", db.resolveForStrings("#Arvind# and #Patterson#"));
+        Assert.assertEquals("Arvind", db.resolveForStrings("#Arvind#"));
+        Assert.assertEquals("Patterson, David", db.resolveForStrings("#Patterson#"));
+        Assert.assertEquals("Arvind and Patterson, David", db.resolveForStrings("#Arvind# and #Patterson#"));
 
         // Strings that are not found return just the given string.
-        assertEquals("#unknown#", db.resolveForStrings("#unknown#"));
+        Assert.assertEquals("#unknown#", db.resolveForStrings("#unknown#"));
 
     }
-
 
 }

@@ -42,19 +42,21 @@ import javax.swing.text.JTextComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class CaseChangeMenu extends JMenu {
-    private JTextComponent parent;
 
-    public CaseChangeMenu(JTextComponent opener){
+    private final JTextComponent parent;
+
+
+    public CaseChangeMenu(JTextComponent opener) {
         /* case */
         super(Globals.lang("Change case"));
         parent = opener;
 
         // create menu items, one for each case changer
-        for(final CaseChangers.CaseChanger caseChanger : CaseChangers.ALL) {
+        for (final CaseChangers.CaseChanger caseChanger : CaseChangers.ALL) {
             JMenuItem menuItem = new JMenuItem(Globals.lang(caseChanger.getName()));
             menuItem.addActionListener(new ActionListener() {
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     parent.setText(caseChanger.changeCase(parent.getText()));

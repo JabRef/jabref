@@ -37,7 +37,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
  * @author Fabian Bieker
  * @since 12/2008
  */
-public class PreventDraggingJTableHeader extends JTableHeader {
+class PreventDraggingJTableHeader extends JTableHeader {
 
     public PreventDraggingJTableHeader(TableColumnModel cm) {
         super(cm);
@@ -62,23 +62,23 @@ public class PreventDraggingJTableHeader extends JTableHeader {
             // therefore, isUnnamed will always return "false"
             // to be safe, we keep this call nevertheless
             // (this is the null check for getHeaderValue())
-            if (isUnnamed(column)) {
+            if (PreventDraggingJTableHeader.isUnnamed(column)) {
                 return;
             }
-            
+
             // prevent dragging of special field columns
             String headerValue = column.getHeaderValue().toString();
             if (headerValue.equals("P") || headerValue.equals("Q") || headerValue.equals("R")) {
-            	// the letters are guessed. Don't know, where they are set in the code.
-            	return;
+                // the letters are guessed. Don't know, where they are set in the code.
+                return;
             }
-            
+
             // other icon columns should also not be dragged
             // note that "P" is used for "PDF" and "Priority"
             if (headerValue.equals("F") || headerValue.equals("U")) {
-            	return;
+                return;
             }
-            
+
         }
 
         super.setDraggedColumn(column);
@@ -92,7 +92,7 @@ public class PreventDraggingJTableHeader extends JTableHeader {
     public TableColumn getDraggedColumn() {
         TableColumn column = super.getDraggedColumn();
         if (column != null) {
-            preventDragBeforeIndex(this.getTable(), column.getModelIndex(),
+            PreventDraggingJTableHeader.preventDragBeforeIndex(this.getTable(), column.getModelIndex(),
                     getSpecialColumnsCount());
         }
 
@@ -121,31 +121,37 @@ public class PreventDraggingJTableHeader extends JTableHeader {
         }
 
         if (Globals.prefs.getBoolean("extraFileColumns")) {
-            count+=Globals.prefs.getStringArray("listOfFileColumns").length;
+            count += Globals.prefs.getStringArray("listOfFileColumns").length;
         }
-        
+
         // special field columns may also not be dragged
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED))
-	            count++;
-	        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ))
-	            count++;
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+                count++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+                count++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+                count++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+                count++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+                count++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+                count++;
+            }
         }
 
         return count;
     }
 
     private static boolean isUnnamed(TableColumn column) {
-        return column.getHeaderValue() == null
-                || "".equals(column.getHeaderValue().toString());
+        return (column.getHeaderValue() == null)
+                || column.getHeaderValue().toString() != null && column.getHeaderValue().toString().isEmpty();
     }
 
     /**
@@ -161,7 +167,7 @@ public class PreventDraggingJTableHeader extends JTableHeader {
 
             // found the element in the view ...
             // ... and check if it should not be dragged
-            if (col.getModelIndex() == mColIndex && c <= toIndex) {
+            if ((col.getModelIndex() == mColIndex) && (c <= toIndex)) {
                 // Util.pr("prevented! viewIndex = " + c + " modelIndex = "
                 // + mColIndex + " toIndex = " + toIndex);
 

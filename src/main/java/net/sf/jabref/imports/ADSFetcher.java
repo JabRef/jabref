@@ -37,13 +37,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.imports.BibtexParser;
 
 /**
  *
@@ -55,28 +53,30 @@ import net.sf.jabref.imports.BibtexParser;
  * @version $Id$
  */
 public class ADSFetcher implements EntryFetcher {
+
+    @Override
     public JPanel getOptionsPanel() {
         // No option panel
         return null;
     }
 
+    @Override
     public String getHelpPage() {
         // TODO: No help page
         return null;
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
+    @Override
     public String getKeyName() {
         return "ADS from ADS-DOI";
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle(getKeyName());
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
             /* Remove "doi:" scheme identifier */
@@ -101,10 +101,11 @@ public class ADSFetcher implements EntryFetcher {
         return true;
     }
 
+    @Override
     public void stopFetching() {
     }
 
-    public BibtexDatabase importADSEntries(String key, OutputPrinter status) {
+    private BibtexDatabase importADSEntries(String key, OutputPrinter status) {
         String url = constructUrl(key);
         try {
             URL ADSUrl = new URL(url + "&data_type=BIBTEX");
@@ -116,21 +117,21 @@ public class ADSFetcher implements EntryFetcher {
             return pr.getDatabase();
         } catch (IOException e) {
             status.showMessage(Globals.lang(
-                "An Exception ocurred while accessing '%0'", url)
-                + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Globals.lang(
-                "An Error occurred while fetching from ADS (%0):", new String[]{url})
-                + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Error occurred while fetching from ADS (%0):", new String[] {url})
+                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
 
-    public String constructUrl(String key) {
+    private String constructUrl(String key) {
         return "http://adsabs.harvard.edu/doi/" + key;
     }
 
-    public void importADSAbstract(String key, BibtexEntry entry, OutputPrinter status) {
+    private void importADSAbstract(String key, BibtexEntry entry, OutputPrinter status) {
         /* TODO: construct ADSUrl from BibtexEntry */
         String url = constructUrl(key);
         try {
@@ -160,16 +161,16 @@ public class ADSFetcher implements EntryFetcher {
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {
             status.showMessage(Globals.lang(
-                "An Error occurred while parsing abstract"),
-                Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Error occurred while parsing abstract"),
+                    Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             status.showMessage(Globals.lang(
-                "An Exception ocurred while accessing '%0'", url)
-                + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Globals.lang(
-                "An Error occurred while fetching from ADS (%0):", new String[]{url})
-                + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    "An Error occurred while fetching from ADS (%0):", new String[] {url})
+                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
     }
 }

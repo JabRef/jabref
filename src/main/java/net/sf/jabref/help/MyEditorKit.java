@@ -11,12 +11,14 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 
 @SuppressWarnings("serial")
-public class MyEditorKit extends LargeHTMLEditorKit {
+class MyEditorKit extends LargeHTMLEditorKit {
 
-    public class MyNextVisualPositionAction extends TextAction {
-        private Action textActn;
+    public static class MyNextVisualPositionAction extends TextAction {
 
-        private int direction;
+        private final Action textActn;
+
+        private final int direction;
+
 
         private MyNextVisualPositionAction(Action textActn, int direction) {
             super((String) textActn.getValue(Action.NAME));
@@ -24,6 +26,7 @@ public class MyEditorKit extends LargeHTMLEditorKit {
             this.direction = direction;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             JTextComponent c = getTextComponent(e);
 
@@ -43,8 +46,11 @@ public class MyEditorKit extends LargeHTMLEditorKit {
         }
     }
 
+
     private Action[] myActions;
 
+
+    @Override
     public Action[] getActions() {
         if (myActions == null) {
             Action[] actions = super.getActions();

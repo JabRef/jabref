@@ -28,12 +28,14 @@ import net.sf.jabref.Globals;
  * 
  */
 public class UndoableChangeAssignment extends AbstractUndoableEdit {
+
     private final Set<BibtexEntry> m_previousAssignmentBackup;
     private final Set<BibtexEntry> m_newAssignmentBackup;
     /** The path to the edited node */
     private int[] m_pathToNode = null;
     /** The root of the global groups tree */
     private GroupTreeNode m_groupsRootHandle = null;
+
 
     /**
      * Constructor for use in a group itself, where the enclosing node is
@@ -68,30 +70,37 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         m_pathToNode = node.getIndexedPath();
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": "
                 + Globals.lang("change assignment of entries");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": "
                 + Globals.lang("change assignment of entries");
     }
 
+    @Override
     public void undo() {
         super.undo();
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_previousAssignmentBackup : m_previousAssignmentBackup)
+        for (BibtexEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
             group.addEntry(aM_previousAssignmentBackup);
+        }
     }
 
+    @Override
     public void redo() {
         super.redo();
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup) group.addEntry(aM_newAssignmentBackup);
+        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
+            group.addEntry(aM_newAssignmentBackup);
+        }
     }
 }

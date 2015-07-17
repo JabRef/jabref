@@ -36,13 +36,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.export.layout;
 
-
 /*==========================================================================*
  * IMPORTS
  *========================================================================== */
 import java.util.StringTokenizer;
 import java.util.Vector;
-
 
 /*==========================================================================*
  * CLASS DECLARATION
@@ -56,6 +54,7 @@ import java.util.Vector;
  */
 public class WSITools
 {
+
     //~ Constructors ///////////////////////////////////////////////////////////
 
     private WSITools()
@@ -71,7 +70,7 @@ public class WSITools
      */
     public static boolean tokenize(Vector<String> vcr, String buf)
     {
-        return tokenize(vcr, buf, " \t\n");
+        return WSITools.tokenize(vcr, buf, " \t\n");
     }
 
     /**
@@ -83,7 +82,7 @@ public class WSITools
     public static boolean tokenize(Vector<String> vcr, String buf, String delimstr)
     {
         vcr.clear();
-        buf = buf + "\n";
+        buf = buf + '\n';
 
         StringTokenizer st = new StringTokenizer(buf, delimstr);
 
@@ -103,13 +102,13 @@ public class WSITools
      * @return           Description of the Return Value
      */
     public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
-        int limit)
+            int limit)
     {
-        System.out.println("Warning: tokenize \"" + s + "\"");
+        System.out.println("Warning: tokenize \"" + s + '"');
         vcr.clear();
-        s = s + "\n";
+        s = s + '\n';
 
-        int endpos = 0;
+        int endpos;
         int matched = 0;
 
         StringTokenizer st = new StringTokenizer(s, delimstr);

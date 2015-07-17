@@ -27,11 +27,12 @@ import java.util.Hashtable;
 public class LabelPattern extends Hashtable<String, ArrayList<String>> {
 
     private ArrayList<String> defaultPattern = null;
-    
+
     /**
      * The parent of this LabelPattern.
      */
-    protected LabelPattern parent = null;
+    private LabelPattern parent = null;
+
 
     public LabelPattern() {
     }
@@ -72,7 +73,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      *            a <code>String</code>
      */
     public void removeLabelPattern(String type) {
-        if (containsKey(type) && parent != null) {
+        if (containsKey(type) && (parent != null)) {
             remove(type);
         }
     }
@@ -124,7 +125,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
         Object _obj = get(key);
         return _obj == null;
     }
-    
+
     /**
      * This method is called "...Value" to be in line with the other methods
      * @return
@@ -138,7 +139,6 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      * @param labelPattern the pattern to store
      */
     public void setDefaultValue(String labelPattern) {
-        ArrayList<String> split = LabelPatternUtil.split(labelPattern);
-        this.defaultPattern = split;
+        this.defaultPattern = LabelPatternUtil.split(labelPattern);
     }
 }

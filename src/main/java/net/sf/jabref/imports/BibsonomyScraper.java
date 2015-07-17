@@ -26,10 +26,11 @@ import java.net.URL;
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
  * from an URL pointing to an entry.
  */
-public class BibsonomyScraper {
+class BibsonomyScraper {
 
-    protected static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
-    protected static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
+    private static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
+    private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
+
 
     /**
      * Return a BibtexEntry by looking up the given url from the BibSonomy scraper.
@@ -41,18 +42,16 @@ public class BibsonomyScraper {
             // Replace special characters by corresponding sequences:
             entryUrl = entryUrl.replaceAll("%", "%25").replaceAll(":", "%3A").replaceAll("/", "%2F")
                     .replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
-                    
-            URL url = new URL(BIBSONOMY_SCRAPER+entryUrl+BIBSONOMY_SCRAPER_POST);
-            URLDownload ud = new URLDownload(url);
-            ud.setEncoding("UTF8");
-            ud.download();
-            String bibtex = ud.getStringContent();
+
+            URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + entryUrl + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
+            String bibtex = new URLDownload(url).downloadToString("UTF8");
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
                 return pr.getDatabase().getEntries().iterator().next();
+            } else {
+                return null;
             }
-            else return null;
 
         } catch (IOException ex) {
             ex.printStackTrace();

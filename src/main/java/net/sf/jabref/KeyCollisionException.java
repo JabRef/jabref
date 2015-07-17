@@ -27,6 +27,7 @@ package net.sf.jabref;
 
 public class KeyCollisionException extends RuntimeException
 {
+
     public KeyCollisionException()
     {
         super();

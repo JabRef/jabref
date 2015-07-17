@@ -24,9 +24,11 @@ import ca.odell.glazedlists.matchers.Matcher;
  */
 public class SearchMatcher implements Matcher<BibtexEntry> {
 
-	public static SearchMatcher INSTANCE = new SearchMatcher();
+    public static final SearchMatcher INSTANCE = new SearchMatcher();
 
-	public boolean matches(BibtexEntry entry) {
-		return entry.isSearchHit();
-	}
+
+    @Override
+    public boolean matches(BibtexEntry entry) {
+        return entry.isSearchHit();
+    }
 }

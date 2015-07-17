@@ -25,31 +25,37 @@ package net.sf.jabref;
  */
 public class UnknownEntryType extends BibtexEntryType {
 
-    private String name;
-    private String[] fields = new String[0];
+    private final String name;
+    private final String[] fields = new String[0];
+
 
     public UnknownEntryType(String name_) {
-	name = name_;
+        name = name_;
     }
 
+    @Override
     public String getName() {
-	return name;
+        return name;
     }
 
+    @Override
     public String[] getOptionalFields() {
-	return fields;
+        return fields;
     }
+
+    @Override
     public String[] getRequiredFields() {
-	return fields;
+        return fields;
     }
 
-
+    @Override
     public String describeRequiredFields() {
-	return "unknown";
+        return "unknown";
     }
 
+    @Override
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-	return true;
+        return true;
     }
 
 }

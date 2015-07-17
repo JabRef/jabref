@@ -49,6 +49,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class RemoveWhitespace implements LayoutFormatter {
 
+    @Override
     public String format(String fieldEntry) {
 
         StringBuilder sb = new StringBuilder(fieldEntry.length());

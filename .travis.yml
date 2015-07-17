@@ -9,4 +9,7 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - TERM=dumb ./gradlew assemble
+  - ./gradlew check --info
+
+after_success:
+  - ./gradlew jacocoTestReport coveralls

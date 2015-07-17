@@ -30,119 +30,120 @@ import net.sf.jabref.util.XMPUtil;
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
 
-	private static Logger logger = Logger.getLogger(EntryFromPDFCreator.class.getName());
-	
-	public EntryFromPDFCreator() {
-		super(getPDFExternalFileType());
-	}
-	
-	private static ExternalFileType getPDFExternalFileType(){
-		ExternalFileType pdfFileType = JabRefPreferences.getInstance().getExternalFileTypeByExt("pdf");
-		if (pdfFileType==null){
-			return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall");
-		}
-		return pdfFileType;
-	}
+    private static Logger logger = Logger.getLogger(EntryFromPDFCreator.class.getName());
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.imports.EntryFromFileCreator#accept(java.io.File)
-	 * 
-	 * Accepts all Files having as suffix ".PDF" (in ignore case mode).
-	 */
-	@Override
-	public boolean accept(File f) {
-		return f != null && f.getName().toUpperCase().endsWith(".PDF");
-	}
 
-	@Override
-	protected BibtexEntry createBibtexEntry(File pdfFile) {
+    public EntryFromPDFCreator() {
+        super(EntryFromPDFCreator.getPDFExternalFileType());
+    }
 
-		if (!accept(pdfFile)) {
-			return null;
-		}
+    private static ExternalFileType getPDFExternalFileType() {
+        ExternalFileType pdfFileType = JabRefPreferences.getInstance().getExternalFileTypeByExt("pdf");
+        if (pdfFileType == null) {
+            return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall");
+        }
+        return pdfFileType;
+    }
 
-		PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.basePanel(), JabRef.jrf.basePanel().mainTable, -1);
-		String[] fileNames = {pdfFile.toString()};
-		ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
-		assert(res.entries.size() == 1);
-		return res.entries.get(0);
-		
-		/*addEntryDataFromPDDocumentInformation(pdfFile, entry);
-		addEntyDataFromXMP(pdfFile, entry);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.sf.jabref.imports.EntryFromFileCreator#accept(java.io.File)
+     * 
+     * Accepts all Files having as suffix ".PDF" (in ignore case mode).
+     */
+    @Override
+    public boolean accept(File f) {
+        return (f != null) && f.getName().toUpperCase().endsWith(".PDF");
+    }
 
-		if (entry.getField("title") == null) {
-			entry.setField("title", pdfFile.getName());
-		}
+    @Override
+    protected BibtexEntry createBibtexEntry(File pdfFile) {
 
-		return entry;*/
-	}
+        if (!accept(pdfFile)) {
+            return null;
+        }
 
-	/** Adds entry data read from the PDDocument information of the file.
-	 * @param pdfFile
-	 * @param entry
-	 */
-	private void addEntryDataFromPDDocumentInformation(File pdfFile, BibtexEntry entry) {
-		PDDocument document = null;
-		try {
-			document = PDDocument.load(pdfFile.getAbsoluteFile());
-			PDDocumentInformation pdfDocInfo = document
-					.getDocumentInformation();
-			
-			if (pdfDocInfo!=null){
-				BibtexEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
-						.getDocumentInformation());
-				if (entryDI!=null){
-					addEntryDataToEntry(entry,entryDI);
-					Calendar creationDate = pdfDocInfo.getCreationDate();
-					if (creationDate != null) {
-						String date = new SimpleDateFormat("yyyy.MM.dd")
-								.format(creationDate.getTime());
-						appendToField(entry, "timestamp", date);
-					}
-		
-					if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null){
-						entry.setId(pdfDocInfo
-								.getCustomMetadataValue("bibtex/bibtexkey"));
-					}
-				}
-			}
-		} catch (IOException e) {
-			// no canceling here, just no data added.
-		} finally {
-			if (document != null) {
-				try {
-					document.close();
-				} catch (IOException e) {
-					// no canceling here, just no data added.
-				}
-			}
-		}
-	}
+        PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.basePanel(), JabRef.jrf.basePanel().mainTable, -1);
+        String[] fileNames = {pdfFile.toString()};
+        ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
+        assert (res.entries.size() == 1);
+        return res.entries.get(0);
 
-	/**
-	 * Adds all data Found in all the entrys of this XMP file to the given
-	 * entry. This was implemented without having much knowledge of the XMP
-	 * format.
-	 * 
-	 * @param aFile
-	 * @param entry
-	 */
-	private void addEntyDataFromXMP(File aFile, BibtexEntry entry) {
-		try {
-			List<BibtexEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
-			addEntrysToEntry(entry, entrys);
-		} catch (EncryptionNotSupportedException e) {
-			// no canceling here, just no data added.
-		} catch (IOException e) {
-			// no canceling here, just no data added.
-		}
-	}
+        /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
+        addEntyDataFromXMP(pdfFile, entry);
 
-	@Override
-	public String getFormatName() {
-		return "PDF";
-	}
+        if (entry.getField("title") == null) {
+        	entry.setField("title", pdfFile.getName());
+        }
+
+        return entry;*/
+    }
+
+    /** Adds entry data read from the PDDocument information of the file.
+     * @param pdfFile
+     * @param entry
+     */
+    private void addEntryDataFromPDDocumentInformation(File pdfFile, BibtexEntry entry) {
+        PDDocument document = null;
+        try {
+            document = PDDocument.load(pdfFile.getAbsoluteFile());
+            PDDocumentInformation pdfDocInfo = document
+                    .getDocumentInformation();
+
+            if (pdfDocInfo != null) {
+                BibtexEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                        .getDocumentInformation());
+                if (entryDI != null) {
+                    addEntryDataToEntry(entry, entryDI);
+                    Calendar creationDate = pdfDocInfo.getCreationDate();
+                    if (creationDate != null) {
+                        String date = new SimpleDateFormat("yyyy.MM.dd")
+                                .format(creationDate.getTime());
+                        appendToField(entry, "timestamp", date);
+                    }
+
+                    if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null) {
+                        entry.setId(pdfDocInfo
+                                .getCustomMetadataValue("bibtex/bibtexkey"));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // no canceling here, just no data added.
+        } finally {
+            if (document != null) {
+                try {
+                    document.close();
+                } catch (IOException e) {
+                    // no canceling here, just no data added.
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds all data Found in all the entrys of this XMP file to the given
+     * entry. This was implemented without having much knowledge of the XMP
+     * format.
+     * 
+     * @param aFile
+     * @param entry
+     */
+    private void addEntyDataFromXMP(File aFile, BibtexEntry entry) {
+        try {
+            List<BibtexEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
+            addEntrysToEntry(entry, entrys);
+        } catch (EncryptionNotSupportedException e) {
+            // no canceling here, just no data added.
+        } catch (IOException e) {
+            // no canceling here, just no data added.
+        }
+    }
+
+    @Override
+    public String getFormatName() {
+        return "PDF";
+    }
 
 }

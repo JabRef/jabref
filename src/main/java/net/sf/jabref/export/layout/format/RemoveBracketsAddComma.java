@@ -39,7 +39,6 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
-
 /**
  * Remove brackets formatter.
  *
@@ -48,27 +47,29 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class RemoveBracketsAddComma implements LayoutFormatter
 {
+
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText)
     {
         String fieldEntry = fieldText;
-        StringBuffer sb = new StringBuffer(fieldEntry.length());
+        StringBuilder sb = new StringBuilder(fieldEntry.length());
 
         for (int i = 0; i < fieldEntry.length(); i++)
-	    {
-		//System.out.print(fieldEntry.charAt(i));
-		if ((fieldEntry.charAt(i) != '{') && (fieldEntry.charAt(i) != '}'))
-		    {
-			//System.out.print(fieldEntry.charAt(i));
-			sb.append(fieldEntry.charAt(i));
-		    }
-		if (fieldEntry.charAt(i) == '}')
-		    {
-			sb.append(",");
-		    }
-	    }
-	
+        {
+            //System.out.print(fieldEntry.charAt(i));
+            if ((fieldEntry.charAt(i) != '{') && (fieldEntry.charAt(i) != '}'))
+            {
+                //System.out.print(fieldEntry.charAt(i));
+                sb.append(fieldEntry.charAt(i));
+            }
+            if (fieldEntry.charAt(i) == '}')
+            {
+                sb.append(',');
+            }
+        }
+
         fieldEntry = sb.toString();
         return fieldEntry;
     }

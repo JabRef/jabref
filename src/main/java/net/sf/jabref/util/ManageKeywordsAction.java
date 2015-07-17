@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -46,7 +47,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Util;
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -70,32 +71,34 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Either set field, or clear field.
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
-    private JabRefFrame frame;
-    
+
+    private final JabRefFrame frame;
+
     private JDialog diag = null;
 
     // keyword to add
     private JTextField keyword;
 
-	private DefaultListModel keywordListModel;
-	private JList keywordList;
+    private DefaultListModel keywordListModel;
+    private JList keywordList;
 
     private JRadioButton intersectKeywords, mergeKeywords;
 
     private boolean cancelled;
 
-	private TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
-	
-	public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(NAME, "Manage keywords");
+    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
+
+
+    public ManageKeywordsAction(JabRefFrame frame) {
+        putValue(Action.NAME, "Manage keywords");
         this.frame = frame;
     }
 
     private void createDialog() {
         keyword = new JTextField();
 
-		keywordListModel = new DefaultListModel();
-		keywordList = new JList(keywordListModel);
+        keywordListModel = new DefaultListModel();
+        keywordList = new JList(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -105,25 +108,27 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         JButton cancel = new JButton(Globals.lang("Cancel"));
         JButton add = new JButton(Globals.lang("Add"));
         JButton remove = new JButton(Globals.lang("Remove"));
-        
+
         keywordList.setVisibleRowCount(10);
-        
+
         intersectKeywords = new JRadioButton("Display keywords appearing in ALL entries");
         mergeKeywords = new JRadioButton("Display keywords appearing in ANY entry");
-		ButtonGroup group = new ButtonGroup();
-		group.add(intersectKeywords);
-		group.add(mergeKeywords);
-		ActionListener stateChanged = new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-		        fillKeyWordList();
-			}
-		};
-		intersectKeywords.addActionListener(stateChanged);
-		mergeKeywords.addActionListener(stateChanged);
-		intersectKeywords.setSelected(true);
+        ButtonGroup group = new ButtonGroup();
+        group.add(intersectKeywords);
+        group.add(mergeKeywords);
+        ActionListener stateChanged = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                fillKeyWordList();
+            }
+        };
+        intersectKeywords.addActionListener(stateChanged);
+        mergeKeywords.addActionListener(stateChanged);
+        intersectKeywords.setSelected(true);
 
         DefaultFormBuilder builder = new DefaultFormBuilder(
-        		new FormLayout("fill:200dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
+                new FormLayout("fill:200dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
         builder.appendSeparator(Globals.lang("Keywords of selected entries"));
         builder.append(intersectKeywords, 5);
         builder.nextLine();
@@ -135,16 +140,18 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         builder.append(keyword, 3);
         builder.append(add);
         builder.nextLine();
-        
+
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         ok.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = false;
                 diag.dispose();
@@ -152,86 +159,101 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    cancelled = true;
-                    diag.dispose();
-                }
-            };
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancelled = true;
+                diag.dispose();
+            }
+        };
         cancel.addActionListener(cancelAction);
-        
+
         final ActionListener addActionListener = new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String text = keyword.getText().trim();
-				if (text.equals("")) {
-					// no text to add, do nothing
-					return;
-				}
-				if (keywordListModel.isEmpty()) {
-					keywordListModel.addElement(text);
-				} else {
-					int idx = 0;
-					String element = (String) keywordListModel.getElementAt(idx);
-					while ((idx < keywordListModel.size()) &&
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                String text = keyword.getText().trim();
+                if (text.isEmpty()) {
+                    // no text to add, do nothing
+                    return;
+                }
+                if (keywordListModel.isEmpty()) {
+                    keywordListModel.addElement(text);
+                } else {
+                    int idx = 0;
+                    String element = (String) keywordListModel.getElementAt(idx);
+                    while ((idx < keywordListModel.size()) &&
                             (element.compareTo(text) < 0)) {
-						idx++;
-					}
-					if (idx == keywordListModel.size()) {
-						// list is empty or word is greater than last word in list
-						keywordListModel.addElement(text);
-					} else if (element.compareTo(text) == 0) {
-						// nothing to do, word already in table
-					} else {
-						keywordListModel.add(idx, text);
-					}
-				}
-				keyword.setText(null);
-				keyword.requestFocusInWindow();
-			}
-		};
+                        idx++;
+                    }
+                    if (idx == keywordListModel.size()) {
+                        // list is empty or word is greater than last word in list
+                        keywordListModel.addElement(text);
+                    } else if (element.compareTo(text) == 0) {
+                        // nothing to do, word already in table
+                    } else {
+                        keywordListModel.add(idx, text);
+                    }
+                }
+                keyword.setText(null);
+                keyword.requestFocusInWindow();
+            }
+        };
         add.addActionListener(addActionListener);
 
         final ActionListener removeActionListenter = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
-				// keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-				String[] values = (String[]) keywordList.getSelectedValues();
+                // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
+                String[] values = (String[]) keywordList.getSelectedValues();
 
-				for (String val: values) {
-					keywordListModel.removeElement(val);
-				}
-			}
-		};
+                for (String val : values) {
+                    keywordListModel.removeElement(val);
+                }
+            }
+        };
         remove.addActionListener(removeActionListenter);
         keywordList.addKeyListener(new KeyListener() {
-			
-			public void keyTyped(KeyEvent arg0) {}
-			
-			public void keyReleased(KeyEvent arg0) {}
-			
-			public void keyPressed(KeyEvent arg0) {
-				if (arg0.getKeyCode() == KeyEvent.VK_DELETE) {
-					removeActionListenter.actionPerformed(null);
-				}
-			}
-		});
-        
-        AbstractAutoCompleter autoComp = JabRef.jrf.basePanel().getAutoCompleter("keywords");
+
+            @Override
+            public void keyTyped(KeyEvent arg0) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent arg0) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent arg0) {
+                if (arg0.getKeyCode() == KeyEvent.VK_DELETE) {
+                    removeActionListenter.actionPerformed(null);
+                }
+            }
+        });
+
+        AutoCompleter autoComp = JabRef.jrf.basePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
         keyword.addKeyListener(new KeyListener() {
-			
-			public void keyTyped(KeyEvent e) {}
-			
-			public void keyReleased(KeyEvent e) {}
-			
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					addActionListener.actionPerformed(null);
-				}
-			}
-		});
-        
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    addActionListener.actionPerformed(null);
+                }
+            }
+        });
+
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -243,13 +265,15 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         //diag.pack();
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         BasePanel bp = frame.basePanel();
-        if (bp == null)
+        if (bp == null) {
             return;
+        }
         if (bp.getSelectedEntries().length == 0) {
-        	// no entries selected, silently ignore action
-        	return;
+            // no entries selected, silently ignore action
+            return;
         }
 
         // Lazy creation of the dialog:
@@ -264,108 +288,109 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         diag.pack();
         Util.placeDialog(diag, frame);
         diag.setVisible(true);
-        if (cancelled)
+        if (cancelled) {
             return;
-        
+        }
+
         HashSet<String> keywordsToAdd = new HashSet<String>();
         HashSet<String> userSelectedKeywords = new HashSet<String>();
         // build keywordsToAdd and userSelectedKeywords in parallel
-		for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
-			String keyword = (String) keywords.nextElement();
-        	userSelectedKeywords.add(keyword);
-        	if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
-        		keywordsToAdd.add(keyword);
-        	}
+        for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
+            String keyword = (String) keywords.nextElement();
+            userSelectedKeywords.add(keyword);
+            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
+                keywordsToAdd.add(keyword);
+            }
         }
-        
+
         HashSet<String> keywordsToRemove = new HashSet<String>();
-        for (String keyword: sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-        	if (!userSelectedKeywords.contains(keyword)) {
-        		keywordsToRemove.add(keyword);
-        	}
+        for (String keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+            if (!userSelectedKeywords.contains(keyword)) {
+                keywordsToRemove.add(keyword);
+            }
         }
-        
+
         if (keywordsToAdd.isEmpty() && keywordsToRemove.isEmpty()) {
-        	// nothing to be done if nothing is new and nothing is obsolete
-        	return;
+            // nothing to be done if nothing is new and nothing is obsolete
+            return;
         }
-        
-    	if (SpecialFieldsUtils.keywordSyncEnabled()) {
-	        if (!keywordsToAdd.isEmpty()) {
-	        	// we need to check whether a special field is added
-	        	// for each field:
-	        	//   check if something is added
-	        	//   if yes, add all keywords of that special fields to the keywords to be removed
-	        	
-	        	HashSet<String> clone;
-	        	
-	        	// Priority
-	        	clone = createClone(keywordsToAdd);
-	        	clone.retainAll(Priority.getInstance().getKeyWords());
-	        	if (!clone.isEmpty()) {
-	        		keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
-	        	}
-	        	
-	        	// Quality
-	        	clone = createClone(keywordsToAdd);
-	        	clone.retainAll(Quality.getInstance().getKeyWords());
-	        	if (!clone.isEmpty()) {
-	        		keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
-	        	}
-	        	
-	        	// Rank
-	        	clone = createClone(keywordsToAdd);
-	        	clone.retainAll(Rank.getInstance().getKeyWords());
-	        	if (!clone.isEmpty()) {
-	        		keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
-	        	}
-	        	
-	        	// Relevance
-	        	clone = createClone(keywordsToAdd);
-	        	clone.retainAll(Relevance.getInstance().getKeyWords());
-	        	if (!clone.isEmpty()) {
-	        		keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
-	        	}
-	        	
-	        	// Read status
-	        	clone = createClone(keywordsToAdd);
-	        	clone.retainAll(ReadStatus.getInstance().getKeyWords());
-	        	if (!clone.isEmpty()) {
-	        		keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
-	        	}
-	        	
-	        	// Printed
-	        	clone = createClone(keywordsToAdd);
-	        	clone.retainAll(Printed.getInstance().getKeyWords());
-	        	if (!clone.isEmpty()) {
-	        		keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
-	        	}
-	        }
+
+        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+            if (!keywordsToAdd.isEmpty()) {
+                // we need to check whether a special field is added
+                // for each field:
+                //   check if something is added
+                //   if yes, add all keywords of that special fields to the keywords to be removed
+
+                HashSet<String> clone;
+
+                // Priority
+                clone = createClone(keywordsToAdd);
+                clone.retainAll(Priority.getInstance().getKeyWords());
+                if (!clone.isEmpty()) {
+                    keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
+                }
+
+                // Quality
+                clone = createClone(keywordsToAdd);
+                clone.retainAll(Quality.getInstance().getKeyWords());
+                if (!clone.isEmpty()) {
+                    keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
+                }
+
+                // Rank
+                clone = createClone(keywordsToAdd);
+                clone.retainAll(Rank.getInstance().getKeyWords());
+                if (!clone.isEmpty()) {
+                    keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
+                }
+
+                // Relevance
+                clone = createClone(keywordsToAdd);
+                clone.retainAll(Relevance.getInstance().getKeyWords());
+                if (!clone.isEmpty()) {
+                    keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
+                }
+
+                // Read status
+                clone = createClone(keywordsToAdd);
+                clone.retainAll(ReadStatus.getInstance().getKeyWords());
+                if (!clone.isEmpty()) {
+                    keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
+                }
+
+                // Printed
+                clone = createClone(keywordsToAdd);
+                clone.retainAll(Printed.getInstance().getKeyWords());
+                if (!clone.isEmpty()) {
+                    keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
+                }
+            }
         }
 
         BibtexEntry[] entries = bp.getSelectedEntries();
         NamedCompound ce = new NamedCompound(Globals.lang("Update keywords"));
-        for (BibtexEntry entry: entries) {
+        for (BibtexEntry entry : entries) {
             ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
-            
+
             // we "intercept" with a treeset
             // pro: no duplicates
             // possible con: alphabetical sorting of the keywords
             TreeSet<String> keywords = new TreeSet<String>();
             keywords.addAll(separatedKeywords);
-            
+
             // update keywords
             keywords.removeAll(keywordsToRemove);
             keywords.addAll(keywordsToAdd);
-            
+
             // put keywords back
             separatedKeywords.clear();
             separatedKeywords.addAll(keywords);
             Util.putKeywords(entry, separatedKeywords, ce);
-            
-        	if (SpecialFieldsUtils.keywordSyncEnabled()) {
-        		SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
-        	}
+
+            if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
+            }
         }
         ce.end();
         bp.undoManager.addEdit(ce);
@@ -384,30 +409,30 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         // fill dialog with values
         keywordListModel.clear();
         sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
-        
+
         if (mergeKeywords.isSelected()) {
             for (BibtexEntry entry : entries) {
-            	ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
-            	sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
+                ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+                sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
-        	assert(intersectKeywords.isSelected());
-        	
-        	// all keywords from first entry have to be added
-        	BibtexEntry firstEntry = entries[0];
-        	ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(firstEntry);
-        	sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
-        	
-        	// for the remaining entries, intersection has to be used
-        	// this approach ensures that one empty keyword list leads to an empty set of common keywords
-        	for (int i = 1; i<entries.length; i++) {
-        		BibtexEntry entry = entries[i];
-        		separatedKeywords = Util.getSeparatedKeywords(entry);
-        		sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
-        	}
+            assert (intersectKeywords.isSelected());
+
+            // all keywords from first entry have to be added
+            BibtexEntry firstEntry = entries[0];
+            ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(firstEntry);
+            sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
+
+            // for the remaining entries, intersection has to be used
+            // this approach ensures that one empty keyword list leads to an empty set of common keywords
+            for (int i = 1; i < entries.length; i++) {
+                BibtexEntry entry = entries[i];
+                separatedKeywords = Util.getSeparatedKeywords(entry);
+                sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
+            }
         }
         for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-        	keywordListModel.addElement(s);
+            keywordListModel.addElement(s);
         }
     }
 

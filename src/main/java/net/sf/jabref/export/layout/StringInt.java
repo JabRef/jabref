@@ -36,7 +36,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.export.layout;
 
-
 /*==========================================================================*
  * IMPORTS
  *========================================================================== */
@@ -50,8 +49,9 @@ package net.sf.jabref.export.layout;
  * @author     wegnerj
  * @version    $Revision$, $Date$
  */
-public class StringInt implements java.io.Serializable
+class StringInt implements java.io.Serializable
 {
+
     //~ Instance fields ////////////////////////////////////////////////////////
 
     /*-------------------------------------------------------------------------*
@@ -66,7 +66,8 @@ public class StringInt implements java.io.Serializable
     /**
      *  Description of the Field
      */
-    public int i;
+    public final int i;
+
 
     //~ Constructors ///////////////////////////////////////////////////////////
 

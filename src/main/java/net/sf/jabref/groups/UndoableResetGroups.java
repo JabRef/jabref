@@ -20,12 +20,14 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.Globals;
 
 class UndoableResetGroups extends AbstractUndoableEdit {
+
     /** A backup of the groups before the modification */
     private final GroupTreeNode m_groupsBackup;
     /** A handle to the global groups root node */
     private final GroupTreeNode m_groupsRootHandle;
     private final GroupSelector m_groupSelector;
     private boolean m_revalidate = true;
+
 
     public UndoableResetGroups(GroupSelector groupSelector,
             GroupTreeNode groupsRoot) {
@@ -34,34 +36,41 @@ class UndoableResetGroups extends AbstractUndoableEdit {
         this.m_groupSelector = groupSelector;
     }
 
+    @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " 
-            + Globals.lang("clear all groups");
+        return Globals.lang("Undo") + ": "
+                + Globals.lang("clear all groups");
     }
 
+    @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " 
-            + Globals.lang("clear all groups");
+        return Globals.lang("Redo") + ": "
+                + Globals.lang("clear all groups");
     }
 
+    @Override
     public void undo() {
         super.undo();
         // keep root handle, but restore everything else from backup
         m_groupsRootHandle.removeAllChildren();
         m_groupsRootHandle.setGroup(m_groupsBackup.getGroup().deepCopy());
-        for (int i = 0; i < m_groupsBackup.getChildCount(); ++i)
+        for (int i = 0; i < m_groupsBackup.getChildCount(); ++i) {
             m_groupsRootHandle.add(((GroupTreeNode) m_groupsBackup
                     .getChildAt(i)).deepCopy());
-        if (m_revalidate)
+        }
+        if (m_revalidate) {
             m_groupSelector.revalidateGroups();
+        }
     }
 
+    @Override
     public void redo() {
         super.redo();
         m_groupsRootHandle.removeAllChildren();
         m_groupsRootHandle.setGroup(new AllEntriesGroup());
-        if (m_revalidate)
+        if (m_revalidate) {
             m_groupSelector.revalidateGroups();
+        }
     }
 
     /**

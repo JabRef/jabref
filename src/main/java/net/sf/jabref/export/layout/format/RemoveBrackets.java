@@ -39,7 +39,6 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
-
 /**
  * Remove brackets formatter.
  *
@@ -48,12 +47,14 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class RemoveBrackets implements LayoutFormatter
 {
+
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText)
     {
         String fieldEntry = fieldText;
-        StringBuffer sb = new StringBuffer(fieldEntry.length());
+        StringBuilder sb = new StringBuilder(fieldEntry.length());
 
         for (int i = 0; i < fieldEntry.length(); i++)
         {

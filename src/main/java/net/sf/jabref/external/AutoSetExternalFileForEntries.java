@@ -39,18 +39,18 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class AutoSetExternalFileForEntries extends AbstractWorker {
 
-    private String fieldName;
-    private BasePanel panel;
+    private final String fieldName;
+    private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private OptionsDialog optDiag = null;
 
-    Object[] brokenLinkOptions =
-            {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
-                    Globals.lang("Quit synchronization")};
+    private final Object[] brokenLinkOptions =
+    {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
+            Globals.lang("Quit synchronization")};
 
     private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
 
-    private int entriesChanged = 0, brokenLinks = 0;
+    private int entriesChanged = 0;
 
 
     public AutoSetExternalFileForEntries(BasePanel panel, String fieldName) {
@@ -58,14 +58,16 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         this.panel = panel;
     }
 
+    @Override
     public void init() {
 
-    	Collection<BibtexEntry> col = panel.database().getEntries();
+        Collection<BibtexEntry> col = panel.database().getEntries();
         sel = col.toArray(new BibtexEntry[col.size()]);
 
         // Ask about rules for the operation:
-        if (optDiag == null)
+        if (optDiag == null) {
             optDiag = new OptionsDialog(panel.frame(), fieldName);
+        }
         Util.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
@@ -79,6 +81,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
+    @Override
     public void run() {
         if (!goOn) {
             panel.output(Globals.lang("No entries selected."));
@@ -92,7 +95,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
         entriesChanged = 0;
-        brokenLinks = 0;
+        int brokenLinks = 0;
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
@@ -111,18 +114,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
-                if ((old != null) && !old.equals("") && !overWriteAllowed)
+                if ((old != null) && !old.equals("") && !overWriteAllowed) {
                     continue;
+                }
                 extPan.setEntry(aSel, panel.getDatabase());
                 editor.setText((old != null) ? old : "");
-                Thread t = extPan.autoSetFile(fieldName, editor);
-                // Wait for the autoset process to finish:
-                if (t != null)
-                    try {
-                        t.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                JabRefExecutorService.INSTANCE.executeAndWait(extPan.autoSetFile(fieldName, editor));
                 // If something was found, entriesChanged it:
                 if (!editor.getText().equals("") && !editor.getText().equals(old)) {
                     // Store an undo edit:
@@ -136,47 +133,46 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
-            mainLoop:
-            for (BibtexEntry aSel : sel) {
+            mainLoop: for (BibtexEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     // Get an absolute path representation:
-                    File file = Util.expandFilename(old, dirs);
+                    File file = FileUtil.expandFilename(old, dirs);
 
                     if ((file == null) || !file.exists()) {
 
                         int answer =
                                 JOptionPane.showOptionDialog(panel.frame(),
                                         Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[]{old, aSel.getCiteKey()}),
+                                                new String[] {old, aSel.getCiteKey()}),
                                         Globals.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
-                                );
+                                        );
                         switch (answer) {
-                            case 1:
-                                // Assign new file.
-                                AttachFileDialog afd = new AttachFileDialog(panel.frame(),
-                                        panel.metaData(), aSel, fieldName);
-                                Util.placeDialog(afd, panel.frame());
-                                afd.setVisible(true);
-                                if (!afd.cancelled()) {
-                                    ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, afd.getValue()));
-                                    aSel.setField(fieldName, afd.getValue());
-                                    entriesChanged++;
-                                }
-                                break;
-                            case 2:
-                                // Clear field
-                                ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, null));
-                                aSel.setField(fieldName, null);
+                        case 1:
+                            // Assign new file.
+                            AttachFileDialog afd = new AttachFileDialog(panel.frame(),
+                                    panel.metaData(), aSel, fieldName);
+                            Util.placeDialog(afd, panel.frame());
+                            afd.setVisible(true);
+                            if (!afd.cancelled()) {
+                                ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, afd.getValue()));
+                                aSel.setField(fieldName, afd.getValue());
                                 entriesChanged++;
-                                break;
-                            case 3:
-                                // Cancel
-                                break mainLoop;
+                            }
+                            break;
+                        case 2:
+                            // Clear field
+                            ce.addEdit(new UndoableFieldChange(aSel, fieldName, old, null));
+                            aSel.setField(fieldName, null);
+                            entriesChanged++;
+                            break;
+                        case 3:
+                            // Cancel
+                            break mainLoop;
                         }
                         brokenLinks++;
                     }
@@ -192,33 +188,41 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         }
     }
 
-
+    @Override
     public void update() {
-        if (!goOn)
+        if (!goOn) {
             return;
+        }
 
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
-                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
+                new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
         panel.frame().setProgressBarVisible(false);
         if (entriesChanged > 0) {
             panel.markBaseChanged();
         }
     }
 
+
     class OptionsDialog extends JDialog {
-        JRadioButton autoSetUnset, autoSetAll, autoSetNone;
-        JCheckBox checkLinks;
-        JButton ok = new JButton(Globals.lang("Ok")),
-                cancel = new JButton(Globals.lang("Cancel"));
+
+        final JRadioButton autoSetUnset;
+        final JRadioButton autoSetAll;
+        final JRadioButton autoSetNone;
+        final JCheckBox checkLinks;
+        final JButton ok = new JButton(Globals.lang("Ok"));
+        final JButton cancel = new JButton(Globals.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
-        private String fieldName;
+        private final String fieldName;
+
 
         public OptionsDialog(JFrame parent, String fieldName) {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             final String fn = fieldName.toUpperCase();
             this.fieldName = fieldName;
             ok.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;
                     dispose();
@@ -226,11 +230,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             });
 
             Action closeAction = new AbstractAction() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
             };
-
 
             cancel.addActionListener(closeAction);
 
@@ -276,7 +281,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             builder.nextLine();
             builder.appendSeparator();
 
-
             JPanel main = builder.getPanel();
             main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -291,9 +295,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             pack();
         }
 
+        @Override
         public void setVisible(boolean visible) {
-            if (visible)
+            if (visible) {
                 canceled = true;
+            }
 
             String[] dirs = panel.metaData().getFileDirectory(fieldName);
 

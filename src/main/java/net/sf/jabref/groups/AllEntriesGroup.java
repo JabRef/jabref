@@ -28,18 +28,21 @@ import net.sf.jabref.SearchRule;
  * This group contains all entries.
  */
 public class AllEntriesGroup extends AbstractGroup implements SearchRule {
+
     public static final String ID = "AllEntriesGroup:";
+
 
     public AllEntriesGroup() {
         super(Globals.lang("All Entries"), AbstractGroup.INDEPENDENT);
     }
-    
+
     public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
-        if (!s.startsWith(ID))
+        if (!s.startsWith(AllEntriesGroup.ID)) {
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""
                             + s + "\". "
                             + "Please report this on www.sf.net/projects/jabref");
+        }
         switch (version) {
         case 0:
         case 1:
@@ -47,75 +50,91 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         case 3:
             return new AllEntriesGroup();
         default:
-            throw new UnsupportedVersionException("AllEntriesGroup", version); 
+            throw new UnsupportedVersionException("AllEntriesGroup", version);
         }
     }
 
+    @Override
     public SearchRule getSearchRule() {
         return this;
     }
 
+    @Override
     public boolean supportsAdd() {
         return false;
     }
 
+    @Override
     public boolean supportsRemove() {
         return false;
     }
 
+    @Override
     public AbstractUndoableEdit add(BibtexEntry[] entries) {
         // not supported -> ignore
         return null;
     }
 
+    @Override
     public AbstractUndoableEdit remove(BibtexEntry[] entries) {
         // not supported -> ignore
         return null;
     }
 
+    @Override
     public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
         return true; // contains everything
     }
 
+    @Override
     public AbstractGroup deepCopy() {
         return new AllEntriesGroup();
     }
 
+    @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
         return true;
     }
 
+    @Override
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         return 1; // contains everything
     }
 
+    @Override
     public boolean equals(Object o) {
         return o instanceof AllEntriesGroup;
     }
 
+    @Override
     public String toString() {
-        return ID;
+        return AllEntriesGroup.ID;
     }
 
+    @Override
     public boolean contains(BibtexEntry entry) {
         return true;
     }
-    
+
+    @Override
     public boolean isDynamic() {
-    	// this is actually a special case; I define it as non-dynamic
-    	return false;
+        // this is actually a special case; I define it as non-dynamic
+        return false;
     }
 
-	public String getDescription() {
-		return "This group contains all entries. It cannot be edited or removed.";
-		// JZTODO lyrics
-	}
-	
-	public String getShortDescription() {
-		return Globals.lang("<b>All Entries</b> (this group cannot be edited or removed)");
-	}
+    @Override
+    public String getDescription() {
+        return "This group contains all entries. It cannot be edited or removed.";
+        // JZTODO lyrics
+    }
 
+    @Override
+    public String getShortDescription() {
+        return Globals.lang("<b>All Entries</b> (this group cannot be edited or removed)");
+    }
+
+    @Override
     public String getTypeId() {
-        return ID;
+        return AllEntriesGroup.ID;
     }
 }

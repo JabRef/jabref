@@ -1,0 +1,11 @@
+machine:
+  java:
+    version: openjdk6
+
+dependencies:
+  override:
+    - TERM=dumb ./gradlew dependencies
+
+test:
+  override:
+    - TERM=dumb ./gradlew test

@@ -22,51 +22,53 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 public abstract class SpecialField {
-	// currently, menuString is used for undo string
-	// public static String TEXT_UNDO;
-	
-	public String TEXT_DONE_PATTERN;
-	
-	private List<SpecialFieldValue> values;
-	private List<String> keywords;
-	private HashMap<String, SpecialFieldValue> map;
-	
-	protected void setValues(List<SpecialFieldValue> values) {
-		this.values = values;
-		this.keywords = new ArrayList<String>();		
-		this.map = new HashMap<String, SpecialFieldValue>();
-		for (SpecialFieldValue v: values) {
-			if (v.getKeyword() != null) {
-				keywords.add(v.getKeyword());
-			}
-			if (v.getFieldValue() != null) {
-				map.put(v.getFieldValue(), v);
-			}
-		}
-	}
-	
-	public List<SpecialFieldValue> getValues() {
-		return this.values;
-	}
-	
-	public List<String> getKeyWords() {
-		return this.keywords;
-	}
-	
-	public SpecialFieldValue parse(String s) {
-		return map.get(s);
-	}
-	
-	public abstract String getFieldName();
-	
-	public abstract ImageIcon getRepresentingIcon();
-	
-	public abstract String getMenuString();
-	
-	public abstract String getToolTip();
-	
-	public boolean isSingleValueField() {
-		return false;
-	}
-	
+
+    // currently, menuString is used for undo string
+    // public static String TEXT_UNDO;
+
+    public String TEXT_DONE_PATTERN;
+
+    private List<SpecialFieldValue> values;
+    private List<String> keywords;
+    private HashMap<String, SpecialFieldValue> map;
+
+
+    void setValues(List<SpecialFieldValue> values) {
+        this.values = values;
+        this.keywords = new ArrayList<String>();
+        this.map = new HashMap<String, SpecialFieldValue>();
+        for (SpecialFieldValue v : values) {
+            if (v.getKeyword() != null) {
+                keywords.add(v.getKeyword());
+            }
+            if (v.getFieldValue() != null) {
+                map.put(v.getFieldValue(), v);
+            }
+        }
+    }
+
+    public List<SpecialFieldValue> getValues() {
+        return this.values;
+    }
+
+    public List<String> getKeyWords() {
+        return this.keywords;
+    }
+
+    public SpecialFieldValue parse(String s) {
+        return map.get(s);
+    }
+
+    public abstract String getFieldName();
+
+    public abstract ImageIcon getRepresentingIcon();
+
+    public abstract String getMenuString();
+
+    public abstract String getToolTip();
+
+    public boolean isSingleValueField() {
+        return false;
+    }
+
 }

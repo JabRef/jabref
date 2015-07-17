@@ -41,11 +41,11 @@ import net.sf.jabref.undo.UndoableRemoveEntry;
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
-    JabRefFrame frame;
-    boolean openInNew;
-    MyWorker worker = null;
-    ImportFormat importer;
-    IOException importError = null;
+    private final JabRefFrame frame;
+    private final boolean openInNew;
+    private final ImportFormat importer;
+    private IOException importError = null;
+
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -60,14 +60,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         addActionListener(this);
     }
 
-
+    @Override
     public void actionPerformed(ActionEvent e) {
-        worker = new MyWorker();
+        MyWorker worker = new MyWorker();
         worker.init();
         worker.getWorker().run();
         worker.getCallBack().update();
     }
-    
+
     /**
      * Automatically imports the files given as arguments
      * @param filenames List of files to import
@@ -77,17 +77,20 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         MyWorker worker = new MyWorker();
         worker.fileOk = true;
         worker.filenames = filenames;
-        
+
         worker.getWorker().run();
         worker.getCallBack().update();
     }
 
 
     class MyWorker extends AbstractWorker {
+
         String[] filenames = null;
         ParserResult bibtexResult = null; // Contains the merged import results
         boolean fileOk = false;
 
+
+        @Override
         public void init() {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
@@ -98,53 +101,52 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 frame.block();
                 frame.output(Globals.lang("Starting import"));
                 fileOk = true;
-                
+
                 Globals.prefs.put("workingDirectory", filenames[0]);
             }
         }
 
+        @Override
         public void run() {
-            if (!fileOk)
+            if (!fileOk) {
                 return;
+            }
 
             // We import all files and collect their results:
-			List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<ImportFormatReader.UnknownFormatImport>();
-			for (String filename : filenames) {
-				try {
-					if (importer != null) {
-						// Specific importer:
-						ParserResult pr = new ParserResult(
-							Globals.importFormatReader.importFromFile(importer,
-								filename, frame));
+            List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<ImportFormatReader.UnknownFormatImport>();
+            for (String filename : filenames) {
+                try {
+                    if (importer != null) {
+                        // Specific importer:
+                        ParserResult pr = new ParserResult(
+                                Globals.importFormatReader.importFromFile(importer,
+                                        filename, frame));
 
-						imports.add(new ImportFormatReader.UnknownFormatImport(importer
-							.getFormatName(), pr));
-					} else {
-						// Unknown format:
-                        frame.output(Globals.lang("Importing in unknown format")+"...");
+                        imports.add(new ImportFormatReader.UnknownFormatImport(importer
+                                .getFormatName(), pr));
+                    } else {
+                        // Unknown format:
+                        frame.output(Globals.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
                         imports.add(Globals.importFormatReader
-							.importUnknownFormat(filename));
-					}
-				} catch (IOException e) {
-					// This indicates that a specific importer was specified, and that
+                                .importUnknownFormat(filename));
+                    }
+                } catch (IOException e) {
+                    // This indicates that a specific importer was specified, and that
                     // this importer has thrown an IOException. We store the exception,
                     // so a relevant error message can be displayed.
                     importError = e;
                 }
-			}
-
-
+            }
 
             // Ok, done. Then try to gather in all we have found. Since we might
-			// have found
+            // have found
             // one or more bibtex results, it's best to gather them in a
-			// BibtexDatabase.
+            // BibtexDatabase.
             bibtexResult = mergeImportResults(imports);
-            
-            
+
             /* show parserwarnings, if any. */
-			for (ImportFormatReader.UnknownFormatImport p : imports) {
+            for (ImportFormatReader.UnknownFormatImport p : imports) {
                 if (p != null) {
                     ParserResult pr = p.parserResult;
                     if (pr.hasWarnings()) {
@@ -152,39 +154,43 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 .getBoolean("displayKeyWarningDialogAtStartup")
                                 && pr.hasWarnings()) {
                             String[] wrns = pr.warnings();
-                            StringBuffer wrn = new StringBuffer();
-                            for (int j = 0; j < wrns.length; j++)
+                            StringBuilder wrn = new StringBuilder();
+                            for (int j = 0; j < wrns.length; j++) {
                                 wrn.append(j + 1).append(". ").append(wrns[j])
                                         .append("\n");
-                            if (wrn.length() > 0)
+                            }
+                            if (wrn.length() > 0) {
                                 wrn.deleteCharAt(wrn.length() - 1);
+                            }
                             JOptionPane.showMessageDialog(frame, wrn.toString(),
                                     Globals.lang("Warnings"),
                                     JOptionPane.WARNING_MESSAGE);
                         }
                     }
                 }
-			}
+            }
         }
 
+        @Override
         public void update() {
-            if (!fileOk)
+            if (!fileOk) {
                 return;
+            }
 
             // TODO: undo is not handled properly here, except for the entries
-			// added by
+            // added by
             //  the import inspection dialog.
             if (bibtexResult != null) {
                 if (!openInNew) {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
                     BibtexDatabase toAddTo = panel.database();
-                    
+
                     // Use the import inspection dialog if it is enabled in preferences, and
                     // (there are more than one entry or the inspection dialog is also enabled
                     // for single entries):
                     if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
                             (Globals.prefs.getBoolean("useImportInspectionDialogForSingle")
-                                    || (bibtexResult.getDatabase().getEntryCount() > 1))) {
+                            || (bibtexResult.getDatabase().getEntryCount() > 1))) {
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
                                 Globals.lang("Import"), openInNew);
@@ -198,13 +204,13 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
 
                         // Check if we should unmark entries before adding the new ones:
-                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting"))
+                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
                             for (BibtexEntry entry : toAddTo.getEntries()) {
-                                Util.unmarkEntry(entry, true, toAddTo, ce);
+                                EntryMarker.unmarkEntry(entry, true, toAddTo, ce);
                             }
+                        }
 
-
-                        for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()){
+                        for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()) {
                             try {
                                 // Check if the entry is a duplicate of an existing one:
                                 boolean keepEntry = true;
@@ -213,8 +219,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                     int answer = DuplicateResolverDialog.resolveDuplicateInImport
                                             (frame, duplicate, entry);
                                     // The upper entry is the
-                                    if (answer == DuplicateResolverDialog.DO_NOT_IMPORT)
+                                    if (answer == DuplicateResolverDialog.DO_NOT_IMPORT) {
                                         keepEntry = false;
+                                    }
                                     if (answer == DuplicateResolverDialog.IMPORT_AND_DELETE_OLD) {
                                         // Remove the old one and import the new one.
                                         toAddTo.removeEntry(duplicate.getId());
@@ -241,7 +248,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             panel.markBaseChanged();
                         }
 
-                    }                    
+                    }
 
                 }
 
@@ -251,20 +258,19 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     frame.output(Globals.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
 
-
             } else {
-                if (importer == null)
+                if (importer == null) {
                     frame.output(Globals.lang("Could not find a suitable import format."));
-                else {
+                } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError != null) {
                         JOptionPane.showMessageDialog(frame, importError.getMessage(), Globals.lang("Import failed"),
-                              JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.ERROR_MESSAGE);
                     }
                     else {
                         JOptionPane.showMessageDialog(frame, Globals.lang("No entries found. Please make sure you are "
-                                      +"using the correct import filter."), Globals.lang("Import failed"),
-                              JOptionPane.ERROR_MESSAGE);
+                                + "using the correct import filter."), Globals.lang("Import failed"),
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -272,21 +278,23 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         }
     }
 
-    public ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
+
+    private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibtexDatabase database = new BibtexDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
 
-        for (ImportFormatReader.UnknownFormatImport importResult : imports){
-            if (importResult == null)
+        for (ImportFormatReader.UnknownFormatImport importResult : imports) {
+            if (importResult == null) {
                 continue;
-            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)){
-        	    // Bibtex result. We must merge it into our main base.
+            }
+            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
+                // Bibtex result. We must merge it into our main base.
                 ParserResult pr = importResult.parserResult;
 
                 anythingUseful = anythingUseful
                         || ((pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0));
-                
+
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {
                     directParserResult = pr;
@@ -296,43 +304,43 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 for (BibtexEntry entry : pr.getDatabase().getEntries()) {
                     database.insertEntry(entry);
                 }
-                
+
                 // Merge strings:
-                for (BibtexString bs : pr.getDatabase().getStringValues()){
+                for (BibtexString bs : pr.getDatabase().getStringValues()) {
                     try {
-                        database.addString((BibtexString)bs.clone());
+                        database.addString((BibtexString) bs.clone());
                     } catch (KeyCollisionException e) {
                         // TODO: This means a duplicate string name exists, so it's not
                         // a very exceptional situation. We should maybe give a warning...?
                     }
                 }
             } else {
-            	
-            	ParserResult pr = importResult.parserResult;
-				Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
 
-				anythingUseful = anythingUseful | (entries.size() > 0);
+                ParserResult pr = importResult.parserResult;
+                Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
 
-				// set timestamp and owner
-				Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
+                anythingUseful = anythingUseful | (entries.size() > 0);
+
+                // set timestamp and owner
+                Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
                         Globals.prefs.getBoolean("overwriteTimeStamp"),
                         !openInNew && Globals.prefs.getBoolean("markImportedEntries")); // set timestamp and owner
 
-                for (BibtexEntry entry : entries){
-					database.insertEntry(entry);
-				}
-			}
+                for (BibtexEntry entry : entries) {
+                    database.insertEntry(entry);
+                }
+            }
         }
 
-        if (!anythingUseful)
+        if (!anythingUseful) {
             return null;
+        }
 
         if ((imports.size() == 1) && (directParserResult != null)) {
             return directParserResult;
         } else {
 
-            ParserResult pr = new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
-            return pr;
+            return new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
 
         }
     }

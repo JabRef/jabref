@@ -30,34 +30,35 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
-    private JCheckBox
-    	useProxy;
-    private JTextField defProxyHostname, defProxyPort;
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
-//    private HelpAction ownerHelp, timeStampHelp;
+    private final JCheckBox useProxy;
+    private final JTextField defProxyHostname;
+    private final JTextField defProxyPort;
+    private final JabRefPreferences _prefs;
+
+
+    //    private HelpAction ownerHelp, timeStampHelp;
 
     public NetworkTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
-        _frame = frame;
-        
-		setLayout(new BorderLayout());
+
+        setLayout(new BorderLayout());
 
         useProxy = new JCheckBox(Globals.lang("Use custom proxy configuration"));
 
         defProxyHostname = new JTextField();
-		defProxyHostname.setEnabled(false);
+        defProxyHostname.setEnabled(false);
         defProxyPort = new JTextField();
-		defProxyPort.setEnabled(false);
-        
-        Insets marg = new Insets(0,12,3,0);
+        defProxyPort.setEnabled(false);
+
+        Insets marg = new Insets(0, 12, 3, 0);
         useProxy.setMargin(marg);
         defProxyPort.setMargin(marg);
 
-        
         // We need a listener on useImportInspector to enable and disable the
         // import inspector related choices;
         useProxy.addChangeListener(new ChangeListener() {
+
+            @Override
             public void stateChanged(ChangeEvent event) {
                 //useProxy.setEnabled(useProxy.isSelected());
                 defProxyHostname.setEnabled(useProxy.isSelected());
@@ -66,26 +67,24 @@ public class NetworkTab extends JPanel implements PrefsTab {
         });
 
         FormLayout layout = new FormLayout
-				("1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref","");
-                //("right:pref, 10dlu, 50dlu, 5dlu, fill:60dlu", "");
-				//("10dlu, left:50dlu, 4dlu, fill:pref", "");
+                ("1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
+        //("right:pref, 10dlu, 50dlu, 5dlu, fill:60dlu", "");
+        //("10dlu, left:50dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-
-
 
         builder.appendSeparator(Globals.lang("Network"));
         builder.nextLine();
         builder.append(useProxy, 5);
         builder.nextLine();
         builder.append(new JPanel());
-		JLabel lap = new JLabel(Globals.lang("Host") + ":");
-		builder.append(lap);
-		builder.append(defProxyHostname);
+        JLabel lap = new JLabel(Globals.lang("Host") + ':');
+        builder.append(lap);
+        builder.append(defProxyHostname);
         builder.nextLine();
         builder.append(new JPanel());
-		JLabel lap2 = new JLabel(Globals.lang("Port") + ":");
-		builder.append(lap2);
-		//builder.append(new JPanel());
+        JLabel lap2 = new JLabel(Globals.lang("Port") + ':');
+        builder.append(lap2);
+        //builder.append(new JPanel());
         builder.append(defProxyPort);
 
         JPanel pan = builder.getPanel();
@@ -94,15 +93,17 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public void setValues() {
-        
-		useProxy.setSelected(_prefs.getBoolean("useProxy"));
+
+        useProxy.setSelected(_prefs.getBoolean("useProxy"));
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
         defProxyHostname.setText(_prefs.get("proxyHostname"));
-		defProxyPort.setText(_prefs.get("proxyPort"));
-		
+        defProxyPort.setText(_prefs.get("proxyPort"));
+
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean("useProxy", useProxy.isSelected());
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
@@ -110,36 +111,38 @@ public class NetworkTab extends JPanel implements PrefsTab {
         _prefs.put("proxyPort", defProxyPort.getText().trim());
     }
 
+    @Override
     public boolean readyToClose() {
-    	boolean validSetting;
-    	if (useProxy.isSelected()) {
-    		String host = defProxyHostname.getText();
-    		String port = defProxyPort.getText();
-    		if ((host == null) || (host.trim().equals("")) ||
-    			(port == null) || (port.trim().equals(""))) {
-    			validSetting = false;
-    		} else {
-    			Integer p;
-    			try {
-    				p = Integer.parseInt(port);
-        			validSetting = (p > 0);
-    			} catch (NumberFormatException e) {
-    				validSetting = false;
-    			}
-    		}
-    	} else {
-			validSetting = true;
-    	}
-    	if (!validSetting) {
+        boolean validSetting;
+        if (useProxy.isSelected()) {
+            String host = defProxyHostname.getText();
+            String port = defProxyPort.getText();
+            if ((host == null) || (host.trim().isEmpty()) ||
+                    (port == null) || (port.trim().isEmpty())) {
+                validSetting = false;
+            } else {
+                Integer p;
+                try {
+                    p = Integer.parseInt(port);
+                    validSetting = (p > 0);
+                } catch (NumberFormatException e) {
+                    validSetting = false;
+                }
+            }
+        } else {
+            validSetting = true;
+        }
+        if (!validSetting) {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("Please specify both hostname and port"),
                             Globals.lang("Invalid setting"),
                             JOptionPane.ERROR_MESSAGE);
         }
-    	return validSetting;
+        return validSetting;
     }
 
-	public String getTabName() {
-		return Globals.lang("Network");
-	}
+    @Override
+    public String getTabName() {
+        return Globals.lang("Network");
+    }
 }

@@ -38,93 +38,98 @@ import net.sf.jabref.export.LatexFieldFormatter;
  * preferences/external programs   
  */
 public class SendAsEMailAction extends AbstractWorker {
+
     private static final Logger logger = Logger.getLogger(SendAsEMailAction.class.getName());
 
-	String message = null;
-	private JabRefFrame frame;
+    private String message = null;
+    private final JabRefFrame frame;
 
-	public SendAsEMailAction(JabRefFrame frame) {
-		this.frame = frame;
-	}
 
-	public void run() {
+    public SendAsEMailAction(JabRefFrame frame) {
+        this.frame = frame;
+    }
+
+    @Override
+    public void run() {
         if (!Desktop.isDesktopSupported()) {
-        	message = Globals.lang("Error creating email");
-        	return;
+            message = Globals.lang("Error creating email");
+            return;
         }
-		
-		BasePanel panel = frame.basePanel();
-		if (panel == null)
-			return;
-		if (panel.getSelectedEntries().length == 0) {
-			message = Globals.lang("No entries selected.");
-			return;
-		}
 
-		StringWriter sw = new StringWriter();
-		BibtexEntry[] bes = panel.getSelectedEntries();
+        BasePanel panel = frame.basePanel();
+        if (panel == null) {
+            return;
+        }
+        if (panel.getSelectedEntries().length == 0) {
+            message = Globals.lang("No entries selected.");
+            return;
+        }
 
-		// write the entries using sw, which is used later to form the email content
-		LatexFieldFormatter ff = new LatexFieldFormatter();
-		for (BibtexEntry entry: bes) {
-		    try {
-                entry.write(sw, ff, true);
+        StringWriter sw = new StringWriter();
+        BibtexEntry[] bes = panel.getSelectedEntries();
+
+        // write the entries using sw, which is used later to form the email content
+        BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+
+        for (BibtexEntry entry : bes) {
+            try {
+                bibtexEntryWriter.write(entry, sw);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-		}
+        }
 
-		ArrayList<String> attachments = new ArrayList<String>();
-		
-		// open folders is needed to indirectly support email programs, which cannot handle
-		//   the unofficial "mailto:attachment" property 
-		boolean openFolders = JabRefPreferences.getInstance().getBoolean("openFoldersOfAttachedFiles");
+        ArrayList<String> attachments = new ArrayList<String>();
 
-		List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
-		for (File f: fileList) {
-		    attachments.add(f.getPath());
+        // open folders is needed to indirectly support email programs, which cannot handle
+        //   the unofficial "mailto:attachment" property 
+        boolean openFolders = JabRefPreferences.getInstance().getBoolean("openFoldersOfAttachedFiles");
+
+        List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+        for (File f : fileList) {
+            attachments.add(f.getPath());
             if (openFolders) {
-               try {
-                   Util.openFolderAndSelectFile(f.getAbsolutePath());
-               } catch (IOException e) {
-                   logger.fine(e.getMessage());
-               }
-           }
-		}
-		
-		
-		String mailTo = "?Body=".concat(sw.getBuffer().toString());
+                try {
+                    Util.openFolderAndSelectFile(f.getAbsolutePath());
+                } catch (IOException e) {
+                    SendAsEMailAction.logger.fine(e.getMessage());
+                }
+            }
+        }
+
+        String mailTo = "?Body=".concat(sw.getBuffer().toString());
         mailTo = mailTo.concat("&Subject=");
         mailTo = mailTo.concat(JabRefPreferences.getInstance().get(JabRefPreferences.EMAIL_SUBJECT));
-        for (String path: attachments) {
-        	mailTo = mailTo.concat("&Attachment=\"").concat(path);
-        	mailTo = mailTo.concat("\"");
+        for (String path : attachments) {
+            mailTo = mailTo.concat("&Attachment=\"").concat(path);
+            mailTo = mailTo.concat("\"");
         }
-        
-        URI uriMailTo = null;
+
+        URI uriMailTo;
         try {
-			uriMailTo = new URI("mailto", mailTo, null);
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-			message = Globals.lang("Error creating email");
-			return;
-		}
+            uriMailTo = new URI("mailto", mailTo, null);
+        } catch (URISyntaxException e1) {
+            e1.printStackTrace();
+            message = Globals.lang("Error creating email");
+            return;
+        }
 
         Desktop desktop = Desktop.getDesktop();
         try {
-			desktop.mail(uriMailTo);
-		} catch (IOException e) {
-			e.printStackTrace();
-			message = Globals.lang("Error creating email");
-			return;
-		}
+            desktop.mail(uriMailTo);
+        } catch (IOException e) {
+            e.printStackTrace();
+            message = Globals.lang("Error creating email");
+            return;
+        }
 
-		message = String.format("%s: %d",
-				Globals.lang("Entries added to an email"), bes.length);
-	}
+        message = String.format("%s: %d",
+                Globals.lang("Entries added to an email"), bes.length);
+    }
 
-	public void update() {
-		frame.output(message);
-	}
+    @Override
+    public void update() {
+        frame.output(message);
+    }
 
 }

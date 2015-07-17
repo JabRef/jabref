@@ -24,5 +24,5 @@ import net.sf.jabref.gui.FileListEntry;
  */
 public interface ConfirmCloseFileListEntryEditor {
 
-    public boolean confirmClose(FileListEntry entry);
+    boolean confirmClose(FileListEntry entry);
 }

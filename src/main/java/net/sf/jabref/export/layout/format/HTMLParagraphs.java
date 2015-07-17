@@ -30,34 +30,36 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class HTMLParagraphs implements LayoutFormatter {
 
-	static Pattern beforeNewLines;
+    private static Pattern beforeNewLines;
 
-	public String format(String fieldText) {
 
-		fieldText = fieldText.trim();
-		
-		if (fieldText.length() == 0){
-			return fieldText;
-		}
-		
-		if (beforeNewLines == null) {
-			beforeNewLines = Pattern.compile("(.*?)\\n\\s*\\n");
-		}
+    @Override
+    public String format(String fieldText) {
 
-		Matcher m = beforeNewLines.matcher(fieldText);
-		StringBuffer s = new StringBuffer();
-		while (m.find()) {
-			String middle = m.group(1).trim();
-			if (middle.length() > 0){
-				s.append("<p>\n");
-				m.appendReplacement(s, m.group(1));
-				s.append("\n</p>\n");
-			}
-		}
-		s.append("<p>\n");
-		m.appendTail(s);
-		s.append("\n</p>");
-	
-		return s.toString();
-	}
+        fieldText = fieldText.trim();
+
+        if (fieldText.isEmpty()) {
+            return fieldText;
+        }
+
+        if (HTMLParagraphs.beforeNewLines == null) {
+            HTMLParagraphs.beforeNewLines = Pattern.compile("(.*?)\\n\\s*\\n");
+        }
+
+        Matcher m = HTMLParagraphs.beforeNewLines.matcher(fieldText);
+        StringBuffer s = new StringBuffer();
+        while (m.find()) {
+            String middle = m.group(1).trim();
+            if (!middle.isEmpty()) {
+                s.append("<p>\n");
+                m.appendReplacement(s, m.group(1));
+                s.append("\n</p>\n");
+            }
+        }
+        s.append("<p>\n");
+        m.appendTail(s);
+        s.append("\n</p>");
+
+        return s.toString();
+    }
 }

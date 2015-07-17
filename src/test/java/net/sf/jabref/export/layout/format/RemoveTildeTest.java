@@ -1,6 +1,8 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,22 +14,22 @@ public class RemoveTildeTest {
 
         LayoutFormatter l = new RemoveTilde();
 
-        assertEquals("", l.format(""));
+        Assert.assertEquals("", l.format(""));
 
-        assertEquals("simple", l.format("simple"));
+        Assert.assertEquals("simple", l.format("simple"));
 
-        assertEquals(" ", l.format("~"));
+        Assert.assertEquals(" ", l.format("~"));
 
-        assertEquals("   ", l.format("~~~"));
+        Assert.assertEquals("   ", l.format("~~~"));
 
-        assertEquals(" \\~ ", l.format("~\\~~"));
+        Assert.assertEquals(" \\~ ", l.format("~\\~~"));
 
-        assertEquals("\\\\ ", l.format("\\\\~"));
+        Assert.assertEquals("\\\\ ", l.format("\\\\~"));
 
-        assertEquals("Doe Joe and Jane, M. and Kamp, J. A.", l
+        Assert.assertEquals("Doe Joe and Jane, M. and Kamp, J. A.", l
                 .format("Doe Joe and Jane, M. and Kamp, J.~A."));
 
-        assertEquals("T\\~olkien, J. R. R.", l
+        Assert.assertEquals("T\\~olkien, J. R. R.", l
                 .format("T\\~olkien, J.~R.~R."));
     }
 }

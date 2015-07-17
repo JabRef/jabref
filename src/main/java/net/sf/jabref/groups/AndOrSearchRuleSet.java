@@ -27,31 +27,36 @@ import net.sf.jabref.SearchRuleSet;
  */
 class AndOrSearchRuleSet extends SearchRuleSet {
 
-    private boolean and, invert;
+    private final boolean and;
+    private final boolean invert;
+
 
     public AndOrSearchRuleSet(boolean and, boolean invert) {
         this.and = and;
         this.invert = invert;
     }
 
+    @Override
     public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) {
         int score = 0;
-        
+
         // We let each rule add a maximum of 1 to the score.
         for (SearchRule rule : ruleSet) {
-			score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
-		}
+            score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
+        }
 
         // Then an AND rule demands that score == number of rules, and
         // an OR rule demands score > 0.
         boolean res;
-        if (and)
+        if (and) {
             res = (score == ruleSet.size());
-        else
+        } else {
             res = (score > 0);
+        }
 
-        if (invert)
+        if (invert) {
             return (res ? 0 : 1);
+        }
         return (res ? 1 : 0);
     }
 }

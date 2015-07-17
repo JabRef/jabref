@@ -24,40 +24,46 @@ import net.sf.jabref.Globals;
 
 public class Printed extends SpecialField {
 
-	private static Printed INSTANCE;
+    private static Printed INSTANCE;
 
-	public Printed() {
-		ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-    	values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Globals.lang("Toogle print status"), GUIGlobals.getImage("printed"), Globals.lang("Toogle print status")));
-		this.setValues(values);
-		TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
-	}
-	
-	public String getFieldName() {
-		return SpecialFieldsUtils.FIELDNAME_PRINTED;
-	}
 
-	public static Printed getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new Printed();
-		}
-		return INSTANCE;
-	}
-	
-	public ImageIcon getRepresentingIcon() {
-		return this.getValues().get(0).getIcon();
-	}
+    private Printed() {
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Globals.lang("Toogle print status"), GUIGlobals.getImage("printed"), Globals.lang("Toogle print status")));
+        this.setValues(values);
+        TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
+    }
 
-	public String getToolTip() {
-		return this.getValues().get(0).getToolTipText();
-	}
+    @Override
+    public String getFieldName() {
+        return SpecialFieldsUtils.FIELDNAME_PRINTED;
+    }
 
-	public String getMenuString() {
-		return Globals.lang("Printed");
-	}
-	
-	public boolean isSingleValueField() {
-		return true;
-	}
+    public static Printed getInstance() {
+        if (Printed.INSTANCE == null) {
+            Printed.INSTANCE = new Printed();
+        }
+        return Printed.INSTANCE;
+    }
+
+    @Override
+    public ImageIcon getRepresentingIcon() {
+        return this.getValues().get(0).getIcon();
+    }
+
+    @Override
+    public String getToolTip() {
+        return this.getValues().get(0).getToolTipText();
+    }
+
+    @Override
+    public String getMenuString() {
+        return Globals.lang("Printed");
+    }
+
+    @Override
+    public boolean isSingleValueField() {
+        return true;
+    }
 
 }

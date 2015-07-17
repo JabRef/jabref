@@ -1,5 +1,6 @@
 package net.sf.jabref.bst;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,9 +39,11 @@ import static org.junit.Assert.fail;
 public class BibtexWidthTest {
 
     void assertBibtexWidth(final int i, final String string) {
-        assertEquals(i, BibtexWidth.width(string, new Warn() {
+        Assert.assertEquals(i, BibtexWidth.width(string, new Warn() {
+
+            @Override
             public void warn(String s) {
-                fail("Should not Warn! Width should be " + i + " for " + string);
+                Assert.fail("Should not Warn! Width should be " + i + " for " + string);
             }
         }));
     }
@@ -68,13 +71,12 @@ public class BibtexWidthTest {
 
     }
 
-
     @Test
     public void testGetCharWidth() {
-        assertEquals(500, BibtexWidth.getCharWidth('0'));
-        assertEquals(361, BibtexWidth.getCharWidth('I'));
-        assertEquals(500, BibtexWidth.getCharWidth('~'));
-        assertEquals(500, BibtexWidth.getCharWidth('}'));
-        assertEquals(278, BibtexWidth.getCharWidth(' '));
+        Assert.assertEquals(500, BibtexWidth.getCharWidth('0'));
+        Assert.assertEquals(361, BibtexWidth.getCharWidth('I'));
+        Assert.assertEquals(500, BibtexWidth.getCharWidth('~'));
+        Assert.assertEquals(500, BibtexWidth.getCharWidth('}'));
+        Assert.assertEquals(278, BibtexWidth.getCharWidth(' '));
     }
 }

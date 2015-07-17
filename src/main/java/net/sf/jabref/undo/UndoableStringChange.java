@@ -23,61 +23,66 @@ import net.sf.jabref.Globals;
 
 public class UndoableStringChange extends AbstractUndoableEdit {
 
-    private BibtexString string;
-    private String oldValue, newValue;
-    private boolean nameChange;
-    private BasePanel panel;
-    
+    private final BibtexString string;
+    private final String oldValue;
+    private final String newValue;
+    private final boolean nameChange;
+    private final BasePanel panel;
+
 
     public UndoableStringChange(BasePanel panel,
-				BibtexString string, boolean nameChange,
-				String oldValue, String newValue) {
-	this.string = string;
-	this.oldValue = oldValue;
-	this.newValue = newValue;
-	this.nameChange = nameChange;
-	this.panel = panel;
+            BibtexString string, boolean nameChange,
+            String oldValue, String newValue) {
+        this.string = string;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.nameChange = nameChange;
+        this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "
-	    +Globals.lang(nameChange ? "change string name" : "change string content");
+        return Globals.lang("Undo") + ": "
+                + Globals.lang(nameChange ? "change string name" : "change string content");
     }
 
+    @Override
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "
-	    +Globals.lang(nameChange ? "change string name" : "change string content");
+        return Globals.lang("Redo") + ": "
+                + Globals.lang(nameChange ? "change string name" : "change string content");
     }
 
+    @Override
     public void undo() {
-	super.undo();
-	
-	// Revert the change.
+        super.undo();
 
-	panel.assureStringDialogNotEditing();
+        // Revert the change.
 
-	if (nameChange)
-	    string.setName(oldValue);
-	else
-	    string.setContent(oldValue);
+        panel.assureStringDialogNotEditing();
 
-	panel.updateStringDialog();
+        if (nameChange) {
+            string.setName(oldValue);
+        } else {
+            string.setContent(oldValue);
+        }
+
+        panel.updateStringDialog();
     }
 
+    @Override
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
+        // Redo the change.
 
-	panel.assureStringDialogNotEditing();
-	if (nameChange)
-	    string.setName(newValue);
-	else
-	    string.setContent(newValue);
+        panel.assureStringDialogNotEditing();
+        if (nameChange) {
+            string.setName(newValue);
+        } else {
+            string.setContent(newValue);
+        }
 
-	panel.updateStringDialog();
+        panel.updateStringDialog();
     }
-
-
 
 }

@@ -35,9 +35,11 @@ import java.util.Vector;
  * Callers can query whether the operation was cancelled, or whether it was successful.
  */
 public class SaveDatabaseAction extends AbstractWorker {
-    private BasePanel panel;
-    private JabRefFrame frame;
+
+    private final BasePanel panel;
+    private final JabRefFrame frame;
     private boolean success = false, cancelled = false, fileLockedError = false;
+
 
     public SaveDatabaseAction(BasePanel panel) {
 
@@ -45,19 +47,19 @@ public class SaveDatabaseAction extends AbstractWorker {
         this.frame = panel.frame();
     }
 
-
+    @Override
     public void init() throws Throwable {
         success = false;
         cancelled = false;
         fileLockedError = false;
-        if (panel.getFile() == null)
+        if (panel.getFile() == null) {
             saveAs();
-        else {
+        } else {
 
             // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
 
-                String[] opts = new String[]{Globals.lang("Review changes"), Globals.lang("Save"),
+                String[] opts = new String[] {Globals.lang("Review changes"), Globals.lang("Save"),
                         Globals.lang("Cancel")};
                 int answer = JOptionPane.showOptionDialog(panel.frame(), Globals.lang("File has been updated externally. "
                         + "What do you want to do?"), Globals.lang("File updated externally"),
@@ -76,29 +78,30 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     cancelled = true;
 
-                    (new Thread(new Runnable() {
+                    JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+                        @Override
                         public void run() {
 
-                            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+                            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                                 // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                                 System.err.println("File locked, this will be trouble.");
                             }
 
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel);
-                            scanner.changeScan(panel.getFile());
-                            try {
-                                scanner.join();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
+                            JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
                                 scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
+
+                                    @Override
                                     public void scanResultsResolved(boolean resolved) {
                                         if (!resolved) {
                                             cancelled = true;
                                         } else {
                                             panel.setUpdatedExternally(false);
                                             SwingUtilities.invokeLater(new Runnable() {
+
+                                                @Override
                                                 public void run() {
                                                     panel.getSidePaneManager().hide("fileUpdate");
                                                 }
@@ -108,12 +111,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                                 });
                             }
                         }
-                    })).start();
+                    });
 
                     return;
                 }
                 else { // User indicated to store anyway.
-                    // See if the database has the protected flag set:
+                       // See if the database has the protected flag set:
                     Vector<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
                     boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
                     if (databaseProtectionFlag) {
@@ -133,6 +136,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         if (success) {
             // Reset title of tab
@@ -145,11 +149,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
                 frame.output(Globals.lang("Could not save, file locked by another JabRef instance."));
-            } else
+            } else {
                 frame.output(Globals.lang("Save failed"));
+            }
         }
     }
 
+    @Override
     public void run() {
         if (cancelled || (panel.getFile() == null)) {
             return;
@@ -164,7 +170,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                 success = false;
                 fileLockedError = true;
             }
@@ -201,7 +207,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
         } catch (SaveException ex2) {
             if (ex2 == SaveException.FILE_LOCKED) {
-                success =false;
+                success = false;
                 fileLockedError = true;
                 return;
             }
@@ -213,12 +219,13 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
         frame.block();
         try {
-            if (!selectedOnly)
+            if (!selectedOnly) {
                 session = FileActions.saveDatabase(panel.database(), panel.metaData(), file,
                         Globals.prefs, false, false, encoding, false);
-            else
+            } else {
                 session = FileActions.savePartOfDatabase(panel.database(), panel.metaData(), file,
                         Globals.prefs, panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
+            }
 
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
@@ -232,12 +239,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 // Error occured during processing of
                 // be. Highlight it:
-                int row = panel.mainTable.findEntry(ex.getEntry()),
-                        topShow = Math.max(0, row - 3);
+                int row = panel.mainTable.findEntry(ex.getEntry()), topShow = Math.max(0, row - 3);
                 panel.mainTable.setRowSelectionInterval(row, row);
                 panel.mainTable.scrollTo(topShow);
                 panel.showEntry(ex.getEntry());
-            } else ex.printStackTrace();
+            } else {
+                ex.printStackTrace();
+            }
 
             JOptionPane.showMessageDialog
                     (frame, Globals.lang("Could not save file")
@@ -262,7 +270,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Globals.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Globals.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[]{Globals.lang("Save"), tryDiff, Globals.lang("Cancel")}, tryDiff);
+                    new String[] {Globals.lang("Save"), tryDiff, Globals.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -271,11 +279,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                 if (choice != null) {
                     String newEncoding = (String) choice;
                     return saveDatabase(file, selectedOnly, newEncoding);
-                } else
+                } else {
                     commit = false;
-            } else if (answer == JOptionPane.CANCEL_OPTION)
+                }
+            } else if (answer == JOptionPane.CANCEL_OPTION) {
                 commit = false;
-
+            }
 
         }
 
@@ -283,18 +292,20 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (commit) {
                 session.commit();
                 panel.setEncoding(encoding); // Make sure to remember which encoding we used.
-            } else
+            } else {
                 session.cancel();
+            }
         } catch (SaveException e) {
-            int ans = JOptionPane.showConfirmDialog(null, Globals.lang("Save failed during backup creation")+". "
-                +Globals.lang("Save without backup?"), Globals.lang("Unable to create backup"),
+            int ans = JOptionPane.showConfirmDialog(null, Globals.lang("Save failed during backup creation") + ". "
+                    + Globals.lang("Save without backup?"), Globals.lang("Unable to create backup"),
                     JOptionPane.YES_NO_OPTION);
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
                 session.commit();
                 panel.setEncoding(encoding);
+            } else {
+                commit = false;
             }
-            else commit = false;
         }
 
         return commit;
@@ -346,9 +357,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             f = new File(chosenFile);
             // Check if the file already exists:
             if (f.exists() && (JOptionPane.showConfirmDialog
-                    (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
+                    (frame, '\'' + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                             Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                    != JOptionPane.OK_OPTION)) {
+                        != JOptionPane.OK_OPTION)) {
                 f = null;
             }
         }

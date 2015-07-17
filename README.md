@@ -1,4 +1,9 @@
-# JabRef 2.11 development version
+# JabRef development version
+
+[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
+[![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
+[![Coverage Status](https://coveralls.io/repos/JabRef/jabref/badge.svg)](https://coveralls.io/r/JabRef/jabref)
+[![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This version is a development version. Features may not work as expected.
 
@@ -35,9 +40,7 @@ The "old" trackers at sourceforge still remain intact:
 
 Do *not* file patches using https://sourceforge.net/p/jabref/patches/.
 Just fork JabRef and create a pull request.
-
-For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful. It contains steps to get start with JabRef development.
-
+For details see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Next Steps
 
@@ -52,34 +55,26 @@ JabRef runs on any system equipped with the Java Virtual Machine (1.6 or newer),
 If you do not plan to compile JabRef, the Java Runtime Environment may be a better choice than the Java Development Kit.
 
 
+## Installing and running, Mac OS X:
+
+Please see our [Mac OS X FAQ](http://jabref.sourceforge.net/faq.php#osx).
+
+
 ## Installing and running, Windows:
 
-JabRef is available in Windows Installer (`.msi`) format. To install,
-double-click the .msi file. A shortcut to JabRef will be added to your
-start menu.
+JabRef offers an installer, which also adds a shortcut to JabRef to your start menu.
 
-The Windows installation was made by Dale Visser, using the following open-source tools:
-JSmooth (.exe wrapper for Java apps), available at http://jsmooth.sf.net/
-Wix (tool for compiling MSI files from an XML specification), available at http://wix.sf.net/
+Please also see our [Windows FAQ](http://jabref.sourceforge.net/faq.php#windows)
 
 
 ## Installing and running, general:
 
-JabRef can be downloaded as an executable .jar file. Run the
-program as follows:
-If you are using the Java Development Kit:
+JabRef can be downloaded as an executable .jar file.
+Try to doubleclick the `jar` file or execute the follwing command:
      `java -jar <path to jar>`
-or, if you are using the Java Runtime Environment:
-     `jre -new -jar <path to jar>` or
-     `jrew -new -jar <path to jar>`
 
 If you run JabRef under Java 1.5, you can add the option `-Dswing.aatext=true` before the
 `-jar` option, to activate antialiased text throughout the application.
-
-The jar file containing JabRef can be unpacked with the command:
-    `jar xf <path to jar>`
-or  `jar xf <path to jar> <list of files to extract>`.
-Unpacking the jar file is not necessary to run the program.
 
 
 ## Documentation
@@ -109,8 +104,9 @@ and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` 
 Requires
  * [launch4j](http://launch4j.sourceforge.net/)
  * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
+ * Eventually a `user.properties` with correct setting of `launch4j.dir` and `nsis.executable`. See [build.xml](build.xml) for defaults.
 
-Replace `ANY_ANT_TARGET` with the Ant Target of your choice, and the system will build your binaries.
+Replace `ANY_ANT_TARGET` with the Ant Target of your choice (e.g., `macbundle`), and the system will build your binaries.
 To get a list of all targets, use `gradlew tasks`.
 
 `gradlew generateSource antTargets.ANY_ANT_TARGET`
@@ -121,11 +117,12 @@ named `JabRef-$VERSION.jar` (where $VERSION is the current version of the
 source tree) in the `buildant\lib` directory. Enjoy!
 The setup files are created by invoking the command `gradlew generateSource antTargets.release`.
 
-On Mac OS X you should include the targets osx and osxjar,
-making the correct command `gradlew generateSource antTargets.compile antTargets.unjarlib antTargets.osx antTargets.jars antTargets.osxjar`.
-After the build is finished, you will find the OS X application
-`JabRef.app` in the `buildant/lib` directory along with the executable
-jar.
+
+### Releasing on Linux
+
+Run `gradlew antTargets.release.linux`
+
+All binaries (including OSX) and the installer are generated in the directory `buildant/lib`.
 
 
 ### Releasing on Windows
