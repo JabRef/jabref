@@ -16,6 +16,9 @@
 package net.sf.jabref.journals.logic;
 
 import com.google.common.base.Optional;
+
+import net.sf.jabref.Globals;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
@@ -96,7 +99,7 @@ public class JournalAbbreviationRepository {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
             // TODO logging strategy required
-            System.out.format("Duplicate Journal Abbreviation - old one will be overwritten by new one%nOLD: %s%nNEW: %s%n", previous, abbreviation);
+            System.out.println(Globals.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
         }
 
         abbreviations.add(abbreviation);
