@@ -1575,7 +1575,7 @@ public class JabRefPreferences {
         try {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException ex) {
-            throw new IOException(ex.getMessage());
+            throw new IOException(ex);
         }
     }
 
