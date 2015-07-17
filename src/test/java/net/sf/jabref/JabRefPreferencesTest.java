@@ -28,11 +28,11 @@ public class JabRefPreferencesTest {
 
     @Test
     public void testPreferencesExport() throws IOException {
-        String tmpFile = "src/test/resources/net/sf/jabref/preferencesTest.pref";
+        String tmpFile = "src/test/resources/net/sf/jabref/preferencesTest.xml";
         prefs.exportPreferences(tmpFile);
 
         List<String> actual = Files.readAllLines(Paths.get(tmpFile));
-        List<String> expected = Files.readAllLines(Paths.get("src/test/resources/net/sf/jabref/defaultPreferences.pref"));
+        List<String> expected = Files.readAllLines(Paths.get("src/test/resources/net/sf/jabref/defaultPreferences.xml"));
       
         Files.delete(Paths.get(tmpFile));
 
