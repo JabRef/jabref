@@ -23,6 +23,9 @@ import java.util.Collection;
 
 import javax.swing.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.AttachFileDialog;
 import net.sf.jabref.undo.NamedCompound;
@@ -31,13 +34,13 @@ import net.sf.jabref.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 
 /**
- * This action goes through all selected entries in the BasePanel, and attempts to autoset the
- * given external file (pdf, ps, ...) based on the same algorithm used for the "Auto" button in
- * EntryEditor.
+ * This action goes through all selected entries in the BasePanel, and attempts to autoset the given external file (pdf,
+ * ps, ...) based on the same algorithm used for the "Auto" button in EntryEditor.
  */
 public class AutoSetExternalFileForEntries extends AbstractWorker {
 
@@ -45,6 +48,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private OptionsDialog optDiag = null;
+
+    private static final Log log = LogFactory.getLog(AutoSetExternalFileForEntries.class);
 
     private final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
@@ -183,6 +188,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             }
         }
 
+        //log brokenLinks if some were found
+        if (brokenLinks > 0) {
+            log.warn(Globals.lang("Found %0 broken links", brokenLinks + ""));
+        }
+
         if (entriesChanged > 0) {
             // Add the undo edit:
             ce.end();
@@ -207,6 +217,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     class OptionsDialog extends JDialog {
 
+        private static final long serialVersionUID = 1L;
         final JRadioButton autoSetUnset;
         final JRadioButton autoSetAll;
         final JRadioButton autoSetNone;
@@ -233,6 +244,9 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
             Action closeAction = new AbstractAction() {
 
+                private static final long serialVersionUID = 1L;
+
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
@@ -246,7 +260,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             im.put(Globals.prefs.getKey("Close dialog"), "close");
             am.put("close", closeAction);
 
-            fieldName = fieldName.toUpperCase();
             autoSetUnset = new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
             autoSetAll = new JRadioButton(Globals.lang("Autoset %0 links. Allow overwriting existing links.", fn), false);
             autoSetNone = new JRadioButton(Globals.lang("Do not autoset"), false);

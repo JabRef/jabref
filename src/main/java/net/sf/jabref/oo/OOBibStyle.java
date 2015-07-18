@@ -272,7 +272,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             //System.out.println("'"+line.substring(0, index)+"' : '"+formatString+"'");
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
-            Short typeS;
             try {
                 /*typeS = new Short(Short.parseShort(type));
                 OOBibFormatParser parser = new OOBibFormatParser(new StringReader(formatString));
@@ -878,7 +877,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public boolean equals(Object o) {
-        return styleFile.equals(((OOBibStyle) o).styleFile);
+    	if(o != null) {
+            return styleFile.equals(((OOBibStyle) o).styleFile);
+    	} else {
+            return false;
+    	}
     }
 
 }

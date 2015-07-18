@@ -56,7 +56,7 @@ public class PdfXmpImporter extends ImportFormat {
      * 
      * @return "xmp"
      */
-    public String getCLIid() {
+    public String getCommandLineId() {
         return "xmp";
     }
 

@@ -1053,7 +1053,7 @@ class MSBibEntry {
             bibtex = BibtexEntryType.CONFERENCE;
         } else if (msbib.equals("Report")) {
             bibtex = BibtexEntryType.TECHREPORT;
-        } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
+        } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
             bibtex = BibtexEntryType.OTHER;
         } else {
             bibtex = BibtexEntryType.MISC;

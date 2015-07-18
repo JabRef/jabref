@@ -910,6 +910,7 @@ public class AuthorList {
         return authorsFirstFirst[abbrInt];
     }
 
+
     /**
      * Compare this object with the given one. 
      * 
@@ -924,6 +925,15 @@ public class AuthorList {
 
         return this.authors.equals(a.authors);
     }
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((authors == null) ? 0 : authors.hashCode());
+        return result;
+    }
+
 
     /**
      * Returns the list of authors separated by "and"s with first names before
@@ -1010,6 +1020,23 @@ public class AuthorList {
 
         private final String jr_part;
 
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result
+                    + ((first_abbr == null) ? 0 : first_abbr.hashCode());
+            result = prime * result
+                    + ((first_part == null) ? 0 : first_part.hashCode());
+            result = prime * result
+                    + ((jr_part == null) ? 0 : jr_part.hashCode());
+            result = prime * result
+                    + ((last_part == null) ? 0 : last_part.hashCode());
+            result = prime * result
+                    + ((von_part == null) ? 0 : von_part.hashCode());
+            return result;
+        }
 
         /**
          * Compare this object with the given one. 

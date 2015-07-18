@@ -1,4 +1,5 @@
 [master]
+    - Fix several FindBugs warnings
     - Fix for bug #1276: OO styles do not consider editor fields anymore for sorting
     - Fix for bug #1288: Emacs keybindings: Rebinding of C-f can now be configured
     - Antialiasing is now enabled and set to LCD

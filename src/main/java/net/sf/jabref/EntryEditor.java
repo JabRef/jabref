@@ -82,6 +82,8 @@ import net.sf.jabref.util.Util;
  */
 public class EntryEditor extends JPanel implements VetoableChangeListener, EntryContainer {
 
+    private static final long serialVersionUID = 1L;
+
     // A reference to the entry this object works on.
     private BibtexEntry entry;
 
@@ -189,7 +191,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         helpAction = new HelpAction(frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
         closeAction = new CloseAction();
-        CopyKeyAction copyKeyAction = new CopyKeyAction();
         generateKeyAction = new GenerateKeyAction(frame);
         storeFieldAction = new StoreFieldAction();
         writeXmp = new WriteXMPEntryEditorAction(panel_, this);
@@ -449,7 +450,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) // double click
                     {
-                        String date = EasyDateFormat.easyDateFormat();
+                        String date = new EasyDateFormat().getCurrentDate();
                         ed.setText(date);
                     }
                 }
@@ -1057,6 +1058,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private class TypeButton extends JButton {
 
+        private static final long serialVersionUID = 1L;
+
         public TypeButton(String type) {
             super(GUIGlobals.getImage("edit"));
             setToolTipText(Globals.lang("Change entry type"));
@@ -1077,6 +1080,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private class TypeLabel extends JLabel {
+
+        private static final long serialVersionUID = 1L;
 
         public TypeLabel(String type) {
             super(type);
@@ -1179,6 +1184,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class DeleteAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public DeleteAction() {
             super(Globals.lang("Delete"), GUIGlobals.getImage("delete"));
             putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete entry"));
@@ -1203,6 +1210,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class CloseAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public CloseAction() {
             super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
             putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close window"));
@@ -1223,6 +1232,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class CopyKeyAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public CopyKeyAction() {
             super("Copy BibTeX key to clipboard");
             putValue(Action.SHORT_DESCRIPTION, "Copy BibTeX key to clipboard (Ctrl-K)");
@@ -1241,6 +1252,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     public class StoreFieldAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         public StoreFieldAction() {
             super("Store field value");
@@ -1409,6 +1422,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class SwitchLeftAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public SwitchLeftAction() {
             super("Switch to the panel to the left");
         }
@@ -1425,6 +1440,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class SwitchRightAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public SwitchRightAction() {
             super("Switch to the panel to the right");
         }
@@ -1440,6 +1457,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class NextEntryAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         public NextEntryAction() {
             super(Globals.lang("Next entry"), GUIGlobals.getImage("down"));
@@ -1471,6 +1490,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class PrevEntryAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public PrevEntryAction() {
             super(Globals.lang("Previous entry"), GUIGlobals.getImage("up"));
 
@@ -1501,6 +1522,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class GenerateKeyAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         final JabRefFrame parent;
 
@@ -1572,6 +1595,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class UndoAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public UndoAction() {
             super("Undo", GUIGlobals.getImage("undo"));
             putValue(Action.SHORT_DESCRIPTION, "Undo");
@@ -1588,6 +1613,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     class RedoAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public RedoAction() {
             super("Undo", GUIGlobals.getImage("redo"));
             putValue(Action.SHORT_DESCRIPTION, "Redo");
@@ -1603,6 +1630,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class SaveDatabaseAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         public SaveDatabaseAction() {
             super("Save database");
@@ -1655,6 +1684,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     class ChangeTypeAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         final BibtexEntryType type;
 
@@ -1709,6 +1740,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     private class AutoLinkAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         public AutoLinkAction() {
             putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));

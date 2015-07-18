@@ -43,6 +43,8 @@ import net.sf.jabref.util.Util;
  */
 public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchTextListener, EntryContainer {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The bibtex entry currently shown
      */
@@ -195,6 +197,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     class PrintAction extends AbstractAction {
 
+        private static final long serialVersionUID = 1L;
+
         public PrintAction() {
             super(Globals.lang("Print Preview"), GUIGlobals.getImage("psSmall"));
             putValue(Action.SHORT_DESCRIPTION, Globals.lang("Print Preview"));
@@ -242,6 +246,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     class CloseAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
 
         public CloseAction() {
             super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
@@ -316,6 +322,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private JEditorPane createPreviewPane() {
         JEditorPane previewPane = new JEditorPane() {
+
+            private static final long serialVersionUID = 1L;
 
             @Override
             public Dimension getPreferredScrollableViewportSize() {
