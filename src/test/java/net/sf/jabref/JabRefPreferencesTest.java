@@ -32,13 +32,28 @@ public class JabRefPreferencesTest {
     public void testPreferencesExport() throws IOException {
         File tmpFile = new File("src/test/resources/net/sf/jabref/preferencesTest.xml");
         File expectedFile = new File("src/test/resources/net/sf/jabref/defaultPreferences.xml");
-        
+
         prefs.exportPreferences(tmpFile.getAbsolutePath());
 
         List<String> actual = Files.readLines(tmpFile, Charset.defaultCharset());
         List<String> expected = Files.readLines(expectedFile, Charset.defaultCharset());
-      
+
         tmpFile.delete();
+
+        for (int i = 0; i < actual.size(); i++) {
+            assertEquals(expected.get(i), actual.get(i));
+        }
+    }
+
+    @Test
+    public void testPreferencesImport() throws IOException {
+        // the primary sort field has been changed to "editor" in this case
+        File importFile = new File("src/test/resources/net/sf/jabref/customPreferences.xml");
+
+        prefs.importPreferences(importFile.getAbsolutePath());
+
+        String expected = "editor";
+        String actual = prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
 
         assertEquals(expected, actual);
     }
