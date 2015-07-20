@@ -23,11 +23,6 @@ public class JabRefPreferencesTest {
         prefs = JabRefPreferences.getInstance();
     }
 
-    @After
-    public void tearDown() {
-        prefs.resetToDefaultPreferences();
-    }
-
     @Test
     public void testPreferencesExport() throws IOException {
         File tmpFile = new File("src/test/resources/net/sf/jabref/preferencesTest.xml");
@@ -54,6 +49,9 @@ public class JabRefPreferencesTest {
 
         String expected = "editor";
         String actual = prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD);
+        
+        //clean up preferences to default state
+        prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "author");
 
         assertEquals(expected, actual);
     }

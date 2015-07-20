@@ -634,12 +634,6 @@ public class JabRefPreferences {
             defaults.put("userFileDirIndividual", GUIGlobals.FILE_FIELD + "Directory" + '-' + get("defaultOwner"));
         }
     }
-    
-
-    public void resetToDefaultPreferences() {
-        JabRefPreferences.singleton = new JabRefPreferences();
-    }
-
 
     public void setLanguageDependentDefaultValues() {
 
