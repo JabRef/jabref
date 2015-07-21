@@ -22,7 +22,9 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
 import org.jdesktop.swingx.JXTitledPanel;
@@ -41,8 +43,8 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
 
     public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
-        //TODO: set icon
         super(title);
+        this.add(new JLabel(new ImageIcon(icon)));
         this.manager = manager;
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));
@@ -101,16 +103,14 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     }
 
     /**
-     * Override this method if the component needs to make any changes before it
-     * can close.
+     * Override this method if the component needs to make any changes before it can close.
      */
     public void componentClosing() {
 
     }
 
     /**
-     * Override this method if the component needs to do any actions when
-     * opening.
+     * Override this method if the component needs to do any actions when opening.
      */
     public void componentOpening() {
 
