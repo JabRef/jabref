@@ -2,25 +2,26 @@ package net.sf.jabref.search;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.search.rules.BasicSearchRule;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test case for BasicSearch.
+ * Test case for BasicSearchRule.
  */
-public class BasicSearchTest {
+public class BasicSearchRuleTest {
 
     @Test
     public void testBasicSearchParsing() {
         Globals.prefs = JabRefPreferences.getInstance();
 
         BibtexEntry be = makeBibtexEntry();
-        BasicSearch bsCaseSensitive = new BasicSearch(true, false);
-        BasicSearch bsCaseInsensitive = new BasicSearch(false, false);
-        BasicSearch bsCaseSensitiveRegexp = new BasicSearch(true, true);
-        BasicSearch bsCaseInsensitiveRegexp = new BasicSearch(false, true);
+        BasicSearchRule bsCaseSensitive = new BasicSearchRule(true, false);
+        BasicSearchRule bsCaseInsensitive = new BasicSearchRule(false, false);
+        BasicSearchRule bsCaseSensitiveRegexp = new BasicSearchRule(true, true);
+        BasicSearchRule bsCaseInsensitiveRegexp = new BasicSearchRule(false, true);
 
         String query = "marine 2001 shields";
 

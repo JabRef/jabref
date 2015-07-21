@@ -24,21 +24,22 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref;
+package net.sf.jabref.search.rules;
 
 import java.util.Map;
 
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.search.SearchRule;
 
 public class SimpleSearchRule implements SearchRule {
 
-    private final boolean m_caseSensitiveSearch;
-    //static RemoveBrackets removeBrackets = new RemoveBrackets();
     private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
+    private final boolean caseSensitive;
 
     public SimpleSearchRule(boolean caseSensitive) {
-        m_caseSensitiveSearch = caseSensitive;
+        this.caseSensitive = caseSensitive;
     }
 
     @Override
@@ -50,24 +51,22 @@ public class SimpleSearchRule implements SearchRule {
     public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         String searchString = searchStrings.values().iterator().next();
 
-        if (!m_caseSensitiveSearch) {
+        if (!caseSensitive) {
             searchString = searchString.toLowerCase();
         }
         int score = 0;
         int counter = 0;
-        Object fieldContentAsObject;
-        String fieldContent;
         for (String field : bibtexEntry.getAllFields()) {
-            fieldContentAsObject = bibtexEntry.getField(field);
+            Object fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
                 try {
-                    fieldContent = SimpleSearchRule.removeBrackets.format(fieldContentAsObject.toString());
-                    if (!m_caseSensitiveSearch) {
+                    String fieldContent = SimpleSearchRule.removeBrackets.format(fieldContentAsObject.toString());
+                    if (!caseSensitive) {
                         fieldContent = fieldContent.toLowerCase();
                     }
                     counter = fieldContent.indexOf(searchString, counter);
                     while (counter >= 0) {
-                        ++score;
+                        score++;
                         counter = fieldContent.indexOf(searchString, counter + 1);
                     }
                 } catch (Throwable t) {

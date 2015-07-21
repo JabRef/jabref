@@ -71,8 +71,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.SearchRule;
-import net.sf.jabref.SearchRuleSet;
+import net.sf.jabref.search.rules.AndOrSearchRuleSet;
+import net.sf.jabref.search.rules.InvertSearchRule;
+import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.help.HelpAction;
@@ -770,7 +771,7 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void updateSelections() {
-        final AndOrSearchRuleSet searchRules = new AndOrSearchRuleSet(andCb.isSelected(), invCb.isSelected());
+        final AndOrSearchRuleSet searchRules = new AndOrSearchRuleSet(andCb.isSelected());
         TreePath[] selection = groupsTree.getSelectionPaths();
 
         for (TreePath aSelection : selection) {
@@ -778,7 +779,9 @@ public class GroupSelector extends SidePaneComponent implements
         }
         Hashtable<String, String> searchOptions = new Hashtable<String, String>();
         searchOptions.put("option", "dummy");
-        GroupingWorker worker = new GroupingWorker(searchRules, searchOptions);
+
+        SearchRule searchRule = invCb.isSelected() ? new InvertSearchRule(searchRules) : searchRules;
+        GroupingWorker worker = new GroupingWorker(searchRule, searchOptions);
         worker.getWorker().run();
         worker.getCallBack().update();
         /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
@@ -793,14 +796,14 @@ public class GroupSelector extends SidePaneComponent implements
 
     class GroupingWorker extends AbstractWorker {
 
-        private final SearchRuleSet rules;
+        private final SearchRule rules;
         private final Hashtable<String, String> searchTerm;
         private final ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
         private final boolean showOverlappingGroupsP;
         int hits = 0;
 
 
-        public GroupingWorker(SearchRuleSet rules, Hashtable<String, String> searchTerm) {
+        public GroupingWorker(SearchRule rules, Hashtable<String, String> searchTerm) {
             this.rules = rules;
             this.searchTerm = searchTerm;
             showOverlappingGroupsP = showOverlappingGroups.isSelected();

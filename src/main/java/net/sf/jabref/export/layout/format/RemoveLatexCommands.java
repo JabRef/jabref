@@ -27,7 +27,8 @@ public class RemoveLatexCommands implements LayoutFormatter {
         StringBuilder sb = new StringBuilder("");
         StringBuffer currentCommand = null;
         char c;
-        boolean escaped = false, incommand = false;
+        boolean escaped = false;
+        boolean incommand = false;
         int i;
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);

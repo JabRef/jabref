@@ -26,7 +26,7 @@ import net.sf.jabref.BibtexFields;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.SearchRuleSet;
+import net.sf.jabref.search.rules.SearchRuleSet;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;

@@ -24,12 +24,15 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref;
+package net.sf.jabref.search;
+
+import net.sf.jabref.BibtexEntry;
 
 import java.util.Map;
 
 public interface SearchRule {
 
+    //TODO why is there a Map required for applying the a search query? In every case I looked at only the first element is used.
     int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry);
 
     boolean validateSearchStrings(Map<String, String> searchStrings);

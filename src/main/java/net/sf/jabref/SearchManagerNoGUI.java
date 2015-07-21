@@ -21,8 +21,11 @@ import java.util.Hashtable;
 import java.util.Collection;
 import java.util.Vector;
 
-import net.sf.jabref.search.*;
 import net.sf.jabref.imports.*;
+import net.sf.jabref.search.rules.BasicSearchRule;
+import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.SearchRuleSet;
 
 /**
  *
@@ -51,7 +54,7 @@ class SearchManagerNoGUI {
         searchOptions.put("option", searchTerm);
         SearchRuleSet searchRules = new SearchRuleSet();
         SearchRule rule1;
-        rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"),
+        rule1 = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"),
                 Globals.prefs.getBoolean("regExpSearch"));
         try {
             rule1 = new SearchExpression(Globals.prefs, searchOptions);

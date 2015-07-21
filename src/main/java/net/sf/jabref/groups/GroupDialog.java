@@ -42,7 +42,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

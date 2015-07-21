@@ -24,7 +24,10 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref;
+package net.sf.jabref.search.rules;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.search.SearchRule;
 
 import java.util.Map;
 import java.util.Vector;
@@ -33,13 +36,8 @@ import java.util.regex.PatternSyntaxException;
 public class SearchRuleSet implements SearchRule {
 
     protected final Vector<SearchRule> ruleSet = new Vector<SearchRule>();
-
     public void addRule(SearchRule newRule) {
         ruleSet.add(newRule);
-    }
-
-    public void clearRules() {
-        ruleSet.clear();
     }
 
     @Override

@@ -32,12 +32,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.search.BasicSearch;
-import net.sf.jabref.search.SearchExpression;
-import net.sf.jabref.search.SearchExpressionParser;
-import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.search.*;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.search.matchers.SearchMatcher;
+import net.sf.jabref.search.rules.BasicSearchRule;
+import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.SearchRuleSet;
 
 public class SearchManager2 extends SidePaneComponent
         implements ActionListener, KeyListener, ItemListener, CaretListener {
@@ -531,7 +533,7 @@ public class SearchManager2 extends SidePaneComponent
             SearchRuleSet searchRules = new SearchRuleSet();
             SearchRule rule1;
 
-            rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"),
+            rule1 = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"),
                     Globals.prefs.getBoolean("regExpSearch"));
 
             try {
@@ -660,7 +662,7 @@ public class SearchManager2 extends SidePaneComponent
                     startedFloatSearch = false;
                 }
                 startedFilterSearch = true;
-                panel.setSearchMatcher(SearchMatcher.INSTANCE);
+                panel.setSearchMatcher(new SearchMatcher());
 
             } else {
                 // Float search - floats hits to the top of the table:
@@ -669,7 +671,7 @@ public class SearchManager2 extends SidePaneComponent
                     startedFilterSearch = false;
                 }
                 startedFloatSearch = true;
-                panel.mainTable.showFloatSearch(SearchMatcher.INSTANCE);
+                panel.mainTable.showFloatSearch(new SearchMatcher());
 
             }
 

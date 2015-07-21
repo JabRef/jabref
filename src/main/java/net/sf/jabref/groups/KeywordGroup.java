@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.util.QuotedStringTokenizer;

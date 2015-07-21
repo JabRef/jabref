@@ -23,10 +23,10 @@ import java.util.regex.Pattern;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.search.SearchExpressionLexer;
-import net.sf.jabref.search.SearchExpressionParser;
-import net.sf.jabref.search.SearchExpressionTreeParser;
-import net.sf.jabref.search.SearchExpressionTreeParserTokenTypes;
+import net.sf.jabref.search.*;
+import net.sf.jabref.search.rules.RegExpSearchRule;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.SimpleSearchRule;
 import net.sf.jabref.util.QuotedStringTokenizer;
 import antlr.RecognitionException;
 import antlr.collections.AST;
@@ -54,7 +54,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     /**
      * If m_searchExpression is in valid syntax for advanced search, <b>this
-     * </b> will do the search; otherwise, either <b>RegExpRule </b> or
+     * </b> will do the search; otherwise, either <b>RegExpSearchRule </b> or
      * <b>SimpleSearchRule </b> will be used.
      */
     private final SearchRule m_searchRule;
@@ -90,7 +90,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             m_searchRule = this;
         } else { // do plaintext search
             if (m_regExp) {
-                m_searchRule = new RegExpRule(m_caseSensitive);
+                m_searchRule = new RegExpSearchRule(m_caseSensitive);
             } else {
                 m_searchRule = new SimpleSearchRule(m_caseSensitive);
             }

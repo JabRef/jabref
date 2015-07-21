@@ -13,27 +13,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.search.rules;
 
 import java.util.Map;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.SearchRule;
-import net.sf.jabref.SearchRuleSet;
+import net.sf.jabref.search.SearchRule;
 
 /**
  * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
  * 1.
  */
-class AndOrSearchRuleSet extends SearchRuleSet {
+public class AndOrSearchRuleSet extends SearchRuleSet {
 
     private final boolean and;
-    private final boolean invert;
 
-
-    public AndOrSearchRuleSet(boolean and, boolean invert) {
+    public AndOrSearchRuleSet(boolean and) {
         this.and = and;
-        this.invert = invert;
     }
 
     @Override
@@ -49,14 +45,11 @@ class AndOrSearchRuleSet extends SearchRuleSet {
         // an OR rule demands score > 0.
         boolean res;
         if (and) {
-            res = (score == ruleSet.size());
+            res = score == ruleSet.size();
         } else {
-            res = (score > 0);
+            res = score > 0;
         }
 
-        if (invert) {
-            return (res ? 0 : 1);
-        }
-        return (res ? 1 : 0);
+        return res ? 1 : 0;
     }
 }

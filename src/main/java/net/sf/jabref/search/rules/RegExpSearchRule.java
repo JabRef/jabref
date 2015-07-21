@@ -24,7 +24,7 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref;
+package net.sf.jabref.search.rules;
 
 import java.util.Map;
 import java.util.Set;
@@ -32,35 +32,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.search.SearchRule;
 
-public class RegExpRule implements SearchRule {
+public class RegExpSearchRule implements SearchRule {
 
-    private final boolean m_caseSensitiveSearch;
-    //static RemoveBrackets removeBrackets = new RemoveBrackets();
     private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
+    private final boolean caseSensitive;
 
-    public RegExpRule(boolean caseSensitive) {
-        m_caseSensitiveSearch = caseSensitive;
+    public RegExpSearchRule(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
     }
 
     @Override
     public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        int score = 0;
         String searchString = searchStrings.values().iterator().next();
 
-        int flags = 0;
-        if (!m_caseSensitiveSearch)
-         {
-            flags = Pattern.CASE_INSENSITIVE; // testing
-        }
         try {
-            Pattern pattern = Pattern.compile(searchString, flags);
-        } catch (PatternSyntaxException ex) {
+            compileSearchString(searchString);
+        } catch (PatternSyntaxException e) {
             return false;
         }
         return true;
+    }
+
+    private Pattern compileSearchString(String searchString) {
+        int flags = 0;
+        if (!caseSensitive) {
+            flags = Pattern.CASE_INSENSITIVE; // testing
+        }
+
+        return Pattern.compile(searchString, flags);
     }
 
     @Override
@@ -69,13 +73,7 @@ public class RegExpRule implements SearchRule {
         int score = 0;
         String searchString = searchStrings.values().iterator().next();
 
-        int flags = 0;
-        if (!m_caseSensitiveSearch)
-         {
-            flags = Pattern.CASE_INSENSITIVE; // testing
-        }
-        //System.out.println(searchString);
-        Pattern pattern = Pattern.compile(searchString, flags);
+        Pattern pattern = compileSearchString(searchString);
 
         score += searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
 
@@ -90,14 +88,12 @@ public class RegExpRule implements SearchRule {
                 try {
                     Object value = bibtexEntry.getField(field);
                     if (value != null) {
-                        Matcher m = pattern.matcher(RegExpRule.removeBrackets.format((String) value));
+                        Matcher m = pattern.matcher(RegExpSearchRule.removeBrackets.format((String) value));
                         if (m.find()) {
                             score++;
                         }
                     }
-                }
-
-                catch (Throwable t) {
+                } catch (Throwable t) {
                     System.err.println("Searching error: " + t);
                 }
             }

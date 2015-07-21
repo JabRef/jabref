@@ -13,22 +13,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.search;
+package net.sf.jabref.search.expression;
 
-import net.sf.jabref.BibtexEntry;
-import ca.odell.glazedlists.matchers.Matcher;
+import antlr.CommonAST;
+import java.util.regex.Pattern;
 
-/**
- * Matcher for filtering or sorting the table according to whether entries are
- * tagged as search matches.
- */
-public class SearchMatcher implements Matcher<BibtexEntry> {
+public class RegExNode extends CommonAST {
 
-    public static final SearchMatcher INSTANCE = new SearchMatcher();
+    private Pattern pattern = null;
 
+    public RegExNode(int tokenType, String text, boolean caseSensitive, boolean regex) {
+        initialize(tokenType, text);
+        pattern = Pattern.compile(
+                regex ? text : "\\Q" + text + "\\E", // quote if !regex
+                caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
+    }
 
-    @Override
-    public boolean matches(BibtexEntry entry) {
-        return entry.isSearchHit();
+    public Pattern getPattern() {
+        return pattern;
     }
 }

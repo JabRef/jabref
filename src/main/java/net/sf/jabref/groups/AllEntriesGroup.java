@@ -22,7 +22,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.SearchRule;
+import net.sf.jabref.search.SearchRule;
 
 /**
  * This group contains all entries.
