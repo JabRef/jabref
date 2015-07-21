@@ -92,8 +92,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.4'
     compile 'org.antlr:antlr-runtime:3.4'
 
-    compile 'mysql:mysql-connector-java:5.0.7'
-    compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
+    compile 'mysql:mysql-connector-java:5.1.36'
+    compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
