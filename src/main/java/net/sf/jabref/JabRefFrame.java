@@ -1520,7 +1520,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          else
           GUIGlobals.CURRENTFONT=f;
          // updatefont
-         prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
+         prefs.put(JabRefPreferences.FONT_FAMILY, GUIGlobals.CURRENTFONT.getFamily());
          prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
          prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
          if (tabbedPane.getTabCount() > 0) {

@@ -180,7 +180,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
         //_prefs.putBoolean("antialias", antialias.isSelected());
-        _prefs.put("fontFamily", font.getFamily());
+        _prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
         _prefs.putInt("fontStyle", font.getStyle());
         _prefs.putInt("fontSize", font.getSize());
         _prefs.putBoolean("overrideDefaultFonts", overrideFonts.isSelected());
