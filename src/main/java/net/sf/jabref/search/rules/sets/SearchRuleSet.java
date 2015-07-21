@@ -26,11 +26,9 @@
  */
 package net.sf.jabref.search.rules.sets;
 
-import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.search.SearchRule;
 
 import java.util.Vector;
-import java.util.regex.PatternSyntaxException;
 
 public abstract class SearchRuleSet implements SearchRule {
 

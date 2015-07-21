@@ -34,8 +34,6 @@ public class OrSearchRuleSet extends SearchRuleSet {
         }
 
         // OR rule demands score > 0.
-        boolean res = score > 0;
-
-        return res ? 1 : 0;
+        return score > 0 ? 1 : 0;
     }
 }

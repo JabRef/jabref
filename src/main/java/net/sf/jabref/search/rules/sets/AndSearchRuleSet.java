@@ -34,8 +34,6 @@ public class AndSearchRuleSet extends SearchRuleSet {
         }
 
         // Then an AND rule demands that score == number of rules
-        boolean res = score == ruleSet.size();
-
-        return res ? 1 : 0;
+        return score == ruleSet.size() ? 1 : 0;
     }
 }
