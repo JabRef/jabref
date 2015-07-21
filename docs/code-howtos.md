@@ -2,9 +2,8 @@ This page provides some development support in the form of howtos.
 
 # Logging
 
-JabRef uses Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html).
-The plugin framework uses [apache.commons.logging](http://commons.apache.org/proper/commons-logging/).
-We intend to switch to [slf4j](http://slf4j.org/).
+JabRef uses [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/).
+Legacy JabRef code uses Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html) and is going to be replaced by Apache Commons Logging.
 
 # Drag and Drop
 
