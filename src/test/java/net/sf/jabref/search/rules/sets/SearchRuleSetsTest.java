@@ -27,15 +27,7 @@ public class SearchRuleSetsTest {
 
     @Test
     public void testBuildOr() throws Exception {
-        assertSearchRuleSetNoneAndOr(SearchRuleSets.build(SearchRuleSets.RuleSetType.OR));
-    }
-
-    @Test
-    public void testBuildNone() throws Exception {
-        assertSearchRuleSetNoneAndOr(SearchRuleSets.build(SearchRuleSets.RuleSetType.NONE));
-    }
-
-    private void assertSearchRuleSetNoneAndOr(SearchRuleSet searchRuleSet) {
+        SearchRuleSet searchRuleSet = SearchRuleSets.build(SearchRuleSets.RuleSetType.OR);
         assertEquals(0, searchRuleSet.applyRule(DUMMY_QUERY, null));
         assertEquals(true, searchRuleSet.validateSearchStrings(DUMMY_QUERY));
 
@@ -47,4 +39,5 @@ public class SearchRuleSetsTest {
         assertEquals(1, searchRuleSet.applyRule(DUMMY_QUERY, null));
         assertEquals(false, searchRuleSet.validateSearchStrings(DUMMY_QUERY));
     }
+
 }

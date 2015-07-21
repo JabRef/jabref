@@ -528,31 +528,29 @@ public class SearchManager2 extends SidePaneComponent
             fireSearchlistenerEvent(searchField.getText());
 
             // Setup search parameters common to both normal and float.
-            SearchRuleSet searchRules = new SearchRuleSet();
-            SearchRule rule1;
+            SearchRule searchRule;
 
             if(Globals.prefs.getBoolean("regExpSearch")) {
-                rule1 = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+                searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
             } else {
-                rule1 = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+                searchRule = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
             }
 
             try {
                 // this searches specified fields if specified,
                 // and all fields otherwise
-                rule1 = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchField.getText());
+                searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchField.getText());
             } catch (Exception ex) {
                 // we'll do a search in all fields
             }
 
-            searchRules.addRule(rule1);
 
-            if (!searchRules.validateSearchStrings(searchField.getText())) {
+            if (!searchRule.validateSearchStrings(searchField.getText())) {
                 panel.output(Globals.lang("Search failed: illegal search expression"));
                 panel.stopShowingSearchResults();
                 return;
             }
-            SearchWorker worker = new SearchWorker(searchRules, searchField.getText());
+            SearchWorker worker = new SearchWorker(searchRule, searchField.getText());
             worker.getWorker().run();
             worker.getCallBack().update();
             escape.setEnabled(true);
@@ -564,13 +562,13 @@ public class SearchManager2 extends SidePaneComponent
 
     class SearchWorker extends AbstractWorker {
 
-        private final SearchRuleSet rules;
+        private final SearchRule rule;
         private final String searchTerm;
         int hits = 0;
 
 
-        public SearchWorker(SearchRuleSet rules, String searchTerm) {
-            this.rules = rules;
+        public SearchWorker(SearchRule rule, String searchTerm) {
+            this.rule = rule;
             this.searchTerm = searchTerm;
         }
 
@@ -580,7 +578,7 @@ public class SearchManager2 extends SidePaneComponent
                 // Search only the current database:
                 for (BibtexEntry entry : panel.getDatabase().getEntries()) {
 
-                    boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                    boolean hit = rule.applyRule(searchTerm, entry) > 0;
                     entry.setSearchHit(hit);
                     if (hit) {
                         hits++;
@@ -593,7 +591,7 @@ public class SearchManager2 extends SidePaneComponent
                     BasePanel p = frame.baseAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
-                        boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                        boolean hit = rule.applyRule(searchTerm, entry) > 0;
                         entry.setSearchHit(hit);
                         if (hit) {
                             hits++;

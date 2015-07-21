@@ -32,20 +32,11 @@ import net.sf.jabref.search.SearchRule;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
-public class SearchRuleSet implements SearchRule {
+public abstract class SearchRuleSet implements SearchRule {
 
     protected final Vector<SearchRule> ruleSet = new Vector<SearchRule>();
     public void addRule(SearchRule newRule) {
         ruleSet.add(newRule);
-    }
-
-    @Override
-    public int applyRule(String searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException {
-        int score = 0;
-        for (SearchRule searchRule : ruleSet) {
-            score += searchRule.applyRule(searchString, bibtexEntry);
-        }
-        return score;
     }
 
     @Override

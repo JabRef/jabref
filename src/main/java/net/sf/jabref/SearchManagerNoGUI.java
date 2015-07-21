@@ -25,7 +25,6 @@ import net.sf.jabref.search.rules.BasicRegexSearchRule;
 import net.sf.jabref.search.rules.BasicSearchRule;
 import net.sf.jabref.search.rules.SearchExpression;
 import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.rules.sets.SearchRuleSet;
 
 /**
  * @author Silberer, Zirn
@@ -48,23 +47,21 @@ class SearchManagerNoGUI {
             searchTerm = fieldYear();
         }
 
-        SearchRuleSet searchRules = new SearchRuleSet();
-        SearchRule rule1;
+        SearchRule searchRule;
 
         if (Globals.prefs.getBoolean("regExpSearch")) {
-            rule1 = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
         } else {
-            rule1 = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            searchRule = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
         }
 
         try {
-            rule1 = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchTerm);
+            searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchTerm);
         } catch (Exception ignored) {
 
         }
-        searchRules.addRule(rule1);
 
-        if (!searchRules.validateSearchStrings(searchTerm)) {
+        if (!searchRule.validateSearchStrings(searchTerm)) {
             System.out.println(Globals.lang("Search failed: illegal search expression"));
             return base;
         }
@@ -72,7 +69,7 @@ class SearchManagerNoGUI {
         Collection<BibtexEntry> entries = database.getEntries();
         Vector<BibtexEntry> matchEntries = new Vector<BibtexEntry>();
         for (BibtexEntry entry : entries) {
-            boolean hit = searchRules.applyRule(searchTerm, entry) > 0;
+            boolean hit = searchRule.applyRule(searchTerm, entry) > 0;
             entry.setSearchHit(hit);
             if (hit) {
                 hits++;
