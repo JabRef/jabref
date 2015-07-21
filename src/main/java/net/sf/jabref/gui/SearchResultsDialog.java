@@ -15,7 +15,11 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,25 +29,44 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.EntryComparator;
+import net.sf.jabref.FieldComparator;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.GeneralRenderer;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.TransferableBibtexEntry;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-
-import com.jgoodies.uif_lite.component.UIFSplitPane;
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.util.Util;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -73,7 +96,7 @@ public class SearchResultsDialog {
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
-    private final UIFSplitPane contentPane = new UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
+    private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private PreviewPanel preview;
 
 

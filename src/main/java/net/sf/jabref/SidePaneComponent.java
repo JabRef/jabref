@@ -41,6 +41,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
 
     public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
+        //TODO: set icon
         super(title);
         this.manager = manager;
         JToolBar tlb = new JToolBar();

@@ -33,7 +33,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -58,10 +66,10 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.export.ExportToClipboardAction;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.FileActions.DatabaseSaveType;
 import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
-import net.sf.jabref.export.FileActions.DatabaseSaveType;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.AttachFileAction;
@@ -74,7 +82,17 @@ import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.CleanUpAction;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GlazedEntrySorter;
+import net.sf.jabref.gui.GroupAddRemoveDialog;
+import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.MainTableSelectionListener;
+import net.sf.jabref.gui.MergeEntriesDialog;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.SPIRESFetcher;
@@ -114,7 +132,6 @@ import ca.odell.glazedlists.matchers.Matcher;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -140,7 +157,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private MainTableSelectionListener selectionListener = null;
     private ListEventListener<BibtexEntry> groupsHighlightListener;
-    UIFSplitPane contentPane = new UIFSplitPane();
+    JSplitPane contentPane = new JSplitPane();
 
     private JSplitPane splitPane;
 
