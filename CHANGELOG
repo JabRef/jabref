@@ -1,4 +1,5 @@
 [master]
+    - Update dependencies: jersey, commons.logging, pdfbox, jgoodies, lazedlists, JDBC connectors
     - Refactored preferences
     - Remove local jgoodies dependency: replace SimpleInteralFrame with swingx JXTitledPanel and UIFSplitPane by JSplitPane
     - Fix several FindBugs warnings
