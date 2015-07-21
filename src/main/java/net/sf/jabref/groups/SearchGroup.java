@@ -39,22 +39,22 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     public static final String ID = "SearchGroup:";
 
-    private final String m_searchExpression;
+    private final String searchExpression;
 
-    private final boolean m_caseSensitive;
+    private final boolean caseSensitive;
 
-    private final boolean m_regExp;
+    private final boolean regExp;
 
-    private final AST m_ast;
+    private final AST ast;
 
-    private static final SearchExpressionTreeParser m_treeParser = new SearchExpressionTreeParser();
+    private static final SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
 
     /**
-     * If m_searchExpression is in valid syntax for advanced search, <b>this
+     * If searchExpression is in valid syntax for advanced search, <b>this
      * </b> will do the search; otherwise, either <b>RegExpSearchRule </b> or
      * <b>SimpleSearchRule </b> will be used.
      */
-    private final SearchRule m_searchRule;
+    private final SearchRule searchRule;
 
 
     /**
@@ -63,33 +63,33 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
     public SearchGroup(String name, String searchExpression,
                        boolean caseSensitive, boolean regExp, int context) {
         super(name, context);
-        m_searchExpression = searchExpression;
-        m_caseSensitive = caseSensitive;
-        m_regExp = regExp;
+        this.searchExpression = searchExpression;
+        this.caseSensitive = caseSensitive;
+        this.regExp = regExp;
 
         // create AST
         AST ast;
         try {
             SearchExpressionParser parser = new SearchExpressionParser(
                     new SearchExpressionLexer(new StringReader(
-                            m_searchExpression)));
-            parser.caseSensitive = m_caseSensitive;
-            parser.regex = m_regExp;
+                            this.searchExpression)));
+            parser.caseSensitive = this.caseSensitive;
+            parser.regex = this.regExp;
             parser.searchExpression();
             ast = parser.getAST();
         } catch (Exception e) {
             ast = null;
-            // nothing to do; set m_ast to null -> regular plaintext search
+            // nothing to do; set ast to null -> regular plaintext search
         }
-        m_ast = ast;
+        this.ast = ast;
 
-        if (m_ast != null) { // do advanced search
-            m_searchRule = this;
+        if (this.ast != null) { // do advanced search
+            searchRule = this;
         } else { // do plaintext search
-            if (m_regExp) {
-                m_searchRule = new RegExpSearchRule(m_caseSensitive);
+            if (this.regExp) {
+                searchRule = new RegExpSearchRule(this.caseSensitive);
             } else {
-                m_searchRule = new SimpleSearchRule(m_caseSensitive);
+                searchRule = new SimpleSearchRule(this.caseSensitive);
             }
         }
 
@@ -163,13 +163,13 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
     public String toString() {
         return SearchGroup.ID + StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + m_context + AbstractGroup.SEPARATOR
-                + StringUtil.quote(m_searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + (m_caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
-                + (m_regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
+                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + (caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
+                + (regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
     }
 
     public String getSearchExpression() {
-        return m_searchExpression;
+        return searchExpression;
     }
 
     @Override
@@ -201,9 +201,9 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         }
         SearchGroup other = (SearchGroup) o;
         return m_name.equals(other.m_name)
-                && m_searchExpression.equals(other.m_searchExpression)
-                && (m_caseSensitive == other.m_caseSensitive)
-                && (m_regExp == other.m_regExp)
+                && searchExpression.equals(other.searchExpression)
+                && (caseSensitive == other.caseSensitive)
+                && (regExp == other.regExp)
                 && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
@@ -225,13 +225,13 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public int applyRule(String searchOptions, BibtexEntry entry) {
-        if (m_ast == null) {
+        if (ast == null) {
             // the searchOptions object is a dummy; we need to insert
             // the actual search expression.
-            return m_searchRule.applyRule(m_searchExpression, entry);
+            return searchRule.applyRule(searchExpression, entry);
         }
         try {
-            return SearchGroup.m_treeParser.apply(m_ast, entry);
+            return SearchGroup.treeParser.apply(ast, entry);
         } catch (RecognitionException e) {
             return 0; // this should never occur
         }
@@ -240,8 +240,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(m_name, m_searchExpression, m_caseSensitive,
-                    m_regExp, m_context);
+            return new SearchGroup(m_name, searchExpression, caseSensitive,
+                    regExp, m_context);
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -253,11 +253,11 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
     }
 
     public boolean isCaseSensitive() {
-        return m_caseSensitive;
+        return caseSensitive;
     }
 
     public boolean isRegExp() {
-        return m_regExp;
+        return regExp;
     }
 
     @Override
@@ -267,8 +267,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public String getDescription() {
-        return new SearchExpressionDescriber(m_caseSensitive,
-                m_regExp, m_searchExpression, m_ast).getDescriptionForPreview();
+        return new SearchExpressionDescriber(caseSensitive,
+                regExp, searchExpression, ast).getDescriptionForPreview();
     }
 
     @Override
@@ -285,7 +285,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         sb.append(" (");
         sb.append(Globals.lang("search expression"));
         sb.append(" <b>").
-                append(StringUtil.quoteForHTML(m_searchExpression)).append("</b>)");
+                append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
         switch (getHierarchicalContext()) {
             case AbstractGroup.INCLUDING:
                 sb.append(", ").append(Globals.lang("includes subgroups"));
