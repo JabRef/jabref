@@ -138,7 +138,7 @@ task wrapper(type: Wrapper) {
 compileJava {
     // files are all encoded using UTF-8
     options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Xlint:none"
 }
 
 compileTestJava {
