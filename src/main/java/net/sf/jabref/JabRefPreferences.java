@@ -343,8 +343,10 @@ public class JabRefPreferences {
     public final String MARKING_WITH_NUMBER_PATTERN;
 
     private final Preferences prefs;
-    private HashMap<String, String> keyBinds = new HashMap<String, String>();
-    private final HashMap<String, String> defKeyBinds = new HashMap<String, String>();
+
+    private KeyBinds keyBinds = new KeyBinds();
+    private KeyBinds defaultKeyBinds = new KeyBinds();
+
     private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
     private final HashSet<String> nonWrappableFields = new HashSet<String>(5);
     private static LabelPattern keyPattern;
@@ -961,7 +963,6 @@ public class JabRefPreferences {
     }
 
     public void put(String key, String value) {
-        //System.out.println("WRITE PREF [" + key + "]=" + value);
         prefs.put(key, value);
     }
 
@@ -1100,7 +1101,7 @@ public class JabRefPreferences {
         // user has his own set in Preferences, and has upgraded to a
         // new version where new bindings have been introduced.
         if (s == null) {
-            s = defKeyBinds.get(bindName);
+            s = defaultKeyBinds.get(bindName);
             if (s == null) {
                 // there isn't even a default value
                 // Output error
@@ -1149,14 +1150,14 @@ public class JabRefPreferences {
      * Returns the HashMap containing all key bindings.
      */
     public HashMap<String, String> getKeyBindings() {
-        return keyBinds;
+        return keyBinds.getKeyBindings();
     }
 
     /**
      * Returns the HashMap containing default key bindings.
      */
     public HashMap<String, String> getDefaultKeys() {
-        return defKeyBinds;
+        return defaultKeyBinds.getKeyBindings();
     }
 
     /**
@@ -1206,7 +1207,7 @@ public class JabRefPreferences {
             }
             putStringArray("bindNames", bindNames);
             putStringArray("bindings", bindings);
-            keyBinds = newBindings;
+            keyBinds.overwriteBindings(newBindings);
         }
     }
 
@@ -1260,7 +1261,7 @@ public class JabRefPreferences {
 
     private void restoreKeyBindings() {
         // Define default keybindings.
-        defineDefaultKeyBindings();
+        defaultKeyBinds = new KeyBinds();
 
         // First read the bindings, and their names.
         String[] bindNames = getStringArray("bindNames"), bindings = getStringArray("bindings");
@@ -1269,122 +1270,13 @@ public class JabRefPreferences {
         if ((bindNames == null) || (bindings == null)
                 || (bindNames.length != bindings.length)) {
             // Nothing defined in Preferences, or something is wrong.
-            setDefaultKeyBindings();
+            keyBinds = new KeyBinds();
             return;
         }
 
         for (int i = 0; i < bindNames.length; i++) {
             keyBinds.put(bindNames[i], bindings[i]);
         }
-    }
-
-    private void setDefaultKeyBindings() {
-        keyBinds = defKeyBinds;
-    }
-
-    private void defineDefaultKeyBindings() {
-        defKeyBinds.put("Push to application", "ctrl L");
-        defKeyBinds.put("Push to LyX", "ctrl L");
-        defKeyBinds.put("Push to WinEdt", "ctrl shift W");
-        defKeyBinds.put("Quit JabRef", "ctrl Q");
-        defKeyBinds.put("Open database", "ctrl O");
-        defKeyBinds.put("Save database", "ctrl S");
-        defKeyBinds.put("Save database as ...", "ctrl shift S");
-        defKeyBinds.put("Save all", "ctrl alt S");
-        defKeyBinds.put("Close database", "ctrl W");
-        defKeyBinds.put("New entry", "ctrl N");
-        defKeyBinds.put("Cut", "ctrl X");
-        defKeyBinds.put("Copy", "ctrl C");
-        defKeyBinds.put("Paste", "ctrl V");
-        defKeyBinds.put("Undo", "ctrl Z");
-        defKeyBinds.put("Redo", "ctrl Y");
-        defKeyBinds.put("Help", "F1");
-        defKeyBinds.put("New article", "ctrl shift A");
-        defKeyBinds.put("New book", "ctrl shift B");
-        defKeyBinds.put("New phdthesis", "ctrl shift T");
-        defKeyBinds.put("New inbook", "ctrl shift I");
-        defKeyBinds.put("New mastersthesis", "ctrl shift M");
-        defKeyBinds.put("New proceedings", "ctrl shift P");
-        defKeyBinds.put("New unpublished", "ctrl shift U");
-        defKeyBinds.put("Edit strings", "ctrl T");
-        defKeyBinds.put("Edit preamble", "ctrl P");
-        defKeyBinds.put("Select all", "ctrl A");
-        defKeyBinds.put("Toggle groups interface", "ctrl shift G");
-        defKeyBinds.put("Autogenerate BibTeX keys", "ctrl G");
-        defKeyBinds.put("Search", "ctrl F");
-        defKeyBinds.put("Incremental search", "ctrl shift F");
-        defKeyBinds.put("Repeat incremental search", "ctrl shift F");
-        defKeyBinds.put("Close dialog", "ESCAPE");
-        defKeyBinds.put("Close entry editor", "ESCAPE");
-        defKeyBinds.put("Close preamble editor", "ESCAPE");
-        defKeyBinds.put("Back, help dialog", "LEFT");
-        defKeyBinds.put("Forward, help dialog", "RIGHT");
-        defKeyBinds.put("Preamble editor, store changes", "alt S");
-        defKeyBinds.put("Clear search", "ESCAPE");
-        defKeyBinds.put("Entry editor, next panel", "ctrl TAB");//"ctrl PLUS");//"shift Right");
-        defKeyBinds.put("Entry editor, previous panel", "ctrl shift TAB");//"ctrl MINUS");
-        defKeyBinds.put("Entry editor, next panel 2", "ctrl PLUS");//"ctrl PLUS");//"shift Right");
-        defKeyBinds.put("Entry editor, previous panel 2", "ctrl MINUS");//"ctrl MINUS");
-        defKeyBinds.put("Entry editor, next entry", "ctrl shift DOWN");
-        defKeyBinds.put("Entry editor, previous entry", "ctrl shift UP");
-        defKeyBinds.put("Entry editor, store field", "alt S");
-        defKeyBinds.put("String dialog, add string", "ctrl N");
-        defKeyBinds.put("String dialog, remove string", "shift DELETE");
-        defKeyBinds.put("String dialog, move string up", "ctrl UP");
-        defKeyBinds.put("String dialog, move string down", "ctrl DOWN");
-        defKeyBinds.put("Save session", "F11");
-        defKeyBinds.put("Load session", "F12");
-        defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
-        defKeyBinds.put("Copy BibTeX key", "ctrl shift K");
-        defKeyBinds.put("Copy BibTeX key and title", "ctrl shift alt K");
-        defKeyBinds.put("Next tab", "ctrl PAGE_DOWN");
-        defKeyBinds.put("Previous tab", "ctrl PAGE_UP");
-        defKeyBinds.put("Replace string", "ctrl R");
-        defKeyBinds.put("Delete", "DELETE");
-        defKeyBinds.put("Open file", "F4");
-        defKeyBinds.put("Open folder", "ctrl shift O");
-        defKeyBinds.put("Open PDF or PS", "shift F5");
-        defKeyBinds.put("Open URL or DOI", "F3");
-        defKeyBinds.put("Open SPIRES entry", "ctrl F3");
-        defKeyBinds.put("Toggle entry preview", "ctrl F9");
-        defKeyBinds.put("Switch preview layout", "F9");
-        defKeyBinds.put("Edit entry", "ctrl E");
-        defKeyBinds.put("Mark entries", "ctrl M");
-        defKeyBinds.put("Unmark entries", "ctrl shift M");
-        defKeyBinds.put("Fetch Medline", "F5");
-        defKeyBinds.put("Search ScienceDirect", "ctrl F5");
-        defKeyBinds.put("Search ADS", "ctrl shift F6");
-        defKeyBinds.put("New from plain text", "ctrl shift N");
-        defKeyBinds.put("Synchronize files", "ctrl F4");
-        defKeyBinds.put("Synchronize PDF", "shift F4");
-        defKeyBinds.put("Synchronize PS", "ctrl shift F4");
-        defKeyBinds.put("Focus entry table", "ctrl shift E");
-
-        defKeyBinds.put("Abbreviate", "ctrl alt A");
-        defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
-        defKeyBinds.put("Search IEEEXplore", "alt F8");
-        defKeyBinds.put("Search ACM Portal", "ctrl shift F8");
-        defKeyBinds.put("Fetch ArXiv.org", "shift F8");
-        defKeyBinds.put("Search JSTOR", "shift F9");
-        defKeyBinds.put("Cleanup", "ctrl shift F7");
-        defKeyBinds.put("Write XMP", "ctrl F7");
-        defKeyBinds.put("New file link", "ctrl N");
-        defKeyBinds.put("Fetch SPIRES", "ctrl F8");
-        defKeyBinds.put("Fetch INSPIRE", "ctrl F2");
-        defKeyBinds.put("Back", "alt LEFT");
-        defKeyBinds.put("Forward", "alt RIGHT");
-        defKeyBinds.put("Import into current database", "ctrl I");
-        defKeyBinds.put("Import into new database", "ctrl alt I");
-        defKeyBinds.put(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION, "shift F7");
-        defKeyBinds.put("Increase table font size", "ctrl PLUS");
-        defKeyBinds.put("Decrease table font size", "ctrl MINUS");
-        defKeyBinds.put("Automatically link files", "alt F");
-        defKeyBinds.put("Resolve duplicate BibTeX keys", "ctrl shift D");
-        defKeyBinds.put("Refresh OO", "ctrl alt O");
-        defKeyBinds.put("File list editor, move entry up", "ctrl UP");
-        defKeyBinds.put("File list editor, move entry down", "ctrl DOWN");
-        defKeyBinds.put("Minimize to system tray", "ctrl alt W");
-        defKeyBinds.put("Hide/show toolbar", "ctrl alt T");
     }
 
     private String getNextUnit(Reader data) throws IOException {
