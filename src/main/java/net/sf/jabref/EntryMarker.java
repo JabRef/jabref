@@ -151,7 +151,7 @@ public class EntryMarker {
             // System.out.println("Owner: "+entry.getField(Globals.OWNER));
             }
         }
-        owners.remove(Globals.prefs.get("defaultOwner"));
+        owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
         StringBuilder sb = new StringBuilder();
         for (Object owner : owners) {
             sb.append('[');

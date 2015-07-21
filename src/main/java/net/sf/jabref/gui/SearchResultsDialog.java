@@ -51,6 +51,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.GeneralRenderer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.TransferableBibtexEntry;
@@ -112,7 +113,7 @@ public class SearchResultsDialog {
 
         int activePreview = Globals.prefs.getInt("activePreview");
         preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get("preview0") : Globals.prefs.get("preview1"));
+                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
         model = new EventTableModel<BibtexEntry>(sortedEntries,

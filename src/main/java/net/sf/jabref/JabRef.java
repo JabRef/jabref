@@ -77,16 +77,16 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // See if there are plugins scheduled for deletion:
-        if (prefs.hasKey("deletePlugins") && (prefs.get("deletePlugins").length() > 0)) {
-            String[] toDelete = prefs.getStringArray("deletePlugins");
+        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && (prefs.get(JabRefPreferences.DELETE_PLUGINS).length() > 0)) {
+            String[] toDelete = prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
             PluginInstaller.deletePluginsOnStartup(toDelete);
-            prefs.put("deletePlugins", "");
+            prefs.put(JabRefPreferences.DELETE_PLUGINS, "");
         }
 
-        if (prefs.getBoolean("useProxy")) {
+        if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
             // NetworkTab.java ensures that proxyHostname and proxyPort are not null
-            System.setProperty("http.proxyHost", prefs.get("proxyHostname"));
-            System.setProperty("http.proxyPort", prefs.get("proxyPort"));
+            System.setProperty("http.proxyHost", prefs.get(JabRefPreferences.PROXY_HOSTNAME));
+            System.setProperty("http.proxyPort", prefs.get(JabRefPreferences.PROXY_PORT));
 
             // currently, the following cannot be configured
             if (prefs.get("proxyUsername") != null) {
@@ -183,7 +183,7 @@ public class JabRef {
     }
 
     private void setLanguage(JabRefPreferences prefs) {
-        String langStr = prefs.get("language");
+        String langStr = prefs.get(JabRefPreferences.LANGUAGE);
         String[] parts = langStr.split("_");
         String language, country;
         if (parts.length == 1) {
@@ -435,7 +435,7 @@ public class JabRef {
                                 System.out.println(Globals.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
                                         pr.getMetaData(), new File(data[0]), Globals.prefs,
-                                        false, false, Globals.prefs.get("defaultEncoding"), false);
+                                        false, false, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Globals.lang("Warning") + ": " +
@@ -628,7 +628,7 @@ public class JabRef {
                 // Use system Look & Feel by default
                 lookFeel = systemLnF;
             } else {
-                lookFeel = Globals.prefs.get("lookAndFeel");
+                lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
 
             // At all cost, avoid ending up with the Metal look and feel:
@@ -714,9 +714,9 @@ public class JabRef {
         }
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!cli.isBlank() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get("lastEdited") != null)) {
+        if (!cli.isBlank() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
             // How to handle errors in the databases to open?
-            String[] names = Globals.prefs.getStringArray("lastEdited");
+            String[] names = Globals.prefs.getStringArray(JabRefPreferences.LAST_EDITED);
             lastEdLoop: for (String name : names) {
                 File fileToOpen = new File(name);
 
@@ -929,7 +929,7 @@ public class JabRef {
                 return ParserResult.FILE_LOCKED;
             }
 
-            String encoding = Globals.prefs.get("defaultEncoding");
+            String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
             if (pr == null) {
                 pr = new ParserResult(null, null, null);

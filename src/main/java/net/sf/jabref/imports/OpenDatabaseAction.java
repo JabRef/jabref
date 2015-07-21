@@ -80,7 +80,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (showDialog) {
 
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     true);
             if (chosen != null) {
                 for (String aChosen : chosen) {
@@ -202,7 +202,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String fileName = file.getPath();
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get("defaultEncoding");
+                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modTime = FileBasedLock.getLockFileTimeStamp(file);

@@ -1835,7 +1835,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             metaData = new MetaData();
         }
         if (encoding == null) {
-            encoding = Globals.prefs.get("defaultEncoding");
+            encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         }
 
         BasePanel bp = new BasePanel(JabRefFrame.this, db, file, metaData, encoding);
@@ -2015,7 +2015,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             // Create a new, empty, database.
             BibtexDatabase database = new BibtexDatabase();
-            addTab(database, null, new MetaData(), Globals.prefs.get("defaultEncoding"), true);
+            addTab(database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
             output(Globals.lang("New database created."));
         }
     }
@@ -2047,7 +2047,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = new BasePanel(JabRefFrame.this,
                         dialog.getGenerateDB(), // database
                         null, // file
-                        new MetaData(), Globals.prefs.get("defaultEncoding")); // meta data
+                        new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
                 tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), bp);
                 tabbedPane.setSelectedComponent(bp);
                 output(Globals.lang("New database created."));
@@ -2202,7 +2202,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             // Metadata are only put in bibtex files, so we will not find it
             // in imported files. We therefore pass in an empty MetaData:
-            BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get("defaultEncoding"));
+            BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             /*
                   if (prefs.getBoolean("autoComplete")) {
                   db.setCompleters(autoCompleters);

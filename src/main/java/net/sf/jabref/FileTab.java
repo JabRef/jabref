@@ -333,19 +333,19 @@ public class FileTab extends JPanel implements PrefsTab {
         Globals.NEWLINE = newline;
         Globals.NEWLINE_LENGTH = newline.length();
 
-        _prefs.putBoolean("backup", backup.isSelected());
-        _prefs.putBoolean("openLastEdited", openLast.isSelected());
-        _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
-        _prefs.putBoolean("resolveStringsAllFields", resolveStringsAll.isSelected());
-        _prefs.put("doNotResolveStringsFor", doNotResolveStringsFor.getText().trim());
-        _prefs.putBoolean("autoSave", autoSave.isSelected());
-        _prefs.putBoolean("promptBeforeUsingAutosave", promptBeforeUsingAutoSave.isSelected());
-        _prefs.putInt("autoSaveInterval", (Integer) autoSaveInterval.getValue());
+        _prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
+        _prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
+        _prefs.putBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES, autoDoubleBraces.isSelected());
+        _prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());
+        _prefs.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, doNotResolveStringsFor.getText().trim());
+        _prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
+        _prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
+        _prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
         _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
-        _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
+        _prefs.putBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS, includeEmptyFields.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
-        doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
+        doNotResolveStringsFor.setText(_prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
         //for LWang_AdjustableFieldOrder
         _prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, getBgValue(bgFieldOrderStyle));
@@ -353,7 +353,7 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD, wrapFieldLine.isSelected());
 
         boolean updateSpecialFields = false;
-        if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {
+        if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
             _prefs.put("putBracesAroundCapitals", bracesAroundCapitalsFields.getText());
             updateSpecialFields = true;
         }

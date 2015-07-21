@@ -32,7 +32,7 @@ class EntryAddChange extends Change {
         super("Added entry");
         this.diskEntry = diskEntry;
 
-        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get("preview0"));
+        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);
     }
 

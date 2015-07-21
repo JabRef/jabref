@@ -33,6 +33,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.util.Util;
@@ -277,7 +278,7 @@ public class MergeEntriesDialog extends JDialog {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         this.add(label, cc.xy(1, row));
 
-        String layoutString = Globals.prefs.get("preview0");
+        String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         pp = new PreviewPanel(null, mergedEntry, null, new MetaData(), layoutString);
         // JScrollPane jsppp = new JScrollPane(pp);
         this.add(pp, cc.xyw(3, row, 3));

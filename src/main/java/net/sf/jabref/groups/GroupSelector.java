@@ -911,7 +911,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         } else if (e.getSource() == autoGroup) {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel,
-                    GroupSelector.this, groupsRoot, Globals.prefs.get("groupsDefaultField"), " .,", ",");
+                    GroupSelector.this, groupsRoot, Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,", ",");
             gd.setVisible(true); // gd.show(); -> deprecated since 1.5
             // gd does the operation itself
         } else if (e.getSource() instanceof JCheckBox) {

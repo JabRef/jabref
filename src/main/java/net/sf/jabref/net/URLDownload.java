@@ -16,8 +16,10 @@
 package net.sf.jabref.net;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.*;
 import java.net.CookieHandler;
@@ -108,7 +110,7 @@ public class URLDownload {
      * @throws IOException
      */
     public String downloadToString() throws IOException {
-        return downloadToString(Globals.prefs.get("defaultEncoding"));
+        return downloadToString(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
     }
 
     public String downloadToString(String encoding) throws IOException {

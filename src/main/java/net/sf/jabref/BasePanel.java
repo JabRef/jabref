@@ -3176,7 +3176,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void action() throws Throwable {
 
-            String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     JFileChooser.SAVE_DIALOG, false);
             if (chosenFile != null) {
                 File expFile = new File(chosenFile);

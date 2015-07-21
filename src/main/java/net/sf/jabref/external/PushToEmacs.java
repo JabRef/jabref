@@ -72,7 +72,7 @@ public class PushToEmacs implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        citeCommand.setText(Globals.prefs.get("citeCommandEmacs"));
+        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS));
         emacsPath.setText(Globals.prefs.get(JabRefPreferences.EMACS_PATH));
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
@@ -81,7 +81,7 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("citeCommandEmacs", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_EMACS, citeCommand.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_PATH, emacsPath.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
         Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());

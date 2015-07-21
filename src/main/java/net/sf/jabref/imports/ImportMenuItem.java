@@ -95,7 +95,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         public void init() {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get("workingDirectory")),
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     (importer != null ? importer.getExtensions() : null), true);
 
             if ((filenames != null) && (filenames.length > 0)) {
@@ -255,7 +255,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 else {
                     frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
-                            bibtexResult.getMetaData(), Globals.prefs.get("defaultEncoding"), true);
+                            bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
                     frame.output(Globals.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
 

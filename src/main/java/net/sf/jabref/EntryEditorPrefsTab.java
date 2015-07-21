@@ -196,20 +196,20 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        autoOpenForm.setSelected(_prefs.getBoolean("autoOpenForm"));
-        defSource.setSelected(_prefs.getBoolean("defaultShowSource"));
-        showSource.setSelected(_prefs.getBoolean("showSource"));
+        autoOpenForm.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM));
+        defSource.setSelected(_prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE));
+        showSource.setSelected(_prefs.getBoolean(JabRefPreferences.SHOW_SOURCE));
         emacsMode.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS));
         emacsRebindCtrlA.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
         emacsRebindCtrlF.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
-        disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
-        autoComplete.setSelected(_prefs.getBoolean("autoComplete"));
-        autoCompFields.setText(_prefs.get("autoCompleteFields"));
+        disableOnMultiple.setSelected(_prefs.getBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION));
+        autoComplete.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
+        autoCompFields.setText(_prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS));
         shortestToComplete.setValue(_prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE));
 
-        if (_prefs.getBoolean("autoCompFF")) {
+        if (_prefs.getBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST)) {
             autoCompFF.setSelected(true);
-        } else if (_prefs.getBoolean("autoCompLF")) {
+        } else if (_prefs.getBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST)) {
             autoCompLF.setSelected(true);
         } else {
             autoCompBoth.setSelected(true);
@@ -264,24 +264,24 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         }
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         // We want to know if the following settings have been modified:
-        boolean oldAutoComplete = _prefs.getBoolean("autoComplete");
-        boolean oldShowSource = _prefs.getBoolean("showSource");
-        String oldAutoCompFields = _prefs.get("autoCompleteFields");
+        boolean oldAutoComplete = _prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE);
+        boolean oldShowSource = _prefs.getBoolean(JabRefPreferences.SHOW_SOURCE);
+        String oldAutoCompFields = _prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS);
         _prefs.putInt(JabRefPreferences.SHORTEST_TO_COMPLETE, (Integer) shortestToComplete.getValue());
-        _prefs.putBoolean("autoComplete", autoComplete.isSelected());
-        _prefs.put("autoCompleteFields", autoCompFields.getText());
-        _prefs.putBoolean("showSource", showSource.isSelected());
+        _prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
+        _prefs.put(JabRefPreferences.AUTO_COMPLETE_FIELDS, autoCompFields.getText());
+        _prefs.putBoolean(JabRefPreferences.SHOW_SOURCE, showSource.isSelected());
         if (autoCompBoth.isSelected()) {
-            _prefs.putBoolean("autoCompFF", false);
-            _prefs.putBoolean("autoCompLF", false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
         }
         else if (autoCompFF.isSelected()) {
-            _prefs.putBoolean("autoCompFF", true);
-            _prefs.putBoolean("autoCompLF", false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, true);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
         }
         else {
-            _prefs.putBoolean("autoCompFF", false);
-            _prefs.putBoolean("autoCompLF", true);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, true);
         }
         if (autoCompFirstNameMode_Abbr.isSelected()) {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);

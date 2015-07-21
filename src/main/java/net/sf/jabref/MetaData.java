@@ -167,12 +167,12 @@ public class MetaData implements Iterable<String> {
         // the preferences can specify one. The settings are prioritized in the following
         // order and the first defined setting is used: metadata user-specific directory,
         // metadata general directory, preferences directory.
-        String key = Globals.prefs.get("userFileDirIndividual");
+        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
         List<String> dirs = new ArrayList<String>();
 
         Vector<String> vec = getData(key);
         if (vec == null) {
-            key = Globals.prefs.get("userFileDir");
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
         if ((vec != null) && (vec.size() > 0)) {

@@ -49,7 +49,7 @@ public class LabelPatternUtil {
     private static BibtexDatabase _db;
 
     public static void updateDefaultPattern() {
-        LabelPatternUtil.DEFAULT_LABELPATTERN = LabelPatternUtil.split(JabRefPreferences.getInstance().get("defaultLabelPattern"));
+        LabelPatternUtil.DEFAULT_LABELPATTERN = LabelPatternUtil.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
     }
 
     /**

@@ -106,7 +106,7 @@ class HelpContent extends JTextPane {
             reference = "";
         }
 
-        String middle = prefs.get("language") + '/';
+        String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
         if (middle.equals("en/"))
          {
             middle = ""; // english in base help dir.

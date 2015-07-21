@@ -60,7 +60,7 @@ public class AppendDatabaseAction implements BaseAction {
         Util.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")),
+            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     null, false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
@@ -96,7 +96,7 @@ public class AppendDatabaseAction implements BaseAction {
             try {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get("defaultEncoding");
+                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);

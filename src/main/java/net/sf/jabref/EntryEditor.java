@@ -441,7 +441,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         String s = BibtexFields.getFieldExtras(string);
 
         // timestamp or a other field with datepicker command
-        if ((fieldName.equals(Globals.prefs.get("timeStampField")))
+        if ((fieldName.equals(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD)))
                 || ((s != null) && s.equals("datepicker"))) {
             // double click AND datefield => insert the current date (today)
             ((JTextArea) ed).addMouseListener(new MouseAdapter() {
@@ -551,7 +551,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    ed.setText(Globals.prefs.get("defaultOwner"));
+                    ed.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
                     storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
                 }
             });

@@ -31,6 +31,7 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.util.Util;
@@ -205,7 +206,7 @@ public class DbImportAction extends AbstractWorker {
             metaData = (MetaData) res[1];
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData,
-                        Globals.prefs.get("defaultEncoding"), true);
+                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
                 pan.metaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res[2] + "(Imported)", "Imported DB");
                 pan.markBaseChanged();

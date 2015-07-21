@@ -1304,7 +1304,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
 
         // Read external lists, if any (in reverse order, so the upper lists
         // override the lower):
-        String[] lists = Globals.prefs.getStringArray("externalJournalLists");
+        String[] lists = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if ((lists != null) && (lists.length > 0)) {
             for (int i = lists.length - 1; i >= 0; i--) {
                 try {
@@ -1319,9 +1319,9 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         // Read personal list, if set up:
         if (Globals.prefs.get("personalJournalList") != null) {
             try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get("personalJournalList")));
+                Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {
-                Globals.logger("Personal journal list file '" + Globals.prefs.get("personalJournalList")
+                Globals.logger("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
                         + "' not found.");
             }
         }

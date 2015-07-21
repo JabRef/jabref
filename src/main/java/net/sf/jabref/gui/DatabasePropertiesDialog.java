@@ -43,6 +43,7 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.BrowseAction;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.config.SaveOrderConfig;
 
@@ -346,7 +347,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveTerField.setEnabled(selected);
         saveTerDesc.setEnabled(selected);
 
-        Vector<String> fileD = metaData.getData(Globals.prefs.get("userFileDir"));
+        Vector<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         if (fileD == null) {
             fileDir.setText("");
         } else {
@@ -356,8 +357,8 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         }
 
-        Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual")); // File dir setting
-        Vector<String> fileDIL = metaData.getData(Globals.prefs.get("userFileDirInd_Legacy")); // Legacy file dir setting for backward comp.
+        Vector<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
+        Vector<String> fileDIL = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_IND_LEGACY)); // Legacy file dir setting for backward comp.
         if (fileDI == null) {
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
             if (fileDIL == null) {
@@ -445,18 +446,18 @@ public class DatabasePropertiesDialog extends JDialog {
         String text = fileDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
-            metaData.putData(Globals.prefs.get("userFileDir"), dir);
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), dir);
         } else {
-            metaData.remove(Globals.prefs.get("userFileDir"));
+            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
         dir = new Vector<String>(1);
         text = fileDirIndv.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
-            metaData.putData(Globals.prefs.get("userFileDirIndividual"), dir);
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), dir);
         } else {
-            metaData.remove(Globals.prefs.get("userFileDirIndividual"));
+            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         }
 
         dir = new Vector<String>(1);

@@ -62,6 +62,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.IdGenerator;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.OutputPrinter;
@@ -233,7 +234,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.fields = fields;
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        preview = new PreviewPanel(null, metaData, Globals.prefs.get("preview0"));
+        preview = new PreviewPanel(null, metaData, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
 
         duplLabel.setToolTipText(Globals.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -732,7 +733,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // Create a new BasePanel for the entries:
                     BibtexDatabase base = new BibtexDatabase();
                     panel = new BasePanel(frame, base, null, new MetaData(),
-                            Globals.prefs.get("defaultEncoding"));
+                            Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
                 }
 
                 boolean groupingCanceled = false;

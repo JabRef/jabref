@@ -70,9 +70,9 @@ public class PushToVim implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        vimPath.setText(Globals.prefs.get("vim"));
-        vimServer.setText(Globals.prefs.get("vimServer"));
-        citeCommand.setText(Globals.prefs.get("citeCommandVim"));
+        vimPath.setText(Globals.prefs.get(JabRefPreferences.VIM));
+        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
+        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM));
         return settings;
     }
 
@@ -109,8 +109,8 @@ public class PushToVim implements PushToApplication {
         couldNotConnect = false;
         couldNotRunClient = false;
         try {
-            String[] com = new String[] {Globals.prefs.get("vim"), "--servername", Globals.prefs.get("vimServer"), "--remote-send",
-                    "<C-\\><C-N>a" + Globals.prefs.get("citeCommandVim") +
+            String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
+                    "<C-\\><C-N>a" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM) +
                             "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);

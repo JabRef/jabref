@@ -229,7 +229,7 @@ public class ExportFormats {
             public void actionPerformed(ActionEvent e) {
                 ExportFormats.initAllExports();
                 JFileChooser fc = ExportFormats.createExportFileChooser(
-                        Globals.prefs.get("exportWorkingDirectory"));
+                        Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 fc.showSaveDialog(frame);
                 File file = fc.getSelectedFile();
                 if (file == null) {
@@ -329,7 +329,7 @@ public class ExportFormats {
     }
 
     private static JFileChooser createExportFileChooser(String currentDir) {
-        String lastUsedFormat = Globals.prefs.get("lastUsedExport");
+        String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
         TreeSet<FileFilter> filters = new TreeSet<FileFilter>();

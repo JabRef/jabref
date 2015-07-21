@@ -250,18 +250,18 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
 
-        if (_prefs.getBoolean("namesAsIs")) {
+        if (_prefs.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
             namesAsIs.setSelected(true);
-        } else if (_prefs.getBoolean("namesFf")) {
+        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
             namesFf.setSelected(true);
-        } else if (_prefs.getBoolean("namesNatbib")) {
+        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_NATBIB)) {
             namesNatbib.setSelected(true);
         } else {
             namesFl.setSelected(true);
         }
-        if (_prefs.getBoolean("abbrAuthorNames")) {
+        if (_prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
             abbrNames.setSelected(true);
-        } else if (_prefs.getBoolean("namesLastOnly")) {
+        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
             lastNamesOnly.setSelected(true);
         } else {
             noAbbrNames.setSelected(true);
@@ -270,13 +270,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
         terDesc.setSelected(_prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
 
-        floatMarked.setSelected(_prefs.getBoolean("floatMarkedEntries"));
+        floatMarked.setSelected(_prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         abbrNames.setEnabled(!namesNatbib.isSelected());
         lastNamesOnly.setEnabled(!namesNatbib.isSelected());
         noAbbrNames.setEnabled(!namesNatbib.isSelected());
 
-        String numF = _prefs.get("numericFields");
+        String numF = _prefs.get(JabRefPreferences.NUMERIC_FIELDS);
         if (numF == null) {
             numericFields.setText("");
         } else {
@@ -312,7 +312,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
         _prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
 
-        _prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
+        _prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
         // updatefont
 
         String oldVal = _prefs.get("numericFields");

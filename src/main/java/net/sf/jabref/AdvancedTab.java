@@ -209,7 +209,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         oldUseDef = preferences.getBoolean("useDefaultLookAndFeel");
-        oldLnf = preferences.get("lookAndFeel");
+        oldLnf = preferences.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
         useDefault.setSelected(!oldUseDef);
         className.setSelectedItem(oldLnf);
         className.setEnabled(!oldUseDef);

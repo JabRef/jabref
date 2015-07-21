@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.journals.logic.Abbreviation;
@@ -261,7 +262,7 @@ class ManageJournalsPanel extends JPanel {
     }
 
     public void setValues() {
-        personalFile.setText(Globals.prefs.get("personalJournalList"));
+        personalFile.setText(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST));
         if (personalFile.getText().length() == 0) {
             newFile.setSelected(true);
             oldFile.setEnabled(false);

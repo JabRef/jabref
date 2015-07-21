@@ -263,7 +263,7 @@ public class GUIGlobals {
         URL resource = defaultResource;
 
         if (Globals.prefs.getBoolean("useCustomIconTheme")) {
-            String filename = Globals.prefs.get("customIconThemeFile");
+            String filename = Globals.prefs.get(JabRefPreferences.CUSTOM_ICON_THEME_FILE);
             if (filename != null) {
                 try {
                     File file = new File(filename);
@@ -384,7 +384,7 @@ public class GUIGlobals {
     public static String getLocaleHelpPath()
     {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
-        String middle = prefs.get("language") + '/';
+        String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
         if (middle.equals("en/"))
          {
             middle = ""; // english in base help dir.
