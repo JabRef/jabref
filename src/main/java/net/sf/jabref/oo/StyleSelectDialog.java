@@ -15,6 +15,58 @@
 */
 package net.sf.jabref.oo;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.TableColumnModel;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BrowseAction;
+import net.sf.jabref.Globals;
+import net.sf.jabref.IdGenerator;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -23,28 +75,10 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.UnknownExternalFileType;
-import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.*;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * This class produces a dialog box for choosing a style file.
@@ -56,7 +90,7 @@ class StyleSelectDialog {
     private EventList<OOBibStyle> styles;
     private JDialog diag;
     private JTable table;
-    private final UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
+    private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private EventTableModel<OOBibStyle> tableModel;
     private EventSelectionModel<OOBibStyle> selectionModel;
     private final JPopupMenu popup = new JPopupMenu();

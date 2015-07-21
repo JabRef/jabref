@@ -20,15 +20,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
-import net.sf.jabref.*;
+import net.sf.jabref.AuthorList;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.CheckBoxMessage;
+import net.sf.jabref.DuplicateCheck;
+import net.sf.jabref.DuplicateResolverDialog;
+import net.sf.jabref.EntryMarker;
+import net.sf.jabref.FieldComparator;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.GeneralRenderer;
+import net.sf.jabref.Globals;
+import net.sf.jabref.IdGenerator;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.groups.AbstractGroup;
@@ -41,11 +78,14 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
@@ -53,9 +93,6 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.util.Util;
 
 /**
  * Dialog to allow the selection of entries as part of an Import.
@@ -101,7 +138,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final MetaData metaData;
 
-    private final UIFSplitPane contentPane = new UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
+    private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
     private final JTable glTable;
 

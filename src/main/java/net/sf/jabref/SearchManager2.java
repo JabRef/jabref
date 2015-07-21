@@ -302,7 +302,7 @@ public class SearchManager2 extends SidePaneComponent
         main.add(pan);
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        setContent(main);
+        setContentContainer(main);
 
         searchField.getInputMap().put(Globals.prefs.getKey("Repeat incremental search"),
                 "repeat");
