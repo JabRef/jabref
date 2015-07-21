@@ -363,4 +363,8 @@ public class StringUtil {
         }
         return s;
     }
+
+    public static String booleanToBinaryString(boolean expression) {
+        return expression ? "1" : "0";
+    }
 }

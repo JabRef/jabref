@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.groups.structure;
 
 import java.util.regex.Pattern;
 
@@ -32,6 +32,7 @@ import net.sf.jabref.util.StringUtil;
 public class KeywordGroup extends AbstractGroup {
 
     public static final String ID = "KeywordGroup:";
+
     private final String searchField;
     private final String searchExpression;
     private final boolean caseSensitive;
@@ -42,8 +43,8 @@ public class KeywordGroup extends AbstractGroup {
      * Creates a KeywordGroup with the specified properties.
      */
     public KeywordGroup(String name, String searchField,
-            String searchExpression, boolean caseSensitive, boolean regExp,
-            int context) throws IllegalArgumentException {
+                        String searchExpression, boolean caseSensitive, boolean regExp,
+                        GroupHierarchyType context) throws IllegalArgumentException {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -61,13 +62,12 @@ public class KeywordGroup extends AbstractGroup {
 
     /**
      * Parses s and recreates the KeywordGroup from it.
-     * 
-     * @param s
-     *            The String representation obtained from
-     *            KeywordGroup.toString()
+     *
+     * @param s The String representation obtained from
+     *          KeywordGroup.toString()
      */
     public static AbstractGroup fromString(String s, BibtexDatabase db,
-            int version) throws Exception {
+                                           int version) throws Exception {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new Exception(
                     "Internal error: KeywordGroup cannot be created from \""
@@ -78,45 +78,45 @@ public class KeywordGroup extends AbstractGroup {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
         switch (version) {
-        case 0: {
-            String name = tok.nextToken();
-            String field = tok.nextToken();
-            String expression = tok.nextToken();
-            // assume caseSensitive=false and regExp=true for old groups
-            return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                    .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                    AbstractGroup.QUOTE_CHAR), false, true, AbstractGroup.INDEPENDENT);
-        }
-        case 1:
-        case 2: {
-            String name = tok.nextToken();
-            String field = tok.nextToken();
-            String expression = tok.nextToken();
-            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                    .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                    AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                    AbstractGroup.INDEPENDENT);
-        }
-        case 3: {
-            String name = tok.nextToken();
-            int context = Integer.parseInt(tok.nextToken());
-            String field = tok.nextToken();
-            String expression = tok.nextToken();
-            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                    .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                    AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, context);
-        }
-        default:
-            throw new UnsupportedVersionException("KeywordGroup", version);
+            case 0: {
+                String name = tok.nextToken();
+                String field = tok.nextToken();
+                String expression = tok.nextToken();
+                // assume caseSensitive=false and regExp=true for old groups
+                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
+                        AbstractGroup.QUOTE_CHAR), false, true, GroupHierarchyType.INDEPENDENT);
+            }
+            case 1:
+            case 2: {
+                String name = tok.nextToken();
+                String field = tok.nextToken();
+                String expression = tok.nextToken();
+                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
+                        AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                        GroupHierarchyType.INDEPENDENT);
+            }
+            case 3: {
+                String name = tok.nextToken();
+                int context = Integer.parseInt(tok.nextToken());
+                String field = tok.nextToken();
+                String expression = tok.nextToken();
+                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
+                        AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, GroupHierarchyType.getByNumber(context));
+            }
+            default:
+                throw new UnsupportedVersionException("KeywordGroup", version);
         }
     }
 
     /**
-     * @see net.sf.jabref.groups.AbstractGroup#getSearchRule()
+     * @see AbstractGroup#getSearchRule()
      */
     @Override
     public SearchRule getSearchRule() {
@@ -143,8 +143,8 @@ public class KeywordGroup extends AbstractGroup {
                 + context + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + (caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
-                + (regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
+                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
     }
 
     @Override
@@ -208,8 +208,8 @@ public class KeywordGroup extends AbstractGroup {
                     // Store undo information.
                     ce.addEdit(new UndoableFieldChange(entry,
                             searchField, oldContent, entry
-                                    .getField(searchField)
-                            ));
+                            .getField(searchField)
+                    ));
                     modified = true;
                 }
             }
@@ -240,7 +240,7 @@ public class KeywordGroup extends AbstractGroup {
     /*
      * (non-Javadoc)
      * 
-     * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
+     * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
     @Override
@@ -266,6 +266,7 @@ public class KeywordGroup extends AbstractGroup {
     /**
      * Look for the given non-regexp string in another string, but check whether a
      * match concerns a complete word, not part of a word.
+     *
      * @param word The word to look for.
      * @param text The string to look in.
      * @return true if the word was found, false otherwise.
@@ -273,16 +274,17 @@ public class KeywordGroup extends AbstractGroup {
     private static boolean containsWord(String word, String text) {
         int piv = 0;
         while (piv < text.length()) {
-            int ind = text.indexOf(word, piv);
-            if (ind < 0) {
+            int index = text.indexOf(word, piv);
+            if (index < 0) {
                 return false;
             }
             // Found a match. See if it is a complete word:
-            if (((ind == 0) || !Character.isLetterOrDigit(text.charAt(ind - 1))) &&
-                    (((ind + word.length()) == text.length()) || !Character.isLetterOrDigit(text.charAt(ind + word.length())))) {
+            if ((index == 0 || !Character.isLetterOrDigit(text.charAt(index - 1))) &&
+                    (((index + word.length()) == text.length())
+                            || !Character.isLetterOrDigit(text.charAt(index + word.length())))) {
                 return true;
             } else {
-                piv = ind + 1;
+                piv = index + 1;
             }
         }
         return false;
@@ -362,31 +364,32 @@ public class KeywordGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return KeywordGroup.getDescriptionForPreview(searchField, searchExpression, caseSensitive,
-                regExp);
+        return KeywordGroup.getDescriptionForPreview(searchField, searchExpression, caseSensitive, regExp);
     }
 
-    public static String getDescriptionForPreview(String field, String expr,
-            boolean caseSensitive, boolean regExp) {
-        return (regExp ? Globals.lang(
+    public static String getDescriptionForPreview(String field, String expr, boolean caseSensitive, boolean regExp) {
+        String header = regExp ? Globals.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
                 field, StringUtil.quoteForHTML(expr))
                 : Globals.lang(
-                        "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
-                        field, StringUtil.quoteForHTML(expr))) + " (" + (caseSensitive ? Globals.lang("case sensitive")
-                : Globals.lang("case insensitive")) + "). " + (regExp ?
+                "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
+                field, StringUtil.quoteForHTML(expr));
+        String caseSensitiveText = caseSensitive ? Globals.lang("case sensitive") : Globals.lang("case insensitive");
+        String footer = regExp ?
                 Globals.lang("Entries cannot be manually assigned to or removed from this group.")
                 : Globals.lang(
-                        "Additionally, entries whose <b>%0</b> field does not contain "
-                                + "<b>%1</b> can be assigned manually to this group by selecting them "
-                                + "then using either drag and drop or the context menu. "
-                                + "This process adds the term <b>%1</b> to "
-                                + "each entry's <b>%0</b> field. "
-                                + "Entries can be removed manually from this group by selecting them "
-                                + "then using the context menu. "
-                                + "This process removes the term <b>%1</b> from "
-                                + "each entry's <b>%0</b> field.",
-                        field, StringUtil.quoteForHTML(expr)));
+                "Additionally, entries whose <b>%0</b> field does not contain "
+                        + "<b>%1</b> can be assigned manually to this group by selecting them "
+                        + "then using either drag and drop or the context menu. "
+                        + "This process adds the term <b>%1</b> to "
+                        + "each entry's <b>%0</b> field. "
+                        + "Entries can be removed manually from this group by selecting them "
+                        + "then using the context menu. "
+                        + "This process removes the term <b>%1</b> from "
+                        + "each entry's <b>%0</b> field.",
+                field, StringUtil.quoteForHTML(expr));
+
+        return String.format("%s (%s). %s", header, caseSensitiveText, footer);
     }
 
     @Override
@@ -408,14 +411,14 @@ public class KeywordGroup extends AbstractGroup {
         sb.append(StringUtil.quoteForHTML(searchExpression));
         sb.append("</b>)");
         switch (getHierarchicalContext()) {
-        case AbstractGroup.INCLUDING:
-            sb.append(", ").append(Globals.lang("includes subgroups"));
-            break;
-        case AbstractGroup.REFINING:
-            sb.append(", ").append(Globals.lang("refines supergroup"));
-            break;
-        default:
-            break;
+            case INCLUDING:
+                sb.append(", ").append(Globals.lang("includes subgroups"));
+                break;
+            case REFINING:
+                sb.append(", ").append(Globals.lang("refines supergroup"));
+                break;
+            default:
+                break;
         }
         return sb.toString();
     }

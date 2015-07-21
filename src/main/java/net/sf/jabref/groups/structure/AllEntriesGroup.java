@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -23,15 +23,14 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.search.SearchRule;
 
 /**
- * This group contains all entries.
+ * This group contains all entries. Always. At any time!
  */
 public class AllEntriesGroup extends AbstractGroup {
 
     public static final String ID = "AllEntriesGroup:";
 
-
     public AllEntriesGroup() {
-        super(Globals.lang("All Entries"), AbstractGroup.INDEPENDENT);
+        super(Globals.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
     }
 
     public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
@@ -122,8 +121,7 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return "This group contains all entries. It cannot be edited or removed.";
-        // JZTODO lyrics
+        return Globals.lang("This group contains all entries. It cannot be edited or removed.");
     }
 
     @Override

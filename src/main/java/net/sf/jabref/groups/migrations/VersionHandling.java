@@ -13,12 +13,17 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.groups.migrations;
 
 import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.util.StringUtil;
 
 /**
@@ -48,7 +53,7 @@ public class VersionHandling {
             name = groups.get((3 * i) + 1);
             regexp = groups.get((3 * i) + 2);
             root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
-                    false, true, AbstractGroup.INDEPENDENT)));
+                    false, true, GroupHierarchyType.INDEPENDENT)));
         }
         return root;
     }

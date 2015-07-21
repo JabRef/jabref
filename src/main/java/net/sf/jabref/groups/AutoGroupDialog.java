@@ -31,6 +31,9 @@ import javax.swing.event.CaretListener;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.groups.structure.ExplicitGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.undo.NamedCompound;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -90,7 +93,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
                         new ExplicitGroup(Globals.lang("Automatically created groups"),
-                                AbstractGroup.INCLUDING));
+                                GroupHierarchyType.INCLUDING));
                 Set<String> hs = null;
                 String field = field();
                 if (keywords.isSelected()) {
@@ -120,7 +123,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 for (String keyword : hs) {
                     KeywordGroup group = new KeywordGroup(keyword, field,
-                            keyword, false, false, AbstractGroup.INDEPENDENT);
+                            keyword, false, false, GroupHierarchyType.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
 

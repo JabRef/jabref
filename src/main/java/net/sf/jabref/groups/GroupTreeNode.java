@@ -28,6 +28,9 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.search.rules.sets.SearchRuleSet;
@@ -179,21 +182,21 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         return getSearchRule(getGroup().getHierarchicalContext());
     }
 
-    private SearchRule getSearchRule(int originalContext) {
-        final int context = getGroup().getHierarchicalContext();
-        if (context == AbstractGroup.INDEPENDENT) {
+    private SearchRule getSearchRule(GroupHierarchyType originalContext) {
+        final GroupHierarchyType context = getGroup().getHierarchicalContext();
+        if (context == GroupHierarchyType.INDEPENDENT) {
             return getGroup().getSearchRule();
         }
-        SearchRuleSet searchRule = SearchRuleSets.build(context == AbstractGroup.REFINING ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
+        SearchRuleSet searchRule = SearchRuleSets.build(context == GroupHierarchyType.REFINING ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
         searchRule.addRule(getGroup().getSearchRule());
-        if ((context == AbstractGroup.INCLUDING)
-                && (originalContext != AbstractGroup.REFINING)) {
+        if ((context == GroupHierarchyType.INCLUDING)
+                && (originalContext != GroupHierarchyType.REFINING)) {
             for (int i = 0; i < getChildCount(); ++i) {
                 searchRule.addRule(((GroupTreeNode) getChildAt(i))
                         .getSearchRule(originalContext));
             }
-        } else if ((context == AbstractGroup.REFINING) && !isRoot()
-                && (originalContext != AbstractGroup.INCLUDING)) {
+        } else if ((context == GroupHierarchyType.REFINING) && !isRoot()
+                && (originalContext != GroupHierarchyType.INCLUDING)) {
             searchRule.addRule(((GroupTreeNode) getParent())
                     .getSearchRule(originalContext));
         }

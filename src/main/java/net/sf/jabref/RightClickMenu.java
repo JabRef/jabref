@@ -25,6 +25,9 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.groups.*;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -532,10 +535,10 @@ public class RightClickMenu extends JPopupMenu
         }
         if (Globals.prefs.getBoolean("groupShowIcons")) {
             switch (group.getHierarchicalContext()) {
-            case AbstractGroup.INCLUDING:
+            case INCLUDING:
                 menuItem.setIcon(GUIGlobals.getImage("groupIncluding"));
                 break;
-            case AbstractGroup.REFINING:
+            case REFINING:
                 menuItem.setIcon(GUIGlobals.getImage("groupRefining"));
                 break;
             default:

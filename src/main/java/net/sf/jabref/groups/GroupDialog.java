@@ -40,6 +40,7 @@ import net.sf.jabref.FieldContentSelector;
 import net.sf.jabref.FieldTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.search.SearchExpressionDescriber;
 import net.sf.jabref.search.SearchExpressionParser;
 import net.sf.jabref.util.StringUtil;
@@ -385,7 +386,7 @@ class GroupDialog extends JDialog {
             setContext(editedGroup.getHierarchicalContext());
         } else { // creating new group -> defaults!
             m_explicitRadioButton.setSelected(true);
-            setContext(AbstractGroup.INDEPENDENT);
+            setContext(GroupHierarchyType.INDEPENDENT);
         }
     }
 
@@ -561,29 +562,25 @@ class GroupDialog extends JDialog {
     /**
      * Returns the int representing the selected hierarchical group context.
      */
-    private int getContext() {
+    private GroupHierarchyType getContext() {
         if (m_independentButton.isSelected()) {
-            return AbstractGroup.INDEPENDENT;
+            return GroupHierarchyType.INDEPENDENT;
         }
         if (m_intersectionButton.isSelected()) {
-            return AbstractGroup.REFINING;
+            return GroupHierarchyType.REFINING;
         }
         if (m_unionButton.isSelected()) {
-            return AbstractGroup.INCLUDING;
+            return GroupHierarchyType.INCLUDING;
         }
-        return AbstractGroup.INDEPENDENT; // default
+        return GroupHierarchyType.INDEPENDENT; // default
     }
 
-    private void setContext(int context) {
-        switch (context) {
-        case AbstractGroup.REFINING:
+    private void setContext(GroupHierarchyType context) {
+        if (context == GroupHierarchyType.REFINING) {
             m_intersectionButton.setSelected(true);
-            return;
-        case AbstractGroup.INCLUDING:
+        } else if (context == GroupHierarchyType.INCLUDING) {
             m_unionButton.setSelected(true);
-            return;
-        case AbstractGroup.INDEPENDENT:
-        default:
+        } else {
             m_independentButton.setSelected(true);
         }
     }

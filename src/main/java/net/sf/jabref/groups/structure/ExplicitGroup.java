@@ -13,35 +13,34 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.groups.structure;
 
 import java.util.*;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.util.QuotedStringTokenizer;
 import net.sf.jabref.util.StringUtil;
 
 /**
- * @author jzieren
+ * Select explicit bibtex entries. It is also known as static group.
  *
+ * @author jzieren
  */
 public class ExplicitGroup extends AbstractGroup {
 
     public static final String ID = "ExplicitGroup:";
 
-    private final Set<BibtexEntry> entries;
+    private final Set<BibtexEntry> entries = new HashSet<BibtexEntry>();
 
-
-    public ExplicitGroup(String name, int context) {
+    public ExplicitGroup(String name, GroupHierarchyType context) {
         super(name, context);
-        entries = new HashSet<BibtexEntry>();
     }
 
-    public static AbstractGroup fromString(String s, BibtexDatabase db,
-            int version) throws Exception {
+    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
@@ -52,32 +51,33 @@ public class ExplicitGroup extends AbstractGroup {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
         switch (version) {
-        case 0:
-        case 1:
-        case 2: {
-            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(),
-                    AbstractGroup.INDEPENDENT);
-            newGroup.addEntries(tok, db);
-            return newGroup;
-        }
-        case 3: {
-            String name = tok.nextToken();
-            int context = Integer.parseInt(tok.nextToken());
-            ExplicitGroup newGroup = new ExplicitGroup(name, context);
-            newGroup.addEntries(tok, db);
-            return newGroup;
-        }
-        default:
-            throw new UnsupportedVersionException("ExplicitGroup", version);
+            case 0:
+            case 1:
+            case 2: {
+                ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(),
+                        GroupHierarchyType.INDEPENDENT);
+                newGroup.addEntries(tok, db);
+                return newGroup;
+            }
+            case 3: {
+                String name = tok.nextToken();
+                int context = Integer.parseInt(tok.nextToken());
+                ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
+                newGroup.addEntries(tok, db);
+                return newGroup;
+            }
+            default:
+                throw new UnsupportedVersionException("ExplicitGroup", version);
         }
     }
 
-    /** Called only when created fromString */
+    /**
+     * Called only when created fromString
+     */
     private void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
         BibtexEntry[] entries;
         while (tok.hasMoreTokens()) {
-            entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(),
-                    AbstractGroup.QUOTE_CHAR));
+            entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
             Collections.addAll(this.entries, entries);
         }
     }
@@ -109,8 +109,7 @@ public class ExplicitGroup extends AbstractGroup {
 
     @Override
     public AbstractUndoableEdit add(BibtexEntry[] entries) {
-        if (entries.length == 0)
-         {
+        if (entries.length == 0) {
             return null; // nothing to do
         }
 
@@ -166,8 +165,7 @@ public class ExplicitGroup extends AbstractGroup {
         }
         ExplicitGroup other = (ExplicitGroup) o;
         // compare entries assigned to both groups
-        if (entries.size() != other.entries.size())
-         {
+        if (entries.size() != other.entries.size()) {
             return false; // add/remove
         }
         HashSet<String> keys = new HashSet<String>();
@@ -222,7 +220,9 @@ public class ExplicitGroup extends AbstractGroup {
         return sb.toString();
     }
 
-    /** Remove all assignments, resulting in an empty group. */
+    /**
+     * Remove all assignments, resulting in an empty group.
+     */
     public void clearAssignments() {
         entries.clear();
     }
@@ -252,14 +252,14 @@ public class ExplicitGroup extends AbstractGroup {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>").append(getName()).append("</b> -").append(Globals.lang("static group"));
         switch (getHierarchicalContext()) {
-        case AbstractGroup.INCLUDING:
-            sb.append(", ").append(Globals.lang("includes subgroups"));
-            break;
-        case AbstractGroup.REFINING:
-            sb.append(", ").append(Globals.lang("refines supergroup"));
-            break;
-        default:
-            break;
+            case INCLUDING:
+                sb.append(", ").append(Globals.lang("includes subgroups"));
+                break;
+            case REFINING:
+                sb.append(", ").append(Globals.lang("refines supergroup"));
+                break;
+            default:
+                break;
         }
         return sb.toString();
     }

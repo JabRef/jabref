@@ -68,6 +68,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.search.rules.InvertSearchRule;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.SidePaneComponent;
@@ -767,7 +769,8 @@ public class GroupSelector extends SidePaneComponent implements
         TreePath[] selection = groupsTree.getSelectionPaths();
 
         for (TreePath aSelection : selection) {
-            searchRules.addRule(((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule());
+            SearchRule searchRule = ((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule();
+            searchRules.addRule(searchRule);
         }
         SearchRule searchRule = invCb.isSelected() ? new InvertSearchRule(searchRules) : searchRules;
         GroupingWorker worker = new GroupingWorker(searchRule, SearchRule.DUMMY_QUERY);

@@ -37,6 +37,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.util.Util;
 
 public class GroupsTree extends JTree implements DragSourceListener,

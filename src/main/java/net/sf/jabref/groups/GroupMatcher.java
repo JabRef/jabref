@@ -26,7 +26,6 @@ public class GroupMatcher implements Matcher<BibtexEntry> {
 
     public static final GroupMatcher INSTANCE = new GroupMatcher();
 
-
     @Override
     public boolean matches(BibtexEntry entry) {
         return entry.isGroupHit();

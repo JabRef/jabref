@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -27,6 +27,8 @@ import net.sf.jabref.util.QuotedStringTokenizer;
 import net.sf.jabref.util.StringUtil;
 
 /**
+ * Internally, it consists of a search pattern.
+ *
  * @author jzieren
  */
 public class SearchGroup extends AbstractGroup {
@@ -34,9 +36,7 @@ public class SearchGroup extends AbstractGroup {
     public static final String ID = "SearchGroup:";
 
     private final String searchExpression;
-
     private final boolean caseSensitive;
-
     private final boolean regExp;
 
     /**
@@ -51,8 +51,7 @@ public class SearchGroup extends AbstractGroup {
     /**
      * Creates a SearchGroup with the specified properties.
      */
-    public SearchGroup(String name, String searchExpression,
-                       boolean caseSensitive, boolean regExp, int context) {
+    public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp, GroupHierarchyType context) {
         super(name, context);
         this.searchExpression = searchExpression;
         this.caseSensitive = caseSensitive;
@@ -60,7 +59,7 @@ public class SearchGroup extends AbstractGroup {
 
         expressionSearchRule = new SearchExpression(caseSensitive, regExp);
         if (expressionSearchRule.validateSearchStrings(this.searchExpression)) {
-            searchRule = getSearchRule();  // do advanced search
+            searchRule = expressionSearchRule;  // do advanced search
         } else if (this.regExp) {
             searchRule = new RegExpSearchRule(this.caseSensitive);
         } else {
@@ -96,7 +95,7 @@ public class SearchGroup extends AbstractGroup {
                 // fields; these are ignored now, all fields are always searched
                 return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
                         .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                        AbstractGroup.INDEPENDENT);
+                        GroupHierarchyType.INDEPENDENT);
             }
             case 3: {
                 String name = tok.nextToken();
@@ -108,7 +107,7 @@ public class SearchGroup extends AbstractGroup {
                 // fields; these are ignored now, all fields are always searched
                 return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
                         .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                        context);
+                        GroupHierarchyType.getByNumber(context));
             }
             default:
                 throw new UnsupportedVersionException("SearchGroup", version);
@@ -121,7 +120,7 @@ public class SearchGroup extends AbstractGroup {
     }
 
     /**
-     * @see net.sf.jabref.groups.AbstractGroup#getSearchRule()
+     * @see AbstractGroup#getSearchRule()
      */
     @Override
     public SearchRule getSearchRule() {
@@ -137,8 +136,8 @@ public class SearchGroup extends AbstractGroup {
         return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + context + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + (caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
-                + (regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
+                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
     }
 
     public String getSearchExpression() {
@@ -183,7 +182,7 @@ public class SearchGroup extends AbstractGroup {
     /*
      * (non-Javadoc)
      * 
-     * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
+     * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
     @Override
@@ -246,10 +245,10 @@ public class SearchGroup extends AbstractGroup {
         sb.append(" <b>").
                 append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
         switch (getHierarchicalContext()) {
-            case AbstractGroup.INCLUDING:
+            case INCLUDING:
                 sb.append(", ").append(Globals.lang("includes subgroups"));
                 break;
-            case AbstractGroup.REFINING:
+            case REFINING:
                 sb.append(", ").append(Globals.lang("refines supergroup"));
                 break;
             default:
