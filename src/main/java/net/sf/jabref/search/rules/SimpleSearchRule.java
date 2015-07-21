@@ -33,7 +33,7 @@ import net.sf.jabref.search.SearchRule;
 //TODO why have simple and basic search rule????
 public class SimpleSearchRule implements SearchRule {
 
-    private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    private static final RemoveLatexCommands REMOVE_LATEX_COMMANDS = new RemoveLatexCommands();
 
     private final boolean caseSensitive;
 
@@ -59,7 +59,7 @@ public class SimpleSearchRule implements SearchRule {
             Object fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
                 try {
-                    String fieldContent = SimpleSearchRule.removeBrackets.format(fieldContentAsObject.toString());
+                    String fieldContent = SimpleSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
                     if (!caseSensitive) {
                         fieldContent = fieldContent.toLowerCase();
                     }

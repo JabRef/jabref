@@ -158,7 +158,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     Globals.lang("add entries to group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
-                if (applyRule(null, entry) == 0) {
+                if (applyRule(SearchRule.NULL_QUERY, entry) == 0) {
                     String oldContent = entry
                             .getField(searchField), pre = Globals.prefs.get("groupKeywordSeparator");
                     String newContent = (oldContent == null ? "" : oldContent
@@ -192,7 +192,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
-                if (applyRule(null, entry) > 0) {
+                if (applyRule(NULL_QUERY, entry) > 0) {
                     String oldContent = entry
                             .getField(searchField);
                     removeMatches(entry);

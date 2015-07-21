@@ -30,6 +30,15 @@ import net.sf.jabref.BibtexEntry;
 
 public interface SearchRule {
 
+    /*
+     * Because some rules require the query in the constructor,
+     * the parameter query is not always used as expected.
+     * The two constants provide means to mark this as dummy.
+     * As I am not sure whether null could be substituted by "dummy" I leave everything as is.
+     */
+    String DUMMY_QUERY = "dummy";
+    String NULL_QUERY = null;
+
     int applyRule(String query, BibtexEntry bibtexEntry);
 
     boolean validateSearchStrings(String query);

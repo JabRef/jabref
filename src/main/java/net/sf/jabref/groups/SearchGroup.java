@@ -220,7 +220,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public boolean contains(BibtexEntry entry) {
-        return contains("dummy", entry);
+        return contains(SearchRule.DUMMY_QUERY, entry);
     }
 
     @Override

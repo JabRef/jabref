@@ -776,7 +776,7 @@ public class GroupSelector extends SidePaneComponent implements
             searchRules.addRule(((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule());
         }
         SearchRule searchRule = invCb.isSelected() ? new InvertSearchRule(searchRules) : searchRules;
-        GroupingWorker worker = new GroupingWorker(searchRule, "dummy");
+        GroupingWorker worker = new GroupingWorker(searchRule, SearchRule.DUMMY_QUERY);
         worker.getWorker().run();
         worker.getCallBack().update();
         /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
@@ -1572,7 +1572,7 @@ public class GroupSelector extends SidePaneComponent implements
             rule = node.getSearchRule();
             for (BibtexEntry matche : matches) {
                 entry = matche;
-                if (rule.applyRule("dummy", entry) == 0) {
+                if (rule.applyRule(SearchRule.DUMMY_QUERY, entry) == 0) {
                     continue;
                 }
                 vec.add(node);
