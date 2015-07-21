@@ -71,9 +71,9 @@ configurations {
 dependencies {
 
     // jgoodies
-    compile 'com.jgoodies:jgoodies-common:1.4.0'
-    compile 'com.jgoodies:jgoodies-forms:1.6.0'
-    compile 'com.jgoodies:jgoodies-looks:2.5.2'
+    compile 'com.jgoodies:jgoodies-common:1.7.0'
+    compile 'com.jgoodies:jgoodies-forms:1.7.2'
+    compile 'com.jgoodies:jgoodies-looks:2.5.3'
     
     compile 'org.swinglabs:swingx:1.6.1'
 
