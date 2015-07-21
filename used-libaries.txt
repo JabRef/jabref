@@ -64,7 +64,7 @@ Note:    This should fetch org.jvnet.mimepull:mimepull; maybe that version is br
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
-License: GPLv2! and Oracle�s FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
+License: GPLv2! and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
 
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
