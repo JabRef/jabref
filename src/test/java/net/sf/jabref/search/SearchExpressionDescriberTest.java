@@ -76,7 +76,9 @@ public class SearchExpressionDescriberTest {
     }
 
     private void evaluate(String query, boolean caseSensitive, boolean regex, String expected) throws IOException, TokenStreamException, antlr.RecognitionException {
-        AST ast = new SearchExpression(caseSensitive, regex, query).getAst();
+        SearchExpression searchExpression = new SearchExpression(caseSensitive, regex);
+        searchExpression.validateSearchStrings(query);
+        AST ast = searchExpression.getAst();
         SearchExpressionDescriber describer = new SearchExpressionDescriber(caseSensitive, regex, query, ast);
         assertEquals(expected, describer.getDescriptionForPreview());
     }

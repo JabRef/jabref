@@ -29,7 +29,7 @@ import net.sf.jabref.util.StringUtil;
 /**
  * @author jzieren
  */
-public class KeywordGroup extends AbstractGroup implements SearchRule {
+public class KeywordGroup extends AbstractGroup {
 
     public static final String ID = "KeywordGroup:";
     private final String searchField;
@@ -37,7 +37,6 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     private final boolean caseSensitive;
     private final boolean regExp;
     private Pattern pattern = null;
-
 
     /**
      * Creates a KeywordGroup with the specified properties.
@@ -121,7 +120,17 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public SearchRule getSearchRule() {
-        return this;
+        return new SearchRule() {
+            @Override
+            public int applyRule(String query, BibtexEntry bibtexEntry) {
+                return contains(query, bibtexEntry) ? 1 : 0;
+            }
+
+            @Override
+            public boolean validateSearchStrings(String query) {
+                return true;
+            }
+        };
     }
 
     /**
@@ -130,8 +139,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + m_context + AbstractGroup.SEPARATOR
+        return KeywordGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + context + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + (caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
@@ -158,7 +167,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     Globals.lang("add entries to group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
-                if (applyRule(SearchRule.NULL_QUERY, entry) == 0) {
+                if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry) == 0) {
                     String oldContent = entry
                             .getField(searchField), pre = Globals.prefs.get("groupKeywordSeparator");
                     String newContent = (oldContent == null ? "" : oldContent
@@ -192,7 +201,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
-                if (applyRule(NULL_QUERY, entry) > 0) {
+                if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry) > 0) {
                     String oldContent = entry
                             .getField(searchField);
                     removeMatches(entry);
@@ -220,7 +229,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             return false;
         }
         KeywordGroup other = (KeywordGroup) o;
-        return m_name.equals(other.m_name)
+        return name.equals(other.name)
                 && searchField.equals(other.searchField)
                 && searchExpression.equals(other.searchExpression)
                 && (caseSensitive == other.caseSensitive)
@@ -285,8 +294,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      */
     private void removeMatches(BibtexEntry entry) {
         String content = entry.getField(searchField);
-        if (content == null)
-         {
+        if (content == null) {
             return; // nothing to modify
         }
         StringBuffer sbOrig = new StringBuffer(content);
@@ -317,20 +325,10 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public int applyRule(String searchOptions, BibtexEntry entry) {
-        return contains(searchOptions, entry) ? 1 : 0;
-    }
-
-    @Override
-    public boolean validateSearchStrings(String query) {
-        return true;
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
         try {
-            return new KeywordGroup(m_name, searchField, searchExpression,
-                    caseSensitive, regExp, m_context);
+            return new KeywordGroup(name, searchField, searchExpression,
+                    caseSensitive, regExp, context);
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!

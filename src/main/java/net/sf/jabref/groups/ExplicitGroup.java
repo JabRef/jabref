@@ -28,7 +28,7 @@ import net.sf.jabref.util.StringUtil;
  * @author jzieren
  *
  */
-public class ExplicitGroup extends AbstractGroup implements SearchRule {
+public class ExplicitGroup extends AbstractGroup {
 
     public static final String ID = "ExplicitGroup:";
 
@@ -84,7 +84,17 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public SearchRule getSearchRule() {
-        return this;
+        return new SearchRule() {
+            @Override
+            public int applyRule(String query, BibtexEntry bibtexEntry) {
+                return contains(query, bibtexEntry) ? 1 : 0;
+            }
+
+            @Override
+            public boolean validateSearchStrings(String query) {
+                return true;
+            }
+        };
     }
 
     @Override
@@ -116,8 +126,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public AbstractUndoableEdit remove(BibtexEntry[] entries) {
-        if (entries.length == 0)
-         {
+        if (entries.length == 0) {
             return null; // nothing to do
         }
 
@@ -144,18 +153,8 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        return contains(query, bibtexEntry) ? 1 : 0;
-    }
-
-    @Override
-    public boolean validateSearchStrings(String query) {
-        return true;
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
-        ExplicitGroup copy = new ExplicitGroup(m_name, m_context);
+        ExplicitGroup copy = new ExplicitGroup(name, context);
         copy.entries.addAll(entries);
         return copy;
     }
@@ -194,7 +193,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         if (!keys.isEmpty()) {
             return false;
         }
-        return other.m_name.equals(m_name)
+        return other.name.equals(name)
                 && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
@@ -207,7 +206,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ExplicitGroup.ID).append(StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(m_context).append(AbstractGroup.SEPARATOR);
+        sb.append(ExplicitGroup.ID).append(StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(context).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<String>();

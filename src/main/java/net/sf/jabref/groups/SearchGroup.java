@@ -15,27 +15,21 @@
 */
 package net.sf.jabref.groups;
 
-import java.io.StringReader;
-
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.search.*;
 import net.sf.jabref.search.rules.RegExpSearchRule;
 import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.SearchExpression;
 import net.sf.jabref.search.rules.SimpleSearchRule;
 import net.sf.jabref.util.QuotedStringTokenizer;
-import antlr.RecognitionException;
-import antlr.collections.AST;
 import net.sf.jabref.util.StringUtil;
 
 /**
  * @author jzieren
- *         <p>
- *         TODO To change the template for this generated type comment go to Window -
- *         Preferences - Java - Code Style - Code Templates
  */
-public class SearchGroup extends AbstractGroup implements SearchRule {
+public class SearchGroup extends AbstractGroup {
 
     public static final String ID = "SearchGroup:";
 
@@ -45,16 +39,13 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 
     private final boolean regExp;
 
-    private final AST ast;
-
-    private static final SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
-
     /**
      * If searchExpression is in valid syntax for advanced search, <b>this
      * </b> will do the search; otherwise, either <b>RegExpSearchRule </b> or
      * <b>SimpleSearchRule </b> will be used.
      */
     private final SearchRule searchRule;
+    private final SearchExpression expressionSearchRule;
 
 
     /**
@@ -67,32 +58,14 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         this.caseSensitive = caseSensitive;
         this.regExp = regExp;
 
-        // create AST
-        AST ast;
-        try {
-            SearchExpressionParser parser = new SearchExpressionParser(
-                    new SearchExpressionLexer(new StringReader(
-                            this.searchExpression)));
-            parser.caseSensitive = this.caseSensitive;
-            parser.regex = this.regExp;
-            parser.searchExpression();
-            ast = parser.getAST();
-        } catch (Exception e) {
-            ast = null;
-            // nothing to do; set ast to null -> regular plaintext search
+        expressionSearchRule = new SearchExpression(caseSensitive, regExp);
+        if (expressionSearchRule.validateSearchStrings(this.searchExpression)) {
+            searchRule = getSearchRule();  // do advanced search
+        } else if (this.regExp) {
+            searchRule = new RegExpSearchRule(this.caseSensitive);
+        } else {
+            searchRule = new SimpleSearchRule(this.caseSensitive);
         }
-        this.ast = ast;
-
-        if (this.ast != null) { // do advanced search
-            searchRule = this;
-        } else { // do plaintext search
-            if (this.regExp) {
-                searchRule = new RegExpSearchRule(this.caseSensitive);
-            } else {
-                searchRule = new SimpleSearchRule(this.caseSensitive);
-            }
-        }
-
     }
 
     /**
@@ -152,7 +125,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public SearchRule getSearchRule() {
-        return this;
+        return this.searchRule;
     }
 
     /**
@@ -161,8 +134,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public String toString() {
-        return SearchGroup.ID + StringUtil.quote(m_name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + m_context + AbstractGroup.SEPARATOR
+        return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + context + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + (caseSensitive ? "1" : "0") + AbstractGroup.SEPARATOR
                 + (regExp ? "1" : "0") + AbstractGroup.SEPARATOR;
@@ -200,7 +173,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             return false;
         }
         SearchGroup other = (SearchGroup) o;
-        return m_name.equals(other.m_name)
+        return name.equals(other.name)
                 && searchExpression.equals(other.searchExpression)
                 && (caseSensitive == other.caseSensitive)
                 && (regExp == other.regExp)
@@ -215,7 +188,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      */
     @Override
     public boolean contains(String searchOptions, BibtexEntry entry) {
-        return applyRule(searchOptions, entry) != 0;
+        return getSearchRule().applyRule(searchOptions, entry) != 0;
     }
 
     @Override
@@ -224,24 +197,10 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public int applyRule(String searchOptions, BibtexEntry entry) {
-        if (ast == null) {
-            // the searchOptions object is a dummy; we need to insert
-            // the actual search expression.
-            return searchRule.applyRule(searchExpression, entry);
-        }
-        try {
-            return SearchGroup.treeParser.apply(ast, entry);
-        } catch (RecognitionException e) {
-            return 0; // this should never occur
-        }
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(m_name, searchExpression, caseSensitive,
-                    regExp, m_context);
+            return new SearchGroup(name, searchExpression, caseSensitive,
+                    regExp, context);
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -268,7 +227,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
     @Override
     public String getDescription() {
         return new SearchExpressionDescriber(caseSensitive,
-                regExp, searchExpression, ast).getDescriptionForPreview();
+                regExp, searchExpression, expressionSearchRule.getAst()).getDescriptionForPreview();
     }
 
     @Override
@@ -299,8 +258,4 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         return sb.toString();
     }
 
-    @Override
-    public boolean validateSearchStrings(String query) {
-        return true;
-    }
 }

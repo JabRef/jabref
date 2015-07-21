@@ -25,7 +25,7 @@ import net.sf.jabref.search.SearchRule;
 /**
  * This group contains all entries.
  */
-public class AllEntriesGroup extends AbstractGroup implements SearchRule {
+public class AllEntriesGroup extends AbstractGroup {
 
     public static final String ID = "AllEntriesGroup:";
 
@@ -54,7 +54,17 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public SearchRule getSearchRule() {
-        return this;
+        return new SearchRule() {
+            @Override
+            public int applyRule(String query, BibtexEntry bibtexEntry) {
+                return 1; // contains everything
+            }
+
+            @Override
+            public boolean validateSearchStrings(String query) {
+                return true;
+            }
+        };
     }
 
     @Override
@@ -87,16 +97,6 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     @Override
     public AbstractGroup deepCopy() {
         return new AllEntriesGroup();
-    }
-
-    @Override
-    public boolean validateSearchStrings(String query) {
-        return true;
-    }
-
-    @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        return 1; // contains everything
     }
 
     @Override

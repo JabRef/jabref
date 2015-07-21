@@ -539,7 +539,8 @@ public class SearchManager2 extends SidePaneComponent
             try {
                 // this searches specified fields if specified,
                 // and all fields otherwise
-                searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchField.getText());
+                searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"),
+                        Globals.prefs.getBoolean("regExpSearch"));
             } catch (Exception ex) {
                 // we'll do a search in all fields
             }

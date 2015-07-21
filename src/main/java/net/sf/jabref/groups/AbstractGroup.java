@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.groups;
 
-import java.util.Map;
-
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
@@ -29,20 +27,20 @@ import net.sf.jabref.search.SearchRule;
 public abstract class AbstractGroup {
 
     /** The group's name (every type of group has one). */
-    String m_name;
+    String name;
 
     /**
      * The hierarchical context of the group (INDEPENDENT, REFINING, or
      * INCLUDING). Defaults to INDEPENDENT, which will be used if and
      * only if the context specified in the constructor is invalid.
      */
-    int m_context = AbstractGroup.INDEPENDENT;
+    int context = AbstractGroup.INDEPENDENT;
 
 
     public abstract String getTypeId();
 
     AbstractGroup(String name, int context) {
-        m_name = name;
+        this.name = name;
         setHierarchicalContext(context);
     }
 
@@ -104,12 +102,12 @@ public abstract class AbstractGroup {
 
     /** Returns this group's name, e.g. for display in a list/tree. */
     public final String getName() {
-        return m_name;
+        return name;
     }
 
     /** Sets the group's name. */
     public final void setName(String name) {
-        m_name = name;
+        this.name = name;
     }
 
     /**
@@ -195,12 +193,12 @@ public abstract class AbstractGroup {
                 && (context != AbstractGroup.INCLUDING)) {
             return;
         }
-        m_context = context;
+        this.context = context;
     }
 
     /** Returns the group's hierarchical context. */
     public int getHierarchicalContext() {
-        return m_context;
+        return context;
     }
 
     /** Returns a lengthy textual description of this instance (for 

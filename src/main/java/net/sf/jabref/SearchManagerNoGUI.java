@@ -56,7 +56,8 @@ class SearchManagerNoGUI {
         }
 
         try {
-            searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchTerm);
+            searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"),
+                    Globals.prefs.getBoolean("regExpSearch"));
         } catch (Exception ignored) {
 
         }

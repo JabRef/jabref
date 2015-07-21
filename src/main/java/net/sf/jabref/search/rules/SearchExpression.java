@@ -15,9 +15,7 @@
 */
 package net.sf.jabref.search.rules;
 
-import java.io.IOException;
 import java.io.StringReader;
-import java.util.regex.PatternSyntaxException;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -36,10 +34,23 @@ public class SearchExpression implements SearchRule {
         return ast;
     }
 
-    private AST ast = null;
+    private final boolean caseSensitive;
+    private final boolean regex;
 
-    public SearchExpression(boolean caseSensitive, boolean regex, String query)
-            throws PatternSyntaxException, IOException, TokenStreamException, antlr.RecognitionException {
+    private AST ast;
+    private String query;
+
+    public SearchExpression(boolean caseSensitive, boolean regex) {
+        this.caseSensitive = caseSensitive;
+        this.regex = regex;
+    }
+
+    private void init(String query) throws TokenStreamException, RecognitionException {
+        if(this.query != null && this.query.equals(query)) {
+            return;
+        }
+
+        this.query = query;
 
         // parse search expression
         SearchExpressionParser parser = new SearchExpressionParser(new SearchExpressionLexer(new StringReader(query)));
@@ -52,6 +63,8 @@ public class SearchExpression implements SearchRule {
     @Override
     public int applyRule(String query, BibtexEntry bibtexEntry) {
         try {
+            validateSearchStrings(query);
+
             return treeParser.apply(ast, bibtexEntry);
         } catch (RecognitionException e) {
             return 0; // this should never occur
@@ -60,6 +73,13 @@ public class SearchExpression implements SearchRule {
 
     @Override
     public boolean validateSearchStrings(String query) {
-        return true;
+        try {
+            init(query);
+            return true;
+        } catch (TokenStreamException e) {
+            return false;
+        } catch (RecognitionException e) {
+            return false;
+        }
     }
 }
