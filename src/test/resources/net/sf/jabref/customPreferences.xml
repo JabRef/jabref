@@ -11,7 +11,6 @@
           <map>
             <entry key="useRegExpSearch" value="false"/>
             <entry key="autolinkExactKeyOnly" value="true"/>
-            <entry key="pdfDirectory" value="C:\Users\joerg\AppData\Local\Temp\UtilFindFileTest2795738181544981409"/>
             <entry key="nameFormatterNames" value=""/>
             <entry key="nameFormatterFormats" value=""/>
             <entry key="autoComplete" value="true"/>
@@ -30,7 +29,6 @@
             <entry key="windowMaximised" value="false"/>
             <entry key="searchPanelVisible" value="false"/>
             <entry key="previewPanelHeight" value="200"/>
-            <entry key="lastEdited" value="C:\\Users\\joerg\\AppData\\Local\\Temp\\Temp1_ipais-lenhard-src.zip\\literature-pais.bib;C:\\Users\\joerg\\Desktop\\jl-main\\publikationen\\literature\\references.bib;C:\\Users\\joerg\\Desktop\\jl-main\\publikationen\\2014\\intelligent-pais\\book-chapter\\literature-pais.bib"/>
             <entry key="searchReq" value="true"/>
             <entry key="searchOpt" value="true"/>
             <entry key="searchGen" value="true"/>
@@ -44,10 +42,7 @@
             <entry key="searchAllBases" value="false"/>
             <entry key="entryEditorHeight" value="440"/>
             <entry key="sidePaneWidth" value="160"/>
-            <entry key="workingDirectory" value="C:\Users\joerg\Desktop\jl-main\publikationen\2014\intelligent-pais\book-chapter\literature-pais.bib"/>
-            <entry key="recentFiles" value="C:\\Users\\joerg\\Desktop\\cloudcycle.bib;C:\\Users\\joerg\\Desktop\\jl-main\\publikationen\\2014\\intelligent-pais\\book-chapter\\literature-pais.bib"/>
             <entry key="showFileLinksUpgradeWarning" value="false"/>
-            <entry key="fileDirectory" value="C:\Users\joerg\AppData\Local\Temp\UtilFindFileTest2795738181544981409"/>
             <entry key="xmpPrivacyFilters" value="pdf;timestamp;keywords;owner;note;review"/>
             <entry key="customTabName_0" value="General"/>
             <entry key="customTabFields_0" value="crossref;keywords;file;doi;url;comment;"/>
