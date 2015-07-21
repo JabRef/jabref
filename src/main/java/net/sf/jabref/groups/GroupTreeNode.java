@@ -34,11 +34,10 @@ import net.sf.jabref.search.rules.sets.SearchRuleSet;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
- * 
+ *
  * @author jzieren
  */
-public class GroupTreeNode extends DefaultMutableTreeNode implements
-        Transferable {
+public class GroupTreeNode extends DefaultMutableTreeNode implements Transferable {
 
     public static final DataFlavor flavor;
     private static final DataFlavor[] flavors;
@@ -52,7 +51,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
             // never happens
         }
         flavor = df;
-        flavors = new DataFlavor[] {GroupTreeNode.flavor};
+        flavors = new DataFlavor[]{GroupTreeNode.flavor};
     }
 
 
@@ -97,7 +96,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     /**
      * Creates a deep copy of this node and all of its children, including all
      * groups.
-     * 
+     *
      * @return This object's deep copy.
      */
     public GroupTreeNode deepCopy() {
@@ -125,9 +124,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 
     /**
      * @return An indexed path from the root node to this node. The elements in
-     *         the returned array represent the child index of each node in the
-     *         path. If this node is the root node, the returned array has zero
-     *         elements.
+     * the returned array represent the child index of each node in the
+     * path. If this node is the root node, the returned array has zero
+     * elements.
      */
     public int[] getIndexedPath() {
         TreeNode[] path = getPath();
@@ -151,14 +150,13 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     /**
-     * @param indexedPath
-     *            A sequence of child indices that describe a path from this
-     *            node to one of its desendants. Be aware that if <b>indexedPath
-     *            </b> was obtained by getIndexedPath(), this node should
-     *            usually be the root node.
+     * @param indexedPath A sequence of child indices that describe a path from this
+     *                    node to one of its desendants. Be aware that if <b>indexedPath
+     *                    </b> was obtained by getIndexedPath(), this node should
+     *                    usually be the root node.
      * @return The descendant found by evaluating <b>indexedPath </b>. If the
-     *         path could not be traversed completely (i.e. one of the child
-     *         indices did not exist), null will be returned.
+     * path could not be traversed completely (i.e. one of the child
+     * indices did not exist), null will be returned.
      */
     public GroupTreeNode getDescendant(int[] indexedPath) {
         GroupTreeNode cursor = this;
@@ -174,7 +172,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      * children's groups (recursively), or the intersection of the elements in
      * its own group and its parent's group. This setting is configured in the
      * group contained in this node.
-     * 
+     *
      * @return A SearchRule that finds the desired elements.
      */
     public SearchRule getSearchRule() {
@@ -228,7 +226,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 
     /**
      * Scans the subtree rooted at this node.
-     * 
+     *
      * @return All groups that contain the specified entry.
      */
     public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
@@ -320,11 +318,10 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     /**
-     * @param path
-     *            A sequence of child indices that designate a node relative to
-     *            this node.
+     * @param path A sequence of child indices that designate a node relative to
+     *             this node.
      * @return The node designated by the specified path, or null if one or more
-     *         indices in the path could not be resolved.
+     * indices in the path could not be resolved.
      */
     public GroupTreeNode getChildAt(int[] path) {
         GroupTreeNode cursor = this;
@@ -334,10 +331,11 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         return cursor;
     }
 
-    /** Adds the selected entries to this node's group. */
+    /**
+     * Adds the selected entries to this node's group.
+     */
     public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
-        if (getGroup() == null)
-         {
+        if (getGroup() == null) {
             return null; // paranoia
         }
         AbstractUndoableEdit undo = getGroup().add(entries);
@@ -347,10 +345,11 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         return undo;
     }
 
-    /** Removes the selected entries from this node's group. */
+    /**
+     * Removes the selected entries from this node's group.
+     */
     public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
-        if (getGroup() == null)
-         {
+        if (getGroup() == null) {
             return null; // paranoia
         }
         AbstractUndoableEdit undo = getGroup().remove(entries);

@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import net.sf.jabref.util.MonthUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

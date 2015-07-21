@@ -31,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.util.MonthUtil;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 

@@ -84,7 +84,6 @@ import net.sf.jabref.ImportSettingsTab;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.MonthUtil;
 import net.sf.jabref.OpenFileFilter;
 import net.sf.jabref.Worker;
 import net.sf.jabref.export.layout.Layout;
