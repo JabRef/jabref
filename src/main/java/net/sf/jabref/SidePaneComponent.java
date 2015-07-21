@@ -46,7 +46,6 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         this.manager = manager;
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));
-        // tlb.setOpaque(false);
         close.setBorder(null);
         JButton up = new JButton(GUIGlobals.getImage("up"));
         up.setMargin(new Insets(0, 0, 0, 0));
@@ -61,14 +60,8 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         tlb.add(down);
         tlb.add(close);
         close.addActionListener(new CloseButtonListener());
-//        setToolBar(tlb);
         this.getUI().getTitleBar().add(tlb);
-        // setBorder(BorderFactory.createEtchedBorder());
         setBorder(BorderFactory.createEmptyBorder());
-        // setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
-        // setPreferredSize(new java.awt.Dimension
-        // (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
-        // Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
     }
 
     void hideAway() {
