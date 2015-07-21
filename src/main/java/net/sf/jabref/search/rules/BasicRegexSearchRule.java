@@ -21,7 +21,6 @@ import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -37,15 +36,9 @@ public class BasicRegexSearchRule extends BasicSearchRule {
         super(caseSensitive);
     }
 
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("1", query);
-        return applyRule(map, bibtexEntry);
-    }
-
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        String searchString = searchStrings.values().iterator().next();
+    public boolean validateSearchStrings(String query) {
+        String searchString = query;
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
         }
@@ -61,9 +54,9 @@ public class BasicRegexSearchRule extends BasicSearchRule {
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
 
-        String searchString = searchStrings.values().iterator().next();
+        String searchString = query;
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
         }

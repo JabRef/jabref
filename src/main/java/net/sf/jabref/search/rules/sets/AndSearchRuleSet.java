@@ -13,23 +13,29 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.search.expression;
+package net.sf.jabref.search.rules.sets;
 
-import antlr.CommonAST;
-import java.util.regex.Pattern;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.search.SearchRule;
 
-public class RegExNode extends CommonAST {
+/**
+ * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
+ * 1.
+ */
+public class AndSearchRuleSet extends SearchRuleSet {
 
-    private Pattern pattern = null;
+    @Override
+    public int applyRule(String searchString, BibtexEntry bibtexEntry) {
+        int score = 0;
 
-    public RegExNode(int tokenType, String text, boolean caseSensitive, boolean regex) {
-        initialize(tokenType, text);
-        pattern = Pattern.compile(
-                regex ? text : "\\Q" + text + "\\E", // quote if !regex
-                caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
-    }
+        // We let each rule add a maximum of 1 to the score.
+        for (SearchRule rule : ruleSet) {
+            score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
+        }
 
-    public Pattern getPattern() {
-        return pattern;
+        // Then an AND rule demands that score == number of rules
+        boolean res = score == ruleSet.size();
+
+        return res ? 1 : 0;
     }
 }

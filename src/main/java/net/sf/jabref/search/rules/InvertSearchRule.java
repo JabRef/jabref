@@ -4,8 +4,6 @@ import com.google.common.base.Preconditions;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.search.SearchRule;
 
-import java.util.Map;
-
 /**
  * Inverts result score.
  *
@@ -23,12 +21,12 @@ public class InvertSearchRule implements SearchRule {
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
-        return otherRule.applyRule(searchStrings, bibtexEntry) == 0 ? 1 : 0;
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
+        return otherRule.applyRule(query, bibtexEntry) == 0 ? 1 : 0;
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        return this.otherRule.validateSearchStrings(searchStrings);
+    public boolean validateSearchStrings(String query) {
+        return this.otherRule.validateSearchStrings(query);
     }
 }

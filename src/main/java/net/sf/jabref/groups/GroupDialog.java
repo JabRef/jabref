@@ -40,6 +40,8 @@ import net.sf.jabref.FieldContentSelector;
 import net.sf.jabref.FieldTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.search.SearchExpressionDescriber;
+import net.sf.jabref.search.SearchExpressionParser;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
 import antlr.collections.AST;
@@ -454,8 +456,8 @@ class GroupDialog extends JDialog {
                 AST ast = SearchExpressionParser
                         .checkSyntax(s1, m_sgCaseSensitive.isSelected(),
                                 m_sgRegExp.isSelected());
-                setDescription(SearchGroup.getDescriptionForPreview(s1, ast,
-                        m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected()));
+                setDescription(new SearchExpressionDescriber(
+                        m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected(),s1, ast).getDescriptionForPreview());
                 if (m_sgRegExp.isSelected()) {
                     try {
                         Pattern.compile(s1);

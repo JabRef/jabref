@@ -29,10 +29,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -71,12 +68,13 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.search.rules.AndOrSearchRuleSet;
 import net.sf.jabref.search.rules.InvertSearchRule;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
 import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.search.rules.sets.SearchRuleSets;
+import net.sf.jabref.search.rules.sets.SearchRuleSet;
 import net.sf.jabref.undo.NamedCompound;
 
 /**
@@ -771,17 +769,14 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void updateSelections() {
-        final AndOrSearchRuleSet searchRules = new AndOrSearchRuleSet(andCb.isSelected());
+        final SearchRuleSet searchRules = SearchRuleSets.build(andCb.isSelected() ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
         TreePath[] selection = groupsTree.getSelectionPaths();
 
         for (TreePath aSelection : selection) {
             searchRules.addRule(((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule());
         }
-        Hashtable<String, String> searchOptions = new Hashtable<String, String>();
-        searchOptions.put("option", "dummy");
-
         SearchRule searchRule = invCb.isSelected() ? new InvertSearchRule(searchRules) : searchRules;
-        GroupingWorker worker = new GroupingWorker(searchRule, searchOptions);
+        GroupingWorker worker = new GroupingWorker(searchRule, "dummy");
         worker.getWorker().run();
         worker.getCallBack().update();
         /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
@@ -797,13 +792,13 @@ public class GroupSelector extends SidePaneComponent implements
     class GroupingWorker extends AbstractWorker {
 
         private final SearchRule rules;
-        private final Hashtable<String, String> searchTerm;
+        private final String searchTerm;
         private final ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
         private final boolean showOverlappingGroupsP;
         int hits = 0;
 
 
-        public GroupingWorker(SearchRule rules, Hashtable<String, String> searchTerm) {
+        public GroupingWorker(SearchRule rules, String searchTerm) {
             this.rules = rules;
             this.searchTerm = searchTerm;
             showOverlappingGroupsP = showOverlappingGroups.isSelected();
@@ -1572,13 +1567,12 @@ public class GroupSelector extends SidePaneComponent implements
         SearchRule rule;
         BibtexEntry entry;
         Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
-        Map<String, String> dummyMap = new HashMap<String, String>(); // just because I don't want to use null...
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
             node = e.nextElement();
             rule = node.getSearchRule();
             for (BibtexEntry matche : matches) {
                 entry = matche;
-                if (rule.applyRule(dummyMap, entry) == 0) {
+                if (rule.applyRule("dummy", entry) == 0) {
                     continue;
                 }
                 vec.add(node);

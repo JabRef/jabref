@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.groups;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -236,7 +235,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      *      net.sf.jabref.BibtexEntry)
      */
     @Override
-    public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
+    public boolean contains(String query, BibtexEntry entry) {
         return contains(entry);
     }
 
@@ -318,12 +317,12 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public int applyRule(Map<String, String> searchOptions, BibtexEntry entry) {
+    public int applyRule(String searchOptions, BibtexEntry entry) {
         return contains(searchOptions, entry) ? 1 : 0;
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 

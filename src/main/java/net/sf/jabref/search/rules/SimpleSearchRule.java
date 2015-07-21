@@ -26,12 +26,11 @@
  */
 package net.sf.jabref.search.rules;
 
-import java.util.Map;
-
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 import net.sf.jabref.search.SearchRule;
 
+//TODO why have simple and basic search rule????
 public class SimpleSearchRule implements SearchRule {
 
     private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
@@ -43,13 +42,13 @@ public class SimpleSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
-        String searchString = searchStrings.values().iterator().next();
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
+        String searchString = query;
 
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();

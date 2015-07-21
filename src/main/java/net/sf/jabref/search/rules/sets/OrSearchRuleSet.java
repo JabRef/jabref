@@ -13,9 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.search.rules;
-
-import java.util.Map;
+package net.sf.jabref.search.rules.sets;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.search.SearchRule;
@@ -24,16 +22,10 @@ import net.sf.jabref.search.SearchRule;
  * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
  * 1.
  */
-public class AndOrSearchRuleSet extends SearchRuleSet {
-
-    private final boolean and;
-
-    public AndOrSearchRuleSet(boolean and) {
-        this.and = and;
-    }
+public class OrSearchRuleSet extends SearchRuleSet {
 
     @Override
-    public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) {
+    public int applyRule(String searchString, BibtexEntry bibtexEntry) {
         int score = 0;
 
         // We let each rule add a maximum of 1 to the score.
@@ -41,14 +33,8 @@ public class AndOrSearchRuleSet extends SearchRuleSet {
             score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
         }
 
-        // Then an AND rule demands that score == number of rules, and
-        // an OR rule demands score > 0.
-        boolean res;
-        if (and) {
-            res = score == ruleSet.size();
-        } else {
-            res = score > 0;
-        }
+        // OR rule demands score > 0.
+        boolean res = score > 0;
 
         return res ? 1 : 0;
     }

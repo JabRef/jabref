@@ -24,12 +24,11 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref.search.rules;
+package net.sf.jabref.search.rules.sets;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.search.SearchRule;
 
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
 
@@ -41,7 +40,7 @@ public class SearchRuleSet implements SearchRule {
     }
 
     @Override
-    public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException {
+    public int applyRule(String searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException {
         int score = 0;
         for (SearchRule searchRule : ruleSet) {
             score += searchRule.applyRule(searchString, bibtexEntry);
@@ -50,9 +49,9 @@ public class SearchRuleSet implements SearchRule {
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         for (SearchRule searchRule : ruleSet) {
-            if (!searchRule.validateSearchStrings(searchStrings)) {
+            if (!searchRule.validateSearchStrings(query)) {
                 return false;
             }
         }

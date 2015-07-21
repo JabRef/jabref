@@ -1,7 +1,8 @@
-package net.sf.jabref.search;
+package net.sf.jabref.search.rules;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.search.rules.BasicRegexSearchRule;
 import net.sf.jabref.search.rules.BasicSearchRule;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,10 +19,10 @@ public class BasicSearchRuleTest {
         Globals.prefs = JabRefPreferences.getInstance();
 
         BibtexEntry be = makeBibtexEntry();
-        BasicSearchRule bsCaseSensitive = new BasicSearchRule(true, false);
-        BasicSearchRule bsCaseInsensitive = new BasicSearchRule(false, false);
-        BasicSearchRule bsCaseSensitiveRegexp = new BasicSearchRule(true, true);
-        BasicSearchRule bsCaseInsensitiveRegexp = new BasicSearchRule(false, true);
+        BasicSearchRule bsCaseSensitive = new BasicSearchRule(true);
+        BasicSearchRule bsCaseInsensitive = new BasicSearchRule(false);
+        BasicSearchRule bsCaseSensitiveRegexp = new BasicRegexSearchRule(true);
+        BasicSearchRule bsCaseInsensitiveRegexp = new BasicRegexSearchRule(false);
 
         String query = "marine 2001 shields";
 
@@ -51,10 +52,7 @@ public class BasicSearchRuleTest {
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
         e.setField("year", "2001");
-        e
-                .setField(
-                        "author",
-                        "Kevin Shields");
+        e.setField("author", "Kevin Shields");
         return e;
     }
 }

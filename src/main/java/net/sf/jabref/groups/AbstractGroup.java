@@ -143,11 +143,11 @@ public abstract class AbstractGroup {
     public abstract AbstractUndoableEdit remove(BibtexEntry[] entries);
 
     /**
-     * @param searchOptions
-     *            The search options to apply.
+     * @param query
+     *            The search option to apply.
      * @return true if this group contains the specified entry, false otherwise.
      */
-    public abstract boolean contains(Map<String, String> searchOptions, BibtexEntry entry);
+    public abstract boolean contains(String query, BibtexEntry entry);
 
     /**
      * @return true if this group contains the specified entry, false otherwise.

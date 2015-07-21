@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.groups;
 
-import java.util.Map;
-
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
@@ -82,7 +80,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
+    public boolean contains(String query, BibtexEntry entry) {
         return true; // contains everything
     }
 
@@ -92,12 +90,12 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
         return 1; // contains everything
     }
 

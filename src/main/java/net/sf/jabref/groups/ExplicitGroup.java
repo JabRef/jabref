@@ -139,17 +139,17 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
+    public boolean contains(String query, BibtexEntry entry) {
         return contains(entry);
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
-        return contains(searchStrings, bibtexEntry) ? 1 : 0;
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
+        return contains(query, bibtexEntry) ? 1 : 0;
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 

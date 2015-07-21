@@ -26,7 +26,6 @@
  */
 package net.sf.jabref.search.rules;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,11 +46,9 @@ public class RegExpSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        String searchString = searchStrings.values().iterator().next();
-
+    public boolean validateSearchStrings(String query) {
         try {
-            compileSearchString(searchString);
+            compileSearchString(query);
         } catch (PatternSyntaxException e) {
             return false;
         }
@@ -68,34 +65,34 @@ public class RegExpSearchRule implements SearchRule {
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) throws PatternSyntaxException {
+    public int applyRule(String query, BibtexEntry bibtexEntry) throws PatternSyntaxException {
 
         int score = 0;
-        String searchString = searchStrings.values().iterator().next();
 
-        Pattern pattern = compileSearchString(searchString);
+        Pattern pattern = compileSearchString(query);
 
         score += searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
 
         return score;
     }
 
-    private int searchFields(Set<String> fields, BibtexEntry bibtexEntry,
-                             Pattern pattern) {
+    private int searchFields(Set<String> fields, BibtexEntry bibtexEntry, Pattern pattern) {
+        if (fields == null) {
+            return 0;
+        }
+
         int score = 0;
-        if (fields != null) {
-            for (String field : fields) {
-                try {
-                    Object value = bibtexEntry.getField(field);
-                    if (value != null) {
-                        Matcher m = pattern.matcher(RegExpSearchRule.removeBrackets.format((String) value));
-                        if (m.find()) {
-                            score++;
-                        }
+        for (String field : fields) {
+            try {
+                Object value = bibtexEntry.getField(field);
+                if (value != null) {
+                    Matcher m = pattern.matcher(RegExpSearchRule.removeBrackets.format((String) value));
+                    if (m.find()) {
+                        score++;
                     }
-                } catch (Throwable t) {
-                    System.err.println("Searching error: " + t);
                 }
+            } catch (Throwable t) {
+                System.err.println("Searching error: " + t);
             }
         }
         return score;

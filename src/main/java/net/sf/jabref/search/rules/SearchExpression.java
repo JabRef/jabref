@@ -17,15 +17,12 @@ package net.sf.jabref.search.rules;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import antlr.collections.AST;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.search.SearchExpressionLexer;
 import net.sf.jabref.search.SearchExpressionParser;
 import net.sf.jabref.search.SearchExpressionTreeParser;
@@ -34,23 +31,26 @@ import net.sf.jabref.search.SearchRule;
 public class SearchExpression implements SearchRule {
 
     private final SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();
+
+    public AST getAst() {
+        return ast;
+    }
+
     private AST ast = null;
 
-    public SearchExpression(JabRefPreferences prefs, Hashtable<String, String> searchOptions)
+    public SearchExpression(boolean caseSensitive, boolean regex, String query)
             throws PatternSyntaxException, IOException, TokenStreamException, antlr.RecognitionException {
 
         // parse search expression
-        SearchExpressionParser parser = new SearchExpressionParser(
-                new SearchExpressionLexer(new StringReader(searchOptions.elements()
-                        .nextElement()))); // supports only single entry
-        parser.caseSensitive = prefs.getBoolean("caseSensitiveSearch");
-        parser.regex = prefs.getBoolean("regExpSearch");
+        SearchExpressionParser parser = new SearchExpressionParser(new SearchExpressionLexer(new StringReader(query)));
+        parser.caseSensitive = caseSensitive;
+        parser.regex = regex;
         parser.searchExpression(); // this is the "global" rule
         ast = parser.getAST(); // remember abstract syntax tree
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
         try {
             return treeParser.apply(ast, bibtexEntry);
         } catch (RecognitionException e) {
@@ -59,7 +59,7 @@ public class SearchExpression implements SearchRule {
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 }

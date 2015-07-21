@@ -28,8 +28,9 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.search.rules.AndOrSearchRuleSet;
 import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.sets.SearchRuleSets;
+import net.sf.jabref.search.rules.sets.SearchRuleSet;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -185,8 +186,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         if (context == AbstractGroup.INDEPENDENT) {
             return getGroup().getSearchRule();
         }
-        AndOrSearchRuleSet searchRule = new AndOrSearchRuleSet(
-                context == AbstractGroup.REFINING);
+        SearchRuleSet searchRule = SearchRuleSets.build(context == AbstractGroup.REFINING ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
         searchRule.addRule(getGroup().getSearchRule());
         if ((context == AbstractGroup.INCLUDING)
                 && (originalContext != AbstractGroup.REFINING)) {

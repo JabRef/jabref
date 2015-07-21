@@ -16,9 +16,7 @@
 package net.sf.jabref.search.rules;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
@@ -37,21 +35,15 @@ public class BasicSearchRule implements SearchRule {
         this.caseSensitive = caseSensitive;
     }
 
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("1", query);
-        return applyRule(map, bibtexEntry);
-    }
-
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
 
-        String searchString = searchStrings.values().iterator().next();
+        String searchString = query;
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
         }
@@ -66,7 +58,6 @@ public class BasicSearchRule implements SearchRule {
         String fieldContent;
 
         //TODO build upon already existing SimpleSearchRule
-        //TODO build upon
         for (String field : bibtexEntry.getAllFields()) {
             fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
@@ -78,7 +69,7 @@ public class BasicSearchRule implements SearchRule {
                 // Check if we have a match for each of the query words, ignoring
                 // those words for which we already have a match:
                 for (String s : words) {
-                    matchFound[index] = matchFound[index] || (fieldContent.contains(s));
+                    matchFound[index] = matchFound[index] || fieldContent.contains(s);
 
                     index++;
                 }

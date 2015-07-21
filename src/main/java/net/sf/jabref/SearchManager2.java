@@ -22,7 +22,6 @@ import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -36,10 +35,11 @@ import net.sf.jabref.search.*;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.search.matchers.SearchMatcher;
+import net.sf.jabref.search.rules.BasicRegexSearchRule;
 import net.sf.jabref.search.rules.BasicSearchRule;
 import net.sf.jabref.search.rules.SearchExpression;
 import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.rules.SearchRuleSet;
+import net.sf.jabref.search.rules.sets.SearchRuleSet;
 
 public class SearchManager2 extends SidePaneComponent
         implements ActionListener, KeyListener, ItemListener, CaretListener {
@@ -528,30 +528,31 @@ public class SearchManager2 extends SidePaneComponent
             fireSearchlistenerEvent(searchField.getText());
 
             // Setup search parameters common to both normal and float.
-            Hashtable<String, String> searchOptions = new Hashtable<String, String>();
-            searchOptions.put("option", searchField.getText());
             SearchRuleSet searchRules = new SearchRuleSet();
             SearchRule rule1;
 
-            rule1 = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"),
-                    Globals.prefs.getBoolean("regExpSearch"));
+            if(Globals.prefs.getBoolean("regExpSearch")) {
+                rule1 = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            } else {
+                rule1 = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            }
 
             try {
                 // this searches specified fields if specified,
                 // and all fields otherwise
-                rule1 = new SearchExpression(Globals.prefs, searchOptions);
+                rule1 = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"), searchField.getText());
             } catch (Exception ex) {
                 // we'll do a search in all fields
             }
 
             searchRules.addRule(rule1);
 
-            if (!searchRules.validateSearchStrings(searchOptions)) {
+            if (!searchRules.validateSearchStrings(searchField.getText())) {
                 panel.output(Globals.lang("Search failed: illegal search expression"));
                 panel.stopShowingSearchResults();
                 return;
             }
-            SearchWorker worker = new SearchWorker(searchRules, searchOptions);
+            SearchWorker worker = new SearchWorker(searchRules, searchField.getText());
             worker.getWorker().run();
             worker.getCallBack().update();
             escape.setEnabled(true);
@@ -564,11 +565,11 @@ public class SearchManager2 extends SidePaneComponent
     class SearchWorker extends AbstractWorker {
 
         private final SearchRuleSet rules;
-        final Hashtable<String, String> searchTerm;
+        private final String searchTerm;
         int hits = 0;
 
 
-        public SearchWorker(SearchRuleSet rules, Hashtable<String, String> searchTerm) {
+        public SearchWorker(SearchRuleSet rules, String searchTerm) {
             this.rules = rules;
             this.searchTerm = searchTerm;
         }
