@@ -1,4 +1,5 @@
 [master]
+    - Refactored preferences
     - Remove local jgoodies dependency: replace SimpleInteralFrame with swingx JXTitledPanel and UIFSplitPane by JSplitPane
     - Fix several FindBugs warnings
     - Fix for bug #1276: OO styles do not consider editor fields anymore for sorting
