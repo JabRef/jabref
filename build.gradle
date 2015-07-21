@@ -75,6 +75,8 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.6.0'
     compile 'com.jgoodies:jgoodies-looks:2.5.2'
     compile fileTree(dir: 'lib/jgoodies/', includes: ['*.jar']) // instead of having the source code inside
+    
+    compile 'org.swinglabs:swingx:1.6.1'
 
     compile 'org.apache.pdfbox:pdfbox:1.7.1'
     compile 'org.apache.pdfbox:fontbox:1.7.1'

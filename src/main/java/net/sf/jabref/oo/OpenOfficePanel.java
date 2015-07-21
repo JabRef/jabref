@@ -454,7 +454,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         //diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
 
         JPanel content = new JPanel();
-        comp.setContent(content);
+        comp.setContentContainer(content);
         content.setLayout(new BorderLayout());
         content.add(b.getPanel(), BorderLayout.CENTER);
 

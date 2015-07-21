@@ -22,13 +22,14 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
-import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
+import org.jdesktop.swingx.JXTitledPanel;
 
-public abstract class SidePaneComponent extends SimpleInternalFrame {
+public abstract class SidePaneComponent extends JXTitledPanel {
+
+    private static final long serialVersionUID = 1L;
 
     protected final JButton close = new JButton(GUIGlobals.getImage("close"));
 
@@ -40,9 +41,8 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
 
 
     public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
-        super(new ImageIcon(icon), title);
+        super(title);
         this.manager = manager;
-        setSelected(true);
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));
         // tlb.setOpaque(false);
@@ -60,7 +60,8 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
         tlb.add(down);
         tlb.add(close);
         close.addActionListener(new CloseButtonListener());
-        setToolBar(tlb);
+//        setToolBar(tlb);
+        this.getUI().getTitleBar().add(tlb);
         // setBorder(BorderFactory.createEtchedBorder());
         setBorder(BorderFactory.createEmptyBorder());
         // setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
