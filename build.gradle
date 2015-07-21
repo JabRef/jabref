@@ -102,7 +102,7 @@ dependencies {
 
     compile 'com.google.guava:guava:18.0'
 
-    compile 'commons-logging:commons-logging:1.0.2'
+    compile 'commons-logging:commons-logging:1.2'
     // not available in maven repository
     compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
