@@ -828,19 +828,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (width > 0) {
             prefs.putInt("sidePaneWidth", width);
         }
-        if (prefs.getBoolean("openLastEdited")) {
+        if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
             // previously stored file name.
             if (filenames.isEmpty()) {
-                prefs.remove("lastEdited");
+                prefs.remove(JabRefPreferences.LAST_EDITED);
             }
             else {
                 String[] names = new String[filenames.size()];
                 for (int i = 0; i < filenames.size(); i++) {
                     names[i] = filenames.elementAt(i);
                 }
-                prefs.putStringArray("lastEdited", names);
+                prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
             }
 
         }

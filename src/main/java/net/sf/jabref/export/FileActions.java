@@ -157,7 +157,7 @@ public class FileActions {
 
         TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>();
 
-        boolean backup = prefs.getBoolean("backup");
+        boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
             backup = false;
         }
@@ -354,7 +354,7 @@ public class FileActions {
         // that we must save along with entries using them.
 
         BibtexEntry be = null;
-        boolean backup = prefs.getBoolean("backup");
+        boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
 
         SaveSession session;
         try {

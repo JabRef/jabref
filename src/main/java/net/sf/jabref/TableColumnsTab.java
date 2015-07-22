@@ -459,7 +459,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
         }
         rowCount = tableRows.size() + 5;
-        ncWidth = _prefs.getInt("numberColWidth");
+        ncWidth = _prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
 
     }
 
@@ -794,7 +794,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             String[] names = new String[tableRows.size()], widths = new String[tableRows.size()];
             int[] nWidths = new int[tableRows.size()];
 
-            _prefs.putInt("numberColWidth", ncWidth);
+            _prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
             for (i = 0; i < tableRows.size(); i++) {
                 TableRow tr = tableRows.elementAt(i);
                 names[i] = tr.name.toLowerCase();

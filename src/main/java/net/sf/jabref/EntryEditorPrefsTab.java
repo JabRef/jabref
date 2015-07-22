@@ -238,7 +238,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        _prefs.putBoolean("autoOpenForm", autoOpenForm.isSelected());
+        _prefs.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, autoOpenForm.isSelected());
         _prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
         boolean emacsModeChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected());
         boolean emacsRebindCtrlAChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected()); 

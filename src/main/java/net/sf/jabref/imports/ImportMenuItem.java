@@ -103,7 +103,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 frame.output(Globals.lang("Starting import"));
                 fileOk = true;
 
-                Globals.prefs.put("workingDirectory", filenames[0]);
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames[0]);
             }
         }
 

@@ -369,7 +369,7 @@ public class FileListEntryEditor {
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
-                Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);

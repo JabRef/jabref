@@ -278,8 +278,8 @@ public class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        openLast.setSelected(_prefs.getBoolean("openLastEdited"));
-        backup.setSelected(_prefs.getBoolean("backup"));
+        openLast.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
+        backup.setSelected(_prefs.getBoolean(JabRefPreferences.BACKUP));
 
         String newline = _prefs.get(net.sf.jabref.JabRefPreferences.NEWLINE);
         if ("\r".equals(newline)) {

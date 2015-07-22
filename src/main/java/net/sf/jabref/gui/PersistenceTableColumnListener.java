@@ -89,7 +89,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
                 columnsWidths.toArray(new String[columnsWidths.size()]));
 
         // width of the number ("#") column
-        Globals.prefs.putInt("numberColWidth", ncWidth);
+        Globals.prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
     }
 
     /**

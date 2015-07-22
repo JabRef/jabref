@@ -127,7 +127,7 @@ public class ImportFormats {
                     } else {
                         Globals.prefs.put("lastUsedImport", "__all");
                     }
-                    Globals.prefs.put("importWorkingDirectory", file.getParent());
+                    Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

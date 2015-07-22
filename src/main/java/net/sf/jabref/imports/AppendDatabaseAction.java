@@ -94,7 +94,7 @@ public class AppendDatabaseAction implements BaseAction {
         }
         for (File file : filesToOpen) {
             try {
-                Globals.prefs.put("workingDirectory", file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);

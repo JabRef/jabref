@@ -368,7 +368,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (chosenFile != null) {
             File oldFile = panel.metaData().getFile();
             panel.metaData().setFile(f);
-            Globals.prefs.put("workingDirectory", f.getParent());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
             runCommand();
             // If the operation failed, revert the file field and return:
             if (!success) {

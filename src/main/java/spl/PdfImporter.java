@@ -227,7 +227,7 @@ public class PdfImporter {
                     dfh = new DroppedFileHandler(frame, panel);
                     dfh.linkPdfToEntry(fileName, entryTable, entry);
                     panel.highlightEntry(entry);
-                    if (Globals.prefs.getBoolean("autoOpenForm")) {
+                    if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                         EntryEditor editor = panel.getEntryEditor(entry);
                         panel.showEntryEditor(editor);
                         panel.adjustSplitter();

@@ -114,7 +114,7 @@ class CustomExportDialog extends JDialog {
                 File chosen = new File(chosenStr);
 
                 // Update working directory for layout files.
-                Globals.prefs.put("exportWorkingDirectory", chosen.getParent());
+                Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, chosen.getParent());
 
                 layoutFile.setText(chosen.getPath());
             }

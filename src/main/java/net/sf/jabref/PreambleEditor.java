@@ -62,8 +62,8 @@ class PreambleEditor extends JDialog {
             }
         });
 
-        int prefHeight = (int) (GUIGlobals.PE_HEIGHT * GUIGlobals.FORM_HEIGHT[prefs.getInt("entryTypeFormHeightFactor")]);
-        setSize(GUIGlobals.FORM_WIDTH[prefs.getInt("entryTypeFormWidth")], prefHeight);
+        int prefHeight = (int) (GUIGlobals.PE_HEIGHT * GUIGlobals.FORM_HEIGHT[prefs.getInt(JabRefPreferences.ENTRY_TYPE_FORM_HEIGHT_FACTOR)]);
+        setSize(GUIGlobals.FORM_WIDTH[prefs.getInt(JabRefPreferences.ENTRY_TYPE_FORM_WIDTH)], prefHeight);
 
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();

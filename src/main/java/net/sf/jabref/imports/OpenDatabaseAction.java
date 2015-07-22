@@ -201,7 +201,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             boolean done = false;
             while (!done) {
                 String fileName = file.getPath();
-                Globals.prefs.put("workingDirectory", file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
 

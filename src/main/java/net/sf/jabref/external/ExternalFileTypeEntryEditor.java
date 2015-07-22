@@ -284,7 +284,7 @@ public class ExternalFileTypeEntryEditor {
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
-                Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
                 comp.setText(newFile.getPath());
                 comp.requestFocus();
             }

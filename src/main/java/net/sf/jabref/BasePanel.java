@@ -628,7 +628,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 + '.');
                         markBaseChanged();
 
-                        if (Globals.prefs.getBoolean("autoOpenForm")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                             selectionListener.editSignalled(firstBE);
                         }
                         highlightEntry(firstBE);
@@ -2007,7 +2007,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         + Globals.lang("entry") + '.');
 
                 markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean("autoOpenForm"))
+                if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM))
                 {
                     selectionListener.editSignalled(bibEntry);
                 }
