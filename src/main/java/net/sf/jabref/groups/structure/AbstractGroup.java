@@ -13,54 +13,43 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
-
-import java.util.Map;
+package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.SearchRule;
+import net.sf.jabref.search.SearchRule;
 
 /**
  * A group of BibtexEntries.
  */
 public abstract class AbstractGroup {
 
-    /** The group's name (every type of group has one). */
-    String m_name;
+    /**
+     * The group's name (every type of group has one).
+     */
+    String name;
 
     /**
      * The hierarchical context of the group (INDEPENDENT, REFINING, or
      * INCLUDING). Defaults to INDEPENDENT, which will be used if and
      * only if the context specified in the constructor is invalid.
      */
-    int m_context = AbstractGroup.INDEPENDENT;
+    GroupHierarchyType context = GroupHierarchyType.INDEPENDENT;
 
 
     public abstract String getTypeId();
 
-    AbstractGroup(String name, int context) {
-        m_name = name;
+    AbstractGroup(String name, GroupHierarchyType context) {
+        this.name = name;
         setHierarchicalContext(context);
     }
 
 
-    /** Group's contents are independent of its hierarchical position. */
-    public static final int INDEPENDENT = 0;
     /**
-     * Group's content is the intersection of its own content with its
-     * supergroup's content.
+     * Character used for quoting in the string representation.
      */
-    public static final int REFINING = 1;
-    /**
-     * Group's content is the union of its own content with its subgroups'
-     * content.
-     */
-    public static final int INCLUDING = 2;
-
-    /** Character used for quoting in the string representation. */
     static final char QUOTE_CHAR = '\\';
 
     /**
@@ -77,16 +66,13 @@ public abstract class AbstractGroup {
 
     /**
      * Re-create a group instance from a textual representation.
-     * 
-     * @param s
-     *            The result from the group's toString() method.
+     *
+     * @param s The result from the group's toString() method.
      * @return New instance of the encoded group.
-     * @throws Exception
-     *             If an error occured and a group could not be created, e.g.
-     *             due to a malformed regular expression.
+     * @throws Exception If an error occured and a group could not be created, e.g.
+     *                   due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, BibtexDatabase db,
-            int version) throws Exception {
+    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
         if (s.startsWith(KeywordGroup.ID)) {
             return KeywordGroup.fromString(s, db, version);
         }
@@ -102,52 +88,55 @@ public abstract class AbstractGroup {
         return null; // unknown group
     }
 
-    /** Returns this group's name, e.g. for display in a list/tree. */
+    /**
+     * Returns this group's name, e.g. for display in a list/tree.
+     */
     public final String getName() {
-        return m_name;
+        return name;
     }
 
-    /** Sets the group's name. */
+    /**
+     * Sets the group's name.
+     */
     public final void setName(String name) {
-        m_name = name;
+        this.name = name;
     }
 
     /**
      * @return true if this type of group supports the explicit adding of
-     *         entries.
+     * entries.
      */
     public abstract boolean supportsAdd();
 
     /**
      * @return true if this type of group supports the explicit removal of
-     *         entries.
+     * entries.
      */
     public abstract boolean supportsRemove();
 
     /**
      * Adds the specified entries to this group.
-     * 
+     *
      * @return If this group or one or more entries was/were modified as a
-     *         result of this operation, an object is returned that allows to
-     *         undo this change. null is returned otherwise.
+     * result of this operation, an object is returned that allows to
+     * undo this change. null is returned otherwise.
      */
     public abstract AbstractUndoableEdit add(BibtexEntry[] entries);
 
     /**
      * Removes the specified entries from this group.
-     * 
+     *
      * @return If this group or one or more entries was/were modified as a
-     *         result of this operation, an object is returned that allows to
-     *         undo this change. null is returned otherwise.
+     * result of this operation, an object is returned that allows to
+     * undo this change. null is returned otherwise.
      */
     public abstract AbstractUndoableEdit remove(BibtexEntry[] entries);
 
     /**
-     * @param searchOptions
-     *            The search options to apply.
+     * @param query The search option to apply.
      * @return true if this group contains the specified entry, false otherwise.
      */
-    public abstract boolean contains(Map<String, String> searchOptions, BibtexEntry entry);
+    public abstract boolean contains(String query, BibtexEntry entry);
 
     /**
      * @return true if this group contains the specified entry, false otherwise.
@@ -156,7 +145,7 @@ public abstract class AbstractGroup {
 
     /**
      * @return true if this group contains any of the specified entries, false
-     *         otherwise.
+     * otherwise.
      */
     public boolean containsAny(BibtexEntry[] entries) {
         for (BibtexEntry entry : entries) {
@@ -169,7 +158,7 @@ public abstract class AbstractGroup {
 
     /**
      * @return true if this group contains all of the specified entries, false
-     *         otherwise.
+     * otherwise.
      */
     public boolean containsAll(BibtexEntry[] entries) {
         for (BibtexEntry entry : entries) {
@@ -188,23 +177,28 @@ public abstract class AbstractGroup {
      */
     public abstract boolean isDynamic();
 
-    /** Sets the groups's hierarchical context. If context is not a valid
-     * value, the call is ignored. */
-    public void setHierarchicalContext(int context) {
-        if ((context != AbstractGroup.INDEPENDENT) && (context != AbstractGroup.REFINING)
-                && (context != AbstractGroup.INCLUDING)) {
+    /**
+     * Sets the groups's hierarchical context. If context is not a valid
+     * value, the call is ignored.
+     */
+    public void setHierarchicalContext(GroupHierarchyType context) {
+        if(context == null) {
             return;
         }
-        m_context = context;
+        this.context = context;
     }
 
-    /** Returns the group's hierarchical context. */
-    public int getHierarchicalContext() {
-        return m_context;
+    /**
+     * Returns the group's hierarchical context.
+     */
+    public GroupHierarchyType getHierarchicalContext() {
+        return context;
     }
 
-    /** Returns a lengthy textual description of this instance (for 
-     * the groups editor). The text is formatted in HTML. */
+    /**
+     * Returns a lengthy textual description of this instance (for
+     * the groups editor). The text is formatted in HTML.
+     */
     public abstract String getDescription();
 
     /**
@@ -212,7 +206,9 @@ public abstract class AbstractGroup {
      */
     public abstract AbstractGroup deepCopy();
 
-    /** Returns a short description of the group in HTML (for a tooltip). */
+    /**
+     * Returns a short description of the group in HTML (for a tooltip).
+     */
     public abstract String getShortDescription();
 
     // by general AbstractGroup contract, toString() must return

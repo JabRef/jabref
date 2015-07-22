@@ -24,37 +24,25 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref;
+package net.sf.jabref.search.rules.sets;
 
-import java.util.Map;
+import com.google.common.base.Preconditions;
+import net.sf.jabref.search.SearchRule;
+
 import java.util.Vector;
-import java.util.regex.PatternSyntaxException;
 
-public class SearchRuleSet implements SearchRule {
+public abstract class SearchRuleSet implements SearchRule {
 
     protected final Vector<SearchRule> ruleSet = new Vector<SearchRule>();
 
     public void addRule(SearchRule newRule) {
-        ruleSet.add(newRule);
-    }
-
-    public void clearRules() {
-        ruleSet.clear();
+        ruleSet.add(Preconditions.checkNotNull(newRule));
     }
 
     @Override
-    public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException {
-        int score = 0;
+    public boolean validateSearchStrings(String query) {
         for (SearchRule searchRule : ruleSet) {
-            score += searchRule.applyRule(searchString, bibtexEntry);
-        }
-        return score;
-    }
-
-    @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        for (SearchRule searchRule : ruleSet) {
-            if (!searchRule.validateSearchStrings(searchStrings)) {
+            if (!searchRule.validateSearchStrings(query)) {
                 return false;
             }
         }

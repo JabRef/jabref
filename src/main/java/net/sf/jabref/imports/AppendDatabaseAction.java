@@ -23,10 +23,10 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
@@ -155,8 +155,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = new ExplicitGroup("Imported",
-                            AbstractGroup.INDEPENDENT); // JZTODO lyrics
+                    ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
                     newGroups.setGroup(group);
                     for (BibtexEntry appendedEntry : appendedEntries) {
                         group.addEntry(appendedEntry);
@@ -175,7 +174,7 @@ public class AppendDatabaseAction implements BaseAction {
                 BibtexEntry entry;
 
                 for (Enumeration<GroupTreeNode> e = newGroups
-                        .preorderEnumeration(); e.hasMoreElements();) {
+                        .preorderEnumeration(); e.hasMoreElements(); ) {
                     node = e.nextElement();
                     if (!(node.getGroup() instanceof ExplicitGroup)) {
                         continue;

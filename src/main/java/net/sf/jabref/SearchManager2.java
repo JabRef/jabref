@@ -22,7 +22,6 @@ import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -32,12 +31,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.search.BasicSearch;
-import net.sf.jabref.search.SearchExpression;
-import net.sf.jabref.search.SearchExpressionParser;
-import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.search.*;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.search.matchers.SearchMatcher;
+import net.sf.jabref.search.rules.BasicRegexSearchRule;
+import net.sf.jabref.search.rules.BasicSearchRule;
+import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.sets.SearchRuleSet;
 
 public class SearchManager2 extends SidePaneComponent
         implements ActionListener, KeyListener, ItemListener, CaretListener {
@@ -526,30 +528,30 @@ public class SearchManager2 extends SidePaneComponent
             fireSearchlistenerEvent(searchField.getText());
 
             // Setup search parameters common to both normal and float.
-            Hashtable<String, String> searchOptions = new Hashtable<String, String>();
-            searchOptions.put("option", searchField.getText());
-            SearchRuleSet searchRules = new SearchRuleSet();
-            SearchRule rule1;
+            SearchRule searchRule;
 
-            rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"),
-                    Globals.prefs.getBoolean("regExpSearch"));
+            if(Globals.prefs.getBoolean("regExpSearch")) {
+                searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            } else {
+                searchRule = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            }
 
             try {
                 // this searches specified fields if specified,
                 // and all fields otherwise
-                rule1 = new SearchExpression(Globals.prefs, searchOptions);
+                searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"),
+                        Globals.prefs.getBoolean("regExpSearch"));
             } catch (Exception ex) {
                 // we'll do a search in all fields
             }
 
-            searchRules.addRule(rule1);
 
-            if (!searchRules.validateSearchStrings(searchOptions)) {
+            if (!searchRule.validateSearchStrings(searchField.getText())) {
                 panel.output(Globals.lang("Search failed: illegal search expression"));
                 panel.stopShowingSearchResults();
                 return;
             }
-            SearchWorker worker = new SearchWorker(searchRules, searchOptions);
+            SearchWorker worker = new SearchWorker(searchRule, searchField.getText());
             worker.getWorker().run();
             worker.getCallBack().update();
             escape.setEnabled(true);
@@ -561,13 +563,13 @@ public class SearchManager2 extends SidePaneComponent
 
     class SearchWorker extends AbstractWorker {
 
-        private final SearchRuleSet rules;
-        final Hashtable<String, String> searchTerm;
+        private final SearchRule rule;
+        private final String searchTerm;
         int hits = 0;
 
 
-        public SearchWorker(SearchRuleSet rules, Hashtable<String, String> searchTerm) {
-            this.rules = rules;
+        public SearchWorker(SearchRule rule, String searchTerm) {
+            this.rule = rule;
             this.searchTerm = searchTerm;
         }
 
@@ -577,7 +579,7 @@ public class SearchManager2 extends SidePaneComponent
                 // Search only the current database:
                 for (BibtexEntry entry : panel.getDatabase().getEntries()) {
 
-                    boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                    boolean hit = rule.applyRule(searchTerm, entry) > 0;
                     entry.setSearchHit(hit);
                     if (hit) {
                         hits++;
@@ -590,7 +592,7 @@ public class SearchManager2 extends SidePaneComponent
                     BasePanel p = frame.baseAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
-                        boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                        boolean hit = rule.applyRule(searchTerm, entry) > 0;
                         entry.setSearchHit(hit);
                         if (hit) {
                             hits++;
@@ -660,7 +662,7 @@ public class SearchManager2 extends SidePaneComponent
                     startedFloatSearch = false;
                 }
                 startedFilterSearch = true;
-                panel.setSearchMatcher(SearchMatcher.INSTANCE);
+                panel.setSearchMatcher(new SearchMatcher());
 
             } else {
                 // Float search - floats hits to the top of the table:
@@ -669,7 +671,7 @@ public class SearchManager2 extends SidePaneComponent
                     startedFilterSearch = false;
                 }
                 startedFloatSearch = true;
-                panel.mainTable.showFloatSearch(SearchMatcher.INSTANCE);
+                panel.mainTable.showFloatSearch(new SearchMatcher());
 
             }
 

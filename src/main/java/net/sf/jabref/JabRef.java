@@ -50,6 +50,7 @@ import net.sf.jabref.remote.RemotePreferences;
 import net.sf.jabref.remote.client.RemoteListenerClient;
 import net.sf.jabref.remote.JabRefMessageHandler;
 import net.sf.jabref.splash.SplashScreenLifecycle;
+import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;

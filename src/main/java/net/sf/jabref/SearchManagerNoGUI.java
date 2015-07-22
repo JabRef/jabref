@@ -17,15 +17,16 @@ package net.sf.jabref;
 
 import java.lang.Integer;
 import java.lang.Math;
-import java.util.Hashtable;
 import java.util.Collection;
 import java.util.Vector;
 
-import net.sf.jabref.search.*;
 import net.sf.jabref.imports.*;
+import net.sf.jabref.search.rules.BasicRegexSearchRule;
+import net.sf.jabref.search.rules.BasicSearchRule;
+import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.SearchRule;
 
 /**
- *
  * @author Silberer, Zirn
  */
 class SearchManagerNoGUI {
@@ -33,8 +34,6 @@ class SearchManagerNoGUI {
     private String searchTerm;
     private final BibtexDatabase database;
     private BibtexDatabase base = null;
-    private final Hashtable<String, String> searchOptions = new Hashtable<String, String>();
-
 
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
         searchTerm = term;
@@ -48,19 +47,22 @@ class SearchManagerNoGUI {
             searchTerm = fieldYear();
         }
 
-        searchOptions.put("option", searchTerm);
-        SearchRuleSet searchRules = new SearchRuleSet();
-        SearchRule rule1;
-        rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"),
-                Globals.prefs.getBoolean("regExpSearch"));
+        SearchRule searchRule;
+
+        if (Globals.prefs.getBoolean("regExpSearch")) {
+            searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+        } else {
+            searchRule = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+        }
+
         try {
-            rule1 = new SearchExpression(Globals.prefs, searchOptions);
+            searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"),
+                    Globals.prefs.getBoolean("regExpSearch"));
         } catch (Exception ignored) {
 
         }
-        searchRules.addRule(rule1);
 
-        if (!searchRules.validateSearchStrings(searchOptions)) {
+        if (!searchRule.validateSearchStrings(searchTerm)) {
             System.out.println(Globals.lang("Search failed: illegal search expression"));
             return base;
         }
@@ -68,7 +70,7 @@ class SearchManagerNoGUI {
         Collection<BibtexEntry> entries = database.getEntries();
         Vector<BibtexEntry> matchEntries = new Vector<BibtexEntry>();
         for (BibtexEntry entry : entries) {
-            boolean hit = searchRules.applyRule(searchOptions, entry) > 0;
+            boolean hit = searchRule.applyRule(searchTerm, entry) > 0;
             entry.setSearchHit(hit);
             if (hit) {
                 hits++;

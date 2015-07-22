@@ -13,23 +13,19 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.search;
+package net.sf.jabref.search.matchers;
 
 import net.sf.jabref.BibtexEntry;
-
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
- * Matcher that accepts all entries. Used for filtering when so search is
- * active.
+ * Matcher for filtering or sorting the table according to whether entries are
+ * tagged as search matches.
  */
-public class NoSearchMatcher implements Matcher<BibtexEntry> {
-
-    public static final Matcher<BibtexEntry> INSTANCE = new NoSearchMatcher();
-
+public class SearchMatcher implements Matcher<BibtexEntry> {
 
     @Override
-    public boolean matches(BibtexEntry object) {
-        return true;
+    public boolean matches(BibtexEntry entry) {
+        return entry.isSearchHit();
     }
 }

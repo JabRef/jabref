@@ -22,12 +22,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.groups.SearchGroup;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
@@ -210,7 +206,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 groups.put(rsGroups.getString("groups_id"), rootNode);
             } else if (typeId.equals(ExplicitGroup.ID)) {
                 group = new ExplicitGroup(rsGroups.getString("label"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(KeywordGroup.ID)) {
                 System.out.println("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
@@ -219,7 +215,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(SearchGroup.ID)) {
                 System.out.println("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
@@ -227,7 +223,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             }
 
             if (group != null) {

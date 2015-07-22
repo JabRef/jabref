@@ -13,27 +13,24 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
-
-import java.util.Map;
+package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.SearchRule;
+import net.sf.jabref.search.SearchRule;
 
 /**
- * This group contains all entries.
+ * This group contains all entries. Always. At any time!
  */
-public class AllEntriesGroup extends AbstractGroup implements SearchRule {
+public class AllEntriesGroup extends AbstractGroup {
 
     public static final String ID = "AllEntriesGroup:";
 
-
     public AllEntriesGroup() {
-        super(Globals.lang("All Entries"), AbstractGroup.INDEPENDENT);
+        super(Globals.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
     }
 
     public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
@@ -56,7 +53,17 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public SearchRule getSearchRule() {
-        return this;
+        return new SearchRule() {
+            @Override
+            public int applyRule(String query, BibtexEntry bibtexEntry) {
+                return 1; // contains everything
+            }
+
+            @Override
+            public boolean validateSearchStrings(String query) {
+                return true;
+            }
+        };
     }
 
     @Override
@@ -82,23 +89,13 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     }
 
     @Override
-    public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
+    public boolean contains(String query, BibtexEntry entry) {
         return true; // contains everything
     }
 
     @Override
     public AbstractGroup deepCopy() {
         return new AllEntriesGroup();
-    }
-
-    @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        return true;
-    }
-
-    @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
-        return 1; // contains everything
     }
 
     @Override
@@ -124,8 +121,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
 
     @Override
     public String getDescription() {
-        return "This group contains all entries. It cannot be edited or removed.";
-        // JZTODO lyrics
+        return Globals.lang("This group contains all entries. It cannot be edited or removed.");
     }
 
     @Override

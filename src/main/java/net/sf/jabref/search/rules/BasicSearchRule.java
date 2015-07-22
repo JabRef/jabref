@@ -13,87 +13,42 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.search;
+package net.sf.jabref.search.rules;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.SearchRule;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.search.SearchRule;
 
 /**
  * Search rule for simple search.
  */
-public class BasicSearch implements SearchRule {
+public class BasicSearchRule implements SearchRule {
 
-    private final boolean caseSensitive;
-    private final boolean regExp;
-    private Pattern[] pattern;
-    //static RemoveBrackets removeLatexCommands = new RemoveBrackets();
     private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
 
+    protected final boolean caseSensitive;
 
-    public BasicSearch(boolean caseSensitive, boolean regExp) {
-
+    public BasicSearchRule(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
-        this.regExp = regExp;
-    }
-
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("1", query);
-        return applyRule(map, bibtexEntry);
     }
 
     @Override
-    public boolean validateSearchStrings(Map<String, String> searchStrings) {
-        if (regExp) {
-            int flags = 0;
-            String searchString = searchStrings.values().iterator().next();
-            if (!caseSensitive) {
-                searchString = searchString.toLowerCase();
-                flags = Pattern.CASE_INSENSITIVE;
-            }
-            ArrayList<String> words = parseQuery(searchString);
-            try {
-                pattern = new Pattern[words.size()];
-                for (int i = 0; i < pattern.length; i++) {
-                    pattern[i] = Pattern.compile(words.get(i), flags);
-                }
-            } catch (PatternSyntaxException ex) {
-                return false;
-            }
-        }
+    public boolean validateSearchStrings(String query) {
         return true;
     }
 
     @Override
-    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
 
-        int flags = 0;
-        String searchString = searchStrings.values().iterator().next();
+        String searchString = query;
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
-            flags = Pattern.CASE_INSENSITIVE;
         }
 
-        ArrayList<String> words = parseQuery(searchString);
-
-        if (regExp) {
-            try {
-                pattern = new Pattern[words.size()];
-                for (int i = 0; i < pattern.length; i++) {
-                    pattern[i] = Pattern.compile(words.get(i), flags);
-                }
-            } catch (PatternSyntaxException ex) {
-                return 0;
-            }
-        }
+        List<String> words = parseQuery(searchString);
 
         //print(words);
         // We need match for all words:
@@ -102,29 +57,19 @@ public class BasicSearch implements SearchRule {
         Object fieldContentAsObject;
         String fieldContent;
 
+        //TODO build upon already existing SimpleSearchRule
         for (String field : bibtexEntry.getAllFields()) {
             fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
-                fieldContent = BasicSearch.removeBrackets.format(fieldContentAsObject.toString());
+                fieldContent = BasicSearchRule.removeBrackets.format(fieldContentAsObject.toString());
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }
                 int index = 0;
                 // Check if we have a match for each of the query words, ignoring
                 // those words for which we already have a match:
-                for (int j = 0; j < words.size(); j++) {
-                    if (!regExp) {
-                        String s = words.get(j);
-                        matchFound[index] = matchFound[index]
-                                || (fieldContent.contains(s));
-                    } else {
-                        if (fieldContent != null) {
-                            Matcher m = pattern[j].matcher
-                                    (BasicSearch.removeBrackets.format(fieldContent));
-                            matchFound[index] = matchFound[index]
-                                    || m.find();
-                        }
-                    }
+                for (String s : words) {
+                    matchFound[index] = matchFound[index] || fieldContent.contains(s);
 
                     index++;
                 }
@@ -132,21 +77,20 @@ public class BasicSearch implements SearchRule {
 
         }
         for (boolean aMatchFound : matchFound) {
-            if (!aMatchFound)
-             {
+            if (!aMatchFound) {
                 return 0; // Didn't match all words.
             }
         }
         return 1; // Matched all words.
     }
 
-    private ArrayList<String> parseQuery(String query) {
+    protected List<String> parseQuery(String query) {
         StringBuffer sb = new StringBuffer();
-        ArrayList<String> result = new ArrayList<String>();
-        int c;
-        boolean escaped = false, quoted = false;
+        List<String> result = new ArrayList<String>();
+        boolean escaped = false;
+        boolean quoted = false;
         for (int i = 0; i < query.length(); i++) {
-            c = query.charAt(i);
+            int c = query.charAt(i);
             // Check if we are entering an escape sequence:
             if (!escaped && (c == '\\')) {
                 escaped = true;
@@ -157,8 +101,7 @@ public class BasicSearch implements SearchRule {
                         result.add(sb.toString());
                         sb = new StringBuffer();
                     }
-                }
-                else if (c == '"') {
+                } else if (c == '"') {
                     // Whether it is a start or end quote, store the current
                     // word if any:
                     if (sb.length() > 0) {
@@ -166,8 +109,7 @@ public class BasicSearch implements SearchRule {
                         sb = new StringBuffer();
                     }
                     quoted = !quoted;
-                }
-                else {
+                } else {
                     // All other possibilities exhausted, we add the char to
                     // the current word:
                     sb.append((char) c);

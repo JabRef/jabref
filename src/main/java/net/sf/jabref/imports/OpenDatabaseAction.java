@@ -36,6 +36,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 import net.sf.jabref.HandleDuplicateWarnings;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
 

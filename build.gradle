@@ -22,7 +22,6 @@ plugins {
 apply plugin: "fatjar"
 apply plugin: "java"
 apply plugin: "eclipse"
-apply plugin: "idea"
 apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
@@ -261,13 +260,6 @@ task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchPa
     main = 'antlr.Tool'
     classpath = configurations.antlr2
     args = ["-o", destinationDir, antlrSource]
-}
-
-// git support in intellij idea
-idea.project.ipr {
-    withXml { provider ->
-        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
-    }
 }
 
 apply plugin: 'jacoco'

@@ -13,22 +13,27 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.search;
+package net.sf.jabref.search.rules.sets;
 
 import net.sf.jabref.BibtexEntry;
-import ca.odell.glazedlists.matchers.Matcher;
+import net.sf.jabref.search.SearchRule;
 
 /**
- * Matcher for filtering or sorting the table according to whether entries are
- * tagged as search matches.
+ * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
+ * 1.
  */
-public class SearchMatcher implements Matcher<BibtexEntry> {
-
-    public static final SearchMatcher INSTANCE = new SearchMatcher();
-
+public class AndSearchRuleSet extends SearchRuleSet {
 
     @Override
-    public boolean matches(BibtexEntry entry) {
-        return entry.isSearchHit();
+    public int applyRule(String searchString, BibtexEntry bibtexEntry) {
+        int score = 0;
+
+        // We let each rule add a maximum of 1 to the score.
+        for (SearchRule rule : ruleSet) {
+            score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
+        }
+
+        // Then an AND rule demands that score == number of rules
+        return score == ruleSet.size() ? 1 : 0;
     }
 }

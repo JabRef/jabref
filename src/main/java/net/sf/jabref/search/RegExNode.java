@@ -22,7 +22,6 @@ public class RegExNode extends CommonAST {
 
     private Pattern pattern = null;
 
-
     public RegExNode(int tokenType, String text, boolean caseSensitive, boolean regex) {
         initialize(tokenType, text);
         pattern = Pattern.compile(

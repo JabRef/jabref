@@ -24,13 +24,22 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref;
+package net.sf.jabref.search;
 
-import java.util.Map;
+import net.sf.jabref.BibtexEntry;
 
 public interface SearchRule {
 
-    int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry);
+    /*
+     * Because some rules require the query in the constructor,
+     * the parameter query is not always used as expected.
+     * The two constants provide means to mark this as dummy.
+     * As I am not sure whether null could be substituted by "dummy" I leave everything as is.
+     */
+    String DUMMY_QUERY = "dummy";
+    String NULL_QUERY = null;
 
-    boolean validateSearchStrings(Map<String, String> searchStrings);
+    int applyRule(String query, BibtexEntry bibtexEntry);
+
+    boolean validateSearchStrings(String query);
 }

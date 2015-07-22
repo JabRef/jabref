@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import net.sf.jabref.AuthorList;
@@ -26,7 +25,6 @@ import net.sf.jabref.BibtexFields;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.SearchRuleSet;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
@@ -34,7 +32,6 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.matchers.Matcher;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -109,8 +106,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             } else {
                 return null;
             }
-        }
-        else // try to find an alternative fieldname (for display)
+        } else // try to find an alternative fieldname (for display)
         {
             String[] fld = columns[col - padleft];
             StringBuilder sb = new StringBuilder();
@@ -138,6 +134,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     /**
      * Get the column title, or a string identifying the column if it is an icon
      * column without a title.
+     *
      * @param col The column number
      * @return the String identifying the column
      */
@@ -169,6 +166,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     /**
      * Finds the column index for the given column name.
+     *
      * @param colName The column name
      * @return The column index if any, or -1 if no column has that name.
      */
@@ -184,6 +182,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     /**
      * Checks, if the Column (int col) is a Ranking-Column
+     *
      * @param col Column Number
      * @return Is Ranking-Column or not?
      */
@@ -220,9 +219,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
         if (col == 0) {
             o = "#";// + (row + 1);
-        }
-
-        else if (iconType != null) {
+        } else if (iconType != null) {
             int hasField;
 
             int[] fieldCount = hasField(be, iconType);
@@ -301,6 +298,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     /**
      * Format a name field for the table, according to user preferences.
+     *
      * @param o The contents of the name field.
      * @return The formatted name field.
      */
@@ -335,7 +333,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // Otherwise returns -1. When field indicates one or more file types,
         // returns the index of the first present file type.
         if ((be == null) || (field == null) || (field.length < 1)) {
-            return new int[] {-1, -1};
+            return new int[]{-1, -1};
         }
         int hasField = -1;
         if (!field[0].equals(GUIGlobals.FILE_FIELD)) {
@@ -344,19 +342,17 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     hasField = i;
                 }
             }
-            return new int[] {hasField, -1};
-        }
-        else {
+            return new int[]{hasField, -1};
+        } else {
             // We use a FileListTableModel to parse the field content:
             Object o = be.getField(GUIGlobals.FILE_FIELD);
             FileListTableModel fileList = new FileListTableModel();
             fileList.setContent((String) o);
             if (field.length == 1) {
                 if (fileList.getRowCount() == 0) {
-                    return new int[] {-1, -1};
-                }
-                else {
-                    return new int[] {0, fileList.getRowCount()};
+                    return new int[]{-1, -1};
+                } else {
+                    return new int[]{0, fileList.getRowCount()};
                 }
             }
             int lastLinkPosition = -1, countLinks = 0;
@@ -370,7 +366,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     }
                 }
             }
-            return new int[] {lastLinkPosition, countLinks};
+            return new int[]{lastLinkPosition, countLinks};
         }
     }
 
@@ -454,7 +450,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (Globals.prefs.getBoolean("extraFileColumns")) {
             String[] desiredColumns = Globals.prefs.getStringArray("listOfFileColumns");
             for (String desiredColumn : desiredColumns) {
-                iconCols.put(coln, new String[] {GUIGlobals.FILE_FIELD, desiredColumn});
+                iconCols.put(coln, new String[]{GUIGlobals.FILE_FIELD, desiredColumn});
                 coln++;
             }
         }
@@ -472,7 +468,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             for (int j = 0; j < columns[i].length; j++) {
                 if (columns[i][j].equals("author")
                         || columns[i][j].equals("editor")) {
-                    tmp.add(new int[] {i, j});
+                    tmp.add(new int[]{i, j});
                 }
             }
         }
@@ -482,34 +478,4 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
     }
 
-    public boolean isIconColumn(int col) {
-        return (getIconTypeForColumn(col) != null);
-    }
-
-
-    private static class NoSearchMatcher implements Matcher<BibtexEntry> {
-
-        @Override
-        public boolean matches(BibtexEntry object) {
-            return true;
-        }
-    }
-
-    static class SearchMatcher implements Matcher<BibtexEntry> {
-
-        private final SearchRuleSet ruleSet;
-        private final Hashtable<String, String> searchOptions;
-
-
-        public SearchMatcher(SearchRuleSet ruleSet, Hashtable<String, String> searchOptions) {
-            this.ruleSet = ruleSet;
-            this.searchOptions = searchOptions;
-        }
-
-        @Override
-        public boolean matches(BibtexEntry entry) {
-            int result = ruleSet.applyRule(searchOptions, entry);
-            return result > 0;
-        }
-    }
 }

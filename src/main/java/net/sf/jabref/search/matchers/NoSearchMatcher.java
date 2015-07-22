@@ -13,13 +13,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.search.matchers;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.BibtexEntry;
 
-class UnsupportedVersionException extends Exception {
+import ca.odell.glazedlists.matchers.Matcher;
 
-    public UnsupportedVersionException(String groupType, int version) {
-        super(Globals.lang("Unsupported version of class %0: %1", groupType, Integer.toString(version)));
+/**
+ * Matcher that accepts all entries. Used for filtering when so search is
+ * active.
+ */
+public class NoSearchMatcher implements Matcher<BibtexEntry> {
+
+    public static final Matcher<BibtexEntry> INSTANCE = new NoSearchMatcher();
+
+    @Override
+    public boolean matches(BibtexEntry object) {
+        return true;
     }
 }

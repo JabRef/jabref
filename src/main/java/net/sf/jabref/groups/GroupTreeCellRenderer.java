@@ -28,6 +28,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.util.StringUtil;
 
 /**
@@ -147,12 +148,12 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         label.setToolTipText("<html>" + group.getShortDescription() + "</html>");
         if (Globals.prefs.getBoolean("groupShowIcons")) {
             switch (group.getHierarchicalContext()) {
-            case AbstractGroup.REFINING:
+            case REFINING:
                 if (label.getIcon() != GroupTreeCellRenderer.groupRefiningIcon) {
                     label.setIcon(GroupTreeCellRenderer.groupRefiningIcon);
                 }
                 break;
-            case AbstractGroup.INCLUDING:
+            case INCLUDING:
                 if (label.getIcon() != GroupTreeCellRenderer.groupIncludingIcon) {
                     label.setIcon(GroupTreeCellRenderer.groupIncludingIcon);
                 }

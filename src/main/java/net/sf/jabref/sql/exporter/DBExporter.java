@@ -39,14 +39,10 @@ import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.export.FileActions;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.groups.SearchGroup;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
@@ -288,7 +284,7 @@ public abstract class DBExporter extends DBImporterExporter {
 
         AbstractGroup group = cursor.getGroup();
         String searchField = null, searchExpr = null, caseSens = null, reg_exp = null;
-        int hierContext = group.getHierarchicalContext();
+        GroupHierarchyType hierContext = group.getHierarchicalContext();
         if (group instanceof KeywordGroup) {
             searchField = ((KeywordGroup) group).getSearchField();
             searchExpr = ((KeywordGroup) group).getSearchExpression();
@@ -327,7 +323,7 @@ public abstract class DBExporter extends DBImporterExporter {
                         + (caseSens != null ? '\'' + caseSens + '\'' : "NULL")
                         + ", "
                         + (reg_exp != null ? '\'' + reg_exp + '\'' : "NULL")
-                        + ", " + hierContext + ", '" + database_id + "');");
+                        + ", " + hierContext.ordinal() + ", '" + database_id + "');");
         // recurse on child nodes (depth-first traversal)
         Object response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='"

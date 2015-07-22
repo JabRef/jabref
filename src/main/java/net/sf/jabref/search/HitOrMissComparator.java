@@ -17,6 +17,7 @@ package net.sf.jabref.search;
 
 import java.util.Comparator;
 
+import com.google.common.base.Preconditions;
 import net.sf.jabref.BibtexEntry;
 import ca.odell.glazedlists.matchers.Matcher;
 
@@ -28,9 +29,8 @@ public class HitOrMissComparator implements Comparator<BibtexEntry> {
 
     private final Matcher<BibtexEntry> hitOrMiss;
 
-
     public HitOrMissComparator(Matcher<BibtexEntry> hitOrMiss) {
-        this.hitOrMiss = hitOrMiss;
+        this.hitOrMiss = Preconditions.checkNotNull(hitOrMiss);
     }
 
     @Override
@@ -39,7 +39,10 @@ public class HitOrMissComparator implements Comparator<BibtexEntry> {
             return 0;
         }
 
-        boolean hit1 = hitOrMiss.matches(o1), hit2 = hitOrMiss.matches(o2);
+        boolean hit1 = hitOrMiss.matches(o1);
+        boolean hit2 = hitOrMiss.matches(o2);
+
+        // TODO use Boolean.compareTo when converting to Java8
         if (hit1 == hit2) {
             return 0;
         } else {

@@ -34,17 +34,17 @@ import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import com.jgoodies.forms.factories.Borders;
-
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FieldContentSelector;
 import net.sf.jabref.FieldTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.search.SearchExpressionDescriber;
+import net.sf.jabref.search.SearchExpressionParser;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -135,7 +135,7 @@ class GroupDialog extends JDialog {
         m_editedGroup = editedGroup;
 
         // set default values (overwritten if editedGroup != null)
-        m_kgSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
+        m_kgSearchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
 
         // configure elements
         ButtonGroup groupType = new ButtonGroup();
@@ -386,7 +386,7 @@ class GroupDialog extends JDialog {
             setContext(editedGroup.getHierarchicalContext());
         } else { // creating new group -> defaults!
             m_explicitRadioButton.setSelected(true);
-            setContext(AbstractGroup.INDEPENDENT);
+            setContext(GroupHierarchyType.INDEPENDENT);
         }
     }
 
@@ -457,8 +457,8 @@ class GroupDialog extends JDialog {
                 AST ast = SearchExpressionParser
                         .checkSyntax(s1, m_sgCaseSensitive.isSelected(),
                                 m_sgRegExp.isSelected());
-                setDescription(SearchGroup.getDescriptionForPreview(s1, ast,
-                        m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected()));
+                setDescription(new SearchExpressionDescriber(
+                        m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected(),s1, ast).getDescriptionForPreview());
                 if (m_sgRegExp.isSelected()) {
                     try {
                         Pattern.compile(s1);
@@ -562,29 +562,25 @@ class GroupDialog extends JDialog {
     /**
      * Returns the int representing the selected hierarchical group context.
      */
-    private int getContext() {
+    private GroupHierarchyType getContext() {
         if (m_independentButton.isSelected()) {
-            return AbstractGroup.INDEPENDENT;
+            return GroupHierarchyType.INDEPENDENT;
         }
         if (m_intersectionButton.isSelected()) {
-            return AbstractGroup.REFINING;
+            return GroupHierarchyType.REFINING;
         }
         if (m_unionButton.isSelected()) {
-            return AbstractGroup.INCLUDING;
+            return GroupHierarchyType.INCLUDING;
         }
-        return AbstractGroup.INDEPENDENT; // default
+        return GroupHierarchyType.INDEPENDENT; // default
     }
 
-    private void setContext(int context) {
-        switch (context) {
-        case AbstractGroup.REFINING:
+    private void setContext(GroupHierarchyType context) {
+        if (context == GroupHierarchyType.REFINING) {
             m_intersectionButton.setSelected(true);
-            return;
-        case AbstractGroup.INCLUDING:
+        } else if (context == GroupHierarchyType.INCLUDING) {
             m_unionButton.setSelected(true);
-            return;
-        case AbstractGroup.INDEPENDENT:
-        default:
+        } else {
             m_independentButton.setSelected(true);
         }
     }
