@@ -115,7 +115,7 @@ public class SearchManager2 extends SidePaneComponent
         hideSearch = new JRadioButton(Globals.lang("Filter"), true);
         showResultsInDialog = new JRadioButton(Globals.lang("Show results in dialog"), true);
         searchAllBases = new JRadioButton(Globals.lang("Global search"),
-                Globals.prefs.getBoolean("searchAllBases"));
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL_BASES));
         ButtonGroup types = new ButtonGroup();
         types.add(increment);
         types.add(floatSearch);
@@ -252,11 +252,11 @@ public class SearchManager2 extends SidePaneComponent
         // Select the last used mode of search:
         if (Globals.prefs.getBoolean(JabRefPreferences.INCREMENT_S)) {
             increment.setSelected(true);
-        } else if (Globals.prefs.getBoolean("floatSearch")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_SEARCH)) {
             floatSearch.setSelected(true);
-        } else if (Globals.prefs.getBoolean("showSearchInDialog")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SEARCH_IN_DIALOG)) {
             showResultsInDialog.setSelected(true);
-        } else if (Globals.prefs.getBoolean("searchAllBases")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL_BASES)) {
             searchAllBases.setSelected(true);
         } else {
             hideSearch.setSelected(true);
@@ -442,13 +442,13 @@ public class SearchManager2 extends SidePaneComponent
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_ALL, searchAll.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.INCREMENT_S, increment.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SELECT_S, select.isSelected());
-        Globals.prefs.putBoolean("floatSearch", floatSearch.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.FLOAT_SEARCH, floatSearch.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH,
                 caseSensitive.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.REG_EXP_SEARCH, regExpSearch.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.HIGH_LIGHT_WORDS, highLightWords.isSelected());
-        Globals.prefs.putBoolean("showSearchInDialog", showResultsInDialog.isSelected());
-        Globals.prefs.putBoolean("searchAllBases", searchAllBases.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SHOW_SEARCH_IN_DIALOG, showResultsInDialog.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_ALL_BASES, searchAllBases.isSelected());
     }
 
     public void startIncrementalSearch() {

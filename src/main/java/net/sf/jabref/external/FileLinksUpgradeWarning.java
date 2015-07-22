@@ -51,7 +51,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     @Override
     public boolean isActionNecessary(ParserResult pr) {
         // First check if this warning is disabled:
-        if (!Globals.prefs.getBoolean("showFileLinksUpgradeWarning")) {
+        if (!Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)) {
             return false;
         }
         if (pr.getJabrefMajorVersion() < 0)
@@ -138,7 +138,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Globals.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {
-            Globals.prefs.putBoolean("showFileLinksUpgradeWarning", false);
+            Globals.prefs.putBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING, false);
         }
 
         if (answer == JOptionPane.YES_OPTION) {

@@ -739,7 +739,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 boolean groupingCanceled = false;
 
                 // Set owner/timestamp if options are enabled:
-                Util.setAutomaticFields(selected, Globals.prefs.getBoolean("overwriteOwner"),
+                Util.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
                 // Check if we should unmark entries before adding the new ones:

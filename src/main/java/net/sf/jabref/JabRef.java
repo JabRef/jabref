@@ -831,7 +831,7 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.elementAt(i);
-            if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
                 String[] wrns = pr.warnings();
                 StringBuilder wrn = new StringBuilder();
                 for (int j = 0; j < Math.min(JabRef.MAX_DIALOG_WARNINGS, wrns.length); j++) {

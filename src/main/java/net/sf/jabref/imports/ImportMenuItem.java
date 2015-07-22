@@ -152,7 +152,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     ParserResult pr = p.parserResult;
                     if (pr.hasWarnings()) {
                         if (Globals.prefs
-                                .getBoolean("displayKeyWarningDialogAtStartup")
+                                .getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)
                                 && pr.hasWarnings()) {
                             String[] wrns = pr.warnings();
                             StringBuilder wrn = new StringBuilder();
@@ -323,7 +323,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 anythingUseful = anythingUseful | (entries.size() > 0);
 
                 // set timestamp and owner
-                Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
+                Util.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
                         !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
 

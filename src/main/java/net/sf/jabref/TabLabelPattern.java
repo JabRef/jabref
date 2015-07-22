@@ -70,8 +70,8 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         // Set the default value:
         Globals.prefs.put(JabRefPreferences.DEFAULT_LABEL_PATTERN, defaultPat.getText());
 
-        Globals.prefs.putBoolean("warnBeforeOverwritingKey", warnBeforeOverwriting.isSelected());
-        Globals.prefs.putBoolean("avoidOverwritingKey", dontOverwrite.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
         //Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
         //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());

@@ -601,7 +601,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     firstBE = be;
                                 }
                                 Util.setAutomaticFields(be,
-                                        Globals.prefs.getBoolean("overwriteOwner"),
+                                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
 
                                 // We have to clone the
@@ -877,17 +877,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
                     bes = i.next();
                     if (bes.getField(BibtexFields.KEY_FIELD) != null) {
-                        if (Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                             // Remove the entry, because its key is already set:
                             i.remove();
-                        } else if (Globals.prefs.getBoolean("warnBeforeOverwritingKey")) {
+                        } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
                             // Ask if the user wants to cancel the operation:
                             CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("One or more keys will be overwritten. Continue?"),
                                     Globals.lang("Disable this confirmation dialog"), false);
                             int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite keys"),
                                     JOptionPane.YES_NO_OPTION);
                             if (cbm.isSelected()) {
-                                Globals.prefs.putBoolean("warnBeforeOverwritingKey", false);
+                                Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
                             }
                             if (answer == JOptionPane.NO_OPTION) {
                                 // Ok, break off the operation.
@@ -904,7 +904,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 HashMap<BibtexEntry, Object> oldvals = new HashMap<BibtexEntry, Object>();
                 // Iterate again, removing already set keys. This is skipped if overwriting
                 // is disabled, since all entries with keys set will have been removed.
-                if (!Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     for (BibtexEntry entry : entries) {
                         bes = entry;
                         // Store the old value:
@@ -1996,7 +1996,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try
             {
                 database.insertEntry(bibEntry);
-                if (Globals.prefs.getBoolean("useOwner")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
                     Util.setAutomaticFields(bibEntry, true, true);
                 }
@@ -2773,7 +2773,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
-        if (Globals.prefs.getBoolean("confirmDelete")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String msg = Globals.lang("Really delete the selected")
                     + ' ' + Globals.lang("entry") + '?', title = Globals.lang("Delete entry");
             if (numberOfEntries > 1) {
@@ -2789,7 +2789,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (cb.isSelected()) {
-                Globals.prefs.putBoolean("confirmDelete", false);
+                Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, false);
             }
             return (answer == JOptionPane.YES_OPTION);
         } else {

@@ -2185,7 +2185,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int addedEntries = 0;
 
         // Set owner and timestamp fields:
-        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean("overwriteOwner"),
+        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                 Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
         if (intoNew || (tabbedPane.getTabCount() == 0)) {

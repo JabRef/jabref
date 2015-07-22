@@ -128,9 +128,9 @@ public class GroupSelector extends SidePaneComponent implements
 
         this.frame = frame;
         hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
-                !Globals.prefs.getBoolean("grayOutNonHits"));
+                !Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
         grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
-                Globals.prefs.getBoolean("grayOutNonHits"));
+                Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
         ButtonGroup nonHits = new ButtonGroup();
         nonHits.add(hideNonHits);
         nonHits.add(grayOut);
@@ -178,7 +178,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected());
             }
         });
 
@@ -779,7 +779,7 @@ public class GroupSelector extends SidePaneComponent implements
         /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
         DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
                 panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
-                        .getBoolean("grayOutNonHits"),
+                        .getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS),
                 //true,
                 select.isSelected());
         search.start();*/

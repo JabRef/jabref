@@ -124,7 +124,7 @@ public class AppendDatabaseAction implements BaseAction {
         MetaData meta = pr.getMetaData();
 
         if (importEntries) { // Add entries
-            boolean overwriteOwner = Globals.prefs.getBoolean("overwriteOwner");
+            boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
             boolean overwriteTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP);
 
             for (String key : fromDatabase.getKeySet()) {
