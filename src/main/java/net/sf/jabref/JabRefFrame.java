@@ -618,7 +618,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
                     searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
-                    previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
+                    previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
                     highlightAny
                             .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
                     highlightAll
@@ -2128,8 +2128,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * (there are more than one entry or the inspection dialog is also
          * enabled for single entries):
          */
-        if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
-                (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
+                (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || (entries.size() > 1))) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -2186,7 +2186,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Set owner and timestamp fields:
         Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean("overwriteOwner"),
-                Globals.prefs.getBoolean("overwriteTimeStamp"), Globals.prefs.getBoolean("markImportedEntries"));
+                Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
         if (intoNew || (tabbedPane.getTabCount() == 0)) {
             // Import into new database.

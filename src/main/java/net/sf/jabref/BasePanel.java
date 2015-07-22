@@ -602,7 +602,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 }
                                 Util.setAutomaticFields(be,
                                         Globals.prefs.getBoolean("overwriteOwner"),
-                                        Globals.prefs.getBoolean("overwriteTimeStamp"));
+                                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
 
                                 // We have to clone the
                                 // entries, since the pasted
@@ -1640,8 +1640,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                boolean enabled = !Globals.prefs.getBoolean("previewEnabled");
-                Globals.prefs.putBoolean("previewEnabled", enabled);
+                boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
+                Globals.prefs.putBoolean(JabRefPreferences.PREVIEW_ENABLED, enabled);
                 frame.setPreviewActive(enabled);
                 frame.previewToggle.setSelected(enabled);
             }

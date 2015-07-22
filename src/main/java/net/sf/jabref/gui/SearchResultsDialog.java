@@ -111,7 +111,7 @@ public class SearchResultsDialog {
     private void init(String title) {
         diag = new JDialog(frame, title, false);
 
-        int activePreview = Globals.prefs.getInt("activePreview");
+        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         preview = new PreviewPanel(null, new MetaData(),
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 

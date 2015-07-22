@@ -24,7 +24,7 @@ public class JabRefMessageHandler implements MessageHandler {
 
         // put "bringToFront" in the queue
         // it has to happen before the call to import as the import might open a dialog
-        // --> Globals.prefs.getBoolean("useImportInspectionDialog")
+        // --> Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG)
         // this dialog has to be shown AFTER JabRef has been brought to front
         SwingUtilities.invokeLater(new Runnable() {
 

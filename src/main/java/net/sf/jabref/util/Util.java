@@ -1711,7 +1711,7 @@ public class Util {
     }
 
     public static boolean updateTimeStampIsSet() {
-        return (Globals.prefs.getBoolean("useTimeStamp") && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        return (Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
     }
 
     /**

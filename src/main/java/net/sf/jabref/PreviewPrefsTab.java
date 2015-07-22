@@ -151,9 +151,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
-                _prefs.remove("preview0");
+                _prefs.remove(JabRefPreferences.PREVIEW_0);
                 layout1.setText(_prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
-                _prefs.put("preview0", tmp);
+                _prefs.put(JabRefPreferences.PREVIEW_0, tmp);
             }
         });
         def2.addActionListener(new ActionListener() {
@@ -161,9 +161,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
-                _prefs.remove("preview1");
+                _prefs.remove(JabRefPreferences.PREVIEW_1);
                 layout2.setText(_prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
-                _prefs.put("preview1", tmp);
+                _prefs.put(JabRefPreferences.PREVIEW_1, tmp);
             }
         });
 

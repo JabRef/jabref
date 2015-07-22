@@ -189,7 +189,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
 
     private final JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs
-            .getBoolean("generateKeysAfterInspection"));
+            .getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
 
     private final JLabel duplLabel = new JLabel(GUIGlobals.getImage("duplicate"));
     private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
@@ -675,7 +675,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // First check if we are supposed to warn about duplicates. If so,
             // see if there
             // are unresolved duplicates, and warn if yes.
-            if (Globals.prefs.getBoolean("warnAboutDuplicatesInInspection")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION)) {
                 for (BibtexEntry entry : entries) {
 
                     // Only check entries that are to be imported. Keep status
@@ -695,7 +695,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
                                 cbm, Globals.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
                         if (cbm.isSelected()) {
-                            Globals.prefs.putBoolean("warnAboutDuplicatesInInspection", false);
+                            Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, false);
                         }
                         if (answer == JOptionPane.NO_OPTION) {
                             return;
@@ -723,7 +723,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 generateKeys(false);
             }
             // Remember the choice until next time:
-            Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerate.isSelected());
+            Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerate.isSelected());
 
             final List<BibtexEntry> selected = getSelectedEntries();
 
@@ -740,10 +740,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
                 // Set owner/timestamp if options are enabled:
                 Util.setAutomaticFields(selected, Globals.prefs.getBoolean("overwriteOwner"),
-                        Globals.prefs.getBoolean("overwriteTimeStamp"), Globals.prefs.getBoolean("markImportedEntries"));
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
                 // Check if we should unmark entries before adding the new ones:
-                if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
                     for (BibtexEntry entry : panel.database().getEntries()) {
                         EntryMarker.unmarkEntry(entry, true, panel.database(), ce);
                     }

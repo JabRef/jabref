@@ -94,7 +94,7 @@ public class BibtexParser {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
-        autoDoubleBraces = Globals.prefs.getBoolean("autoDoubleBraces");
+        autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
         _in = new PushbackReader(in, BibtexParser.LOOKAHEAD);
     }
 

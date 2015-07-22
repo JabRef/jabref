@@ -189,8 +189,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     // Use the import inspection dialog if it is enabled in preferences, and
                     // (there are more than one entry or the inspection dialog is also enabled
                     // for single entries):
-                    if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
-                            (Globals.prefs.getBoolean("useImportInspectionDialogForSingle")
+                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
+                            (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE)
                             || (bibtexResult.getDatabase().getEntryCount() > 1))) {
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
@@ -201,11 +201,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         diag.setVisible(true);
                         diag.toFront();
                     } else {
-                        boolean generateKeys = Globals.prefs.getBoolean("generateKeysAfterInspection");
+                        boolean generateKeys = Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION);
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
 
                         // Check if we should unmark entries before adding the new ones:
-                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
                             for (BibtexEntry entry : toAddTo.getEntries()) {
                                 EntryMarker.unmarkEntry(entry, true, toAddTo, ce);
                             }
@@ -324,8 +324,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 // set timestamp and owner
                 Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
-                        Globals.prefs.getBoolean("overwriteTimeStamp"),
-                        !openInNew && Globals.prefs.getBoolean("markImportedEntries")); // set timestamp and owner
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
+                        !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
 
                 for (BibtexEntry entry : entries) {
                     database.insertEntry(entry);

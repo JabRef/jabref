@@ -293,12 +293,12 @@ public class FileTab extends JPanel implements PrefsTab {
 
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         wrapFieldLine.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD));
-        autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
-        resolveStringsAll.setSelected(_prefs.getBoolean("resolveStringsAllFields"));
+        autoDoubleBraces.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES));
+        resolveStringsAll.setSelected(_prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
-        doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
-        bracesAroundCapitalsFields.setText(_prefs.get("putBracesAroundCapitals"));
-        nonWrappableFields.setText(_prefs.get("nonWrappableFields"));
+        doNotResolveStringsFor.setText(_prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        bracesAroundCapitalsFields.setText(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
+        nonWrappableFields.setText(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
         autoSave.setSelected(_prefs.getBoolean("autoSave"));
         promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean("promptBeforeUsingAutosave"));
@@ -354,11 +354,11 @@ public class FileTab extends JPanel implements PrefsTab {
 
         boolean updateSpecialFields = false;
         if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
-            _prefs.put("putBracesAroundCapitals", bracesAroundCapitalsFields.getText());
+            _prefs.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, bracesAroundCapitalsFields.getText());
             updateSpecialFields = true;
         }
-        if (!nonWrappableFields.getText().trim().equals(_prefs.get("nonWrappableFields"))) {
-            _prefs.put("nonWrappableFields", nonWrappableFields.getText());
+        if (!nonWrappableFields.getText().trim().equals(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
+            _prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
             updateSpecialFields = true;
         }
         // If either of the two last entries were changed, run the update for special field handling:
