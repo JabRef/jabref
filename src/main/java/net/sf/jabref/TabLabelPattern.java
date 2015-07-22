@@ -78,17 +78,17 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
         Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerateOnImport.isSelected());
-        Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, generateOnSave.isSelected());
 
         if (alwaysAddLetter.isSelected()) {
-            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", true);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
         } else if (letterStartA.isSelected()) {
             Globals.prefs.putBoolean("keyGenFirstLetterA", true);
-            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
         else {
             Globals.prefs.putBoolean("keyGenFirstLetterA", false);
-            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
 
         LabelPatternUtil.updateDefaultPattern();

@@ -526,7 +526,7 @@ public class LabelPatternUtil {
             occurences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"), firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
+        boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER), firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
 
         if (!alwaysAddLetter && (occurences == 0)) {
             // No dupes found, so we can just go ahead.

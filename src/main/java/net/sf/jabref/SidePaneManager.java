@@ -275,7 +275,7 @@ public class SidePaneManager {
             boolean wasVisible = sidep.isVisible();
             sidep.setVisible(true);
             if (!wasVisible) {
-                int width = Globals.prefs.getInt("sidePaneWidth");
+                int width = Globals.prefs.getInt(JabRefPreferences.SIDE_PANE_WIDTH);
                 if (width > 0) {
                     frame.contentPane.setDividerLocation(width);
                 } else {
@@ -284,7 +284,7 @@ public class SidePaneManager {
             }
         } else {
             if (sidep.isVisible()) {
-                Globals.prefs.putInt("sidePaneWidth", frame.contentPane.getDividerLocation());
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
             }
             sidep.setVisible(false);
 

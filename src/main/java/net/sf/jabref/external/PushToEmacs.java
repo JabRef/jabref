@@ -134,14 +134,14 @@ public class PushToEmacs implements PushToApplication {
                     // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                     // so cmd receives: (insert \"\\cite{Blah2001}\")
                     // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\\\"\\" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
+                    prefix.concat("\\\"\\" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS).replaceAll("\\\\", "\\\\\\\\") +
                             "{" + keys + "}\\\"").concat(suffix)
                     :
                     // Linux gnuclient escaping:
                     // java string: "(insert \"\\\\cite{Blah2001}\")"
                     // so sh receives: (insert "\\cite{Blah2001}")
                     // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\"" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
+                    prefix.concat("\"" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS).replaceAll("\\\\", "\\\\\\\\") +
                             "{" + keys + "}\"").concat(suffix);
 
             final Process p = Runtime.getRuntime().exec(com);

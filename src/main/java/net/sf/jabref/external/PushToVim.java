@@ -80,7 +80,7 @@ public class PushToVim implements PushToApplication {
     public void storeSettings() {
         Globals.prefs.put(JabRefPreferences.VIM, vimPath.getText());
         Globals.prefs.put(JabRefPreferences.VIM_SERVER, vimServer.getText());
-        Globals.prefs.put("citeCommandVim", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_VIM, citeCommand.getText());
     }
 
     private void initSettingsPanel() {

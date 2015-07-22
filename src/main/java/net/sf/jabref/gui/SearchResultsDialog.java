@@ -178,15 +178,15 @@ public class SearchResultsDialog {
 
             @Override
             public void windowClosing(WindowEvent event) {
-                Globals.prefs.putInt("searchDialogWidth", diag.getSize().width);
-                Globals.prefs.putInt("searchDialogHeight", diag.getSize().height);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_WIDTH, diag.getSize().width);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT, diag.getSize().height);
             }
         });
 
         diag.getContentPane().add(contentPane, BorderLayout.CENTER);
         // Remember and default to last size:
-        diag.setSize(new Dimension(Globals.prefs.getInt("searchDialogWidth"), Globals.prefs
-                .getInt("searchDialogHeight")));
+        diag.setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.SEARCH_DIALOG_WIDTH), Globals.prefs
+                .getInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT)));
         diag.setLocationRelativeTo(frame);
     }
 

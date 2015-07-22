@@ -123,7 +123,7 @@ public class FileDialogs {
 
         // Added the !dirOnly condition below as a workaround to the native file dialog
         // not supporting directory selection:
-        if (!dirOnly && Globals.prefs.getBoolean("useNativeFileDialogOnMac")) {
+        if (!dirOnly && Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC)) {
 
             return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType,
                     updateWorkingDirectory, dirOnly, off);

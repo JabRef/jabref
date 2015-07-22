@@ -2803,7 +2803,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * lacking keys.
      */
     public void autoGenerateKeysBeforeSaving() {
-        if (Globals.prefs.getBoolean("generateKeysBeforeSaving")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
             NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
             boolean any = false;
 

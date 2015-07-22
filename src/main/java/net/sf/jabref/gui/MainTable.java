@@ -156,7 +156,7 @@ public class MainTable extends JTable {
 
     public void refreshSorting() {
         sortedForMarking.getReadWriteLock().writeLock().lock();
-        if (Globals.prefs.getBoolean("floatMarkedEntries")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES)) {
             sortedForMarking.setComparator(markingComparator);
         } else {
             sortedForMarking.setComparator(null);

@@ -500,7 +500,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void init() {
         tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
-        UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
+        UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME));
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
@@ -826,7 +826,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Store divider location for side pane:
         int width = contentPane.getDividerLocation();
         if (width > 0) {
-            prefs.putInt("sidePaneWidth", width);
+            prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, width);
         }
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If

@@ -303,7 +303,7 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray("externalJournalLists");
+        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if ((externalFiles == null) || (externalFiles.length == 0)) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
@@ -404,7 +404,7 @@ class ManageJournalsPanel extends JPanel {
             if (filename.equals("")) {
                 filename = null;
             }
-            Globals.prefs.put("personalJournalList", filename);
+            Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, filename);
         }
 
         // Store the list of external files set up:
@@ -415,10 +415,10 @@ class ManageJournalsPanel extends JPanel {
             }
         }
         if (extFiles.size() == 0) {
-            Globals.prefs.put("externalJournalLists", "");
+            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
         } else {
             String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray("externalJournalLists", list);
+            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
         }
 
         Globals.initializeJournalNames();

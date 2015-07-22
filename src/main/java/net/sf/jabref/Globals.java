@@ -1317,7 +1317,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         }
 
         // Read personal list, if set up:
-        if (Globals.prefs.get("personalJournalList") != null) {
+        if (Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST) != null) {
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {

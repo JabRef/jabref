@@ -84,7 +84,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property 
-        boolean openFolders = JabRefPreferences.getInstance().getBoolean("openFoldersOfAttachedFiles");
+        boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
         for (File f : fileList) {

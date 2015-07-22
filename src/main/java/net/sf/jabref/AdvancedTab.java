@@ -216,8 +216,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         useRemoteServer.setSelected(remotePreferences.useRemoteServer());
         oldPort = remotePreferences.getPort();
         remoteServerPort.setText(String.valueOf(oldPort));
-        useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
-        filechooserDisableRename.setSelected(Globals.prefs.getBoolean("filechooserDisableRename"));
+        useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC));
+        filechooserDisableRename.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
         oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
         biblatexMode.setSelected(oldBiblMode);
@@ -230,8 +230,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !useDefault.isSelected());
         preferences.put(JabRefPreferences.WIN_LOOK_AND_FEEL, className.getSelectedItem().toString());
-        preferences.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
-        preferences.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());
+        preferences.putBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC, useNativeFileDialogOnMac.isSelected());
+        preferences.putBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME, filechooserDisableRename.isSelected());
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
         preferences.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
         if (useIEEEAbrv.isSelected()) {

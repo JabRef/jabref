@@ -333,8 +333,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
         // Remember and default to last size:
-        setSize(new Dimension(Globals.prefs.getInt("importInspectionDialogWidth"), Globals.prefs
-                .getInt("importInspectionDialogHeight")));
+        setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_WIDTH), Globals.prefs
+                .getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT)));
         addWindowListener(new WindowAdapter() {
 
             @Override
@@ -344,8 +344,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             @Override
             public void windowClosed(WindowEvent e) {
-                Globals.prefs.putInt("importInspectionDialogWidth", getSize().width);
-                Globals.prefs.putInt("importInspectionDialogHeight", getSize().height);
+                Globals.prefs.putInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_WIDTH, getSize().width);
+                Globals.prefs.putInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT, getSize().height);
             }
         });
         // Key bindings:

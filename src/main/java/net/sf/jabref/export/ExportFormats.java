@@ -272,7 +272,7 @@ public class ExportFormats {
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
-                    Globals.prefs.put("lastUsedExport", format.getConsoleName());
+                    Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getConsoleName());
                     Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent());
 
                     final File finFile = file;
