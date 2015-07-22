@@ -532,12 +532,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setVisible(Globals.prefs.getBoolean("toolbarVisible"));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        if (!prefs.getBoolean("windowMaximised")) {
+        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
 
-            int sizeX = prefs.getInt("sizeX");
-            int sizeY = prefs.getInt("sizeY");
-            int posX = prefs.getInt("posX");
-            int posY = prefs.getInt("posY");
+            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
+            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
+            int posX = prefs.getInt(JabRefPreferences.POS_X);
+            int posY = prefs.getInt(JabRefPreferences.POS_Y);
 
             /*
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -583,8 +583,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     if (sizeX <= width) {
                         posX = width - sizeX;
                     } else {
-                        posX = prefs.getIntDefault("posX");
-                        sizeX = prefs.getIntDefault("sizeX");
+                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
+                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
                     }
                 }
 
@@ -592,8 +592,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     if (sizeY <= height) {
                         posY = height - sizeY;
                     } else {
-                        posY = prefs.getIntDefault("posY");
-                        sizeY = prefs.getIntDefault("sizeY");
+                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
+                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
                     }
                 }
             }
@@ -814,12 +814,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (basePanel() != null) {
             basePanel().saveDividerLocation();
         }
-        prefs.putInt("posX", JabRefFrame.this.getLocation().x);
-        prefs.putInt("posY", JabRefFrame.this.getLocation().y);
-        prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
-        prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
-        //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
-        prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
+        prefs.putInt(JabRefPreferences.POS_X, JabRefFrame.this.getLocation().x);
+        prefs.putInt(JabRefPreferences.POS_Y, JabRefFrame.this.getLocation().y);
+        prefs.putInt(JabRefPreferences.SIZE_X, JabRefFrame.this.getSize().width);
+        prefs.putInt(JabRefPreferences.SIZE_Y, JabRefFrame.this.getSize().height);
+        //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
+        prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState() == Frame.MAXIMIZED_BOTH));
 
         prefs.putBoolean("toolbarVisible", tlb.isVisible());
         prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));

@@ -92,7 +92,7 @@ public class MainTable extends JTable {
         super();
 
         addFocusListener(Globals.focusListener);
-        setAutoResizeMode(Globals.prefs.getInt("autoResizeMode"));
+        setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;
         this.panel = panel;
@@ -114,14 +114,14 @@ public class MainTable extends JTable {
         EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
-        tableColorCodes = Globals.prefs.getBoolean("tableColorCodesOn");
+        tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
         selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
-        pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
-        setGridColor(Globals.prefs.getColor("gridColor"));
-        if (Globals.prefs.getBoolean("tableShowGrid")) {
+        pane.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
+        setGridColor(Globals.prefs.getColor(JabRefPreferences.GRID_COLOR));
+        if (Globals.prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID)) {
             setShowGrid(true);
         } else
         {

@@ -625,7 +625,7 @@ public class JabRef {
             String lookFeel;
             String systemLnF = UIManager.getSystemLookAndFeelClassName();
 
-            if (Globals.prefs.getBoolean("useDefaultLookAndFeel")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
                 // Use system Look & Feel by default
                 lookFeel = systemLnF;
             } else {
@@ -808,13 +808,13 @@ public class JabRef {
         // If we are set to remember the window location, we also remember the maximised
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
-        if (Globals.prefs.getBoolean("windowMaximised")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         JabRef.jrf.setVisible(true);
 
-        if (Globals.prefs.getBoolean("windowMaximised")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 

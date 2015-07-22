@@ -373,7 +373,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public void updateTableFormat() {
 
         // Read table columns from prefs:
-        String[] colSettings = Globals.prefs.getStringArray("columnNames");
+        String[] colSettings = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
         columns = new String[colSettings.length][];
         for (int i = 0; i < colSettings.length; i++) {
             String[] fields = colSettings[i].split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
@@ -382,12 +382,12 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
 
         // Read name format options:
-        boolean showShort = Globals.prefs.getBoolean("showShort");
-        namesNatbib = Globals.prefs.getBoolean("namesNatbib"); //MK:
-        namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
-        namesAsIs = Globals.prefs.getBoolean("namesAsIs");
-        abbr_names = Globals.prefs.getBoolean("abbrAuthorNames"); //MK:
-        namesFf = Globals.prefs.getBoolean("namesFf");
+        boolean showShort = Globals.prefs.getBoolean(JabRefPreferences.SHOW_SHORT);
+        namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
+        namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
+        namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
+        abbr_names = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
+        namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
         namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
 
         // Set the icon columns, indicating the number of special columns to the left.

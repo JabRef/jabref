@@ -2294,9 +2294,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void adjustSplitter() {
         int mode = getMode();
         if (mode == BasePanel.SHOWING_PREVIEW) {
-            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt("previewPanelHeight"));
+            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT));
         } else {
-            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt("entryEditorHeight"));
+            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
 
         }
     }
@@ -2387,7 +2387,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         else {
             splitPane.setDividerLocation
-                    (splitPane.getHeight() - Globals.prefs.getInt("entryEditorHeight"));
+                    (splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
         //new FocusRequester(form);
         //form.requestFocus();
         }
@@ -2446,9 +2446,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void showEntryEditor(EntryEditor editor) {
         if (mode == BasePanel.SHOWING_EDITOR) {
-            Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         } else if (mode == BasePanel.SHOWING_PREVIEW) {
-            Globals.prefs.putInt("previewPanelHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanel.SHOWING_EDITOR;
         currentEditor = editor;
@@ -2503,7 +2503,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void entryEditorClosing(EntryEditor editor) {
         // Store divider location for next time:
-        Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+        Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         selectionListener.entryEditorClosing(editor);
     }
 
@@ -2843,9 +2843,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void saveDividerLocation() {
         if (mode == BasePanel.SHOWING_PREVIEW) {
-            Globals.prefs.putInt("previewPanelHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         } else if (mode == BasePanel.SHOWING_EDITOR) {
-            Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         }
     }
 

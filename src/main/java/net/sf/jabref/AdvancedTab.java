@@ -208,7 +208,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        oldUseDef = preferences.getBoolean("useDefaultLookAndFeel");
+        oldUseDef = preferences.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL);
         oldLnf = preferences.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
         useDefault.setSelected(!oldUseDef);
         className.setSelectedItem(oldLnf);
@@ -228,7 +228,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
+        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !useDefault.isSelected());
         preferences.put(JabRefPreferences.WIN_LOOK_AND_FEEL, className.getSelectedItem().toString());
         preferences.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
         preferences.putBoolean("filechooserDisableRename", filechooserDisableRename.isSelected());

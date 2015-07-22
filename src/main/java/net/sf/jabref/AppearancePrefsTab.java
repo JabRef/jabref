@@ -156,7 +156,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
+        colorCodes.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
         //antialias.setSelected(_prefs.getBoolean("antialias"));
         fontSize.setText("" + _prefs.getInt("menuFontSize"));
         rowPadding.setText("" + _prefs.getInt("tableRowPadding"));
@@ -166,7 +166,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSize.setEnabled(overrideFonts.isSelected());
         //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));
         //customIconThemeFile.setText(_prefs.get("customIconThemeFile"));
-        showGrid.setSelected(_prefs.getBoolean("tableShowGrid"));
+        showGrid.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID));
         colorPanel.setValues();
     }
 
@@ -178,20 +178,20 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
 
-        _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
+        _prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
         //_prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
-        _prefs.putInt("fontStyle", font.getStyle());
-        _prefs.putInt("fontSize", font.getSize());
-        _prefs.putBoolean("overrideDefaultFonts", overrideFonts.isSelected());
+        _prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
+        _prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
+        _prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
         GUIGlobals.CURRENTFONT = font;
         colorPanel.storeSettings();
-        _prefs.putBoolean("tableShowGrid", showGrid.isSelected());
+        _prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
             if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
                     (size != oldMenuFontSize)) {
-                _prefs.putInt("menuFontSize", size);
+                _prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Globals.lang("You have changed the menu and label font size.")
                                 .concat(" ")

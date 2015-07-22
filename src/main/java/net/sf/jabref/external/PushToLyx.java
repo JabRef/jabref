@@ -107,7 +107,7 @@ public class PushToLyx implements PushToApplication {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("verify that LyX is running and that the lyxpipe is valid")
                     + ". [" + Globals.prefs.get(JabRefPreferences.LYXPIPE) + "]");
         } else if (couldNotWrite) {
-            panel.output(Globals.lang("Error") + ": " + Globals.lang("unable to write to") + " " + Globals.prefs.get("lyxpipe") +
+            panel.output(Globals.lang("Error") + ": " + Globals.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
                     ".in");
         } else {
 
@@ -134,7 +134,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("lyxpipe", lyxPipe.getText());
+        Globals.prefs.put(JabRefPreferences.LYXPIPE, lyxPipe.getText());
     }
 
     private void initSettingsPanel() {
