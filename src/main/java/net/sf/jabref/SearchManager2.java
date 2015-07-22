@@ -15,31 +15,25 @@
 */
 package net.sf.jabref;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Vector;
+import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.SearchResultsDialog;
+import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.matchers.SearchMatcher;
+import net.sf.jabref.search.rules.BasicRegexSearchRule;
+import net.sf.jabref.search.rules.BasicSearchRule;
+import net.sf.jabref.search.rules.SearchExpression;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.search.*;
-import net.sf.jabref.gui.SearchResultsDialog;
-import net.sf.jabref.help.HelpAction;
-import net.sf.jabref.search.matchers.SearchMatcher;
-import net.sf.jabref.search.rules.BasicRegexSearchRule;
-import net.sf.jabref.search.rules.BasicSearchRule;
-import net.sf.jabref.search.rules.SearchExpression;
-import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.rules.sets.SearchRuleSet;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Vector;
 
 public class SearchManager2 extends SidePaneComponent
         implements ActionListener, KeyListener, ItemListener, CaretListener {
@@ -61,7 +55,9 @@ public class SearchManager2 extends SidePaneComponent
     private final JPopupMenu settings = new JPopupMenu();
     private final JButton openset = new JButton(Globals.lang("Settings"));
     private final JButton escape = new JButton(Globals.lang("Clear"));
-    /** This button's text will be set later. */
+    /**
+     * This button's text will be set later.
+     */
     private final JButton search = new JButton();
     private final JCheckBoxMenuItem searchReq;
     private final JCheckBoxMenuItem searchOpt;
@@ -81,7 +77,6 @@ public class SearchManager2 extends SidePaneComponent
     private boolean incSearch = false, startedFloatSearch = false, startedFilterSearch = false;
 
     private int incSearchPos = -1; // To keep track of where we are in
-
 
     // an incremental search. -1 means
     // that the search is inactive.
@@ -218,8 +213,7 @@ public class SearchManager2 extends SidePaneComponent
                 if (settings.isVisible()) {
                     //System.out.println("oee");
                     //settings.setVisible(false);
-                }
-                else {
+                } else {
                     JButton src = (JButton) e.getSource();
                     settings.show(src, 0, openset.getHeight());
                 }
@@ -348,8 +342,7 @@ public class SearchManager2 extends SidePaneComponent
         }
         if (increment.isSelected()) {
             searchField.addKeyListener(this);
-        }
-        else {
+        } else {
             if (searchAutoComplete.isSelected() && (autoCompleteListener != null)) {
                 searchField.addKeyListener(autoCompleteListener);
             }
@@ -359,7 +352,7 @@ public class SearchManager2 extends SidePaneComponent
     /**
      * Subscribe to the SearchListener and receive events, if the user searches for some thing. You
      * will receive a list of words
-     * 
+     *
      * @param l
      */
     public void addSearchListener(SearchTextListener l) {
@@ -374,6 +367,7 @@ public class SearchManager2 extends SidePaneComponent
 
     /**
      * Remove object from the SearchListener
+     *
      * @param l
      */
     public void removeSearchListener(SearchTextListener l) {
@@ -382,8 +376,8 @@ public class SearchManager2 extends SidePaneComponent
 
     /**
      * parse the search string for valid words and return a list of words
-     * Like "The great Vikinger" will be ["The","great","Vikinger"] 
-     * 
+     * Like "The great Vikinger" will be ["The","great","Vikinger"]
+     *
      * @param t
      * @return
      */
@@ -397,6 +391,7 @@ public class SearchManager2 extends SidePaneComponent
 
     /**
      * Fires an event if a search was started / canceled
+     *
      * @param t
      */
     private void fireSearchlistenerEvent(String t) {
@@ -414,8 +409,10 @@ public class SearchManager2 extends SidePaneComponent
         }
     }
 
-    /** force the search button to be large enough for
-     * the longer of the two texts */
+    /**
+     * force the search button to be large enough for
+     * the longer of the two texts
+     */
     private void setSearchButtonSizes() {
         search.setText(Globals.lang("Search specified field(s)"));
         Dimension size1 = search.getPreferredSize();
@@ -492,7 +489,7 @@ public class SearchManager2 extends SidePaneComponent
     }
 
     private void clearSearchLater() {
-        if(panel == null) {
+        if (panel == null) {
             return;
         }
 
@@ -513,8 +510,7 @@ public class SearchManager2 extends SidePaneComponent
         if (e.getSource() == escape) {
             incSearch = false;
             clearSearchLater();
-        }
-        else if (((e.getSource() == searchField) || (e.getSource() == search))
+        } else if (((e.getSource() == searchField) || (e.getSource() == search))
                 && !increment.isSelected()
                 && (panel != null)) {
 
@@ -530,7 +526,7 @@ public class SearchManager2 extends SidePaneComponent
             // Setup search parameters common to both normal and float.
             SearchRule searchRule;
 
-            if(Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH)) {
                 searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
             } else {
                 searchRule = new BasicSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
@@ -544,7 +540,6 @@ public class SearchManager2 extends SidePaneComponent
             } catch (Exception ex) {
                 // we'll do a search in all fields
             }
-
 
             if (!searchRule.validateSearchStrings(searchField.getText())) {
                 panel.output(Globals.lang("Search failed: illegal search expression"));
@@ -560,13 +555,11 @@ public class SearchManager2 extends SidePaneComponent
         }
     }
 
-
     class SearchWorker extends AbstractWorker {
 
         private final SearchRule rule;
         private final String searchTerm;
         int hits = 0;
-
 
         public SearchWorker(SearchRule rule, String searchTerm) {
             this.rule = rule;
@@ -585,8 +578,7 @@ public class SearchManager2 extends SidePaneComponent
                         hits++;
                     }
                 }
-            }
-            else {
+            } else {
                 // Search all databases:
                 for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                     BasePanel p = frame.baseAt(i);
@@ -632,9 +624,7 @@ public class SearchManager2 extends SidePaneComponent
                 }
                 searchDialog.selectFirstEntry();
                 searchDialog.setVisible(true);
-            }
-
-            else if (showResultsInDialog.isSelected()) {
+            } else if (showResultsInDialog.isSelected()) {
                 // Turn off other search mode, if activated:
                 if (startedFloatSearch) {
                     panel.mainTable.stopShowingFloatSearch();
@@ -654,8 +644,7 @@ public class SearchManager2 extends SidePaneComponent
                 }
                 searchDialog.selectFirstEntry();
                 searchDialog.setVisible(true);
-            }
-            else if (hideSearch.isSelected()) {
+            } else if (hideSearch.isSelected()) {
                 // Filtering search - removes non-hits from the table:
                 if (startedFloatSearch) {
                     panel.mainTable.stopShowingFloatSearch();
@@ -680,7 +669,6 @@ public class SearchManager2 extends SidePaneComponent
 
         }
     }
-
 
     private void clearSearch() {
 
@@ -712,7 +700,7 @@ public class SearchManager2 extends SidePaneComponent
             // Make sure the correct key listener is activated:
             updateKeyListeners();
 
-        } else /*if (e.getSource() == normal)*/{
+        } else /*if (e.getSource() == normal)*/ {
             updateSearchButtonText();
 
             // If this search type is disabled, remove reordering from
@@ -733,7 +721,7 @@ public class SearchManager2 extends SidePaneComponent
     /**
      * Used for incremental search. Only activated when incremental
      * is selected.
-     *
+     * <p/>
      * The variable incSearchPos keeps track of which entry was last
      * checked.
      */
@@ -817,16 +805,16 @@ public class SearchManager2 extends SidePaneComponent
         }
     }
 
-    /** Updates the text on the search button to reflect
-     * the type of search that will happen on click. */
+    /**
+     * Updates the text on the search button to reflect
+     * the type of search that will happen on click.
+     */
     private void updateSearchButtonText() {
-        search.setText(!increment.isSelected()
-                && (SearchExpressionParser.checkSyntax(
-                        searchField.getText(),
-                        caseSensitive.isSelected(),
-                        regExpSearch.isSelected()) != null)
-                ? Globals.lang("Search specified field(s)")
-                : Globals.lang("Search all fields"));
+        search.setText(isSpecificSearch() ? Globals.lang("Search specified field(s)") : Globals.lang("Search all fields"));
+    }
+
+    private boolean isSpecificSearch() {
+        return !increment.isSelected() && SearchExpression.isValid(caseSensitive.isSelected(), regExpSearch.isSelected(), searchField.getText());
     }
 
     @Override

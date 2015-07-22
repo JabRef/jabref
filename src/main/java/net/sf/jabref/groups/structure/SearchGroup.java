@@ -18,7 +18,8 @@ package net.sf.jabref.groups.structure;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.search.*;
+import net.sf.jabref.search.describer.BasicSearchDescriber;
+import net.sf.jabref.search.describer.SearchExpressionDescriber;
 import net.sf.jabref.search.rules.RegExpSearchRule;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.search.rules.SearchExpression;
@@ -225,8 +226,11 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return new SearchExpressionDescriber(caseSensitive,
-                regExp, searchExpression, expressionSearchRule.getAst()).getDescriptionForPreview();
+        if(expressionSearchRule.getTree() != null) {
+            return new SearchExpressionDescriber(caseSensitive, regExp, expressionSearchRule.getTree()).getDescription();
+        } else {
+            return new BasicSearchDescriber(caseSensitive, regExp, searchExpression).getDescription();
+        }
     }
 
     @Override

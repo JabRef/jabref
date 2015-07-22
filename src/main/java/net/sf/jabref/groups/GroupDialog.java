@@ -36,11 +36,11 @@ import javax.swing.undo.AbstractUndoableEdit;
 import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.search.SearchExpressionDescriber;
-import net.sf.jabref.search.SearchExpressionParser;
+import net.sf.jabref.search.describer.BasicSearchDescriber;
+import net.sf.jabref.search.describer.SearchExpressionDescriber;
+import net.sf.jabref.search.rules.SearchExpression;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
-import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -322,8 +322,7 @@ class GroupDialog extends JDialog {
                         // therefore I don't catch anything here
                         m_resultingGroup = new SearchGroup(m_name.getText()
                                 .trim(), m_sgSearchExpression.getText().trim(),
-                                m_sgCaseSensitive.isSelected(), m_sgRegExp
-                                        .isSelected(), getContext());
+                                isCaseSensitive(), isRegex(), getContext());
                     } catch (Exception e1) {
                         // should never happen
                     }
@@ -449,12 +448,14 @@ class GroupDialog extends JDialog {
                         + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>"
                         + "<tt>author%esmith and title%eelectrical</tt>"));
             } else {
-                AST ast = SearchExpressionParser
-                        .checkSyntax(s1, m_sgCaseSensitive.isSelected(),
-                                m_sgRegExp.isSelected());
-                setDescription(new SearchExpressionDescriber(
-                        m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected(),s1, ast).getDescriptionForPreview());
-                if (m_sgRegExp.isSelected()) {
+                SearchExpression expression = new SearchExpression(isCaseSensitive(), isRegex());
+                expression.validateSearchStrings(s1);
+                if(expression.getTree() != null) {
+                    setDescription(new SearchExpressionDescriber(isCaseSensitive(), isRegex(), expression.getTree()).getDescription());
+                } else {
+                    setDescription(new BasicSearchDescriber(isCaseSensitive(), isRegex(), s1).getDescription());
+                }
+                if (isRegex()) {
                     try {
                         Pattern.compile(s1);
                     } catch (Exception e) {
@@ -469,6 +470,14 @@ class GroupDialog extends JDialog {
             setNameFontItalic(false);
         }
         m_ok.setEnabled(okEnabled);
+    }
+
+    private boolean isRegex() {
+        return m_sgRegExp.isSelected();
+    }
+
+    private boolean isCaseSensitive() {
+        return m_sgCaseSensitive.isSelected();
     }
 
     /**

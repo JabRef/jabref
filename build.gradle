@@ -64,7 +64,7 @@ sourceSets {
 configurations {
     generateClasspath
     antlr3
-    antlr2
+    antlr4
 }
 
 dependencies {
@@ -87,9 +87,11 @@ dependencies {
     compile 'org.openoffice:ridl:3.2.1'
     compile 'org.openoffice:unoil:3.2.1'
 
-    antlr2 'antlr:antlr:2.7.7'
     antlr3 'org.antlr:antlr:3.4'
     compile 'org.antlr:antlr-runtime:3.4'
+
+    antlr4 'org.antlr:antlr4:4.5.1'
+    compile 'org.antlr:antlr4-runtime:4.5.1'
 
     compile 'mysql:mysql-connector-java:5.1.36'
     compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
@@ -156,7 +158,7 @@ javadoc {
 // jabref specific tasks
 compileJava.dependsOn "generateSource"
 
-task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchTreeParserSource"]) {
+task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
 }
@@ -190,76 +192,30 @@ task generateBstGrammarSource(type: JavaExec) {
     args = ["-o", file('src/main/gen/net/sf/jabref/bst/'), antlrSource]
 }
 
-task generateSearchLexerSource(type: JavaExec) {
-    String grammarFile = "Lexer"
+task generateSearchGrammarSource(type: JavaExec) {
+    String grammarFile = "Search"
 
     group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr2."
+    description "Generates java files for ${grammarFile}.g antlr4."
 
     String packagePath = "net/sf/jabref/search"
-    File antlr2Path = file("src/main/antlr2")
+    File antlrPath = file("src/main/antlr4")
     File genPath = file("src/main/gen")
 
-    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
+    File antlrSource = file("$antlrPath/$packagePath/${grammarFile}.g4")
     File destinationDir = file("$genPath/$packagePath")
 
     inputs.file antlrSource
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
+    outputs.file file("$destinationDir/${grammarFile}Parser.java")
+    outputs.file file("$destinationDir/${grammarFile}Lexer.java")
+    outputs.file file("$destinationDir/${grammarFile}Visitor.java")
+    outputs.file file("$destinationDir/${grammarFile}BaseVisitor.java")
+    outputs.file file("$destinationDir/${grammarFile}.tokens")
+    outputs.file file("$destinationDir/${grammarFile}Lexer.tokens")
 
-    main = 'antlr.Tool'
-    classpath = configurations.antlr2
-    args = ["-o", destinationDir, antlrSource]
-}
-
-task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerSource") {
-    String grammarFile = "Parser"
-
-    group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr2."
-
-    String packagePath = "net/sf/jabref/search"
-    File antlr2Path = file("src/main/antlr2")
-    File genPath = file("src/main/gen")
-
-    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
-    File destinationDir = file("$genPath/$packagePath")
-
-    inputs.file antlrSource
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
-
-    main = 'antlr.Tool'
-    classpath = configurations.antlr2
-    args = ["-o", destinationDir, antlrSource]
-}
-
-task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchParserSource") {
-    String grammarFile = "TreeParser"
-
-    group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr2."
-
-    String packagePath = "net/sf/jabref/search"
-    File antlr2Path = file("src/main/antlr2")
-    File genPath = file("src/main/gen")
-
-    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
-    File destinationDir = file("$genPath/$packagePath")
-
-    inputs.file antlrSource
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
-
-    main = 'antlr.Tool'
-    classpath = configurations.antlr2
-    args = ["-o", destinationDir, antlrSource]
+    main = 'org.antlr.v4.Tool'
+    classpath = configurations.antlr4
+    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
 }
 
 apply plugin: 'jacoco'

@@ -9,6 +9,8 @@
     - Special fields: .bib files edited with 2.11 beta 3 are not compatible with this release. Other versions are not affected.
     - Journal abbreviation lists: in case entries are defined more than once, a message is output on the console
     - JabRef metadata ("jabref-meta") @comments are now always written in alphabetical order
+    - Switch vom antlr2 grammar to antlr4 for capturing the search expressions. Should be backwards compatible.
+    - Changed html description of search expressions, expressing the conditional logic more explicitly with brackets.
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
