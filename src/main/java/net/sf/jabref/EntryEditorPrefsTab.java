@@ -262,7 +262,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 EmacsKeyBindings.load();
             }
         }
-        _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
+        _prefs.putBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION, disableOnMultiple.isSelected());
         // We want to know if the following settings have been modified:
         boolean oldAutoComplete = _prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE);
         boolean oldShowSource = _prefs.getBoolean(JabRefPreferences.SHOW_SOURCE);

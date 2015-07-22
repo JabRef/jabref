@@ -666,7 +666,7 @@ public class MainTable extends JTable {
     static class IncompleteRenderer extends GeneralRenderer {
 
         public IncompleteRenderer() {
-            super(Globals.prefs.getColor("incompleteEntryBackground"));
+            super(Globals.prefs.getColor(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND));
             super.setToolTipText(Globals.lang("This entry is incomplete"));
         }
 

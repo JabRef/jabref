@@ -1933,7 +1933,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
             if ((e.getType() == ChangeType.ADDED_ENTRY)
-                    && (Globals.prefs.getBoolean("autoAssignGroup"))
+                    && (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP))
                     && (frame.groupToggle.isSelected())) {
                 BibtexEntry[] entries = {e.getEntry()};
                 TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();

@@ -79,7 +79,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     public void performAction(BasePanel panel, ParserResult pr) {
         // Find out which actions should be offered:
         // Only offer to change Preferences if file column is not already visible:
-        boolean offerChangeSettings = !Globals.prefs.getBoolean("fileColumn") || !showsFileInGenFields();
+        boolean offerChangeSettings = !Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN) || !showsFileInGenFields();
         // Only offer to upgrade links if the pdf/ps fields are used:
         boolean offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
@@ -188,8 +188,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradePrefs) {
             // Exchange table columns:
-            Globals.prefs.putBoolean("pdfColumn", Boolean.FALSE);
-            Globals.prefs.putBoolean("fileColumn", Boolean.TRUE);
+            Globals.prefs.putBoolean(JabRefPreferences.PDF_COLUMN, Boolean.FALSE);
+            Globals.prefs.putBoolean(JabRefPreferences.FILE_COLUMN, Boolean.TRUE);
 
             // Modify General fields if necessary:
             // If we don't find the file field, insert it at the bottom of the first tab:

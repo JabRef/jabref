@@ -246,10 +246,10 @@ public class GUIGlobals {
 
 
     public static void updateEntryEditorColors() {
-        GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor("activeFieldEditorBackgroundColor");
-        GUIGlobals.validFieldBackgroundColor = JabRefPreferences.getInstance().getColor("validFieldBackgroundColor");
-        GUIGlobals.invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor("invalidFieldBackgroundColor");
-        GUIGlobals.editorTextColor = JabRefPreferences.getInstance().getColor("fieldEditorTextColor");
+        GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
+        GUIGlobals.validFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR);
+        GUIGlobals.invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR);
+        GUIGlobals.editorTextColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR);
     }
 
     /**

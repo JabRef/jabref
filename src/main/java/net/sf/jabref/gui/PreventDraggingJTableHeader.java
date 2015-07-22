@@ -21,6 +21,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 /**
@@ -107,21 +108,21 @@ class PreventDraggingJTableHeader extends JTableHeader {
      */
     private int getSpecialColumnsCount() {
         int count = 0;
-        if (Globals.prefs.getBoolean("fileColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
             count++;
         }
-        if (Globals.prefs.getBoolean("pdfColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.PDF_COLUMN)) {
             count++;
         }
-        if (Globals.prefs.getBoolean("urlColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
             count++;
         }
-        if (Globals.prefs.getBoolean("arxivColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
             count++;
         }
 
-        if (Globals.prefs.getBoolean("extraFileColumns")) {
-            count += Globals.prefs.getStringArray("listOfFileColumns").length;
+        if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
+            count += Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS).length;
         }
 
         // special field columns may also not be dragged

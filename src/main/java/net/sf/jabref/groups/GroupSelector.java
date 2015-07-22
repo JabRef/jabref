@@ -138,7 +138,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected());
             }
         });
         andCb.addChangeListener(new ChangeListener() {
@@ -183,7 +183,7 @@ public class GroupSelector extends SidePaneComponent implements
         });
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
-        if (Globals.prefs.getBoolean("groupFloatSelections")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
 
             floatCb.setSelected(true);
             highlCb.setSelected(false);
@@ -218,7 +218,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("autoAssignGroup", autoAssignGroup.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
             }
         });
 
@@ -228,7 +228,7 @@ public class GroupSelector extends SidePaneComponent implements
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
         showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
-        autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup"));
+        autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
 
         openset.setMargin(new Insets(0, 0, 0, 0));
         settings.add(andCb);
@@ -259,7 +259,7 @@ public class GroupSelector extends SidePaneComponent implements
                 } else {
                     JButton src = (JButton) e.getSource();
                     showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
-                    autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup"));
+                    autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
                     settings.show(src, 0, openset.getHeight());
                 }
             }
