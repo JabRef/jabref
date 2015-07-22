@@ -49,7 +49,7 @@ class SearchManagerNoGUI {
 
         SearchRule searchRule;
 
-        if (Globals.prefs.getBoolean("regExpSearch")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH)) {
             searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
         } else {
             searchRule = new BasicSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
@@ -57,7 +57,7 @@ class SearchManagerNoGUI {
 
         try {
             searchRule = new SearchExpression(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
-                    Globals.prefs.getBoolean("regExpSearch"));
+                    Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
         } catch (Exception ignored) {
 
         }

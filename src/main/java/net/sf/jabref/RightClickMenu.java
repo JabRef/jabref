@@ -529,11 +529,11 @@ public class RightClickMenu extends JPopupMenu
 
     /** Sets the font and icon to be used, depending on the group */
     private void setGroupFontAndIcon(JMenuItem menuItem, AbstractGroup group) {
-        if (Globals.prefs.getBoolean("groupShowDynamic")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
             menuItem.setFont(menuItem.getFont().deriveFont(group.isDynamic() ?
                     Font.ITALIC : Font.PLAIN));
         }
-        if (Globals.prefs.getBoolean("groupShowIcons")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case INCLUDING:
                 menuItem.setIcon(GUIGlobals.getImage("groupIncluding"));

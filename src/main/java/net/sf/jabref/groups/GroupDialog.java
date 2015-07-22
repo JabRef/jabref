@@ -34,12 +34,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import com.jgoodies.forms.factories.Borders;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.FieldContentSelector;
-import net.sf.jabref.FieldTextField;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.search.SearchExpressionDescriber;
 import net.sf.jabref.search.SearchExpressionParser;
@@ -135,7 +130,7 @@ class GroupDialog extends JDialog {
         m_editedGroup = editedGroup;
 
         // set default values (overwritten if editedGroup != null)
-        m_kgSearchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
+        m_kgSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
 
         // configure elements
         ButtonGroup groupType = new ButtonGroup();

@@ -145,21 +145,21 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupIntersectSelections", andCb.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected());
             }
         });
         invCb.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupInvertSelections", invCb.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected());
             }
         });
         showOverlappingGroups.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupShowOverlapping",
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING,
                         showOverlappingGroups.isSelected());
                 if (!showOverlappingGroups.isSelected()) {
                     groupsTree.setHighlight2Cells(null);
@@ -171,7 +171,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupSelectMatches", select.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected());
             }
         });
         grayOut.addChangeListener(new ChangeListener() {
@@ -193,7 +193,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
         JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
                 false);
-        if (Globals.prefs.getBoolean("groupIntersectSelections")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS)) {
             andCb.setSelected(true);
             orCb.setSelected(false);
         } else {
@@ -222,9 +222,9 @@ public class GroupSelector extends SidePaneComponent implements
             }
         });
 
-        invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
-        showOverlappingGroups.setSelected(Globals.prefs.getBoolean("groupShowOverlapping"));
-        select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
+        invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
+        showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
+        select.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SELECT_MATCHES));
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
         showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
@@ -937,7 +937,7 @@ public class GroupSelector extends SidePaneComponent implements
     private void setGroups(GroupTreeNode groupsRoot) {
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
         this.groupsRoot = groupsRoot;
-        if (Globals.prefs.getBoolean("groupExpandTree")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
             groupsTree.expandSubtree(groupsRoot);
         }
     }
@@ -1503,11 +1503,11 @@ public class GroupSelector extends SidePaneComponent implements
         }
 
         // auto show/hide groups interface
-        if (Globals.prefs.getBoolean("groupAutoShow")
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW)
                 && !groupsRoot.isLeaf()) { // groups were defined
             frame.sidePaneManager.show("groups");
             frame.groupToggle.setSelected(true);
-        } else if (Globals.prefs.getBoolean("groupAutoHide")
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE)
                 && groupsRoot.isLeaf()) { // groups were not defined
             frame.sidePaneManager.hide("groups");
             frame.groupToggle.setSelected(false);

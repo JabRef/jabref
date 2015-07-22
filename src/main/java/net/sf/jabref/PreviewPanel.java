@@ -449,12 +449,12 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     @Override
     public void searchText(ArrayList<String> words) {
-        if (Globals.prefs.getBoolean("highLightWords")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
             this.wordsToHighlight = words;
             update();
         } else {
             if (this.wordsToHighlight != null) {
-                // setting of "highLightWords" seems to have changed.
+                // setting of JabRefPreferences.HIGH_LIGHT_WORDS seems to have changed.
                 // clear all highlights and remember the clearing (by wordsToHighlight = null)
                 this.wordsToHighlight = null;
                 update();

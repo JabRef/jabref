@@ -48,10 +48,10 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     public NameFieldAutoCompleter(String[] fieldNames, boolean lastNameOnlyAndSeparationBySpace) {
         this.fieldNames = fieldNames;
         this.lastNameOnlyAndSeparationBySpace = lastNameOnlyAndSeparationBySpace;
-        if (Globals.prefs.getBoolean("autoCompFF")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST)) {
             autoCompFF = true;
             autoCompLF = false;
-        } else if (Globals.prefs.getBoolean("autoCompLF")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST)) {
             autoCompFF = false;
             autoCompLF = true;
         } else {

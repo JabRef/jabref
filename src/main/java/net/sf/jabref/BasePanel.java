@@ -2225,7 +2225,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
 
         // Set up AutoCompleters for this panel:
-        if (Globals.prefs.getBoolean("autoComplete")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
             autoCompleters = new ContentAutoCompleters(getDatabase(), metaData);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());

@@ -1337,7 +1337,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
             return Pattern.compile("");
         }
 
-        boolean regExSearch = Globals.prefs.getBoolean("regExpSearch");
+        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
 
         // compile the words to a regex in the form (w1) | (w2) | (w3)
         String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");

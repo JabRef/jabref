@@ -80,7 +80,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());
         }
-        boolean italics = Globals.prefs.getBoolean("groupShowDynamic")
+        boolean italics = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)
                 && group.isDynamic();
         boolean red = false;
         if (highlight2Cells != null) {
@@ -146,7 +146,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             label.setText(text);
         }
         label.setToolTipText("<html>" + group.getShortDescription() + "</html>");
-        if (Globals.prefs.getBoolean("groupShowIcons")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case REFINING:
                 if (label.getIcon() != GroupTreeCellRenderer.groupRefiningIcon) {
