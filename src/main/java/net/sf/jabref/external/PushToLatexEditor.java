@@ -130,7 +130,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("latexEditorPath", ledPath.getText());
+        Globals.prefs.put(JabRefPreferences.LATEX_EDITOR_PATH, ledPath.getText());
         Globals.prefs.put("citeCommandLed", citeCommand.getText());
     }
 }
