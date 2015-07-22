@@ -18,6 +18,7 @@ package net.sf.jabref.export;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -47,7 +48,7 @@ public class AutoSaveManager {
 
         TimerTask task = new AutoSaveTask();
         t = new Timer();
-        long interval = 60000 * Globals.prefs.getInt("autoSaveInterval");
+        long interval = 60000 * Globals.prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL);
         t.scheduleAtFixedRate(task, interval, interval);
     }
 

@@ -1190,7 +1190,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             if (link != null) {
                                 filepath = link.toString();
                             } else {
-                                if (Globals.prefs.getBoolean("runAutomaticFileSearch")) {
+                                if (Globals.prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH)) {
 
                                     /*  The search can lead to an unexpected 100% CPU usage which is perceived
                                         as a bug, if the search incidentally starts at a directory with lots

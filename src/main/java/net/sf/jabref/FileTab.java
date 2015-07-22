@@ -85,7 +85,7 @@ public class FileTab extends JPanel implements PrefsTab {
                 GUIGlobals.getIconUrl("helpSmall"));
         openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Globals.lang("Backup old file when saving"));
-        autoSave = new JCheckBox(Globals.lang("Autosave"));
+        autoSave = new JCheckBox(Globals.lang(JabRefPreferences.AUTO_SAVE));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
         valueDelimiter = new JComboBox(new String[] {
@@ -300,12 +300,12 @@ public class FileTab extends JPanel implements PrefsTab {
         bracesAroundCapitalsFields.setText(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
         nonWrappableFields.setText(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
-        autoSave.setSelected(_prefs.getBoolean("autoSave"));
-        promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean("promptBeforeUsingAutosave"));
-        autoSaveInterval.setValue(_prefs.getInt("autoSaveInterval"));
+        autoSave.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
+        promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE));
+        autoSaveInterval.setValue(_prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL));
         origAutoSaveSetting = autoSave.isSelected();
-        valueDelimiter.setSelectedIndex(_prefs.getInt("valueDelimiters"));
-        includeEmptyFields.setSelected(_prefs.getBoolean("includeEmptyFields"));
+        valueDelimiter.setSelectedIndex(_prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
+        includeEmptyFields.setSelected(_prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS));
         camelCase.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
         sameColumn.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
 
@@ -341,7 +341,7 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
         _prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
         _prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
-        _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
+        _prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
         _prefs.putBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS, includeEmptyFields.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());

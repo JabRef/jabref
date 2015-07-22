@@ -54,7 +54,7 @@ public class AutosaveStartupPrompter implements Runnable {
         for (File file : files) {
             File fileToLoad = file;
             boolean tryingAutosave;
-            if (Globals.prefs.getBoolean("promptBeforeUsingAutosave")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
                 int answer = JOptionPane.showConfirmDialog(null, "<html>" +
                         Globals.lang("An autosave file was found for this database. This could indicate ")
                         + Globals.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"

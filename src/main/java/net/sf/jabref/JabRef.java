@@ -801,7 +801,7 @@ public class JabRef {
                 Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
 
         // Start auto save timer:
-        if (Globals.prefs.getBoolean("autoSave")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {
             Globals.startAutoSaveManager(JabRef.jrf);
         }
 

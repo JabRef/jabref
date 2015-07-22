@@ -211,7 +211,7 @@ public class Util {
         if (key == null) {
             return null;
         }
-        if (!JabRefPreferences.getInstance().getBoolean("enforceLegalBibtexKey")) {
+        if (!JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:

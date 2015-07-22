@@ -128,9 +128,9 @@ public class DBStrings {
      * Store these db strings into JabRef preferences.
      */
     public void storeToPreferences() {
-        Globals.prefs.put("dbConnectServerType", getServerType());
-        Globals.prefs.put("dbConnectHostname", getServerHostname());
-        Globals.prefs.put("dbConnectDatabase", getDatabase());
-        Globals.prefs.put("dbConnectUsername", getUsername());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_SERVER_TYPE, getServerType());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_HOSTNAME, getServerHostname());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_DATABASE, getDatabase());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_USERNAME, getUsername());
     }
 }

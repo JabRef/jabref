@@ -1048,7 +1048,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
     private static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
     static {
         // Put the standard entry types into the type map.
-        if (!Globals.prefs.getBoolean("biblatexMode")) {
+        if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
             BibtexEntryType.ALL_TYPES.put("article", BibtexEntryType.ARTICLE);
             BibtexEntryType.ALL_TYPES.put("inbook", BibtexEntryType.INBOOK);
             BibtexEntryType.ALL_TYPES.put("book", BibtexEntryType.BOOK);

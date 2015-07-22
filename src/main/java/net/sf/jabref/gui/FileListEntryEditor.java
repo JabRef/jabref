@@ -278,7 +278,7 @@ public class FileListEntryEditor {
     }
 
     public void setVisible(boolean visible, boolean openBrowse) {
-        openBrowseWhenShown = openBrowse && Globals.prefs.getBoolean("allowFileAutoOpenBrowse");
+        openBrowseWhenShown = openBrowse && Globals.prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE);
         if (visible) {
             okPressed = false;
         }

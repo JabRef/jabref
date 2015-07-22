@@ -83,11 +83,11 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         if (alwaysAddLetter.isSelected()) {
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
         } else if (letterStartA.isSelected()) {
-            Globals.prefs.putBoolean("keyGenFirstLetterA", true);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
         else {
-            Globals.prefs.putBoolean("keyGenFirstLetterA", false);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
 

@@ -88,7 +88,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
         fetcherChoice = new JComboBox(choices);
-        int defaultFetcher = Globals.prefs.getInt("selectedFetcherIndex");
+        int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
         if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
         }
@@ -123,7 +123,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
-                Globals.prefs.putInt("selectedFetcherIndex", fetcherChoice.getSelectedIndex());
+                Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
                 if (activeFetcher.getHelpPage() != null) {
                     help.setHelpFile(activeFetcher.getHelpPage());
                     helpBut.setEnabled(true);
@@ -328,13 +328,13 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     @Override
     public void componentClosing() {
         super.componentClosing();
-        Globals.prefs.putBoolean("webSearchVisible", Boolean.FALSE);
+        Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 
     @Override
     public void componentOpening() {
         super.componentOpening();
-        Globals.prefs.putBoolean("webSearchVisible", Boolean.TRUE);
+        Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
     }
 
 

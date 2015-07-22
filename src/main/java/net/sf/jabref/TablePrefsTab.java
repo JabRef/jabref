@@ -323,7 +323,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (((newVal != null) && (oldVal == null))
                 || ((newVal == null) && (oldVal != null))
                 || ((newVal != null) && !newVal.equals(oldVal))) {
-            _prefs.put("numericFields", newVal);
+            _prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             BibtexFields.setNumericFieldsFromPrefs();
         }
 

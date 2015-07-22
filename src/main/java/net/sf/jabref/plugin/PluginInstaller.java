@@ -17,6 +17,7 @@ package net.sf.jabref.plugin;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Globals;
@@ -349,13 +350,13 @@ public class PluginInstaller {
      * @param filename The path to the file to delete.
      */
     private static void schedulePluginForDeletion(String filename) {
-        String[] oldValues = Globals.prefs.getStringArray("deletePlugins");
+        String[] oldValues = Globals.prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
         String[] newValues = oldValues == null ? new String[1] : new String[oldValues.length + 1];
         if (oldValues != null) {
             System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
         }
         newValues[newValues.length - 1] = filename;
-        Globals.prefs.putStringArray("deletePlugins", newValues);
+        Globals.prefs.putStringArray(JabRefPreferences.DELETE_PLUGINS, newValues);
     }
 
     /**

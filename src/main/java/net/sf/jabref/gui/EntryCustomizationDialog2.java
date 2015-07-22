@@ -71,7 +71,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         Container pane = getContentPane();
         pane.setLayout(new BorderLayout());
 
-        biblatexMode = Globals.prefs.getBoolean("biblatexMode");
+        biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
 
         JPanel main = new JPanel(), buttons = new JPanel(), right = new JPanel();
         main.setLayout(new BorderLayout());

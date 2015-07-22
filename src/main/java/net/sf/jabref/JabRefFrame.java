@@ -1432,7 +1432,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.addSeparator();
         GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetchers);
         search.add(generalFetcher.getAction());
-        if (prefs.getBoolean("webSearchVisible")) {
+        if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
             sidePaneManager.show(generalFetcher.getTitle());
         }

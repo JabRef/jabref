@@ -1298,7 +1298,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         // Read internal lists:
         Globals.journalAbbrev = new JournalAbbreviationRepository();
         Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-        if (Globals.prefs.getBoolean("useIEEEAbrv")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
             Globals.journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_INTERNAL_LIST);
         }
 

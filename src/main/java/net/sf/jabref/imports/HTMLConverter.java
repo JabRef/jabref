@@ -20,8 +20,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class HTMLConverter implements LayoutFormatter {
 
@@ -790,7 +791,7 @@ public class HTMLConverter implements LayoutFormatter {
         // Deal with the form <sup>k</sup>and <sub>k</sub>
         // If the result is in text or equation form can be controlled
         // From the "Advanced settings" tab
-        if (Globals.prefs.getBoolean("useConvertToEquation")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
             text = text.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
             text = text.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
         } else {

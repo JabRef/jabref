@@ -266,7 +266,7 @@ public class BibtexFields
      * add a field descriptor for the new field.
      */
     public static void setNumericFieldsFromPrefs() {
-        String[] numFields = Globals.prefs.getStringArray("numericFields");
+        String[] numFields = Globals.prefs.getStringArray(JabRefPreferences.NUMERIC_FIELDS);
         if (numFields == null) {
             return;
         }

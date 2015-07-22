@@ -228,7 +228,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
             EntryEditorTab optPan;
-            if (!prefs.getBoolean("biblatexMode")) {
+            if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
                 optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
                         false, false, Globals.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {

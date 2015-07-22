@@ -218,12 +218,12 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         remoteServerPort.setText(String.valueOf(oldPort));
         useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC));
         filechooserDisableRename.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME));
-        useIEEEAbrv.setSelected(Globals.prefs.getBoolean("useIEEEAbrv"));
-        oldBiblMode = Globals.prefs.getBoolean("biblatexMode");
+        useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
+        oldBiblMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
         biblatexMode.setSelected(oldBiblMode);
-        useConvertToEquation.setSelected(Globals.prefs.getBoolean("useConvertToEquation"));
-        useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean("useCaseKeeperOnSearch"));
-        useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean("useUnitFormatterOnSearch"));
+        useConvertToEquation.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
+        useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
+        useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
     }
 
     @Override
@@ -233,14 +233,14 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         preferences.putBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC, useNativeFileDialogOnMac.isSelected());
         preferences.putBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME, filechooserDisableRename.isSelected());
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
-        preferences.putBoolean("useIEEEAbrv", useIEEEAbrv.isSelected());
+        preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
         if (useIEEEAbrv.isSelected()) {
             Globals.journalAbbrev = new JournalAbbreviationRepository();
             Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
         }
         storeRemoteSettings();
 
-        preferences.putBoolean("biblatexMode", biblatexMode.isSelected());
+        preferences.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
 
         if ((useDefault.isSelected() == oldUseDef) ||
                 !oldLnf.equals(className.getSelectedItem().toString())) {
@@ -260,9 +260,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                     Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
 
-        preferences.putBoolean("useConvertToEquation", useConvertToEquation.isSelected());
-        preferences.putBoolean("useCaseKeeperOnSearch", useCaseKeeperOnSearch.isSelected());
-        preferences.putBoolean("useUnitFormatterOnSearch", useUnitFormatterOnSearch.isSelected());
+        preferences.putBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION, useConvertToEquation.isSelected());
+        preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperOnSearch.isSelected());
+        preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterOnSearch.isSelected());
     }
 
     public void storeRemoteSettings() {
