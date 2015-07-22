@@ -127,7 +127,7 @@ public class PushToWinEdt implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("winEdtPath", winEdtPath.getText());
+        Globals.prefs.put(JabRefPreferences.WIN_EDT_PATH, winEdtPath.getText());
         Globals.prefs.put("citeCommandWinEdt", citeCommand.getText());
     }
 }
