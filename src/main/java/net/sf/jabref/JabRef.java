@@ -660,7 +660,7 @@ public class JabRef {
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
         boolean overrideDefaultFonts = Globals.prefs.getBoolean("overrideDefaultFonts");
         if (overrideDefaultFonts) {
-            int fontSize = Globals.prefs.getInt("menuFontSize");
+            int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
             Double zoomLevel = null;

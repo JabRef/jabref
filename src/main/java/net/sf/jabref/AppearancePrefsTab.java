@@ -158,9 +158,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public void setValues() {
         colorCodes.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
         //antialias.setSelected(_prefs.getBoolean("antialias"));
-        fontSize.setText("" + _prefs.getInt("menuFontSize"));
-        rowPadding.setText("" + _prefs.getInt("tableRowPadding"));
-        oldMenuFontSize = _prefs.getInt("menuFontSize");
+        fontSize.setText("" + _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE));
+        rowPadding.setText("" + _prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING));
+        oldMenuFontSize = _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
         overrideFonts.setSelected(_prefs.getBoolean("overrideDefaultFonts"));
         oldOverrideFontSize = overrideFonts.isSelected();
         fontSize.setEnabled(overrideFonts.isSelected());
@@ -204,7 +204,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
         try {
             int padding = Integer.parseInt(rowPadding.getText());
-            _prefs.putInt("tableRowPadding", padding);
+            _prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
