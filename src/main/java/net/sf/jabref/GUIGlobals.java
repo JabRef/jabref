@@ -262,7 +262,7 @@ public class GUIGlobals {
         URL defaultResource = GUIGlobals.class.getResource(prefix + "Icons.properties");
         URL resource = defaultResource;
 
-        if (Globals.prefs.getBoolean("useCustomIconTheme")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CUSTOM_ICON_THEME)) {
             String filename = Globals.prefs.get(JabRefPreferences.CUSTOM_ICON_THEME_FILE);
             if (filename != null) {
                 try {

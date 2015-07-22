@@ -957,7 +957,7 @@ public class Util {
                 newGen = genFields;
             }
             // pr(newGen);
-            Globals.prefs.put("generalFields", newGen);
+            Globals.prefs.put(JabRefPreferences.GENERAL_FIELDS, newGen);
         }
 
     }

@@ -1651,12 +1651,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                boolean enabled = !Globals.prefs.getBoolean("highlightGroupsMatchingAny");
-                Globals.prefs.putBoolean("highlightGroupsMatchingAny", enabled);
+                boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY);
+                Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, enabled);
                 frame.highlightAny.setSelected(enabled);
                 if (enabled) {
                     frame.highlightAll.setSelected(false);
-                    Globals.prefs.putBoolean("highlightGroupsMatchingAll", false);
+                    Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, false);
                 }
                 // ping the listener so it updates:
                 groupsHighlightListener.listChanged(null);
@@ -1667,12 +1667,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                boolean enabled = !Globals.prefs.getBoolean("highlightGroupsMatchingAll");
-                Globals.prefs.putBoolean("highlightGroupsMatchingAll", enabled);
+                boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL);
+                Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, enabled);
                 frame.highlightAll.setSelected(enabled);
                 if (enabled) {
                     frame.highlightAny.setSelected(false);
-                    Globals.prefs.putBoolean("highlightGroupsMatchingAny", false);
+                    Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, false);
                 }
                 // ping the listener so it updates:
                 groupsHighlightListener.listChanged(null);
@@ -2050,10 +2050,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void listChanged(ListEvent<BibtexEntry> listEvent) {
-                if (Globals.prefs.getBoolean("highlightGroupsMatchingAny")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY)) {
                     getGroupSelector().showMatchingGroups(
                             mainTable.getSelectedEntries(), false);
-                } else if (Globals.prefs.getBoolean("highlightGroupsMatchingAll")) {
+                } else if (Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL)) {
                     getGroupSelector().showMatchingGroups(
                             mainTable.getSelectedEntries(), true);
                 } else {
@@ -3188,7 +3188,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                         Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                             == JOptionPane.OK_OPTION)) {
 
-                    saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"), saveType);
+                    saveDatabase(expFile, true, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), saveType);
                     //runCommand("save");
                     frame.getFileHistory().newFile(expFile.getPath());
                     frame.output(Globals.lang("Saved selected to") + " '"

@@ -482,7 +482,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             					if (panel == null) {
             						// // Create a new, empty, database.
             						BibtexDatabase database = new BibtexDatabase();
-            						frame.addTab(database, null, null, Globals.prefs.get("defaultEncoding"),
+            						frame.addTab(database, null, null, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING),
             							true);
             						frame.output(Globals.lang("New database created."));
             						panel = frame.basePanel();

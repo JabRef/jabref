@@ -587,7 +587,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         // was focused when
         // an action was called.
         source.addFocusListener(Globals.focusListener);
-        source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt("fontSize")));
+        source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         setupJTextComponent(source);
         updateSource();
 

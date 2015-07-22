@@ -161,7 +161,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSize.setText("" + _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE));
         rowPadding.setText("" + _prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING));
         oldMenuFontSize = _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
-        overrideFonts.setSelected(_prefs.getBoolean("overrideDefaultFonts"));
+        overrideFonts.setSelected(_prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS));
         oldOverrideFontSize = overrideFonts.isSelected();
         fontSize.setEnabled(overrideFonts.isSelected());
         //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));

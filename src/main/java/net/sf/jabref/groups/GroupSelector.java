@@ -269,13 +269,13 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt("groupsVisibleRows") + 1;
+                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) + 1;
                 groupsTree.setVisibleRowCount(i);
                 groupsTree.revalidate();
                 groupsTree.repaint();
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
-                Globals.prefs.putInt("groupsVisibleRows", i);
+                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
                 GroupSelector.logger.fine(Double.toString(GroupSelector.this.getHeight()));
                 GroupSelector.logger.fine(Double.toString(GroupSelector.this.getPreferredSize().getHeight()));
 
@@ -286,7 +286,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt("groupsVisibleRows") - 1;
+                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) - 1;
                 if (i < 1) {
                     i = 1;
                 }
@@ -296,7 +296,7 @@ public class GroupSelector extends SidePaneComponent implements
                 GroupSelector.this.revalidate();
                 // _panel.sidePaneManager.revalidate();
                 GroupSelector.this.repaint();
-                Globals.prefs.putInt("groupsVisibleRows", i);
+                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
             }
         });
 

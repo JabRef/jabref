@@ -526,7 +526,7 @@ public class JabRef {
                                         + subName);
                                 SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                         new File(subName), Globals.prefs, false, false,
-                                        Globals.prefs.get("defaultEncoding"), false);
+                                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Globals.lang("Warning") + ": " +
@@ -658,7 +658,7 @@ public class JabRef {
         }
 
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
-        boolean overrideDefaultFonts = Globals.prefs.getBoolean("overrideDefaultFonts");
+        boolean overrideDefaultFonts = Globals.prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
         if (overrideDefaultFonts) {
             int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
             UIDefaults defaults = UIManager.getDefaults();
@@ -747,8 +747,8 @@ public class JabRef {
 
         GUIGlobals.init();
         GUIGlobals.CURRENTFONT =
-                new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY), Globals.prefs.getInt("fontStyle"),
-                        Globals.prefs.getInt("fontSize"));
+                new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY), Globals.prefs.getInt(JabRefPreferences.FONT_STYLE),
+                        Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         //Util.pr(": Initializing frame");
         JabRef.jrf = new JabRefFrame(this);

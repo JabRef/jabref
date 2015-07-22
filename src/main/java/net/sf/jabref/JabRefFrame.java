@@ -529,7 +529,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         initActions();
 
         // Show the toolbar if it was visible at last shutdown:
-        tlb.setVisible(Globals.prefs.getBoolean("toolbarVisible"));
+        tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
         if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
@@ -620,9 +620,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
                     previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
                     highlightAny
-                            .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
                     highlightAll
-                            .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
                     Globals.focusListener.setFocused(bp.mainTable);
                     setWindowTitle();
                     // Update search autocompleter with information for the correct database:
@@ -694,7 +694,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager.register("search", searchManager);
 
         // Show the search panel if it was visible at last shutdown:
-        if (Globals.prefs.getBoolean("searchPanelVisible")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE)) {
             sidePaneManager.show("search");
         }
     }
@@ -821,8 +821,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState() == Frame.MAXIMIZED_BOTH));
 
-        prefs.putBoolean("toolbarVisible", tlb.isVisible());
-        prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
+        prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
+        prefs.putBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE, sidePaneManager.isComponentVisible("search"));
         // Store divider location for side pane:
         int width = contentPane.getDividerLocation();
         if (width > 0) {
@@ -2719,7 +2719,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             int currentSize = GUIGlobals.CURRENTFONT.getSize();
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize + 1);
-            Globals.prefs.putInt("fontSize", currentSize + 1);
+            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
             }
@@ -2741,7 +2741,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize - 1);
-            Globals.prefs.putInt("fontSize", currentSize - 1);
+            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
             }

@@ -97,7 +97,7 @@ public class MoveFileAction extends AbstractAction {
                             concat(".").concat(flEntry.getType().extension);
                     CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Move file to file directory?"),
                             Globals.lang("Rename to '%0'", suggName),
-                            Globals.prefs.getBoolean("renameOnMoveFileToFileDir"));
+                            Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));
                     int answer;
                     // Only ask about renaming file if the file doesn't have the proper name already:
                     if (!suggName.equals(file.getName())) {
@@ -110,7 +110,7 @@ public class MoveFileAction extends AbstractAction {
                     if (answer != JOptionPane.YES_OPTION) {
                         return;
                     }
-                    Globals.prefs.putBoolean("renameOnMoveFileToFileDir", cbm.isSelected());
+                    Globals.prefs.putBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR, cbm.isSelected());
                     StringBuilder sb = new StringBuilder(dirs[found]);
                     if (!dirs[found].endsWith(File.separator)) {
                         sb.append(File.separator);

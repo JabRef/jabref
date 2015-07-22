@@ -72,7 +72,7 @@ public class FileHistory extends JMenu implements ActionListener {
             i++;
         }
         history.addFirst(filename);
-        while (history.size() > prefs.getInt("historySize")) {
+        while (history.size() > prefs.getInt(JabRefPreferences.HISTORY_SIZE)) {
             history.removeLast();
         }
         setItems();

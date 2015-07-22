@@ -104,7 +104,7 @@ public class URLDownload {
     }
 
     /**
-     * Encoding will be determined from "defaultEncoding"
+     * Encoding will be determined from JabRefPreferences.DEFAULT_ENCODING
      *
      * @return the downloaded string
      * @throws IOException
