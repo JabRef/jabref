@@ -305,7 +305,7 @@ public class MainTable extends JTable {
     private void setWidths() {
         // Setting column widths:
         int ncWidth = Globals.prefs.getInt("numberColWidth");
-        String[] widths = Globals.prefs.getStringArray("columnWidths");
+        String[] widths = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < tableFormat.padleft; i++) {

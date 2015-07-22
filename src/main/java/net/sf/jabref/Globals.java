@@ -1346,7 +1346,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         }
 
         Pattern pattern;
-        if (Globals.prefs.getBoolean("caseSensitiveSearch")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
             pattern = Pattern.compile(searchPattern);
         } else {
             pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);

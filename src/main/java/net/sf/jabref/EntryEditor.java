@@ -202,7 +202,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         setupSourcePanel();
         add(tabbed, BorderLayout.CENTER);
         tabbed.addChangeListener(tabListener);
-        if (prefs.getBoolean("showSource") && prefs.getBoolean("defaultShowSource")) {
+        if (prefs.getBoolean(JabRefPreferences.SHOW_SOURCE) && prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
             tabbed.setSelectedIndex(sourceIndex);
         }
 
@@ -309,7 +309,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
 
         srcPanel.setName(Globals.lang("BibTeX source"));
-        if (Globals.prefs.getBoolean("showSource")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SOURCE)) {
             tabbed.addTab(Globals.lang("BibTeX source"), GUIGlobals.getImage("source"), srcPanel,
                     Globals.lang("Show/edit BibTeX source"));
             tabs.add(srcPanel);

@@ -50,13 +50,13 @@ class SearchManagerNoGUI {
         SearchRule searchRule;
 
         if (Globals.prefs.getBoolean("regExpSearch")) {
-            searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
         } else {
-            searchRule = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            searchRule = new BasicSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
         }
 
         try {
-            searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"),
+            searchRule = new SearchExpression(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
                     Globals.prefs.getBoolean("regExpSearch"));
         } catch (Exception ignored) {
 

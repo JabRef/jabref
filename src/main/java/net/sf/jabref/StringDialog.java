@@ -98,7 +98,7 @@ class StringDialog extends JDialog {
         });
 
         setLocation(prefs.getInt("stringsPosX"), prefs.getInt("stringsPosY"));
-        setSize(prefs.getInt("stringsSizeX"), prefs.getInt("stringsSizeY"));
+        setSize(prefs.getInt("stringsSizeX"), prefs.getInt(JabRefPreferences.STRINGS_SIZE_Y));
 
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
@@ -368,7 +368,7 @@ class StringDialog extends JDialog {
             prefs.putInt("stringsPosX", p.x);
             prefs.putInt("stringsPosY", p.y);
             prefs.putInt("stringsSizeX", d.width);
-            prefs.putInt("stringsSizeY", d.height);
+            prefs.putInt(JabRefPreferences.STRINGS_SIZE_Y, d.height);
         }
     }
 

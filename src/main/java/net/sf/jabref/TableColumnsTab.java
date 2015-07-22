@@ -450,7 +450,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
         tableRows.clear();
-        String[] names = _prefs.getStringArray("columnNames"), lengths = _prefs.getStringArray("columnWidths");
+        String[] names = _prefs.getStringArray(JabRefPreferences.COLUMN_NAMES), lengths = _prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.length; i++) {
             if (i < lengths.length) {
                 tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
@@ -804,8 +804,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            _prefs.putStringArray("columnNames", names);
-            _prefs.putStringArray("columnWidths", widths);
+            _prefs.putStringArray(JabRefPreferences.COLUMN_NAMES, names);
+            _prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }
