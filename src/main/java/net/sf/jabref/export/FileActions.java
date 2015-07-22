@@ -474,13 +474,13 @@ public class FileActions {
         if (isSaveOperation) {
             Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
-                inOriginalOrder = Globals.prefs.getBoolean("saveInOriginalOrder");
+                inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             } else {
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                 inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
             }
         } else {
-            inOriginalOrder = Globals.prefs.getBoolean("exportInOriginalOrder");
+            inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         }
         List<Comparator<BibtexEntry>> comparators;
         if (inOriginalOrder) {
