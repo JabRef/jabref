@@ -46,8 +46,7 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
     private final JCheckBox generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)"));
     private final JCheckBox autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
 
-    private final JRadioButton
-            letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)"));
+    private final JRadioButton letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)"));
     private final JRadioButton letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)"));
     private final JRadioButton alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
 
@@ -62,35 +61,34 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
     }
 
     /**
-     * Store changes to table preferences. This method is called when
-     * the user clicks Ok.
+     * Store changes to table preferences. This method is called when the user clicks Ok.
      *
      */
     @Override
     public void storeSettings() {
 
         // Set the default value:
-        Globals.prefs.put("defaultLabelPattern", defaultPat.getText());
+        Globals.prefs.put(JabRefPreferences.DEFAULT_LABEL_PATTERN, defaultPat.getText());
 
-        Globals.prefs.putBoolean("warnBeforeOverwritingKey", warnBeforeOverwriting.isSelected());
-        Globals.prefs.putBoolean("avoidOverwritingKey", dontOverwrite.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
         //Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
         //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
         Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
         Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
-        Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerateOnImport.isSelected());
-        Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerateOnImport.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, generateOnSave.isSelected());
 
         if (alwaysAddLetter.isSelected()) {
-            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", true);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
         } else if (letterStartA.isSelected()) {
-            Globals.prefs.putBoolean("keyGenFirstLetterA", true);
-            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
         else {
-            Globals.prefs.putBoolean("keyGenFirstLetterA", false);
-            Globals.prefs.putBoolean("keyGenAlwaysAddLetter", false);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
+            Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
 
         LabelPatternUtil.updateDefaultPattern();
@@ -170,13 +168,13 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
     @Override
     public void setValues() {
         super.setValues(_prefs.getKeyPattern());
-        defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
-        dontOverwrite.setSelected(Globals.prefs.getBoolean("avoidOverwritingKey"));
-        generateOnSave.setSelected(Globals.prefs.getBoolean("generateKeysBeforeSaving"));
-        autoGenerateOnImport.setSelected(Globals.prefs.getBoolean("generateKeysAfterInspection"));
-        warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
+        defaultPat.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+        dontOverwrite.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY));
+        generateOnSave.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
+        autoGenerateOnImport.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
+        warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY));
 
-        boolean alwaysAddLetter = Globals.prefs.getBoolean("keyGenAlwaysAddLetter"), firstLetterA = Globals.prefs.getBoolean("keyGenFirstLetterA");
+        boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER), firstLetterA = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
         if (alwaysAddLetter) {
             this.alwaysAddLetter.setSelected(true);
         } else if (firstLetterA) {

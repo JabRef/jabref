@@ -235,12 +235,12 @@ public class ExternalTab extends JPanel implements PrefsTab {
         pdfDir.setText(_prefs.get("pdfDirectory"));
         psDir.setText(_prefs.get("psDirectory"));
         fileDir.setText(_prefs.get(GUIGlobals.FILE_FIELD + "Directory"));
-        bibLocationAsFileDir.setSelected(_prefs.getBoolean("bibLocationAsFileDir"));
-        bibLocAsPrimaryDir.setSelected(_prefs.getBoolean("bibLocAsPrimaryDir"));
+        bibLocationAsFileDir.setSelected(_prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
+        bibLocAsPrimaryDir.setSelected(_prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
-        runAutoFileSearch.setSelected(_prefs.getBoolean("runAutomaticFileSearch"));
+        runAutoFileSearch.setSelected(_prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
-        allowFileAutoOpenBrowse.setSelected(_prefs.getBoolean("allowFileAutoOpenBrowse"));
+        allowFileAutoOpenBrowse.setSelected(_prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
 
         emailSubject.setText(_prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
@@ -266,11 +266,11 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.put("pdfDirectory", pdfDir.getText());
         _prefs.put("psDirectory", psDir.getText());
         _prefs.put(GUIGlobals.FILE_FIELD + "Directory", fileDir.getText());
-        _prefs.putBoolean("bibLocationAsFileDir", bibLocationAsFileDir.isSelected());
-        _prefs.putBoolean("bibLocAsPrimaryDir", bibLocAsPrimaryDir.isSelected());
+        _prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
+        _prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         _prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());
-        _prefs.putBoolean("runAutomaticFileSearch", runAutoFileSearch.isSelected());
-        _prefs.putBoolean("allowFileAutoOpenBrowse", allowFileAutoOpenBrowse.isSelected());
+        _prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
+        _prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());
         _prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());
         _prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
     }

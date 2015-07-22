@@ -95,7 +95,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         public void init() {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get("workingDirectory")),
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     (importer != null ? importer.getExtensions() : null), true);
 
             if ((filenames != null) && (filenames.length > 0)) {
@@ -103,7 +103,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 frame.output(Globals.lang("Starting import"));
                 fileOk = true;
 
-                Globals.prefs.put("workingDirectory", filenames[0]);
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames[0]);
             }
         }
 
@@ -152,7 +152,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     ParserResult pr = p.parserResult;
                     if (pr.hasWarnings()) {
                         if (Globals.prefs
-                                .getBoolean("displayKeyWarningDialogAtStartup")
+                                .getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)
                                 && pr.hasWarnings()) {
                             String[] wrns = pr.warnings();
                             StringBuilder wrn = new StringBuilder();
@@ -189,8 +189,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     // Use the import inspection dialog if it is enabled in preferences, and
                     // (there are more than one entry or the inspection dialog is also enabled
                     // for single entries):
-                    if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
-                            (Globals.prefs.getBoolean("useImportInspectionDialogForSingle")
+                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
+                            (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE)
                             || (bibtexResult.getDatabase().getEntryCount() > 1))) {
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
@@ -201,11 +201,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         diag.setVisible(true);
                         diag.toFront();
                     } else {
-                        boolean generateKeys = Globals.prefs.getBoolean("generateKeysAfterInspection");
+                        boolean generateKeys = Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION);
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
 
                         // Check if we should unmark entries before adding the new ones:
-                        if (Globals.prefs.getBoolean("unmarkAllEntriesBeforeImporting")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
                             for (BibtexEntry entry : toAddTo.getEntries()) {
                                 EntryMarker.unmarkEntry(entry, true, toAddTo, ce);
                             }
@@ -255,7 +255,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 else {
                     frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
-                            bibtexResult.getMetaData(), Globals.prefs.get("defaultEncoding"), true);
+                            bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
                     frame.output(Globals.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
 
@@ -323,9 +323,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 anythingUseful = anythingUseful | (entries.size() > 0);
 
                 // set timestamp and owner
-                Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
-                        Globals.prefs.getBoolean("overwriteTimeStamp"),
-                        !openInNew && Globals.prefs.getBoolean("markImportedEntries")); // set timestamp and owner
+                Util.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
+                        !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
 
                 for (BibtexEntry entry : entries) {
                     database.insertEntry(entry);

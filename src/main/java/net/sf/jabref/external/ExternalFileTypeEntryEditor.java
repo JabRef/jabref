@@ -27,6 +27,7 @@ import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -276,14 +277,14 @@ public class ExternalFileTypeEntryEditor {
             File initial = new File(comp.getText().trim());
             if (comp.getText().trim().length() == 0) {
                 // Nothing in the field. Go to the last file dir used:
-                initial = new File(Globals.prefs.get("fileWorkingDirectory"));
+                initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
             String chosen = FileDialogs.getNewFile(/*parent*/null, initial, Globals.NONE,
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
-                Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
                 comp.setText(newFile.getPath());
                 comp.requestFocus();
             }

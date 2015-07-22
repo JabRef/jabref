@@ -119,26 +119,26 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        showIcons.setSelected(prefs.getBoolean("groupShowIcons"));
-        showDynamic.setSelected(prefs.getBoolean("groupShowDynamic"));
-        expandTree.setSelected(prefs.getBoolean("groupExpandTree"));
-        groupingField.setText(prefs.get("groupsDefaultField"));
-        autoShow.setSelected(prefs.getBoolean("groupAutoShow"));
-        autoHide.setSelected(prefs.getBoolean("groupAutoHide"));
-        keywordSeparator.setText(prefs.get("groupKeywordSeparator"));
-        autoAssignGroup.setSelected(prefs.getBoolean("autoAssignGroup"));
+        showIcons.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS));
+        showDynamic.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC));
+        expandTree.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE));
+        groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
+        autoShow.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW));
+        autoHide.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE));
+        keywordSeparator.setText(prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR));
+        autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
     }
 
     @Override
     public void storeSettings() {
-        prefs.putBoolean("groupShowIcons", showIcons.isSelected());
-        prefs.putBoolean("groupShowDynamic", showDynamic.isSelected());
-        prefs.putBoolean("groupExpandTree", expandTree.isSelected());
-        prefs.put("groupsDefaultField", groupingField.getText().trim());
-        prefs.putBoolean("groupAutoShow", autoShow.isSelected());
-        prefs.putBoolean("groupAutoHide", autoHide.isSelected());
-        prefs.putBoolean("autoAssignGroup", autoAssignGroup.isSelected());
-        prefs.put("groupKeywordSeparator", keywordSeparator.getText());
+        prefs.putBoolean(JabRefPreferences.GROUP_SHOW_ICONS, showIcons.isSelected());
+        prefs.putBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC, showDynamic.isSelected());
+        prefs.putBoolean(JabRefPreferences.GROUP_EXPAND_TREE, expandTree.isSelected());
+        prefs.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, groupingField.getText().trim());
+        prefs.putBoolean(JabRefPreferences.GROUP_AUTO_SHOW, autoShow.isSelected());
+        prefs.putBoolean(JabRefPreferences.GROUP_AUTO_HIDE, autoHide.isSelected());
+        prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
+        prefs.put(JabRefPreferences.GROUP_KEYWORD_SEPARATOR, keywordSeparator.getText());
     }
 
     @Override

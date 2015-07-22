@@ -28,6 +28,7 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MnemonicAwareAction;
 
 /**
@@ -94,7 +95,7 @@ public class ImportFormats {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = ImportFormats.createImportFileChooser
-                        (Globals.prefs.get("importWorkingDirectory"));
+                        (Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
                 fc.showOpenDialog(frame);
                 File file = fc.getSelectedFile();
                 if (file == null) {
@@ -126,7 +127,7 @@ public class ImportFormats {
                     } else {
                         Globals.prefs.put("lastUsedImport", "__all");
                     }
-                    Globals.prefs.put("importWorkingDirectory", file.getParent());
+                    Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

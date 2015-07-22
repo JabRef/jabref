@@ -51,7 +51,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     @Override
     public boolean isActionNecessary(ParserResult pr) {
         // First check if this warning is disabled:
-        if (!Globals.prefs.getBoolean("showFileLinksUpgradeWarning")) {
+        if (!Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)) {
             return false;
         }
         if (pr.getJabrefMajorVersion() < 0)
@@ -79,7 +79,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     public void performAction(BasePanel panel, ParserResult pr) {
         // Find out which actions should be offered:
         // Only offer to change Preferences if file column is not already visible:
-        boolean offerChangeSettings = !Globals.prefs.getBoolean("fileColumn") || !showsFileInGenFields();
+        boolean offerChangeSettings = !Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN) || !showsFileInGenFields();
         // Only offer to upgrade links if the pdf/ps fields are used:
         boolean offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
@@ -138,7 +138,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Globals.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {
-            Globals.prefs.putBoolean("showFileLinksUpgradeWarning", false);
+            Globals.prefs.putBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING, false);
         }
 
         if (answer == JOptionPane.YES_OPTION) {
@@ -188,8 +188,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradePrefs) {
             // Exchange table columns:
-            Globals.prefs.putBoolean("pdfColumn", Boolean.FALSE);
-            Globals.prefs.putBoolean("fileColumn", Boolean.TRUE);
+            Globals.prefs.putBoolean(JabRefPreferences.PDF_COLUMN, Boolean.FALSE);
+            Globals.prefs.putBoolean(JabRefPreferences.FILE_COLUMN, Boolean.TRUE);
 
             // Modify General fields if necessary:
             // If we don't find the file field, insert it at the bottom of the first tab:

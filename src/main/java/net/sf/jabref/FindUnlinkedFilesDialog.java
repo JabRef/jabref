@@ -350,7 +350,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private File loadLastSelectedDirectory() {
         String workingDirectory = Globals.prefs.get(FindUnlinkedFilesDialog.GLOBAL_PREFS_WORKING_DIRECTORY_KEY);
         if (workingDirectory == null) {
-            workingDirectory = Globals.prefs.get("workingDirectory");
+            workingDirectory = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
         lastSelectedDirectory = new File(workingDirectory);
         if (lastSelectedDirectory.isFile()) {

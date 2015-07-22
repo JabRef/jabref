@@ -157,7 +157,7 @@ public class FileActions {
 
         TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>();
 
-        boolean backup = prefs.getBoolean("backup");
+        boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
             backup = false;
         }
@@ -354,7 +354,7 @@ public class FileActions {
         // that we must save along with entries using them.
 
         BibtexEntry be = null;
-        boolean backup = prefs.getBoolean("backup");
+        boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
 
         SaveSession session;
         try {
@@ -474,13 +474,13 @@ public class FileActions {
         if (isSaveOperation) {
             Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
-                inOriginalOrder = Globals.prefs.getBoolean("saveInOriginalOrder");
+                inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             } else {
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                 inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
             }
         } else {
-            inOriginalOrder = Globals.prefs.getBoolean("exportInOriginalOrder");
+            inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         }
         List<Comparator<BibtexEntry>> comparators;
         if (inOriginalOrder) {

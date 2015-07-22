@@ -92,7 +92,7 @@ public class MainTable extends JTable {
         super();
 
         addFocusListener(Globals.focusListener);
-        setAutoResizeMode(Globals.prefs.getInt("autoResizeMode"));
+        setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;
         this.panel = panel;
@@ -114,14 +114,14 @@ public class MainTable extends JTable {
         EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
-        tableColorCodes = Globals.prefs.getBoolean("tableColorCodesOn");
+        tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
         selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
-        pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
-        setGridColor(Globals.prefs.getColor("gridColor"));
-        if (Globals.prefs.getBoolean("tableShowGrid")) {
+        pane.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
+        setGridColor(Globals.prefs.getColor(JabRefPreferences.GRID_COLOR));
+        if (Globals.prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID)) {
             setShowGrid(true);
         } else
         {
@@ -156,7 +156,7 @@ public class MainTable extends JTable {
 
     public void refreshSorting() {
         sortedForMarking.getReadWriteLock().writeLock().lock();
-        if (Globals.prefs.getBoolean("floatMarkedEntries")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES)) {
             sortedForMarking.setComparator(markingComparator);
         } else {
             sortedForMarking.setComparator(null);
@@ -304,8 +304,8 @@ public class MainTable extends JTable {
 
     private void setWidths() {
         // Setting column widths:
-        int ncWidth = Globals.prefs.getInt("numberColWidth");
-        String[] widths = Globals.prefs.getStringArray("columnWidths");
+        int ncWidth = Globals.prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
+        String[] widths = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < tableFormat.padleft; i++) {
@@ -560,7 +560,7 @@ public class MainTable extends JTable {
      */
     public void updateFont() {
         setFont(GUIGlobals.CURRENTFONT);
-        setRowHeight(Globals.prefs.getInt("tableRowPadding") + GUIGlobals.CURRENTFONT.getSize());
+        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.CURRENTFONT.getSize());
     }
 
     public void ensureVisible(int row) {
@@ -629,21 +629,21 @@ public class MainTable extends JTable {
 
     public static void updateRenderers() {
 
-        MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor("tableBackground"),
-                Globals.prefs.getColor("tableText"));
+        MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND),
+                Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         Color sel = MainTable.defRenderer.getTableCellRendererComponent
                 (new JTable(), "", true, false, 0, 0).getBackground();
-        MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"));
-        MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"));
+        MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
+        MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.incRenderer = new IncompleteRenderer();
-        MainTable.compRenderer = new CompleteRenderer(Globals.prefs.getColor("tableBackground"));
-        MainTable.grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("grayedOutBackground"));
-        MainTable.veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("veryGrayedOutBackground"));
-        MainTable.grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
-                Globals.prefs.getColor("grayedOutText"), MainTable.mixColors(Globals.prefs.getColor("grayedOutBackground"),
+        MainTable.compRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
+        MainTable.grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND));
+        MainTable.veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND));
+        MainTable.grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
+                Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
                         sel));
-        MainTable.veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("veryGrayedOutBackground"),
-                Globals.prefs.getColor("veryGrayedOutText"), MainTable.mixColors(Globals.prefs.getColor("veryGrayedOutBackground"),
+        MainTable.veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
+                Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
                         sel));
 
         MainTable.markedRenderers = new GeneralRenderer[EntryMarker.MARK_COLOR_LEVELS];
@@ -651,7 +651,7 @@ public class MainTable extends JTable {
         for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
             Color c = Globals.prefs.getColor("markedEntryBackground" + i);
             MainTable.markedRenderers[i] = new GeneralRenderer(c,
-                    Globals.prefs.getColor("tableText"), MainTable.mixColors(Globals.prefs.getColor("markedEntryBackground" + i), sel));
+                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor("markedEntryBackground" + i), sel));
             MainTable.markedNumberRenderers[i] = new CompleteRenderer(c);
         }
 
@@ -666,7 +666,7 @@ public class MainTable extends JTable {
     static class IncompleteRenderer extends GeneralRenderer {
 
         public IncompleteRenderer() {
-            super(Globals.prefs.getColor("incompleteEntryBackground"));
+            super(Globals.prefs.getColor(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND));
             super.setToolTipText(Globals.lang("This entry is incomplete"));
         }
 

@@ -39,7 +39,7 @@ public class PushToLyx implements PushToApplication {
         couldNotFindPipe = false;
         couldNotWrite = false;
 
-        String lyxpipeSetting = Globals.prefs.get("lyxpipe");
+        String lyxpipeSetting = Globals.prefs.get(JabRefPreferences.LYXPIPE);
         if (!lyxpipeSetting.endsWith(".in")) {
             lyxpipeSetting = lyxpipeSetting + ".in";
         }
@@ -105,9 +105,9 @@ public class PushToLyx implements PushToApplication {
     public void operationCompleted(BasePanel panel) {
         if (couldNotFindPipe) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("verify that LyX is running and that the lyxpipe is valid")
-                    + ". [" + Globals.prefs.get("lyxpipe") + "]");
+                    + ". [" + Globals.prefs.get(JabRefPreferences.LYXPIPE) + "]");
         } else if (couldNotWrite) {
-            panel.output(Globals.lang("Error") + ": " + Globals.lang("unable to write to") + " " + Globals.prefs.get("lyxpipe") +
+            panel.output(Globals.lang("Error") + ": " + Globals.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
                     ".in");
         } else {
 
@@ -128,13 +128,13 @@ public class PushToLyx implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        lyxPipe.setText(Globals.prefs.get("lyxpipe"));
+        lyxPipe.setText(Globals.prefs.get(JabRefPreferences.LYXPIPE));
         return settings;
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("lyxpipe", lyxPipe.getText());
+        Globals.prefs.put(JabRefPreferences.LYXPIPE, lyxPipe.getText());
     }
 
     private void initSettingsPanel() {

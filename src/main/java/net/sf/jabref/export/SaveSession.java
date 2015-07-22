@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.export;
 
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
@@ -62,7 +63,7 @@ public class SaveSession {
             UnsupportedCharsetException {
         this.file = file;
         tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
-        useLockFile = Globals.prefs.getBoolean("useLockFiles");
+        useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
         this.encoding = encoding;
         writer = new VerifyingWriter(new FileOutputStream(tmp), encoding);

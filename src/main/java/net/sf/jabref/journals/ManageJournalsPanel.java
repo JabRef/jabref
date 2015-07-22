@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.journals.logic.Abbreviation;
@@ -261,7 +262,7 @@ class ManageJournalsPanel extends JPanel {
     }
 
     public void setValues() {
-        personalFile.setText(Globals.prefs.get("personalJournalList"));
+        personalFile.setText(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST));
         if (personalFile.getText().length() == 0) {
             newFile.setSelected(true);
             oldFile.setEnabled(false);
@@ -302,7 +303,7 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray("externalJournalLists");
+        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if ((externalFiles == null) || (externalFiles.length == 0)) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
@@ -403,7 +404,7 @@ class ManageJournalsPanel extends JPanel {
             if (filename.equals("")) {
                 filename = null;
             }
-            Globals.prefs.put("personalJournalList", filename);
+            Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, filename);
         }
 
         // Store the list of external files set up:
@@ -414,10 +415,10 @@ class ManageJournalsPanel extends JPanel {
             }
         }
         if (extFiles.size() == 0) {
-            Globals.prefs.put("externalJournalLists", "");
+            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
         } else {
             String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray("externalJournalLists", list);
+            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
         }
 
         Globals.initializeJournalNames();

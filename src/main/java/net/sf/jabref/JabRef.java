@@ -78,16 +78,16 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // See if there are plugins scheduled for deletion:
-        if (prefs.hasKey("deletePlugins") && (prefs.get("deletePlugins").length() > 0)) {
-            String[] toDelete = prefs.getStringArray("deletePlugins");
+        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && (prefs.get(JabRefPreferences.DELETE_PLUGINS).length() > 0)) {
+            String[] toDelete = prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
             PluginInstaller.deletePluginsOnStartup(toDelete);
-            prefs.put("deletePlugins", "");
+            prefs.put(JabRefPreferences.DELETE_PLUGINS, "");
         }
 
-        if (prefs.getBoolean("useProxy")) {
+        if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
             // NetworkTab.java ensures that proxyHostname and proxyPort are not null
-            System.setProperty("http.proxyHost", prefs.get("proxyHostname"));
-            System.setProperty("http.proxyPort", prefs.get("proxyPort"));
+            System.setProperty("http.proxyHost", prefs.get(JabRefPreferences.PROXY_HOSTNAME));
+            System.setProperty("http.proxyPort", prefs.get(JabRefPreferences.PROXY_PORT));
 
             // currently, the following cannot be configured
             if (prefs.get("proxyUsername") != null) {
@@ -151,13 +151,13 @@ public class JabRef {
          * See if the user has a personal journal list set up. If so, add these
          * journal names and abbreviations to the list:
          */
-        String personalJournalList = prefs.get("personalJournalList");
+        String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
         if ((personalJournalList != null) && !personalJournalList.isEmpty()) {
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
             } catch (FileNotFoundException e) {
                 JOptionPane.showMessageDialog(null, Globals.lang("Journal file not found") + ": " + e.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                Globals.prefs.put("personalJournalList", "");
+                Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
             }
         }
 
@@ -184,7 +184,7 @@ public class JabRef {
     }
 
     private void setLanguage(JabRefPreferences prefs) {
-        String langStr = prefs.get("language");
+        String langStr = prefs.get(JabRefPreferences.LANGUAGE);
         String[] parts = langStr.split("_");
         String language, country;
         if (parts.length == 1) {
@@ -436,7 +436,7 @@ public class JabRef {
                                 System.out.println(Globals.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
                                         pr.getMetaData(), new File(data[0]), Globals.prefs,
-                                        false, false, Globals.prefs.get("defaultEncoding"), false);
+                                        false, false, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Globals.lang("Warning") + ": " +
@@ -526,7 +526,7 @@ public class JabRef {
                                         + subName);
                                 SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                         new File(subName), Globals.prefs, false, false,
-                                        Globals.prefs.get("defaultEncoding"), false);
+                                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Globals.lang("Warning") + ": " +
@@ -625,11 +625,11 @@ public class JabRef {
             String lookFeel;
             String systemLnF = UIManager.getSystemLookAndFeelClassName();
 
-            if (Globals.prefs.getBoolean("useDefaultLookAndFeel")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
                 // Use system Look & Feel by default
                 lookFeel = systemLnF;
             } else {
-                lookFeel = Globals.prefs.get("lookAndFeel");
+                lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
 
             // At all cost, avoid ending up with the Metal look and feel:
@@ -646,7 +646,7 @@ public class JabRef {
                     // specified look and feel does not exist on the classpath, so use system l&f
                     UIManager.setLookAndFeel(systemLnF);
                     // also set system l&f as default
-                    Globals.prefs.put("lookAndFeel", systemLnF);
+                    Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLnF);
                     // notify the user
                     JOptionPane.showMessageDialog(JabRef.jrf, Globals.lang("Unable to find the requested Look & Feel and thus the default one is used."),
                             Globals.lang("Warning"),
@@ -658,9 +658,9 @@ public class JabRef {
         }
 
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
-        boolean overrideDefaultFonts = Globals.prefs.getBoolean("overrideDefaultFonts");
+        boolean overrideDefaultFonts = Globals.prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
         if (overrideDefaultFonts) {
-            int fontSize = Globals.prefs.getInt("menuFontSize");
+            int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
             Double zoomLevel = null;
@@ -715,9 +715,9 @@ public class JabRef {
         }
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!cli.isBlank() && Globals.prefs.getBoolean("openLastEdited") && (Globals.prefs.get("lastEdited") != null)) {
+        if (!cli.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
             // How to handle errors in the databases to open?
-            String[] names = Globals.prefs.getStringArray("lastEdited");
+            String[] names = Globals.prefs.getStringArray(JabRefPreferences.LAST_EDITED);
             lastEdLoop: for (String name : names) {
                 File fileToOpen = new File(name);
 
@@ -747,8 +747,8 @@ public class JabRef {
 
         GUIGlobals.init();
         GUIGlobals.CURRENTFONT =
-                new Font(Globals.prefs.get("fontFamily"), Globals.prefs.getInt("fontStyle"),
-                        Globals.prefs.getInt("fontSize"));
+                new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY), Globals.prefs.getInt(JabRefPreferences.FONT_STYLE),
+                        Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         //Util.pr(": Initializing frame");
         JabRef.jrf = new JabRefFrame(this);
@@ -801,20 +801,20 @@ public class JabRef {
                 Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
 
         // Start auto save timer:
-        if (Globals.prefs.getBoolean("autoSave")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {
             Globals.startAutoSaveManager(JabRef.jrf);
         }
 
         // If we are set to remember the window location, we also remember the maximised
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
-        if (Globals.prefs.getBoolean("windowMaximised")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         JabRef.jrf.setVisible(true);
 
-        if (Globals.prefs.getBoolean("windowMaximised")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
@@ -831,7 +831,7 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.elementAt(i);
-            if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
                 String[] wrns = pr.warnings();
                 StringBuilder wrn = new StringBuilder();
                 for (int j = 0; j < Math.min(JabRef.MAX_DIALOG_WARNINGS, wrns.length); j++) {
@@ -930,7 +930,7 @@ public class JabRef {
                 return ParserResult.FILE_LOCKED;
             }
 
-            String encoding = Globals.prefs.get("defaultEncoding");
+            String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
             if (pr == null) {
                 pr = new ParserResult(null, null, null);

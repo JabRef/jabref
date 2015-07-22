@@ -46,10 +46,10 @@ public class LatexFieldFormatter implements FieldFormatter {
     private LatexFieldFormatter(boolean neverFailOnHashes) {
         this.neverFailOnHashes = neverFailOnHashes;
 
-        this.resolveStringsAllFields = Globals.prefs.getBoolean("resolveStringsAllFields");
+        this.resolveStringsAllFields = Globals.prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
         valueDelimitersZero = Globals.prefs.getValueDelimiters(0);
         valueDelimitersOne = Globals.prefs.getValueDelimiters(1);
-        doNotResolveStringsFors = Globals.prefs.getStringArray("doNotResolveStringsFor");
+        doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
         writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
     }
 

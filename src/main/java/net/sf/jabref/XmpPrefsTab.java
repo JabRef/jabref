@@ -221,7 +221,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         rowCount = tableRows.size() + 5;
 
         privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(
-                "useXmpPrivacyFilter"));
+                JabRefPreferences.USE_XMP_PRIVACY_FILTER));
     }
 
     /**
@@ -256,7 +256,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
                     tableRows.toArray(new String[tableRows.size()]));
         }
 
-        JabRefPreferences.getInstance().putBoolean("useXmpPrivacyFilter", privacyFilterCheckBox.isSelected());
+        JabRefPreferences.getInstance().putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, privacyFilterCheckBox.isSelected());
     }
 
     @Override

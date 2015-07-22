@@ -36,6 +36,7 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
@@ -411,7 +412,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
         ArrayList<String> notBibFiles = new ArrayList<String>();
-        String encoding = Globals.prefs.get("defaultEncoding");
+        String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             String extension = "";
@@ -481,7 +482,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             					if (panel == null) {
             						// // Create a new, empty, database.
             						BibtexDatabase database = new BibtexDatabase();
-            						frame.addTab(database, null, null, Globals.prefs.get("defaultEncoding"),
+            						frame.addTab(database, null, null, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING),
             							true);
             						frame.output(Globals.lang("New database created."));
             						panel = frame.basePanel();

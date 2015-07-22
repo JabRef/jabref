@@ -202,7 +202,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         setupSourcePanel();
         add(tabbed, BorderLayout.CENTER);
         tabbed.addChangeListener(tabListener);
-        if (prefs.getBoolean("showSource") && prefs.getBoolean("defaultShowSource")) {
+        if (prefs.getBoolean(JabRefPreferences.SHOW_SOURCE) && prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
             tabbed.setSelectedIndex(sourceIndex);
         }
 
@@ -228,7 +228,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
             EntryEditorTab optPan;
-            if (!prefs.getBoolean("biblatexMode")) {
+            if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
                 optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
                         false, false, Globals.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
@@ -309,7 +309,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
 
         srcPanel.setName(Globals.lang("BibTeX source"));
-        if (Globals.prefs.getBoolean("showSource")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SOURCE)) {
             tabbed.addTab(Globals.lang("BibTeX source"), GUIGlobals.getImage("source"), srcPanel,
                     Globals.lang("Show/edit BibTeX source"));
             tabs.add(srcPanel);
@@ -441,7 +441,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         String s = BibtexFields.getFieldExtras(string);
 
         // timestamp or a other field with datepicker command
-        if ((fieldName.equals(Globals.prefs.get("timeStampField")))
+        if ((fieldName.equals(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD)))
                 || ((s != null) && s.equals("datepicker"))) {
             // double click AND datefield => insert the current date (today)
             ((JTextArea) ed).addMouseListener(new MouseAdapter() {
@@ -551,7 +551,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    ed.setText(Globals.prefs.get("defaultOwner"));
+                    ed.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
                     storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
                 }
             });
@@ -587,7 +587,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         // was focused when
         // an action was called.
         source.addFocusListener(Globals.focusListener);
-        source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt("fontSize")));
+        source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         setupJTextComponent(source);
         updateSource();
 
@@ -1554,17 +1554,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 Object oldValue = entry.getField(BibtexFields.KEY_FIELD);
 
                 if (oldValue != null) {
-                    if (Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                    if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                         panel.output(Globals.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
                         return;
                     }
-                    else if (Globals.prefs.getBoolean("warnBeforeOverwritingKey")) {
+                    else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
                         CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("The current BibTeX key will be overwritten. Continue?"),
                                 Globals.lang("Disable this confirmation dialog"), false);
                         int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite key"),
                                 JOptionPane.YES_NO_OPTION);
                         if (cbm.isSelected()) {
-                            Globals.prefs.putBoolean("warnBeforeOverwritingKey", false);
+                            Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
                         }
                         if (answer == JOptionPane.NO_OPTION) {
                             // Ok, break off the operation.
@@ -1708,7 +1708,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void warnDuplicateBibtexkey() {
         panel.output(Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
 
-        /*if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
+        /*if (prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY)) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning") + ": "
                 + Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."),
@@ -1717,7 +1717,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 JOptionPane.WARNING_MESSAGE);
 
             if (jcb.isSelected())
-                prefs.putBoolean("dialogWarningForDuplicateKey", false);
+                prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY, false);
         }*/
     }
 
@@ -1725,7 +1725,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         // JZTODO lyrics
         panel.output(Globals.lang("Empty BibTeX key. Grouping may not work for this entry."));
 
-        /*if (prefs.getBoolean("dialogWarningForEmptyKey")) {
+        /*if (prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY)) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning") + ": "
                 + Globals.lang("Empty BibTeX key. Grouping may not work for this entry."), Globals
@@ -1734,7 +1734,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 JOptionPane.WARNING_MESSAGE);
 
             if (jcb.isSelected())
-                prefs.putBoolean("dialogWarningForEmptyKey", false);
+                prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, false);
         }*/
     }
 

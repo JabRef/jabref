@@ -351,7 +351,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts       
-            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
                 title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
                 title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
                 title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
@@ -367,12 +367,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("\\\\infin", "\\\\infty");
 
             // Unit formatting
-            if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                 title = unitFormatter.format(title);
             }
 
             // Automatic case keeping
-            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                 title = caseKeeper.format(title);
             }
             // Write back
@@ -513,7 +513,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 
                 fullName = fullName.trim();
-                if (Globals.prefs.getBoolean("useIEEEAbrv")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
                     fullName = Globals.journalAbbrev.getMedlineAbbreviation(fullName).or(fullName);
                 }
             }
@@ -566,7 +566,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts       
-            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
                 abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
                 abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
                 abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");

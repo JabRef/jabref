@@ -66,7 +66,7 @@ public class PushToLatexEditor implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        String led = Globals.prefs.get("latexEditorPath");
+        String led = Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH);
 
         if ((led == null) || (led.trim().length() == 0)) {
             notDefined = true;
@@ -74,7 +74,7 @@ public class PushToLatexEditor implements PushToApplication {
         }
 
         try {
-            Runtime.getRuntime().exec(led + " " + "-i " + Globals.prefs.get("citeCommandLed") + "{" + keyString + "}");
+            Runtime.getRuntime().exec(led + " " + "-i " + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_LED) + "{" + keyString + "}");
 
         }
 
@@ -92,7 +92,7 @@ public class PushToLatexEditor implements PushToApplication {
         }
         else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
-                    + Globals.prefs.get("latexEditorPath") + "'.");
+                    + Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH) + "'.");
         } else {
             Globals.lang("Pushed citations to %0", "LatexEditor");
         }
@@ -108,8 +108,8 @@ public class PushToLatexEditor implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        ledPath.setText(Globals.prefs.get("latexEditorPath"));
-        citeCommand.setText(Globals.prefs.get("citeCommandLed"));
+        ledPath.setText(Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH));
+        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_LED));
         return settings;
     }
 
@@ -130,7 +130,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("latexEditorPath", ledPath.getText());
-        Globals.prefs.put("citeCommandLed", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.LATEX_EDITOR_PATH, ledPath.getText());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_LED, citeCommand.getText());
     }
 }

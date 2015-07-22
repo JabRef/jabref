@@ -373,7 +373,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public void updateTableFormat() {
 
         // Read table columns from prefs:
-        String[] colSettings = Globals.prefs.getStringArray("columnNames");
+        String[] colSettings = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
         columns = new String[colSettings.length][];
         for (int i = 0; i < colSettings.length; i++) {
             String[] fields = colSettings[i].split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
@@ -382,12 +382,12 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
 
         // Read name format options:
-        boolean showShort = Globals.prefs.getBoolean("showShort");
-        namesNatbib = Globals.prefs.getBoolean("namesNatbib"); //MK:
-        namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
-        namesAsIs = Globals.prefs.getBoolean("namesAsIs");
-        abbr_names = Globals.prefs.getBoolean("abbrAuthorNames"); //MK:
-        namesFf = Globals.prefs.getBoolean("namesFf");
+        boolean showShort = Globals.prefs.getBoolean(JabRefPreferences.SHOW_SHORT);
+        namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
+        namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
+        namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
+        abbr_names = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
+        namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
         namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
 
         // Set the icon columns, indicating the number of special columns to the left.
@@ -423,16 +423,16 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             }
         }
 
-        if (Globals.prefs.getBoolean("fileColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
             iconCols.put(coln, MainTableFormat.FILE);
             coln++;
         }
-        if (Globals.prefs.getBoolean("pdfColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.PDF_COLUMN)) {
             iconCols.put(coln, MainTableFormat.PDF);
             coln++;
         }
-        if (Globals.prefs.getBoolean("urlColumn")) {
-            if (Globals.prefs.getBoolean("preferUrlDoi")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
                 iconCols.put(coln, MainTableFormat.DOI_FIRST);
                 coln++;
             } else {
@@ -442,13 +442,13 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
         }
 
-        if (Globals.prefs.getBoolean("arxivColumn")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
             iconCols.put(coln, MainTableFormat.ARXIV);
             coln++;
         }
 
-        if (Globals.prefs.getBoolean("extraFileColumns")) {
-            String[] desiredColumns = Globals.prefs.getStringArray("listOfFileColumns");
+        if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
+            String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             for (String desiredColumn : desiredColumns) {
                 iconCols.put(coln, new String[]{GUIGlobals.FILE_FIELD, desiredColumn});
                 coln++;

@@ -34,6 +34,7 @@ import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
@@ -277,7 +278,7 @@ public class FileListEntryEditor {
     }
 
     public void setVisible(boolean visible, boolean openBrowse) {
-        openBrowseWhenShown = openBrowse && Globals.prefs.getBoolean("allowFileAutoOpenBrowse");
+        openBrowseWhenShown = openBrowse && Globals.prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE);
         if (visible) {
             okPressed = false;
         }
@@ -361,14 +362,14 @@ public class FileListEntryEditor {
             File initial = new File(comp.getText().trim());
             if (comp.getText().trim().isEmpty()) {
                 // Nothing in the field. Go to the last file dir used:
-                initial = new File(Globals.prefs.get("fileWorkingDirectory"));
+                initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
             String chosen = FileDialogs.getNewFile(parent, initial, Globals.NONE,
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
-                Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);

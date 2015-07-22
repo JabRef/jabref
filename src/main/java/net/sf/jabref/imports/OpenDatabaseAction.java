@@ -81,7 +81,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (showDialog) {
 
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     true);
             if (chosen != null) {
                 for (String aChosen : chosen) {
@@ -179,7 +179,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             frame.output(Globals.lang("Opening") + ": '" + file.getPath() + "'");
             boolean tryingAutosave = false;
             boolean autoSaveFound = AutoSaveManager.newerAutoSaveExists(file);
-            if (autoSaveFound && !Globals.prefs.getBoolean("promptBeforeUsingAutosave")) {
+            if (autoSaveFound && !Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
                 // We have found a newer autosave, and the preferences say we should load
                 // it without prompting, so we replace the fileToLoad:
                 fileToLoad = AutoSaveManager.getAutoSaveFile(file);
@@ -201,9 +201,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             boolean done = false;
             while (!done) {
                 String fileName = file.getPath();
-                Globals.prefs.put("workingDirectory", file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get("defaultEncoding");
+                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modTime = FileBasedLock.getLockFileTimeStamp(file);

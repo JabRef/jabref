@@ -146,7 +146,7 @@ public class ParserResult {
 
     /**
      * Returns the name of the encoding used during parsing, or null if not specified
-     * (indicates that prefs.get("defaultEncoding") was used).
+     * (indicates that prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
      */
     public String getEncoding() {
         return encoding;

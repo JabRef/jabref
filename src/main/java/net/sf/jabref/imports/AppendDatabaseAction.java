@@ -60,7 +60,7 @@ public class AppendDatabaseAction implements BaseAction {
         Util.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")),
+            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     null, false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
@@ -94,9 +94,9 @@ public class AppendDatabaseAction implements BaseAction {
         }
         for (File file : filesToOpen) {
             try {
-                Globals.prefs.put("workingDirectory", file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get("defaultEncoding");
+                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
@@ -124,8 +124,8 @@ public class AppendDatabaseAction implements BaseAction {
         MetaData meta = pr.getMetaData();
 
         if (importEntries) { // Add entries
-            boolean overwriteOwner = Globals.prefs.getBoolean("overwriteOwner");
-            boolean overwriteTimeStamp = Globals.prefs.getBoolean("overwriteTimeStamp");
+            boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
+            boolean overwriteTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP);
 
             for (String key : fromDatabase.getKeySet()) {
                 originalEntry = fromDatabase.getEntryById(key);

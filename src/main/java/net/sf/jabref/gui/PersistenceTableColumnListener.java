@@ -23,6 +23,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  * Listens for TableColumnModelEvents to keep track of changes made to the
@@ -82,13 +83,13 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
         }
 
         // Finally, we store the new preferences.
-        Globals.prefs.putStringArray("columnNames",
+        Globals.prefs.putStringArray(JabRefPreferences.COLUMN_NAMES,
                 storedColumns.toArray(new String[storedColumns.size()]));
-        Globals.prefs.putStringArray("columnWidths",
+        Globals.prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS,
                 columnsWidths.toArray(new String[columnsWidths.size()]));
 
         // width of the number ("#") column
-        Globals.prefs.putInt("numberColWidth", ncWidth);
+        Globals.prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
     }
 
     /**

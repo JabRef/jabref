@@ -35,6 +35,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
@@ -106,7 +107,7 @@ public class LabelPatternPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                defaultPat.setText((String) Globals.prefs.defaults.get("defaultLabelPattern"));
+                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
             }
         });
         con.gridx = 2;
@@ -166,7 +167,7 @@ public class LabelPatternPanel extends JPanel {
                 }
 
                 // also reset the default pattern
-                defaultPat.setText((String) Globals.prefs.defaults.get("defaultLabelPattern"));
+                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
             }
         });
         add(btnDefaultAll);

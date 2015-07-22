@@ -37,6 +37,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.util.Util;
 
@@ -97,7 +98,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setToggleClickCount(0);
         ToolTipManager.sharedInstance().registerComponent(this);
         setShowsRootHandles(false);
-        setVisibleRowCount(Globals.prefs.getInt("groupsVisibleRows"));
+        setVisibleRowCount(Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS));
         getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
     }

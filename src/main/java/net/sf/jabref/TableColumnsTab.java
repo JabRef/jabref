@@ -382,17 +382,17 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
-        pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
-        urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
-        preferUrl.setSelected(!_prefs.getBoolean("preferUrlDoi"));
-        preferDoi.setSelected(_prefs.getBoolean("preferUrlDoi"));
-        fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
-        arxivColumn.setSelected(_prefs.getBoolean("arxivColumn"));
+        fileColumn.setSelected(_prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
+        pdfColumn.setSelected(_prefs.getBoolean(JabRefPreferences.PDF_COLUMN));
+        urlColumn.setSelected(_prefs.getBoolean(JabRefPreferences.URL_COLUMN));
+        preferUrl.setSelected(!_prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI));
+        preferDoi.setSelected(_prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI));
+        fileColumn.setSelected(_prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
+        arxivColumn.setSelected(_prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN));
 
-        extraFileColumns.setSelected(_prefs.getBoolean("extraFileColumns"));
+        extraFileColumns.setSelected(_prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS));
         if (extraFileColumns.isSelected()) {
-            String[] desiredColumns = _prefs.getStringArray("listOfFileColumns");
+            String[] desiredColumns = _prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             int listSize = listOfFileColumns.getModel().getSize();
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
@@ -450,7 +450,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
         tableRows.clear();
-        String[] names = _prefs.getStringArray("columnNames"), lengths = _prefs.getStringArray("columnWidths");
+        String[] names = _prefs.getStringArray(JabRefPreferences.COLUMN_NAMES), lengths = _prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.length; i++) {
             if (i < lengths.length) {
                 tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
@@ -459,7 +459,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
         }
         rowCount = tableRows.size() + 5;
-        ncWidth = _prefs.getInt("numberColWidth");
+        ncWidth = _prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
 
     }
 
@@ -704,23 +704,23 @@ class TableColumnsTab extends JPanel implements PrefsTab {
      */
     @Override
     public void storeSettings() {
-        _prefs.putBoolean("fileColumn", fileColumn.isSelected());
-        _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
-        _prefs.putBoolean("urlColumn", urlColumn.isSelected());
-        _prefs.putBoolean("preferUrlDoi", preferDoi.isSelected());
-        _prefs.putBoolean("arxivColumn", arxivColumn.isSelected());
+        _prefs.putBoolean(JabRefPreferences.FILE_COLUMN, fileColumn.isSelected());
+        _prefs.putBoolean(JabRefPreferences.PDF_COLUMN, pdfColumn.isSelected());
+        _prefs.putBoolean(JabRefPreferences.URL_COLUMN, urlColumn.isSelected());
+        _prefs.putBoolean(JabRefPreferences.PREFER_URL_DOI, preferDoi.isSelected());
+        _prefs.putBoolean(JabRefPreferences.ARXIV_COLUMN, arxivColumn.isSelected());
 
-        _prefs.putBoolean("extraFileColumns", extraFileColumns.isSelected());
+        _prefs.putBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS, extraFileColumns.isSelected());
         if (extraFileColumns.isSelected() && !listOfFileColumns.isSelectionEmpty()) {
             String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
             for (int i = 0; i < selections.length; i++) {
                 selections[i] = (String) listOfFileColumns.getModel().getElementAt(
                         listOfFileColumns.getSelectedIndices()[i]);
             }
-            _prefs.putStringArray("listOfFileColumns", selections);
+            _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
         }
         else {
-            _prefs.putStringArray("listOfFileColumns", new String[] {});
+            _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[] {});
         }
 
         _prefs.putBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, showOneLetterHeadingForIconColumns.isSelected());
@@ -794,7 +794,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             String[] names = new String[tableRows.size()], widths = new String[tableRows.size()];
             int[] nWidths = new int[tableRows.size()];
 
-            _prefs.putInt("numberColWidth", ncWidth);
+            _prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
             for (i = 0; i < tableRows.size(); i++) {
                 TableRow tr = tableRows.elementAt(i);
                 names[i] = tr.name.toLowerCase();
@@ -804,8 +804,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            _prefs.putStringArray("columnNames", names);
-            _prefs.putStringArray("columnWidths", widths);
+            _prefs.putStringArray(JabRefPreferences.COLUMN_NAMES, names);
+            _prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }

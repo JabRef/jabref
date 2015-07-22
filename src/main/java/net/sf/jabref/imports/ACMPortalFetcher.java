@@ -15,19 +15,37 @@
 */
 package net.sf.jabref.imports;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 
@@ -176,12 +194,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                         title = convertHTMLChars(title);
 
                         // Unit formatting
-                        if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                             title = unitFormatter.format(title);
                         }
 
                         // Case keeping
-                        if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                             title = caseKeeper.format(title);
                         }
                         entry.setField("title", title);

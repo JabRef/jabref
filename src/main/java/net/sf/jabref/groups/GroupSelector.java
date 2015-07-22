@@ -128,9 +128,9 @@ public class GroupSelector extends SidePaneComponent implements
 
         this.frame = frame;
         hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
-                !Globals.prefs.getBoolean("grayOutNonHits"));
+                !Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
         grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
-                Globals.prefs.getBoolean("grayOutNonHits"));
+                Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
         ButtonGroup nonHits = new ButtonGroup();
         nonHits.add(hideNonHits);
         nonHits.add(grayOut);
@@ -138,28 +138,28 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected());
             }
         });
         andCb.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupIntersectSelections", andCb.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected());
             }
         });
         invCb.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupInvertSelections", invCb.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected());
             }
         });
         showOverlappingGroups.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupShowOverlapping",
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING,
                         showOverlappingGroups.isSelected());
                 if (!showOverlappingGroups.isSelected()) {
                     groupsTree.setHighlight2Cells(null);
@@ -171,19 +171,19 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupSelectMatches", select.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected());
             }
         });
         grayOut.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected());
             }
         });
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
-        if (Globals.prefs.getBoolean("groupFloatSelections")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
 
             floatCb.setSelected(true);
             highlCb.setSelected(false);
@@ -193,7 +193,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
         JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
                 false);
-        if (Globals.prefs.getBoolean("groupIntersectSelections")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS)) {
             andCb.setSelected(true);
             orCb.setSelected(false);
         } else {
@@ -218,17 +218,17 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("autoAssignGroup", autoAssignGroup.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
             }
         });
 
-        invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
-        showOverlappingGroups.setSelected(Globals.prefs.getBoolean("groupShowOverlapping"));
-        select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
+        invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
+        showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
+        select.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SELECT_MATCHES));
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
         showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
-        autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup"));
+        autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
 
         openset.setMargin(new Insets(0, 0, 0, 0));
         settings.add(andCb);
@@ -259,7 +259,7 @@ public class GroupSelector extends SidePaneComponent implements
                 } else {
                     JButton src = (JButton) e.getSource();
                     showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
-                    autoAssignGroup.setSelected(Globals.prefs.getBoolean("autoAssignGroup"));
+                    autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
                     settings.show(src, 0, openset.getHeight());
                 }
             }
@@ -269,13 +269,13 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt("groupsVisibleRows") + 1;
+                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) + 1;
                 groupsTree.setVisibleRowCount(i);
                 groupsTree.revalidate();
                 groupsTree.repaint();
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
-                Globals.prefs.putInt("groupsVisibleRows", i);
+                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
                 GroupSelector.logger.fine(Double.toString(GroupSelector.this.getHeight()));
                 GroupSelector.logger.fine(Double.toString(GroupSelector.this.getPreferredSize().getHeight()));
 
@@ -286,7 +286,7 @@ public class GroupSelector extends SidePaneComponent implements
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt("groupsVisibleRows") - 1;
+                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) - 1;
                 if (i < 1) {
                     i = 1;
                 }
@@ -296,7 +296,7 @@ public class GroupSelector extends SidePaneComponent implements
                 GroupSelector.this.revalidate();
                 // _panel.sidePaneManager.revalidate();
                 GroupSelector.this.repaint();
-                Globals.prefs.putInt("groupsVisibleRows", i);
+                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
             }
         });
 
@@ -779,7 +779,7 @@ public class GroupSelector extends SidePaneComponent implements
         /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
         DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
                 panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
-                        .getBoolean("grayOutNonHits"),
+                        .getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS),
                 //true,
                 select.isSelected());
         search.start();*/
@@ -908,7 +908,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         } else if (e.getSource() == autoGroup) {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel,
-                    GroupSelector.this, groupsRoot, Globals.prefs.get("groupsDefaultField"), " .,", ",");
+                    GroupSelector.this, groupsRoot, Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,", ",");
             gd.setVisible(true); // gd.show(); -> deprecated since 1.5
             // gd does the operation itself
         } else if (e.getSource() instanceof JCheckBox) {
@@ -937,7 +937,7 @@ public class GroupSelector extends SidePaneComponent implements
     private void setGroups(GroupTreeNode groupsRoot) {
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
         this.groupsRoot = groupsRoot;
-        if (Globals.prefs.getBoolean("groupExpandTree")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
             groupsTree.expandSubtree(groupsRoot);
         }
     }
@@ -1503,11 +1503,11 @@ public class GroupSelector extends SidePaneComponent implements
         }
 
         // auto show/hide groups interface
-        if (Globals.prefs.getBoolean("groupAutoShow")
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW)
                 && !groupsRoot.isLeaf()) { // groups were defined
             frame.sidePaneManager.show("groups");
             frame.groupToggle.setSelected(true);
-        } else if (Globals.prefs.getBoolean("groupAutoHide")
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE)
                 && groupsRoot.isLeaf()) { // groups were not defined
             frame.sidePaneManager.hide("groups");
             frame.groupToggle.setSelected(false);

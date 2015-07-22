@@ -15,15 +15,20 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.JabRefFrame;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.export.AutoSaveManager;
-
-import javax.swing.*;
-import java.io.File;
-import java.util.*;
-import net.sf.jabref.BasePanel;
 
 /**
  * Runnable task that prompts the user for what to do about files loaded at startup,
@@ -49,7 +54,7 @@ public class AutosaveStartupPrompter implements Runnable {
         for (File file : files) {
             File fileToLoad = file;
             boolean tryingAutosave;
-            if (Globals.prefs.getBoolean("promptBeforeUsingAutosave")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
                 int answer = JOptionPane.showConfirmDialog(null, "<html>" +
                         Globals.lang("An autosave file was found for this database. This could indicate ")
                         + Globals.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
@@ -103,7 +108,7 @@ public class AutosaveStartupPrompter implements Runnable {
             }
 
             if ((pr != null) && !pr.isInvalid()) {
-                if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
                     StringBuilder wrn = new StringBuilder();
                     for (int j = 0; j < wrns.length; j++) {

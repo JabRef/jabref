@@ -105,7 +105,7 @@ public class DuplicateResolverDialog extends JDialog {
             both = new JButton(Globals.lang("Import and keep old entry"));
         }
 
-        String layout = Globals.prefs.get("preview0");
+        String layout = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         p1 = new PreviewPanel(null, one, null, new MetaData(), layout);
         p2 = new PreviewPanel(null, two, null, new MetaData(), layout);
         ta1 = new JTextArea();

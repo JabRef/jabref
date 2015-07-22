@@ -167,12 +167,12 @@ public class MetaData implements Iterable<String> {
         // the preferences can specify one. The settings are prioritized in the following
         // order and the first defined setting is used: metadata user-specific directory,
         // metadata general directory, preferences directory.
-        String key = Globals.prefs.get("userFileDirIndividual");
+        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
         List<String> dirs = new ArrayList<String>();
 
         Vector<String> vec = getData(key);
         if (vec == null) {
-            key = Globals.prefs.get("userFileDir");
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
         if ((vec != null) && (vec.size() > 0)) {
@@ -204,9 +204,9 @@ public class MetaData implements Iterable<String> {
         }
 
         // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && (getFile() != null)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean("bibLocAsPrimaryDir")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
                 dirs.add(0, getFile().getParent());
             } else {
                 dirs.add(getFile().getParent());

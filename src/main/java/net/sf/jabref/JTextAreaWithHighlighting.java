@@ -176,7 +176,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     @Override
     public void setText(String t) {
         super.setText(t);
-        if (Globals.prefs.getBoolean("highLightWords")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
             highLight(wordsToHighlight);
         }
         if (undo != null) {
@@ -189,7 +189,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         // words have to be stored in class variable as 
         // setText() makes use of them
 
-        if (Globals.prefs.getBoolean("highLightWords")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
             this.wordsToHighlight = words;
             highLight(words);
         } else {

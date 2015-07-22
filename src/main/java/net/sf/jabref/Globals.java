@@ -1298,13 +1298,13 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         // Read internal lists:
         Globals.journalAbbrev = new JournalAbbreviationRepository();
         Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-        if (Globals.prefs.getBoolean("useIEEEAbrv")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
             Globals.journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_INTERNAL_LIST);
         }
 
         // Read external lists, if any (in reverse order, so the upper lists
         // override the lower):
-        String[] lists = Globals.prefs.getStringArray("externalJournalLists");
+        String[] lists = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if ((lists != null) && (lists.length > 0)) {
             for (int i = lists.length - 1; i >= 0; i--) {
                 try {
@@ -1317,11 +1317,11 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         }
 
         // Read personal list, if set up:
-        if (Globals.prefs.get("personalJournalList") != null) {
+        if (Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST) != null) {
             try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get("personalJournalList")));
+                Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {
-                Globals.logger("Personal journal list file '" + Globals.prefs.get("personalJournalList")
+                Globals.logger("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
                         + "' not found.");
             }
         }
@@ -1337,7 +1337,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
             return Pattern.compile("");
         }
 
-        boolean regExSearch = Globals.prefs.getBoolean("regExpSearch");
+        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
 
         // compile the words to a regex in the form (w1) | (w2) | (w3)
         String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
@@ -1346,7 +1346,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         }
 
         Pattern pattern;
-        if (Globals.prefs.getBoolean("caseSensitiveSearch")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
             pattern = Pattern.compile(searchPattern);
         } else {
             pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);

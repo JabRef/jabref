@@ -601,8 +601,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     firstBE = be;
                                 }
                                 Util.setAutomaticFields(be,
-                                        Globals.prefs.getBoolean("overwriteOwner"),
-                                        Globals.prefs.getBoolean("overwriteTimeStamp"));
+                                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
 
                                 // We have to clone the
                                 // entries, since the pasted
@@ -628,7 +628,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 + '.');
                         markBaseChanged();
 
-                        if (Globals.prefs.getBoolean("autoOpenForm")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                             selectionListener.editSignalled(firstBE);
                         }
                         highlightEntry(firstBE);
@@ -877,17 +877,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
                     bes = i.next();
                     if (bes.getField(BibtexFields.KEY_FIELD) != null) {
-                        if (Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                        if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                             // Remove the entry, because its key is already set:
                             i.remove();
-                        } else if (Globals.prefs.getBoolean("warnBeforeOverwritingKey")) {
+                        } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
                             // Ask if the user wants to cancel the operation:
                             CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("One or more keys will be overwritten. Continue?"),
                                     Globals.lang("Disable this confirmation dialog"), false);
                             int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite keys"),
                                     JOptionPane.YES_NO_OPTION);
                             if (cbm.isSelected()) {
-                                Globals.prefs.putBoolean("warnBeforeOverwritingKey", false);
+                                Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
                             }
                             if (answer == JOptionPane.NO_OPTION) {
                                 // Ok, break off the operation.
@@ -904,7 +904,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 HashMap<BibtexEntry, Object> oldvals = new HashMap<BibtexEntry, Object>();
                 // Iterate again, removing already set keys. This is skipped if overwriting
                 // is disabled, since all entries with keys set will have been removed.
-                if (!Globals.prefs.getBoolean("avoidOverwritingKey")) {
+                if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     for (BibtexEntry entry : entries) {
                         bes = entry;
                         // Store the old value:
@@ -1190,7 +1190,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             if (link != null) {
                                 filepath = link.toString();
                             } else {
-                                if (Globals.prefs.getBoolean("runAutomaticFileSearch")) {
+                                if (Globals.prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH)) {
 
                                     /*  The search can lead to an unexpected 100% CPU usage which is perceived
                                         as a bug, if the search incidentally starts at a directory with lots
@@ -1640,8 +1640,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                boolean enabled = !Globals.prefs.getBoolean("previewEnabled");
-                Globals.prefs.putBoolean("previewEnabled", enabled);
+                boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
+                Globals.prefs.putBoolean(JabRefPreferences.PREVIEW_ENABLED, enabled);
                 frame.setPreviewActive(enabled);
                 frame.previewToggle.setSelected(enabled);
             }
@@ -1651,12 +1651,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                boolean enabled = !Globals.prefs.getBoolean("highlightGroupsMatchingAny");
-                Globals.prefs.putBoolean("highlightGroupsMatchingAny", enabled);
+                boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY);
+                Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, enabled);
                 frame.highlightAny.setSelected(enabled);
                 if (enabled) {
                     frame.highlightAll.setSelected(false);
-                    Globals.prefs.putBoolean("highlightGroupsMatchingAll", false);
+                    Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, false);
                 }
                 // ping the listener so it updates:
                 groupsHighlightListener.listChanged(null);
@@ -1667,12 +1667,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void action() {
-                boolean enabled = !Globals.prefs.getBoolean("highlightGroupsMatchingAll");
-                Globals.prefs.putBoolean("highlightGroupsMatchingAll", enabled);
+                boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL);
+                Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, enabled);
                 frame.highlightAll.setSelected(enabled);
                 if (enabled) {
                     frame.highlightAny.setSelected(false);
-                    Globals.prefs.putBoolean("highlightGroupsMatchingAny", false);
+                    Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, false);
                 }
                 // ping the listener so it updates:
                 groupsHighlightListener.listChanged(null);
@@ -1933,7 +1933,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
             if ((e.getType() == ChangeType.ADDED_ENTRY)
-                    && (Globals.prefs.getBoolean("autoAssignGroup"))
+                    && (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP))
                     && (frame.groupToggle.isSelected())) {
                 BibtexEntry[] entries = {e.getEntry()};
                 TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
@@ -1996,7 +1996,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try
             {
                 database.insertEntry(bibEntry);
-                if (Globals.prefs.getBoolean("useOwner")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
                     Util.setAutomaticFields(bibEntry, true, true);
                 }
@@ -2007,7 +2007,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         + Globals.lang("entry") + '.');
 
                 markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean("autoOpenForm"))
+                if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM))
                 {
                     selectionListener.editSignalled(bibEntry);
                 }
@@ -2050,10 +2050,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void listChanged(ListEvent<BibtexEntry> listEvent) {
-                if (Globals.prefs.getBoolean("highlightGroupsMatchingAny")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY)) {
                     getGroupSelector().showMatchingGroups(
                             mainTable.getSelectedEntries(), false);
-                } else if (Globals.prefs.getBoolean("highlightGroupsMatchingAll")) {
+                } else if (Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL)) {
                     getGroupSelector().showMatchingGroups(
                             mainTable.getSelectedEntries(), true);
                 } else {
@@ -2225,7 +2225,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
 
         // Set up AutoCompleters for this panel:
-        if (Globals.prefs.getBoolean("autoComplete")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
             autoCompleters = new ContentAutoCompleters(getDatabase(), metaData);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
@@ -2294,9 +2294,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void adjustSplitter() {
         int mode = getMode();
         if (mode == BasePanel.SHOWING_PREVIEW) {
-            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt("previewPanelHeight"));
+            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT));
         } else {
-            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt("entryEditorHeight"));
+            splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
 
         }
     }
@@ -2387,7 +2387,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         else {
             splitPane.setDividerLocation
-                    (splitPane.getHeight() - Globals.prefs.getInt("entryEditorHeight"));
+                    (splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
         //new FocusRequester(form);
         //form.requestFocus();
         }
@@ -2446,9 +2446,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void showEntryEditor(EntryEditor editor) {
         if (mode == BasePanel.SHOWING_EDITOR) {
-            Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         } else if (mode == BasePanel.SHOWING_PREVIEW) {
-            Globals.prefs.putInt("previewPanelHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanel.SHOWING_EDITOR;
         currentEditor = editor;
@@ -2503,7 +2503,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void entryEditorClosing(EntryEditor editor) {
         // Store divider location for next time:
-        Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+        Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         selectionListener.entryEditorClosing(editor);
     }
 
@@ -2773,7 +2773,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
-        if (Globals.prefs.getBoolean("confirmDelete")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String msg = Globals.lang("Really delete the selected")
                     + ' ' + Globals.lang("entry") + '?', title = Globals.lang("Delete entry");
             if (numberOfEntries > 1) {
@@ -2789,7 +2789,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (cb.isSelected()) {
-                Globals.prefs.putBoolean("confirmDelete", false);
+                Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, false);
             }
             return (answer == JOptionPane.YES_OPTION);
         } else {
@@ -2803,7 +2803,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * lacking keys.
      */
     public void autoGenerateKeysBeforeSaving() {
-        if (Globals.prefs.getBoolean("generateKeysBeforeSaving")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
             NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
             boolean any = false;
 
@@ -2843,9 +2843,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void saveDividerLocation() {
         if (mode == BasePanel.SHOWING_PREVIEW) {
-            Globals.prefs.putInt("previewPanelHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         } else if (mode == BasePanel.SHOWING_EDITOR) {
-            Globals.prefs.putInt("entryEditorHeight", splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         }
     }
 
@@ -3177,7 +3177,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void action() throws Throwable {
 
-            String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     JFileChooser.SAVE_DIALOG, false);
             if (chosenFile != null) {
                 File expFile = new File(chosenFile);
@@ -3188,7 +3188,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                         Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                             == JOptionPane.OK_OPTION)) {
 
-                    saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"), saveType);
+                    saveDatabase(expFile, true, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), saveType);
                     //runCommand("save");
                     frame.getFileHistory().newFile(expFile.getPath());
                     frame.output(Globals.lang("Saved selected to") + " '"

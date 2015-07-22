@@ -1,17 +1,18 @@
 package net.sf.jabref.autocompleter;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.journals.logic.Abbreviation;
-
 import java.util.Map;
 import java.util.Vector;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.journals.logic.Abbreviation;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
     public ContentAutoCompleters(BibtexDatabase database, MetaData metaData) {
-        String[] completeFields = Globals.prefs.getStringArray("autoCompleteFields");
+        String[] completeFields = Globals.prefs.getStringArray(JabRefPreferences.AUTO_COMPLETE_FIELDS);
         for (String field : completeFields) {
             AutoCompleter autoCompleter = AutoCompleterFactory.getFor(field);
             put(field, autoCompleter);

@@ -15,12 +15,16 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.OpenFileFilter;
-import net.sf.jabref.Globals;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.FilenameFilter;
+
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OpenFileFilter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -119,7 +123,7 @@ public class FileDialogs {
 
         // Added the !dirOnly condition below as a workaround to the native file dialog
         // not supporting directory selection:
-        if (!dirOnly && Globals.prefs.getBoolean("useNativeFileDialogOnMac")) {
+        if (!dirOnly && Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC)) {
 
             return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType,
                     updateWorkingDirectory, dirOnly, off);
@@ -182,7 +186,7 @@ public class FileDialogs {
         }
 
         if (updateWorkingDirectory) {
-            Globals.prefs.put("workingDirectory", selectedFile.getPath());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, selectedFile.getPath());
         }
 
         if (!multipleSelection) {
@@ -216,7 +220,7 @@ public class FileDialogs {
 
         if (fc.getFile() != null) {
             if (updateWorkingDirectory) {
-                Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fc.getDirectory() + fc.getFile());
             }
             return fc.getDirectory() + fc.getFile();
         } else {

@@ -77,11 +77,11 @@ public class ChangeScanner implements Runnable {
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
-                    Globals.prefs.get("defaultEncoding"));
+                    Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
-            pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
+            pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             BibtexDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = pr.getMetaData();
 

@@ -211,7 +211,7 @@ public class Util {
         if (key == null) {
             return null;
         }
-        if (!JabRefPreferences.getInstance().getBoolean("enforceLegalBibtexKey")) {
+        if (!JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)) {
             // User doesn't want us to enforce legal characters. We must still look
             // for whitespace and some characters such as commas, since these would
             // interfere with parsing:
@@ -864,11 +864,11 @@ public class Util {
     public static void setAutomaticFields(Collection<BibtexEntry> bibs,
             boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
 
-        String timeStampField = Globals.prefs.get("timeStampField");
+        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
 
-        String defaultOwner = Globals.prefs.get("defaultOwner");
+        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = dateFormatter.getCurrentDate();
-        boolean globalSetOwner = Globals.prefs.getBoolean("useOwner"), globalSetTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
+        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER), globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp || markEntries)) {
@@ -903,12 +903,12 @@ public class Util {
      */
     public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner,
             boolean overwriteTimestamp) {
-        String defaultOwner = Globals.prefs.get("defaultOwner");
+        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = dateFormatter.getCurrentDate();
-        String timeStampField = Globals.prefs.get("timeStampField");
-        boolean setOwner = Globals.prefs.getBoolean("useOwner") &&
+        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
+        boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER) &&
                 (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
-        boolean setTimeStamp = Globals.prefs.getBoolean("useTimeStamp") &&
+        boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) &&
                 (overwriteTimestamp || (entry.getField(timeStampField) == null));
 
         Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
@@ -940,7 +940,7 @@ public class Util {
 
         // Make sure "abstract" is not in General fields, because
         // Jabref 1.55 moves the abstract to its own tab.
-        String genFields = Globals.prefs.get("generalFields");
+        String genFields = Globals.prefs.get(JabRefPreferences.GENERAL_FIELDS);
         // pr(genFields+"\t"+genFields.indexOf("abstract"));
         if (genFields.contains("abstract")) {
             // pr(genFields+"\t"+genFields.indexOf("abstract"));
@@ -957,7 +957,7 @@ public class Util {
                 newGen = genFields;
             }
             // pr(newGen);
-            Globals.prefs.put("generalFields", newGen);
+            Globals.prefs.put(JabRefPreferences.GENERAL_FIELDS, newGen);
         }
 
     }
@@ -1711,7 +1711,7 @@ public class Util {
     }
 
     public static boolean updateTimeStampIsSet() {
-        return (Globals.prefs.getBoolean("useTimeStamp") && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        return (Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
     }
 
     /**
@@ -1722,7 +1722,7 @@ public class Util {
     public static NamedCompound doUpdateTimeStamp(BibtexEntry entry, AbstractUndoableEdit undoableEdit) {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
-        String timeStampField = Globals.prefs.get("timeStampField");
+        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         String timestamp = dateFormatter.getCurrentDate();
         Util.updateField(entry, timeStampField, timestamp, ce);
         return ce;

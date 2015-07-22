@@ -52,7 +52,7 @@ public class RightClickMenu extends JPopupMenu
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
     private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
-            Globals.prefs.getBoolean("floatMarkedEntries"));
+            Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
@@ -396,7 +396,7 @@ public class RightClickMenu extends JPopupMenu
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Globals.prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
                 panel.mainTable.refreshSorting(); // Bad remote access
             }
         });
@@ -443,7 +443,7 @@ public class RightClickMenu extends JPopupMenu
         }
 
         addSeparator();
-        floatMarked.setSelected(Globals.prefs.getBoolean("floatMarkedEntries"));
+        floatMarked.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
         add(floatMarked);
     }
 
@@ -529,11 +529,11 @@ public class RightClickMenu extends JPopupMenu
 
     /** Sets the font and icon to be used, depending on the group */
     private void setGroupFontAndIcon(JMenuItem menuItem, AbstractGroup group) {
-        if (Globals.prefs.getBoolean("groupShowDynamic")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
             menuItem.setFont(menuItem.getFont().deriveFont(group.isDynamic() ?
                     Font.ITALIC : Font.PLAIN));
         }
-        if (Globals.prefs.getBoolean("groupShowIcons")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case INCLUDING:
                 menuItem.setIcon(GUIGlobals.getImage("groupIncluding"));

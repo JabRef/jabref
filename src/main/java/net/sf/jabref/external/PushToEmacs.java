@@ -72,7 +72,7 @@ public class PushToEmacs implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        citeCommand.setText(Globals.prefs.get("citeCommandEmacs"));
+        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS));
         emacsPath.setText(Globals.prefs.get(JabRefPreferences.EMACS_PATH));
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
@@ -81,7 +81,7 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("citeCommandEmacs", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_EMACS, citeCommand.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_PATH, emacsPath.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
         Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());
@@ -134,14 +134,14 @@ public class PushToEmacs implements PushToApplication {
                     // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                     // so cmd receives: (insert \"\\cite{Blah2001}\")
                     // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\\\"\\" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
+                    prefix.concat("\\\"\\" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS).replaceAll("\\\\", "\\\\\\\\") +
                             "{" + keys + "}\\\"").concat(suffix)
                     :
                     // Linux gnuclient escaping:
                     // java string: "(insert \"\\\\cite{Blah2001}\")"
                     // so sh receives: (insert "\\cite{Blah2001}")
                     // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\"" + Globals.prefs.get("citeCommandEmacs").replaceAll("\\\\", "\\\\\\\\") +
+                    prefix.concat("\"" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS).replaceAll("\\\\", "\\\\\\\\") +
                             "{" + keys + "}\"").concat(suffix);
 
             final Process p = Runtime.getRuntime().exec(com);

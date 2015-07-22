@@ -47,7 +47,7 @@ class IncrementalSearcher {
                     	       +"' for '"
                     	       +pattern.toString()+"'.");*/
                     if (bibtexEntry.getField(field) != null) {
-                        if (prefs.getBoolean("caseSensitiveSearch")) {
+                        if (prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
                             if (bibtexEntry.getField(field).contains(searchString)) {
                                 found = true;
                             }

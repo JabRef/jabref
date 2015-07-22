@@ -30,7 +30,7 @@ public class EasyDateFormat {
     public String getDateAt(Date date) {
         // first use, create an instance
         if (dateFormatter == null) {
-            String format = Globals.prefs.get("timeStampFormat");
+            String format = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
             dateFormatter = new SimpleDateFormat(format);
         }
         return dateFormatter.format(date);

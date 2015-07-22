@@ -51,6 +51,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.GeneralRenderer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.TransferableBibtexEntry;
@@ -110,9 +111,9 @@ public class SearchResultsDialog {
     private void init(String title) {
         diag = new JDialog(frame, title, false);
 
-        int activePreview = Globals.prefs.getInt("activePreview");
+        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get("preview0") : Globals.prefs.get("preview1"));
+                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
         model = new EventTableModel<BibtexEntry>(sortedEntries,
@@ -177,15 +178,15 @@ public class SearchResultsDialog {
 
             @Override
             public void windowClosing(WindowEvent event) {
-                Globals.prefs.putInt("searchDialogWidth", diag.getSize().width);
-                Globals.prefs.putInt("searchDialogHeight", diag.getSize().height);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_WIDTH, diag.getSize().width);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT, diag.getSize().height);
             }
         });
 
         diag.getContentPane().add(contentPane, BorderLayout.CENTER);
         // Remember and default to last size:
-        diag.setSize(new Dimension(Globals.prefs.getInt("searchDialogWidth"), Globals.prefs
-                .getInt("searchDialogHeight")));
+        diag.setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.SEARCH_DIALOG_WIDTH), Globals.prefs
+                .getInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT)));
         diag.setLocationRelativeTo(frame);
     }
 

@@ -14,19 +14,20 @@
 */
 package net.sf.jabref.imports;
 
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import javax.swing.JOptionPane;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.util.Util;
 
@@ -96,12 +97,12 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             String title = entry.getField("title");
             if (title != null) {
                 // Unit formatting
-                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
                 }
 
                 // Case keeping
-                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);

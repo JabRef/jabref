@@ -161,8 +161,8 @@ public class SidePaneManager {
     private Map<String, Integer> getPreferredPositions() {
         Map<String, Integer> preferredPositions = new HashMap<String, Integer>();
 
-        String[] componentNames = Globals.prefs.getStringArray("sidePaneComponentNames");
-        String[] componentPositions = Globals.prefs.getStringArray("sidePaneComponentPreferredPositions");
+        String[] componentNames = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
+        String[] componentPositions = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
 
         for (int i = 0; i < componentNames.length; ++i) {
             try {
@@ -195,8 +195,8 @@ public class SidePaneManager {
             componentPositions[i] = preferredPositions.get(componentNames[i]).toString();
         }
 
-        Globals.prefs.putStringArray("sidePaneComponentNames", componentNames);
-        Globals.prefs.putStringArray("sidePaneComponentPreferredPositions", componentPositions);
+        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, componentNames);
+        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
     }
 
 
@@ -275,7 +275,7 @@ public class SidePaneManager {
             boolean wasVisible = sidep.isVisible();
             sidep.setVisible(true);
             if (!wasVisible) {
-                int width = Globals.prefs.getInt("sidePaneWidth");
+                int width = Globals.prefs.getInt(JabRefPreferences.SIDE_PANE_WIDTH);
                 if (width > 0) {
                     frame.contentPane.setDividerLocation(width);
                 } else {
@@ -284,7 +284,7 @@ public class SidePaneManager {
             }
         } else {
             if (sidep.isVisible()) {
-                Globals.prefs.putInt("sidePaneWidth", frame.contentPane.getDividerLocation());
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
             }
             sidep.setVisible(false);
 

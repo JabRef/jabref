@@ -121,7 +121,7 @@ public class ImportCustomizationDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 String chosenFileStr = null;
                 CustomImportList.Importer importer = prefs.customImports.new Importer();
-                importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
+                importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
                         Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
                 if (importer.getBasePath() != null) {
                     chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
@@ -152,7 +152,7 @@ public class ImportCustomizationDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String basePath = FileDialogs.getNewFile(frame, new File(prefs.get("workingDirectory")), ".zip,.jar",
+                String basePath = FileDialogs.getNewFile(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".zip,.jar",
                         Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
                 ZipFile zipFile = null;
                 if (basePath != null) {

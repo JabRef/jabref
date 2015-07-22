@@ -156,17 +156,17 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
+        colorCodes.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
         //antialias.setSelected(_prefs.getBoolean("antialias"));
-        fontSize.setText("" + _prefs.getInt("menuFontSize"));
-        rowPadding.setText("" + _prefs.getInt("tableRowPadding"));
-        oldMenuFontSize = _prefs.getInt("menuFontSize");
-        overrideFonts.setSelected(_prefs.getBoolean("overrideDefaultFonts"));
+        fontSize.setText("" + _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE));
+        rowPadding.setText("" + _prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING));
+        oldMenuFontSize = _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
+        overrideFonts.setSelected(_prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS));
         oldOverrideFontSize = overrideFonts.isSelected();
         fontSize.setEnabled(overrideFonts.isSelected());
         //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));
         //customIconThemeFile.setText(_prefs.get("customIconThemeFile"));
-        showGrid.setSelected(_prefs.getBoolean("tableShowGrid"));
+        showGrid.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID));
         colorPanel.setValues();
     }
 
@@ -178,20 +178,20 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
 
-        _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
+        _prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
         //_prefs.putBoolean("antialias", antialias.isSelected());
-        _prefs.put("fontFamily", font.getFamily());
-        _prefs.putInt("fontStyle", font.getStyle());
-        _prefs.putInt("fontSize", font.getSize());
-        _prefs.putBoolean("overrideDefaultFonts", overrideFonts.isSelected());
+        _prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
+        _prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
+        _prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
+        _prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
         GUIGlobals.CURRENTFONT = font;
         colorPanel.storeSettings();
-        _prefs.putBoolean("tableShowGrid", showGrid.isSelected());
+        _prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
             if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
                     (size != oldMenuFontSize)) {
-                _prefs.putInt("menuFontSize", size);
+                _prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Globals.lang("You have changed the menu and label font size.")
                                 .concat(" ")
@@ -204,7 +204,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
         try {
             int padding = Integer.parseInt(rowPadding.getText());
-            _prefs.putInt("tableRowPadding", padding);
+            _prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }

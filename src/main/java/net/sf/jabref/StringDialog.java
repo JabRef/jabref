@@ -97,8 +97,8 @@ class StringDialog extends JDialog {
             }
         });
 
-        setLocation(prefs.getInt("stringsPosX"), prefs.getInt("stringsPosY"));
-        setSize(prefs.getInt("stringsSizeX"), prefs.getInt("stringsSizeY"));
+        setLocation(prefs.getInt(JabRefPreferences.STRINGS_POS_X), prefs.getInt(JabRefPreferences.STRINGS_POS_Y));
+        setSize(prefs.getInt(JabRefPreferences.STRINGS_SIZE_X), prefs.getInt(JabRefPreferences.STRINGS_SIZE_Y));
 
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
@@ -179,7 +179,7 @@ class StringDialog extends JDialog {
             TableColumnModel cm = getColumnModel();
             cm.getColumn(0).setPreferredWidth(800);
             cm.getColumn(1).setPreferredWidth(2000);
-            sp.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
+            sp.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
             // getInputMap().remove(GUIGlobals.exitDialog);
             getInputMap().put(frame.prefs.getKey("Close dialog"), "close");
             getActionMap().put("close", closeAction);
@@ -365,10 +365,10 @@ class StringDialog extends JDialog {
             dispose();
             Point p = getLocation();
             Dimension d = getSize();
-            prefs.putInt("stringsPosX", p.x);
-            prefs.putInt("stringsPosY", p.y);
-            prefs.putInt("stringsSizeX", d.width);
-            prefs.putInt("stringsSizeY", d.height);
+            prefs.putInt(JabRefPreferences.STRINGS_POS_X, p.x);
+            prefs.putInt(JabRefPreferences.STRINGS_POS_Y, p.y);
+            prefs.putInt(JabRefPreferences.STRINGS_SIZE_X, d.width);
+            prefs.putInt(JabRefPreferences.STRINGS_SIZE_Y, d.height);
         }
     }
 

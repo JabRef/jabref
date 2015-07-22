@@ -50,12 +50,12 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         KeyListener, FocusListener {
 
     private PreviewPanel[] previewPanel = null;
-    private int activePreview = Globals.prefs.getInt("activePreview");
+    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
     private PreviewPanel preview;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibtexEntry> tableRows;
-    private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
+    private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
     private boolean workingOnPreview = false;
 
     private boolean enabled = true;
@@ -85,9 +85,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private void instantiatePreviews() {
         previewPanel = new PreviewPanel[] {
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get("preview0"), true),
+                        .get(JabRefPreferences.PREVIEW_0), true),
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get("preview1"), true)};
+                        .get(JabRefPreferences.PREVIEW_1), true)};
 
         panel.frame().getSearchManager().addSearchListener(previewPanel[0]);
         panel.frame().getSearchManager().addSearchListener(previewPanel[1]);
@@ -95,8 +95,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     public void updatePreviews() {
         try {
-            previewPanel[0].readLayout(Globals.prefs.get("preview0"));
-            previewPanel[1].readLayout(Globals.prefs.get("preview1"));
+            previewPanel[0].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+            previewPanel[1].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -543,7 +543,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         } else {
             activePreview = 0;
         }
-        Globals.prefs.putInt("activePreview", activePreview);
+        Globals.prefs.putInt(JabRefPreferences.ACTIVE_PREVIEW, activePreview);
         if (previewActive) {
             this.preview = previewPanel[activePreview];
 

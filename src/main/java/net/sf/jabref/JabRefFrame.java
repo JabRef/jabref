@@ -500,7 +500,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void init() {
         tabbedPane = new DragDropPopupPane(manageSelectors, databaseProperties, bibtexKeyPattern);
 
-        UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean("filechooserDisableRename"));
+        UIManager.put("FileChooser.readOnly", Globals.prefs.getBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME));
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
@@ -529,15 +529,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         initActions();
 
         // Show the toolbar if it was visible at last shutdown:
-        tlb.setVisible(Globals.prefs.getBoolean("toolbarVisible"));
+        tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        if (!prefs.getBoolean("windowMaximised")) {
+        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
 
-            int sizeX = prefs.getInt("sizeX");
-            int sizeY = prefs.getInt("sizeY");
-            int posX = prefs.getInt("posX");
-            int posY = prefs.getInt("posY");
+            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
+            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
+            int posX = prefs.getInt(JabRefPreferences.POS_X);
+            int posY = prefs.getInt(JabRefPreferences.POS_Y);
 
             /*
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -583,8 +583,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     if (sizeX <= width) {
                         posX = width - sizeX;
                     } else {
-                        posX = prefs.getIntDefault("posX");
-                        sizeX = prefs.getIntDefault("sizeX");
+                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
+                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
                     }
                 }
 
@@ -592,8 +592,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     if (sizeY <= height) {
                         posY = height - sizeY;
                     } else {
-                        posY = prefs.getIntDefault("posY");
-                        sizeY = prefs.getIntDefault("sizeY");
+                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
+                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
                     }
                 }
             }
@@ -618,11 +618,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
                     searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
-                    previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
+                    previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
                     highlightAny
-                            .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
                     highlightAll
-                            .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
                     Globals.focusListener.setFocused(bp.mainTable);
                     setWindowTitle();
                     // Update search autocompleter with information for the correct database:
@@ -694,7 +694,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager.register("search", searchManager);
 
         // Show the search panel if it was visible at last shutdown:
-        if (Globals.prefs.getBoolean("searchPanelVisible")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE)) {
             sidePaneManager.show("search");
         }
     }
@@ -814,33 +814,33 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (basePanel() != null) {
             basePanel().saveDividerLocation();
         }
-        prefs.putInt("posX", JabRefFrame.this.getLocation().x);
-        prefs.putInt("posY", JabRefFrame.this.getLocation().y);
-        prefs.putInt("sizeX", JabRefFrame.this.getSize().width);
-        prefs.putInt("sizeY", JabRefFrame.this.getSize().height);
-        //prefs.putBoolean("windowMaximised", (getExtendedState()&MAXIMIZED_BOTH)>0);
-        prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
+        prefs.putInt(JabRefPreferences.POS_X, JabRefFrame.this.getLocation().x);
+        prefs.putInt(JabRefPreferences.POS_Y, JabRefFrame.this.getLocation().y);
+        prefs.putInt(JabRefPreferences.SIZE_X, JabRefFrame.this.getSize().width);
+        prefs.putInt(JabRefPreferences.SIZE_Y, JabRefFrame.this.getSize().height);
+        //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
+        prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState() == Frame.MAXIMIZED_BOTH));
 
-        prefs.putBoolean("toolbarVisible", tlb.isVisible());
-        prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
+        prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
+        prefs.putBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE, sidePaneManager.isComponentVisible("search"));
         // Store divider location for side pane:
         int width = contentPane.getDividerLocation();
         if (width > 0) {
-            prefs.putInt("sidePaneWidth", width);
+            prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, width);
         }
-        if (prefs.getBoolean("openLastEdited")) {
+        if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
             // previously stored file name.
             if (filenames.isEmpty()) {
-                prefs.remove("lastEdited");
+                prefs.remove(JabRefPreferences.LAST_EDITED);
             }
             else {
                 String[] names = new String[filenames.size()];
                 for (int i = 0; i < filenames.size(); i++) {
                     names[i] = filenames.elementAt(i);
                 }
-                prefs.putStringArray("lastEdited", names);
+                prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
             }
 
         }
@@ -1432,7 +1432,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.addSeparator();
         GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetchers);
         search.add(generalFetcher.getAction());
-        if (prefs.getBoolean("webSearchVisible")) {
+        if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
             sidePaneManager.show(generalFetcher.getTitle());
         }
@@ -1520,7 +1520,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          else
           GUIGlobals.CURRENTFONT=f;
          // updatefont
-         prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
+         prefs.put(JabRefPreferences.FONT_FAMILY, GUIGlobals.CURRENTFONT.getFamily());
          prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
          prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
          if (tabbedPane.getTabCount() > 0) {
@@ -1835,7 +1835,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             metaData = new MetaData();
         }
         if (encoding == null) {
-            encoding = Globals.prefs.get("defaultEncoding");
+            encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         }
 
         BasePanel bp = new BasePanel(JabRefFrame.this, db, file, metaData, encoding);
@@ -2015,7 +2015,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             // Create a new, empty, database.
             BibtexDatabase database = new BibtexDatabase();
-            addTab(database, null, new MetaData(), Globals.prefs.get("defaultEncoding"), true);
+            addTab(database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
             output(Globals.lang("New database created."));
         }
     }
@@ -2047,7 +2047,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = new BasePanel(JabRefFrame.this,
                         dialog.getGenerateDB(), // database
                         null, // file
-                        new MetaData(), Globals.prefs.get("defaultEncoding")); // meta data
+                        new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
                 tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), bp);
                 tabbedPane.setSelectedComponent(bp);
                 output(Globals.lang("New database created."));
@@ -2128,8 +2128,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * (there are more than one entry or the inspection dialog is also
          * enabled for single entries):
          */
-        if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
-                (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
+                (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || (entries.size() > 1))) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -2185,8 +2185,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int addedEntries = 0;
 
         // Set owner and timestamp fields:
-        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean("overwriteOwner"),
-                Globals.prefs.getBoolean("overwriteTimeStamp"), Globals.prefs.getBoolean("markImportedEntries"));
+        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
         if (intoNew || (tabbedPane.getTabCount() == 0)) {
             // Import into new database.
@@ -2202,7 +2202,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             // Metadata are only put in bibtex files, so we will not find it
             // in imported files. We therefore pass in an empty MetaData:
-            BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get("defaultEncoding"));
+            BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             /*
                   if (prefs.getBoolean("autoComplete")) {
                   db.setCompleters(autoCompleters);
@@ -2719,7 +2719,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             int currentSize = GUIGlobals.CURRENTFONT.getSize();
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize + 1);
-            Globals.prefs.putInt("fontSize", currentSize + 1);
+            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
             }
@@ -2741,7 +2741,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
                     currentSize - 1);
-            Globals.prefs.putInt("fontSize", currentSize - 1);
+            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
             }

@@ -85,7 +85,7 @@ public class FileTab extends JPanel implements PrefsTab {
                 GUIGlobals.getIconUrl("helpSmall"));
         openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Globals.lang("Backup old file when saving"));
-        autoSave = new JCheckBox(Globals.lang("Autosave"));
+        autoSave = new JCheckBox(Globals.lang(JabRefPreferences.AUTO_SAVE));
         promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
         valueDelimiter = new JComboBox(new String[] {
@@ -278,8 +278,8 @@ public class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        openLast.setSelected(_prefs.getBoolean("openLastEdited"));
-        backup.setSelected(_prefs.getBoolean("backup"));
+        openLast.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
+        backup.setSelected(_prefs.getBoolean(JabRefPreferences.BACKUP));
 
         String newline = _prefs.get(net.sf.jabref.JabRefPreferences.NEWLINE);
         if ("\r".equals(newline)) {
@@ -293,19 +293,19 @@ public class FileTab extends JPanel implements PrefsTab {
 
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         wrapFieldLine.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD));
-        autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
-        resolveStringsAll.setSelected(_prefs.getBoolean("resolveStringsAllFields"));
+        autoDoubleBraces.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES));
+        resolveStringsAll.setSelected(_prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
-        doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
-        bracesAroundCapitalsFields.setText(_prefs.get("putBracesAroundCapitals"));
-        nonWrappableFields.setText(_prefs.get("nonWrappableFields"));
+        doNotResolveStringsFor.setText(_prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        bracesAroundCapitalsFields.setText(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
+        nonWrappableFields.setText(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
-        autoSave.setSelected(_prefs.getBoolean("autoSave"));
-        promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean("promptBeforeUsingAutosave"));
-        autoSaveInterval.setValue(_prefs.getInt("autoSaveInterval"));
+        autoSave.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
+        promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE));
+        autoSaveInterval.setValue(_prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL));
         origAutoSaveSetting = autoSave.isSelected();
-        valueDelimiter.setSelectedIndex(_prefs.getInt("valueDelimiters"));
-        includeEmptyFields.setSelected(_prefs.getBoolean("includeEmptyFields"));
+        valueDelimiter.setSelectedIndex(_prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
+        includeEmptyFields.setSelected(_prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS));
         camelCase.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
         sameColumn.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
 
@@ -333,19 +333,19 @@ public class FileTab extends JPanel implements PrefsTab {
         Globals.NEWLINE = newline;
         Globals.NEWLINE_LENGTH = newline.length();
 
-        _prefs.putBoolean("backup", backup.isSelected());
-        _prefs.putBoolean("openLastEdited", openLast.isSelected());
-        _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
-        _prefs.putBoolean("resolveStringsAllFields", resolveStringsAll.isSelected());
-        _prefs.put("doNotResolveStringsFor", doNotResolveStringsFor.getText().trim());
-        _prefs.putBoolean("autoSave", autoSave.isSelected());
-        _prefs.putBoolean("promptBeforeUsingAutosave", promptBeforeUsingAutoSave.isSelected());
-        _prefs.putInt("autoSaveInterval", (Integer) autoSaveInterval.getValue());
-        _prefs.putInt("valueDelimiters", valueDelimiter.getSelectedIndex());
-        _prefs.putBoolean("includeEmptyFields", includeEmptyFields.isSelected());
+        _prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
+        _prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
+        _prefs.putBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES, autoDoubleBraces.isSelected());
+        _prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());
+        _prefs.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, doNotResolveStringsFor.getText().trim());
+        _prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
+        _prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
+        _prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
+        _prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
+        _prefs.putBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS, includeEmptyFields.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
-        doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
+        doNotResolveStringsFor.setText(_prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
         //for LWang_AdjustableFieldOrder
         _prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, getBgValue(bgFieldOrderStyle));
@@ -353,12 +353,12 @@ public class FileTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD, wrapFieldLine.isSelected());
 
         boolean updateSpecialFields = false;
-        if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {
-            _prefs.put("putBracesAroundCapitals", bracesAroundCapitalsFields.getText());
+        if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
+            _prefs.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, bracesAroundCapitalsFields.getText());
             updateSpecialFields = true;
         }
-        if (!nonWrappableFields.getText().trim().equals(_prefs.get("nonWrappableFields"))) {
-            _prefs.put("nonWrappableFields", nonWrappableFields.getText());
+        if (!nonWrappableFields.getText().trim().equals(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
+            _prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
             updateSpecialFields = true;
         }
         // If either of the two last entries were changed, run the update for special field handling:

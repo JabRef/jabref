@@ -96,26 +96,26 @@ public class SearchManager2 extends SidePaneComponent
 
         searchReq = new JCheckBoxMenuItem
                 (Globals.lang("Search required fields"),
-                        Globals.prefs.getBoolean("searchReq"));
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REQ));
         searchOpt = new JCheckBoxMenuItem
                 (Globals.lang("Search optional fields"),
-                        Globals.prefs.getBoolean("searchOpt"));
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_OPT));
         searchGen = new JCheckBoxMenuItem
                 (Globals.lang("Search general fields"),
-                        Globals.prefs.getBoolean("searchGen"));
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_GEN));
         searchAll = new JCheckBoxMenuItem
                 (Globals.lang("Search all fields"),
-                        Globals.prefs.getBoolean("searchAll"));
+                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL));
         regExpSearch = new JCheckBoxMenuItem
                 (Globals.lang("Use regular expressions"),
-                        Globals.prefs.getBoolean("regExpSearch"));
+                        Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
         increment = new JRadioButton(Globals.lang("Incremental"), false);
         floatSearch = new JRadioButton(Globals.lang("Float"), true);
         hideSearch = new JRadioButton(Globals.lang("Filter"), true);
         showResultsInDialog = new JRadioButton(Globals.lang("Show results in dialog"), true);
         searchAllBases = new JRadioButton(Globals.lang("Global search"),
-                Globals.prefs.getBoolean("searchAllBases"));
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL_BASES));
         ButtonGroup types = new ButtonGroup();
         types.add(increment);
         types.add(floatSearch);
@@ -156,13 +156,13 @@ public class SearchManager2 extends SidePaneComponent
         });
 
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
-                Globals.prefs.getBoolean("caseSensitiveSearch"));
+                Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
 
         highLightWords = new JCheckBoxMenuItem(Globals.lang("Highlight Words"),
-                Globals.prefs.getBoolean("highLightWords"));
+                Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS));
 
         searchAutoComplete = new JCheckBoxMenuItem(Globals.lang("Autocomplete names"),
-                Globals.prefs.getBoolean("searchAutoComplete"));
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
         settings.add(select);
 
         // 2005.03.29, trying to remove field category searches, to simplify
@@ -230,7 +230,7 @@ public class SearchManager2 extends SidePaneComponent
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Globals.prefs.putBoolean("searchAutoComplete", searchAutoComplete.isSelected());
+                Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, searchAutoComplete.isSelected());
                 if (SearchManager2.this.frame.basePanel() != null) {
                     SearchManager2.this.frame.basePanel().updateSearchManager();
                 }
@@ -250,13 +250,13 @@ public class SearchManager2 extends SidePaneComponent
         help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.searchHelp, "Help"));
 
         // Select the last used mode of search:
-        if (Globals.prefs.getBoolean("incrementS")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.INCREMENT_S)) {
             increment.setSelected(true);
-        } else if (Globals.prefs.getBoolean("floatSearch")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_SEARCH)) {
             floatSearch.setSelected(true);
-        } else if (Globals.prefs.getBoolean("showSearchInDialog")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SEARCH_IN_DIALOG)) {
             showResultsInDialog.setSelected(true);
-        } else if (Globals.prefs.getBoolean("searchAllBases")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL_BASES)) {
             searchAllBases.setSelected(true);
         } else {
             hideSearch.setSelected(true);
@@ -436,19 +436,19 @@ public class SearchManager2 extends SidePaneComponent
     }
 
     public void updatePrefs() {
-        Globals.prefs.putBoolean("searchReq", searchReq.isSelected());
-        Globals.prefs.putBoolean("searchOpt", searchOpt.isSelected());
-        Globals.prefs.putBoolean("searchGen", searchGen.isSelected());
-        Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
-        Globals.prefs.putBoolean("incrementS", increment.isSelected());
-        Globals.prefs.putBoolean("selectS", select.isSelected());
-        Globals.prefs.putBoolean("floatSearch", floatSearch.isSelected());
-        Globals.prefs.putBoolean("caseSensitiveSearch",
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_REQ, searchReq.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_OPT, searchOpt.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_GEN, searchGen.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_ALL, searchAll.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.INCREMENT_S, increment.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SELECT_S, select.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.FLOAT_SEARCH, floatSearch.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH,
                 caseSensitive.isSelected());
-        Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
-        Globals.prefs.putBoolean("highLightWords", highLightWords.isSelected());
-        Globals.prefs.putBoolean("showSearchInDialog", showResultsInDialog.isSelected());
-        Globals.prefs.putBoolean("searchAllBases", searchAllBases.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.REG_EXP_SEARCH, regExpSearch.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.HIGH_LIGHT_WORDS, highLightWords.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SHOW_SEARCH_IN_DIALOG, showResultsInDialog.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_ALL_BASES, searchAllBases.isSelected());
     }
 
     public void startIncrementalSearch() {
@@ -530,17 +530,17 @@ public class SearchManager2 extends SidePaneComponent
             // Setup search parameters common to both normal and float.
             SearchRule searchRule;
 
-            if(Globals.prefs.getBoolean("regExpSearch")) {
-                searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+            if(Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH)) {
+                searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
             } else {
-                searchRule = new BasicSearchRule(Globals.prefs.getBoolean("caseSensitiveSearch"));
+                searchRule = new BasicSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
             }
 
             try {
                 // this searches specified fields if specified,
                 // and all fields otherwise
-                searchRule = new SearchExpression(Globals.prefs.getBoolean("caseSensitiveSearch"),
-                        Globals.prefs.getBoolean("regExpSearch"));
+                searchRule = new SearchExpression(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
+                        Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
             } catch (Exception ex) {
                 // we'll do a search in all fields
             }

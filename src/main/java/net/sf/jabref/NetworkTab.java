@@ -96,19 +96,19 @@ public class NetworkTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
 
-        useProxy.setSelected(_prefs.getBoolean("useProxy"));
+        useProxy.setSelected(_prefs.getBoolean(JabRefPreferences.USE_PROXY));
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
-        defProxyHostname.setText(_prefs.get("proxyHostname"));
-        defProxyPort.setText(_prefs.get("proxyPort"));
+        defProxyHostname.setText(_prefs.get(JabRefPreferences.PROXY_HOSTNAME));
+        defProxyPort.setText(_prefs.get(JabRefPreferences.PROXY_PORT));
 
     }
 
     @Override
     public void storeSettings() {
-        _prefs.putBoolean("useProxy", useProxy.isSelected());
+        _prefs.putBoolean(JabRefPreferences.USE_PROXY, useProxy.isSelected());
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
-        _prefs.put("proxyHostname", defProxyHostname.getText().trim());
-        _prefs.put("proxyPort", defProxyPort.getText().trim());
+        _prefs.put(JabRefPreferences.PROXY_HOSTNAME, defProxyHostname.getText().trim());
+        _prefs.put(JabRefPreferences.PROXY_PORT, defProxyPort.getText().trim());
     }
 
     @Override
