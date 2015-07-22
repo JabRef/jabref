@@ -646,7 +646,7 @@ public class JabRef {
                     // specified look and feel does not exist on the classpath, so use system l&f
                     UIManager.setLookAndFeel(systemLnF);
                     // also set system l&f as default
-                    Globals.prefs.put("lookAndFeel", systemLnF);
+                    Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLnF);
                     // notify the user
                     JOptionPane.showMessageDialog(JabRef.jrf, Globals.lang("Unable to find the requested Look & Feel and thus the default one is used."),
                             Globals.lang("Warning"),
