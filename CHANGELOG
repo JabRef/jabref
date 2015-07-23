@@ -11,6 +11,7 @@
     - JabRef metadata ("jabref-meta") @comments are now always written in alphabetical order
     - Switch vom antlr2 grammar to antlr4 for capturing the search expressions. Should be backwards compatible.
     - Changed html description of search expressions, expressing the conditional logic more explicitly with brackets.
+    - Fixed INSPIRE searches compatibility problem (by Stefano Gariazzo).
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
