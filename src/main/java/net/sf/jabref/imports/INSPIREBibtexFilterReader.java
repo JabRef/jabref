@@ -57,11 +57,11 @@ class INSPIREBibtexFilterReader extends FilterReader {
             if (l == null) {
                 return null;
             }
-            if (l.indexOf("<pre>") != -1) {
+            if (l.contains("<pre>")) {
                 pre = true;
                 l = in.readLine();
             }
-            if (l.indexOf("</pre>") != -1) {
+            if (l.contains("</pre>")) {
                 pre = false;
             }
         } while (!pre);
