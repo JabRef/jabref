@@ -47,7 +47,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class INSPIREFetcher implements EntryFetcher {
 
-    private static final String INSPIRE_HOST = "inspirebeta.net";
+    private static final String INSPIRE_HOST = "inspirehep.net";
 
 
     public INSPIREFetcher() {
