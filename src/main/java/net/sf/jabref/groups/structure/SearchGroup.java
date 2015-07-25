@@ -135,7 +135,7 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public String toString() {
         return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + context + AbstractGroup.SEPARATOR
+                + context.ordinal() + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
                 + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;

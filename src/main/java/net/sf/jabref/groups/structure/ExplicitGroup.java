@@ -15,15 +15,19 @@
 */
 package net.sf.jabref.groups.structure;
 
-import java.util.*;
-
-import javax.swing.undo.AbstractUndoableEdit;
-
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.util.QuotedStringTokenizer;
 import net.sf.jabref.util.StringUtil;
+
+import javax.swing.undo.AbstractUndoableEdit;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Select explicit bibtex entries. It is also known as static group.
@@ -51,23 +55,22 @@ public class ExplicitGroup extends AbstractGroup {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
         switch (version) {
-            case 0:
-            case 1:
-            case 2: {
-                ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(),
-                        GroupHierarchyType.INDEPENDENT);
-                newGroup.addEntries(tok, db);
-                return newGroup;
-            }
-            case 3: {
-                String name = tok.nextToken();
-                int context = Integer.parseInt(tok.nextToken());
-                ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
-                newGroup.addEntries(tok, db);
-                return newGroup;
-            }
-            default:
-                throw new UnsupportedVersionException("ExplicitGroup", version);
+        case 0:
+        case 1:
+        case 2: {
+            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), GroupHierarchyType.INDEPENDENT);
+            newGroup.addEntries(tok, db);
+            return newGroup;
+        }
+        case 3: {
+            String name = tok.nextToken();
+            int context = Integer.parseInt(tok.nextToken());
+            ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
+            newGroup.addEntries(tok, db);
+            return newGroup;
+        }
+        default:
+            throw new UnsupportedVersionException("ExplicitGroup", version);
         }
     }
 
@@ -85,6 +88,7 @@ public class ExplicitGroup extends AbstractGroup {
     @Override
     public SearchRule getSearchRule() {
         return new SearchRule() {
+
             @Override
             public int applyRule(String query, BibtexEntry bibtexEntry) {
                 return contains(query, bibtexEntry) ? 1 : 0;
@@ -204,7 +208,8 @@ public class ExplicitGroup extends AbstractGroup {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ExplicitGroup.ID).append(StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR).append(context).append(AbstractGroup.SEPARATOR);
+        sb.append(ExplicitGroup.ID).append(StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
+                append(AbstractGroup.SEPARATOR).append(context.ordinal()).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<String>();
@@ -252,14 +257,14 @@ public class ExplicitGroup extends AbstractGroup {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>").append(getName()).append("</b> -").append(Globals.lang("static group"));
         switch (getHierarchicalContext()) {
-            case INCLUDING:
-                sb.append(", ").append(Globals.lang("includes subgroups"));
-                break;
-            case REFINING:
-                sb.append(", ").append(Globals.lang("refines supergroup"));
-                break;
-            default:
-                break;
+        case INCLUDING:
+            sb.append(", ").append(Globals.lang("includes subgroups"));
+            break;
+        case REFINING:
+            sb.append(", ").append(Globals.lang("refines supergroup"));
+            break;
+        default:
+            break;
         }
         return sb.toString();
     }
