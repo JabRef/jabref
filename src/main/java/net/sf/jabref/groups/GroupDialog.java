@@ -449,8 +449,7 @@ class GroupDialog extends JDialog {
                         + "<tt>author%esmith and title%eelectrical</tt>"));
             } else {
                 SearchExpression expression = new SearchExpression(isCaseSensitive(), isRegex());
-                expression.validateSearchStrings(s1);
-                if(expression.getTree() != null) {
+                if(expression.validateSearchStrings(s1)) {
                     setDescription(new SearchExpressionDescriber(isCaseSensitive(), isRegex(), expression.getTree()).getDescription());
                 } else {
                     setDescription(new BasicSearchDescriber(isCaseSensitive(), isRegex(), s1).getDescription());

@@ -19,6 +19,7 @@ import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.SearchRules;
 import net.sf.jabref.search.matchers.SearchMatcher;
 import net.sf.jabref.search.rules.BasicRegexSearchRule;
 import net.sf.jabref.search.rules.BasicSearchRule;
@@ -524,22 +525,9 @@ public class SearchManager2 extends SidePaneComponent
             fireSearchlistenerEvent(searchField.getText());
 
             // Setup search parameters common to both normal and float.
-            SearchRule searchRule;
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH)) {
-                searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
-            } else {
-                searchRule = new BasicSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
-            }
-
-            try {
-                // this searches specified fields if specified,
-                // and all fields otherwise
-                searchRule = new SearchExpression(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
-                        Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
-            } catch (Exception ex) {
-                // we'll do a search in all fields
-            }
+            SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchField.getText(),
+                    Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
+                    Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
             if (!searchRule.validateSearchStrings(searchField.getText())) {
                 panel.output(Globals.lang("Search failed: illegal search expression"));

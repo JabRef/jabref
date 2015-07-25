@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Vector;
 
 import net.sf.jabref.imports.*;
+import net.sf.jabref.search.SearchRules;
 import net.sf.jabref.search.rules.BasicRegexSearchRule;
 import net.sf.jabref.search.rules.BasicSearchRule;
 import net.sf.jabref.search.rules.SearchExpression;
@@ -47,20 +48,9 @@ class SearchManagerNoGUI {
             searchTerm = fieldYear();
         }
 
-        SearchRule searchRule;
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH)) {
-            searchRule = new BasicRegexSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
-        } else {
-            searchRule = new BasicSearchRule(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
-        }
-
-        try {
-            searchRule = new SearchExpression(Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
-                    Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
-        } catch (Exception ignored) {
-
-        }
+        SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchTerm,
+                Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
+                Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
         if (!searchRule.validateSearchStrings(searchTerm)) {
             System.out.println(Globals.lang("Search failed: illegal search expression"));

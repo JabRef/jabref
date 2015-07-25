@@ -58,6 +58,7 @@ public class SearchGroup extends AbstractGroup {
         this.caseSensitive = caseSensitive;
         this.regExp = regExp;
 
+        // TODO why use other search rules instead of "normal" search in JabRef. This WILL cause confusion!
         expressionSearchRule = new SearchExpression(caseSensitive, regExp);
         if (expressionSearchRule.validateSearchStrings(this.searchExpression)) {
             searchRule = expressionSearchRule;  // do advanced search
