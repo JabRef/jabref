@@ -803,7 +803,7 @@ public class GroupSelector extends SidePaneComponent implements
         @Override
         public void run() {
             for (BibtexEntry entry : panel.getDatabase().getEntries()) {
-                boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                boolean hit = rules.applyRule(searchTerm, entry);
                 entry.setGroupHit(hit);
                 if (hit) {
                     hits++;
@@ -1571,7 +1571,7 @@ public class GroupSelector extends SidePaneComponent implements
             GroupTreeNode node = e.nextElement();
             SearchRule rule = node.getSearchRule();
             for (BibtexEntry match : matches) {
-                if (rule.applyRule(SearchRule.DUMMY_QUERY, match) == 0) {
+                if (!rule.applyRule(SearchRule.DUMMY_QUERY, match)) {
                     continue;
                 }
                 nodes.add(node);

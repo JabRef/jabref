@@ -560,7 +560,7 @@ public class SearchManager2 extends SidePaneComponent
                 // Search only the current database:
                 for (BibtexEntry entry : panel.getDatabase().getEntries()) {
 
-                    boolean hit = rule.applyRule(searchTerm, entry) > 0;
+                    boolean hit = rule.applyRule(searchTerm, entry);
                     entry.setSearchHit(hit);
                     if (hit) {
                         hits++;
@@ -572,7 +572,7 @@ public class SearchManager2 extends SidePaneComponent
                     BasePanel p = frame.baseAt(i);
                     for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
-                        boolean hit = rule.applyRule(searchTerm, entry) > 0;
+                        boolean hit = rule.applyRule(searchTerm, entry);
                         entry.setSearchHit(hit);
                         if (hit) {
                             hits++;

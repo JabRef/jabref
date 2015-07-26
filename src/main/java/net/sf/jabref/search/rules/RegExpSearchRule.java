@@ -65,7 +65,7 @@ public class RegExpSearchRule implements SearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) throws PatternSyntaxException {
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) throws PatternSyntaxException {
 
         int score = 0;
 
@@ -73,7 +73,7 @@ public class RegExpSearchRule implements SearchRule {
 
         score += searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
 
-        return score;
+        return score > 0;
     }
 
     private int searchFields(Set<String> fields, BibtexEntry bibtexEntry, Pattern pattern) {

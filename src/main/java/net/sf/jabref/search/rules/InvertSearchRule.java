@@ -8,9 +8,8 @@ import net.sf.jabref.search.SearchRule;
  * Inverts result score.
  *
  * Example:
- * 0 --> 1
- * 1 --> 0
- * ELSE --> 0
+ * false --> true
+ * true --> false
  */
 public class InvertSearchRule implements SearchRule {
 
@@ -21,8 +20,8 @@ public class InvertSearchRule implements SearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        return otherRule.applyRule(query, bibtexEntry) == 0 ? 1 : 0;
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+        return !otherRule.applyRule(query, bibtexEntry);
     }
 
     @Override

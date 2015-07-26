@@ -27,7 +27,7 @@ import net.sf.jabref.search.SearchRule;
  */
 public class BasicSearchRule implements SearchRule {
 
-    private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    private static final RemoveLatexCommands REMOVE_LATEX_COMMANDS = new RemoveLatexCommands();
 
     protected final boolean caseSensitive;
 
@@ -41,7 +41,7 @@ public class BasicSearchRule implements SearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
 
         String searchString = query;
         if (!caseSensitive) {
@@ -54,17 +54,15 @@ public class BasicSearchRule implements SearchRule {
         // We need match for all words:
         boolean[] matchFound = new boolean[words.size()];
 
-        Object fieldContentAsObject;
-        String fieldContent;
-
         //TODO build upon already existing SimpleSearchRule
         for (String field : bibtexEntry.getAllFields()) {
-            fieldContentAsObject = bibtexEntry.getField(field);
+            Object fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
-                fieldContent = BasicSearchRule.removeBrackets.format(fieldContentAsObject.toString());
+                String fieldContent = BasicSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }
+
                 int index = 0;
                 // Check if we have a match for each of the query words, ignoring
                 // those words for which we already have a match:
@@ -78,10 +76,10 @@ public class BasicSearchRule implements SearchRule {
         }
         for (boolean aMatchFound : matchFound) {
             if (!aMatchFound) {
-                return 0; // Didn't match all words.
+                return false; // Didn't match all words.
             }
         }
-        return 1; // Matched all words.
+        return true; // Matched all words.
     }
 
     protected List<String> parseQuery(String query) {

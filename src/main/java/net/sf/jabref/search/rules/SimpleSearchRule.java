@@ -47,32 +47,42 @@ public class SimpleSearchRule implements SearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        String searchString = query;
-
-        if (!caseSensitive) {
-            searchString = searchString.toLowerCase();
-        }
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
         int score = 0;
-        int counter = 0;
         for (String field : bibtexEntry.getAllFields()) {
             Object fieldContentAsObject = bibtexEntry.getField(field);
-            if (fieldContentAsObject != null) {
-                try {
-                    String fieldContent = SimpleSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
-                    if (!caseSensitive) {
-                        fieldContent = fieldContent.toLowerCase();
-                    }
-                    counter = fieldContent.indexOf(searchString, counter);
-                    while (counter >= 0) {
-                        score++;
-                        counter = fieldContent.indexOf(searchString, counter + 1);
-                    }
-                } catch (Throwable t) {
-                    System.err.println("sorting error: " + t);
-                }
+            if (fieldContentAsObject == null) {
+                continue;
             }
-            counter = 0;
+
+            try {
+                String fieldContent = sanatizeFieldContent(fieldContentAsObject);
+                score += getNumberOfOccurrences(fieldContent, sanatizeString(query));
+            } catch (Throwable t) {
+                System.err.println("sorting error: " + t);
+            }
+        }
+        return score > 0;
+    }
+
+    private String sanatizeString(String query) {
+        if (!caseSensitive) {
+            return query.toLowerCase();
+        } else {
+            return query;
+        }
+    }
+
+    private String sanatizeFieldContent(Object fieldContentAsObject) {
+        return sanatizeString(SimpleSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString()));
+    }
+
+    private static int getNumberOfOccurrences(String haystack, String needle) {
+        int score = 0;
+        int counter = haystack.indexOf(needle);
+        while (counter >= 0) {
+            score++;
+            counter = haystack.indexOf(needle, counter + 1);
         }
         return score;
     }

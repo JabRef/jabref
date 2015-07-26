@@ -122,8 +122,8 @@ public class KeywordGroup extends AbstractGroup {
     public SearchRule getSearchRule() {
         return new SearchRule() {
             @Override
-            public int applyRule(String query, BibtexEntry bibtexEntry) {
-                return contains(query, bibtexEntry) ? 1 : 0;
+            public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+                return contains(query, bibtexEntry);
             }
 
             @Override
@@ -168,7 +168,7 @@ public class KeywordGroup extends AbstractGroup {
                     Globals.lang("add entries to group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
-                if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry) == 0) {
+                if (!getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
                     String oldContent = entry
                             .getField(searchField), pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
@@ -202,7 +202,7 @@ public class KeywordGroup extends AbstractGroup {
             NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
-                if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry) > 0) {
+                if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
                     String oldContent = entry
                             .getField(searchField);
                     removeMatches(entry);

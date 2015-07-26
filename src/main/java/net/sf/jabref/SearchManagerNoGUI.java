@@ -60,7 +60,7 @@ class SearchManagerNoGUI {
         Collection<BibtexEntry> entries = database.getEntries();
         Vector<BibtexEntry> matchEntries = new Vector<BibtexEntry>();
         for (BibtexEntry entry : entries) {
-            boolean hit = searchRule.applyRule(searchTerm, entry) > 0;
+            boolean hit = searchRule.applyRule(searchTerm, entry);
             entry.setSearchHit(hit);
             if (hit) {
                 hits++;

@@ -89,11 +89,8 @@ public class SearchExpression implements SearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
-        Boolean result = new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
-
-        // convert to int value
-        return result ? 1 : 0;
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+        return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibtexEntry).visit(tree);
     }
 
     @Override

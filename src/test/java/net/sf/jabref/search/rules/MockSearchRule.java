@@ -8,16 +8,16 @@ import net.sf.jabref.search.SearchRule;
  */
 public class MockSearchRule implements SearchRule {
 
-    private final int result;
+    private final boolean result;
     private final boolean valid;
 
-    public MockSearchRule(int result, boolean valid) {
+    public MockSearchRule(boolean result, boolean valid) {
         this.result = result;
         this.valid = valid;
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
         return result;
     }
 

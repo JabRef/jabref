@@ -189,7 +189,7 @@ public class SearchGroup extends AbstractGroup {
      */
     @Override
     public boolean contains(String searchOptions, BibtexEntry entry) {
-        return getSearchRule().applyRule(searchOptions, entry) != 0;
+        return getSearchRule().applyRule(searchOptions, entry);
     }
 
     @Override

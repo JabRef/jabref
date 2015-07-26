@@ -25,15 +25,17 @@ import net.sf.jabref.search.SearchRule;
 public class OrSearchRuleSet extends SearchRuleSet {
 
     @Override
-    public int applyRule(String searchString, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String searchString, BibtexEntry bibtexEntry) {
         int score = 0;
 
         // We let each rule add a maximum of 1 to the score.
         for (SearchRule rule : ruleSet) {
-            score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
+            if(rule.applyRule(searchString, bibtexEntry)) {
+                score++;
+            }
         }
 
         // OR rule demands score > 0.
-        return score > 0 ? 1 : 0;
+        return score > 0;
     }
 }

@@ -55,8 +55,8 @@ public class AllEntriesGroup extends AbstractGroup {
     public SearchRule getSearchRule() {
         return new SearchRule() {
             @Override
-            public int applyRule(String query, BibtexEntry bibtexEntry) {
-                return 1; // contains everything
+            public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+                return true; // contains everything
             }
 
             @Override

@@ -90,8 +90,8 @@ public class ExplicitGroup extends AbstractGroup {
         return new SearchRule() {
 
             @Override
-            public int applyRule(String query, BibtexEntry bibtexEntry) {
-                return contains(query, bibtexEntry) ? 1 : 0;
+            public boolean applyRule(String query, BibtexEntry bibtexEntry) {
+                return contains(query, bibtexEntry);
             }
 
             @Override

@@ -19,7 +19,6 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +53,7 @@ public class BasicRegexSearchRule extends BasicSearchRule {
     }
 
     @Override
-    public int applyRule(String query, BibtexEntry bibtexEntry) {
+    public boolean applyRule(String query, BibtexEntry bibtexEntry) {
 
         String searchString = query;
         if (!caseSensitive) {
@@ -69,7 +68,7 @@ public class BasicRegexSearchRule extends BasicSearchRule {
                 patterns.add(Pattern.compile(word, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE));
             }
         } catch (PatternSyntaxException ex) {
-            return 0;
+            return false;
         }
 
         //print(words);
@@ -99,10 +98,10 @@ public class BasicRegexSearchRule extends BasicSearchRule {
         }
         for (boolean aMatchFound : matchFound) {
             if (!aMatchFound) {
-                return 0; // Didn't match all words.
+                return false; // Didn't match all words.
             }
         }
-        return 1; // Matched all words.
+        return true; // Matched all words.
     }
 
 }
