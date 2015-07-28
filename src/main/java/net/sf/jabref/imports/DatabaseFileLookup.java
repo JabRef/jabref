@@ -3,7 +3,6 @@ package net.sf.jabref.imports;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
@@ -28,8 +27,6 @@ import net.sf.jabref.gui.FileListTableModel;
 class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
-
-    private static Logger logger = Logger.getLogger(DatabaseFileLookup.class.getName());
 
     private final HashMap<File, Boolean> fileToFound = new HashMap<File, Boolean>();
 

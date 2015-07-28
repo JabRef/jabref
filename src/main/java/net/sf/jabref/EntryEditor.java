@@ -43,8 +43,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -69,6 +67,8 @@ import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
@@ -145,7 +145,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
 
-    private final Logger logger = Logger.getLogger(EntryEditor.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
@@ -1752,7 +1752,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent event) {
             FileListEditor fileListEditor = EntryEditor.this.fileListEditor;
             if (fileListEditor == null) {
-                logger.log(Level.WARNING, "No file list editor found.");
+                LOGGER.debug("No file list editor found.");
             } else {
                 fileListEditor.autoSetLinks();
             }

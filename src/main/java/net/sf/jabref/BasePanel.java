@@ -42,7 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -133,12 +132,14 @@ import ca.odell.glazedlists.matchers.Matcher;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = Logger.getLogger(BasePanel.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     public final static int SHOWING_NOTHING = 0;
     private final static int SHOWING_PREVIEW = 1;
@@ -293,7 +294,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
                         file);
             } catch (IOException ex) {
-                BasePanel.logger.warning(ex.toString());
+                LOGGER.debug("Could not register FileUpdateMonitor", ex);
             }
         }
 
@@ -1339,7 +1340,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             try {
                                 Util.openFolderAndSelectFile(f.getAbsolutePath());
                             } catch (IOException e) {
-                                BasePanel.logger.fine(e.getMessage());
+                                LOGGER.debug("Could not open folder", e);
                             }
                         }
                     }

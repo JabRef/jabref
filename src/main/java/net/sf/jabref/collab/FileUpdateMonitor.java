@@ -17,12 +17,13 @@ package net.sf.jabref.collab;
 
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 /**
  * This thread monitors a set of files, each associated with a FileUpdateListener, for changes
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class FileUpdateMonitor implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;
 
@@ -61,7 +62,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                FileUpdateMonitor.logger.finest("FileUpdateMonitor has been interrupted.");
+                LOGGER.info("FileUpdateMonitor has been interrupted. Terminating...", ex);
                 return;
             }
         }

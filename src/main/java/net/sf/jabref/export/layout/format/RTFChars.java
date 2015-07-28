@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.export.layout.format;
 
-import java.util.logging.Logger;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.LayoutFormatter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Transform a LaTeX-String to RTF.
@@ -38,7 +38,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class RTFChars implements LayoutFormatter {
 
     // Instantiate logger:
-    private static final Logger logger = Logger.getLogger(RTFChars.class.toString());
+    private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
 
 
     @Override
@@ -153,7 +153,7 @@ public class RTFChars implements LayoutFormatter {
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
                         } else {
-                            RTFChars.logger.fine("Unknown command " + command);
+                            LOGGER.info("Unknown command " + command);
                         }
                         if (c == ' ') {
                             // command was separated with the content by ' '

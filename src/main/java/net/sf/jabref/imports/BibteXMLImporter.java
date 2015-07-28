@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.SAXParser;
@@ -29,6 +27,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -38,12 +38,13 @@ import net.sf.jabref.OutputPrinter;
  */
 public class BibteXMLImporter extends ImportFormat {
 
-    private static final Logger logger = Logger.getLogger(BibteXMLImporter.class.toString());
+    private static final Log LOGGER = LogFactory.getLog(BibteXMLImporter.class);
 
 
-    /**
-     * Return the name of this import format.
-     */
+            /**
+             * Return the name of this import format.
+             */
+
     @Override
     public String getFormatName() {
         return "BibTeXML";
@@ -103,13 +104,13 @@ public class BibteXMLImporter extends ImportFormat {
             bibItems = handler.getItems();
 
         } catch (javax.xml.parsers.ParserConfigurationException e1) {
-            BibteXMLImporter.logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+            LOGGER.debug("Error with XML parser configuration", e1);
             status.showMessage(e1.getLocalizedMessage());
         } catch (org.xml.sax.SAXException e2) {
-            BibteXMLImporter.logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+            LOGGER.debug("Error during XML parsing", e2);
             status.showMessage(e2.getLocalizedMessage());
         } catch (java.io.IOException e3) {
-            BibteXMLImporter.logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
+            LOGGER.debug("Error during file import", e3);
             status.showMessage(e3.getLocalizedMessage());
         }
         return bibItems;

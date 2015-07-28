@@ -18,7 +18,6 @@ package net.sf.jabref;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
@@ -37,11 +36,13 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class RightClickMenu extends JPopupMenu
         implements PopupMenuListener {
 
-    private static final Logger logger = Logger.getLogger(RightClickMenu.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
 
     private final BasePanel panel;
     private final MetaData metaData;
@@ -77,7 +78,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("copy");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute copy", ex);
                 }
             }
         });
@@ -88,7 +89,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("paste");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute paste", ex);
                 }
             }
         });
@@ -99,7 +100,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("cut");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute cut", ex);
                 }
             }
         });
@@ -113,7 +114,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("delete");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute delete", ex);
                 }
                 /*}
                 }); */
@@ -128,7 +129,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("exportToClipboard");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute exportToClipboard", ex);
                 }
             }
         });
@@ -139,7 +140,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("sendAsEmail");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute sendAsEmail", ex);
                 }
             }
         });
@@ -159,7 +160,7 @@ public class RightClickMenu extends JPopupMenu
                     try {
                         panel.runCommand("markEntries");
                     } catch (Throwable ex) {
-                        RightClickMenu.logger.warning(ex.getMessage());
+                        LOGGER.debug("Could not execute markEntries", ex);
                     }
                 }
             });
@@ -173,7 +174,7 @@ public class RightClickMenu extends JPopupMenu
                     try {
                         panel.runCommand("unmarkEntries");
                     } catch (Throwable ex) {
-                        RightClickMenu.logger.warning(ex.getMessage());
+                        LOGGER.debug("Could not execute unmarkEntries", ex);
                     }
                 }
             });
@@ -189,7 +190,7 @@ public class RightClickMenu extends JPopupMenu
                         try {
                             panel.runCommand("markEntries");
                         } catch (Throwable ex) {
-                            RightClickMenu.logger.warning(ex.getMessage());
+                            LOGGER.debug("Could not execute markEntries", ex);
                         }
                     }
                 });
@@ -204,7 +205,7 @@ public class RightClickMenu extends JPopupMenu
                         try {
                             panel.runCommand("unmarkEntries");
                         } catch (Throwable ex) {
-                            RightClickMenu.logger.warning(ex.getMessage());
+                            LOGGER.debug("Could not execute unmarkEntries", ex);
                         }
                     }
                 });
@@ -254,7 +255,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("openFolder");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not open folder", ex);
                 }
             }
         });
@@ -266,7 +267,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("openExternalFile");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not open external file", ex);
                 }
             }
         });
@@ -278,7 +279,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("addFileLink");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not attach file", ex);
                 }
             }
         });
@@ -297,7 +298,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("openUrl");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute open URL", ex);
                 }
             }
         });
@@ -309,7 +310,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("copyKey");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not copy BibTex key", ex);
                 }
             }
         });
@@ -321,7 +322,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("copyCiteKey");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not copy cite key", ex);
                 }
             }
         });
@@ -338,7 +339,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("importPlainText");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not import plain text", ex);
                 }
             }
         });
@@ -360,7 +361,7 @@ public class RightClickMenu extends JPopupMenu
                     //JMenu groupMenu = buildGroupMenu(bes, true, false);
 
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not add to group", ex);
                 }
             }
         });
@@ -373,7 +374,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("removeFromGroup");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not remove from group", ex);
                 }
             }
         });
@@ -386,7 +387,7 @@ public class RightClickMenu extends JPopupMenu
                 try {
                     panel.runCommand("moveToGroup");
                 } catch (Throwable ex) {
-                    RightClickMenu.logger.warning(ex.getMessage());
+                    LOGGER.debug("Could not execute move to group", ex);
                 }
             }
         });

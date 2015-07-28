@@ -23,10 +23,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -40,7 +41,7 @@ import net.sf.jabref.util.Util;
  */
 public class SendAsEMailAction extends AbstractWorker {
 
-    private static final Logger logger = Logger.getLogger(SendAsEMailAction.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(SendAsEMailAction.class);
 
     private String message = null;
     private final JabRefFrame frame;
@@ -93,7 +94,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 try {
                     Util.openFolderAndSelectFile(f.getAbsolutePath());
                 } catch (IOException e) {
-                    SendAsEMailAction.logger.fine(e.getMessage());
+                    LOGGER.debug("Could not open file", e);
                 }
             }
         }
