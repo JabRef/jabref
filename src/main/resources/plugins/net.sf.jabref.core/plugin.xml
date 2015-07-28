@@ -169,7 +169,6 @@
         value="Fetch Entries from DBLP." />
     </extension>
 
-<!-- disabled because of https://sourceforge.net/p/jabref/bugs/1241/
     <extension id="ISBNtoBibTeXFetcher" plugin-id="net.sf.jabref.core"
        point-id="EntryFetcher">
       <parameter id="entryFetcher"
@@ -178,7 +177,6 @@
       <parameter id="description"
         value="Fetch entries based on ISBN." />
     </extension>
--->
 
     <extension id="GoogleScholarFetcher" plugin-id="net.sf.jabref.core"
 		point-id="EntryFetcher">

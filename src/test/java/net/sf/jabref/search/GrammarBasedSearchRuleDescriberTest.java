@@ -1,12 +1,12 @@
 package net.sf.jabref.search;
 
-import net.sf.jabref.search.describer.SearchExpressionDescriber;
-import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.describer.GrammarBasedSearchRuleDescriber;
+import net.sf.jabref.search.rules.GrammarBasedSearchRule;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class SearchExpressionDescriberTest {
+public class GrammarBasedSearchRuleDescriberTest {
 
     @Test
     public void testSimpleQuery() throws Exception {
@@ -47,9 +47,9 @@ public class SearchExpressionDescriberTest {
 
 
     private void evaluate(String query, boolean caseSensitive, boolean regex, String expected) {
-        SearchExpression searchExpression = new SearchExpression(caseSensitive, regex);
-        assertTrue(searchExpression.validateSearchStrings(query));
-        SearchExpressionDescriber describer = new SearchExpressionDescriber(caseSensitive, regex, searchExpression.getTree());
+        GrammarBasedSearchRule grammarBasedSearchRule = new GrammarBasedSearchRule(caseSensitive, regex);
+        assertTrue(grammarBasedSearchRule.validateSearchStrings(query));
+        GrammarBasedSearchRuleDescriber describer = new GrammarBasedSearchRuleDescriber(caseSensitive, regex, grammarBasedSearchRule.getTree());
         assertEquals(expected, describer.getDescription());
     }
 }

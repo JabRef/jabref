@@ -27,7 +27,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SearchExpression implements SearchRule {
+/**
+ * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
+ */
+public class GrammarBasedSearchRule implements SearchRule {
 
     static public class ThrowingErrorListener extends BaseErrorListener {
 
@@ -47,13 +50,13 @@ public class SearchExpression implements SearchRule {
     private ParseTree tree;
     private String query;
 
-    public SearchExpression(boolean caseSensitiveSearch, boolean regExpSearch) throws RecognitionException {
+    public GrammarBasedSearchRule(boolean caseSensitiveSearch, boolean regExpSearch) throws RecognitionException {
         this.caseSensitiveSearch = caseSensitiveSearch;
         this.regExpSearch = regExpSearch;
     }
 
     public static boolean isValid(boolean caseSensitive, boolean regExp, String query) {
-        return new SearchExpression(caseSensitive, regExp).validateSearchStrings(query);
+        return new GrammarBasedSearchRule(caseSensitive, regExp).validateSearchStrings(query);
     }
 
     public boolean isCaseSensitiveSearch() {

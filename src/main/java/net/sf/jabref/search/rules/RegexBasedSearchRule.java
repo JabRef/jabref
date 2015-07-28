@@ -17,6 +17,8 @@ package net.sf.jabref.search.rules;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.rules.util.SentenceAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +27,20 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * Search rule for simple search.
+ * Search rule for regex-based search.
  */
-public class BasicRegexSearchRule extends BasicSearchRule {
+public class RegexBasedSearchRule implements SearchRule {
 
-    private static final RemoveLatexCommands removeBrackets = new RemoveLatexCommands();
+    private static final RemoveLatexCommands REMOVE_LATEX_COMMANDS = new RemoveLatexCommands();
 
-    public BasicRegexSearchRule(boolean caseSensitive) {
-        super(caseSensitive);
+    private final boolean caseSensitive;
+
+    public RegexBasedSearchRule(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
     }
 
     @Override
@@ -41,7 +49,7 @@ public class BasicRegexSearchRule extends BasicSearchRule {
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
         }
-        List<String> words = parseQuery(searchString);
+        List<String> words = new SentenceAnalyzer(searchString).getWords();
         try {
             for (String word : words) {
                 Pattern.compile(word, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
@@ -60,7 +68,7 @@ public class BasicRegexSearchRule extends BasicSearchRule {
             searchString = searchString.toLowerCase();
         }
 
-        List<String> words = parseQuery(searchString);
+        List<String> words = new SentenceAnalyzer(searchString).getWords();
 
         List<Pattern> patterns = new ArrayList<Pattern>();
         try {
@@ -78,7 +86,7 @@ public class BasicRegexSearchRule extends BasicSearchRule {
         for (String field : bibtexEntry.getAllFields()) {
             Object fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
-                String fieldContent = BasicRegexSearchRule.removeBrackets.format(fieldContentAsObject.toString());
+                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }
@@ -87,7 +95,7 @@ public class BasicRegexSearchRule extends BasicSearchRule {
                 // Check if we have a match for each of the query words, ignoring
                 // those words for which we already have a match:
                 for (Pattern pattern : patterns) {
-                    String fieldContentNoBrackets = BasicRegexSearchRule.removeBrackets.format(fieldContent);
+                    String fieldContentNoBrackets = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
                     Matcher m = pattern.matcher(fieldContentNoBrackets);
                     matchFound[index] = matchFound[index] || m.find();
 

@@ -15,11 +15,22 @@
 */
 package net.sf.jabref.groups;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.factories.Borders;
+import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.*;
+import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.search.SearchRules;
+import net.sf.jabref.search.describer.SearchDescribers;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
+
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.undo.AbstractUndoableEdit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -27,24 +38,6 @@ import java.awt.event.ItemListener;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.undo.AbstractUndoableEdit;
-
-import com.jgoodies.forms.factories.Borders;
-import net.sf.jabref.*;
-import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.search.describer.BasicSearchDescriber;
-import net.sf.jabref.search.describer.SearchExpressionDescriber;
-import net.sf.jabref.search.rules.SearchExpression;
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.util.Util;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -65,11 +58,11 @@ class GroupDialog extends JDialog {
     private final JRadioButton m_searchRadioButton = new JRadioButton(
             Globals.lang("Dynamically group entries by a free-form search expression"));
     private final JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
-    Globals.lang("Independent group: When selected, view only this group's entries"));
+            Globals.lang("Independent group: When selected, view only this group's entries"));
     private final JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
-    Globals.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
+            Globals.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
     private final JRadioButton m_unionButton = new JRadioButton( // JZTODO lyrics
-    Globals.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
+            Globals.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
     private final JTextField m_kgSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
     private final FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "",
@@ -111,17 +104,13 @@ class GroupDialog extends JDialog {
 
     private final CardLayout m_optionsLayout = new CardLayout();
 
-
     /**
      * Shows a group add/edit dialog.
      *
-     * @param jabrefFrame
-     *            The parent frame.
-     * @param basePanel
-     *            The default grouping field.
-     * @param editedGroup
-     *            The group being edited, or null if a new group is to be
-     *            created.
+     * @param jabrefFrame The parent frame.
+     * @param basePanel   The default grouping field.
+     * @param editedGroup The group being edited, or null if a new group is to be
+     *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
             AbstractGroup editedGroup) {
@@ -308,9 +297,9 @@ class GroupDialog extends JDialog {
                     // therefore I don't catch anything here
                     m_resultingGroup = new KeywordGroup(
                             m_name.getText().trim(), m_kgSearchField.getText()
-                                    .trim(), m_kgSearchTerm.getText().trim(),
+                            .trim(), m_kgSearchTerm.getText().trim(),
                             m_kgCaseSensitive.isSelected(), m_kgRegExp
-                                    .isSelected(), getContext());
+                            .isSelected(), getContext());
                     if (((m_editedGroup instanceof ExplicitGroup) || (m_editedGroup instanceof SearchGroup))
                             && m_resultingGroup.supportsAdd()) {
                         addPreviousEntries();
@@ -448,12 +437,8 @@ class GroupDialog extends JDialog {
                         + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>"
                         + "<tt>author%esmith and title%eelectrical</tt>"));
             } else {
-                SearchExpression expression = new SearchExpression(isCaseSensitive(), isRegex());
-                if(expression.validateSearchStrings(s1)) {
-                    setDescription(new SearchExpressionDescriber(isCaseSensitive(), isRegex(), expression.getTree()).getDescription());
-                } else {
-                    setDescription(new BasicSearchDescriber(isCaseSensitive(), isRegex(), s1).getDescription());
-                }
+                setDescription(SearchDescribers.getSearchDescriberFor(SearchRules.getSearchRuleByQuery(s1, isCaseSensitive(), isRegex()), s1).getDescription());
+
                 if (isRegex()) {
                     try {
                         Pattern.compile(s1);
@@ -553,7 +538,9 @@ class GroupDialog extends JDialog {
         return m_undoAddPreviousEntires;
     }
 
-    /** Sets the font of the name entry field. */
+    /**
+     * Sets the font of the name entry field.
+     */
     private void setNameFontItalic(boolean italic) {
         Font f = m_name.getFont();
         if (f.isItalic() != italic) {

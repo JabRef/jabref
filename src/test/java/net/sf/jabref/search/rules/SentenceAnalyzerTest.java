@@ -1,5 +1,6 @@
 package net.sf.jabref.search.rules;
 
+import net.sf.jabref.search.rules.util.SentenceAnalyzer;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -11,10 +12,10 @@ public class SentenceAnalyzerTest {
 
     @Test
     public void testGetWords() throws Exception {
-        assertEquals(Arrays.asList("a","b"), new BasicSearchRule.SentenceAnalyzer("a b").getWords());
-        assertEquals(Arrays.asList("a","b"), new BasicSearchRule.SentenceAnalyzer(" a b ").getWords());
-        assertEquals(Collections.singletonList("b "), new BasicSearchRule.SentenceAnalyzer("\"b \" ").getWords());
-        assertEquals(Collections.singletonList(" a"), new BasicSearchRule.SentenceAnalyzer(" \\ a").getWords());
+        assertEquals(Arrays.asList("a","b"), new SentenceAnalyzer("a b").getWords());
+        assertEquals(Arrays.asList("a","b"), new SentenceAnalyzer(" a b ").getWords());
+        assertEquals(Collections.singletonList("b "), new SentenceAnalyzer("\"b \" ").getWords());
+        assertEquals(Collections.singletonList(" a"), new SentenceAnalyzer(" \\ a").getWords());
     }
     
 }
