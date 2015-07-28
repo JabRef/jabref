@@ -39,7 +39,6 @@ import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
 import net.sf.jabref.util.logging.CachebleHandler;
-import net.sf.jabref.util.logging.StdoutConsoleHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1328,17 +1327,6 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
     public static void setupLogging() {
         // get the root logger. It is NOT GLOBAL_LOGGER_NAME
         Logger rootLogger = Logger.getLogger("");
-
-        // disable console logging by removing all handlers
-        Handler[] handlers = rootLogger.getHandlers();
-        for (Handler handler : handlers) {
-            rootLogger.removeHandler(handler);
-        }
-
-        // add new handler logging to System.out
-        StdoutConsoleHandler h = new StdoutConsoleHandler();
-        rootLogger.addHandler(h);
-
         Globals.handler = new CachebleHandler();
         rootLogger.addHandler(handler);
     }
