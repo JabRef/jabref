@@ -21,19 +21,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import net.sf.jabref.Globals;
 
@@ -48,27 +36,14 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class DBConnectDialog extends JDialog {
 
-    // labels
-    JLabel lblServerType = new JLabel();
-    JLabel lblServerHostname = new JLabel();
-    JLabel lblDatabase = new JLabel();
-    JLabel lblUsername = new JLabel();
-    JLabel lblPassword = new JLabel();
-
     // input fields
-    JComboBox cmbServerType = new JComboBox();
-    JTextField txtServerHostname = new JTextField(40);
-    JTextField txtDatabase = new JTextField(40);
-    JTextField txtUsername = new JTextField(40);
-    JPasswordField pwdPassword = new JPasswordField(40);
-    JButton btnConnect = new JButton();
-    JButton btnCancel = new JButton();
+    private final JComboBox cmbServerType = new JComboBox();
+    private final JTextField txtServerHostname = new JTextField(40);
+    private final JTextField txtDatabase = new JTextField(40);
+    private final JTextField txtUsername = new JTextField(40);
+    private final JPasswordField pwdPassword = new JPasswordField(40);
 
-    // array for holding components on left-hand and right-hand sides
-    ArrayList<JLabel> lhs = new ArrayList<JLabel>();
-    ArrayList<JComponent> rhs = new ArrayList<JComponent>();
-
-    DBStrings dbStrings = new DBStrings();
+    private DBStrings dbStrings = new DBStrings();
 
     private boolean connectToDB = false;
 
@@ -84,12 +59,19 @@ public class DBConnectDialog extends JDialog {
         dbStrings = dbs;
 
         // build collections of components
+        ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+        JLabel lblServerType = new JLabel();
         lhs.add(lblServerType);
+        JLabel lblServerHostname = new JLabel();
         lhs.add(lblServerHostname);
+        JLabel lblDatabase = new JLabel();
         lhs.add(lblDatabase);
+        JLabel lblUsername = new JLabel();
         lhs.add(lblUsername);
+        JLabel lblPassword = new JLabel();
         lhs.add(lblPassword);
 
+        ArrayList<JComponent> rhs = new ArrayList<JComponent>();
         rhs.add(cmbServerType);
         rhs.add(txtServerHostname);
         rhs.add(txtDatabase);
@@ -105,11 +87,13 @@ public class DBConnectDialog extends JDialog {
 
         // set label text alignment
         for (JLabel label : lhs) {
-            label.setHorizontalAlignment(JLabel.RIGHT);
+            label.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
         // set button text
+        JButton btnConnect = new JButton();
         btnConnect.setText(Globals.lang("Connect"));
+        JButton btnCancel = new JButton();
         btnCancel.setText(Globals.lang("Cancel"));
 
         // init input fields to current DB strings
@@ -164,6 +148,7 @@ public class DBConnectDialog extends JDialog {
 
         ActionListener connectAction = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 String errorMessage = checkInput();
@@ -188,6 +173,7 @@ public class DBConnectDialog extends JDialog {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 dispose();
@@ -215,17 +201,17 @@ public class DBConnectDialog extends JDialog {
         String[] errors = new String[fields.length];
         int cnt = 0;
 
-        if (txtServerHostname.getText().trim().equals("")) {
+        if (txtServerHostname.getText().trim().isEmpty()) {
             errors[cnt] = fields[0];
             cnt++;
         }
 
-        if (txtDatabase.getText().trim().equals("")) {
+        if (txtDatabase.getText().trim().isEmpty()) {
             errors[cnt] = fields[1];
             cnt++;
         }
 
-        if (txtUsername.getText().trim().equals("")) {
+        if (txtUsername.getText().trim().isEmpty()) {
             errors[cnt] = fields[2];
             cnt++;
         }
@@ -237,14 +223,14 @@ public class DBConnectDialog extends JDialog {
             errMsg = null;
             break;
         case 1:
-            errMsg = errMsg + errors[0] + ".";
+            errMsg = errMsg + errors[0] + '.';
             break;
         case 2:
-            errMsg = errMsg + errors[0] + " and " + errors[1] + ".";
+            errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
             break;
         case 3:
             errMsg = errMsg + errors[0] + ", " + errors[1]
-                    + ", and " + errors[2] + ".";
+                    + ", and " + errors[2] + '.';
             break;
         default:
 
@@ -271,7 +257,6 @@ public class DBConnectDialog extends JDialog {
             tmp = tmp + aPwd;
         }
         dbStrings.setPassword(tmp);
-        tmp = "";
         Arrays.fill(pwd, '0');
 
     }
@@ -288,7 +273,7 @@ public class DBConnectDialog extends JDialog {
         return connectToDB;
     }
 
-    public void setConnectToDB(boolean connectToDB) {
+    private void setConnectToDB(boolean connectToDB) {
         this.connectToDB = connectToDB;
     }
 

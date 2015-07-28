@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.util.Util;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -41,14 +42,15 @@ public class SendAsEMailAction extends AbstractWorker {
 
     private static final Logger logger = Logger.getLogger(SendAsEMailAction.class.getName());
 
-    String message = null;
-    private JabRefFrame frame;
+    private String message = null;
+    private final JabRefFrame frame;
 
 
     public SendAsEMailAction(JabRefFrame frame) {
         this.frame = frame;
     }
 
+    @Override
     public void run() {
         if (!Desktop.isDesktopSupported()) {
             message = Globals.lang("Error creating email");
@@ -56,8 +58,9 @@ public class SendAsEMailAction extends AbstractWorker {
         }
 
         BasePanel panel = frame.basePanel();
-        if (panel == null)
+        if (panel == null) {
             return;
+        }
         if (panel.getSelectedEntries().length == 0) {
             message = Globals.lang("No entries selected.");
             return;
@@ -81,7 +84,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property 
-        boolean openFolders = JabRefPreferences.getInstance().getBoolean("openFoldersOfAttachedFiles");
+        boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
         for (File f : fileList) {
@@ -90,7 +93,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 try {
                     Util.openFolderAndSelectFile(f.getAbsolutePath());
                 } catch (IOException e) {
-                    logger.fine(e.getMessage());
+                    SendAsEMailAction.logger.fine(e.getMessage());
                 }
             }
         }
@@ -103,7 +106,7 @@ public class SendAsEMailAction extends AbstractWorker {
             mailTo = mailTo.concat("\"");
         }
 
-        URI uriMailTo = null;
+        URI uriMailTo;
         try {
             uriMailTo = new URI("mailto", mailTo, null);
         } catch (URISyntaxException e1) {
@@ -125,6 +128,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 Globals.lang("Entries added to an email"), bes.length);
     }
 
+    @Override
     public void update() {
         frame.output(message);
     }

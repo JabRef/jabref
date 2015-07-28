@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -46,9 +46,10 @@ public class MySQLExporter extends DBExporter {
      * @return The singleton instance of the MySQLExporter
      */
     public static MySQLExporter getInstance() {
-        if (instance == null)
-            instance = new MySQLExporter();
-        return instance;
+        if (MySQLExporter.instance == null) {
+            MySQLExporter.instance = new MySQLExporter();
+        }
+        return MySQLExporter.instance;
     }
 
     @Override
@@ -61,8 +62,8 @@ public class MySQLExporter extends DBExporter {
         Connection conn = DriverManager.getConnection(url,
                 dbstrings.getUsername(), dbstrings.getPassword());
         SQLUtil.processQuery(conn, "CREATE DATABASE IF NOT EXISTS `"
-                + dbStrings.getDatabase() + "`");
-        SQLUtil.processQuery(conn, "USE `" + dbStrings.getDatabase() + "`");
+                + dbStrings.getDatabase() + '`');
+        SQLUtil.processQuery(conn, "USE `" + dbStrings.getDatabase() + '`');
         return conn;
     }
 
@@ -97,7 +98,7 @@ public class MySQLExporter extends DBExporter {
                 "CREATE TABLE IF NOT EXISTS entries ( \n"
                         + "entries_id      INTEGER         NOT NULL AUTO_INCREMENT, \n"
                         + "jabref_eid      VARCHAR("
-                        + Util.getMinimumIntegerDigits()
+                        + IdGenerator.getMinimumIntegerDigits()
                         + ")   DEFAULT NULL, \n"
                         + "database_id INT UNSIGNED, \n"
                         + "entry_types_id  INT UNSIGNED         DEFAULT NULL, \n"

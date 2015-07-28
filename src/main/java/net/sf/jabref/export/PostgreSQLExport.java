@@ -47,6 +47,7 @@ public class PostgreSQLExport extends ExportFormat {
      *             If something goes wrong, feel free to throw an exception. The
      *             error message is shown to the user.
      */
+    @Override
     public void performExport(final BibtexDatabase database,
             final MetaData metaData, final String file, final String encoding,
             Set<String> keySet) throws Exception {

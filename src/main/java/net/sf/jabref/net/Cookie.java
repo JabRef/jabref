@@ -19,18 +19,21 @@ import java.net.*;
 import java.text.*;
 import java.util.*;
 
-public class Cookie {
+class Cookie {
 
-    String name;
-    String value;
-    URI uri;
+    private final String name;
+    private final String value;
+    private final URI uri;
     String domain;
-    Date expires;
-    String path;
+    private Date expires;
+    private String path;
 
-    private static DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
-
-    private static DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
+    /**
+     * DateFormats should not be reused among instances (or rather among threads), because they are not thread-safe.
+     * If they are shared, their usage should be synchronized.
+     */
+    private final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
+    private final DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
 
 
     /**
@@ -40,7 +43,7 @@ public class Cookie {
      * @param header Set of attributes in header
      */
     public Cookie(URI uri, String header) {
-        String attributes[] = header.split(";");
+        String[] attributes = header.split(";");
         String nameValue = attributes[0].trim();
         this.uri = uri;
         this.name =
@@ -64,7 +67,7 @@ public class Cookie {
                     this.domain = value;
                 } else {
                     if (!value.startsWith(".")) {
-                        value = "." + value;
+                        value = '.' + value;
                     }
                     uriDomain = uriDomain.substring(
                             uriDomain.indexOf('.'));
@@ -128,7 +131,8 @@ public class Cookie {
         return path.startsWith(this.path);
     }
 
+    @Override
     public String toString() {
-        return name + "=" + value;
+        return name + '=' + value;
     }
 }

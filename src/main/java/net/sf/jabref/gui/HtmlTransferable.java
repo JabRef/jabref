@@ -24,17 +24,17 @@ import java.io.IOException;
 /**
  Based on http://newsgroups.derkeiler.com/Archive/De/de.comp.lang.java/2010-04/msg00203.html
  */
-public class HtmlTransferable implements Transferable {
+class HtmlTransferable implements Transferable {
 
     private static final int HTML = 0;
     private static final int STRING = 1;
 
-    public static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format"); // charset could be read via JabRef.jrf.basePanel().getEncoding()
+    private static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format"); // charset could be read via JabRef.jrf.basePanel().getEncoding()
 
-    private static final DataFlavor[] FLAVORS = {HTML_FLAVOR, DataFlavor.stringFlavor};
+    private static final DataFlavor[] FLAVORS = {HtmlTransferable.HTML_FLAVOR, DataFlavor.stringFlavor};
 
-    private String htmlText;
-    private String plainText;
+    private final String htmlText;
+    private final String plainText;
 
 
     /**
@@ -48,12 +48,12 @@ public class HtmlTransferable implements Transferable {
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return FLAVORS.clone();
+        return HtmlTransferable.FLAVORS.clone();
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        for (DataFlavor FLAVOR : FLAVORS) {
+        for (DataFlavor FLAVOR : HtmlTransferable.FLAVORS) {
             if (flavor.equals(FLAVOR)) {
                 return true;
             }
@@ -63,9 +63,9 @@ public class HtmlTransferable implements Transferable {
 
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (flavor.equals(FLAVORS[STRING])) {
+        if (flavor.equals(HtmlTransferable.FLAVORS[HtmlTransferable.STRING])) {
             return plainText;
-        } else if (flavor.equals(FLAVORS[HTML])) {
+        } else if (flavor.equals(HtmlTransferable.FLAVORS[HtmlTransferable.HTML])) {
             return htmlText;
         } else {
             throw new UnsupportedFlavorException(flavor);

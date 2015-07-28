@@ -27,8 +27,9 @@ import java.util.Comparator;
  * Only comparing ranking field
  * inverse comparison of ranking as rank5 is higher than rank1
  */
-public class RankingFieldComparator implements Comparator<BibtexEntry> {
+class RankingFieldComparator implements Comparator<BibtexEntry> {
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
         String val1 = e1.getField(SpecialFieldsUtils.FIELDNAME_RANKING);
         String val2 = e2.getField(SpecialFieldsUtils.FIELDNAME_RANKING);

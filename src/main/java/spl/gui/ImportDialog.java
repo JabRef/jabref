@@ -3,12 +3,13 @@ package spl.gui;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.ImportSettingsTab;
-import spl.listener.LabelLinkListener;
 import spl.localization.LocalizationSupport;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -20,13 +21,13 @@ public class ImportDialog extends JDialog {
     public final static int CONTENT = 2;
     public final static int ONLYATTACH = 4;
 
-    private JPanel contentPane;
-    private JCheckBox checkBoxDoNotShowAgain;
-    private JCheckBox useDefaultPDFImportStyle;
-    private JRadioButton radioButtonXmp;
-    private JRadioButton radioButtonPDFcontent;
-    private JRadioButton radioButtonNoMeta;
-    private JRadioButton radioButtononlyAttachPDF;
+    private final JPanel contentPane;
+    private final JCheckBox checkBoxDoNotShowAgain;
+    private final JCheckBox useDefaultPDFImportStyle;
+    private final JRadioButton radioButtonXmp;
+    private final JRadioButton radioButtonPDFcontent;
+    private final JRadioButton radioButtonNoMeta;
+    private final JRadioButton radioButtononlyAttachPDF;
     private int result;
 
 
@@ -87,12 +88,11 @@ public class ImportDialog extends JDialog {
         if (!targetIsARow1) {
             this.radioButtononlyAttachPDF.setEnabled(false);
         }
-        String fileName1 = fileName;
-        String name = new File(fileName1).getName();
+        String name = new File(fileName).getName();
         if (name.length() < 34) {
             labelFileName.setText(name);
         } else {
-            labelFileName.setText(new File(fileName1).getName().substring(0, 33) + "...");
+            labelFileName.setText(new File(fileName).getName().substring(0, 33) + "...");
         }
         this.setTitle(LocalizationSupport.message("Import_Metadata_From_PDF"));
 
@@ -108,6 +108,7 @@ public class ImportDialog extends JDialog {
 
         buttonOK.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
@@ -115,14 +116,16 @@ public class ImportDialog extends JDialog {
 
         buttonCancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 onCancel();
             }
@@ -130,6 +133,7 @@ public class ImportDialog extends JDialog {
 
         contentPane.registerKeyboardAction(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -178,16 +182,17 @@ public class ImportDialog extends JDialog {
     }
 
     public int getChoice() {
-        if (radioButtonXmp.isSelected())
-            return XMP;
-        else if (radioButtonPDFcontent.isSelected())
-            return CONTENT;
-        else if (radioButtonNoMeta.isSelected())
-            return NOMETA;
-        else if (radioButtononlyAttachPDF.isSelected())
-            return ONLYATTACH;
-        else
+        if (radioButtonXmp.isSelected()) {
+            return ImportDialog.XMP;
+        } else if (radioButtonPDFcontent.isSelected()) {
+            return ImportDialog.CONTENT;
+        } else if (radioButtonNoMeta.isSelected()) {
+            return ImportDialog.NOMETA;
+        } else if (radioButtononlyAttachPDF.isSelected()) {
+            return ImportDialog.ONLYATTACH;
+        } else {
             throw new IllegalStateException();
+        }
     }
 
     public boolean getDoNotShowAgain() {

@@ -27,9 +27,9 @@ import net.sf.jabref.GUIGlobals;
  * @author Alessio Pollero
  * @version 1.0
  */
-public class LargeHTMLEditorKit extends HTMLEditorKit {
+class LargeHTMLEditorKit extends HTMLEditorKit {
 
-    ViewFactory factory = new MyViewFactory();
+    private final ViewFactory factory = new MyViewFactory();
 
 
     @Override
@@ -38,7 +38,7 @@ public class LargeHTMLEditorKit extends HTMLEditorKit {
     }
 
 
-    class MyViewFactory extends HTMLFactory {
+    private class MyViewFactory extends HTMLFactory {
 
         @Override
         public View create(Element elem) {
@@ -73,7 +73,7 @@ public class LargeHTMLEditorKit extends HTMLEditorKit {
 
     }
 
-    private class HTMLBlockView extends BlockView {
+    private static class HTMLBlockView extends BlockView {
 
         public HTMLBlockView(Element elem) {
             super(elem, View.Y_AXIS);

@@ -21,11 +21,11 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class RtfSelection implements Transferable {
+class RtfSelection implements Transferable {
 
-    DataFlavor rtfFlavor;
-    DataFlavor[] supportedFlavors;
-    private String content;
+    private DataFlavor rtfFlavor;
+    private DataFlavor[] supportedFlavors;
+    private final String content;
 
 
     public RtfSelection(String s) {
@@ -40,16 +40,19 @@ public class RtfSelection implements Transferable {
         }
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return flavor.equals(rtfFlavor) ||
                 flavor.equals(DataFlavor.stringFlavor);
     }
 
+    @Override
     public java.awt.datatransfer.DataFlavor[] getTransferDataFlavors() {
         //System.out.println("..");
         return supportedFlavors;
     }
 
+    @Override
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
 

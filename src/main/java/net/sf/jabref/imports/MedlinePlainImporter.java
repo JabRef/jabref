@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
@@ -45,6 +44,7 @@ public class MedlinePlainImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "MedlinePlain";
     }
@@ -53,6 +53,7 @@ public class MedlinePlainImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "medlineplain";
     }
@@ -60,6 +61,7 @@ public class MedlinePlainImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line 
@@ -69,8 +71,9 @@ public class MedlinePlainImporter extends ImportFormat {
 
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find())
+            if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find()) {
                 return true;
+            }
         }
 
         return false;
@@ -80,9 +83,10 @@ public class MedlinePlainImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         while ((str = in.readLine()) != null) {
@@ -93,8 +97,9 @@ public class MedlinePlainImporter extends ImportFormat {
 
         for (String entry1 : entries) {
 
-            if (entry1.trim().length() == 0)
+            if (entry1.trim().length() == 0) {
                 continue;
+            }
 
             String type = "", author = "", editor = "", comment = "";
             HashMap<String, String> hm = new HashMap<String, String>();
@@ -102,23 +107,27 @@ public class MedlinePlainImporter extends ImportFormat {
             String[] fields = entry1.split("\n");
 
             for (int j = 0; j < fields.length; j++) {
-                if (fields[j].equals(""))
+                if (fields[j].equals("")) {
                     continue;
+                }
 
-                StringBuffer current = new StringBuffer(fields[j]);
+                StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
 
-                while (!done && (j < fields.length - 1)) {
-                    if (fields[j + 1].length() <= 4)
+                while (!done && (j < (fields.length - 1))) {
+                    if (fields[j + 1].length() <= 4) {
                         System.out.println("aaa");
+                    }
                     if (fields[j + 1].charAt(4) != '-') {
                         if ((current.length() > 0)
-                                && !Character.isWhitespace(current.charAt(current.length() - 1)))
+                                && !Character.isWhitespace(current.charAt(current.length() - 1))) {
                             current.append(' ');
+                        }
                         current.append(fields[j + 1].trim());
                         j++;
-                    } else
+                    } else {
                         done = true;
+                    }
                 }
                 String entry = current.toString();
 
@@ -126,37 +135,39 @@ public class MedlinePlainImporter extends ImportFormat {
                 String val = entry.substring(entry.indexOf('-') + 1).trim();
                 if (lab.equals("PT")) {
                     val = val.toLowerCase();
-                    if (val.equals("BOOK"))
+                    if (val.equals("BOOK")) {
                         type = "book";
-                    else if (val.equals("journal article")
+                    } else if (val.equals("journal article")
                             || val.equals("classical article")
                             || val.equals("corrected and republished article")
                             || val.equals("historical article")
                             || val.equals("introductory journal article")
-                            || val.equals("newspaper article"))
+                            || val.equals("newspaper article")) {
                         type = "article";
-                    else if (val.equals("clinical conference")
+                    } else if (val.equals("clinical conference")
                             || val.equals("consensus development conference")
-                            || val.equals("consensus development conference, NIH"))
+                            || val.equals("consensus development conference, NIH")) {
                         type = "conference";
-                    else if (val.equals("technical report"))
+                    } else if (val.equals("technical report")) {
                         type = "techreport";
-                    else if (val.equals("editorial"))
+                    } else if (val.equals("editorial")) {
                         type = "inproceedings";//"incollection";"inbook";
-                    else if (val.equals("overall"))
+                    } else if (val.equals("overall")) {
                         type = "proceedings";
-                    else if (type.equals(""))
+                    } else if (type.equals("")) {
                         type = "other";
+                    }
 
                 } else if (lab.equals("TI")) {
                     String oldVal = hm.get("title");
-                    if (oldVal == null)
+                    if (oldVal == null) {
                         hm.put("title", val);
-                    else {
-                        if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?"))
+                    } else {
+                        if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
                             hm.put("title", oldVal + " " + val);
-                        else
+                        } else {
                             hm.put("title", oldVal + ": " + val);
+                        }
                     }
                 }
                 // =
@@ -164,43 +175,38 @@ public class MedlinePlainImporter extends ImportFormat {
                 else if (lab.equals("BTI") || lab.equals("CTI")) {
                     hm.put("booktitle", val);
                 } else if (lab.equals("FAU")) {
-                    if (author.equals("")) // don't add " and " for the first author
+                    if (author.equals("")) {
                         author = val;
-                    else
+                    } else {
                         author += " and " + val;
+                    }
                 } else if (lab.equals("FED")) {
-                    if (editor.equals("")) // don't add " and " for the first editor
+                    if (editor.equals("")) {
                         editor = val;
-                    else
+                    } else {
                         editor += " and " + val;
+                    }
                 } else if (lab.equals("JT")) {
-                    if (type.equals("inproceedings"))
+                    if (type.equals("inproceedings")) {
                         hm.put("booktitle", val);
-                    else
+                    } else {
                         hm.put("journal", val);
-                } else if (lab.equals("PG"))
+                    }
+                } else if (lab.equals("PG")) {
                     hm.put("pages", val);
-
-                //                else if (lab.equals("STAT")) {
-                //                    if (val.equals("MEDLINE"))
-                //                        hm.put("publisher", "PubMed");
-                //                    else
-                //                        hm.put("publisher", val);
-                //                }
-                else if (lab.equals("PL"))
+                } else if (lab.equals("PL")) {
                     hm.put("address", val);
-                else if (lab.equals("IS"))
+                } else if (lab.equals("IS")) {
                     hm.put("issn", val);
-                else if (lab.equals("VI"))
+                } else if (lab.equals("VI")) {
                     hm.put("volume", val);
-                //                else if (lab.equals("")) 
-                //                	hm.put("number", val);
-                else if (lab.equals("AB")) {
+                } else if (lab.equals("AB")) {
                     String oldAb = hm.get("abstract");
-                    if (oldAb == null)
+                    if (oldAb == null) {
                         hm.put("abstract", val);
-                    else
+                    } else {
                         hm.put("abstract", oldAb + "\n" + val);
+                    }
                 } else if ((lab.equals("DP"))) {
                     String[] parts = val.split(" ");
                     hm.put("year", parts[0]);
@@ -208,9 +214,9 @@ public class MedlinePlainImporter extends ImportFormat {
                         hm.put("month", parts[1]);
                     }
                 } else if (lab.equals("MH") || lab.equals("OT")) {
-                    if (!hm.containsKey("keywords"))
+                    if (!hm.containsKey("keywords")) {
                         hm.put("keywords", val);
-                    else {
+                    } else {
                         String kw = hm.get("keywords");
                         hm.put("keywords", kw + ", " + val);
                     }
@@ -220,8 +226,9 @@ public class MedlinePlainImporter extends ImportFormat {
                         || lab.equals("RPF") || lab.equals("RIN") || lab.equals("ROF")
                         || lab.equals("UIN") || lab.equals("UOF") || lab.equals("SPIN")
                         || lab.equals("ORI")) {
-                    if (comment.length() > 0)
+                    if (comment.length() > 0) {
                         comment = comment + "\n";
+                    }
                     comment = comment + val;
                 }
                 //                // Added ID import 2005.12.01, Morten Alver:
@@ -256,12 +263,12 @@ public class MedlinePlainImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().length() == 0))
+                if ((content == null) || (content.trim().length() == 0)) {
                     toRemove.add(key);
+                }
             }
-            for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext();) {
-                hm.remove(iterator.next());
-
+            for (Object aToRemove : toRemove) {
+                hm.remove(aToRemove);
             }
 
             // create one here

@@ -15,48 +15,45 @@
 */
 package net.sf.jabref.autocompleter;
 
-import java.util.StringTokenizer;
-
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+
+import java.util.StringTokenizer;
 
 /**
  * Stores all words which are separated by Globals.SEPARATING_CHARS. This
  * autocompleter only processes the field which is given by the fieldname.
- * 
+ *
  * @author kahlert, cordes
- * 
  */
-public class DefaultAutoCompleter extends AbstractAutoCompleter {
+class DefaultAutoCompleter extends AbstractAutoCompleter {
 
-    public String _fieldName;
-
+    private final String fieldName;
 
     /**
      * @see AutoCompleterFactory
      */
-    protected DefaultAutoCompleter(String fieldName) {
-        _fieldName = fieldName;
+    DefaultAutoCompleter(String fieldName) {
+        this.fieldName = fieldName;
     }
 
+    @Override
     public boolean isSingleUnitField() {
         return false;
     }
 
-    public String[] complete(String s) {
-        return super.complete(s);
-    }
-
     @Override
     public void addBibtexEntry(BibtexEntry entry) {
-        if (entry != null) {
-            String fieldValue = entry.getField(_fieldName);
-            if (fieldValue != null) {
-                StringTokenizer tok = new StringTokenizer(fieldValue, Globals.SEPARATING_CHARS);
-                while (tok.hasMoreTokens()) {
-                    String word = tok.nextToken();
-                    addWordToIndex(word);
-                }
+        if (entry == null) {
+            return;
+        }
+
+        String fieldValue = entry.getField(fieldName);
+        if (fieldValue != null) {
+            StringTokenizer tok = new StringTokenizer(fieldValue, Globals.SEPARATING_CHARS);
+            while (tok.hasMoreTokens()) {
+                String word = tok.nextToken();
+                addWordToIndex(word);
             }
         }
     }

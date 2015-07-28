@@ -32,7 +32,7 @@ import javax.swing.plaf.metal.MetalFileChooserUI;
 public class JabRefFileChooser extends JFileChooser
 {
 
-    public JabRefFileChooser()
+    private JabRefFileChooser()
     {
         super();
     }
@@ -65,11 +65,13 @@ public class JabRefFileChooser extends JFileChooser
     //
     //========================================================
 
+    @Override
     protected void setUI(ComponentUI newUI) {
-        if (Globals.osName.equals(Globals.MAC))
+        if (Globals.osName.equals(Globals.MAC)) {
             super.setUI(newUI);
-        else
+        } else {
             super.setUI(new JabRefUI(this));
+        }
     }
 
     //========================================================
@@ -92,9 +94,9 @@ class JabRefUI extends MetalFileChooserUI {
     }
 
 
-    protected class DoubleClickListener extends BasicFileChooserUI.DoubleClickListener {
+    class DoubleClickListener extends BasicFileChooserUI.DoubleClickListener {
 
-        JList list;
+        final JList list;
 
 
         public DoubleClickListener(JList list) {
@@ -102,6 +104,7 @@ class JabRefUI extends MetalFileChooserUI {
             this.list = list;
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
             //System.out.println("mouse entered");
             MouseListener[] l = list.getMouseListeners();
@@ -115,6 +118,7 @@ class JabRefUI extends MetalFileChooserUI {
     }
 
 
+    @Override
     protected MouseListener createDoubleClickListener(JFileChooser fc, JList list) {
         return new DoubleClickListener(list);
     }

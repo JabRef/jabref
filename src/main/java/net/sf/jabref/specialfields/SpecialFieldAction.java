@@ -21,14 +21,14 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.undo.NamedCompound;
 
-public class SpecialFieldAction extends BaseAction {
+public class SpecialFieldAction implements BaseAction {
 
-    private JabRefFrame frame;
-    private String doneTextPattern;
-    private SpecialField c;
-    String value;
-    private boolean nullFieldIfValueIsTheSame;
-    private String undoText;
+    private final JabRefFrame frame;
+    private final String doneTextPattern;
+    private final SpecialField c;
+    private final String value;
+    private final boolean nullFieldIfValueIsTheSame;
+    private final String undoText;
 
 
     /**
@@ -51,12 +51,14 @@ public class SpecialFieldAction extends BaseAction {
         this.doneTextPattern = doneTextPattern;
     }
 
+    @Override
     public void action() {
         try {
             NamedCompound ce = new NamedCompound(undoText);
             BibtexEntry[] bes = frame.basePanel().getSelectedEntries();
-            if (bes == null)
+            if (bes == null) {
                 return;
+            }
             for (BibtexEntry be : bes) {
                 // if (value==null) and then call nullField has been ommited as updatefield also handles value==null
                 SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
@@ -67,10 +69,11 @@ public class SpecialFieldAction extends BaseAction {
                 frame.basePanel().markBaseChanged();
                 frame.basePanel().updateEntryEditorIfShowing();
                 String outText;
-                if (nullFieldIfValueIsTheSame)
+                if (nullFieldIfValueIsTheSame) {
                     outText = Globals.lang(doneTextPattern, Integer.toString(bes.length));
-                else
+                } else {
                     outText = Globals.lang(doneTextPattern, value, Integer.toString(bes.length));
+                }
                 frame.output(outText);
             } else {
                 // if user does not change anything with his action, we do not do anything either

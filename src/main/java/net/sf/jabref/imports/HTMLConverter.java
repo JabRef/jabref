@@ -20,8 +20,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class HTMLConverter implements LayoutFormatter {
 
@@ -40,7 +41,7 @@ public class HTMLConverter implements LayoutFormatter {
     // An array of arrays of strings in the format:
     // {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
     // Leaving a field empty is OK as it then will not be included
-    private String[][] conversionList = new String[][] {
+    private final String[][] conversionList = new String[][] {
             {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
             //                                 U+00A0 ISOnum 
             {"161", "iexcl", "\\{\\\\textexclamdown\\}"}, // inverted exclamation mark, U+00A1 ISOnum
@@ -656,7 +657,7 @@ public class HTMLConverter implements LayoutFormatter {
     };
 
     // List of combining accents
-    private String[][] accentList = new String[][] {
+    private final String[][] accentList = new String[][] {
             {"768", "`"}, // Grave 
             {"769", "'"}, // Acute
             {"770", "\\^"}, // Circumflex
@@ -741,10 +742,10 @@ public class HTMLConverter implements LayoutFormatter {
             {"866", "sliding"}, // Double rightwards arrow below - requires extraipa
     };
 
-    private HashMap<String, String> escapedSymbols = new HashMap<String, String>();
-    private HashMap<Integer, String> escapedAccents = new HashMap<Integer, String>();
-    private HashMap<Integer, String> numSymbols = new HashMap<Integer, String>();
-    private HashMap<Character, String> unicodeSymbols = new HashMap<Character, String>();
+    private final HashMap<String, String> escapedSymbols = new HashMap<String, String>();
+    private final HashMap<Integer, String> escapedAccents = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> numSymbols = new HashMap<Integer, String>();
+    private final HashMap<Character, String> unicodeSymbols = new HashMap<Character, String>();
 
 
     public HTMLConverter() {
@@ -770,8 +771,9 @@ public class HTMLConverter implements LayoutFormatter {
     }
 
     public String formatUnicode(String text) {
-        if (text == null)
+        if (text == null) {
             return null;
+        }
         Set<Character> chars = unicodeSymbols.keySet();
         for (Character character : chars) {
             // System.err.println(new Integer((int) character).toString() + ": " + character.toString() + ": " + unicodeSymbols.get(character));
@@ -780,14 +782,16 @@ public class HTMLConverter implements LayoutFormatter {
         return text;
     }
 
+    @Override
     public String format(String text) {
-        if (text == null)
+        if (text == null) {
             return null;
+        }
         StringBuffer sb = new StringBuffer();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
         // If the result is in text or equation form can be controlled
         // From the "Advanced settings" tab
-        if (Globals.prefs.getBoolean("useConvertToEquation")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
             text = text.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
             text = text.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
         } else {
@@ -804,8 +808,9 @@ public class HTMLConverter implements LayoutFormatter {
 
             if (c == '<') {
                 i = readTag(text, sb, i);
-            } else
+            } else {
                 sb.append((char) c);
+            }
 
         }
         text = sb.toString();
@@ -887,10 +892,12 @@ public class HTMLConverter implements LayoutFormatter {
     private int readTag(String text, StringBuffer sb, int position) {
         // Have just read the < character that starts the tag.
         int index = text.indexOf('>', position);
-        if ((index > position) && (index - position < MAX_TAG_LENGTH)) {
+        if ((index > position) && ((index - position) < MAX_TAG_LENGTH)) {
             //System.out.println("Removed tag: "+text.substring(position, index));
             return index; // Just skip the tag.
-        } else
+        }
+        else {
             return position; // Don't do anything.
+        }
     }
 }

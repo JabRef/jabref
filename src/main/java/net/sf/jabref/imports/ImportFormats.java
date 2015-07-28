@@ -21,12 +21,14 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MnemonicAwareAction;
 
 /**
@@ -38,7 +40,7 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class ImportFormats {
 
-    public static JFileChooser createImportFileChooser(String currentDir) {
+    private static JFileChooser createImportFileChooser(String currentDir) {
 
         SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
 
@@ -49,17 +51,19 @@ public class ImportFormats {
         for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);
-            if (format.getFormatName().equals(lastUsedFormat))
+            if (format.getFormatName().equals(lastUsedFormat)) {
                 defaultFilter = filter;
+            }
         }
         for (ImportFileFilter filter : filters) {
             fc.addChoosableFileFilter(filter);
         }
 
-        if (defaultFilter != null)
+        if (defaultFilter != null) {
             fc.setFileFilter(defaultFilter);
-        else
+        } else {
             fc.setFileFilter(fc.getAcceptAllFileFilter());
+        }
         return fc;
     }
 
@@ -74,31 +78,34 @@ public class ImportFormats {
 
         class ImportAction extends MnemonicAwareAction {
 
-            private JabRefFrame frame;
-            private boolean openInNew;
+            private final JabRefFrame frame;
+            private final boolean openInNew;
 
 
             public ImportAction(JabRefFrame frame, boolean openInNew) {
                 this.frame = frame;
                 this.openInNew = openInNew;
 
-                putValue(NAME, openInNew ? "Import into new database" :
+                putValue(Action.NAME, openInNew ? "Import into new database" :
                         "Import into current database");
-                putValue(ACCELERATOR_KEY, openInNew ? Globals.prefs.getKey("Import into new database") :
+                putValue(Action.ACCELERATOR_KEY, openInNew ? Globals.prefs.getKey("Import into new database") :
                         Globals.prefs.getKey("Import into current database"));
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = ImportFormats.createImportFileChooser
-                        (Globals.prefs.get("importWorkingDirectory"));
+                        (Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
                 fc.showOpenDialog(frame);
                 File file = fc.getSelectedFile();
-                if (file == null)
+                if (file == null) {
                     return;
+                }
                 FileFilter ff = fc.getFileFilter();
                 ImportFormat format = null;
-                if (ff instanceof ImportFileFilter)
+                if (ff instanceof ImportFileFilter) {
                     format = ((ImportFileFilter) ff).getImportFormat();
+                }
 
                 try {
                     if (!file.exists()) {
@@ -115,11 +122,12 @@ public class ImportFormats {
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:
-                    if (format != null)
+                    if (format != null) {
                         Globals.prefs.put("lastUsedImport", format.getFormatName());
-                    else
+                    } else {
                         Globals.prefs.put("lastUsedImport", "__all");
-                    Globals.prefs.put("importWorkingDirectory", file.getParent());
+                    }
+                    Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

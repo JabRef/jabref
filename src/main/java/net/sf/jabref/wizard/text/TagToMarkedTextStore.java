@@ -49,7 +49,7 @@ public class TagToMarkedTextStore
     }
 
 
-    private HashMap<String, LinkedList<TMarkedStoreItem>> tagMap;
+    private final HashMap<String, LinkedList<TMarkedStoreItem>> tagMap;
 
 
     public TagToMarkedTextStore()

@@ -31,5 +31,5 @@ interface SearchTextListener {
      * 
      * @param words null if nothing is searched for
      */
-    public void searchText(ArrayList<String> words);
+    void searchText(ArrayList<String> words);
 }

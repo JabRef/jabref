@@ -1,10 +1,12 @@
 package net.sf.jabref;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
+
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +33,7 @@ public class SearchTextListenerTest {
         Highlight[] highlight = highlighter.getHighlights();
 
         //there is no area to highlight!
-        assertEquals("Expected no highlighting area ", 0, highlight.length);
+        Assert.assertEquals("Expected no highlighting area ", 0, highlight.length);
 
         //set up arraylist with "word" and inform the fieldtextarea
         ArrayList<String> wordsToHighlight = new ArrayList<String>();
@@ -42,12 +44,12 @@ public class SearchTextListenerTest {
         highlight = highlighter.getHighlights();
 
         //there is one area to highlight!
-        assertEquals("Expected one highlighting area ", 1, highlight.length);
+        Assert.assertEquals("Expected one highlighting area ", 1, highlight.length);
         //start of ... Word
-        assertEquals(content.indexOf(contentToHighlight1), highlight[0].getStartOffset());
+        Assert.assertEquals(content.indexOf(contentToHighlight1), highlight[0].getStartOffset());
 
         //end of ... word
-        assertEquals(content.indexOf(contentToHighlight1) + contentToHighlight1.length(), highlight[0].getEndOffset());
+        Assert.assertEquals(content.indexOf(contentToHighlight1) + contentToHighlight1.length(), highlight[0].getEndOffset());
 
         //add another word "content" and refresh highlighting
         wordsToHighlight.add(contentToHighlight2);
@@ -56,13 +58,13 @@ public class SearchTextListenerTest {
         highlight = highlighter.getHighlights();
 
         //there are two areas to highlight!
-        assertEquals("Expected two highlighting areas ", 2, highlight.length);
+        Assert.assertEquals("Expected two highlighting areas ", 2, highlight.length);
 
         //start of ... content
-        assertEquals(content.indexOf(contentToHighlight2), highlight[1].getStartOffset());
+        Assert.assertEquals(content.indexOf(contentToHighlight2), highlight[1].getStartOffset());
 
         //end of ... content
-        assertEquals(content.indexOf(contentToHighlight2) + contentToHighlight2.length(), highlight[1].getEndOffset());
+        Assert.assertEquals(content.indexOf(contentToHighlight2) + contentToHighlight2.length(), highlight[1].getEndOffset());
 
         //remove everything and check if highlighting is vanished
         wordsToHighlight.clear();
@@ -71,7 +73,7 @@ public class SearchTextListenerTest {
         highlight = highlighter.getHighlights();
 
         //there should be none areas to highlight!
-        assertEquals("Expected no highlighting area ", 0, highlight.length);
+        Assert.assertEquals("Expected no highlighting area ", 0, highlight.length);
     }
 
     @Test
@@ -97,8 +99,8 @@ public class SearchTextListenerTest {
 
         String textThree = ta.getText();
 
-        assertEquals("Highlighting may not change content", textOne, textTwo);
-        assertEquals("Highlighting may not change content", textOne, textThree);
+        Assert.assertEquals("Highlighting may not change content", textOne, textTwo);
+        Assert.assertEquals("Highlighting may not change content", textOne, textThree);
     }
 
     @Test

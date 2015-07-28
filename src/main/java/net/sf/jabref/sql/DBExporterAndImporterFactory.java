@@ -41,10 +41,10 @@ public class DBExporterAndImporterFactory {
     public enum DBType {
         MYSQL("MYSQL"), POSTGRESQL("POSTGRESQL");
 
-        private String dbType;
+        private final String dbType;
 
 
-        private DBType(String dbType) {
+        DBType(String dbType) {
             this.dbType = dbType;
         }
 
@@ -61,7 +61,7 @@ public class DBExporterAndImporterFactory {
      * 		The type of the database selected
      * @return The DBExporter object instance
      */
-    public DBExporter getExporter(DBType type) {
+    private DBExporter getExporter(DBType type) {
         DBExporter exporter = null;
         switch (type) {
         case MYSQL:
@@ -92,7 +92,7 @@ public class DBExporterAndImporterFactory {
      * 		The type of the database selected
      * @return The DBImporter object instance
      */
-    public DBImporter getImporter(DBType type) {
+    private DBImporter getImporter(DBType type) {
         DBImporter importer = null;
         switch (type) {
         case MYSQL:

@@ -26,6 +26,8 @@ import javax.swing.*;
 
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the
@@ -33,71 +35,68 @@ import net.sf.jabref.undo.UndoableFieldChange;
  */
 class ReplaceStringDialog extends JDialog {
 
-    JTextField
-            fields = new JTextField("", 30),
-            from = new JTextField("", 30),
-            to = new JTextField("", 30);
-    JLabel
-            fl = new JLabel(Globals.lang("Search for") + ":"),
-            tl = new JLabel(Globals.lang("Replace with") + ":");
+    private final JTextField
+            fields = new JTextField("", 30);
+    private final JTextField from = new JTextField("", 30);
+    private final JTextField to = new JTextField("", 30);
 
-    JButton
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    JPanel
-            settings = new JPanel(),
-            main = new JPanel(),
-            opt = new JPanel();
-    JCheckBox selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
-    JRadioButton
-            allFi = new JRadioButton(Globals.lang("All fields"), true),
-            field = new JRadioButton(Globals.lang("Limit to fields") + ":", false);
-    ButtonGroup bg = new ButtonGroup();
+    private final JCheckBox selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
+    private final JRadioButton
+            allFi = new JRadioButton(Globals.lang("All fields"), true);
+    private final JRadioButton field = new JRadioButton(Globals.lang("Limit to fields") + ":", false);
     private boolean ok_pressed = false;
-    String[] flds = null;
-    String s1, s2;
-
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    private String[] flds = null;
+    private String s1;
+    private String s2;
 
 
     public ReplaceStringDialog(JabRefFrame parent_) {
         super(parent_, Globals.lang("Replace string"), true);
 
+        ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
         bg.add(field);
         ActionListener okListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 s1 = from.getText();
                 s2 = to.getText();
-                if (s1.equals(""))
+                if (s1.equals("")) {
                     return;
+                }
                 ok_pressed = true;
-                flds = Util.delimToStringArray(fields.getText().toLowerCase(), ";");
+                flds = StringUtil.split(fields.getText().toLowerCase(), ";");
                 dispose();
             }
         };
+        JButton ok = new JButton(Globals.lang("Ok"));
         ok.addActionListener(okListener);
         to.addActionListener(okListener);
         fields.addActionListener(okListener);
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         };
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(cancelAction);
 
         // Key bindings:
+        JPanel settings = new JPanel();
         ActionMap am = settings.getActionMap();
         InputMap im = settings.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent_.prefs.getKey("Close dialog"), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
+        GridBagLayout gbl = new GridBagLayout();
         settings.setLayout(gbl);
+        JPanel opt = new JPanel();
         opt.setLayout(gbl);
+        JPanel main = new JPanel();
         main.setLayout(gbl);
 
         settings.setBorder(BorderFactory.createTitledBorder
@@ -118,6 +117,7 @@ class ReplaceStringDialog extends JDialog {
         gbl.setConstraints(nf, con);
         settings.add(nf);*/
         //con.weightx = 1;
+        GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.HORIZONTAL;
         //JSeparator sep = new JSeparator()
         con.gridwidth = 2;
@@ -147,9 +147,11 @@ class ReplaceStringDialog extends JDialog {
         con.weightx = 0;
         con.gridx = 0;
         con.gridy = 0;
+        JLabel fl = new JLabel(Globals.lang("Search for") + ":");
         gbl.setConstraints(fl, con);
         main.add(fl);
         con.gridy = 1;
+        JLabel tl = new JLabel(Globals.lang("Replace with") + ":");
         gbl.setConstraints(tl, con);
         main.add(tl);
         con.weightx = 1;
@@ -189,7 +191,7 @@ class ReplaceStringDialog extends JDialog {
         return ok_pressed;
     }
 
-    public boolean allFields() {
+    private boolean allFields() {
         return allFi.isSelected();
     }
 
@@ -198,7 +200,7 @@ class ReplaceStringDialog extends JDialog {
     }
 
     public String[] fields() {
-        return Util.delimToStringArray(field.getText(), ";");
+        return StringUtil.split(field.getText(), ";");
     }
 
     /**
@@ -211,26 +213,29 @@ class ReplaceStringDialog extends JDialog {
         if (allFields()) {
 
             for (String s : be.getAllFields()) {
-                if (!s.equals(BibtexFields.KEY_FIELD))
+                if (!s.equals(BibtexFields.KEY_FIELD)) {
                     counter += replaceField(be, s, ce);
+                }
             }
         } else {
             for (String fld : flds) {
-                if (!fld.equals(BibtexFields.KEY_FIELD))
+                if (!fld.equals(BibtexFields.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
+                }
             }
 
         }
         return counter;
     }
 
-    public int replaceField(BibtexEntry be, String field, NamedCompound ce) {
+    private int replaceField(BibtexEntry be, String field, NamedCompound ce) {
         Object o = be.getField(field);
-        if (o == null)
+        if (o == null) {
             return 0;
+        }
         String txt = o.toString();
-        StringBuffer sb = new StringBuffer();
-        int ind = -1, piv = 0, counter = 0, len1 = s1.length();
+        StringBuilder sb = new StringBuilder();
+        int ind, piv = 0, counter = 0, len1 = s1.length();
         while ((ind = txt.indexOf(s1, piv)) >= 0) {
             counter++;
             sb.append(txt.substring(piv, ind)); // Text leading up to s1

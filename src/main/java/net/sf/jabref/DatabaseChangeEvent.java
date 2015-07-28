@@ -22,9 +22,9 @@ public class DatabaseChangeEvent {
     }
 
 
-    private BibtexEntry entry;
-    private ChangeType type;
-    private BibtexDatabase source;
+    private final BibtexEntry entry;
+    private final ChangeType type;
+    private final BibtexDatabase source;
 
 
     public DatabaseChangeEvent(BibtexDatabase source, ChangeType type,

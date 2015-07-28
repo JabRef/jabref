@@ -38,12 +38,13 @@ import net.sf.jabref.OutputPrinter;
  */
 public class BibteXMLImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(BibteXMLImporter.class.toString());
+    private static final Logger logger = Logger.getLogger(BibteXMLImporter.class.toString());
 
 
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "BibTeXML";
     }
@@ -52,6 +53,7 @@ public class BibteXMLImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "bibtexml";
     }
@@ -59,6 +61,7 @@ public class BibteXMLImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         // Our strategy is to look for the "<bibtex:file *" line.
@@ -67,8 +70,9 @@ public class BibteXMLImporter extends ImportFormat {
                 .compile("<bibtex:file .*");
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).find())
+            if (pat1.matcher(str).find()) {
                 return true;
+            }
         }
         return false;
     }
@@ -77,6 +81,7 @@ public class BibteXMLImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
@@ -98,13 +103,13 @@ public class BibteXMLImporter extends ImportFormat {
             bibItems = handler.getItems();
 
         } catch (javax.xml.parsers.ParserConfigurationException e1) {
-            logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+            BibteXMLImporter.logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
             status.showMessage(e1.getLocalizedMessage());
         } catch (org.xml.sax.SAXException e2) {
-            logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+            BibteXMLImporter.logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
             status.showMessage(e2.getLocalizedMessage());
         } catch (java.io.IOException e3) {
-            logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
+            BibteXMLImporter.logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
             status.showMessage(e3.getLocalizedMessage());
         }
         return bibItems;

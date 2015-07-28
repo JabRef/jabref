@@ -24,10 +24,12 @@ import net.sf.jabref.export.ExportFormats;
  */
 public class Number implements ParamLayoutFormatter {
 
+    @Override
     public void setArgument(String arg) {
         // No effect currently.
     }
 
+    @Override
     public String format(String fieldText) {
         return String.valueOf(ExportFormats.entryNumber);
     }

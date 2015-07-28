@@ -41,12 +41,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Convert the contents to lower case.
- * 
- * @author $author$
- * @version $Revision$
  */
 public class ToLowerCase implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         return fieldText.toLowerCase();
     }

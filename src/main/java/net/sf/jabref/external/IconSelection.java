@@ -44,16 +44,15 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 /**
  * Dialog box for choosing an icon for an external file type.
  */
-public class IconSelection extends JDialog {
+class IconSelection extends JDialog {
 
-    JList icons;
-    List<String> iconKeys;
-    DefaultListModel listModel;
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
+    private JList icons;
+    private List<String> iconKeys;
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
     private boolean okPressed = false;
     private int selected = -1;
-    private JDialog parent;
+    private final JDialog parent;
 
 
     public IconSelection(JDialog parent, String initialSelection) {
@@ -62,6 +61,7 @@ public class IconSelection extends JDialog {
         init(initialSelection);
     }
 
+    @Override
     public void setVisible(boolean visible) {
         if (visible) {
             okPressed = false;
@@ -80,10 +80,11 @@ public class IconSelection extends JDialog {
     }
 
     public String getSelectedIconKey() {
-        if (selected >= 0)
+        if (selected >= 0) {
             return iconKeys.get(selected);
-        else
+        } else {
             return null;
+        }
     }
 
     private void init(String initialSelection) {
@@ -95,21 +96,22 @@ public class IconSelection extends JDialog {
             ImageIcon icon = GUIGlobals.getImage(key);
             if (!iconSet.contains(icon)) {
                 iconKeys.add(key);
-                if (key.equals(initialSelection))
+                if (key.equals(initialSelection)) {
                     initSelIndex = iconKeys.size() - 1;
+                }
             }
             iconSet.add(icon);
 
         }
 
-        listModel = new DefaultListModel();
+        DefaultListModel listModel = new DefaultListModel();
         icons = new JList(listModel);
         for (ImageIcon anIconSet : iconSet) {
             listModel.addElement(new JLabel(anIconSet));
         }
         class MyRenderer implements ListCellRenderer {
 
-            JLabel comp = new JLabel();
+            final JLabel comp = new JLabel();
 
 
             public MyRenderer() {
@@ -118,6 +120,7 @@ public class IconSelection extends JDialog {
                 comp.setHorizontalAlignment(JLabel.CENTER);
             }
 
+            @Override
             public Component getListCellRendererComponent(JList list, Object value, int i,
                     boolean isSelected,
                     boolean hasFocus) {
@@ -137,8 +140,9 @@ public class IconSelection extends JDialog {
             }
         }
 
-        if (initSelIndex >= 0)
+        if (initSelIndex >= 0) {
             icons.setSelectedIndex(initSelIndex);
+        }
         icons.setCellRenderer(new MyRenderer());
         icons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         icons.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -152,15 +156,18 @@ public class IconSelection extends JDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = true;
-                if (icons.getSelectedValue() != null)
+                if (icons.getSelectedValue() != null) {
                     selected = icons.getSelectedIndex();
+                }
                 dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = false;
                 dispose();

@@ -41,17 +41,17 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FieldWeightDialog extends JDialog {
 
-    JabRefFrame frame;
-    HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
+    private final JabRefFrame frame;
+    private final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
     public static void main(String[] args) {
         new FieldWeightDialog(null).setVisible(true);
     }
 
-    public FieldWeightDialog(JabRefFrame frame) {
+    private FieldWeightDialog(JabRefFrame frame) {
         this.frame = frame;
         JPanel main = buildMainPanel();
         main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -60,7 +60,7 @@ public class FieldWeightDialog extends JDialog {
         pack();
     }
 
-    public JPanel buildMainPanel() {
+    private JPanel buildMainPanel() {
         FormLayout layout = new FormLayout
                 ("right:pref, 4dlu, fill:pref, 8dlu, right:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                 "");
@@ -83,7 +83,7 @@ public class FieldWeightDialog extends JDialog {
 
         for (String field : fields) {
             builder.append(field);
-            int weight = (int) (100 * BibtexFields.getFieldWeight(field) / GUIGlobals.MAX_FIELD_WEIGHT);
+            int weight = (int) ((100 * BibtexFields.getFieldWeight(field)) / GUIGlobals.MAX_FIELD_WEIGHT);
             //System.out.println(weight);
             JSlider slider = new JSlider(0, 100, weight);//,);
             sliders.put(slider, new SliderInfo(field, weight));
@@ -95,10 +95,11 @@ public class FieldWeightDialog extends JDialog {
 
     }
 
-    public JPanel buildButtonPanel() {
+    private JPanel buildButtonPanel() {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 storeSettings();
                 dispose();
@@ -106,6 +107,7 @@ public class FieldWeightDialog extends JDialog {
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 dispose();
             }
@@ -119,12 +121,12 @@ public class FieldWeightDialog extends JDialog {
         return builder.getPanel();
     }
 
-    public void storeSettings() {
+    private void storeSettings() {
         for (JSlider slider : sliders.keySet()) {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
-                double weight = GUIGlobals.MAX_FIELD_WEIGHT * (slider.getValue()) / 100d;
+                double weight = (GUIGlobals.MAX_FIELD_WEIGHT * (slider.getValue())) / 100d;
                 BibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }
@@ -138,8 +140,8 @@ public class FieldWeightDialog extends JDialog {
      */
     static class SliderInfo {
 
-        String fieldName;
-        int originalValue;
+        final String fieldName;
+        final int originalValue;
 
 
         public SliderInfo(String fieldName, int originalValue) {

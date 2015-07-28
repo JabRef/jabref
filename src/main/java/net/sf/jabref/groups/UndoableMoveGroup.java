@@ -25,7 +25,7 @@ import net.sf.jabref.Globals;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-public class UndoableMoveGroup extends AbstractUndoableEdit {
+class UndoableMoveGroup extends AbstractUndoableEdit {
 
     private final GroupSelector m_groupSelector;
     private final GroupTreeNode m_groupsRootHandle;
@@ -56,16 +56,19 @@ public class UndoableMoveGroup extends AbstractUndoableEdit {
         m_oldChildIndex = moveNode.getParent().getIndex(moveNode);
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": "
                 + Globals.lang("move group");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": "
                 + Globals.lang("move group");
     }
 
+    @Override
     public void undo() {
         super.undo();
         GroupTreeNode cursor = m_groupsRootHandle
@@ -76,6 +79,7 @@ public class UndoableMoveGroup extends AbstractUndoableEdit {
         m_groupSelector.revalidateGroups();
     }
 
+    @Override
     public void redo() {
         super.redo();
         GroupTreeNode cursor = m_groupsRootHandle

@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.export.layout.format;
 
+import net.sf.jabref.util.DOIUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.Util;
 
 /**
  * Will strip any prefixes from the DOI field, in order to output only the DOI number
@@ -27,11 +27,12 @@ import net.sf.jabref.Util;
  */
 public class DOIStrip implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         if (fieldText == null) {
             return null;
         } else {
-            return Util.getDOI(fieldText);
+            return DOIUtil.getDOI(fieldText);
         }
     }
 }

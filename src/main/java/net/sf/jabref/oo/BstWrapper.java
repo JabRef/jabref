@@ -35,10 +35,10 @@ import java.util.regex.Pattern;
  *
  * Wrapper for using JabRef's bst engine for formatting OO bibliography.
  */
-public class BstWrapper {
+class BstWrapper {
 
-    LayoutFormatter formatter = new FormatChars();
-    VM vm = null;
+    private final LayoutFormatter formatter = new FormatChars();
+    private VM vm = null;
 
 
     public BstWrapper() {
@@ -71,19 +71,20 @@ public class BstWrapper {
     }
 
 
-    static Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
+    private static final Pattern bibitemTag = Pattern.compile("\\\\[a-zA-Z]*item\\{.*\\}");
 
 
     private Map<String, String> parseResult(String result) {
         Map<String, String> map = new HashMap<String, String>();
         // Look through for instances of \bibitem :
-        Matcher m = bibitemTag.matcher(result);
+        Matcher m = BstWrapper.bibitemTag.matcher(result);
         ArrayList<Integer> indices = new ArrayList<Integer>();
         ArrayList<Integer> endIndices = new ArrayList<Integer>();
         ArrayList<String> keys = new ArrayList<String>();
         while (m.find()) {
-            if (indices.size() > 0)
+            if (indices.size() > 0) {
                 endIndices.add(m.start());
+            }
             System.out.println(m.start() + "  " + m.end());
             String tag = m.group();
             String key = tag.substring(9, tag.length() - 1);
@@ -91,8 +92,9 @@ public class BstWrapper {
             keys.add(key);
         }
         int lastI = result.lastIndexOf("\\end{thebibliography}");
-        if ((lastI > 0) && (lastI > indices.get(indices.size() - 1)))
+        if ((lastI > 0) && (lastI > indices.get(indices.size() - 1))) {
             endIndices.add(lastI);
+        }
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
             int index = indices.get(i);

@@ -28,43 +28,49 @@ public class PushToWinEdt implements PushToApplication {
     private boolean couldNotCall = false;
     private boolean notDefined = false;
     private JPanel settings = null;
-    private JTextField winEdtPath = new JTextField(30),
-            citeCommand = new JTextField(30);
+    private final JTextField winEdtPath = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
 
 
+    @Override
     public String getName() {
         return Globals.lang("Insert selected citations into WinEdt");
     }
 
+    @Override
     public String getApplicationName() {
         return "WinEdt";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push selection to WinEdt");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("winedt");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return "Push to WinEdt";
     }
 
+    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
         couldNotCall = false;
         notDefined = false;
 
-        String winEdt = Globals.prefs.get("winEdtPath");
+        String winEdt = Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH);
         if ((winEdt == null) || (winEdt.trim().length() == 0)) {
             notDefined = true;
             return;
         }
 
         try {
-            Runtime.getRuntime().exec(new String[] {winEdt, "\"[InsText('" + Globals.prefs.get("citeCommandWinEdt") + "{" + keyString.replaceAll("'", "''") + "}');]\""});
+            Runtime.getRuntime().exec(new String[] {winEdt, "\"[InsText('" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_WIN_EDT) + "{" + keyString.replaceAll("'", "''") + "}');]\""});
 
         }
 
@@ -75,6 +81,7 @@ public class PushToWinEdt implements PushToApplication {
 
     }
 
+    @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
             panel.output(Globals.lang("Error") + ": " +
@@ -82,21 +89,24 @@ public class PushToWinEdt implements PushToApplication {
         }
         else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
-                    + Globals.prefs.get("winEdtPath") + "'.");
-        }
-        else
+                    + Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH) + "'.");
+        } else {
             Globals.lang("Pushed citations to WinEdt");
+        }
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
-        winEdtPath.setText(Globals.prefs.get("winEdtPath"));
-        citeCommand.setText(Globals.prefs.get("citeCommandWinEdt"));
+        }
+        winEdtPath.setText(Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH));
+        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_WIN_EDT));
         return settings;
     }
 
@@ -105,7 +115,7 @@ public class PushToWinEdt implements PushToApplication {
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
         builder.append(winEdtPath);
-        BrowseAction action = new BrowseAction(null, winEdtPath, false);
+        BrowseAction action = BrowseAction.buildForFile(winEdtPath);
         JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
@@ -115,8 +125,9 @@ public class PushToWinEdt implements PushToApplication {
         settings = builder.getPanel();
     }
 
+    @Override
     public void storeSettings() {
-        Globals.prefs.put("winEdtPath", winEdtPath.getText());
-        Globals.prefs.put("citeCommandWinEdt", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.WIN_EDT_PATH, winEdtPath.getText());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_WIN_EDT, citeCommand.getText());
     }
 }

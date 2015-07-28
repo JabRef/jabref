@@ -30,46 +30,59 @@ public class BrowseAction extends AbstractAction implements ActionListener {
 
     private static final long serialVersionUID = 3007593430933681310L;
 
-    JComponent focusTarget = null;
-    JFrame frame = null;
-    //JDialog dialog=null;
-    JTextField comp;
-    boolean dir;
+    private final JFrame frame;
+    private final JTextField comp;
+    private final boolean dir;
+    private final JComponent focusTarget;
 
+    public static BrowseAction buildForDir(JFrame frame, JTextField tc) {
+        return new BrowseAction(frame, tc, true, null);
+    }
 
-    public BrowseAction(JFrame frame, JTextField tc, boolean dir) {
+    public static BrowseAction buildForDir(JTextField tc) {
+        return new BrowseAction(null, tc, true, null);
+    }
+
+    public static BrowseAction buildForFile(JTextField tc) {
+        return new BrowseAction(null, tc, false, null);
+    }
+
+    public static BrowseAction buildForFile(JTextField tc, JComponent focusTarget) {
+        return new BrowseAction(null, tc, false, focusTarget);
+}
+
+    public static BrowseAction buildForDir(JTextField tc, JComponent focusTarget) {
+        return new BrowseAction(null, tc, true, focusTarget);
+    }
+
+    private BrowseAction(JFrame frame, JTextField tc, boolean dir, JComponent focusTarget) {
         super(Globals.lang("Browse"));
         this.frame = frame;
         this.dir = dir;
-        comp = tc;
-
-    }
-
-    /*public BrowseAction(JDialog dialog, JTextField tc, boolean dir) {
-        super(Globals.lang("Browse"));
-        this.dialog = dialog;
-        this.dir = dir;
-        comp = tc;
-
-    } */
-
-    public void setFocusTarget(JComponent focusTarget) {
+        this.comp = tc;
         this.focusTarget = focusTarget;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
-        String chosen;
-        if (dir)
-            chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
-                    JFileChooser.OPEN_DIALOG, false);
-        else
-            chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE,
-                    JFileChooser.OPEN_DIALOG, false);
+        String chosen = askUser();
+
         if (chosen != null) {
             File newFile = new File(chosen);
             comp.setText(newFile.getPath());
-            if (focusTarget != null)
+            if (focusTarget != null) {
                 new FocusRequester(focusTarget);
+            }
+        }
+    }
+
+    private String askUser() {
+        if (dir) {
+            return FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
+                    JFileChooser.OPEN_DIALOG, false);
+        } else {
+            return FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE,
+                    JFileChooser.OPEN_DIALOG, false);
         }
     }
 

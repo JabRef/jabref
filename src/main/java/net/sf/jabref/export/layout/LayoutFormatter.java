@@ -41,5 +41,5 @@ public interface LayoutFormatter {
      *            The text to layout.
      * @return The layouted text.
      */
-    public String format(String fieldText);
+    String format(String fieldText);
 }

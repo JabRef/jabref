@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.util.Comparator;
 import java.util.TreeMap;
 
+import javax.swing.Action;
 import javax.swing.JTabbedPane;
 
 import net.sf.jabref.BasePanel;
@@ -32,15 +33,16 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class SortTabsAction extends MnemonicAwareAction implements Comparator<String> {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public SortTabsAction(JabRefFrame frame) {
-        putValue(NAME, "Sort tabs");
-        putValue(SHORT_DESCRIPTION, Globals.lang("Rearrange tabs alphabetically by title"));
+        putValue(Action.NAME, "Sort tabs");
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Rearrange tabs alphabetically by title"));
         this.frame = frame;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         JTabbedPane tabbedPane = frame.getTabbedPane();
         // Make a sorted Map that compares case-insensitively:
@@ -57,6 +59,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
         }
     }
 
+    @Override
     public int compare(String o1, String o2) {
         return o1.toLowerCase().compareTo(o2.toLowerCase());
     }

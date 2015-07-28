@@ -22,6 +22,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.groups.structure.ExplicitGroup;
 
 /**
  * @author jzieren
@@ -70,31 +71,37 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         m_pathToNode = node.getIndexedPath();
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": "
                 + Globals.lang("change assignment of entries");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": "
                 + Globals.lang("change assignment of entries");
     }
 
+    @Override
     public void undo() {
         super.undo();
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_previousAssignmentBackup : m_previousAssignmentBackup)
+        for (BibtexEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
             group.addEntry(aM_previousAssignmentBackup);
+        }
     }
 
+    @Override
     public void redo() {
         super.redo();
         ExplicitGroup group = (ExplicitGroup) m_groupsRootHandle.getChildAt(
                 m_pathToNode).getGroup();
         group.clearAssignments();
-        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup)
+        for (BibtexEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
             group.addEntry(aM_newAssignmentBackup);
+        }
     }
 }

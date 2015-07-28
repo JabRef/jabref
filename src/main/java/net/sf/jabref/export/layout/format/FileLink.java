@@ -17,9 +17,9 @@ package net.sf.jabref.export.layout.format;
 
 import java.io.File;
 
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 import net.sf.jabref.export.layout.ParamLayoutFormatter;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -31,20 +31,23 @@ import java.io.IOException;
  */
 public class FileLink implements ParamLayoutFormatter {
 
-    String fileType = null;
+    private String fileType = null;
 
 
+    @Override
     public String format(String field) {
         FileListTableModel tableModel = new FileListTableModel();
-        if (field == null)
+        if (field == null) {
             return "";
+        }
 
         tableModel.setContent(field);
         String link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.
-            if (tableModel.getRowCount() > 0)
+            if (tableModel.getRowCount() > 0) {
                 link = tableModel.getEntry(0).getLink();
+            }
         }
         else {
             // A file type is specified:
@@ -57,20 +60,22 @@ public class FileLink implements ParamLayoutFormatter {
             }
         }
 
-        if (link == null)
+        if (link == null) {
             return "";
+        }
 
         String[] dirs;
         // We need to resolve the file directory from the database's metadata,
         // but that is not available from a formatter. Therefore, as an
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
-        if (Globals.prefs.fileDirForDatabase != null)
+        if (Globals.prefs.fileDirForDatabase != null) {
             dirs = Globals.prefs.fileDirForDatabase;
-        else
+        } else {
             dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
+        }
 
-        File f = Util.expandFilename(link, dirs);
+        File f = FileUtil.expandFilename(link, dirs);
 
         /*
          * Stumbled over this while investigating
@@ -95,6 +100,7 @@ public class FileLink implements ParamLayoutFormatter {
      * formatter. We use it as an indicator of which file type we should look for.
      * @param arg The file type.
      */
+    @Override
     public void setArgument(String arg) {
         fileType = arg;
     }

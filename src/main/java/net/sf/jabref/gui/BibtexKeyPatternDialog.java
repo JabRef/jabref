@@ -27,12 +27,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternPanel;
 
@@ -42,7 +43,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
     private MetaData metaData;
     private BasePanel panel;
-    private LabelPatternPanel labelPatternPanel;
+    private final LabelPatternPanel labelPatternPanel;
 
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
@@ -81,12 +82,13 @@ public class BibtexKeyPatternDialog extends JDialog {
 
         getContentPane().add(lower, BorderLayout.SOUTH);
 
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setPreferredSize(new Dimension(500, 600));
         pack();
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
                 panel.markNonUndoableBaseChanged();
@@ -109,9 +111,11 @@ public class BibtexKeyPatternDialog extends JDialog {
         Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
     }
 
+    @Override
     public void setVisible(boolean visible) {
-        if (visible)
+        if (visible) {
             super.setVisible(visible);
+        }
     }
 
 }

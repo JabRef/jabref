@@ -37,7 +37,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * If none is given, the format pattern will be <code>yyyy.MM.dd hh:mm:ss z</code></p>
  *
  * @author andreas_sf at rudert-home dot de
- * @version $Revision$
  */
 public class CurrentDate implements LayoutFormatter
 {
@@ -49,10 +48,11 @@ public class CurrentDate implements LayoutFormatter
      *  (non-Javadoc)
      * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
      */
+    @Override
     public String format(String fieldText)
     {
-        String format = defaultFormat;
-        if (fieldText != null && !"".equals(fieldText.trim())) {
+        String format = CurrentDate.defaultFormat;
+        if ((fieldText != null) && fieldText.trim() != null && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }
         return new SimpleDateFormat(format).format(new Date());

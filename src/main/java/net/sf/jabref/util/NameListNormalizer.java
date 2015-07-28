@@ -23,29 +23,18 @@ import java.util.regex.Pattern;
  */
 public class NameListNormalizer {
 
-    static Pattern lastFF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
-    static Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
-    static Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
-    static Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
-    static Pattern singleName = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
-
-
-    /*public static void main(String[] args) {
-        normalizeAuthorList("Staci D. Bilbo and Smith SH and Jaclyn M Schwarz");
-        //System.out.println(normalizeAuthorList("Ølver MA"));
-        //System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y. and Olsen Y. Y."));
-        //System.out.println(normalizeAuthorList("Ølver MA, GG Øie, Øie GG, Alfredsen JÅÅ, Jo Alfredsen, Olsen Y.Y., Olsen Y. Y."));
-        //System.out.println(normalizeAuthorList("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y."));
-        //System.out.println(normalizeAuthorList("Alver, MA; Alfredsen, JA; Olsen Y.Y."));
-    }*/
+    private static final Pattern lastFF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
+    private static final Pattern lastFdotF = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
+    private static final Pattern FFlast = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
+    private static final Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
+    private static final Pattern SINGLE_NAME = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
     public static String normalizeAuthorList(String in) {
-        boolean andSep = false, semicolonSep = false, commaSep = false;
-        String author;
+        boolean andSep = false;
         String[] authors = in.split("( |,)and ", -1);
-        if (authors.length > 1)
+        if (authors.length > 1) {
             andSep = true;
-        else {
+        } else {
             /*
             If there are no "and" separators in the original string, we assume it either means that
             the author list is comma or semicolon separated or that it contains only a single name.
@@ -54,13 +43,11 @@ public class NameListNormalizer {
             */
             String[] a2 = in.split("; ");
             if (a2.length > 1) {
-                semicolonSep = true;
                 authors = a2;
             }
             else {
                 a2 = in.split(", ");
                 if (a2.length > 3) { // Probably more than a single author, so we split by commas.
-                    commaSep = true;
                     authors = a2;
                 } else {
                     if (a2.length == 3) {
@@ -68,8 +55,9 @@ public class NameListNormalizer {
                         // e.g. Smith, Jr., Peter
                         // We check if the middle part is <= 3 characters. If not, we assume we are
                         // dealing with three authors.
-                        if (a2[1].length() > 3)
+                        if (a2[1].length() > 3) {
                             authors = a2;
+                        }
                     }
                 }
             }
@@ -120,16 +108,17 @@ public class NameListNormalizer {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < authors.length; i++) {
-            String norm = normalizeName(authors[i]);
+            String norm = NameListNormalizer.normalizeName(authors[i]);
             sb.append(norm);
-            if (i < authors.length - 1)
+            if (i < (authors.length - 1)) {
                 sb.append(" and ");
+            }
         }
         return sb.toString();
     }
 
-    public static String normalizeName(String name) {
-        Matcher m = lastFF.matcher(name);
+    private static String normalizeName(String name) {
+        Matcher m = NameListNormalizer.lastFF.matcher(name);
         if (m.matches()) {
             String initials = m.group(2);
             StringBuilder sb = new StringBuilder(m.group(1));
@@ -137,12 +126,13 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length() - 1)
+                if (i < (initials.length() - 1)) {
                     sb.append(' ');
+                }
             }
             return sb.toString();
         }
-        m = lastFdotF.matcher(name);
+        m = NameListNormalizer.lastFdotF.matcher(name);
         if (m.matches()) {
             String initials = m.group(2).replaceAll("[\\. ]+", "");
             StringBuilder sb = new StringBuilder(m.group(1));
@@ -150,13 +140,14 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length() - 1)
+                if (i < (initials.length() - 1)) {
                     sb.append(' ');
+                }
             }
             return sb.toString();
         }
 
-        m = FFlast.matcher(name);
+        m = NameListNormalizer.FFlast.matcher(name);
         if (m.matches()) {
             String initials = m.group(1);
             StringBuilder sb = new StringBuilder(m.group(2));
@@ -164,12 +155,13 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length() - 1)
+                if (i < (initials.length() - 1)) {
                     sb.append(' ');
+                }
             }
             return sb.toString();
         }
-        m = FdotFlast.matcher(name);
+        m = NameListNormalizer.FdotFlast.matcher(name);
         if (m.matches()) {
             String initials = m.group(1).replaceAll("[\\. ]+", "");
             StringBuilder sb = new StringBuilder(m.group(2));
@@ -177,8 +169,9 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < initials.length() - 1)
+                if (i < (initials.length() - 1)) {
                     sb.append(' ');
+                }
             }
             return sb.toString();
         }
@@ -187,8 +180,9 @@ public class NameListNormalizer {
             // Name contains comma
             int index = name.lastIndexOf(',');
             // If the comma is at the end of the name, just remove it to prevent index error:
-            if (index == name.length() - 1)
+            if (index == (name.length() - 1)) {
                 name = name.substring(0, name.length() - 1);
+            }
 
             StringBuilder sb = new StringBuilder(name.substring(0, index));
             sb.append(", ");
@@ -198,26 +192,29 @@ public class NameListNormalizer {
             if (fParts.length > 1) {
                 // Multiple parts. Add all of them, and add a dot if they are single letter parts:
                 for (int i = 0; i < fParts.length; i++) {
-                    if (fParts[i].length() == 1)
-                        sb.append(fParts[i]).append(".");
-                    else
+                    if (fParts[i].length() == 1) {
+                        sb.append(fParts[i]).append('.');
+                    } else {
                         sb.append(fParts[i]);
-                    if (i < fParts.length - 1)
-                        sb.append(" ");
+                    }
+                    if (i < (fParts.length - 1)) {
+                        sb.append(' ');
+                    }
                 }
             } else {
                 // Only a single part. Check if it looks like a name or initials:
-                Matcher m2 = singleName.matcher(fParts[0]);
-                if (m2.matches())
+                Matcher m2 = NameListNormalizer.SINGLE_NAME.matcher(fParts[0]);
+                if (m2.matches()) {
                     sb.append(fParts[0]);
-                else {
+                } else {
                     // It looks like initials.
                     String initials = fParts[0].replaceAll("[\\.]+", "");
                     for (int i = 0; i < initials.length(); i++) {
                         sb.append(initials.charAt(i));
                         sb.append('.');
-                        if (i < initials.length() - 1)
+                        if (i < (initials.length() - 1)) {
                             sb.append(' ');
+                        }
                     }
                 }
 
@@ -228,7 +225,7 @@ public class NameListNormalizer {
             String[] parts = name.split(" +");
             boolean allNames = true;
             for (String part : parts) {
-                m = singleName.matcher(part);
+                m = NameListNormalizer.SINGLE_NAME.matcher(part);
                 if (!m.matches()) {
                     allNames = false;
                     break;
@@ -239,11 +236,12 @@ public class NameListNormalizer {
                 // Change into last name first format:
                 StringBuilder sb = new StringBuilder(parts[parts.length - 1]);
                 if (parts.length > 1) {
-                    sb.append(",");
-                    for (int i = 0; i < parts.length - 1; i++) {
-                        sb.append(" ").append(parts[i]);
-                        if (parts[i].length() == 1)
-                            sb.append(".");
+                    sb.append(',');
+                    for (int i = 0; i < (parts.length - 1); i++) {
+                        sb.append(' ').append(parts[i]);
+                        if (parts[i].length() == 1) {
+                            sb.append('.');
+                        }
                     }
                 }
                 return sb.toString();

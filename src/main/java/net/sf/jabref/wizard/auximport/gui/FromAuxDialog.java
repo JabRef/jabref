@@ -73,25 +73,25 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FromAuxDialog
         extends JDialog {
 
-    private JPanel statusPanel = new JPanel();
-    private JPanel buttons = new JPanel();
-    private JButton selectInDBButton = new JButton();
-    private JButton generateButton = new JButton();
-    private JButton cancelButton = new JButton();
-    private JButton parseButton = new JButton();
+    private final JPanel statusPanel = new JPanel();
+    private final JPanel buttons = new JPanel();
+    private final JButton selectInDBButton = new JButton();
+    private final JButton generateButton = new JButton();
+    private final JButton cancelButton = new JButton();
+    private final JButton parseButton = new JButton();
 
-    private JComboBox dbChooser = new JComboBox();
+    private final JComboBox dbChooser = new JComboBox();
     private JTextField auxFileField;
 
     private JList notFoundList;
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
-    private JTabbedPane parentTabbedPane;
+    private final JTabbedPane parentTabbedPane;
 
     private boolean generatePressed = false;
 
-    private AuxSubGenerator auxParser;
+    private final AuxSubGenerator auxParser;
 
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
@@ -171,6 +171,7 @@ public class FromAuxDialog
         im.put(parent.prefs().getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -184,11 +185,13 @@ public class FromAuxDialog
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
-            if (parent.baseAt(i) == parent.basePanel())
+            if (parent.baseAt(i) == parent.basePanel()) {
                 toSelect = i;
+            }
         }
-        if (toSelect >= 0)
+        if (toSelect >= 0) {
             dbChooser.setSelectedIndex(toSelect);
+        }
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
@@ -310,8 +313,8 @@ public class FromAuxDialog
     static class BrowseAction
             extends AbstractAction {
 
-        private JTextField comp;
-        private JabRefFrame _frame;
+        private final JTextField comp;
+        private final JabRefFrame _frame;
 
 
         public BrowseAction(JTextField tc, JabRefFrame frame) {
@@ -320,6 +323,7 @@ public class FromAuxDialog
             comp = tc;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             String chosen = FileDialogs.getNewFile(_frame,
                     new File(comp.getText()),
@@ -338,13 +342,14 @@ public class FromAuxDialog
 class FromAuxDialog_generate_actionAdapter
         implements java.awt.event.ActionListener {
 
-    FromAuxDialog adaptee;
+    private final FromAuxDialog adaptee;
 
 
     FromAuxDialog_generate_actionAdapter(FromAuxDialog adaptee) {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.generate_actionPerformed(e);
     }
@@ -353,13 +358,14 @@ class FromAuxDialog_generate_actionAdapter
 class FromAuxDialog_Cancel_actionAdapter
         implements java.awt.event.ActionListener {
 
-    FromAuxDialog adaptee;
+    private final FromAuxDialog adaptee;
 
 
     FromAuxDialog_Cancel_actionAdapter(FromAuxDialog adaptee) {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.cancel_actionPerformed(e);
     }
@@ -368,13 +374,14 @@ class FromAuxDialog_Cancel_actionAdapter
 class FromAuxDialog_parse_actionAdapter
         implements java.awt.event.ActionListener {
 
-    FromAuxDialog adaptee;
+    private final FromAuxDialog adaptee;
 
 
     FromAuxDialog_parse_actionAdapter(FromAuxDialog adaptee) {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         adaptee.parse_actionPerformed(e);
     }

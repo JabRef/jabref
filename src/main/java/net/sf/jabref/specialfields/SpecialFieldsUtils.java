@@ -18,7 +18,7 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
@@ -79,16 +79,17 @@ public class SpecialFieldsUtils {
     public static void updateField(SpecialField e, String value, BibtexEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
         Util.updateField(be, e.getFieldName(), value, ce, nullFieldIfValueIsTheSame);
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, BibtexEntry be, NamedCompound ce) {
-        exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, String newValue, BibtexEntry be, NamedCompound ce) {
-        if (!SpecialFieldsUtils.keywordSyncEnabled())
+        if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
+        }
         ArrayList<String> keywordList = Util.getSeparatedKeywords(be);
         List<String> values = e.getKeyWords();
 
@@ -119,12 +120,12 @@ public class SpecialFieldsUtils {
      * @param nc indicates the undo named compound. May be null
      */
     public static void syncKeywordsFromSpecialFields(BibtexEntry be, NamedCompound nc) {
-        exportFieldToKeywords(Priority.getInstance(), be, nc);
-        exportFieldToKeywords(Rank.getInstance(), be, nc);
-        exportFieldToKeywords(Relevance.getInstance(), be, nc);
-        exportFieldToKeywords(Quality.getInstance(), be, nc);
-        exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
-        exportFieldToKeywords(Printed.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(Quality.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, nc);
     }
 
     private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibtexEntry be, NamedCompound nc) {
@@ -145,15 +146,16 @@ public class SpecialFieldsUtils {
      * @param ce indicates the undo named compound. May be null
      */
     public static void syncSpecialFieldsFromKeywords(BibtexEntry be, NamedCompound ce) {
-        if (be.getField("keywords") == null)
+        if (be.getField("keywords") == null) {
             return;
+        }
         ArrayList<String> keywordList = Util.getSeparatedKeywords(be.getField("keywords"));
-        importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
-        importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
-        importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
-        importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
-        importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
-        importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
     }
 
     /**
@@ -161,17 +163,17 @@ public class SpecialFieldsUtils {
      * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
      */
     public static SpecialField getSpecialFieldInstanceFromFieldName(String fieldName) {
-        if (fieldName.equals(FIELDNAME_PRIORITY)) {
+        if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_PRIORITY)) {
             return Priority.getInstance();
-        } else if (fieldName.equals(FIELDNAME_QUALITY)) {
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_QUALITY)) {
             return Quality.getInstance();
-        } else if (fieldName.equals(FIELDNAME_RANKING)) {
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
             return Rank.getInstance();
-        } else if (fieldName.equals(FIELDNAME_RELEVANCE)) {
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_RELEVANCE)) {
             return Relevance.getInstance();
-        } else if (fieldName.equals(FIELDNAME_READ)) {
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_READ)) {
             return ReadStatus.getInstance();
-        } else if (fieldName.equals(FIELDNAME_PRINTED)) {
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_PRINTED)) {
             return Printed.getInstance();
         } else {
             return null;
@@ -183,7 +185,7 @@ public class SpecialFieldsUtils {
      * @return true if given field is a special field, false otherwise
      */
     public static boolean isSpecialField(String fieldName) {
-        return (getSpecialFieldInstanceFromFieldName(fieldName) != null);
+        return (SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName) != null);
     }
 
     public static boolean keywordSyncEnabled() {

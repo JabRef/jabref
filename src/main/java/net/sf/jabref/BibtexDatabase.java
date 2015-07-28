@@ -35,6 +35,9 @@ Modified for use in JabRef
 
 package net.sf.jabref;
 
+import net.sf.jabref.util.MonthUtil;
+import net.sf.jabref.util.Util;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
@@ -47,21 +50,18 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
 public class BibtexDatabase {
 
-    Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
+    private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
 
-    String _preamble = null;
+    private String _preamble = null;
 
-    HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
+    private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
 
-    Vector<String> _strings_ = new Vector<String>();
-
-    Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
+    private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
     private boolean followCrossrefs = true;
 
@@ -69,7 +69,7 @@ public class BibtexDatabase {
      * use a map instead of a set since i need to know how many of each key is
      * inthere
      */
-    private HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if
@@ -82,12 +82,13 @@ public class BibtexDatabase {
             new VetoableChangeListener()
             {
 
+                @Override
                 public void vetoableChange(PropertyChangeEvent pce)
                         throws PropertyVetoException
                 {
-                    if (pce.getPropertyName() == null)
+                    if (pce.getPropertyName() == null) {
                         fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibtexEntry) pce.getSource()));
-                    else if ("id".equals(pce.getPropertyName()))
+                    } else if ("id".equals(pce.getPropertyName()))
                     {
                         // locate the entry under its old key
                         BibtexEntry oldEntry =
@@ -199,8 +200,9 @@ public class BibtexDatabase {
         ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
 
         for (BibtexEntry entry : _entries.values()) {
-            if (key.equals(entry.getCiteKey()))
+            if (key.equals(entry.getCiteKey())) {
                 entries.add(entry);
+            }
         }
 
         return entries.toArray(new BibtexEntry[entries.size()]);
@@ -238,8 +240,9 @@ public class BibtexDatabase {
     {
         BibtexEntry oldValue = _entries.remove(id);
 
-        if (oldValue == null)
+        if (oldValue == null) {
             return null;
+        }
 
         removeKeyFromSet(oldValue.getCiteKey());
         oldValue.removePropertyChangeListener(listener);
@@ -250,13 +253,16 @@ public class BibtexDatabase {
 
     public synchronized boolean setCiteKeyForEntry(String id, String key) {
         if (!_entries.containsKey(id))
+         {
             return false; // Entry doesn't exist!
+        }
         BibtexEntry entry = getEntryById(id);
         String oldKey = entry.getCiteKey();
-        if (key != null)
+        if (key != null) {
             entry.setField(BibtexFields.KEY_FIELD, key);
-        else
+        } else {
             entry.clearField(BibtexFields.KEY_FIELD);
+        }
         return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
     }
 
@@ -286,8 +292,9 @@ public class BibtexDatabase {
             throw new KeyCollisionException(Globals.lang("A string with this label already exists"));
         }
 
-        if (_strings.containsKey(string.getId()))
+        if (_strings.containsKey(string.getId())) {
             throw new KeyCollisionException("Duplicate BibtexString id.");
+        }
 
         _strings.put(string.getId(), string);
     }
@@ -334,8 +341,9 @@ public class BibtexDatabase {
      */
     public synchronized boolean hasStringLabel(String label) {
         for (BibtexString value : _strings.values()) {
-            if (value.getName().equals(label))
+            if (value.getName().equals(label)) {
                 return true;
+            }
         }
         return false;
     }
@@ -366,8 +374,9 @@ public class BibtexDatabase {
      */
     public List<BibtexEntry> resolveForStrings(Collection<BibtexEntry> entries, boolean inPlace) {
 
-        if (entries == null)
+        if (entries == null) {
             throw new NullPointerException();
+        }
 
         List<BibtexEntry> results = new ArrayList<BibtexEntry>(entries.size());
 
@@ -457,13 +466,14 @@ public class BibtexDatabase {
         //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
-            int piv = 0, next = 0;
+            int piv = 0, next;
             while ((next = res.indexOf("#", piv)) >= 0) {
 
                 // We found the next string ref. Append the text
                 // up to it.
-                if (next > 0)
+                if (next > 0) {
                     newRes.append(res.substring(piv, next));
+                }
                 int stringEnd = res.indexOf("#", next + 1);
                 if (stringEnd >= 0) {
                     // We found the boundaries of the string ref,
@@ -475,10 +485,11 @@ public class BibtexDatabase {
                         // Could not resolve string. Display the #
                         // characters rather than removing them:
                         newRes.append(res.substring(next, stringEnd + 1));
-                    } else
+                    } else {
                         // The string was resolved, so we display its meaning only,
                         // stripping the # characters signifying the string label:
                         newRes.append(resolved);
+                    }
                     piv = stringEnd + 1;
                 } else {
                     // We didn't find the boundaries of the string ref. This
@@ -490,8 +501,9 @@ public class BibtexDatabase {
                 }
 
             }
-            if (piv < res.length() - 1)
+            if (piv < (res.length() - 1)) {
                 newRes.append(res.substring(piv));
+            }
             res = newRes.toString();
         }
         return res;
@@ -503,10 +515,10 @@ public class BibtexDatabase {
     //############################################
     // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
-    public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
+    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
         // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
-        boolean duplicate = false;
+        boolean duplicate;
         if (oldKey == null) {// this is a new entry so don't bother removing oldKey
             duplicate = addKeyToSet(newKey);
         } else {
@@ -527,7 +539,7 @@ public class BibtexDatabase {
             }
         }
         if (duplicate && issueWarning) {
-            JOptionPane.showMessageDialog(null, Globals.lang("Warning there is a duplicate key") + ":" + newKey,
+            JOptionPane.showMessageDialog(null, Globals.lang("Warning there is a duplicate key") + ':' + newKey,
                     Globals.lang("Duplicate Key Warning"),
                     JOptionPane.WARNING_MESSAGE);//, options);
 
@@ -540,10 +552,11 @@ public class BibtexDatabase {
      */
     public int getNumberOfKeyOccurences(String key) {
         Object o = allKeys.get(key);
-        if (o == null)
+        if (o == null) {
             return 0;
-        else
+        } else {
             return (Integer) o;
+        }
 
     }
 
@@ -552,14 +565,17 @@ public class BibtexDatabase {
     //========================================================
     private boolean addKeyToSet(String key) {
         boolean exists = false;
-        if ((key == null) || key.equals(""))
+        if ((key == null) || key.isEmpty())
+         {
             return false;//don't put empty key
+        }
         if (allKeys.containsKey(key)) {
             // warning
             exists = true;
             allKeys.put(key, allKeys.get(key) + 1);// incrementInteger( allKeys.get(key)));
-        } else
+        } else {
             allKeys.put(key, 1);
+        }
         return exists;
     }
 
@@ -568,18 +584,21 @@ public class BibtexDatabase {
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
     private void removeKeyFromSet(String key) {
-        if ((key == null) || key.equals(""))
+        if ((key == null) || key.isEmpty()) {
             return;
+        }
         if (allKeys.containsKey(key)) {
             Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
-            if (tI == 1)
+            if (tI == 1) {
                 allKeys.remove(key);
-            else
+            }
+            else {
                 allKeys.put(key, tI - 1);//decrementInteger( tI ));
+            }
         }
     }
 
-    public void fireDatabaseChanged(DatabaseChangeEvent e) {
+    private void fireDatabaseChanged(DatabaseChangeEvent e) {
         for (DatabaseChangeListener listener : changeListeners) {
             listener.databaseChanged(e);
         }
@@ -613,8 +632,9 @@ public class BibtexDatabase {
     public static String getResolvedField(String field, BibtexEntry bibtex,
             BibtexDatabase database) {
 
-        if (field.equals("bibtextype"))
+        if (field.equals("bibtextype")) {
             return bibtex.getType().getName();
+        }
 
         // TODO: Changed this to also consider alias fields, which is the expected 
         // behavior for the preview layout and for the check whatever all fields are present.
@@ -635,7 +655,7 @@ public class BibtexDatabase {
             }
         }
 
-        return getText((String) o, database);
+        return BibtexDatabase.getText((String) o, database);
     }
 
     /**
@@ -647,8 +667,9 @@ public class BibtexDatabase {
      * @return The resolved text or the original text if either the text or the database are null
      */
     public static String getText(String toResolve, BibtexDatabase database) {
-        if (toResolve != null && database != null)
+        if ((toResolve != null) && (database != null)) {
             return database.resolveForStrings(toResolve);
+        }
 
         return toResolve;
     }

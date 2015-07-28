@@ -16,7 +16,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 import java.util.HashMap;
@@ -27,11 +27,11 @@ import java.util.HashMap;
  */
 public class FormatChars implements LayoutFormatter {
 
-    public static HashMap<String, String> CHARS = new HashMap<String, String>();
+    private static final HashMap<String, String> CHARS = new HashMap<String, String>();
 
     static {
         CHARS.put("`A", "À"); // #192
-        CHARS.put("'A", "�?"); // #193
+        CHARS.put("'A", "Á"); // #193
         CHARS.put("^A", "Â"); // #194
         CHARS.put("~A", "Ã"); // #195
         CHARS.put("\"A", "Ä"); // #196
@@ -43,10 +43,10 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("^E", "Ê"); // #202
         CHARS.put("\"E", "Ë"); // #203
         CHARS.put("`I", "Ì"); // #204
-        CHARS.put("'I", "�?"); // #205
+        CHARS.put("'I", "Í"); // #205
         CHARS.put("^I", "Î"); // #206
-        CHARS.put("\"I", "�?"); // #207
-        CHARS.put("DH", "�?"); // #208
+        CHARS.put("\"I", "Ï"); // #207
+        CHARS.put("DH", "Ð"); // #208
         CHARS.put("~N", "Ñ"); // #209
         CHARS.put("`O", "Ò"); // #210
         CHARS.put("'O", "Ó"); // #211
@@ -61,7 +61,7 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("'U", "Ú"); // #218
         CHARS.put("^U", "Û"); // #219
         CHARS.put("\"U", "Ü"); // #220
-        CHARS.put("'Y", "�?"); // #221
+        CHARS.put("'Y", "Ý"); // #221
         CHARS.put("TH", "Þ"); // #222
         CHARS.put("ss", "ß"); // #223
         CHARS.put("`a", "à"); // #224
@@ -102,7 +102,7 @@ public class FormatChars implements LayoutFormatter {
         // HTML special characters without names (UNICODE Latin Extended-A),
         // indicated by UNICODE number
         CHARS.put("=A", "Ā"); // "Amacr"
-        CHARS.put("=a", "�?"); // "amacr"
+        CHARS.put("=a", "ā"); // "amacr"
         CHARS.put("uA", "Ă"); // "Abreve"
         CHARS.put("ua", "ă"); // "abreve"
         CHARS.put("kA", "Ą"); // "Aogon"
@@ -114,10 +114,10 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put(".C", "Ċ"); // "Cdot"
         CHARS.put(".c", "ċ"); // "cdot"
         CHARS.put("vC", "Č"); // "Ccaron"
-        CHARS.put("vc", "�?"); // "ccaron"
+        CHARS.put("vc", "č"); // "ccaron"
         CHARS.put("vD", "Ď"); // "Dcaron"
-        // Symbol #271 (d�) has no special Latex command
-        CHARS.put("DJ", "�?"); // "Dstrok"
+        // Symbol #271 (d) has no special Latex command
+        CHARS.put("DJ", "Đ"); // "Dstrok"
         CHARS.put("dj", "đ"); // "dstrok"
         CHARS.put("=E", "Ē"); // "Emacr"
         CHARS.put("=e", "ē"); // "emacr"
@@ -130,7 +130,7 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("vE", "Ě"); // "Ecaron"
         CHARS.put("ve", "ě"); // "ecaron"
         CHARS.put("^G", "Ĝ"); // "Gcirc"
-        CHARS.put("^g", "�?"); // "gcirc"
+        CHARS.put("^g", "ĝ"); // "gcirc"
         CHARS.put("uG", "Ğ"); // "Gbreve"
         CHARS.put("ug", "ğ"); // "gbreve"
         CHARS.put(".G", "Ġ"); // "Gdot"
@@ -162,11 +162,11 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("'l", "ĺ"); // "lacute"
         CHARS.put("cL", "Ļ"); // "Lcedil"
         CHARS.put("cl", "ļ"); // "lcedil"
-        // Symbol #317 (L�) has no special Latex command
-        // Symbol #318 (l�) has no special Latex command
+        // Symbol #317 (L) has no special Latex command
+        // Symbol #318 (l) has no special Latex command
         CHARS.put("Lmidot", "Ŀ"); // "Lmidot"
         CHARS.put("lmidot", "ŀ"); // "lmidot"
-        CHARS.put("L", "�?"); // "Lstrok"
+        CHARS.put("L", "Ł"); // "Lstrok"
         CHARS.put("l", "ł"); // "lstrok"
         CHARS.put("'N", "Ń"); // "Nacute"
         CHARS.put("'n", "ń"); // "nacute"
@@ -174,14 +174,14 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("cn", "ņ"); // "ncedil"
         CHARS.put("vN", "Ň"); // "Ncaron"
         CHARS.put("vn", "ň"); // "ncaron"
-        // Symbol #329 (�n) has no special Latex command
+        // Symbol #329 (n) has no special Latex command
         CHARS.put("NG", "Ŋ"); // "ENG"
         CHARS.put("ng", "ŋ"); // "eng"
         CHARS.put("=O", "Ō"); // "Omacr"
-        CHARS.put("=o", "�?"); // "omacr"
+        CHARS.put("=o", "ō"); // "omacr"
         CHARS.put("uO", "Ŏ"); // "Obreve"
-        CHARS.put("uo", "�?"); // "obreve"
-        CHARS.put("HO", "�?"); // "Odblac"
+        CHARS.put("uo", "ŏ"); // "obreve"
+        CHARS.put("HO", "Ő"); // "Odblac"
         CHARS.put("Ho", "ő"); // "odblac"
         CHARS.put("OE", "Œ"); // "OElig"
         CHARS.put("oe", "œ"); // "oelig"
@@ -194,7 +194,7 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("'S", "Ś"); // "Sacute"
         CHARS.put("'s", "ś"); // "sacute"
         CHARS.put("^S", "Ŝ"); // "Scirc"
-        CHARS.put("^s", "�?"); // "scirc"
+        CHARS.put("^s", "ŝ"); // "scirc"
         CHARS.put("cS", "Ş"); // "Scedil"
         CHARS.put("cs", "ş"); // "scedil"
         CHARS.put("vS", "Š"); // "Scaron"
@@ -202,7 +202,7 @@ public class FormatChars implements LayoutFormatter {
         CHARS.put("cT", "Ţ"); // "Tcedil"
         CHARS.put("ct", "ţ"); // "tcedil"
         CHARS.put("vT", "Ť"); // "Tcaron"
-        // Symbol #357 (t�) has no special Latex command
+        // Symbol #357 (t) has no special Latex command
         CHARS.put("Tstrok", "Ŧ"); // "Tstrok"
         CHARS.put("tstrok", "ŧ"); // "tstrok"
         CHARS.put("~U", "Ũ"); // "Utilde"
@@ -233,11 +233,12 @@ public class FormatChars implements LayoutFormatter {
     }
 
 
+    @Override
     public String format(String field) {
         int i;
         field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
 
         char c;
@@ -252,7 +253,7 @@ public class FormatChars implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = CHARS.get(command);
+                    Object result = FormatChars.CHARS.get(command);
                     if (result != null) {
                         sb.append((String) result);
                     } else {
@@ -262,23 +263,23 @@ public class FormatChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
                     || (Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c)))) {
                 escaped = false;
 
-                if (!incommand)
+                if (!incommand) {
                     sb.append(c);
-                // Else we are in a command, and should not keep the letter.
-                else {
+                } else {
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
                             && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1)
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
+                        }
 
                         String command = currentCommand.toString();
                         i++;
@@ -286,25 +287,26 @@ public class FormatChars implements LayoutFormatter {
                         // System.out.println("next: "+(char)c);
                         String combody;
                         if (c == '{') {
-                            String part = Util.getPart(field, i, false);
+                            String part = StringUtil.getPart(field, i, false);
                             i += part.length();
                             combody = part;
                         } else {
                             combody = field.substring(i, i + 1);
                             // System.out.println("... "+combody);
                         }
-                        Object result = CHARS.get(command + combody);
+                        Object result = FormatChars.CHARS.get(command + combody);
 
-                        if (result != null)
+                        if (result != null) {
                             sb.append((String) result);
+                        }
 
                         incommand = false;
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if (i + 1 == field.length()) {
+                        if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
-                            Object result = CHARS.get(command);
+                            Object result = FormatChars.CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -319,7 +321,7 @@ public class FormatChars implements LayoutFormatter {
                     }
                 }
             } else {
-                String argument = null;
+                String argument;
 
                 if (!incommand) {
                     sb.append(c);
@@ -331,12 +333,12 @@ public class FormatChars implements LayoutFormatter {
                     String command = currentCommand.toString();
 
                     if (c == '{') {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         argument = part;
                         if (argument != null) {
                             // handle common case of general latex command
-                            Object result = CHARS.get(command + argument);
+                            Object result = FormatChars.CHARS.get(command + argument);
                             // System.out.print("command: "+command+", arg: "+argument);
                             // System.out.print(", result: ");
                             // If found, then use translated version. If not, then keep
@@ -352,7 +354,7 @@ public class FormatChars implements LayoutFormatter {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = CHARS.get(command);
+                        Object result = FormatChars.CHARS.get(command);
                         if (result != null) {
                             sb.append((String) result);
                         } else {
@@ -360,7 +362,7 @@ public class FormatChars implements LayoutFormatter {
                             sb.append(command);
                         }
                     } else {
-                        Object result = CHARS.get(command);
+                        Object result = FormatChars.CHARS.get(command);
                         if (result != null) {
                             sb.append((String) result);
                         } else {

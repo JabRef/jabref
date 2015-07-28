@@ -19,7 +19,7 @@ import java.util.Comparator;
 
 public class BibtexStringComparator implements Comparator<BibtexString> {
 
-    protected boolean considerRefs;
+    private final boolean considerRefs;
 
 
     /**
@@ -31,17 +31,19 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         this.considerRefs = considerRefs;
     }
 
+    @Override
     public int compare(BibtexString s1, BibtexString s2) {
 
-        int res = 0;
+        int res;
 
         // First check their names:
         String name1 = s1.getName().toLowerCase(), name2 = s2.getName().toLowerCase();
 
         res = name1.compareTo(name2);
 
-        if (res == 0)
+        if (res == 0) {
             return res;
+        }
 
         // Then, if we are supposed to, see if the ordering needs
         // to be changed because of one string referring to the other.x

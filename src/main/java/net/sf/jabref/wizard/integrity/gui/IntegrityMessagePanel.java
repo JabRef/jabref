@@ -70,14 +70,14 @@ public class IntegrityMessagePanel
 
 {
 
-    private JList warnings;
-    private HintListModel warningData;
+    private final JList warnings;
+    private final HintListModel warningData;
 
-    private IntegrityCheck validChecker;
+    private final IntegrityCheck validChecker;
 
-    private JTextField content;
-    private JButton applyButton;
-    private BasePanel basePanel;
+    private final JTextField content;
+    private final JButton applyButton;
+    private final BasePanel basePanel;
 
 
     public IntegrityMessagePanel(BasePanel basePanel)
@@ -140,6 +140,7 @@ public class IntegrityMessagePanel
 
     // ------------------------------------------------------------------------
     //This method is required by ListSelectionListener.
+    @Override
     public void valueChanged(ListSelectionEvent e)
     {
         if (e.getValueIsAdjusting())
@@ -167,10 +168,12 @@ public class IntegrityMessagePanel
 
     // --------------------------------------------------------------------------
     // This methods are required by KeyListener
+    @Override
     public void keyPressed(KeyEvent e)
     {
     }
 
+    @Override
     public void keyReleased(KeyEvent e)
     {
         applyButton.setEnabled(true);
@@ -180,10 +183,12 @@ public class IntegrityMessagePanel
         }
     }
 
+    @Override
     public void keyTyped(KeyEvent e)
     {
     }
 
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         Object obj = e.getSource();
@@ -226,6 +231,7 @@ public class IntegrityMessagePanel
         final ImageIcon fixedIcon = GUIGlobals.getImage("complete");
 
 
+        @Override
         public Component getListCellRendererComponent(
                 JList list,
                 Object value, // value to display
@@ -245,12 +251,13 @@ public class IntegrityMessagePanel
                 else
                 {
                     int id = msg.getType();
-                    if (id < 1000)
+                    if (id < 1000) {
                         setIcon(infoIcon);
-                    else if (id < 2000)
+                    } else if (id < 2000) {
                         setIcon(warnIcon);
-                    else
+                    } else {
                         setIcon(failIcon);
+                    }
                 }
             }
             return this;

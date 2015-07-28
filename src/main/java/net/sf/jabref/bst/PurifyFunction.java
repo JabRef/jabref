@@ -29,19 +29,17 @@ import net.sf.jabref.bst.VM.BstFunction;
  * pushes the resulting string. If the literal isn't a string, it complains and
  * pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class PurifyFunction implements BstFunction {
 
-    VM vm;
+    private final VM vm;
 
 
     public PurifyFunction(VM vm) {
         this.vm = vm;
     }
 
+    @Override
     public void execute(BstEntry context) {
         Stack<Object> stack = vm.getStack();
 

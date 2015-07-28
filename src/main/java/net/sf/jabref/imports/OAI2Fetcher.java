@@ -31,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.util.MonthUtil;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -41,37 +42,32 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class OAI2Fetcher implements EntryFetcher {
 
-    public static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
+    private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
 
-    public static final String OAI2_ARXIV_HOST = "export.arxiv.org";
+    private static final String OAI2_ARXIV_HOST = "export.arxiv.org";
 
-    public static final String OAI2_ARXIV_SCRIPT = "oai2";
+    private static final String OAI2_ARXIV_SCRIPT = "oai2";
 
-    public static final String OAI2_ARXIV_METADATAPREFIX = "arXiv";
+    private static final String OAI2_ARXIV_METADATAPREFIX = "arXiv";
 
-    public static final String OAI2_ARXIV_ARCHIVENAME = "ArXiv.org";
+    private static final String OAI2_ARXIV_ARCHIVENAME = "ArXiv.org";
 
-    public static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
-
-    private SAXParserFactory parserFactory;
+    private static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
 
     private SAXParser saxParser;
 
-    private String oai2Host;
+    private final String oai2Host;
 
-    private String oai2Script;
+    private final String oai2Script;
 
-    private String oai2MetaDataPrefix;
+    private final String oai2MetaDataPrefix;
 
-    private String oai2PrefixIdentifier;
+    private final String oai2PrefixIdentifier;
 
-    private String oai2ArchiveName;
+    private final String oai2ArchiveName;
 
     private boolean shouldContinue = true;
 
@@ -115,7 +111,7 @@ public class OAI2Fetcher implements EntryFetcher {
         this.oai2ArchiveName = oai2ArchiveName;
         this.waitTime = waitTimeMs;
         try {
-            parserFactory = SAXParserFactory.newInstance();
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -129,8 +125,8 @@ public class OAI2Fetcher implements EntryFetcher {
      * 
      */
     public OAI2Fetcher() {
-        this(OAI2_ARXIV_HOST, OAI2_ARXIV_SCRIPT, OAI2_ARXIV_METADATAPREFIX,
-                OAI2_ARXIV_PREFIXIDENTIFIER, OAI2_ARXIV_ARCHIVENAME, 20000L);
+        this(OAI2Fetcher.OAI2_ARXIV_HOST, OAI2Fetcher.OAI2_ARXIV_SCRIPT, OAI2Fetcher.OAI2_ARXIV_METADATAPREFIX,
+                OAI2Fetcher.OAI2_ARXIV_PREFIXIDENTIFIER, OAI2Fetcher.OAI2_ARXIV_ARCHIVENAME, 20000L);
     }
 
     /**
@@ -142,7 +138,7 @@ public class OAI2Fetcher implements EntryFetcher {
      * @return a String denoting the query URL
      */
     public String constructUrl(String key) {
-        String identifier = "";
+        String identifier;
         try {
             identifier = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -166,7 +162,7 @@ public class OAI2Fetcher implements EntryFetcher {
         int dot = key.indexOf('.');
         int slash = key.indexOf('/');
 
-        if (dot > -1 && dot < slash) {
+        if ((dot > -1) && (dot < slash)) {
             key = key.substring(0, dot) + key.substring(slash, key.length());
         }
 
@@ -192,7 +188,7 @@ public class OAI2Fetcher implements EntryFetcher {
          * Fix for problem reported in mailing-list: 
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
-        key = fixKey(key);
+        key = OAI2Fetcher.fixKey(key);
 
         String url = constructUrl(key);
         try {
@@ -202,8 +198,8 @@ public class OAI2Fetcher implements EntryFetcher {
             InputStream inputStream = oai2Connection.getInputStream();
 
             /* create an empty BibtexEntry and set the oai2identifier field */
-            BibtexEntry be = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);
-            be.setField(OAI2_IDENTIFIER_FIELD, key);
+            BibtexEntry be = new BibtexEntry(IdGenerator.next(), BibtexEntryType.ARTICLE);
+            be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
             DefaultHandler handlerBase = new OAI2Handler(be);
             /* parse the result */
             saxParser.parse(inputStream, handlerBase);
@@ -240,28 +236,29 @@ public class OAI2Fetcher implements EntryFetcher {
         return null;
     }
 
+    @Override
     public String getHelpPage() {
         // there is no helppage
         return null;
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
+    @Override
     public String getKeyName() {
         return oai2ArchiveName;
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // we have no additional options
         return null;
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle(getKeyName());
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
 
         this.status = status;
@@ -279,7 +276,7 @@ public class OAI2Fetcher implements EntryFetcher {
                  * some archives - like arxive.org - might expect of you to wait
                  * some time
                  */
-                if (shouldWait() && lastCall != null) {
+                if (shouldWait() && (lastCall != null)) {
 
                     long elapsed = new Date().getTime() - lastCall.getTime();
 
@@ -321,6 +318,7 @@ public class OAI2Fetcher implements EntryFetcher {
         return false;
     }
 
+    @Override
     public void stopFetching() {
         shouldContinue = false;
     }

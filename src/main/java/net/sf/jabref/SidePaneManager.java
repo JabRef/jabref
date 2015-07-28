@@ -24,22 +24,19 @@ import javax.swing.event.ChangeListener;
 /**
  * Manages visibility of SideShowComponents in a given newly constructed
  * sidePane.
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class SidePaneManager {
 
-    JabRefFrame frame;
+    private final JabRefFrame frame;
 
     BasePanel panel;
 
-    SidePane sidep;
+    private final SidePane sidep;
 
-    Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
-    Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
+    private final Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
+    private final Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
 
-    List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
+    private final List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
 
 
     public SidePaneManager(JabRefFrame frame) {
@@ -51,9 +48,11 @@ public class SidePaneManager {
          */
         frame.tabbedPane.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane
                                 .getSelectedComponent());
@@ -94,16 +93,18 @@ public class SidePaneManager {
         Object o = components.get(name);
         if (o != null) {
             show((SidePaneComponent) o);
-        } else
+        } else {
             System.err.println("Side pane component '" + name + "' unknown.");
+        }
     }
 
     public void hide(String name) {
         Object o = components.get(name);
         if (o != null) {
             hideComponent((SidePaneComponent) o);
-        } else
+        } else {
             System.err.println("Side pane component '" + name + "' unknown.");
+        }
     }
 
     public synchronized void register(String name, SidePaneComponent comp) {
@@ -133,7 +134,7 @@ public class SidePaneManager {
         return components.get(name);
     }
 
-    public String getComponentName(SidePaneComponent comp) {
+    private String getComponentName(SidePaneComponent comp) {
         return componentNames.get(comp);
     }
 
@@ -147,8 +148,9 @@ public class SidePaneManager {
 
     public synchronized void hideComponent(String name) {
         SidePaneComponent comp = components.get(name);
-        if (comp == null)
+        if (comp == null) {
             return;
+        }
         if (visible.contains(comp)) {
             comp.componentClosing();
             visible.remove(comp);
@@ -159,8 +161,8 @@ public class SidePaneManager {
     private Map<String, Integer> getPreferredPositions() {
         Map<String, Integer> preferredPositions = new HashMap<String, Integer>();
 
-        String[] componentNames = Globals.prefs.getStringArray("sidePaneComponentNames");
-        String[] componentPositions = Globals.prefs.getStringArray("sidePaneComponentPreferredPositions");
+        String[] componentNames = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
+        String[] componentPositions = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
 
         for (int i = 0; i < componentNames.length; ++i) {
             try {
@@ -180,26 +182,28 @@ public class SidePaneManager {
         int index = 0;
         for (SidePaneComponent comp : visible) {
             String componentName = getComponentName(comp);
-            preferredPositions.put(componentName, index++);
+            preferredPositions.put(componentName, index);
+            index++;
         }
 
         // Split the map into a pair of parallel String arrays suitable for storage
-        String[] componentNames = preferredPositions.keySet().toArray(new String[0]);
+        Set<String> var = preferredPositions.keySet();
+        String[] componentNames = var.toArray(new String[var.size()]);
         String[] componentPositions = new String[preferredPositions.size()];
 
         for (int i = 0; i < componentNames.length; ++i) {
             componentPositions[i] = preferredPositions.get(componentNames[i]).toString();
         }
 
-        Globals.prefs.putStringArray("sidePaneComponentNames", componentNames);
-        Globals.prefs.putStringArray("sidePaneComponentPreferredPositions", componentPositions);
+        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, componentNames);
+        Globals.prefs.putStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, componentPositions);
     }
 
 
     // Helper class for sorting visible componenys based on their preferred position
     private class PreferredIndexSort implements Comparator<SidePaneComponent> {
 
-        private Map<String, Integer> preferredPositions;
+        private final Map<String, Integer> preferredPositions;
 
 
         public PreferredIndexSort() {
@@ -215,7 +219,7 @@ public class SidePaneManager {
             int pos1 = (preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0);
             int pos2 = (preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0);
 
-            return Integer.valueOf(pos1).compareTo(Integer.valueOf(pos2));
+            return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
 
@@ -259,27 +263,29 @@ public class SidePaneManager {
      * 
      * @param panel
      */
-    public void setActiveBasePanel(BasePanel panel) {
-        for (String key : components.keySet()) {
-            components.get(key).setActiveBasePanel(panel);
+    private void setActiveBasePanel(BasePanel panel) {
+        for (Map.Entry<String, SidePaneComponent> stringSidePaneComponentEntry : components.entrySet()) {
+            stringSidePaneComponentEntry.getValue().setActiveBasePanel(panel);
         }
     }
 
     public void updateView() {
         sidep.setComponents(visible);
-        if (visible.size() > 0) {
+        if (!visible.isEmpty()) {
             boolean wasVisible = sidep.isVisible();
             sidep.setVisible(true);
             if (!wasVisible) {
-                int width = Globals.prefs.getInt("sidePaneWidth");
-                if (width > 0)
+                int width = Globals.prefs.getInt(JabRefPreferences.SIDE_PANE_WIDTH);
+                if (width > 0) {
                     frame.contentPane.setDividerLocation(width);
-                else
+                } else {
                     frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+                }
             }
         } else {
-            if (sidep.isVisible())
-                Globals.prefs.putInt("sidePaneWidth", frame.contentPane.getDividerLocation());
+            if (sidep.isVisible()) {
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
+            }
             sidep.setVisible(false);
 
         }

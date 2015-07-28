@@ -25,7 +25,7 @@ import net.sf.jabref.undo.UndoableInsertEntry;
  */
 public final class EntryFromFileCreatorManager {
 
-    private List<EntryFromFileCreator> entryCreators;
+    private final List<EntryFromFileCreator> entryCreators;
 
 
     public EntryFromFileCreatorManager() {
@@ -47,7 +47,7 @@ public final class EntryFromFileCreatorManager {
     private boolean hasSpecialisedCreatorForExternalFileType(
             ExternalFileType externalFileType) {
         for (EntryFromFileCreator entryCreator : entryCreators) {
-            if (entryCreator.getExternalFileType() == null || entryCreator.getExternalFileType().getExtension() == null) {
+            if ((entryCreator.getExternalFileType() == null) || (entryCreator.getExternalFileType().getExtension() == null)) {
                 continue;
             }
             if (entryCreator.getExternalFileType().getExtension().equals(
@@ -66,7 +66,7 @@ public final class EntryFromFileCreatorManager {
      * @return null if there is no EntryFromFileCreator for this File.
      */
     public EntryFromFileCreator getEntryCreator(File file) {
-        if (file == null || !file.exists()) {
+        if ((file == null) || !file.exists()) {
             return null;
         }
         for (EntryFromFileCreator creator : entryCreators) {
@@ -128,7 +128,7 @@ public final class EntryFromFileCreatorManager {
                     entry.setType(entryType);
                 }
                 if (entry.getId() == null) {
-                    entry.setId(Util.createNeutralId());
+                    entry.setId(IdGenerator.next());
                 }
                 /*
                  * TODO: database.insertEntry(BibtexEntry) is not sensible. Why
@@ -143,8 +143,9 @@ public final class EntryFromFileCreatorManager {
                                 + ": Insert into BibtexDatabase failed.");
                     } else {
                         count++;
-                        if (panel != null)
+                        if (panel != null) {
                             ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                        }
                     }
                 }
             } else {
@@ -152,8 +153,9 @@ public final class EntryFromFileCreatorManager {
                         + ": Unknown filetype.");
             }
 
-            if (changeListener != null)
+            if (changeListener != null) {
                 changeListener.stateChanged(new ChangeEvent(this));
+            }
         }
 
         System.out.println("count = " + count);
@@ -176,12 +178,13 @@ public final class EntryFromFileCreatorManager {
      * @return A {@link FileFilter} that accepts all files for which creators
      *         exist.
      */
-    public FileFilter getFileFilter() {
+    private FileFilter getFileFilter() {
         return new FileFilter() {
 
             /**
              * Accepts all files, which are accepted by any known creator.
              */
+            @Override
             public boolean accept(File file) {
                 for (EntryFromFileCreator creator : entryCreators) {
                     if (creator.accept(file)) {

@@ -23,10 +23,11 @@ import net.sf.jabref.Globals;
 
 public class UndoableStringChange extends AbstractUndoableEdit {
 
-    private BibtexString string;
-    private String oldValue, newValue;
-    private boolean nameChange;
-    private BasePanel panel;
+    private final BibtexString string;
+    private final String oldValue;
+    private final String newValue;
+    private final boolean nameChange;
+    private final BasePanel panel;
 
 
     public UndoableStringChange(BasePanel panel,
@@ -39,16 +40,19 @@ public class UndoableStringChange extends AbstractUndoableEdit {
         this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": "
                 + Globals.lang(nameChange ? "change string name" : "change string content");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": "
                 + Globals.lang(nameChange ? "change string name" : "change string content");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -56,24 +60,27 @@ public class UndoableStringChange extends AbstractUndoableEdit {
 
         panel.assureStringDialogNotEditing();
 
-        if (nameChange)
+        if (nameChange) {
             string.setName(oldValue);
-        else
+        } else {
             string.setContent(oldValue);
+        }
 
         panel.updateStringDialog();
     }
 
+    @Override
     public void redo() {
         super.redo();
 
         // Redo the change.
 
         panel.assureStringDialogNotEditing();
-        if (nameChange)
+        if (nameChange) {
             string.setName(newValue);
-        else
+        } else {
             string.setContent(newValue);
+        }
 
         panel.updateStringDialog();
     }

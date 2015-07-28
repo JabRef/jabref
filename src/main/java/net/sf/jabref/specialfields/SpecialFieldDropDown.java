@@ -38,8 +38,9 @@ public class SpecialFieldDropDown {
         JButton button = new JButton(field.getRepresentingIcon());
         button.setToolTipText(field.getToolTip());
         button.setPreferredSize(buttonDim);
-        if (!Globals.ON_MAC)
+        if (!Globals.ON_MAC) {
             button.setMargin(new Insets(1, 0, 2, 0));
+        }
         button.setBorder(null);
         button.setBorderPainted(false);
         button.setRolloverEnabled(true);
@@ -57,10 +58,10 @@ public class SpecialFieldDropDown {
     private static class MenuButtonActionListener implements ActionListener {
 
         private JPopupMenu popup;
-        private Dimension dim;
-        private JabRefFrame frame;
-        private SpecialField field;
-        private JButton button;
+        private final Dimension dim;
+        private final JabRefFrame frame;
+        private final SpecialField field;
+        private final JButton button;
 
 
         public MenuButtonActionListener(SpecialField field, JabRefFrame frame, JButton button, Dimension dim) {
@@ -70,6 +71,7 @@ public class SpecialFieldDropDown {
             this.button = button;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (popup == null) {
                 popup = new JPopupMenu();
@@ -88,8 +90,8 @@ public class SpecialFieldDropDown {
 
         private class PopupitemActionListener implements ActionListener {
 
-            private BasePanel panel;
-            private String actionName;
+            private final BasePanel panel;
+            private final String actionName;
 
 
             public PopupitemActionListener(BasePanel panel, String actionName) {
@@ -97,6 +99,7 @@ public class SpecialFieldDropDown {
                 this.actionName = actionName;
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 panel.runCommand(actionName);
                 popup.setVisible(false);

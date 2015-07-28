@@ -30,6 +30,8 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -38,30 +40,29 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * 
  * This action goes through all selected entries in the BasePanel, and attempts
  * to write the XMP data to the external pdf.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class WriteXMPAction extends AbstractWorker {
 
-    BasePanel panel;
+    private final BasePanel panel;
 
-    BibtexEntry[] entries;
+    private BibtexEntry[] entries;
 
-    BibtexDatabase database;
+    private BibtexDatabase database;
 
-    OptionsDialog optDiag;
+    private OptionsDialog optDiag;
 
-    boolean goOn = true;
+    private boolean goOn = true;
 
-    int skipped, entriesChanged, errors;
+    private int skipped;
+    private int entriesChanged;
+    private int errors;
 
 
     public WriteXMPAction(BasePanel panel) {
         this.panel = panel;
     }
 
+    @Override
     public void init() {
 
         database = panel.getDatabase();
@@ -103,10 +104,12 @@ public class WriteXMPAction extends AbstractWorker {
         panel.output(Globals.lang("Writing XMP metadata..."));
     }
 
+    @Override
     public void run() {
 
-        if (!goOn)
+        if (!goOn) {
             return;
+        }
 
         for (BibtexEntry entry : entries) {
 
@@ -116,9 +119,10 @@ public class WriteXMPAction extends AbstractWorker {
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
             String[] dirs = panel.metaData().getFileDirectory("pdf");
-            File f = Util.expandFilename(pdf, dirs);
-            if (f != null)
+            File f = FileUtil.expandFilename(pdf, dirs);
+            if (f != null) {
                 files.add(f);
+            }
 
             // Then check the "file" field:
             dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
@@ -129,9 +133,10 @@ public class WriteXMPAction extends AbstractWorker {
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
                     if ((flEntry.getType() != null) && (flEntry.getType().getName().toLowerCase().equals("pdf"))) {
-                        f = Util.expandFilename(flEntry.getLink(), dirs);
-                        if (f != null)
+                        f = FileUtil.expandFilename(flEntry.getLink(), dirs);
+                        if (f != null) {
                             files.add(f);
+                        }
                     }
                 }
             }
@@ -141,7 +146,7 @@ public class WriteXMPAction extends AbstractWorker {
             if (files.size() == 0) {
                 skipped++;
                 optDiag.progressArea.append("  " + Globals.lang("Skipped - No PDF linked") + ".\n");
-            } else
+            } else {
                 for (File file : files) {
                     if (!file.exists()) {
                         skipped++;
@@ -162,6 +167,7 @@ public class WriteXMPAction extends AbstractWorker {
                         }
                     }
                 }
+            }
 
             if (optDiag.canceled) {
                 optDiag.progressArea.append("\n"
@@ -175,9 +181,11 @@ public class WriteXMPAction extends AbstractWorker {
         optDiag.done();
     }
 
+    @Override
     public void update() {
-        if (!goOn)
+        if (!goOn) {
             return;
+        }
 
         panel.output(Globals.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
@@ -188,12 +196,13 @@ public class WriteXMPAction extends AbstractWorker {
 
         private static final long serialVersionUID = 7459164400811785958L;
 
-        JButton okButton = new JButton(Globals.lang("Ok")), cancelButton = new JButton(
+        final JButton okButton = new JButton(Globals.lang("Ok"));
+        final JButton cancelButton = new JButton(
                 Globals.lang("Cancel"));
 
         boolean canceled;
 
-        JTextArea progressArea;
+        final JTextArea progressArea;
 
 
         public OptionsDialog(JFrame parent) {
@@ -202,6 +211,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             okButton.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
@@ -212,6 +222,7 @@ public class WriteXMPAction extends AbstractWorker {
                 private static final long serialVersionUID = -338601477652815366L;
 
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     canceled = true;
                 }

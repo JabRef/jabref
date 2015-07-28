@@ -36,6 +36,7 @@ public class BiblioscapeImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "Biblioscape";
     }
@@ -44,6 +45,7 @@ public class BiblioscapeImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "biblioscape";
     }
@@ -51,6 +53,7 @@ public class BiblioscapeImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
         return true;
     }
@@ -59,6 +62,7 @@ public class BiblioscapeImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
@@ -69,7 +73,9 @@ public class BiblioscapeImporter extends ImportFormat {
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
             if (line.length() == 0)
+             {
                 continue; // ignore empty lines, e.g. at file
+            }
             // end
             // entry delimiter -> item complete
             if (line.equals("------")) {
@@ -82,224 +88,198 @@ public class BiblioscapeImporter extends ImportFormat {
                 Vector<String> comments = new Vector<String>();
                 // add item
                 for (Map.Entry<String, StringBuffer> entry : lines.entrySet()) {
-                    if (entry.getKey().equals("AU"))
+                    if (entry.getKey().equals("AU")) {
                         hm.put("author", entry.getValue()
                                 .toString());
-                    else if (entry.getKey().equals("TI"))
+                    } else if (entry.getKey().equals("TI")) {
                         titleTI = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("ST"))
+                    } else if (entry.getKey().equals("ST")) {
                         titleST = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("YP"))
+                    } else if (entry.getKey().equals("YP")) {
                         hm.put("year", entry
                                 .getValue().toString());
-                    else if (entry.getKey().equals("VL"))
+                    } else if (entry.getKey().equals("VL")) {
                         hm.put("volume", entry
                                 .getValue().toString());
-                    else if (entry.getKey().equals("NB"))
+                    } else if (entry.getKey().equals("NB")) {
                         hm.put("number", entry
                                 .getValue().toString());
-                    else if (entry.getKey().equals("PS"))
+                    } else if (entry.getKey().equals("PS")) {
                         pages[0] = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("PE"))
+                    } else if (entry.getKey().equals("PE")) {
                         pages[1] = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("KW"))
+                    } else if (entry.getKey().equals("KW")) {
                         hm.put("keywords", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("RM"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("RU"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("RT"))
+                    } else if (entry.getKey().equals("RT")) {
                         type[0] = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("SB"))
+                    } else if (entry.getKey().equals("SB")) {
                         comments.add("Subject: "
                                 + entry.getValue().toString());
-                    else if (entry.getKey().equals("SA"))
+                    } else if (entry.getKey().equals("SA")) {
                         comments
                                 .add("Secondary Authors: " + entry.getValue().toString());
-                    else if (entry.getKey().equals("NT"))
+                    } else if (entry.getKey().equals("NT")) {
                         hm.put("note", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("PP"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("PB"))
+                    } else if (entry.getKey().equals("PB")) {
                         hm.put("publisher", entry
                                 .getValue().toString());
-                    else if (entry.getKey().equals("TA"))
+                    } else if (entry.getKey().equals("TA")) {
                         comments
                                 .add("Tertiary Authors: " + entry.getValue().toString());
-                    else if (entry.getKey().equals("TT"))
+                    } else if (entry.getKey().equals("TT")) {
                         comments
                                 .add("Tertiary Title: " + entry.getValue().toString());
-                    else if (entry.getKey().equals("ED"))
+                    } else if (entry.getKey().equals("ED")) {
                         hm.put("edition", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("DP"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("TW"))
+                    } else if (entry.getKey().equals("TW")) {
                         type[1] = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("QA"))
+                    } else if (entry.getKey().equals("QA")) {
                         comments
                                 .add("Quaternary Authors: " + entry.getValue().toString());
-                    else if (entry.getKey().equals("QT"))
+                    } else if (entry.getKey().equals("QT")) {
                         comments
                                 .add("Quaternary Title: " + entry.getValue().toString());
-                    else if (entry.getKey().equals("IS"))
+                    } else if (entry.getKey().equals("IS")) {
                         hm.put("isbn", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("LA"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("AB"))
+                    } else if (entry.getKey().equals("AB")) {
                         hm.put("abstract", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("DI"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("DM"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("AV"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("PR"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("LO"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("AD"))
+                    } else if (entry.getKey().equals("AD")) {
                         address = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("LG"))
+                    } else if (entry.getKey().equals("LG")) {
                         hm.put("language", entry
                                 .getValue().toString());
-                    else if (entry.getKey().equals("CO"))
+                    } else if (entry.getKey().equals("CO")) {
                         country = entry.getValue()
                                 .toString();
-                    else if (entry.getKey().equals("UR") || entry.getKey().equals("AT")) {
+                    } else if (entry.getKey().equals("UR") || entry.getKey().equals("AT")) {
                         String s = entry.getValue().toString().trim();
                         hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? "url"
                                 : "pdf", entry.getValue().toString());
-                    } else if (entry.getKey().equals("C1"))
+                    } else if (entry.getKey().equals("C1")) {
                         comments.add("Custom1: "
                                 + entry.getValue().toString());
-                    else if (entry.getKey().equals("C2"))
+                    } else if (entry.getKey().equals("C2")) {
                         comments.add("Custom2: "
                                 + entry.getValue().toString());
-                    else if (entry.getKey().equals("C3"))
+                    } else if (entry.getKey().equals("C3")) {
                         comments.add("Custom3: "
                                 + entry.getValue().toString());
-                    else if (entry.getKey().equals("C4"))
+                    } else if (entry.getKey().equals("C4")) {
                         comments.add("Custom4: "
                                 + entry.getValue().toString());
-                    //else if (entry.getKey().equals("RD"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("MB"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("C5"))
+                    } else if (entry.getKey().equals("C5")) {
                         comments.add("Custom5: "
                                 + entry.getValue().toString());
-                    else if (entry.getKey().equals("C6"))
+                    } else if (entry.getKey().equals("C6")) {
                         comments.add("Custom6: "
                                 + entry.getValue().toString());
-                    //else if (entry.getKey().equals("FA"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("CN"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("DE"))
+                    } else if (entry.getKey().equals("DE")) {
                         hm.put("annote", entry
                                 .getValue().toString());
-                    //else if (entry.getKey().equals("RP"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("DF"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("RS"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("CA"))
+                    } else if (entry.getKey().equals("CA")) {
                         comments.add("Categories: "
                                 + entry.getValue().toString());
-                    //else if (entry.getKey().equals("WP"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("TH"))
+                    } else if (entry.getKey().equals("TH")) {
                         comments.add("Short Title: "
                                 + entry.getValue().toString());
-                    //else if (entry.getKey().equals("WR"))
-                    // hm.put("",entry.getValue().toString());
-                    //else if (entry.getKey().equals("EW"))
-                    // hm.put("",entry.getValue().toString());
-                    else if (entry.getKey().equals("SE"))
+                    } else if (entry.getKey().equals("SE"))
+                     {
                         hm.put("chapter", entry
                                 .getValue().toString());
                     //else if (entry.getKey().equals("AC"))
                     // hm.put("",entry.getValue().toString());
                     //else if (entry.getKey().equals("LP"))
                     // hm.put("",entry.getValue().toString());
+                    }
                 }
 
                 String bibtexType = "misc";
                 // to find type, first check TW, then RT
-                for (int i = 1; i >= 0 && bibtexType.equals("misc"); --i) {
-                    if (type[i] == null)
+                for (int i = 1; (i >= 0) && bibtexType.equals("misc"); --i) {
+                    if (type[i] == null) {
                         continue;
+                    }
                     type[i] = type[i].toLowerCase();
-                    if (type[i].contains("article"))
+                    if (type[i].contains("article")) {
                         bibtexType = "article";
-                    else if (type[i].contains("journal"))
+                    } else if (type[i].contains("journal")) {
                         bibtexType = "article";
-                    else if (type[i].contains("book section"))
+                    } else if (type[i].contains("book section")) {
                         bibtexType = "inbook";
-                    else if (type[i].contains("book"))
+                    } else if (type[i].contains("book")) {
                         bibtexType = "book";
-                    else if (type[i].contains("conference"))
+                    } else if (type[i].contains("conference")) {
                         bibtexType = "inproceedings";
-                    else if (type[i].contains("proceedings"))
+                    } else if (type[i].contains("proceedings")) {
                         bibtexType = "inproceedings";
-                    else if (type[i].contains("report"))
+                    } else if (type[i].contains("report")) {
                         bibtexType = "techreport";
-                    else if (type[i].contains("thesis")
-                            && type[i].contains("master"))
+                    } else if (type[i].contains("thesis")
+                            && type[i].contains("master")) {
                         bibtexType = "mastersthesis";
-                    else if (type[i].contains("thesis"))
+                    } else if (type[i].contains("thesis")) {
                         bibtexType = "phdthesis";
+                    }
                 }
 
                 // depending on bibtexType, decide where to place the titleRT and
                 // titleTI
                 if (bibtexType.equals("article")) {
-                    if (titleST != null)
+                    if (titleST != null) {
                         hm.put("journal", titleST);
-                    if (titleTI != null)
+                    }
+                    if (titleTI != null) {
                         hm.put("title", titleTI);
+                    }
                 } else if (bibtexType.equals("inbook")) {
-                    if (titleST != null)
+                    if (titleST != null) {
                         hm.put("booktitle", titleST);
-                    if (titleTI != null)
+                    }
+                    if (titleTI != null) {
                         hm.put("title", titleTI);
+                    }
                 } else {
                     if (titleST != null)
+                     {
                         hm.put("booktitle", titleST); // should not
+                    }
                                                       // happen, I
                                                       // think
-                    if (titleTI != null)
+                    if (titleTI != null) {
                         hm.put("title", titleTI);
+                    }
                 }
 
                 // concatenate pages
-                if (pages[0] != null || pages[1] != null)
+                if ((pages[0] != null) || (pages[1] != null)) {
                     hm.put("pages",
                             (pages[0] != null ? pages[0] : "")
                                     + (pages[1] != null ? "--" + pages[1] : ""));
+                }
 
                 // concatenate address and country
-                if (address != null)
+                if (address != null) {
                     hm.put("address", address
                             + (country != null ? ", " + country : ""));
+                }
 
                 if (comments.size() > 0) { // set comment if present
                     StringBuilder s = new StringBuilder();
-                    for (int i = 0; i < comments.size(); ++i)
+                    for (int i = 0; i < comments.size(); ++i) {
                         s.append(i > 0 ? "; " : "").append(comments.elementAt(i));
+                    }
                     hm.put("comment", s.toString());
                 }
                 BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
@@ -314,15 +294,16 @@ public class BiblioscapeImporter extends ImportFormat {
                 continue;
             }
             // new key
-            if (line.startsWith("--") && line.length() >= 7
+            if (line.startsWith("--") && (line.length() >= 7)
                     && line.substring(4, 7).equals("-- ")) {
                 lines.put(line.substring(2, 4), previousLine = new StringBuffer(line
                         .substring(7)));
                 continue;
             }
             // continuation (folding) of previous line
-            if (previousLine == null) // sanity check; should never happen
+            if (previousLine == null) {
                 return null;
+            }
             previousLine.append(line.trim());
         }
 

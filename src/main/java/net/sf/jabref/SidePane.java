@@ -25,19 +25,16 @@ import javax.swing.JScrollPane;
 /**
  * The side pane is displayed at the right side of JabRef and shows instances of
  * SidePaneComponents, for instance the GroupSelector, or the SearchManager2.
- * 
- * @version $Revision$ ($Date$)
- * 
  */
 public class SidePane extends JPanel {
 
-    final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
+    private final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
 
-    GridBagLayout gridBagLayout = new GridBagLayout();
+    private final GridBagLayout gridBagLayout = new GridBagLayout();
 
-    GridBagConstraints constraint = new GridBagConstraints();
+    private final GridBagConstraints constraint = new GridBagConstraints();
 
-    JPanel mainPanel = new JPanel();
+    private final JPanel mainPanel = new JPanel();
 
 
     public SidePane() {
@@ -85,14 +82,17 @@ public class SidePane extends JPanel {
         repaint();
     }
 
+    @Override
     public void remove(Component c) {
         mainPanel.remove(c);
     }
 
+    @Override
     public Dimension getMaximumSize() {
         return getPreferredSize();
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return PREFERRED_SIZE;
     }

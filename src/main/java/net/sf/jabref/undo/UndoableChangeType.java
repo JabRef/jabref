@@ -25,8 +25,9 @@ import net.sf.jabref.BibtexEntryType;
  */
 public class UndoableChangeType extends AbstractUndoableEdit {
 
-    BibtexEntryType oldType, newType;
-    BibtexEntry be;
+    private final BibtexEntryType oldType;
+    private final BibtexEntryType newType;
+    private final BibtexEntry be;
 
 
     public UndoableChangeType(BibtexEntry be, BibtexEntryType oldType,
@@ -36,19 +37,23 @@ public class UndoableChangeType extends AbstractUndoableEdit {
         this.be = be;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return "Undo: change type";
     }
 
+    @Override
     public String getRedoPresentationName() {
         return "Redo: change type";
     }
 
+    @Override
     public void undo() {
         super.undo();
         be.setType(oldType);
     }
 
+    @Override
     public void redo() {
         super.redo();
         be.setType(newType);

@@ -22,6 +22,8 @@ import net.sf.jabref.GUIGlobals;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
+
 /**
  * Created by IntelliJ IDEA.
  * User: alver
@@ -31,17 +33,18 @@ import java.awt.event.ActionEvent;
  */
 public class PluginInstallerAction extends MnemonicAwareAction {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public PluginInstallerAction(JabRefFrame frame) {
         super(GUIGlobals.getImage("plugin"));
         //System.out.println();
         this.frame = frame;
-        putValue(NAME, Globals.menuTitle("Manage plugins"));
+        putValue(Action.NAME, Globals.menuTitle("Manage plugins"));
 
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         ManagePluginsDialog mpd = new ManagePluginsDialog(frame);
         mpd.setVisible(true);

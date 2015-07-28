@@ -29,7 +29,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 
 /**
- * A UI delegate for JLabel that rotates the label 90�
+ * A UI delegate for JLabel that rotates the label 90°
  * <P>
  * Extends {@link BasicLabelUI}.
  * <P>
@@ -46,10 +46,10 @@ public class VerticalLabelUI extends BasicLabelUI {
 
     private boolean clockwise = false;
     // see comment in BasicLabelUI
-    Rectangle verticalViewR = new Rectangle();
-    Rectangle verticalIconR = new Rectangle();
-    Rectangle verticalTextR = new Rectangle();
-    protected static VerticalLabelUI verticalLabelUI =
+    private Rectangle verticalViewR = new Rectangle();
+    private Rectangle verticalIconR = new Rectangle();
+    private Rectangle verticalTextR = new Rectangle();
+    private static final VerticalLabelUI verticalLabelUI =
             new VerticalLabelUI();
     private final static VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
             new VerticalLabelUI();
@@ -59,7 +59,7 @@ public class VerticalLabelUI extends BasicLabelUI {
      * Constructs a <code>VerticalLabelUI</code> with the default anticlockwise
      * rotation
      */
-    public VerticalLabelUI() {
+    private VerticalLabelUI() {
     }
 
     /**
@@ -76,9 +76,9 @@ public class VerticalLabelUI extends BasicLabelUI {
      */
     public static ComponentUI createUI(JComponent c) {
         if (System.getSecurityManager() != null) {
-            return SAFE_VERTICAL_LABEL_UI;
+            return VerticalLabelUI.SAFE_VERTICAL_LABEL_UI;
         } else {
-            return verticalLabelUI;
+            return VerticalLabelUI.verticalLabelUI;
         }
     }
 

@@ -33,17 +33,20 @@ public class CountingUndoManager extends UndoManager {
         panel = basePanel;
     }
 
+    @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
         current++;
         return super.addEdit(edit);
     }
 
+    @Override
     public synchronized void undo() throws CannotUndoException {
         super.undo();
         current--;
         panel.updateEntryEditorIfShowing();
     }
 
+    @Override
     public synchronized void redo() throws CannotUndoException {
         super.redo();
         current++;

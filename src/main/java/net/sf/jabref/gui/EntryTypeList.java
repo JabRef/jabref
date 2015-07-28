@@ -28,7 +28,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.CustomEntryType;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
@@ -37,7 +37,7 @@ import net.sf.jabref.Util;
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener, ActionListener {
 
-    protected JButton def = new JButton(Globals.lang("Default"));
+    private final JButton def = new JButton(Globals.lang("Default"));
 
 
     /** Creates a new instance of EntryTypeList */
@@ -56,12 +56,15 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         remove.setEnabled(false);
     }
 
+    @Override
     protected void addField(String s) {
         s = s.trim();
-        if (forceLowerCase)
+        if (forceLowerCase) {
             s = s.toLowerCase();
-        if (s.equals("") || listModel.contains(s))
+        }
+        if (s.equals("") || listModel.contains(s)) {
             return;
+        }
 
         String testString = Util.checkLegalKey(s);
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
@@ -80,11 +83,13 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         addFieldUncritically(s);
     }
 
+    @Override
     protected void removeSelected() {
         //super.removeSelected();
         int[] selected = list.getSelectedIndices();
-        if (selected.length > 0)
+        if (selected.length > 0) {
             changesMade = true;
+        }
         for (int i = 0; i < selected.length; i++) {
             String typeName = (String) listModel.get(selected[selected.length - 1 - i]);
             BibtexEntryType type = BibtexEntryType.getType(typeName);
@@ -94,14 +99,15 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             // in this case as well. If it is a standard type it cannot be removed.
             if ((type != null) && (type instanceof CustomEntryType)) {
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
-            }
-            else
+            } else {
                 // This shouldn't happen, since the Remove button should be disabled.
                 JOptionPane.showMessageDialog(null, Globals.lang("This entry type cannot be removed."),
                         Globals.lang("Remove entry type"), JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent e) {
 
     }
@@ -113,8 +119,9 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
             if (isChanged || (BibtexEntryType.getType(typeName) instanceof CustomEntryType)) {
                 def.setEnabled(true);
-            } else
+            } else {
                 def.setEnabled(false);
+            }
 
             remove.setEnabled(false);
         } else {
@@ -127,14 +134,17 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         def.addActionListener(l);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         // Default button pressed.
-        if (e.getSource() == def)
+        if (e.getSource() == def) {
             def.setEnabled(false);
-        else
+        } else {
             super.actionPerformed(e);
+        }
     }
 
+    @Override
     public void setEnabled(boolean en) {
         super.setEnabled(en);
         def.setEnabled(en);

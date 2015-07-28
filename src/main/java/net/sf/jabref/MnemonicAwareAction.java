@@ -35,9 +35,10 @@ public abstract class MnemonicAwareAction extends AbstractAction {
     public MnemonicAwareAction(ImageIcon icon) {
         //super(icon);
 
-        putValue(SMALL_ICON, icon);
+        putValue(Action.SMALL_ICON, icon);
     }
 
+    @Override
     public void putValue(String key, Object value) {
         if (key.equals(Action.NAME)) {
             String name = Globals.menuTitle(value.toString());
@@ -46,8 +47,9 @@ public abstract class MnemonicAwareAction extends AbstractAction {
                 char mnemonic = Character.toUpperCase(name.charAt(i + 1));
                 putValue(Action.MNEMONIC_KEY, new Integer(mnemonic));
                 value = name.substring(0, i) + name.substring(i + 1);
-            } else
+            } else {
                 value = name;
+            }
         }
         super.putValue(key, value);
     }

@@ -24,7 +24,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 
@@ -40,20 +40,24 @@ public class FileListTableModel extends AbstractTableModel {
     public FileListTableModel() {
     }
 
+    @Override
     public int getRowCount() {
         synchronized (list) {
             return list.size();
         }
     }
 
+    @Override
     public int getColumnCount() {
         return 3;
     }
 
+    @Override
     public Class<String> getColumnClass(int columnIndex) {
         return String.class;
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         synchronized (list) {
             FileListEntry entry = list.get(rowIndex);
@@ -95,16 +99,19 @@ public class FileListTableModel extends AbstractTableModel {
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         fireTableRowsInserted(index, index);
                     }
                 });
-            } else
+            } else {
                 fireTableRowsInserted(index, index);
+            }
         }
 
     }
 
+    @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     }
 
@@ -121,8 +128,9 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
-        if (value == null)
+        if (value == null) {
             value = "";
+        }
         ArrayList<FileListEntry> newList = new ArrayList<FileListEntry>();
         StringBuilder sb = new StringBuilder();
         ArrayList<String> thisEntry = new ArrayList<String>();
@@ -138,8 +146,9 @@ public class FileListTableModel extends AbstractTableModel {
             // as "&#44;", because we need to know in order to ignore the semicolon.
             else if (!escaped && (c == '&') && !inXmlChar) {
                 sb.append(c);
-                if ((value.length() > i + 1) && (value.charAt(i + 1) == '#'))
+                if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
                     inXmlChar = true;
+                }
             }
             // Check if we are exiting an XML special character construct:
             else if (!escaped && inXmlChar && (c == ';')) {
@@ -153,24 +162,26 @@ public class FileListTableModel extends AbstractTableModel {
             else if (!escaped && (c == ';') && !inXmlChar) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
-                if (firstOnly)
+                if (firstOnly) {
                     return decodeEntry(thisEntry, deduceUnknownTypes);
-                else {
+                } else {
                     newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
                     thisEntry.clear();
                 }
-            }
-            else
+            } else {
                 sb.append(c);
+            }
             escaped = false;
         }
-        if (sb.length() > 0)
+        if (sb.length() > 0) {
             thisEntry.add(sb.toString());
-        if (thisEntry.size() > 0) {
-            if (firstOnly)
+        }
+        if (!thisEntry.isEmpty()) {
+            if (firstOnly) {
                 return decodeEntry(thisEntry, deduceUnknownTypes);
-            else
+            } else {
                 newList.add(decodeEntry(thisEntry, deduceUnknownTypes));
+            }
         }
 
         synchronized (list) {
@@ -194,8 +205,9 @@ public class FileListTableModel extends AbstractTableModel {
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true, true);
-        if (entry == null || entry.getType() == null)
+        if ((entry == null) || (entry.getType() == null)) {
             return null;
+        }
         return entry.getType().getIconLabel();
     }
 
@@ -214,12 +226,13 @@ public class FileListTableModel extends AbstractTableModel {
                 ExternalFileType typeGuess = null;
                 String link = getElementIfAvailable(contents, 1);
                 int index = link.lastIndexOf('.');
-                if ((index >= 0) && (index < link.length() - 1)) {
+                if ((index >= 0) && (index < (link.length() - 1))) {
                     String extension = link.substring(index + 1);
                     typeGuess = Globals.prefs.getExternalFileTypeByExt(extension);
                 }
-                if (typeGuess != null)
+                if (typeGuess != null) {
                     type = typeGuess;
+                }
             }
         }
 
@@ -229,10 +242,11 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private String getElementIfAvailable(ArrayList<String> contents, int index) {
-        if (index < contents.size())
+        if (index < contents.size()) {
             return contents.get(index);
-        else
+        } else {
             return "";
+        }
     }
 
     /**
@@ -245,8 +259,9 @@ public class FileListTableModel extends AbstractTableModel {
         for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
             FileListEntry entry = iterator.next();
             sb.append(encodeEntry(entry));
-            if (iterator.hasNext())
+            if (iterator.hasNext()) {
                 sb.append(';');
+            }
         }
         return sb.toString();
     }
@@ -261,8 +276,9 @@ public class FileListTableModel extends AbstractTableModel {
         for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
             FileListEntry entry = iterator.next();
             sb.append(entry.getDescription()).append(" (").append(entry.getLink()).append(')');
-            if (iterator.hasNext())
+            if (iterator.hasNext()) {
                 sb.append("<br>");
+            }
         }
         return sb.append("</html>").toString();
     }

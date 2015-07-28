@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -47,9 +47,10 @@ public class PostgreSQLExporter extends DBExporter {
      * @return The singleton instance of the PostgreSQLExporter
      */
     public static PostgreSQLExporter getInstance() {
-        if (instance == null)
-            instance = new PostgreSQLExporter();
-        return instance;
+        if (PostgreSQLExporter.instance == null) {
+            PostgreSQLExporter.instance = new PostgreSQLExporter();
+        }
+        return PostgreSQLExporter.instance;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class PostgreSQLExporter extends DBExporter {
                 dbstrings.getUsername(), dbstrings.getPassword());
         ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(conn,
                 "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='"
-                        + dbStrings.getDatabase() + "'")).getResultSet();
+                        + dbStrings.getDatabase() + '\'')).getResultSet();
         rs.next();
         if (rs.getInt("alreadyThere") == 0) {
             SQLUtil.processQuery(conn, "CREATE DATABASE " + dbStrings.getDatabase());
@@ -122,7 +123,7 @@ public class PostgreSQLExporter extends DBExporter {
                 "SELECT create_table_if_not_exists ('CREATE TABLE entries ( \n"
                         + "entries_id      SERIAL, \n"
                         + "jabref_eid      VARCHAR("
-                        + Util.getMinimumIntegerDigits()
+                        + IdGenerator.getMinimumIntegerDigits()
                         + ")   DEFAULT NULL, \n"
                         + "database_id INTEGER, \n"
                         + "entry_types_id  INTEGER DEFAULT NULL, \n"

@@ -57,6 +57,7 @@ public class FileListEntry {
         this.type = type;
     }
 
+    @Override
     public String toString() {
         return description + " : " + link + " : " + type;
     }

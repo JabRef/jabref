@@ -22,9 +22,9 @@ plugins {
 apply plugin: "fatjar"
 apply plugin: "java"
 apply plugin: "eclipse"
-apply plugin: "idea"
 apply plugin: "application"
 apply plugin: "project-report"
+apply plugin: "sonar-runner"
 
 /* disabled, because plugin requires Java 1.8
 format {
@@ -64,20 +64,21 @@ sourceSets {
 configurations {
     generateClasspath
     antlr3
-    antlr2
+    antlr4
 }
 
 dependencies {
 
     // jgoodies
-    compile 'com.jgoodies:jgoodies-common:1.4.0'
-    compile 'com.jgoodies:jgoodies-forms:1.6.0'
-    compile 'com.jgoodies:jgoodies-looks:2.5.2'
-    compile fileTree(dir: 'lib/jgoodies/', includes: ['*.jar']) // instead of having the source code inside
+    compile 'com.jgoodies:jgoodies-common:1.7.0'
+    compile 'com.jgoodies:jgoodies-forms:1.7.2'
+    compile 'com.jgoodies:jgoodies-looks:2.5.3'
+    
+    compile 'org.swinglabs:swingx:1.6.1'
 
-    compile 'org.apache.pdfbox:pdfbox:1.7.1'
-    compile 'org.apache.pdfbox:fontbox:1.7.1'
-    compile 'org.apache.pdfbox:jempbox:1.7.1'
+    compile 'org.apache.pdfbox:pdfbox:1.8.9'
+    compile 'org.apache.pdfbox:fontbox:1.8.9'
+    compile 'org.apache.pdfbox:jempbox:1.8.9'
 
     compile 'commons-cli:commons-cli:1.3.1'
 
@@ -86,23 +87,27 @@ dependencies {
     compile 'org.openoffice:ridl:3.2.1'
     compile 'org.openoffice:unoil:3.2.1'
 
-    antlr2 'antlr:antlr:2.7.7'
-    antlr3 'org.antlr:antlr:3.4'
-    compile 'org.antlr:antlr-runtime:3.4'
+    antlr3 'org.antlr:antlr:3.5.2'
+    compile 'org.antlr:antlr-runtime:3.5.2'
 
-    compile 'mysql:mysql-connector-java:5.0.7'
-    compile 'org.postgresql:postgresql:9.2-1002-jdbc4'
+    antlr4 'org.antlr:antlr4:4.5.1'
+    compile 'org.antlr:antlr4-runtime:4.5.1'
 
-    compile 'net.java.dev.glazedlists:glazedlists_java15:1.8.0'
+    compile 'mysql:mysql-connector-java:5.1.36'
+    compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
+
+    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
-    compile 'commons-logging:commons-logging:1.0.2'
+    compile 'com.google.guava:guava:18.0'
+
+    compile 'commons-logging:commons-logging:1.2'
     // not available in maven repository
     compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
-    compile 'junit:junit:4.12'
+   compile 'junit:junit:4.12'
 
     generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
 }
@@ -127,7 +132,7 @@ task wrapper(type: Wrapper) {
 compileJava {
     // files are all encoded using UTF-8
     options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Xlint:none"
 }
 
 compileTestJava {
@@ -147,7 +152,7 @@ javadoc {
 // jabref specific tasks
 compileJava.dependsOn "generateSource"
 
-task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchTreeParserSource"]) {
+task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
 }
@@ -181,83 +186,30 @@ task generateBstGrammarSource(type: JavaExec) {
     args = ["-o", file('src/main/gen/net/sf/jabref/bst/'), antlrSource]
 }
 
-task generateSearchLexerSource(type: JavaExec) {
-    String grammarFile = "Lexer"
+task generateSearchGrammarSource(type: JavaExec) {
+    String grammarFile = "Search"
 
     group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr2."
+    description "Generates java files for ${grammarFile}.g antlr4."
 
     String packagePath = "net/sf/jabref/search"
-    File antlr2Path = file("src/main/antlr2")
+    File antlrPath = file("src/main/antlr4")
     File genPath = file("src/main/gen")
 
-    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
+    File antlrSource = file("$antlrPath/$packagePath/${grammarFile}.g4")
     File destinationDir = file("$genPath/$packagePath")
 
     inputs.file antlrSource
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
+    outputs.file file("$destinationDir/${grammarFile}Parser.java")
+    outputs.file file("$destinationDir/${grammarFile}Lexer.java")
+    outputs.file file("$destinationDir/${grammarFile}Visitor.java")
+    outputs.file file("$destinationDir/${grammarFile}BaseVisitor.java")
+    outputs.file file("$destinationDir/${grammarFile}.tokens")
+    outputs.file file("$destinationDir/${grammarFile}Lexer.tokens")
 
-    main = 'antlr.Tool'
-    classpath = configurations.antlr2
-    args = ["-o", destinationDir, antlrSource]
-}
-
-task generateSearchParserSource(type: JavaExec, dependsOn: "generateSearchLexerSource") {
-    String grammarFile = "Parser"
-
-    group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr2."
-
-    String packagePath = "net/sf/jabref/search"
-    File antlr2Path = file("src/main/antlr2")
-    File genPath = file("src/main/gen")
-
-    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
-    File destinationDir = file("$genPath/$packagePath")
-
-    inputs.file antlrSource
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
-
-    main = 'antlr.Tool'
-    classpath = configurations.antlr2
-    args = ["-o", destinationDir, antlrSource]
-}
-
-task generateSearchTreeParserSource(type: JavaExec, dependsOn: "generateSearchParserSource") {
-    String grammarFile = "TreeParser"
-
-    group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr2."
-
-    String packagePath = "net/sf/jabref/search"
-    File antlr2Path = file("src/main/antlr2")
-    File genPath = file("src/main/gen")
-
-    File antlrSource = file("$antlr2Path/$packagePath/${grammarFile}.g")
-    File destinationDir = file("$genPath/$packagePath")
-
-    inputs.file antlrSource
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}.smap")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.java")
-    outputs.file file("$destinationDir/SearchExpression${grammarFile}TokenTypes.txt")
-
-    main = 'antlr.Tool'
-    classpath = configurations.antlr2
-    args = ["-o", destinationDir, antlrSource]
-}
-
-// git support in intellij idea
-idea.project.ipr {
-    withXml { provider ->
-        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
-    }
+    main = 'org.antlr.v4.Tool'
+    classpath = configurations.antlr4
+    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
 }
 
 apply plugin: 'jacoco'

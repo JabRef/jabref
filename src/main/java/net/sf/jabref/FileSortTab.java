@@ -40,14 +40,17 @@ import com.jgoodies.forms.layout.FormLayout;
 @SuppressWarnings("serial")
 public class FileSortTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
-    private JRadioButton saveInOriginalOrder, saveInTableOrder, saveInSpecifiedOrder;
+    private final JabRefPreferences _prefs;
+    private final JRadioButton saveInOriginalOrder;
+    private final JRadioButton saveInTableOrder;
+    private final JRadioButton saveInSpecifiedOrder;
     private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
     private JTextField savePriField, saveSecField, saveTerField;
     private JComboBox savePriSort, saveSecSort, saveTerSort;
 
-    private JRadioButton exportInOriginalOrder, exportInTableOrder, exportInSpecifiedOrder;
+    private final JRadioButton exportInOriginalOrder;
+    private final JRadioButton exportInTableOrder;
+    private final JRadioButton exportInSpecifiedOrder;
     private JCheckBox exportPriDesc, exportSecDesc, exportTerDesc;
     private JTextField exportPriField, exportSecField, exportTerField;
     private JComboBox exportPriSort, exportSecSort, exportTerSort;
@@ -55,7 +58,6 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
     public FileSortTab(JabRefFrame frame, JabRefPreferences prefs) {
         this._prefs = prefs;
-        this._frame = frame;
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.leadingColumnOffset(1);
@@ -73,6 +75,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
             ActionListener listener = new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean selected = e.getSource() == saveInSpecifiedOrder;
                     savePriSort.setEnabled(selected);
@@ -108,6 +111,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
             savePriSort.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (savePriSort.getSelectedIndex() > 0) {
                         savePriField.setText(savePriSort.getSelectedItem().toString());
@@ -117,6 +121,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             });
             saveSecSort.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (saveSecSort.getSelectedIndex() > 0) {
                         saveSecField.setText(saveSecSort.getSelectedItem().toString());
@@ -126,6 +131,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             });
             saveTerSort.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (saveTerSort.getSelectedIndex() > 0) {
                         saveTerField.setText(saveTerSort.getSelectedItem().toString());
@@ -189,6 +195,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
             ActionListener listener = new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean selected = e.getSource() == exportInSpecifiedOrder;
                     exportPriSort.setEnabled(selected);
@@ -224,6 +231,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
             exportPriSort.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (exportPriSort.getSelectedIndex() > 0) {
                         exportPriField.setText(exportPriSort.getSelectedItem().toString());
@@ -233,6 +241,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             });
             exportSecSort.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (exportSecSort.getSelectedIndex() > 0) {
                         exportSecField.setText(exportSecSort.getSelectedItem().toString());
@@ -242,6 +251,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
             });
             exportTerSort.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (exportTerSort.getSelectedIndex() > 0) {
                         exportTerField.setText(exportTerSort.getSelectedItem().toString());
@@ -298,6 +308,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
         if (_prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER)) {
             saveInOriginalOrder.setSelected(true);
@@ -366,6 +377,7 @@ public class FileSortTab extends JPanel implements PrefsTab {
         exportTerDesc.setSelected(_prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING));
     }
 
+    @Override
     public void storeSettings() {
         _prefs.putBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, saveInOriginalOrder.isSelected());
         _prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, saveInSpecifiedOrder.isSelected());
@@ -391,10 +403,12 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("File Sorting");
     }

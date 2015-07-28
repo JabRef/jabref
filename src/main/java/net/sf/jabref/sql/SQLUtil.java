@@ -21,10 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import net.sf.jabref.BibtexFields;
 
@@ -43,7 +40,7 @@ import net.sf.jabref.BibtexFields;
 public class SQLUtil {
 
     private static final ArrayList<String> reservedDBWords = new ArrayList<String>(
-            Arrays.asList("key"));
+            Collections.singletonList("key"));
 
     private static ArrayList<String> allFields = null;
 
@@ -55,14 +52,14 @@ public class SQLUtil {
      * loop through entry types to get required, optional, general and utility
      * fields for this type.
      */
-    public static void refreshFields() {
-        if (allFields == null) {
-            allFields = new ArrayList<String>();
+    private static void refreshFields() {
+        if (SQLUtil.allFields == null) {
+            SQLUtil.allFields = new ArrayList<String>();
         } else {
-            allFields.clear();
+            SQLUtil.allFields.clear();
         }
-        uniqueInsert(allFields, BibtexFields.getAllFieldNames());
-        uniqueInsert(allFields, BibtexFields.getAllPrivateFieldNames());
+        SQLUtil.uniqueInsert(SQLUtil.allFields, BibtexFields.getAllFieldNames());
+        SQLUtil.uniqueInsert(SQLUtil.allFields, BibtexFields.getAllPrivateFieldNames());
     }
 
     /**
@@ -70,9 +67,10 @@ public class SQLUtil {
      * @return All existent fields for a bibtex entry
      */
     public static ArrayList<String> getAllFields() {
-        if (allFields == null)
-            refreshFields();
-        return allFields;
+        if (SQLUtil.allFields == null) {
+            SQLUtil.refreshFields();
+        }
+        return SQLUtil.allFields;
     }
 
     /**
@@ -82,13 +80,15 @@ public class SQLUtil {
     public static String getFieldStr() {
         // create comma separated list of field names
         String fieldstr = "";
-        String field = "";
-        for (int i = 0; i < getAllFields().size(); i++) {
-            field = allFields.get(i);
-            if (i > 0)
+        String field;
+        for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
+            field = SQLUtil.allFields.get(i);
+            if (i > 0) {
                 fieldstr = fieldstr + ", ";
-            if (reservedDBWords.contains(field))
+            }
+            if (SQLUtil.reservedDBWords.contains(field)) {
                 field += "_";
+            }
             fieldstr = fieldstr + field;
         }
         return fieldstr;
@@ -108,9 +108,11 @@ public class SQLUtil {
             String[] array) {
         if (array != null) {
             for (String anArray : array) {
-                if (!list.contains(anArray))
-                    if (!anArray.equals("#"))
+                if (!list.contains(anArray)) {
+                    if (!anArray.equals("#")) {
                         list.add(anArray);
+                    }
+                }
             }
         }
         return list;
@@ -128,15 +130,17 @@ public class SQLUtil {
      */
     public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
         String str = "";
-        String field = "";
+        String field;
         ListIterator<String> li = fields.listIterator();
         while (li.hasNext()) {
             field = li.next();
-            if (reservedDBWords.contains(field))
-                field = field + "_";
+            if (SQLUtil.reservedDBWords.contains(field)) {
+                field = field + '_';
+            }
             str = str + field + datatype;
-            if (li.hasNext())
+            if (li.hasNext()) {
                 str = str + ", ";
+            }
         }
         return str;
     }
@@ -163,15 +167,16 @@ public class SQLUtil {
             List<String> optFields, List<String> utiFields,
             ArrayList<String> origList) {
 
-        String currentField = null;
+        String currentField;
         for (int i = 0; i < allFields.size(); i++) {
             currentField = allFields.get(i);
-            if (reqFields.contains(currentField))
+            if (reqFields.contains(currentField)) {
                 origList.set(i, "req");
-            else if (optFields.contains(currentField))
+            } else if (optFields.contains(currentField)) {
                 origList.set(i, "opt");
-            else if (utiFields.contains(currentField))
+            } else if (utiFields.contains(currentField)) {
                 origList.set(i, "uti");
+            }
         }
         return origList;
     }
@@ -183,7 +188,7 @@ public class SQLUtil {
      *            The SQLException raised
      */
     public static String getExceptionMessage(Exception ex) {
-        String msg = null;
+        String msg;
         if (ex.getMessage() == null) {
             msg = ex.toString();
         } else {
@@ -206,8 +211,8 @@ public class SQLUtil {
      */
     public static ResultSet queryAllFromTable(Connection conn, String tableName)
             throws SQLException {
-        String query = "SELECT * FROM " + tableName + ";";
-        Statement res = (Statement) processQueryWithResults(conn, query);
+        String query = "SELECT * FROM " + tableName + ';';
+        Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
         return res.getResultSet();
     }
 
@@ -227,7 +232,7 @@ public class SQLUtil {
         }
         if (out instanceof Connection) {
             Connection conn = (Connection) out;
-            executeQuery(conn, dml);
+            SQLUtil.executeQuery(conn, dml);
         }
     }
 
@@ -251,7 +256,7 @@ public class SQLUtil {
         }
         if (out instanceof Connection) {
             Connection conn = (Connection) out;
-            return executeQueryWithResults(conn, query);
+            return SQLUtil.executeQueryWithResults(conn, query);
         }
         return null;
     }
@@ -264,10 +269,10 @@ public class SQLUtil {
      * @return The JDBC url corresponding to the input DBStrings
      */
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
-        String url = "";
+        String url;
         url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://"
                 + dbStrings.getServerHostname()
-                + (withDBName ? "/" + dbStrings.getDatabase() : "");
+                + (withDBName ? '/' + dbStrings.getDatabase() : "");
         return url;
     }
 
@@ -285,7 +290,7 @@ public class SQLUtil {
      */
     public static String processQueryWithSingleResult(Connection conn,
             String query) throws SQLException {
-        ResultSet rs = executeQueryWithResults(conn, query)
+        ResultSet rs = SQLUtil.executeQueryWithResults(conn, query)
                 .getResultSet();
         rs.next();
         String result = rs.getString(1);
@@ -301,7 +306,7 @@ public class SQLUtil {
      * @param qry
      *            The DML statements to be executed
      */
-    public static void executeQuery(Connection conn, String qry)
+    private static void executeQuery(Connection conn, String qry)
             throws SQLException {
         Statement stmnt = conn.createStatement();
         stmnt.execute(qry);
@@ -320,7 +325,7 @@ public class SQLUtil {
      * @param qry
      *            The DML statements to be executed
      */
-    public static Statement executeQueryWithResults(Connection conn, String qry)
+    private static Statement executeQueryWithResults(Connection conn, String qry)
             throws SQLException {
         Statement stmnt = conn.createStatement();
         stmnt.executeQuery(qry);

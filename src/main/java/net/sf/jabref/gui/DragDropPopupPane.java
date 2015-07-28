@@ -42,6 +42,7 @@ public class DragDropPopupPane extends DragDropPane {
 
         addMouseListener(new java.awt.event.MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 tabClicked(e);
             }
@@ -68,9 +69,11 @@ public class DragDropPopupPane extends DragDropPane {
         JMenuItem closeBtn = new JMenuItem(Globals.lang("Close"), GUIGlobals.getImage("close"));
         closeBtn.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         closeSelectedTab();
                     }
@@ -81,7 +84,7 @@ public class DragDropPopupPane extends DragDropPane {
     }
 
     private void tabClicked(MouseEvent e) {
-        if (e.getButton() != MouseEvent.BUTTON1 && e.getClickCount() == 1) { // if is right-click
+        if ((e.getButton() != MouseEvent.BUTTON1) && (e.getClickCount() == 1)) { // if is right-click
 
             // display popup near location of mouse click
             popupMenu.show(e.getComponent(), e.getX(), e.getY() - 10);

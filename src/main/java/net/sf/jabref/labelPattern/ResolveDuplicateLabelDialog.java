@@ -30,15 +30,13 @@ import java.util.List;
 /**
  * Dialog box for resolving duplicate bibte keys
  */
-public class ResolveDuplicateLabelDialog {
+class ResolveDuplicateLabelDialog {
 
-    JDialog diag;
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    List<JCheckBox> cbs = new ArrayList<JCheckBox>();
+    private final JDialog diag;
+    private final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
     private boolean okPressed = false;
 
-    final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
+    private final static String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
             "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n" +
             "\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}\n" +
             "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n" +
@@ -70,7 +68,7 @@ public class ResolveDuplicateLabelDialog {
             //pan.add(cb, BorderLayout.NORTH);
             //cb.add(new JPanel(), BorderLayout.CENTER);
             b.append(cb);
-            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), layout);
+            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), ResolveDuplicateLabelDialog.layout);
             pp.setPreferredSize(new Dimension(800, 90));
             //pp.setBorder(BorderFactory.createEtchedBorder());
             b.append(new JScrollPane(pp));
@@ -81,7 +79,9 @@ public class ResolveDuplicateLabelDialog {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Globals.lang("Ok"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -93,6 +93,7 @@ public class ResolveDuplicateLabelDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 okPressed = true;
                 diag.dispose();
@@ -100,6 +101,7 @@ public class ResolveDuplicateLabelDialog {
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
@@ -107,6 +109,7 @@ public class ResolveDuplicateLabelDialog {
 
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }

@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.OutputPrinter;
 
 public class DBLPFetcher implements EntryFetcher {
@@ -149,7 +148,7 @@ public class DBLPFetcher implements EntryFetcher {
     private String readFromURL(final URL source) throws IOException {
         final InputStream in = source.openStream();
         final InputStreamReader ir = new InputStreamReader(in);
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
 
         char[] cbuf = new char[256];
         int read;
@@ -160,10 +159,10 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     private String makeSearchURL() {
-        StringBuffer sb = new StringBuffer(URL_START).append(URL_PART1);
+        StringBuilder sb = new StringBuilder(DBLPFetcher.URL_START).append(DBLPFetcher.URL_PART1);
         String cleanedQuery = helper.cleanDBLPQuery(query);
         sb.append(cleanedQuery);
-        sb.append(URL_END);
+        sb.append(DBLPFetcher.URL_END);
         return sb.toString();
     }
 
@@ -175,11 +174,6 @@ public class DBLPFetcher implements EntryFetcher {
     @Override
     public String getKeyName() {
         return "DBLP";
-    }
-
-    @Override
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
     }
 
     @Override

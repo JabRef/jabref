@@ -41,19 +41,15 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Remove brackets formatter.
- *
- * @author $author$
- * @version $Revision$
  */
 public class RemoveBracketsAddComma implements LayoutFormatter
 {
 
-    //~ Methods ////////////////////////////////////////////////////////////////
-
+    @Override
     public String format(String fieldText)
     {
         String fieldEntry = fieldText;
-        StringBuffer sb = new StringBuffer(fieldEntry.length());
+        StringBuilder sb = new StringBuilder(fieldEntry.length());
 
         for (int i = 0; i < fieldEntry.length(); i++)
         {
@@ -65,7 +61,7 @@ public class RemoveBracketsAddComma implements LayoutFormatter
             }
             if (fieldEntry.charAt(i) == '}')
             {
-                sb.append(",");
+                sb.append(',');
             }
         }
 
@@ -73,6 +69,3 @@ public class RemoveBracketsAddComma implements LayoutFormatter
         return fieldEntry;
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

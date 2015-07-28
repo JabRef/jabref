@@ -37,18 +37,18 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.StringUtil;
 
 public class AuxCommandLine
 {
 
-    private String auxName;
-    private BibtexDatabase bib;
+    private final String auxName;
+    private final BibtexDatabase bib;
 
 
     public AuxCommandLine(String auxFileName, BibtexDatabase refDBase)
     {
-        auxName = Util.getCorrectFileName(auxFileName, "aux");
+        auxName = StringUtil.getCorrectFileName(auxFileName, "aux");
         bib = refDBase;
     }
 
@@ -73,8 +73,9 @@ public class AuxCommandLine
                 System.out.println(returnValue);
             }
             int nested = auxParser.getNestedAuxCounter();
-            if (nested > 0)
+            if (nested > 0) {
                 System.out.println(Globals.lang("nested_aux_files") + " " + nested);
+            }
 
         }
         return back;

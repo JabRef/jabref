@@ -25,14 +25,10 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-/**
- * @author $Author$
- * @version $Revision$ ($Date$)
- */
 public class AuthorFirstLastOxfordCommasTest {
 
     /**
@@ -43,20 +39,20 @@ public class AuthorFirstLastOxfordCommasTest {
         LayoutFormatter a = new AuthorFirstLastOxfordCommas();
 
         // Empty case
-        assertEquals("", a.format(""));
+        Assert.assertEquals("", a.format(""));
 
         // Single Names
-        assertEquals("Van Something Someone", a.format("Someone, Van Something"));
+        Assert.assertEquals("Van Something Someone", a.format("Someone, Van Something"));
 
         // Two names
-        assertEquals("John von Neumann and Peter Black Brown", a
+        Assert.assertEquals("John von Neumann and Peter Black Brown", a
                 .format("John von Neumann and Peter Black Brown"));
 
         // Three names
-        assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
+        Assert.assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
                 .format("von Neumann, John and Smith, John and Black Brown, Peter"));
 
-        assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
+        Assert.assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
                 .format("John von Neumann and John Smith and Black Brown, Peter"));
     }
 

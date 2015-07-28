@@ -40,13 +40,14 @@ import net.sf.jabref.bst.VM.BstFunction;
  */
 public class FormatNameFunction implements BstFunction {
 
-    VM vm;
+    private final VM vm;
 
 
     public FormatNameFunction(VM vm) {
         this.vm = vm;
     }
 
+    @Override
     public void execute(BstEntry context) {
         Stack<Object> stack = vm.getStack();
 

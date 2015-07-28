@@ -28,18 +28,18 @@ import java.util.ArrayList;
 /**
  * 
  */
-public class MetaDataChange extends Change {
+class MetaDataChange extends Change {
 
-    static final int
-            ADD = 1,
-            REMOVE = 2,
-            MODIFY = 3;
+    private static final int
+            ADD = 1;
+    private static final int REMOVE = 2;
+    private static final int MODIFY = 3;
 
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
-    private MetaData md;
-    private MetaData mdSecondary;
-    ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
+    private final MetaData md;
+    private final MetaData mdSecondary;
+    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {
@@ -55,17 +55,18 @@ public class MetaDataChange extends Change {
     }
 
     public void insertMetaDataAddition(String key, Vector<String> value) {
-        changes.add(new MetaDataChangeUnit(ADD, key, value));
+        changes.add(new MetaDataChangeUnit(MetaDataChange.ADD, key, value));
     }
 
     public void insertMetaDataRemoval(String key) {
-        changes.add(new MetaDataChangeUnit(REMOVE, key, null));
+        changes.add(new MetaDataChangeUnit(MetaDataChange.REMOVE, key, null));
     }
 
     public void insertMetaDataChange(String key, Vector<String> value) {
-        changes.add(new MetaDataChangeUnit(MODIFY, key, value));
+        changes.add(new MetaDataChangeUnit(MetaDataChange.MODIFY, key, value));
     }
 
+    @Override
     JComponent description() {
         StringBuilder sb = new StringBuilder("<html>" + Globals.lang("Changes have been made to the following metadata elements") + ":<p>");
         for (MetaDataChangeUnit unit : changes) {
@@ -88,6 +89,7 @@ public class MetaDataChange extends Change {
         return sp;
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         for (MetaDataChangeUnit unit : changes) {
             switch (unit.type) {
@@ -109,11 +111,11 @@ public class MetaDataChange extends Change {
     }
 
 
-    class MetaDataChangeUnit {
+    static class MetaDataChangeUnit {
 
-        int type;
-        String key;
-        Vector<String> value;
+        final int type;
+        final String key;
+        final Vector<String> value;
 
 
         public MetaDataChangeUnit(int type, String key, Vector<String> value) {

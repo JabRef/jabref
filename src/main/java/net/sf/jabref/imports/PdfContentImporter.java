@@ -30,14 +30,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.*;
+import net.sf.jabref.util.DOIUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
-
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -51,10 +47,10 @@ import net.sf.jabref.Util;
  */
 public class PdfContentImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
+    private static final Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
 
     // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
-    private static DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
+    private static final DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
 
     /* global variables holding the state of the current parse run
      * needed to be able to generate methods such as "fillCurStringWithNonEmptyLines"
@@ -89,8 +85,9 @@ public class PdfContentImporter extends ImportFormat {
      */
     private String removeNonLettersAtEnd(String input) {
         input = input.trim();
-        if (input.length() == 0)
+        if (input.length() == 0) {
             return input;
+        }
         char lastC = input.charAt(input.length() - 1);
         while (!Character.isLetter(lastC) && (lastC != ')')) {
             // if there is an asterix, a dot or something else at the end: remove it
@@ -128,8 +125,9 @@ public class PdfContentImporter extends ImportFormat {
                 }
 
                 if (!curName.equals("")) {
-                    if (curName.equalsIgnoreCase("et al."))
+                    if (curName.equalsIgnoreCase("et al.")) {
                         curName = "others";
+                    }
                     if (isFirst) {
                         isFirst = false;
                     } else {
@@ -161,7 +159,7 @@ public class PdfContentImporter extends ImportFormat {
                         } else {
                             res = res.concat(" and ");
                         }
-                        if ((splitNames[i].equalsIgnoreCase("et")) && (splitNames.length > i + 1) && (splitNames[i + 1].equalsIgnoreCase("al."))) {
+                        if ((splitNames[i].equalsIgnoreCase("et")) && (splitNames.length > (i + 1)) && (splitNames[i + 1].equalsIgnoreCase("al."))) {
                             res = res.concat("others");
                             break;
                         } else {
@@ -180,7 +178,7 @@ public class PdfContentImporter extends ImportFormat {
                         // last name found
                         res = res.concat(removeNonLettersAtEnd(splitNames[i]));
 
-                        if (splitNames[i].length() > 0 && Character.isLowerCase(splitNames[i].charAt(0))) {
+                        if ((splitNames[i].length() > 0) && Character.isLowerCase(splitNames[i].charAt(0))) {
                             // it is probably be "van", "vom", ...
                             // we just rely on the fact that these things are written in lower case letters
                             // do NOT finish name
@@ -215,17 +213,17 @@ public class PdfContentImporter extends ImportFormat {
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         final ArrayList<BibtexEntry> res = new ArrayList<BibtexEntry>(1);
 
-        PDDocument document = null;
+        PDDocument document;
         try {
             document = PDDocument.load(in);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Could not load document", e);
+            PdfContentImporter.logger.log(Level.SEVERE, "Could not load document", e);
             return res;
         }
 
         try {
             if (document.isEncrypted()) {
-                logger.log(Level.INFO,
+                PdfContentImporter.logger.log(Level.INFO,
                         Globals.lang("Encrypted documents are not supported"));
                 //return res;
             }
@@ -239,7 +237,7 @@ public class PdfContentImporter extends ImportFormat {
             stripper.writeText(document, writer);
             String textResult = writer.toString();
 
-            String doi = Util.getDOI(textResult);
+            String doi = DOIUtil.getDOI(textResult);
             if (doi.length() < textResult.length()) {
                 // A DOI was found in the text
                 // We do NO parsing of the text, but use the DOI fetcher
@@ -260,7 +258,7 @@ public class PdfContentImporter extends ImportFormat {
                         res.add(entry);
                     }
                 };
-                doiToBibTeXFetcher.processQuery(doi, i, status);
+                PdfContentImporter.doiToBibTeXFetcher.processQuery(doi, i, status);
                 if (res.size() != 0) {
                     // if something has been found, return the result
                     return res;
@@ -269,12 +267,12 @@ public class PdfContentImporter extends ImportFormat {
                 }
             }
 
-            String author = null;
+            String author;
             String editor = null;
             String institution = null;
             String abstractT = null;
             String keywords = null;
-            String title = null;
+            String title;
             String conference = null;
             String DOI = null;
             String series = null;
@@ -438,8 +436,9 @@ public class PdfContentImporter extends ImportFormat {
                 } else {
                     if (DOI == null) {
                         pos = curString.indexOf("DOI");
-                        if (pos < 0)
+                        if (pos < 0) {
                             pos = curString.indexOf("doi");
+                        }
                         if (pos >= 0) {
                             pos += 3;
                             char delimiter = curString.charAt(pos);
@@ -447,10 +446,11 @@ public class PdfContentImporter extends ImportFormat {
                                 pos++;
                             }
                             int nextSpace = curString.indexOf(' ', pos);
-                            if (nextSpace > 0)
+                            if (nextSpace > 0) {
                                 DOI = curString.substring(pos, nextSpace);
-                            else
+                            } else {
                                 DOI = curString.substring(pos);
+                            }
                         }
                     }
 
@@ -472,8 +472,9 @@ public class PdfContentImporter extends ImportFormat {
                                 // before the price, the ISSN is stated
                                 // skip that
                                 pos -= 2;
-                                while ((pos >= 0) && (curString.charAt(pos) != ' '))
+                                while ((pos >= 0) && (curString.charAt(pos) != ' ')) {
                                     pos--;
+                                }
                                 if (pos > 0) {
                                     conference = curString.substring(0, pos);
                                 }
@@ -492,34 +493,48 @@ public class PdfContentImporter extends ImportFormat {
             BibtexEntry entry = new BibtexEntry();
             entry.setType(type);
 
-            if (author != null)
+            if (author != null) {
                 entry.setField("author", author);
-            if (editor != null)
+            }
+            if (editor != null) {
                 entry.setField("editor", editor);
-            if (institution != null)
+            }
+            if (institution != null) {
                 entry.setField("institution", institution);
-            if (abstractT != null)
+            }
+            if (abstractT != null) {
                 entry.setField("abstract", abstractT);
-            if (keywords != null)
+            }
+            if (keywords != null) {
                 entry.setField("keywords", keywords);
-            if (title != null)
+            }
+            if (title != null) {
                 entry.setField("title", title);
-            if (conference != null)
+            }
+            if (conference != null) {
                 entry.setField("booktitle", conference);
-            if (DOI != null)
+            }
+            if (DOI != null) {
                 entry.setField("doi", DOI);
-            if (series != null)
+            }
+            if (series != null) {
                 entry.setField("series", series);
-            if (volume != null)
+            }
+            if (volume != null) {
                 entry.setField("volume", volume);
-            if (number != null)
+            }
+            if (number != null) {
                 entry.setField("number", number);
-            if (pages != null)
+            }
+            if (pages != null) {
                 entry.setField("pages", pages);
-            if (year != null)
+            }
+            if (year != null) {
                 entry.setField("year", year);
-            if (publisher != null)
+            }
+            if (publisher != null) {
                 entry.setField("publisher", publisher);
+            }
 
             entry.setField("review", textResult);
 
@@ -528,7 +543,7 @@ public class PdfContentImporter extends ImportFormat {
             if (e.getMessage().equals("org/bouncycastle/jce/provider/BouncyCastleProvider")) {
                 status.showMessage(Globals.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
             } else {
-                logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+                PdfContentImporter.logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
         } finally {
             document.close();
@@ -541,8 +556,9 @@ public class PdfContentImporter extends ImportFormat {
      * Extract the year out of curString (if it is not yet defined)
      */
     private void extractYear() {
-        if (year != null)
+        if (year != null) {
             return;
+        }
 
         final Pattern p = Pattern.compile("\\d\\d\\d\\d");
         Matcher m = p.matcher(curString);

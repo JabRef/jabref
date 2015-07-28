@@ -20,12 +20,13 @@ import java.awt.Component;
 
 public class FocusRequester implements Runnable {
 
-    private Component comp;
+    private final Component comp;
 
 
     public FocusRequester(Component comp) {
-        if (comp == null)
+        if (comp == null) {
             Thread.dumpStack();
+        }
 
         //System.out.println("FocusRequester: "+comp.toString());
         this.comp = comp;
@@ -36,6 +37,7 @@ public class FocusRequester implements Runnable {
         }
     }
 
+    @Override
     public void run() {
 
         comp.requestFocus();

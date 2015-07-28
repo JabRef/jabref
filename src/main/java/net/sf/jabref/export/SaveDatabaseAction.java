@@ -20,6 +20,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
+import net.sf.jabref.util.FileBasedLock;
 
 import javax.swing.*;
 import java.io.File;
@@ -36,8 +37,8 @@ import java.util.Vector;
  */
 public class SaveDatabaseAction extends AbstractWorker {
 
-    private BasePanel panel;
-    private JabRefFrame frame;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
     private boolean success = false, cancelled = false, fileLockedError = false;
 
 
@@ -47,13 +48,14 @@ public class SaveDatabaseAction extends AbstractWorker {
         this.frame = panel.frame();
     }
 
+    @Override
     public void init() throws Throwable {
         success = false;
         cancelled = false;
         fileLockedError = false;
-        if (panel.getFile() == null)
+        if (panel.getFile() == null) {
             saveAs();
-        else {
+        } else {
 
             // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
@@ -77,25 +79,22 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     cancelled = true;
 
-                    (new Thread(new Runnable() {
+                    JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                        @Override
                         public void run() {
 
-                            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+                            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                                 // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                                 System.err.println("File locked, this will be trouble.");
                             }
 
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel);
-                            scanner.changeScan(panel.getFile());
-                            try {
-                                scanner.join();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
+                            JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
                                 scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
 
+                                    @Override
                                     public void scanResultsResolved(boolean resolved) {
                                         if (!resolved) {
                                             cancelled = true;
@@ -103,6 +102,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                                             panel.setUpdatedExternally(false);
                                             SwingUtilities.invokeLater(new Runnable() {
 
+                                                @Override
                                                 public void run() {
                                                     panel.getSidePaneManager().hide("fileUpdate");
                                                 }
@@ -112,7 +112,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                                 });
                             }
                         }
-                    })).start();
+                    });
 
                     return;
                 }
@@ -137,6 +137,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         if (success) {
             // Reset title of tab
@@ -149,11 +150,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
                 frame.output(Globals.lang("Could not save, file locked by another JabRef instance."));
-            } else
+            } else {
                 frame.output(Globals.lang("Save failed"));
+            }
         }
     }
 
+    @Override
     public void run() {
         if (cancelled || (panel.getFile() == null)) {
             return;
@@ -168,7 +171,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (!Util.waitForFileLock(panel.getFile(), 10)) {
+            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
                 success = false;
                 fileLockedError = true;
             }
@@ -217,12 +220,13 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
         frame.block();
         try {
-            if (!selectedOnly)
+            if (!selectedOnly) {
                 session = FileActions.saveDatabase(panel.database(), panel.metaData(), file,
                         Globals.prefs, false, false, encoding, false);
-            else
+            } else {
                 session = FileActions.savePartOfDatabase(panel.database(), panel.metaData(), file,
                         Globals.prefs, panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
+            }
 
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
@@ -240,8 +244,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.mainTable.setRowSelectionInterval(row, row);
                 panel.mainTable.scrollTo(topShow);
                 panel.showEntry(ex.getEntry());
-            } else
+            } else {
                 ex.printStackTrace();
+            }
 
             JOptionPane.showMessageDialog
                     (frame, Globals.lang("Could not save file")
@@ -275,10 +280,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                 if (choice != null) {
                     String newEncoding = (String) choice;
                     return saveDatabase(file, selectedOnly, newEncoding);
-                } else
+                } else {
                     commit = false;
-            } else if (answer == JOptionPane.CANCEL_OPTION)
+                }
+            } else if (answer == JOptionPane.CANCEL_OPTION) {
                 commit = false;
+            }
 
         }
 
@@ -286,8 +293,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (commit) {
                 session.commit();
                 panel.setEncoding(encoding); // Make sure to remember which encoding we used.
-            } else
+            } else {
                 session.cancel();
+            }
         } catch (SaveException e) {
             int ans = JOptionPane.showConfirmDialog(null, Globals.lang("Save failed during backup creation") + ". "
                     + Globals.lang("Save without backup?"), Globals.lang("Unable to create backup"),
@@ -296,9 +304,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                 session.setUseBackup(false);
                 session.commit();
                 panel.setEncoding(encoding);
-            }
-            else
+            } else {
                 commit = false;
+            }
         }
 
         return commit;
@@ -341,7 +349,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         String chosenFile = null;
         File f = null;
         while (f == null) {
-            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     JFileChooser.SAVE_DIALOG, false, null);
             if (chosenFile == null) {
                 cancelled = true;
@@ -350,7 +358,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             f = new File(chosenFile);
             // Check if the file already exists:
             if (f.exists() && (JOptionPane.showConfirmDialog
-                    (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
+                    (frame, '\'' + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                             Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                         != JOptionPane.OK_OPTION)) {
                 f = null;
@@ -360,7 +368,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (chosenFile != null) {
             File oldFile = panel.metaData().getFile();
             panel.metaData().setFile(f);
-            Globals.prefs.put("workingDirectory", f.getParent());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
             runCommand();
             // If the operation failed, revert the file field and return:
             if (!success) {

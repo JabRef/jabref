@@ -19,10 +19,6 @@ package net.sf.jabref;
  * A prefsTab is a component displayed in the PreferenceDialog.
  * 
  * It needs to extend from Component.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- *
  */
 public interface PrefsTab {
 
@@ -34,7 +30,7 @@ public interface PrefsTab {
      * is ILLEGAL to set values only at construction time, because the dialog
      * will be reused and updated.
      */
-    public void setValues();
+    void setValues();
 
     /**
      * This method is called when the user presses OK in the
@@ -42,7 +38,7 @@ public interface PrefsTab {
      * settings presented get stored in JabRefPreferences.
      *
      */
-    public void storeSettings();
+    void storeSettings();
 
     /**
      * This method is called before the {@link #storeSettings()} method,
@@ -51,12 +47,12 @@ public interface PrefsTab {
      * If the tab is *not* ready, it should display a message to the user 
      * informing about the illegal setting.
      */
-    public boolean readyToClose();
+    boolean readyToClose();
 
     /**
      * Should return the localized identifier to use for the tab.
      * 
      * @return Identifier for the tab (for instance "General", "Appearance" or "External Files").
      */
-    public String getTabName();
+    String getTabName();
 }

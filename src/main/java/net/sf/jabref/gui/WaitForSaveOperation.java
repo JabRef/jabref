@@ -29,19 +29,17 @@ import java.awt.event.ActionListener;
  */
 public class WaitForSaveOperation implements ActionListener {
 
-    JabRefFrame frame;
-    JDialog diag;
-    JProgressBar prog;
-    JButton cancel;
-    Timer t = new Timer(500, this);
-    boolean cancelled = false;
+    private final JabRefFrame frame;
+    private final JDialog diag;
+    private final Timer t = new Timer(500, this);
+    private boolean cancelled = false;
 
 
     public WaitForSaveOperation(JabRefFrame frame) {
         this.frame = frame;
 
-        cancel = new JButton(Globals.lang("Cancel"));
-        prog = new JProgressBar(0);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JProgressBar prog = new JProgressBar(0);
         prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag = new JDialog(frame, Globals.lang("Please wait..."), true);
@@ -52,6 +50,7 @@ public class WaitForSaveOperation implements ActionListener {
         bb.addGlue();
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 cancelled = true;
                 t.stop();
@@ -79,6 +78,7 @@ public class WaitForSaveOperation implements ActionListener {
         return cancelled;
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         boolean anySaving = false;
         for (int i = 0; i < frame.baseCount(); i++) {

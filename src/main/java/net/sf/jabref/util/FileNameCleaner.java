@@ -49,7 +49,7 @@ public class FileNameCleaner {
         StringBuilder cleanName = new StringBuilder();
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);
-            if (isCharLegal(c)) {
+            if (FileNameCleaner.isCharLegal(c)) {
                 cleanName.append(c);
             } else {
                 cleanName.append('_');
@@ -59,7 +59,6 @@ public class FileNameCleaner {
     }
 
     private static boolean isCharLegal(char c) {
-        int intValueOfChar = (int) c;
-        return Arrays.binarySearch(ILLEGAL_CHARS, intValueOfChar) < 0;
+        return Arrays.binarySearch(FileNameCleaner.ILLEGAL_CHARS, (int) c) < 0;
     }
 }

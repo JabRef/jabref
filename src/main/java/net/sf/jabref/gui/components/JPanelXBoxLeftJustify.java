@@ -18,9 +18,9 @@ package net.sf.jabref.gui.components;
 import java.awt.Component;
 import javax.swing.JPanel;
 
-public class JPanelXBoxLeftJustify extends JPanelXBox {
+class JPanelXBoxLeftJustify extends JPanelXBox {
 
-    public JPanelXBoxLeftJustify() {
+    private JPanelXBoxLeftJustify() {
         super();
         add(new JPanel()); // padding
     }
@@ -30,6 +30,7 @@ public class JPanelXBoxLeftJustify extends JPanelXBox {
         add(c);
     }
 
+    @Override
     public Component add(Component c) {
         return super.add(c, Math.max(0, getComponentCount() - 1));
     }

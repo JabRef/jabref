@@ -16,19 +16,19 @@
 package net.sf.jabref.oo;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Util;
+import net.sf.jabref.IdGenerator;
 
 /**
  * Subclass of BibtexEntry for representing entries referenced in a document that can't
  * be found in JabRef's current database.
  */
-public class UndefinedBibtexEntry extends BibtexEntry {
+class UndefinedBibtexEntry extends BibtexEntry {
 
-    private String key;
+    private final String key;
 
 
     public UndefinedBibtexEntry(String key) {
-        super(Util.createNeutralId());
+        super(IdGenerator.next());
         this.key = key;
         setField("author", OOBibStyle.UNDEFINED_CITATION_MARKER);
     }

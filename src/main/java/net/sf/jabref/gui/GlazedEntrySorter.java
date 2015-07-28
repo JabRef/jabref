@@ -28,7 +28,7 @@ import ca.odell.glazedlists.EventList;
 
 public class GlazedEntrySorter implements DatabaseChangeListener {
 
-    EventList<BibtexEntry> list;
+    private final EventList<BibtexEntry> list;
 
     String[] idArray;
     BibtexEntry[] entryArray;
@@ -54,6 +54,7 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
         return list;
     }
 
+    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         list.getReadWriteLock().writeLock().lock();
         if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {

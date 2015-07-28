@@ -28,17 +28,9 @@ import net.sf.jabref.export.layout.format.NotFoundFormatter;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.LayoutFormatterExtension;
+import net.sf.jabref.util.Util;
 
-/**
- * DOCUMENT ME!
- * 
- * @author $author$
- * @version $Revision$
- */
-public class LayoutEntry {
-
-    // ~ Instance fields
-    // ////////////////////////////////////////////////////////
+class LayoutEntry {
 
     private LayoutFormatter[] option;
 
@@ -49,15 +41,12 @@ public class LayoutEntry {
 
     private LayoutEntry[] layoutEntries;
 
-    private int type;
+    private final int type;
 
-    private String classPrefix;
+    private final String classPrefix;
 
     private ArrayList<String> invalidFormatter = null;
 
-
-    // ~ Constructors
-    // ///////////////////////////////////////////////////////////
 
     public LayoutEntry(StringInt si, String classPrefix_) throws Exception {
         type = si.i;
@@ -67,8 +56,7 @@ public class LayoutEntry {
             text = si.s;
         } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
-        } else if (si.i == LayoutHelper.IS_FIELD_START) {
-        } else if (si.i == LayoutHelper.IS_FIELD_END) {
+        } else if (si.i == LayoutHelper.IS_FIELD_START || si.i == LayoutHelper.IS_FIELD_END) {
         } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
             Vector<String> v = new Vector<String>();
             WSITools.tokenize(v, si.s, "\n");
@@ -78,14 +66,15 @@ public class LayoutEntry {
             } else {
                 text = v.get(0).trim();
 
-                option = getOptionalLayout(v.get(1), classPrefix);
+                option = LayoutEntry.getOptionalLayout(v.get(1), classPrefix);
                 // See if there was an undefined formatter:
                 for (LayoutFormatter anOption : option) {
                     if (anOption instanceof NotFoundFormatter) {
                         String notFound = ((NotFoundFormatter) anOption).getNotFound();
 
-                        if (invalidFormatter == null)
+                        if (invalidFormatter == null) {
                             invalidFormatter = new ArrayList<String>();
+                        }
                         invalidFormatter.add(notFound);
                     }
                 }
@@ -96,8 +85,8 @@ public class LayoutEntry {
 
     public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) throws Exception {
         classPrefix = classPrefix_;
-        String blockStart = null;
-        String blockEnd = null;
+        String blockStart;
+        String blockEnd;
         StringInt si;
         Vector<StringInt> blockEntries = null;
         Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>();
@@ -118,8 +107,7 @@ public class LayoutEntry {
             si = parsedEntries.get(i);
 
             // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
-            } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+            if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             } else if ((si.i == LayoutHelper.IS_FIELD_START)
                     || (si.i == LayoutHelper.IS_GROUP_START)) {
                 blockEntries = new Vector<StringInt>();
@@ -127,10 +115,11 @@ public class LayoutEntry {
             } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
                 if (blockStart.equals(si.s)) {
                     blockEntries.add(si);
-                    if (si.i == LayoutHelper.IS_GROUP_END)
+                    if (si.i == LayoutHelper.IS_GROUP_END) {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
-                    else
+                    } else {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
+                    }
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -157,8 +146,9 @@ public class LayoutEntry {
 
             // Note if one of the entries has an invalid formatter:
             if (layoutEntries[i].isInvalidFormatter()) {
-                if (invalidFormatter == null)
+                if (invalidFormatter == null) {
                     invalidFormatter = new ArrayList<String>(1);
+                }
                 invalidFormatter.addAll(layoutEntries[i].getInvalidFormatters());
             }
 
@@ -170,7 +160,7 @@ public class LayoutEntry {
         this.postFormatter = formatter;
     }
 
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
+    private String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
         return doLayout(bibtex, database, null);
     }
 
@@ -181,11 +171,13 @@ public class LayoutEntry {
         case LayoutHelper.IS_SIMPLE_FIELD:
             String value = BibtexDatabase.getResolvedField(text, bibtex, database);
 
-            if (value == null)
+            if (value == null) {
                 value = "";
+            }
             // If a post formatter has been set, call it:
-            if (postFormatter != null)
+            if (postFormatter != null) {
                 value = postFormatter.format(value);
+            }
             return value;
         case LayoutHelper.IS_FIELD_START:
         case LayoutHelper.IS_GROUP_START: {
@@ -198,8 +190,9 @@ public class LayoutEntry {
                 field = null;
                 for (String part : parts) {
                     field = BibtexDatabase.getResolvedField(part, bibtex, database);
-                    if (field == null)
+                    if (field == null) {
                         break;
+                    }
 
                 }
             } else {
@@ -208,8 +201,9 @@ public class LayoutEntry {
                 field = null;
                 for (String part : parts) {
                     field = BibtexDatabase.getResolvedField(part, bibtex, database);
-                    if (field != null)
+                    if (field != null) {
                         break;
+                    }
                 }
             }
 
@@ -221,7 +215,7 @@ public class LayoutEntry {
                 if (type == LayoutHelper.IS_GROUP_START) {
                     LayoutHelper.setCurrentGroup(field);
                 }
-                StringBuffer sb = new StringBuffer(100);
+                StringBuilder sb = new StringBuilder(100);
                 String fieldText;
                 boolean previousSkipped = false;
 
@@ -230,7 +224,7 @@ public class LayoutEntry {
 
                     if (fieldText == null) {
                         if ((i + 1) < layoutEntries.length) {
-                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim().length() == 0) {
+                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim().isEmpty()) {
                                 i++;
                                 previousSkipped = true;
                                 continue;
@@ -306,8 +300,9 @@ public class LayoutEntry {
             }
 
             // If a post formatter has been set, call it:
-            if (postFormatter != null)
+            if (postFormatter != null) {
                 fieldEntry = postFormatter.format(fieldEntry);
+            }
 
             return fieldEntry;
         }
@@ -350,8 +345,9 @@ public class LayoutEntry {
                 }
             }
             // If a post formatter has been set, call it:
-            if (postFormatter != null)
+            if (postFormatter != null) {
                 field = postFormatter.format(field);
+            }
 
             return field;
         } else if (type == LayoutHelper.IS_ENCODING_NAME) {
@@ -373,45 +369,46 @@ public class LayoutEntry {
 
     // added section - end (arudert)
 
-    static Map<String, LayoutFormatter> pluginLayoutFormatter;
+    private static Map<String, LayoutFormatter> pluginLayoutFormatter;
 
 
-    public static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName) {
-        if (pluginLayoutFormatter == null) {
-            pluginLayoutFormatter = new HashMap<String, LayoutFormatter>();
+    private static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName) {
+        if (LayoutEntry.pluginLayoutFormatter == null) {
+            LayoutEntry.pluginLayoutFormatter = new HashMap<String, LayoutFormatter>();
             JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
             if (plugin != null) {
                 for (LayoutFormatterExtension e : plugin.getLayoutFormatterExtensions()) {
                     LayoutFormatter formatter = e.getLayoutFormatter();
                     String name = e.getName();
-                    if (name == null)
+                    if (name == null) {
                         name = e.getId();
+                    }
 
                     if (formatter != null) {
-                        pluginLayoutFormatter.put(name, formatter);
+                        LayoutEntry.pluginLayoutFormatter.put(name, formatter);
                     }
                 }
             }
         }
         // We need to make a new instance of this LayoutFormatter, in case it is a
         // parameter-accepting layout formatter:
-        if (pluginLayoutFormatter.containsKey(formatterName)) {
-            Class<? extends LayoutFormatter> c = pluginLayoutFormatter.get(formatterName).getClass();
+        if (LayoutEntry.pluginLayoutFormatter.containsKey(formatterName)) {
+            Class<? extends LayoutFormatter> c = LayoutEntry.pluginLayoutFormatter.get(formatterName).getClass();
             try {
                 return c.getConstructor().newInstance();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
-            return pluginLayoutFormatter.get(formatterName);
-        }
-        else
+            return LayoutEntry.pluginLayoutFormatter.get(formatterName);
+        } else {
             return null;
+        }
     }
 
-    public static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
+    private static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
             throws Exception {
 
-        if (className.length() > 0) {
+        if (!className.isEmpty()) {
             try {
                 try {
                     return (LayoutFormatter) Class.forName(classPrefix + className).newInstance();
@@ -434,8 +431,8 @@ public class LayoutEntry {
      * string (in order of appearance).
      * 
      */
-    public static LayoutFormatter[] getOptionalLayout(String formatterName,
-            String classPrefix) {
+    private static LayoutFormatter[] getOptionalLayout(String formatterName,
+                                                       String classPrefix) {
 
         ArrayList<String[]> formatterStrings = Util
                 .parseMethodsCalls(formatterName);
@@ -462,13 +459,14 @@ public class LayoutEntry {
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = getLayoutFormatterByClassName(className,
+                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className,
                         classPrefix);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if (f instanceof ParamLayoutFormatter) {
-                    if (strings.length >= 2)
+                    if (strings.length >= 2) {
                         ((ParamLayoutFormatter) f).setArgument(strings[1]);
+                    }
                 }
                 results.add(f);
                 continue;
@@ -487,7 +485,7 @@ public class LayoutEntry {
             }
 
             // Last load from plug-ins
-            LayoutFormatter f = getLayoutFormatterFromPlugins(className);
+            LayoutFormatter f = LayoutEntry.getLayoutFormatterFromPlugins(className);
             if (f != null) {
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
@@ -531,8 +529,9 @@ public class LayoutEntry {
      * @return String that was called by the method, with HTML Tags if a word was found 
      */
     private String highlightWords(String text, ArrayList<String> toHighlight) {
-        if (toHighlight == null)
+        if (toHighlight == null) {
             return text;
+        }
 
         Matcher matcher = Globals.getPatternForWords(toHighlight).matcher(text);
 

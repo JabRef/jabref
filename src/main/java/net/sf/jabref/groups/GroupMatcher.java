@@ -24,9 +24,9 @@ import net.sf.jabref.BibtexEntry;
  */
 public class GroupMatcher implements Matcher<BibtexEntry> {
 
-    public static GroupMatcher INSTANCE = new GroupMatcher();
+    public static final GroupMatcher INSTANCE = new GroupMatcher();
 
-
+    @Override
     public boolean matches(BibtexEntry entry) {
         return entry.isGroupHit();
     }

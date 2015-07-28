@@ -21,11 +21,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+
+import net.sf.jabref.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -35,12 +32,13 @@ import net.sf.jabref.Util;
  */
 public class SixpackImporter extends ImportFormat {
 
-    final String SEPARATOR = new String(new char[] {0, 48});
+    private final String SEPARATOR = new String(new char[] {0, 48});
 
 
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "Sixpack";
     }
@@ -49,6 +47,7 @@ public class SixpackImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "sixpack";
     }
@@ -56,14 +55,16 @@ public class SixpackImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-            if (str.contains(SEPARATOR))
+            if (str.contains(SEPARATOR)) {
                 return true;
+            }
 
             i++;
         }
@@ -75,6 +76,7 @@ public class SixpackImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
         HashMap<String, String> fI = new HashMap<String, String>();
@@ -110,54 +112,63 @@ public class SixpackImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         in.readLine();
         String ln = in.readLine();
-        if (ln == null)
+        if (ln == null) {
             return null;
+        }
         String[] fieldDef = ln.split(",");
 
-        String s = null;
-        BibtexEntry entry = null;
+        String s;
+        BibtexEntry entry;
         while ((s = in.readLine()) != null) {
             try {
                 s = s.replaceAll("<par>", ""); // What is <par> ????
                 String[] fields = s.split(SEPARATOR);
                 // Check type and create entry:
                 if (fields.length < 2)
+                 {
                     continue; // Avoid ArrayIndexOutOfBoundsException
+                }
                 BibtexEntryType typ = BibtexEntryType
                         .getType(fields[1].toLowerCase());
                 if (typ == null) {
                     String type = "";
-                    if (fields[1].equals("Masterthesis"))
+                    if (fields[1].equals("Masterthesis")) {
                         type = "mastersthesis";
-                    if (fields[1].equals("PhD-Thesis"))
+                    }
+                    if (fields[1].equals("PhD-Thesis")) {
                         type = "phdthesis";
-                    if (fields[1].equals("miscellaneous"))
+                    }
+                    if (fields[1].equals("miscellaneous")) {
                         type = "misc";
-                    if (fields[1].equals("Conference"))
+                    }
+                    if (fields[1].equals("Conference")) {
                         type = "proceedings";
+                    }
                     typ = BibtexEntryType.getType(type.toLowerCase());
                 }
-                entry = new BibtexEntry(Util.createNeutralId(), typ);
+                entry = new BibtexEntry(IdGenerator.next(), typ);
                 String fld;
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);
                     if (fld != null) {
-                        if (fld.equals("author") || fld.equals("editor"))
+                        if (fld.equals("author") || fld.equals("editor")) {
                             ImportFormatReader.setIfNecessary(entry,
                                     fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
                                             " and "));
-                        else if (fld.equals("pages"))
+                        } else if (fld.equals("pages")) {
                             ImportFormatReader.setIfNecessary(entry, fld, fields[i]
                                     .replaceAll("-", "--"));
-                        else if (fld.equals("file")) {
+                        } else if (fld.equals("file")) {
                             String fieldName = "pdf"; // We set pdf as default.
-                            if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz"))
+                            if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz")) {
                                 fieldName = "ps";
-                            else if (fields[i].endsWith("html"))
+                            } else if (fields[i].endsWith("html")) {
                                 fieldName = "url";
+                            }
                             ImportFormatReader.setIfNecessary(entry, fieldName, fields[i]);
-                        } else
+                        } else {
                             ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
+                        }
                     }
                 }
                 bibitems.add(entry);

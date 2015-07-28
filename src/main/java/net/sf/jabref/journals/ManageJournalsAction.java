@@ -18,9 +18,11 @@ package net.sf.jabref.journals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
+
+import javax.swing.Action;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,15 +33,15 @@ import java.awt.event.ActionEvent;
  */
 public class ManageJournalsAction extends MnemonicAwareAction {
 
-    JabRefFrame frame;
-
+    private final JabRefFrame frame;
 
     public ManageJournalsAction(JabRefFrame frame) {
         super();
-        putValue(NAME, Globals.menuTitle("Manage journal abbreviations"));
+        putValue(Action.NAME, Globals.menuTitle("Manage journal abbreviations"));
         this.frame = frame;
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         ManageJournalsPanel panel = new ManageJournalsPanel(frame);
         Util.placeDialog(panel.getDialog(), frame);

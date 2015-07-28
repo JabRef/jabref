@@ -30,10 +30,12 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
 
     }
 
+    @Override
     public boolean supportsSite(URL url) {
         return url.getHost().toLowerCase().contains("www.sciencedirect.com");
     }
 
+    @Override
     public URL findFullTextURL(URL url) throws IOException {
         String pageSource = FindFullText.loadPage(url);
         //System.out.println(pageSource);
@@ -44,7 +46,7 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
             //System.out.println(leading.toLowerCase());
             index = leading.toLowerCase().lastIndexOf("<a href=");
             //System.out.println(index);
-            if ((index > -1) && (index + 9 < leading.length())) {
+            if ((index > -1) && ((index + 9) < leading.length())) {
                 int endIndex = leading.indexOf("\"", index + 9);
 
                 try {
@@ -55,7 +57,8 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
                 }
             }
             return null;
-        } else
+        } else {
             return null;
+        }
     }
 }

@@ -44,6 +44,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.Util;
 
 /**
  * Dialog to manage custom importers.
@@ -53,14 +54,15 @@ public class ImportCustomizationDialog extends JDialog {
     private final JabRefFrame frame;
 
     private JTable customImporterTable;
-    private JabRefPreferences prefs = Globals.prefs;
-    private ImportCustomizationDialog importCustomizationDialog;
+    private final JabRefPreferences prefs = Globals.prefs;
+    private final ImportCustomizationDialog importCustomizationDialog;
 
 
     /*
     *  (non-Javadoc)
     * @see java.awt.Component#getSize()
     */
+    @Override
     public Dimension getSize() {
         int width = GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH
                 + GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH
@@ -84,8 +86,9 @@ public class ImportCustomizationDialog extends JDialog {
             path = path.getParentFile();
         }
         int lastDot = className.lastIndexOf('.');
-        if (lastDot < 0)
+        if (lastDot < 0) {
             return className;
+        }
         className = className.substring(0, lastDot);
         return className;
     }
@@ -114,14 +117,16 @@ public class ImportCustomizationDialog extends JDialog {
         JButton addFromFolderButton = new JButton(Globals.lang("Add from folder"));
         addFromFolderButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String chosenFileStr = null;
                 CustomImportList.Importer importer = prefs.customImports.new Importer();
-                importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get("workingDirectory")), "",
+                importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
                         Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
-                if (importer.getBasePath() != null)
+                if (importer.getBasePath() != null) {
                     chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
                             Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
+                }
                 if (chosenFileStr != null) {
                     try {
                         importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
@@ -145,8 +150,9 @@ public class ImportCustomizationDialog extends JDialog {
         JButton addFromJarButton = new JButton(Globals.lang("Add from jar"));
         addFromJarButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                String basePath = FileDialogs.getNewFile(frame, new File(prefs.get("workingDirectory")), ".zip,.jar",
+                String basePath = FileDialogs.getNewFile(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".zip,.jar",
                         Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
                 ZipFile zipFile = null;
                 if (basePath != null) {
@@ -179,6 +185,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton showDescButton = new JButton(Globals.lang("Show description"));
         showDescButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = customImporterTable.getSelectedRow();
                 if (row != -1) {
@@ -199,6 +206,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton removeButton = new JButton(Globals.lang("Remove"));
         removeButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int row = customImporterTable.getSelectedRow();
                 if (row != -1) {
@@ -216,6 +224,7 @@ public class ImportCustomizationDialog extends JDialog {
 
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -278,7 +287,7 @@ public class ImportCustomizationDialog extends JDialog {
      */
     class ImportTableModel extends AbstractTableModel {
 
-        private String[] columnNames = new String[] {
+        private final String[] columnNames = new String[] {
                 Globals.lang("Import name"),
                 Globals.lang("Command line id"),
                 Globals.lang("ImportFormat class"),
@@ -286,6 +295,7 @@ public class ImportCustomizationDialog extends JDialog {
         };
 
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Object value = null;
             CustomImportList.Importer importer = getImporter(rowIndex);
@@ -301,14 +311,17 @@ public class ImportCustomizationDialog extends JDialog {
             return value;
         }
 
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        @Override
         public int getRowCount() {
             return Globals.prefs.customImports.size();
         }
 
+        @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }

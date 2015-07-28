@@ -27,6 +27,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.StringUtil;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 
@@ -35,14 +36,14 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
      * Returns null if cancelled.
      */
 
-    BibtexEntryType type = null;
-    CancelAction cancelAction = new CancelAction();
+    private BibtexEntryType type = null;
+    private final CancelAction cancelAction = new CancelAction();
     private static final int COLNUM = 3;
 
 
-    class TypeButton extends JButton implements Comparable<TypeButton> {
+    static class TypeButton extends JButton implements Comparable<TypeButton> {
 
-        BibtexEntryType type;
+        final BibtexEntryType type;
 
 
         public TypeButton(String label, BibtexEntryType type_) {
@@ -50,6 +51,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             type = type_;
         }
 
+        @Override
         public int compareTo(TypeButton o) {
             return type.getName().compareTo(o.type.getName());
         }
@@ -63,6 +65,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 cancelAction.actionPerformed(null);
             }
@@ -100,11 +103,11 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         for (BibtexEntryType tp : BibtexEntryType.ALL_TYPES.values()) {
             if (tp.isVisibleAtNewEntryDialog()) {
-                TypeButton b = new TypeButton(Util.nCase(tp.getName()), tp);
+                TypeButton b = new TypeButton(StringUtil.nCase(tp.getName()), tp);
                 b.addActionListener(this);
                 // Check if we should finish the row.
                 col++;
-                if (col == COLNUM) {
+                if (col == EntryTypeDialog.COLNUM) {
                     col = 0;
                     con.gridwidth = GridBagConstraints.REMAINDER;
                 } else {
@@ -123,6 +126,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         setResizable(false);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TypeButton) {
             type = ((TypeButton) e.getSource()).type;
@@ -145,6 +149,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             //putValue(MNEMONIC_KEY, GUIGlobals.closeKeyCode);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             dispose();
         }

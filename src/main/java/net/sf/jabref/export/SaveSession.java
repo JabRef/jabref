@@ -15,8 +15,10 @@
 */
 package net.sf.jabref.export;
 
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.util.FileBasedLock;
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 import net.sf.jabref.GUIGlobals;
 
 import java.io.File;
@@ -48,17 +50,20 @@ public class SaveSession {
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
 
-    File file, tmp, backupFile;
-    String encoding;
-    boolean backup, useLockFile;
-    VerifyingWriter writer;
+    private final File file;
+    private File tmp;
+    File backupFile;
+    private String encoding;
+    private boolean backup;
+    private boolean useLockFile;
+    private VerifyingWriter writer;
 
 
     public SaveSession(File file, String encoding, boolean backup) throws IOException,
             UnsupportedCharsetException {
         this.file = file;
-        tmp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
-        useLockFile = Globals.prefs.getBoolean("useLockFiles");
+        tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
+        useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
         this.encoding = encoding;
         writer = new VerifyingWriter(new FileOutputStream(tmp), encoding);
@@ -77,14 +82,15 @@ public class SaveSession {
     }
 
     public void commit() throws SaveException {
-        if (file == null)
+        if (file == null) {
             return;
+        }
         if (file.exists() && backup) {
             String name = file.getName();
             String path = file.getParent();
             File backupFile = new File(path, name + GUIGlobals.backupExt);
             try {
-                Util.copyFile(file, backupFile, true);
+                FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
                 ex.printStackTrace();
                 throw SaveException.BACKUP_CREATION;
@@ -96,8 +102,9 @@ public class SaveSession {
                 try {
                     if (createLockFile()) {
                         // Oops, the lock file already existed. Try to wait it out:
-                        if (!Util.waitForFileLock(file, 10))
+                        if (!FileBasedLock.waitForFileLock(file, 10)) {
                             throw SaveException.FILE_LOCKED;
+                        }
 
                     }
                 } catch (IOException ex) {
@@ -106,7 +113,7 @@ public class SaveSession {
                 }
             }
 
-            Util.copyFile(tmp, file, true);
+            FileUtil.copyFile(tmp, file, true);
         } catch (IOException ex2) {
             // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that
@@ -132,7 +139,7 @@ public class SaveSession {
      * @throws IOException if something happens during creation.
      */
     private boolean createLockFile() throws IOException {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (lock.exists()) {
             return true;
         }
@@ -154,7 +161,7 @@ public class SaveSession {
      * @throws IOException if something goes wrong.
      */
     private boolean deleteLockFile() {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;
         }

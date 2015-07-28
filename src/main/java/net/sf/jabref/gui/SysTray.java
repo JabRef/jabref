@@ -28,8 +28,8 @@ import java.awt.event.MouseEvent;
 
 public class SysTray {
 
-    private JabRefFrame frame;
-    private TrayIcon icon;
+    private final JabRefFrame frame;
+    private final TrayIcon icon;
     private SystemTray tray = null;
 
 
@@ -38,9 +38,11 @@ public class SysTray {
 
         final ActionListener showJabref = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         SysTray.this.frame.showIfMinimizedToSysTray();
                     }
@@ -72,24 +74,26 @@ public class SysTray {
                 super.mouseReleased(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
         });
-        if (SystemTray.isSupported())
+        if (SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
+        }
     }
 
-    public void setTrayIconVisible(boolean visible) {
-        if (tray == null)
+    public void show() {
+        if (tray == null) {
             return;
+        }
         try {
-            if (visible)
-                tray.add(icon);
-            else
-                tray.remove(icon);
+            tray.add(icon);
         } catch (AWTException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(SystemTray.isSupported());
+    public void hide() {
+        if (tray == null) {
+            return;
+        }
+        tray.remove(icon);
     }
 }

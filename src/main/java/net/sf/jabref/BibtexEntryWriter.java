@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.export.FieldFormatter;
+import net.sf.jabref.util.StringUtil;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -15,12 +16,12 @@ public class BibtexEntryWriter {
 
     static {
         // The field name display map.
-        tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
-        tagDisplayNameMap.put("howpublished", "HowPublished");
-        tagDisplayNameMap.put("lastchecked", "LastChecked");
-        tagDisplayNameMap.put("isbn", "ISBN");
-        tagDisplayNameMap.put("issn", "ISSN");
-        tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
+        BibtexEntryWriter.tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
+        BibtexEntryWriter.tagDisplayNameMap.put("howpublished", "HowPublished");
+        BibtexEntryWriter.tagDisplayNameMap.put("lastchecked", "LastChecked");
+        BibtexEntryWriter.tagDisplayNameMap.put("isbn", "ISBN");
+        BibtexEntryWriter.tagDisplayNameMap.put("issn", "ISSN");
+        BibtexEntryWriter.tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
     }
 
     /**
@@ -53,7 +54,7 @@ public class BibtexEntryWriter {
     private final boolean write;
     private final boolean writeFieldCameCaseName = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME);
     private final boolean writeFieldAddSpaces = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES);
-    private final boolean includeEmptyFields = Globals.prefs.getBoolean("includeEmptyFields");
+    private final boolean includeEmptyFields = Globals.prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS);
     private final int writeFieldSortStype = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
 
 
@@ -85,10 +86,10 @@ public class BibtexEntryWriter {
      */
     private void writeSorted(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@" + entry.getType().getName() + "{");
+        out.write('@' + entry.getType().getName() + '{');
 
-        String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + "," + Globals.NEWLINE);
+        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         // Write required fields first.
@@ -107,7 +108,7 @@ public class BibtexEntryWriter {
         }
         // Then optional fields.
         s = entry.getOptionalFields();
-        boolean first = true, previous = true;
+        boolean first = true, previous;
         previous = false;
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
@@ -126,8 +127,9 @@ public class BibtexEntryWriter {
         for (String key : entry.getAllFields()) {
             boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key));
-            if (!written.containsKey(key) && writeIt)
+            if (!written.containsKey(key) && writeIt) {
                 remainingFields.add(key);
+            }
         }
         first = previous;
         for (String field : remainingFields) {
@@ -136,7 +138,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + "}" + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
     }
 
     /**
@@ -148,23 +150,24 @@ public class BibtexEntryWriter {
      */
     private void writeUnsorted(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@" + entry.getType().getName().toUpperCase(Locale.US) + "{");
+        out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 
-        String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + "," + Globals.NEWLINE);
+        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
         String[] s = entry.getRequiredFields();
-        if (s != null)
+        if (s != null) {
             for (String value : s) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
                 written.put(value, null);
             }
+        }
         // Then optional fields.
         s = entry.getOptionalFields();
-        if (s != null)
+        if (s != null) {
             for (String value : s) {
                 if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
                     //writeField(s[i], out, fieldFormatter);
@@ -172,27 +175,30 @@ public class BibtexEntryWriter {
                     written.put(value, null);
                 }
             }
+        }
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
             boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key));
-            if (!written.containsKey(key) && writeIt)
+            if (!written.containsKey(key) && writeIt) {
                 remainingFields.add(key);
+            }
         }
-        for (String field : remainingFields)
+        for (String field : remainingFields) {
             hasWritten = hasWritten | writeField(entry, out, field, hasWritten, false);
+        }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + "}" + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
     }
 
     private void writeUserDefinedOrder(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
-        out.write("@" + entry.getType().getName() + "{");
+        out.write('@' + entry.getType().getName() + '{');
 
-        String str = Util.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + "," + Globals.NEWLINE);
+        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
@@ -210,7 +216,7 @@ public class BibtexEntryWriter {
         }
 
         // Then write remaining fields in alphabetic order.
-        boolean first = true, previous = true;
+        boolean first, previous;
         previous = false;
         //STA get remaining fields
         TreeSet<String> remainingFields = new TreeSet<String>();
@@ -219,8 +225,9 @@ public class BibtexEntryWriter {
             boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key));
             //find the ones has not been written.
-            if (!written.containsKey(key) && writeIt)
+            if (!written.containsKey(key) && writeIt) {
                 remainingFields.add(key);
+            }
         }
         //END get remaining fields
 
@@ -231,7 +238,7 @@ public class BibtexEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + "}" + Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
 
     }
 
@@ -248,11 +255,13 @@ public class BibtexEntryWriter {
      */
     private boolean writeField(BibtexEntry entry, Writer out, String name, boolean isNotFirst, boolean isNextGroup) throws IOException {
         String o = entry.getField(name);
-        if (o != null || includeEmptyFields) {
-            if (isNotFirst)
-                out.write("," + Globals.NEWLINE);
-            if (isNextGroup)
+        if ((o != null) || includeEmptyFields) {
+            if (isNotFirst) {
+                out.write(',' + Globals.NEWLINE);
+            }
+            if (isNextGroup) {
                 out.write(Globals.NEWLINE);
+            }
             out.write("  " + getFieldDisplayName(name) + " = ");
 
             try {
@@ -261,8 +270,9 @@ public class BibtexEntryWriter {
                 throw new IOException(Globals.lang("Error in field") + " '" + name + "': " + ex.getMessage());
             }
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -279,21 +289,22 @@ public class BibtexEntryWriter {
      * @return The display version of the field name.
      */
     private String getFieldDisplayName(String field) {
-        if (field.length() == 0) {
+        if (field.isEmpty()) {
             // hard coded "UNKNOWN" is assigned to a field without any name
             field = "UNKNOWN";
         }
 
         String suffix = "";
         if (writeFieldAddSpaces) {
-            for (int i = maxFieldLength - field.length(); i > 0; i--)
+            for (int i = BibtexEntryWriter.maxFieldLength - field.length(); i > 0; i--) {
                 suffix += " ";
+            }
         }
 
         String res;
         if (writeFieldCameCaseName) {
-            if (tagDisplayNameMap.containsKey(field.toLowerCase())) {
-                res = tagDisplayNameMap.get(field.toLowerCase()) + suffix;
+            if (BibtexEntryWriter.tagDisplayNameMap.containsKey(field.toLowerCase())) {
+                res = BibtexEntryWriter.tagDisplayNameMap.get(field.toLowerCase()) + suffix;
             } else {
                 res = (field.charAt(0) + "").toUpperCase() + field.substring(1) + suffix;
             }

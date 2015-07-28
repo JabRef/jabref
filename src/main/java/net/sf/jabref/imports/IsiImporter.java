@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.util.CaseChangers;
+import net.sf.jabref.util.MonthUtil;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -43,16 +45,13 @@ import net.sf.jabref.util.CaseChangers;
  * http://web.mit.edu/emilio/www/utils.html</li>
  * <li>Deal with capitalization correctly</li>
  * </ul>
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class IsiImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "ISI";
     }
@@ -62,6 +61,7 @@ public class IsiImporter extends ImportFormat {
      * 
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "isi";
     }
@@ -69,12 +69,13 @@ public class IsiImporter extends ImportFormat {
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
     // extra | at the end:
-    static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
+    private static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -90,8 +91,9 @@ public class IsiImporter extends ImportFormat {
              * 
              * str = str.replace(" - ", "")
              */
-            if (isiPattern.matcher(str).find())
+            if (IsiImporter.isiPattern.matcher(str).find()) {
                 return true;
+            }
 
             i++;
         }
@@ -100,7 +102,7 @@ public class IsiImporter extends ImportFormat {
     }
 
 
-    static Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
+    private static final Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
 
     static public void processSubSup(HashMap<String, String> map) {
@@ -110,7 +112,7 @@ public class IsiImporter extends ImportFormat {
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
 
-                Matcher m = subsupPattern.matcher(map.get(aSubsup));
+                Matcher m = IsiImporter.subsupPattern.matcher(map.get(aSubsup));
                 StringBuffer sb = new StringBuffer();
 
                 while (m.find()) {
@@ -134,7 +136,7 @@ public class IsiImporter extends ImportFormat {
         }
     }
 
-    static public void processCapitalization(HashMap<String, String> map) {
+    private static void processCapitalization(HashMap<String, String> map) {
 
         String[] subsup = {"title", "journal", "publisher"};
 
@@ -155,13 +157,14 @@ public class IsiImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         if (stream == null) {
             throw new IOException("No stream given.");
         }
 
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
@@ -170,13 +173,14 @@ public class IsiImporter extends ImportFormat {
         String str;
 
         while ((str = in.readLine()) != null) {
-            if (str.length() < 3)
+            if (str.length() < 3) {
                 continue;
+            }
 
             // begining of a new item
-            if (str.substring(0, 3).equals("PT "))
+            if (str.substring(0, 3).equals("PT ")) {
                 sb.append("::").append(str);
-            else {
+            } else {
                 String beg = str.substring(0, 3).trim();
 
                 // I could have used the fieldPattern regular expression instead
@@ -200,8 +204,9 @@ public class IsiImporter extends ImportFormat {
         for (String entry : entries) {
             String[] fields = entry.split(" ## ");
 
-            if (fields.length == 0)
+            if (fields.length == 0) {
                 fields = entry.split("\n");
+            }
 
             String Type = "";
             String PT = "";
@@ -210,8 +215,9 @@ public class IsiImporter extends ImportFormat {
 
             for (String field : fields) {
                 // empty field don't do anything
-                if (field.length() <= 2)
+                if (field.length() <= 2) {
                     continue;
+                }
 
                 String beg = field.substring(0, 2);
                 String value = field.substring(3);
@@ -228,64 +234,67 @@ public class IsiImporter extends ImportFormat {
                     }
                     Type = "article"; // make all of them PT?
                 } else if (beg.equals("TY")) {
-                    if ("JOUR".equals(value))
+                    if ("JOUR".equals(value)) {
                         Type = "article";
-                    else if ("CONF".equals(value))
+                    } else if ("CONF".equals(value)) {
                         Type = "inproceedings";
-                } else if (beg.equals("JO"))
+                    }
+                } else if (beg.equals("JO")) {
                     hm.put("booktitle", value);
-                else if (beg.equals("AU")) {
-                    String author = isiAuthorsConvert(value.replaceAll("EOLEOL", " and "));
+                } else if (beg.equals("AU")) {
+                    String author = IsiImporter.isiAuthorsConvert(value.replaceAll("EOLEOL", " and "));
 
                     // if there is already someone there then append with "and"
-                    if (hm.get("author") != null)
+                    if (hm.get("author") != null) {
                         author = hm.get("author") + " and " + author;
+                    }
 
                     hm.put("author", author);
-                } else if (beg.equals("TI"))
+                } else if (beg.equals("TI")) {
                     hm.put("title", value.replaceAll("EOLEOL", " "));
-                else if (beg.equals("SO") || beg.equals("JA"))
+                } else if (beg.equals("SO") || beg.equals("JA")) {
                     hm.put("journal", value.replaceAll("EOLEOL", " "));
-                else if (beg.equals("ID") || beg.equals("KW")) {
+                } else if (beg.equals("ID") || beg.equals("KW")) {
 
                     value = value.replaceAll("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
-                    if (existingKeywords != null && !existingKeywords.contains(value)) {
+                    if ((existingKeywords != null) && !existingKeywords.contains(value)) {
                         existingKeywords += ", " + value;
                     } else {
                         existingKeywords = value;
                     }
                     hm.put("keywords", existingKeywords);
 
-                } else if (beg.equals("AB"))
+                } else if (beg.equals("AB")) {
                     hm.put("abstract", value.replaceAll("EOLEOL", " "));
-                else if (beg.equals("BP") || beg.equals("BR") || beg.equals("SP"))
+                } else if (beg.equals("BP") || beg.equals("BR") || beg.equals("SP")) {
                     pages = value;
-                else if (beg.equals("EP")) {
+                } else if (beg.equals("EP")) {
                     int detpos = value.indexOf(' ');
 
                     // tweak for IEEE Explore
-                    if (detpos != -1 && value.substring(0, detpos).trim().length() > 0)
+                    if ((detpos != -1) && (value.substring(0, detpos).trim().length() > 0)) {
                         value = value.substring(0, detpos);
+                    }
 
                     pages = pages + "--" + value;
                 } else if (beg.equals("PS")) {
-                    pages = parsePages(value);
-                } else if (beg.equals("AR"))
+                    pages = IsiImporter.parsePages(value);
+                } else if (beg.equals("AR")) {
                     pages = value;
-                else if (beg.equals("IS"))
+                } else if (beg.equals("IS")) {
                     hm.put("number", value);
-                else if (beg.equals("PY"))
+                } else if (beg.equals("PY")) {
                     hm.put("year", value);
-                else if (beg.equals("VL"))
+                } else if (beg.equals("VL")) {
                     hm.put("volume", value);
-                else if (beg.equals("PU"))
+                } else if (beg.equals("PU")) {
                     hm.put("publisher", value);
-                else if (beg.equals("DI"))
+                } else if (beg.equals("DI")) {
                     hm.put("doi", value);
-                else if (beg.equals("PD")) {
+                } else if (beg.equals("PD")) {
 
-                    String month = parseMonth(value);
+                    String month = IsiImporter.parseMonth(value);
                     if (month != null) {
                         hm.put("month", month);
                     }
@@ -305,18 +314,21 @@ public class IsiImporter extends ImportFormat {
                 } else {
                     // Preserve all other entries except
                     if (beg.equals("ER") || beg.equals("EF") || beg.equals("VR")
-                            || beg.equals("FN"))
+                            || beg.equals("FN")) {
                         continue;
+                    }
                     hm.put(beg, value);
                 }
             }
 
-            if (!"".equals(pages))
+            if (!"".equals(pages)) {
                 hm.put("pages", pages);
+            }
 
             // Skip empty entries
-            if (hm.size() == 0)
+            if (hm.size() == 0) {
                 continue;
+            }
 
             BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                     .getEntryType(Type));
@@ -326,8 +338,9 @@ public class IsiImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().length() == 0))
+                if ((content == null) || (content.trim().length() == 0)) {
                     toRemove.add(key);
+                }
             }
             for (Object aToRemove : toRemove) {
                 hm.remove(aToRemove);
@@ -335,8 +348,8 @@ public class IsiImporter extends ImportFormat {
             }
 
             // Polish entries
-            processSubSup(hm);
-            processCapitalization(hm);
+            IsiImporter.processSubSup(hm);
+            IsiImporter.processCapitalization(hm);
 
             b.setField(hm);
 
@@ -346,7 +359,7 @@ public class IsiImporter extends ImportFormat {
         return bibitems;
     }
 
-    public static String parsePages(String value) {
+    private static String parsePages(String value) {
         int lastDash = value.lastIndexOf("-");
         return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
     }
@@ -386,10 +399,11 @@ public class IsiImporter extends ImportFormat {
     public static String isiAuthorConvert(String author) {
 
         String[] s = author.split(",");
-        if (s.length != 2)
+        if (s.length != 2) {
             return author;
+        }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String last = s[0].trim();
         sb.append(last).append(", ");
@@ -408,13 +422,14 @@ public class IsiImporter extends ImportFormat {
                 for (int j = 0; j < first.length(); j++) {
                     sb.append(first.charAt(j)).append(".");
 
-                    if (j < first.length() - 1)
+                    if (j < (first.length() - 1)) {
                         sb.append(" ");
+                    }
                 }
             } else {
                 sb.append(first);
             }
-            if (i < firstParts.length - 1) {
+            if (i < (firstParts.length - 1)) {
                 sb.append(" ");
             }
         }
@@ -422,18 +437,18 @@ public class IsiImporter extends ImportFormat {
 
     }
 
-    public static String[] isiAuthorsConvert(String[] authors) {
+    private static String[] isiAuthorsConvert(String[] authors) {
 
         String[] result = new String[authors.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = isiAuthorConvert(authors[i]);
+            result[i] = IsiImporter.isiAuthorConvert(authors[i]);
         }
         return result;
     }
 
     public static String isiAuthorsConvert(String authors) {
-        String[] s = isiAuthorsConvert(authors.split(" and |;"));
-        return Util.join(s, " and ");
+        String[] s = IsiImporter.isiAuthorsConvert(authors.split(" and |;"));
+        return StringUtil.join(s, " and ");
     }
 
 }

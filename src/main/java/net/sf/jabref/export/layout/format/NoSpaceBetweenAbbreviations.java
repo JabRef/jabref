@@ -31,10 +31,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * <p>
  * See Testcase for more examples.
  * <p>
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class NoSpaceBetweenAbbreviations implements LayoutFormatter {
 
@@ -46,6 +42,7 @@ public class NoSpaceBetweenAbbreviations implements LayoutFormatter {
      * 
      * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
      */
+    @Override
     public String format(String fieldText) {
         return fieldText.replaceAll("\\.\\s+(\\p{Lu})(?=\\.)", "\\.$1");
     }

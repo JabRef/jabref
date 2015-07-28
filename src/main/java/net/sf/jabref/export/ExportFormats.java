@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.*;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -40,7 +41,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
  */
 public class ExportFormats {
 
-    private static Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
+    private static final Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
 
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber = 0;
@@ -48,40 +49,40 @@ public class ExportFormats {
 
     public static void initAllExports() {
 
-        exportFormats.clear();
+        ExportFormats.exportFormats.clear();
 
         // Initialize Build-In Export Formats
-        putFormat(new ExportFormat(
+        ExportFormats.putFormat(new ExportFormat(
                 Globals.lang("HTML"), "html", "html", null, ".html"));
-        putFormat(new ExportFormat(
+        ExportFormats.putFormat(new ExportFormat(
                 Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
-        putFormat(new ExportFormat(Globals.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
-        putFormat(new ExportFormat(Globals.lang("DIN 1505"), "din1505", "din1505winword", "din1505", ".rtf"));
-        putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
-        putFormat(new ExportFormat(Globals.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
-        putFormat(new ModsExportFormat());
-        putFormat(new ExportFormat(Globals.lang("HTML table"),
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("DIN 1505"), "din1505", "din1505winword", "din1505", ".rtf"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
+        ExportFormats.putFormat(new ModsExportFormat());
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table"),
                 "tablerefs", "tablerefs", "tablerefs", ".html"));
-        putFormat(new ExportFormat(Globals.lang("HTML list"),
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML list"),
                 "listrefs", "listrefs", "listrefs", ".html"));
-        putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
-        putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
                 "harvard", ".rtf"));
-        putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
-        putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
-        putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
                 "endnote", ".txt"));
-        putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
         ExportFormat ef = new ExportFormat(Globals.lang("RIS"), "ris", "ris", "ris", ".ris");
         ef.encoding = "UTF-8";
-        putFormat(ef);
-        putFormat(new OpenOfficeDocumentCreator());
-        putFormat(new OpenDocumentSpreadsheetCreator());
-        putFormat(new MSBibExportFormat());
-        putFormat(new MySQLExport());
-        putFormat(new PostgreSQLExport());
+        ExportFormats.putFormat(ef);
+        ExportFormats.putFormat(new OpenOfficeDocumentCreator());
+        ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
+        ExportFormats.putFormat(new MSBibExportFormat());
+        ExportFormats.putFormat(new MySQLExport());
+        ExportFormats.putFormat(new PostgreSQLExport());
 
         // Add Export Formats contributed by Plugins
         JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
@@ -91,22 +92,25 @@ public class ExportFormats {
             for (ExportFormatTemplateExtension e : plugin.getExportFormatTemplateExtensions()) {
                 ExportFormat format = PluginBasedExportFormat.getFormat(e);
                 if (format != null) {
-                    putFormat(format);
+                    ExportFormats.putFormat(format);
                 }
             }
 
             // 2. ExportFormat classed 
             for (final ExportFormatExtension e : plugin.getExportFormatExtensions()) {
-                putFormat(new IExportFormat() {
+                ExportFormats.putFormat(new IExportFormat() {
 
+                    @Override
                     public String getConsoleName() {
                         return e.getConsoleName();
                     }
 
+                    @Override
                     public String getDisplayName() {
                         return e.getDisplayName();
                     }
 
+                    @Override
                     public FileFilter getFileFilter() {
                         return new ExportFileFilter(this, e.getExtension());
                     }
@@ -115,12 +119,14 @@ public class ExportFormats {
                     IExportFormat wrapped;
 
 
+                    @Override
                     public void performExport(BibtexDatabase database, MetaData metaData,
                             String file, String encoding, Set<String> entryIds)
                             throws Exception {
 
-                        if (wrapped == null)
+                        if (wrapped == null) {
                             wrapped = e.getExportFormat();
+                        }
                         wrapped.performExport(database, metaData, file, encoding, entryIds);
                     }
                 });
@@ -130,7 +136,7 @@ public class ExportFormats {
             for (ExportFormatProviderExtension e : plugin.getExportFormatProviderExtensions()) {
                 IExportFormatProvider formatProvider = e.getFormatProvider();
                 for (IExportFormat exportFormat : formatProvider.getExportFormats()) {
-                    putFormat(exportFormat);
+                    ExportFormats.putFormat(exportFormat);
                 }
             }
         }
@@ -138,7 +144,7 @@ public class ExportFormats {
         // Now add custom export formats
         TreeMap<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats();
         for (IExportFormat format : customFormats.values()) {
-            putFormat(format);
+            ExportFormats.putFormat(format);
         }
     }
 
@@ -154,16 +160,17 @@ public class ExportFormats {
      */
     public static String getConsoleExportList(int maxLineLength, int firstLineSubtr,
             String linePrefix) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int lastBreak = -firstLineSubtr;
 
-        for (String name : exportFormats.keySet()) {
-            if (sb.length() + 2 + name.length() - lastBreak > maxLineLength) {
+        for (String name : ExportFormats.exportFormats.keySet()) {
+            if (((sb.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
                 sb.append(",\n");
                 lastBreak = sb.length();
                 sb.append(linePrefix);
-            } else if (sb.length() > 0)
+            } else if (sb.length() > 0) {
                 sb.append(", ");
+            }
             sb.append(name);
         }
 
@@ -176,7 +183,7 @@ public class ExportFormats {
      */
     public static Map<String, IExportFormat> getExportFormats() {
         // It is perhaps overly paranoid to make a defensive copy in this case:
-        return Collections.unmodifiableMap(exportFormats);
+        return Collections.unmodifiableMap(ExportFormats.exportFormats);
     }
 
     /**
@@ -188,7 +195,7 @@ public class ExportFormats {
      *         registered.
      */
     public static IExportFormat getExportFormat(String consoleName) {
-        return exportFormats.get(consoleName);
+        return ExportFormats.exportFormats.get(consoleName);
     }
 
     /**
@@ -207,39 +214,43 @@ public class ExportFormats {
 
             private static final long serialVersionUID = 639463604530580554L;
 
-            private JabRefFrame frame;
+            private final JabRefFrame frame;
 
-            private boolean selectedOnly;
+            private final boolean selectedOnly;
 
 
             public ExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(NAME, selectedOnly ? "Export selected entries" : "Export");
+                putValue(Action.NAME, selectedOnly ? "Export selected entries" : "Export");
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ExportFormats.initAllExports();
                 JFileChooser fc = ExportFormats.createExportFileChooser(
-                        Globals.prefs.get("exportWorkingDirectory"));
+                        Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 fc.showSaveDialog(frame);
                 File file = fc.getSelectedFile();
-                if (file == null)
+                if (file == null) {
                     return;
+                }
                 FileFilter ff = fc.getFileFilter();
                 if (ff instanceof ExportFileFilter) {
 
                     ExportFileFilter eff = (ExportFileFilter) ff;
                     String path = file.getPath();
-                    if (!path.endsWith(eff.getExtension()))
+                    if (!path.endsWith(eff.getExtension())) {
                         path = path + eff.getExtension();
+                    }
                     file = new File(path);
                     if (file.exists()) {
                         // Warn that the file exists:
-                        if (JOptionPane.showConfirmDialog(frame, "'" + file.getName() + "' "
+                        if (JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' "
                                 + Globals.lang("exists. Overwrite file?"), Globals.lang("Export"),
-                                JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)
+                                JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                             return;
+                        }
                     }
                     final IExportFormat format = eff.getExportFormat();
                     Set<String> entryIds = null;
@@ -261,8 +272,8 @@ public class ExportFormats {
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
-                    Globals.prefs.put("lastUsedExport", format.getConsoleName());
-                    Globals.prefs.put("exportWorkingDirectory", file.getParent());
+                    Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getConsoleName());
+                    Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent());
 
                     final File finFile = file;
                     final Set<String> finEntryIDs = entryIds;
@@ -271,6 +282,7 @@ public class ExportFormats {
                         String errorMessage = null;
 
 
+                        @Override
                         public void run() {
                             try {
                                 format.performExport(frame.basePanel().database(),
@@ -287,6 +299,7 @@ public class ExportFormats {
                             }
                         }
 
+                        @Override
                         public void update() {
                             // No error message. Report success:
                             if (errorMessage == null) {
@@ -315,29 +328,31 @@ public class ExportFormats {
         return new ExportAction(frame, selectedOnly);
     }
 
-    public static JFileChooser createExportFileChooser(String currentDir) {
-        String lastUsedFormat = Globals.prefs.get("lastUsedExport");
+    private static JFileChooser createExportFileChooser(String currentDir) {
+        String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
         TreeSet<FileFilter> filters = new TreeSet<FileFilter>();
-        for (Map.Entry<String, IExportFormat> e : exportFormats.entrySet()) {
+        for (Map.Entry<String, IExportFormat> e : ExportFormats.exportFormats.entrySet()) {
             String formatName = e.getKey();
             IExportFormat format = e.getValue();
             filters.add(format.getFileFilter());
-            if (formatName.equals(lastUsedFormat))
+            if (formatName.equals(lastUsedFormat)) {
                 defaultFilter = format.getFileFilter();
+            }
         }
         for (FileFilter ff : filters) {
             fc.addChoosableFileFilter(ff);
         }
         fc.setAcceptAllFileFilterUsed(false);
-        if (defaultFilter != null)
+        if (defaultFilter != null) {
             fc.setFileFilter(defaultFilter);
+        }
         return fc;
     }
 
     private static void putFormat(IExportFormat format) {
-        exportFormats.put(format.getConsoleName(), format);
+        ExportFormats.exportFormats.put(format.getConsoleName(), format);
     }
 
 }

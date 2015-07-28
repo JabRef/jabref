@@ -20,10 +20,10 @@ package net.sf.jabref.imports;
  * Container class for lists with keywords where the case should be kept independent of bibstyle
  * 
  */
-public class CaseKeeperList {
+class CaseKeeperList {
 
     // Common words in IEEE Xplore that should always be in the given case
-    public String[] wordListIEEEXplore = new String[] {
+    private final String[] wordListIEEEXplore = new String[] {
             "1-D",
             "1D",
             "2-D",
@@ -666,7 +666,7 @@ public class CaseKeeperList {
     };
 
     // Weekdays and months
-    public String[] wordListDayMonth = new String[] {
+    private final String[] wordListDayMonth = new String[] {
             "Monday",
             "Tuesday",
             "Wednesday",
@@ -688,7 +688,7 @@ public class CaseKeeperList {
             "December"
     };
 
-    private String[] wordListCountries = new String[] {
+    private final String[] wordListCountries = new String[] {
             "Andorra",
             "United Arab Emirates",
             "UAE",
@@ -979,13 +979,13 @@ public class CaseKeeperList {
     };
 
     // List of all keyword lists
-    private String[][] allLists = new String[][] {
+    private final String[][] allLists = new String[][] {
             wordListIEEEXplore,
             wordListDayMonth,
             wordListCountries
     };
 
-    private String[][] genericLists = new String[][] {
+    private final String[][] genericLists = new String[][] {
             wordListDayMonth,
             wordListCountries
     };

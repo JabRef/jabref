@@ -44,12 +44,13 @@ import net.sf.jabref.plugin.PluginInstaller.NameAndVersion;
  *
  * @author alver
  */
-public class ManagePluginsDialog {
+class ManagePluginsDialog {
 
-    private JabRefFrame frame;
-    private JDialog diag;
+    private final JabRefFrame frame;
+    private final JDialog diag;
     private SortedList<NameAndVersion> plugins;
-    private JTable table, tableOther;
+    private final JTable table;
+    private final JTable tableOther;
 
 
     public ManagePluginsDialog(JabRefFrame frame) {
@@ -108,6 +109,7 @@ public class ManagePluginsDialog {
 
         install.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 installPlugin();
             }
@@ -115,6 +117,7 @@ public class ManagePluginsDialog {
 
         download.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 downloadPlugin();
             }
@@ -122,6 +125,7 @@ public class ManagePluginsDialog {
 
         Action closeListener = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 diag.dispose();
             }
@@ -130,6 +134,7 @@ public class ManagePluginsDialog {
 
         remove.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent arg0) {
                 removeSelected();
             }
@@ -153,8 +158,9 @@ public class ManagePluginsDialog {
                 title = Globals.lang("Delete plugin");
             }
             int reply = JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION);
-            if (reply != JOptionPane.YES_OPTION)
+            if (reply != JOptionPane.YES_OPTION) {
                 return;
+            }
             boolean success = true;
             for (int aSel : sel) {
                 NameAndVersion nav = plugins.get(aSel);
@@ -203,11 +209,12 @@ public class ManagePluginsDialog {
         diag.setVisible(visible);
     }
 
-    public void installPlugin() {
+    private void installPlugin() {
         String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
                 ".jar", JFileChooser.OPEN_DIALOG, false);
-        if (filename == null)
+        if (filename == null) {
             return;
+        }
         File f = new File(filename);
         if (!f.exists()) {
             JOptionPane.showMessageDialog(frame, Globals.lang("File not found") + ".",
@@ -218,10 +225,11 @@ public class ManagePluginsDialog {
 
     }
 
-    public void downloadPlugin() {
+    private void downloadPlugin() {
         String url = JOptionPane.showInputDialog(Globals.lang("Enter download URL"));
-        if (url == null)
+        if (url == null) {
             return;
+        }
         try {
             installFromURL(new URL(url));
         } catch (MalformedURLException e) {
@@ -230,7 +238,7 @@ public class ManagePluginsDialog {
         }
     }
 
-    public void installFromURL(URL url) {
+    private void installFromURL(URL url) {
         try {
             File tmpFile = File.createTempFile("jabref-plugin", ".jar");
             tmpFile.deleteOnExit();
@@ -238,8 +246,9 @@ public class ManagePluginsDialog {
             ud.downloadToFile(tmpFile);
             String path = url.getPath();
             int pos = path.lastIndexOf('/');
-            if ((pos >= 0) && (pos < path.length() - 1))
+            if ((pos >= 0) && (pos < (path.length() - 1))) {
                 path = path.substring(pos + 1);
+            }
             PluginInstaller.installPlugin(frame, tmpFile, path);
             tmpFile.delete();
             buildList();
@@ -249,44 +258,50 @@ public class ManagePluginsDialog {
 
     }
 
-    public void installFromFile(File file) {
+    private void installFromFile(File file) {
         PluginInstaller.installPlugin(frame, file, null);
         buildList();
     }
 
 
-    class PluginTableFormat implements TableFormat<NameAndVersion> {
+    private class PluginTableFormat implements TableFormat<NameAndVersion> {
 
+        @Override
         public int getColumnCount() {
             return 3;
         }
 
+        @Override
         public String getColumnName(int col) {
-            if (col == 0)
+            if (col == 0) {
                 return Globals.lang("Plugin name");
-            else if (col == 1)
+            } else if (col == 1) {
                 return Globals.lang("Version");
-            else
+            } else {
                 return Globals.lang("Status");
+            }
         }
 
+        @Override
         public Object getColumnValue(NameAndVersion nav, int col) {
-            if (col == 0)
+            if (col == 0) {
                 return nav.name;
-            else if (col == 1) {
-                if (!nav.version.equals(PluginInstaller.VersionNumber.ZERO))
+            } else if (col == 1) {
+                if (!nav.version.equals(PluginInstaller.VersionNumber.ZERO)) {
                     return nav.version.toString();
-                else
+                } else {
                     return Globals.lang("Unknown");
+                }
             }
             else {
                 int status = nav.getStatus();
-                if (status == 0)
+                if (status == 0) {
                     return Globals.lang("Not loaded");
-                else if (status == 1)
+                } else if (status == 1) {
                     return Globals.lang("Loaded");
-                else
+                } else {
                     return Globals.lang("Error");
+                }
             }
         }
 

@@ -46,27 +46,27 @@ public class MySQLImporter extends DBImporter {
      * @return The singleton instance of the MySQLImporter
      */
     public static MySQLImporter getInstance() {
-        if (instance == null)
-            instance = new MySQLImporter();
-        return instance;
+        if (MySQLImporter.instance == null) {
+            MySQLImporter.instance = new MySQLImporter();
+        }
+        return MySQLImporter.instance;
     }
 
     @Override
     protected ResultSet readColumnNames(Connection conn) throws SQLException {
         Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
                 "SHOW columns FROM entries;");
-        ResultSet rs = statement.getResultSet();
-        return rs;
+        return statement.getResultSet();
     }
 
+    @Override
     protected Connection connectToDB(DBStrings dbstrings) throws Exception {
         String url = SQLUtil.createJDBCurl(dbstrings, true);
         String drv = "com.mysql.jdbc.Driver";
 
         Class.forName(drv).newInstance();
-        Connection conn = DriverManager.getConnection(url,
+        return DriverManager.getConnection(url,
                 dbstrings.getUsername(), dbstrings.getPassword());
-        return conn;
     }
 
 }

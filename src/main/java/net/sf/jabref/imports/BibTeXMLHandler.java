@@ -17,10 +17,7 @@ package net.sf.jabref.imports;
 
 import java.util.ArrayList;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
@@ -31,7 +28,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Egon Willighagen
  */
-public class BibTeXMLHandler extends DefaultHandler {
+class BibTeXMLHandler extends DefaultHandler {
 
     private ArrayList<BibtexEntry> bibitems;
 
@@ -55,21 +52,24 @@ public class BibTeXMLHandler extends DefaultHandler {
             String systemId) {
     }
 
+    @Override
     public void startDocument() {
         bibitems = new ArrayList<BibtexEntry>();
     }
 
+    @Override
     public void endDocument() {
     }
 
+    @Override
     public void characters(char ch[], int start, int length) {
         String s = new String(ch, start, length).trim();
         currentChars += s;
     }
 
+    @Override
     public void startElement(String uri, String local, String raw, Attributes atts) {
-        String name = raw;
-        if (name.equals("bibtex:entry")) {
+        if (raw.equals("bibtex:entry")) {
             String articleID = null;
             for (int i = 0; i < atts.getLength(); i++) {
                 if (atts.getQName(i).equals("bibtex:id") ||
@@ -77,33 +77,33 @@ public class BibTeXMLHandler extends DefaultHandler {
                     articleID = atts.getValue(i);
                 }
             }
-            b = new BibtexEntry(Util.createNeutralId());
+            b = new BibtexEntry(IdGenerator.next());
             b.setField(BibtexFields.KEY_FIELD, articleID);
-        } else if (name.equals("bibtex:article") ||
-                name.equals("bibtex:inbook") ||
-                name.equals("bibtex:book") ||
-                name.equals("bibtex:booklet") ||
-                name.equals("bibtex:incollection") ||
-                name.equals("bibtex:inproceedings") ||
-                name.equals("bibtex:proceedings") ||
-                name.equals("bibtex:manual") ||
-                name.equals("bibtex:mastersthesis") ||
-                name.equals("bibtex:phdthesis") ||
-                name.equals("bibtex:techreport") ||
-                name.equals("bibtex:unpublished") ||
-                name.equals("bibtex:misc") ||
-                name.equals("bibtex:other")) {
+        } else if (raw.equals("bibtex:article") ||
+                raw.equals("bibtex:inbook") ||
+                raw.equals("bibtex:book") ||
+                raw.equals("bibtex:booklet") ||
+                raw.equals("bibtex:incollection") ||
+                raw.equals("bibtex:inproceedings") ||
+                raw.equals("bibtex:proceedings") ||
+                raw.equals("bibtex:manual") ||
+                raw.equals("bibtex:mastersthesis") ||
+                raw.equals("bibtex:phdthesis") ||
+                raw.equals("bibtex:techreport") ||
+                raw.equals("bibtex:unpublished") ||
+                raw.equals("bibtex:misc") ||
+                raw.equals("bibtex:other")) {
             BibtexEntryType tp = BibtexEntryType.getType(local);
             b.setType(tp);
         }
         currentChars = "";
     }
 
+    @Override
     public void endElement(String uri, String local, String raw) {
-        String name = raw;
-        if (name.equals("bibtex:entry")) {
+        if (raw.equals("bibtex:entry")) {
             bibitems.add(b);
-        } else if (name.startsWith("bibtex:")) {
+        } else if (raw.startsWith("bibtex:")) {
             b.setField(local, currentChars);
             // Util.pr(local+ " "+currentChars);
         }

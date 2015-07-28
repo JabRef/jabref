@@ -33,9 +33,9 @@ import ca.odell.glazedlists.BasicEventList;
 
 public class CustomExportList {
 
-    private EventList<String[]> list;
-    private SortedList<String[]> sorted;
-    private TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
+    private final EventList<String[]> list;
+    private final SortedList<String[]> sorted;
+    private final TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
     private Object[] array;
 
 
@@ -77,21 +77,19 @@ public class CustomExportList {
     }
 
     private ExportFormat createFormat(String[] s) {
-        if (s.length < 3)
+        if (s.length < 3) {
             return null;
+        }
         String lfFileName;
-        if (s[1].endsWith(".layout"))
+        if (s[1].endsWith(".layout")) {
             lfFileName = s[1].substring(0, s[1].length() - 7);
-        else
+        } else {
             lfFileName = s[1];
+        }
         ExportFormat format = new ExportFormat(s[0], s[0], lfFileName, null,
                 s[2]);
         format.setCustomExport(true);
         return format;
-    }
-
-    public String[] getElementAt(int pos) {
-        return (String[]) (array[pos]);
     }
 
     public void addFormat(String[] s) {
@@ -110,9 +108,9 @@ public class CustomExportList {
 
     public void store() {
 
-        if (list.size() == 0)
+        if (list.isEmpty()) {
             purge(0);
-        else {
+        } else {
             for (int i = 0; i < list.size(); i++) {
                 // System.out.println(i+"..");
                 Globals.prefs.putStringArray("customExportFormat" + i,

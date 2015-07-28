@@ -81,9 +81,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * Yeah this is trouble-some to write, but should work.
  * 
  * For more examples see the test-cases.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
  *
  */
 public class NameFormat implements LayoutFormatter {
@@ -91,9 +88,9 @@ public class NameFormat implements LayoutFormatter {
     public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
 
 
-    public String format(String toFormat, AuthorList al, String[] formats) {
+    private String format(String toFormat, AuthorList al, String[] formats) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         int n = al.size();
 
@@ -112,17 +109,19 @@ public class NameFormat implements LayoutFormatter {
                     } else {
                         s = e = Integer.parseInt(range[0]);
                     }
-                    if (s < 0)
+                    if (s < 0) {
                         s += n + 1;
-                    if (e < 0)
+                    }
+                    if (e < 0) {
                         e += n + 1;
+                    }
                     if (e < s) {
                         int temp = e;
                         e = s;
                         s = temp;
                     }
 
-                    if (s <= i && i <= e) {
+                    if ((s <= i) && (i <= e)) {
                         sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
                         break;
                     }
@@ -137,7 +136,7 @@ public class NameFormat implements LayoutFormatter {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
-        if (parameters == null || parameters.length() == 0) {
+        if ((parameters == null) || (parameters.isEmpty())) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
         }
 
@@ -161,12 +160,13 @@ public class NameFormat implements LayoutFormatter {
         return toFormat;
     }
 
+    @Override
     public String format(String fieldText) {
         return format(fieldText, parameter, null);
     }
 
 
-    String parameter = DEFAULT_FORMAT;
+    private String parameter = NameFormat.DEFAULT_FORMAT;
 
 
     public void setParameter(String parameter) {

@@ -19,6 +19,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
@@ -33,7 +34,7 @@ import net.sf.jabref.MnemonicAwareAction;
  */
 public class HelpAction extends MnemonicAwareAction {
 
-    private HelpDialog diag;
+    private final HelpDialog diag;
 
     private Class resourceOwner = null;
 
@@ -42,48 +43,48 @@ public class HelpAction extends MnemonicAwareAction {
 
     public HelpAction(HelpDialog diag, String helpFile) {
         super(GUIGlobals.getImage("help"));
-        putValue(NAME, "Help");
+        putValue(Action.NAME, "Help");
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
         super(GUIGlobals.getImage("help"));
-        putValue(NAME, "Help");
-        putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+        putValue(Action.NAME, "Help");
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(tooltip));
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip, URL iconFile) {
         super(new ImageIcon(iconFile));
-        putValue(NAME, "Help");
-        putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+        putValue(Action.NAME, "Help");
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(tooltip));
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
         super(GUIGlobals.getImage("help"));
-        putValue(NAME, title);
-        putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+        putValue(Action.NAME, title);
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(tooltip));
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, KeyStroke key) {
         super(GUIGlobals.getImage("help"));
-        putValue(NAME, title);
-        putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
-        putValue(ACCELERATOR_KEY, key);
+        putValue(Action.NAME, title);
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(tooltip));
+        putValue(Action.ACCELERATOR_KEY, key);
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, URL iconFile) {
         super(new ImageIcon(iconFile));
-        putValue(NAME, title);
-        putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+        putValue(Action.NAME, title);
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(tooltip));
         this.diag = diag;
         this.helpFile = helpFile;
     }
@@ -103,10 +104,12 @@ public class HelpAction extends MnemonicAwareAction {
         this.helpFile = helpFile;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
-        if (resourceOwner == null)
+        if (resourceOwner == null) {
             diag.showPage(helpFile);
-        else
+        } else {
             diag.showPage(helpFile, resourceOwner);
+        }
     }
 }

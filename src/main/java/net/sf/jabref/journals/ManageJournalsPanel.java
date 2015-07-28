@@ -31,8 +31,11 @@ import javax.swing.table.AbstractTableModel;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.journals.logic.Abbreviation;
+import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.net.URLDownload;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -48,33 +51,26 @@ import com.jgoodies.forms.layout.FormLayout;
  * Time: 7:57:29 PM
  * To browseOld this template use File | Settings | File Templates.
  */
-public class ManageJournalsPanel extends JPanel {
+class ManageJournalsPanel extends JPanel {
 
-    JabRefFrame frame;
-    JTextField personalFile = new JTextField();
-    AbbreviationsTableModel tableModel = new AbbreviationsTableModel();
-    JTable userTable; // builtInTable
-    JPanel userPanel = new JPanel(),
-            journalEditPanel,
-            externalFilesPanel = new JPanel(),
-            addExtPan = new JPanel();
-    JTextField nameTf = new JTextField(),
-            newNameTf = new JTextField(),
-            abbrTf = new JTextField();
-    List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
-    JDialog dialog;
-    JRadioButton newFile = new JRadioButton(Globals.lang("New file")),
-            oldFile = new JRadioButton(Globals.lang("Existing file"));
+    private final JabRefFrame frame;
+    private final JTextField personalFile = new JTextField();
+    private final AbbreviationsTableModel tableModel = new AbbreviationsTableModel();
+    private JTable userTable; // builtInTable
+    private final JPanel userPanel = new JPanel();
+    private final JPanel journalEditPanel;
+    private final JPanel externalFilesPanel = new JPanel();
+    private final JPanel addExtPan = new JPanel();
+    private final JTextField nameTf = new JTextField();
+    private final JTextField newNameTf = new JTextField();
+    private final JTextField abbrTf = new JTextField();
+    private final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
+    private final JDialog dialog;
+    private final JRadioButton newFile = new JRadioButton(Globals.lang("New file"));
+    private final JRadioButton oldFile = new JRadioButton(Globals.lang("Existing file"));
 
-    JButton add = new JButton(GUIGlobals.getImage("add")),
-            remove = new JButton(GUIGlobals.getImage("remove")),
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel")),
-            help = new JButton(Globals.lang("Help")),
-            browseOld = new JButton(Globals.lang("Browse")),
-            browseNew = new JButton(Globals.lang("Browse")),
-            addExt = new JButton(GUIGlobals.getImage("add")),
-            viewBuiltin = new JButton(Globals.lang("View"));
+    private final JButton add = new JButton(GUIGlobals.getImage("add"));
+    private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -86,6 +82,7 @@ public class ManageJournalsPanel extends JPanel {
         group.add(newFile);
         group.add(oldFile);
         addExtPan.setLayout(new BorderLayout());
+        JButton addExt = new JButton(GUIGlobals.getImage("add"));
         addExtPan.add(addExt, BorderLayout.EAST);
         addExtPan.setToolTipText(Globals.lang("Add"));
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
@@ -105,18 +102,21 @@ public class ManageJournalsPanel extends JPanel {
                         + "well as linking to external journal lists.") + "</HTML>");
         description.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         builder.add(description, cc.xyw(2, 2, 6));
+        JButton viewBuiltin = new JButton(Globals.lang("View"));
         builder.add(viewBuiltin, cc.xy(7, 2));
         builder.addSeparator(Globals.lang("Personal journal list"), cc.xyw(2, 3, 6));
 
         //builder.add(description, cc.xyw(2,1,6));
         builder.add(newFile, cc.xy(3, 4));
         builder.add(newNameTf, cc.xy(5, 4));
+        JButton browseNew = new JButton(Globals.lang("Browse"));
         builder.add(browseNew, cc.xy(7, 4));
         builder.add(oldFile, cc.xy(3, 5));
         builder.add(personalFile, cc.xy(5, 5));
         //BrowseAction action = new BrowseAction(personalFile, false);
         //JButton browse = new JButton(Globals.lang("Browse"));
         //browse.addActionListener(action);
+        JButton browseOld = new JButton(Globals.lang("Browse"));
         builder.add(browseOld, cc.xy(7, 5));
 
         userPanel.setLayout(new BorderLayout());
@@ -139,9 +139,12 @@ public class ManageJournalsPanel extends JPanel {
         add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Globals.lang("Ok"));
         bb.addButton(ok);
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         bb.addButton(cancel);
         bb.addUnrelatedGap();
+        JButton help = new JButton(Globals.lang("Help"));
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -164,9 +167,11 @@ public class ManageJournalsPanel extends JPanel {
 
         viewBuiltin.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                JournalAbbreviations abbr = new JournalAbbreviations(Globals.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(abbr.getTableModel());
+                JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+                abbr.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
+                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
                 JScrollPane pane = new JScrollPane(table);
                 JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
             }
@@ -174,10 +179,12 @@ public class ManageJournalsPanel extends JPanel {
 
         browseNew.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 File old = null;
-                if (!newNameTf.getText().equals(""))
+                if (!newNameTf.getText().equals("")) {
                     old = new File(newNameTf.getText());
+                }
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.SAVE_DIALOG, false);
                 if (name != null) {
                     newNameTf.setText(name);
@@ -187,10 +194,12 @@ public class ManageJournalsPanel extends JPanel {
         });
         browseOld.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 File old = null;
-                if (!personalFile.getText().equals(""))
+                if (!personalFile.getText().equals("")) {
                     old = new File(personalFile.getText());
+                }
                 String name = FileDialogs.getNewFile(frame, old, null, JFileChooser.OPEN_DIALOG, false);
                 if (name != null) {
                     personalFile.setText(name);
@@ -203,6 +212,7 @@ public class ManageJournalsPanel extends JPanel {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (readyToClose()) {
                     try {
@@ -218,6 +228,7 @@ public class ManageJournalsPanel extends JPanel {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.dispose();
             }
@@ -228,6 +239,7 @@ public class ManageJournalsPanel extends JPanel {
         remove.addActionListener(tableModel);
         addExt.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 externals.add(new ExternalFileEntry());
                 buildExternalsPanel();
@@ -250,7 +262,7 @@ public class ManageJournalsPanel extends JPanel {
     }
 
     public void setValues() {
-        personalFile.setText(Globals.prefs.get("personalJournalList"));
+        personalFile.setText(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST));
         if (personalFile.getText().length() == 0) {
             newFile.setSelected(true);
             oldFile.setEnabled(false);
@@ -291,7 +303,7 @@ public class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray("externalJournalLists");
+        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if ((externalFiles == null) || (externalFiles.length == 0)) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
@@ -309,24 +321,24 @@ public class ManageJournalsPanel extends JPanel {
 
     }
 
-    public void setupUserTable() {
-        JournalAbbreviations userAbbr = new JournalAbbreviations();
+    private void setupUserTable() {
+        JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
         String filename = personalFile.getText();
         if (!filename.equals("") && (new File(filename)).exists()) {
             try {
-                userAbbr.readJournalList(new File(filename));
+                userAbbr.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
 
-        tableModel.setJournals(userAbbr.getJournals());
+        tableModel.setJournals(userAbbr.getAbbreviations());
         userTable = new JTable(tableModel);
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
 
-    public boolean readyToClose() {
+    private boolean readyToClose() {
         File f;
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {
@@ -340,16 +352,16 @@ public class ManageJournalsPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, Globals.lang("You must choose a file name to store journal abbreviations"),
                             Globals.lang("Store journal abbreviations"), JOptionPane.ERROR_MESSAGE);
                     return false;
-                }
-                else
+                } else {
                     return true;
+                }
 
             }
         }
         return true;
     }
 
-    public void storeSettings() throws FileNotFoundException {
+    private void storeSettings() throws FileNotFoundException {
         File f = null;
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {
@@ -357,8 +369,9 @@ public class ManageJournalsPanel extends JPanel {
             }// else {
              //    return; // Nothing to do.
              //}
-        } else
+        } else {
             f = new File(personalFile.getText());
+        }
 
         if (f != null) {
             if (!f.exists()) {
@@ -378,18 +391,20 @@ public class ManageJournalsPanel extends JPanel {
                 e.printStackTrace();
 
             } finally {
-                if (fw != null)
+                if (fw != null) {
                     try {
                         fw.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }
             }
 
             String filename = f.getPath();
-            if (filename.equals(""))
+            if (filename.equals("")) {
                 filename = null;
-            Globals.prefs.put("personalJournalList", filename);
+            }
+            Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, filename);
         }
 
         // Store the list of external files set up:
@@ -399,11 +414,11 @@ public class ManageJournalsPanel extends JPanel {
                 extFiles.add(efe.getValue());
             }
         }
-        if (extFiles.size() == 0)
-            Globals.prefs.put("externalJournalLists", "");
-        else {
+        if (extFiles.size() == 0) {
+            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
+        } else {
             String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray("externalJournalLists", list);
+            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
         }
 
         Globals.initializeJournalNames();
@@ -411,7 +426,7 @@ public class ManageJournalsPanel extends JPanel {
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
         for (int i = 0; i < frame.baseCount(); i++) {
-            frame.baseAt(i).addJournalListToAutoCompleter();
+            frame.baseAt(i).getAutoCompleters().addJournalListToAutoCompleter();
         }
 
     }
@@ -419,7 +434,7 @@ public class ManageJournalsPanel extends JPanel {
 
     class DownloadAction extends AbstractAction {
 
-        JTextField comp;
+        final JTextField comp;
 
 
         public DownloadAction(JTextField tc) {
@@ -427,21 +442,24 @@ public class ManageJournalsPanel extends JPanel {
             comp = tc;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
-            String chosen = null;
+            String chosen;
             chosen = JOptionPane.showInputDialog(Globals.lang("Choose the URL to download. The default value points to a list provided by the JabRef developers."),
                     "http://jabref.sf.net/journals/journal_abbreviations_general.txt");
-            if (chosen == null)
+            if (chosen == null) {
                 return;
+            }
             File toFile;
             try {
                 URL url = new URL(chosen);
                 String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
                         null, JFileChooser.SAVE_DIALOG, false);
-                if (toName == null)
+                if (toName == null) {
                     return;
-                else
+                } else {
                     toFile = new File(toName);
+                }
                 URLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());
             } catch (Exception ex) {
@@ -453,8 +471,8 @@ public class ManageJournalsPanel extends JPanel {
 
     class BrowseAction extends AbstractAction {
 
-        JTextField comp;
-        boolean dir;
+        final JTextField comp;
+        final boolean dir;
 
 
         public BrowseAction(JTextField tc, boolean dir) {
@@ -463,14 +481,16 @@ public class ManageJournalsPanel extends JPanel {
             comp = tc;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
-            String chosen = null;
-            if (dir)
+            String chosen;
+            if (dir) {
                 chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
                         JFileChooser.OPEN_DIALOG, false);
-            else
+            } else {
                 chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE,
                         JFileChooser.OPEN_DIALOG, false);
+            }
             if (chosen != null) {
                 File newFile = new File(chosen);
                 comp.setText(newFile.getPath());
@@ -480,54 +500,62 @@ public class ManageJournalsPanel extends JPanel {
 
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
-        String[] names = new String[] {Globals.lang("Journal name"), Globals.lang("Abbreviation")};
-        ArrayList<JournalEntry> journals = null;
+        final String[] names = new String[] {Globals.lang("Journal name"), Globals.lang("Abbreviation")};
+        List<JournalEntry> journals = null;
 
 
         public AbbreviationsTableModel() {
 
         }
 
-        public void setJournals(Map<String, String> journals) {
+        public void setJournals(SortedSet<Abbreviation> journals) {
             this.journals = new ArrayList<JournalEntry>();
-            for (Map.Entry<String, String> entry : journals.entrySet()) {
-                this.journals.add(new JournalEntry(entry.getKey(), entry.getValue()));
+            for (Abbreviation abbreviation : journals) {
+                this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }
             fireTableDataChanged();
         }
 
-        public ArrayList<JournalEntry> getJournals() {
+        public List<JournalEntry> getJournals() {
             return journals;
         }
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public int getRowCount() {
             return journals.size();
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
-            if (col == 0)
+            if (col == 0) {
                 return journals.get(row).name;
-            else
+            } else {
                 return journals.get(row).abbreviation;
+            }
         }
 
+        @Override
         public void setValueAt(Object object, int row, int col) {
             JournalEntry entry = journals.get(row);
-            if (col == 0)
+            if (col == 0) {
                 entry.name = (String) object;
-            else
+            } else {
                 entry.abbreviation = (String) object;
+            }
 
         }
 
+        @Override
         public String getColumnName(int i) {
             return names[i];
         }
 
+        @Override
         public boolean isCellEditable(int i, int i1) {
             return false;
         }
@@ -535,6 +563,7 @@ public class ManageJournalsPanel extends JPanel {
         public MouseListener getMouseListener() {
             return new MouseAdapter() {
 
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         JTable table = (JTable) e.getSource();
@@ -554,6 +583,7 @@ public class ManageJournalsPanel extends JPanel {
             };
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == add) {
                 //int sel = userTable.getSelectedRow();
@@ -586,11 +616,11 @@ public class ManageJournalsPanel extends JPanel {
     class ExternalFileEntry {
 
         private JPanel pan;
-        private JTextField tf;
-        private JButton browse = new JButton(Globals.lang("Browse")),
-                view = new JButton(Globals.lang("Preview")),
-                clear = new JButton(GUIGlobals.getImage("delete")),
-                download = new JButton(Globals.lang("Download"));
+        private final JTextField tf;
+        private final JButton browse = new JButton(Globals.lang("Browse"));
+        private final JButton view = new JButton(Globals.lang("Preview"));
+        private final JButton clear = new JButton(GUIGlobals.getImage("delete"));
+        private final JButton download = new JButton(Globals.lang("Download"));
 
 
         public ExternalFileEntry() {
@@ -621,10 +651,12 @@ public class ManageJournalsPanel extends JPanel {
 
             view.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        JournalAbbreviations abbr = new JournalAbbreviations(new File(tf.getText()));
-                        JTable table = new JTable(abbr.getTableModel());
+                        JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+                        abbr.readJournalListFromFile(new File(tf.getText()));
+                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
                         JScrollPane pane = new JScrollPane(table);
                         JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
                     } catch (FileNotFoundException ex) {
@@ -635,13 +667,13 @@ public class ManageJournalsPanel extends JPanel {
             });
             clear.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     externals.remove(ExternalFileEntry.this);
                     buildExternalsPanel();
                 }
             });
             clear.setToolTipText(Globals.lang("Remove"));
-
         }
 
         public JPanel getPanel() {
@@ -657,12 +689,12 @@ public class ManageJournalsPanel extends JPanel {
 
         String name, abbreviation;
 
-
         public JournalEntry(String name, String abbreviation) {
             this.name = name;
             this.abbreviation = abbreviation;
         }
 
+        @Override
         public int compareTo(JournalEntry other) {
             return this.name.compareTo(other.name);
         }

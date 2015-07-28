@@ -25,29 +25,34 @@ import net.sf.jabref.OutputPrinter;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
-    List<BibtexEntry> entries = new LinkedList<BibtexEntry>();
+    private final List<BibtexEntry> entries = new LinkedList<BibtexEntry>();
 
 
+    @Override
     public void addEntry(BibtexEntry entry) {
         entries.add(entry);
     }
 
+    @Override
     public void setProgress(int current, int max) {
         status.setStatus(Globals.lang("Progress: %0 of %1", String.valueOf(current), String
                 .valueOf(max)));
     }
 
 
-    OutputPrinter status = new OutputPrinter() {
+    private final OutputPrinter status = new OutputPrinter() {
 
+        @Override
         public void setStatus(String s) {
             System.out.println(s);
         }
 
+        @Override
         public void showMessage(Object message, String title, int msgType) {
             System.out.println(title + ": " + message);
         }
 
+        @Override
         public void showMessage(String message) {
             System.out.println(message);
         }
@@ -62,6 +67,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
         return null;
     }
 
+    @Override
     public void toFront() {
     }
 }

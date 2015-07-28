@@ -16,7 +16,7 @@
 // created by : ?
 //
 // modified : r.nagel 2.09.2004
-//            - new SearcherThread.setFinish() method
+//            - new SearcherRunnable.setFinish() method
 //            - replace thread.sleep in run() by wait() and notify() mechanism
 
 package net.sf.jabref;
@@ -30,34 +30,35 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 import spin.Spin;
 
-public class DuplicateSearch extends Thread {
+public class DuplicateSearch implements Runnable {
 
-    BasePanel panel;
-    BibtexEntry[] bes;
-    final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
-    boolean autoRemoveExactDuplicates = false;
+    private final BasePanel panel;
+    private BibtexEntry[] bes;
+    private final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
 
 
     public DuplicateSearch(BasePanel bp) {
         panel = bp;
     }
 
+    @Override
     public void run() {
         final NamedCompound ce = new NamedCompound(Globals.lang("duplicate removal"));
         int duplicateCounter = 0;
 
-        autoRemoveExactDuplicates = false;
+        boolean autoRemoveExactDuplicates = false;
         panel.output(Globals.lang("Searching for duplicates..."));
         Object[] keys = panel.database.getKeySet().toArray();
-        if ((keys.length < 2))
+        if ((keys.length < 2)) {
             return;
+        }
         bes = new BibtexEntry[keys.length];
-        for (int i = 0; i < keys.length; i++)
+        for (int i = 0; i < keys.length; i++) {
             bes[i] = panel.database.getEntryById((String) keys[i]);
+        }
 
-        SearcherThread st = new SearcherThread();
-        st.setPriority(Thread.MIN_PRIORITY);
-        st.start();
+        SearcherRunnable st = new SearcherRunnable();
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
         final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
@@ -105,7 +106,9 @@ public class DuplicateSearch extends Thread {
                             || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
                         toRemove.add(be[1]);
                         if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
+                         {
                             autoRemoveExactDuplicates = true; // Remember choice
+                        }
                     } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
                         toRemove.add(be[0]);
                     } else if (answer == DuplicateResolverDialog.BREAK) {
@@ -120,9 +123,10 @@ public class DuplicateSearch extends Thread {
         final int dupliC = duplicateCounter;
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 // Now, do the actual removal:
-                if (toRemove.size() > 0) {
+                if (!toRemove.isEmpty()) {
                     for (BibtexEntry entry : toRemove) {
                         panel.database.removeEntry(entry.getId());
                         ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
@@ -130,7 +134,7 @@ public class DuplicateSearch extends Thread {
                     panel.markBaseChanged();
                 }
                 panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + " " + Globals.lang("pairs processed") + ": " + dupliC);
+                        + ' ' + Globals.lang("pairs processed") + ": " + dupliC);
 
                 ce.end();
                 panel.undoManager.addEdit(ce);
@@ -142,21 +146,19 @@ public class DuplicateSearch extends Thread {
     }
 
 
-    class SearcherThread extends Thread {
+    class SearcherRunnable implements Runnable {
 
-        private boolean finished = false;
+        private volatile boolean finished = false;
 
-
+        @Override
         public void run() {
-            for (int i = 0; (i < bes.length - 1) && !finished; i++) {
+            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
                 for (int j = i + 1; (j < bes.length) && !finished; j++) {
                     boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
                     // If (suspected) duplicates, add them to the duplicates vector.
-                    if (eq)
-                    {
-                        synchronized (duplicates)
-                        {
+                    if (eq) {
+                        synchronized (duplicates) {
                             duplicates.add(new BibtexEntry[] {bes[i], bes[j]});
                             duplicates.notifyAll(); // send wake up all
                         }
@@ -165,8 +167,7 @@ public class DuplicateSearch extends Thread {
             }
             finished = true;
             // if no duplicates found, the graphical thread will never wake up
-            synchronized (duplicates)
-            {
+            synchronized (duplicates) {
                 duplicates.notifyAll();
             }
         }
@@ -183,14 +184,14 @@ public class DuplicateSearch extends Thread {
         }
     }
 
-    class DuplicateCallBack implements CallBack {
+    static class DuplicateCallBack implements CallBack {
 
         private int reply = -1;
         DuplicateResolverDialog diag;
-        private JabRefFrame frame;
-        private BibtexEntry one;
-        private BibtexEntry two;
-        private int dialogType;
+        private final JabRefFrame frame;
+        private final BibtexEntry one;
+        private final BibtexEntry two;
+        private final int dialogType;
 
 
         public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,
@@ -206,6 +207,7 @@ public class DuplicateSearch extends Thread {
             return reply;
         }
 
+        @Override
         public void update() {
             diag = new DuplicateResolverDialog(frame, one, two, dialogType);
             diag.setVisible(true);

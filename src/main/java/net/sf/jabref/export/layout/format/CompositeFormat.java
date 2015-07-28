@@ -21,13 +21,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * A layout formatter that is the composite of the given Formatters executed in
  * order.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class CompositeFormat implements LayoutFormatter {
 
-    LayoutFormatter[] formatters;
+    private LayoutFormatter[] formatters;
 
 
     /**
@@ -45,6 +42,7 @@ public class CompositeFormat implements LayoutFormatter {
         this.formatters = formatters;
     }
 
+    @Override
     public String format(String fieldText) {
         if (formatters != null) {
             for (LayoutFormatter formatter : formatters) {

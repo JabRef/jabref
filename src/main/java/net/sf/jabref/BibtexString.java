@@ -60,31 +60,35 @@ public class BibtexString {
         PUBLISHER("p"),
         OTHER("");
 
-        private String prefix;
+        private final String prefix;
 
 
         Type(String prefix) {
             this.prefix = prefix;
         }
 
-        public static final Type get(String name) {
+        public static Type get(String name) {
             if (name.length() <= 1) {
                 return OTHER;
             }
             if (!(name.charAt(1) + "").toUpperCase().equals(
-                    (name.charAt(1) + "")))
+                    (name.charAt(1) + ""))) {
                 return OTHER;
+            }
             for (Type t : Type.values()) {
-                if (t.prefix.equals(name.charAt(0) + ""))
+                if (t.prefix.equals(name.charAt(0) + "")) {
                     return t;
+                }
             }
             return OTHER;
         }
     }
 
 
-    String _name, _content, _id;
-    Type _type;
+    private String _name;
+    private String _content;
+    private String _id;
+    private Type _type;
 
 
     public BibtexString(String id, String name, String content) {
@@ -126,6 +130,7 @@ public class BibtexString {
         _content = content;
     }
 
+    @Override
     public Object clone() {
         return new BibtexString(_id, _name, _content);
     }

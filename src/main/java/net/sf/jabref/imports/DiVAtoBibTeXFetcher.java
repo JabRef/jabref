@@ -14,30 +14,30 @@
 */
 package net.sf.jabref.imports;
 
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import javax.swing.JOptionPane;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
     private static final String ABSTRACT_URL_PATTERN = "http://www.diva-portal.org/smash/record.jsf?pid=%s";
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
-    final HTMLConverter htmlConverter = new HTMLConverter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final HTMLConverter htmlConverter = new HTMLConverter();
 
 
     @Override
@@ -57,7 +57,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        String urlString = String.format(URL_PATTERN, q);
+        String urlString = String.format(DiVAtoBibTeXFetcher.URL_PATTERN, q);
 
         // Send the request
         URL url;
@@ -97,12 +97,12 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             String title = entry.getField("title");
             if (title != null) {
                 // Unit formatting
-                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
                 }
 
                 // Case keeping
-                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
@@ -118,9 +118,9 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             inspector.addEntry(entry);
 
             return true;
-        }
-        else
+        } else {
             return false;
+        }
 
     }
 
@@ -132,13 +132,6 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     @Override
     public String getKeyName() {
         return "DiVAtoBibTeX";
-    }
-
-    @Override
-    public URL getIcon() {
-        // no special icon for this fetcher available.
-        // Therefore, we return some kind of default icon
-        return GUIGlobals.getIconUrl("www");
     }
 
     @Override

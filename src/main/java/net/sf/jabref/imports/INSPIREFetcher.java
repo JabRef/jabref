@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
@@ -48,7 +47,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class INSPIREFetcher implements EntryFetcher {
 
-    private static final String INSPIRE_HOST = "inspirebeta.net";
+    private static final String INSPIRE_HOST = "inspirehep.net";
 
 
     public INSPIREFetcher() {
@@ -66,14 +65,14 @@ public class INSPIREFetcher implements EntryFetcher {
      * 
      * @return a String denoting the query URL
      */
-    public String constructUrl(String key) {
-        String identifier = "";
+    private String constructUrl(String key) {
+        String identifier;
         try {
             identifier = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST)
+        StringBuilder sb = new StringBuilder("http://").append(INSPIREFetcher.INSPIRE_HOST)
                 .append("/");
         sb.append("/search?ln=en&ln=en&p=find+");
         //sb.append("spires/find/hep/www").append("?");
@@ -182,23 +181,23 @@ public class INSPIREFetcher implements EntryFetcher {
     /*
      * @see net.sf.jabref.imports.EntryFetcher
      */
+    @Override
     public String getHelpPage() {
         return "Spires.html";
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
+    @Override
     public String getKeyName() {
         return "INSPIRE";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // we have no additional options
         return null;
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle(getKeyName());
     }
@@ -212,12 +211,14 @@ public class INSPIREFetcher implements EntryFetcher {
     public void done(int entriesImported) {
     }
 
+    @Override
     public void stopFetching() {
     }
 
     /*
      * @see java.lang.Runnable
      */
+    @Override
     public boolean processQuery(String query, ImportInspector dialog,
             OutputPrinter frame) {
         try {
@@ -229,9 +230,11 @@ public class INSPIREFetcher implements EntryFetcher {
 
             frame.setStatus("Adding fetched entries");
             /* add the entry to the inspection dialog */
-            if (bd.getEntryCount() > 0)
-                for (BibtexEntry entry : bd.getEntries())
+            if (bd.getEntryCount() > 0) {
+                for (BibtexEntry entry : bd.getEntries()) {
                     dialog.addEntry(entry);
+                }
+            }
 
             /* update the dialogs progress bar */
             // dialog.setProgress(i + 1, keys.length);

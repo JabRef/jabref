@@ -52,12 +52,12 @@ import org.java.plugin.util.ExtendedProperties;
  */
 public class PluginCore {
 
-    static PluginManager singleton;
+    private static PluginManager singleton;
 
-    static File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
+    static final File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
 
 
-    static PluginLocation getLocationInsideJar(String context, String manifest) {
+    private static PluginLocation getLocationInsideJar(String context, String manifest) {
         URL jar = PluginCore.class
                 .getResource(Util.joinPath(context, manifest));
 
@@ -81,7 +81,7 @@ public class PluginCore {
         return null;
     }
 
-    static PluginManager initialize() {
+    private static PluginManager initialize() {
         // We do not want info messages from JPF.
         Logger.getLogger("org.java.plugin").setLevel(Level.WARNING);
 
@@ -101,7 +101,7 @@ public class PluginCore {
             List<File> directoriesToSearch = new LinkedList<File>();
             directoriesToSearch.add(new File("./src/resources/plugins"));
             directoriesToSearch.add(new File("./plugins"));
-            directoriesToSearch.add(userPluginDir);
+            directoriesToSearch.add(PluginCore.userPluginDir);
 
             try {
                 File parent = new File(PluginCore.class.getProtectionDomain()
@@ -121,8 +121,9 @@ public class PluginCore {
                 // We don't want warnings if the default plug-in paths don't
                 // exist, we do that below
                 if (directory.exists()) {
-                    if (sb.length() > 0)
+                    if (sb.length() > 0) {
                         sb.append(',');
+                    }
                     sb.append(directory.getPath());
                 }
             }
@@ -144,10 +145,11 @@ public class PluginCore {
 
             // Collection locations
             for (String jarLocation : jarLocationsToSearch) {
-                PluginLocation location = getLocationInsideJar(jarLocation,
+                PluginLocation location = PluginCore.getLocationInsideJar(jarLocation,
                         "plugin.xml");
-                if (location != null)
+                if (location != null) {
                     plugins.add(location);
+                }
             }
 
             if (plugins.size() <= 0) {
@@ -192,10 +194,10 @@ public class PluginCore {
     }
 
     public static PluginManager getManager() {
-        if (singleton == null) {
-            singleton = PluginCore.initialize();
+        if (PluginCore.singleton == null) {
+            PluginCore.singleton = PluginCore.initialize();
         }
 
-        return singleton;
+        return PluginCore.singleton;
     }
 }

@@ -28,9 +28,10 @@ import net.sf.jabref.Globals;
  */
 public class UndoablePreambleChange extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private String oldValue, newValue;
-    private BasePanel panel;
+    private final BibtexDatabase base;
+    private final String oldValue;
+    private final String newValue;
+    private final BasePanel panel;
 
 
     public UndoablePreambleChange(BibtexDatabase base, BasePanel panel,
@@ -41,14 +42,17 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
         this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": " + Globals.lang("change preamble");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": " + Globals.lang("change preamble");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -59,6 +63,7 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
         panel.updatePreamble();
     }
 
+    @Override
     public void redo() {
         super.redo();
 

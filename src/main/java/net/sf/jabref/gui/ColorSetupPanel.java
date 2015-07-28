@@ -36,7 +36,7 @@ import net.sf.jabref.Globals;
 public class ColorSetupPanel extends JPanel {
 
     private final static int ICON_WIDTH = 30, ICON_HEIGHT = 20;
-    private ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+    private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
 
 
     public ColorSetupPanel() {
@@ -94,17 +94,19 @@ public class ColorSetupPanel extends JPanel {
 
     class ColorButtonListener implements ActionListener {
 
-        private ColorButton button;
+        private final ColorButton button;
 
 
         public ColorButtonListener(ColorButton button) {
             this.button = button;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             Color chosen = JColorChooser.showDialog(null, button.getName(), button.getColor());
-            if (chosen != null)
+            if (chosen != null) {
                 button.setColor(chosen);
+            }
         }
     }
 
@@ -115,7 +117,8 @@ public class ColorSetupPanel extends JPanel {
     class ColorButton extends JButton implements Icon {
 
         private Color color = Color.white;
-        private String key, name;
+        private final String key;
+        private final String name;
 
 
         public ColorButton(String key, String name) {
@@ -129,6 +132,7 @@ public class ColorSetupPanel extends JPanel {
             JButton toDefault = new JButton(Globals.lang("Default"));
             toDefault.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setColor(Globals.prefs.getDefaultColor(key));
                     repaint();
@@ -141,6 +145,7 @@ public class ColorSetupPanel extends JPanel {
             return key;
         }
 
+        @Override
         public String getName() {
             return name;
         }
@@ -153,18 +158,21 @@ public class ColorSetupPanel extends JPanel {
             this.color = color;
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Rectangle r = g.getClipBounds();
             g.setColor(color);
             g.fillRect(r.x, r.y, r.width, r.height);
         }
 
+        @Override
         public int getIconWidth() {
-            return ICON_WIDTH;
+            return ColorSetupPanel.ICON_WIDTH;
         }
 
+        @Override
         public int getIconHeight() {
-            return ICON_HEIGHT;
+            return ColorSetupPanel.ICON_HEIGHT;
         }
     }
 

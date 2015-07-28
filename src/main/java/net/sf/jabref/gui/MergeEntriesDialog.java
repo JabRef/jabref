@@ -33,9 +33,11 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -53,7 +55,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 public class MergeEntriesDialog extends JDialog {
 
     // private String [] preferedOrder = {"author", "title", "journal", "booktitle", "volume", "number", "pages", "year", "month"};
-    private String[] columnHeadings = {Globals.lang("Field"),
+    private final String[] columnHeadings = {Globals.lang("Field"),
             Globals.lang("First entry"),
             Globals.lang("Use 1st"),
             Globals.lang("None"),
@@ -61,14 +63,12 @@ public class MergeEntriesDialog extends JDialog {
             Globals.lang("Second entry")};
     private final Dimension DIM = new Dimension(800, 800);
     private PreviewPanel preview;
-    private BasePanel panel;
-    private JabRefFrame frame;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
     private JRadioButton[][] rb;
-    private ButtonGroup[] rbg;
     private Boolean[] identical;
-    private boolean block = true;
-    private CellConstraints cc = new CellConstraints();
-    private BibtexEntry mergedEntry = new BibtexEntry();
+    private final CellConstraints cc = new CellConstraints();
+    private final BibtexEntry mergedEntry = new BibtexEntry();
     private BibtexEntry one;
     private BibtexEntry two;
     private JTextArea jta;
@@ -124,7 +124,7 @@ public class MergeEntriesDialog extends JDialog {
 
         // Create storage arrays
         rb = new JRadioButton[3][joint.size() + 1];
-        rbg = new ButtonGroup[joint.size() + 1];
+        ButtonGroup[] rbg = new ButtonGroup[joint.size() + 1];
         identical = new Boolean[joint.size() + 1];
         jointStrings = new String[joint.size()];
 
@@ -145,7 +145,7 @@ public class MergeEntriesDialog extends JDialog {
             JLabel label = new JLabel(columnHeadings[i]);
             Font font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-            this.add(label, cc.xy(1 + i * 2, 1));
+            this.add(label, cc.xy(1 + (i * 2), 1));
 
         }
 
@@ -170,9 +170,10 @@ public class MergeEntriesDialog extends JDialog {
             for (int k = 0; k < 3; k += 2) {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
-                this.add(rb[k][0], cc.xy(5 + k * 2, 3));
+                this.add(rb[k][0], cc.xy(5 + (k * 2), 3));
                 rb[k][0].addChangeListener(new ChangeListener() {
 
+                    @Override
                     public void stateChanged(ChangeEvent e) {
                         updateAll();
                     }
@@ -190,7 +191,7 @@ public class MergeEntriesDialog extends JDialog {
         int row = 4;
         for (String field : joint) {
             jointStrings[row - 4] = field;
-            label = new JLabel(Util.toUpperFirstLetter(field));
+            label = new JLabel(StringUtil.toUpperFirstLetter(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             this.add(label, cc.xy(1, row));
@@ -228,9 +229,10 @@ public class MergeEntriesDialog extends JDialog {
                 for (int k = 0; k < 3; k++) {
                     rb[k][row - 3] = new JRadioButton();
                     rbg[row - 3].add(rb[k][row - 3]);
-                    this.add(rb[k][row - 3], cc.xy(5 + k * 2, row));
+                    this.add(rb[k][row - 3], cc.xy(5 + (k * 2), row));
                     rb[k][row - 3].addChangeListener(new ChangeListener() {
 
+                        @Override
                         public void stateChanged(ChangeEvent e) {
                             updateAll();
                         }
@@ -276,7 +278,7 @@ public class MergeEntriesDialog extends JDialog {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         this.add(label, cc.xy(1, row));
 
-        String layoutString = Globals.prefs.get("preview0");
+        String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         pp = new PreviewPanel(null, mergedEntry, null, new MetaData(), layoutString);
         // JScrollPane jsppp = new JScrollPane(pp);
         this.add(pp, cc.xyw(3, row, 3));
@@ -305,6 +307,7 @@ public class MergeEntriesDialog extends JDialog {
         cancel.setActionCommand("cancel");
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 buttonPressed(e.getActionCommand());
             }
@@ -314,6 +317,7 @@ public class MergeEntriesDialog extends JDialog {
         newentry.setActionCommand("newentry");
         newentry.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 buttonPressed(e.getActionCommand());
             }
@@ -323,6 +327,7 @@ public class MergeEntriesDialog extends JDialog {
         replaceentries.setActionCommand("replace");
         replaceentries.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 buttonPressed(e.getActionCommand());
             }
@@ -424,9 +429,5 @@ public class MergeEntriesDialog extends JDialog {
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
-    }
-
-    public boolean isBlocking() {
-        return block;
     }
 }

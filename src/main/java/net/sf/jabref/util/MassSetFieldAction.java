@@ -42,17 +42,16 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class MassSetFieldAction extends MnemonicAwareAction {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private JDialog diag;
     private JRadioButton all, selected, clear, set, rename;
     private JTextField field, text, renameTo;
-    private JButton ok, cancel;
-    boolean cancelled = true;
+    private boolean cancelled = true;
     private JCheckBox overwrite;
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(NAME, "Set/clear/rename fields");
+        putValue(Action.NAME, "Set/clear/rename fields");
         this.frame = frame;
     }
 
@@ -65,8 +64,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton cancel = new JButton(Globals.lang("Cancel"));
 
         all = new JRadioButton(Globals.lang("All entries"));
         selected = new JRadioButton(Globals.lang("Selected entries"));
@@ -76,6 +75,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         rename.setToolTipText(Globals.lang("Move contents of a field into a field with a different name"));
         set.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are setting, not clearing:
                 text.setEnabled(set.isSelected());
@@ -83,6 +83,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         });
         clear.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 // Overwrite protection makes no sense if we are clearing the field:
                 overwrite.setEnabled(!clear.isSelected());
@@ -90,6 +91,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         });
         rename.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are renaming
                 renameTo.setEnabled(rename.isSelected());
@@ -138,6 +140,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // Check if the user tries to rename multiple fields:
                 if (rename.isSelected()) {
@@ -155,6 +158,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = true;
                 diag.dispose();
@@ -171,39 +175,47 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
     private void prepareDialog(boolean selection) {
         selected.setEnabled(selection);
-        if (selection)
+        if (selection) {
             selected.setSelected(true);
-        else
+        } else {
             all.setSelected(true);
+        }
         // Make sure one of the following ones is selected:
-        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected())
+        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected()) {
             set.setSelected(true);
+        }
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         BasePanel bp = frame.basePanel();
-        if (bp == null)
+        if (bp == null) {
             return;
+        }
         BibtexEntry[] entries = bp.getSelectedEntries();
         // Lazy creation of the dialog:
-        if (diag == null)
+        if (diag == null) {
             createDialog();
+        }
         cancelled = true;
         prepareDialog(entries.length > 0);
         Util.placeDialog(diag, frame);
         diag.setVisible(true);
-        if (cancelled)
+        if (cancelled) {
             return;
+        }
 
         Collection<BibtexEntry> entryList;
         // If all entries should be treated, change the entries array:
-        if (all.isSelected())
+        if (all.isSelected()) {
             entryList = bp.database().getEntries();
-        else
+        } else {
             entryList = Arrays.asList(entries);
+        }
         String toSet = text.getText();
-        if (toSet.length() == 0)
+        if (toSet.isEmpty()) {
             toSet = null;
+        }
         String[] fields = getFieldNames(field.getText().trim().toLowerCase());
         NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
         if (rename.isSelected()) {

@@ -31,15 +31,15 @@ public class SpecialFieldValue {
     private final String actionName;
 
     // localized menu string used at menu / button
-    private String menuString;
+    private final String menuString;
 
     private SpecialFieldAction action = null;
 
     private SpecialFieldMenuAction menuAction = null;
 
-    private ImageIcon icon;
+    private final ImageIcon icon;
 
-    private String toolTipText;
+    private final String toolTipText;
 
 
     // value when used in a separate vield
@@ -48,7 +48,7 @@ public class SpecialFieldValue {
     /**
      * 
      * @param field The special field this value is a value of
-     * @param keyword - The keyword to be used at BibTex's keyword field
+     * @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
      * @param actionName - the action to call
      * @param menuString - the string to display at a menu
      * @param icon - the icon of this value

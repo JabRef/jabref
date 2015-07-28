@@ -33,16 +33,22 @@ import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.util.Util;
 
-public class ChangeScanner extends Thread {
+public class ChangeScanner implements Runnable {
 
-    final double MATCH_THRESHOLD = 0.4;
-    final String[] sortBy = new String[] {"year", "author", "title"};
-    File f;
-    BibtexDatabase inMem, inTemp = null;
-    MetaData mdInMem, mdInTemp;
-    BasePanel panel;
-    JabRefFrame frame;
+    private final String[] sortBy = new String[] {"year", "author", "title"};
+
+    private final File f;
+
+    private final BibtexDatabase inMem;
+    private final MetaData mdInMem;
+    private final BasePanel panel;
+    private final JabRefFrame frame;
+
+    private BibtexDatabase inTemp = null;
+    private MetaData mdInTemp;
+
 
     /**
      * We create an ArrayList to hold the changes we find. These will be added in the form
@@ -50,25 +56,20 @@ public class ChangeScanner extends Thread {
      * can be reproduced in memory by calling redo() on them. REDO, not UNDO!
      */
     //ArrayList changes = new ArrayList();
-    DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
+    private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
 
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp) { //, BibtexDatabase inMem, MetaData mdInMem) {
-        panel = bp;
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) { //, BibtexDatabase inMem, MetaData mdInMem) {
+        this.panel = bp;
         this.frame = frame;
         this.inMem = bp.database();
         this.mdInMem = bp.metaData();
-        // Set low priority:
-        setPriority(Thread.MIN_PRIORITY);
+        this.f = file;
     }
 
-    public void changeScan(File f) {
-        this.f = f;
-        start();
-    }
-
+    @Override
     public void run() {
         try {
             //long startTime = System.currentTimeMillis();
@@ -76,11 +77,11 @@ public class ChangeScanner extends Thread {
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
-                    Globals.prefs.get("defaultEncoding"));
+                    Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
-            pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
+            pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
             BibtexDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = pr.getMetaData();
 
@@ -120,6 +121,7 @@ public class ChangeScanner extends Thread {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
                     Util.placeDialog(dial, frame);
@@ -140,8 +142,9 @@ public class ChangeScanner extends Thread {
     }
 
     private void storeTempDatabase() {
-        new Thread(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
@@ -153,7 +156,7 @@ public class ChangeScanner extends Thread {
                 }
 
             }
-        }).start();
+        });
     }
 
     private void scanMetaData(MetaData inMem, MetaData inTemp, MetaData onDisk) {
@@ -169,8 +172,9 @@ public class ChangeScanner extends Thread {
             } else {
                 // Both exist. Check if they are different:
                 Vector<String> vit = inTemp.getData(key);
-                if (!vod.equals(vit))
+                if (!vod.equals(vit)) {
                     mdc.insertMetaDataChange(key, vod);
+                }
                 // Remember that we've handled this one:
                 handledOnDisk.add(key);
             }
@@ -183,8 +187,9 @@ public class ChangeScanner extends Thread {
             }
         }
 
-        if (mdc.getChangeCount() > 0)
+        if (mdc.getChangeCount() > 0) {
             changes.add(mdc);
+        }
     }
 
     private void scanEntries(EntrySorter mem, EntrySorter tmp, EntrySorter disk) {
@@ -192,7 +197,7 @@ public class ChangeScanner extends Thread {
         // Create pointers that are incremented as the entries of each base are used in
         // successive order from the beginning. Entries "further down" in the "disk" base
         // can also be matched.
-        int piv1 = 0, piv2 = 0;
+        int piv1, piv2 = 0;
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
@@ -218,12 +223,13 @@ public class ChangeScanner extends Thread {
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < disk.getEntryCount() - 1) {
+            if (piv2 < (disk.getEntryCount() - 1)) {
                 for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
-                    if (!used.contains("" + i))
+                    if (!used.contains("" + i)) {
                         comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
-                    else
+                    } else {
                         comp = -1;
+                    }
 
                     if (comp > 1) {
                         used.add("" + i);
@@ -238,27 +244,26 @@ public class ChangeScanner extends Thread {
 
         // Now we've found all exact matches, look through the remaining entries, looking
         // for close matches.
-        if (notMatched.size() > 0) {
+        if (!notMatched.isEmpty()) {
 
             for (Iterator<Integer> it = notMatched.iterator(); it.hasNext();) {
 
-                Integer integ = it.next();
-                piv1 = integ;
+                piv1 = it.next();
 
                 // These two variables will keep track of which entry most closely matches the
                 // one we're looking at, in case none matches completely.
                 int bestMatchI = -1;
                 double bestMatch = 0;
-                double comp = -1;
+                double comp;
 
-                if (piv2 < disk.getEntryCount() - 1) {
+                if (piv2 < (disk.getEntryCount() - 1)) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
                         if (!used.contains("" + i)) {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
                                     disk.getEntryAt(i));
-                        }
-                        else
+                        } else {
                             comp = -1;
+                        }
 
                         if (comp > bestMatch) {
                             bestMatch = comp;
@@ -267,6 +272,7 @@ public class ChangeScanner extends Thread {
                     }
                 }
 
+                double MATCH_THRESHOLD = 0.4;
                 if (bestMatch > MATCH_THRESHOLD) {
                     used.add("" + bestMatchI);
                     it.remove();
@@ -347,8 +353,9 @@ public class ChangeScanner extends Thread {
                 comp = res;
                 found = i;
             }
-            if (comp > 1)
+            if (comp > 1) {
                 break;
+            }
         }
         return neu.getEntryAt(found);
     }
@@ -356,18 +363,20 @@ public class ChangeScanner extends Thread {
     private void scanPreamble(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
         String mem = inMem.getPreamble(), tmp = onTmp.getPreamble(), disk = onDisk.getPreamble();
         if (tmp != null) {
-            if ((disk == null) || !tmp.equals(disk))
+            if ((disk == null) || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(tmp, mem, disk));
+            }
         }
-        else if ((disk != null) && !disk.equals("")) {
+        else if ((disk != null) && !disk.isEmpty()) {
             changes.add(new PreambleChange(tmp, mem, disk));
         }
     }
 
     private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
         int nTmp = onTmp.getStringCount(), nDisk = onDisk.getStringCount();
-        if ((nTmp == 0) && (nDisk == 0))
+        if ((nTmp == 0) && (nDisk == 0)) {
             return;
+        }
 
         HashSet<Object> used = new HashSet<Object>();
         HashSet<Object> usedInMem = new HashSet<Object>();
@@ -387,12 +396,13 @@ public class ChangeScanner extends Thread {
                         if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
                             BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
-                            if (mem != null)
+                            if (mem != null) {
                                 changes.add(new StringChange(mem, tmp, tmp.getName(),
                                         mem.getContent(),
                                         tmp.getContent(), disk.getContent()));
-                            else
+                            } else {
                                 changes.add(new StringChange(null, tmp, tmp.getName(), null, tmp.getContent(), disk.getContent()));
+                            }
                         }
                         used.add(diskId);
                         //if (j==piv2)
@@ -407,7 +417,7 @@ public class ChangeScanner extends Thread {
         }
 
         // See if we can detect a name change for those entries that we couldn't match.
-        if (notMatched.size() > 0) {
+        if (!notMatched.isEmpty()) {
             for (Iterator<String> i = notMatched.iterator(); i.hasNext();) {
                 BibtexString tmp = onTmp.getString(i.next());
 
@@ -447,7 +457,7 @@ public class ChangeScanner extends Thread {
             }
         }
 
-        if (notMatched.size() > 0) {
+        if (!notMatched.isEmpty()) {
             // Still one or more non-matched strings. So they must have been removed.
             for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
@@ -471,8 +481,9 @@ public class ChangeScanner extends Thread {
     }
 
     private BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
-        if (!base.hasStringLabel(name))
+        if (!base.hasStringLabel(name)) {
             return null;
+        }
         for (String key : base.getStringKeySet()) {
             BibtexString bs = base.getString(key);
             if (bs.getName().equals(name) && !used.contains(key)) {
@@ -488,12 +499,13 @@ public class ChangeScanner extends Thread {
      * determine the type of change. This would be possible, but difficult to do
      * properly, so I rather only report the change.
      */
-    public void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
+    private void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
-        if (groupsTmp == null && groupsDisk == null)
+        if ((groupsTmp == null) && (groupsDisk == null)) {
             return;
-        if ((groupsTmp != null && groupsDisk == null) || (groupsTmp == null)) {
+        }
+        if (((groupsTmp != null) && (groupsDisk == null)) || (groupsTmp == null)) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }
@@ -503,8 +515,7 @@ public class ChangeScanner extends Thread {
     }
 
 
-    public static interface DisplayResultCallback {
-
-        public void scanResultsResolved(boolean resolved);
+    public interface DisplayResultCallback {
+        void scanResultsResolved(boolean resolved);
     }
 }

@@ -21,9 +21,9 @@ import net.sf.jabref.*;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 
-    private BibtexDatabase base;
-    private BibtexString string;
-    private BasePanel panel;
+    private final BibtexDatabase base;
+    private final BibtexString string;
+    private final BasePanel panel;
 
 
     public UndoableRemoveString(BasePanel panel,
@@ -33,14 +33,17 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
         this.panel = panel;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": " + Globals.lang("remove string ");
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": " + Globals.lang("remove string ");
     }
 
+    @Override
     public void undo() {
         super.undo();
 
@@ -54,6 +57,7 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
         panel.updateStringDialog();
     }
 
+    @Override
     public void redo() {
         super.redo();
 

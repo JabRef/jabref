@@ -22,17 +22,13 @@ import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.undo.NamedCompound;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Sep 17, 2005
- * Time: 12:48:23 AM
- * To browseOld this template use File | Settings | File Templates.
+ * Converts journal full names to either iso or medline abbreviations for all selected entries.
  */
 public class AbbreviateAction extends AbstractWorker {
 
-    BasePanel panel;
-    String message = "";
-    boolean iso;
+    private final BasePanel panel;
+    private String message = "";
+    private final boolean iso;
 
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
@@ -40,25 +36,31 @@ public class AbbreviateAction extends AbstractWorker {
         this.iso = iso;
     }
 
+    @Override
     public void init() {
-        //  new FieldWeightDialog(frame).setVisible(true);
         panel.output("Abbreviating...");
     }
 
+    @Override
     public void run() {
-        //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
-
         BibtexEntry[] entries = panel.getSelectedEntries();
-        if (entries == null)
+        if (entries == null) {
             return;
+        }
+
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(Globals.journalAbbrev, iso);
+
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;
         for (BibtexEntry entry : entries) {
-            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journal", ce, iso))
+            if (undoableAbbreviator.abbreviate(panel.database(), entry, "journal", ce)) {
                 count++;
-            if (Globals.journalAbbrev.abbreviate(panel.database(), entry, "journaltitle", ce, iso))
+            }
+            if (undoableAbbreviator.abbreviate(panel.database(), entry, "journaltitle", ce)) {
                 count++;
+            }
         }
+
         if (count > 0) {
             ce.end();
             panel.undoManager.addEdit(ce);
@@ -69,6 +71,7 @@ public class AbbreviateAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         panel.output(message);
     }

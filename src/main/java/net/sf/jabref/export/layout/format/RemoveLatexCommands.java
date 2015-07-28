@@ -20,15 +20,16 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class RemoveLatexCommands implements LayoutFormatter {
 
-    int i;
 
-
+    @Override
     public String format(String field) {
 
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
         StringBuffer currentCommand = null;
         char c;
-        boolean escaped = false, incommand = false;
+        boolean escaped = false;
+        boolean incommand = false;
+        int i;
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
             if (escaped && (c == '\\')) {
@@ -40,17 +41,16 @@ public class RemoveLatexCommands implements LayoutFormatter {
                 incommand = true;
                 currentCommand = new StringBuffer();
             }
-            else if (!incommand && (c == '{' || c == '}')) {
+            else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             }
 
             else if (Character.isLetter(c) ||
                     (Globals.SPECIAL_COMMAND_CHARS.contains("" + c))) {
                 escaped = false;
-                if (!incommand)
+                if (!incommand) {
                     sb.append(c);
-                // Else we are in a command, and should not keep the letter.
-                else {
+                } else {
                     currentCommand.append(c);
                     if ((currentCommand.length() == 1)
                             && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
@@ -86,19 +86,21 @@ public class RemoveLatexCommands implements LayoutFormatter {
 
             else if (Character.isLetter(c)) {
                 escaped = false;
-                if (!incommand)
+                if (!incommand) {
                     sb.append(c);
                 // Else we are in a command, and should not keep the letter.
-                else
+                } else {
                     currentCommand.append(c);
+                }
             }
             else {
                 //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
-                if (!incommand || (!Character.isWhitespace(c) && (c != '{')))
+                if (!incommand || (!Character.isWhitespace(c) && (c != '{'))) {
                     sb.append(c);
-                else {
-                    if (c != '{')
+                } else {
+                    if (c != '{') {
                         sb.append(c);
+                    }
                 }
                 incommand = false;
                 escaped = false;

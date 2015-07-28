@@ -34,7 +34,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 
 
     public EntryFromPDFCreator() {
-        super(getPDFExternalFileType());
+        super(EntryFromPDFCreator.getPDFExternalFileType());
     }
 
     private static ExternalFileType getPDFExternalFileType() {
@@ -54,7 +54,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      */
     @Override
     public boolean accept(File f) {
-        return f != null && f.getName().toUpperCase().endsWith(".PDF");
+        return (f != null) && f.getName().toUpperCase().endsWith(".PDF");
     }
 
     @Override

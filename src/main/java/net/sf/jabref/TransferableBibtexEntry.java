@@ -30,28 +30,31 @@ import java.io.StringWriter;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    private BibtexEntry[] data;
-    public static DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
+    private final BibtexEntry[] data;
+    public static final DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
 
 
     public TransferableBibtexEntry(BibtexEntry[] data) {
         this.data = data;
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] {TransferableBibtexEntry.entryFlavor,
                 DataFlavor.stringFlavor};
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return (flavor.equals(entryFlavor) || flavor.equals(DataFlavor.stringFlavor));
+        return (flavor.equals(TransferableBibtexEntry.entryFlavor) || flavor.equals(DataFlavor.stringFlavor));
     }
 
+    @Override
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException {
-        if (flavor.equals(entryFlavor))
+        if (flavor.equals(TransferableBibtexEntry.entryFlavor)) {
             return data;
-        else if (flavor.equals(DataFlavor.stringFlavor)) {
+        } else if (flavor.equals(DataFlavor.stringFlavor)) {
             try {
                 StringWriter sw = new StringWriter();
                 BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), false);
@@ -65,7 +68,8 @@ public class TransferableBibtexEntry implements Transferable {
                                 "Clipboard", JOptionPane.ERROR_MESSAGE);
                 return "";
             }
-        } else
+        } else {
             throw new UnsupportedFlavorException(flavor);
+        }
     }
 }

@@ -34,20 +34,25 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ExternalTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
 
-    JabRefFrame _frame;
+    private final JabRefFrame _frame;
 
-    JTextField pdfDir, regExpTextField, fileDir, psDir, emailSubject;
+    private final JTextField pdfDir;
+    private final JTextField regExpTextField;
+    private final JTextField fileDir;
+    private final JTextField psDir;
+    private final JTextField emailSubject;
 
-    JCheckBox bibLocationAsFileDir, bibLocAsPrimaryDir, runAutoFileSearch,
-            allowFileAutoOpenBrowse, openFoldersOfAttachedFiles;
-    JButton editFileTypes;
-    ItemListener regExpListener;
+    private final JCheckBox bibLocationAsFileDir;
+    private final JCheckBox bibLocAsPrimaryDir;
+    private final JCheckBox runAutoFileSearch;
+    private final JCheckBox allowFileAutoOpenBrowse;
+    private final JCheckBox openFoldersOfAttachedFiles;
 
-    JRadioButton useRegExpComboBox;
-    JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key")),
-            matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
+    private final JRadioButton useRegExpComboBox;
+    private final JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key"));
+    private final JRadioButton matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
 
 
     public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs,
@@ -65,17 +70,19 @@ public class ExternalTab extends JPanel implements PrefsTab {
                 + "file directory, prefer the bib file location rather than the file directory set above"));
         bibLocationAsFileDir.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent changeEvent) {
                 bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
             }
         });
-        editFileTypes = new JButton(Globals.lang("Manage external file types"));
+        JButton editFileTypes = new JButton(Globals.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Globals.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
-        regExpListener = new ItemListener() {
+        ItemListener regExpListener = new ItemListener() {
 
+            @Override
             public void itemStateChanged(ItemEvent e) {
                 regExpTextField.setEditable(useRegExpComboBox.isSelected());
             }
@@ -106,10 +113,10 @@ public class ExternalTab extends JPanel implements PrefsTab {
          * 
          * Cannot really use %0 to refer to the file type, since this ruins translation.
          */
-        JLabel lab = new JLabel(Globals.lang("Main file directory") + ":");
+        JLabel lab = new JLabel(Globals.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
-        browse = new BrowseAction(_frame, fileDir, true);
+        browse = BrowseAction.buildForDir(_frame, fileDir);
         builder.append(new JButton(browse));
         builder.nextLine();
         builder.append(new JPanel());
@@ -160,19 +167,19 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.nextLine();
         pan = new JPanel();
         builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PDF directory") + ":");
+        lab = new JLabel(Globals.lang("Main PDF directory") + ':');
         builder.append(lab);
         builder.append(pdfDir);
-        browse = new BrowseAction(_frame, pdfDir, true);
+        browse = BrowseAction.buildForDir(_frame, pdfDir);
         builder.append(new JButton(browse));
         builder.nextLine();
 
         pan = new JPanel();
         builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PS directory") + ":");
+        lab = new JLabel(Globals.lang("Main PS directory") + ':');
         builder.append(lab);
         builder.append(psDir);
-        browse = new BrowseAction(_frame, psDir, true);
+        browse = BrowseAction.buildForDir(_frame, psDir);
         builder.append(new JButton(browse));
         builder.nextLine();
         builder.appendSeparator(Globals.lang("External programs"));
@@ -210,6 +217,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
                 pt.getIcon());
         button.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 PushToApplicationButton.showSettingsDialog(_frame, pt, pt.getSettingsPanel());
             }
@@ -222,28 +230,31 @@ public class ExternalTab extends JPanel implements PrefsTab {
         //    b.nextLine();
     }
 
+    @Override
     public void setValues() {
         pdfDir.setText(_prefs.get("pdfDirectory"));
         psDir.setText(_prefs.get("psDirectory"));
         fileDir.setText(_prefs.get(GUIGlobals.FILE_FIELD + "Directory"));
-        bibLocationAsFileDir.setSelected(_prefs.getBoolean("bibLocationAsFileDir"));
-        bibLocAsPrimaryDir.setSelected(_prefs.getBoolean("bibLocAsPrimaryDir"));
+        bibLocationAsFileDir.setSelected(_prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
+        bibLocAsPrimaryDir.setSelected(_prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
-        runAutoFileSearch.setSelected(_prefs.getBoolean("runAutomaticFileSearch"));
+        runAutoFileSearch.setSelected(_prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
-        allowFileAutoOpenBrowse.setSelected(_prefs.getBoolean("allowFileAutoOpenBrowse"));
+        allowFileAutoOpenBrowse.setSelected(_prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
 
         emailSubject.setText(_prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
-        if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY))
+        if (_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
             useRegExpComboBox.setSelected(true);
-        else if (_prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY))
+        } else if (_prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY)) {
             matchExactKeyOnly.setSelected(true);
-        else
+        } else {
             matchStartsWithKey.setSelected(true);
+        }
     }
 
+    @Override
     public void storeSettings() {
 
         _prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, useRegExpComboBox.isSelected());
@@ -255,19 +266,21 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.put("pdfDirectory", pdfDir.getText());
         _prefs.put("psDirectory", psDir.getText());
         _prefs.put(GUIGlobals.FILE_FIELD + "Directory", fileDir.getText());
-        _prefs.putBoolean("bibLocationAsFileDir", bibLocationAsFileDir.isSelected());
-        _prefs.putBoolean("bibLocAsPrimaryDir", bibLocAsPrimaryDir.isSelected());
+        _prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
+        _prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         _prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());
-        _prefs.putBoolean("runAutomaticFileSearch", runAutoFileSearch.isSelected());
-        _prefs.putBoolean("allowFileAutoOpenBrowse", allowFileAutoOpenBrowse.isSelected());
+        _prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
+        _prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());
         _prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());
         _prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("External programs");
     }

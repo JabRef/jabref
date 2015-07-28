@@ -49,43 +49,52 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class GetOpenOfficeType implements LayoutFormatter
 {
 
-    //~ Methods ////////////////////////////////////////////////////////////////
-
+    @Override
     public String format(String fieldText)
     {
-        String fieldEntry = fieldText;
-        if (fieldEntry.equalsIgnoreCase("Article"))
+        if (fieldText.equalsIgnoreCase("Article")) {
             return "7";
-        if (fieldEntry.equalsIgnoreCase("Book"))
+        }
+        if (fieldText.equalsIgnoreCase("Book")) {
             return "1";
-        if (fieldEntry.equalsIgnoreCase("Booklet"))
+        }
+        if (fieldText.equalsIgnoreCase("Booklet")) {
             return "2";
-        if (fieldEntry.equalsIgnoreCase("Inbook"))
+        }
+        if (fieldText.equalsIgnoreCase("Inbook")) {
             return "5";
-        if (fieldEntry.equalsIgnoreCase("Incollection"))
+        }
+        if (fieldText.equalsIgnoreCase("Incollection")) {
             return "5";
-        if (fieldEntry.equalsIgnoreCase("Inproceedings"))
+        }
+        if (fieldText.equalsIgnoreCase("Inproceedings")) {
             return "6";
-        if (fieldEntry.equalsIgnoreCase("Manual"))
+        }
+        if (fieldText.equalsIgnoreCase("Manual")) {
             return "8";
-        if (fieldEntry.equalsIgnoreCase("Mastersthesis"))
+        }
+        if (fieldText.equalsIgnoreCase("Mastersthesis")) {
             return "9";
-        if (fieldEntry.equalsIgnoreCase("Misc"))
+        }
+        if (fieldText.equalsIgnoreCase("Misc")) {
             return "10";
-        if (fieldEntry.equalsIgnoreCase("Other"))
+        }
+        if (fieldText.equalsIgnoreCase("Other")) {
             return "10";
-        if (fieldEntry.equalsIgnoreCase("Phdthesis"))
+        }
+        if (fieldText.equalsIgnoreCase("Phdthesis")) {
             return "9";
-        if (fieldEntry.equalsIgnoreCase("Proceedings"))
+        }
+        if (fieldText.equalsIgnoreCase("Proceedings")) {
             return "3";
-        if (fieldEntry.equalsIgnoreCase("Techreport"))
+        }
+        if (fieldText.equalsIgnoreCase("Techreport")) {
             return "13";
-        if (fieldEntry.equalsIgnoreCase("Unpublished"))
+        }
+        if (fieldText.equalsIgnoreCase("Unpublished")) {
             return "14";
+        }
         // Default, Miscelaneous
         return "10";
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

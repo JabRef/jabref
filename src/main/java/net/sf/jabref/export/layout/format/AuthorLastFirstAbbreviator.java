@@ -36,6 +36,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
     /**
      * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
      */
+    @Override
     public String format(String fieldText) {
 
         /**

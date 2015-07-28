@@ -28,7 +28,8 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.Util;
+import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its
@@ -38,41 +39,48 @@ import net.sf.jabref.Util;
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
-    public static final int MAX_DISPLAYED_LETTERS = 35;
+    private static final int MAX_DISPLAYED_LETTERS = 35;
 
     /** The cell over which the user is currently dragging */
-    protected Object highlight1Cell = null;
-    protected Object[] highlight2Cells = null;
-    protected Object[] highlight3Cells = null;
-    protected Object highlightBorderCell = null;
+    private Object highlight1Cell = null;
+    private Object[] highlight2Cells = null;
+    private Object[] highlight3Cells = null;
+    private Object highlightBorderCell = null;
 
-    public static ImageIcon
-            groupRefiningIcon = GUIGlobals.getImage("groupRefining"),
-            groupIncludingIcon = GUIGlobals.getImage("groupIncluding"),
-            groupRegularIcon = null;
+    private static final ImageIcon
+            groupRefiningIcon = GUIGlobals.getImage("groupRefining");
+    private static final ImageIcon groupIncludingIcon = GUIGlobals.getImage("groupIncluding");
+    private static final ImageIcon groupRegularIcon = null;
 
 
+    @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value,
             boolean selected, boolean expanded, boolean leaf, int row,
             boolean hasFocus) {
         if (value == highlight1Cell)
+         {
             selected = true; // show as selected
+        }
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
         // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
-        if (!(value instanceof GroupTreeNode))
+        if (!(value instanceof GroupTreeNode)) {
             return c;
+        }
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
-        if (group == null || !(c instanceof JLabel))
+        if ((group == null) || !(c instanceof JLabel))
+         {
             return c; // sanity check
+        }
         JLabel label = (JLabel) c;
 
-        if (highlightBorderCell != null && highlightBorderCell == value)
+        if ((highlightBorderCell != null) && (highlightBorderCell == value)) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        else
+        } else {
             label.setBorder(BorderFactory.createEmptyBorder());
-        boolean italics = Globals.prefs.getBoolean("groupShowDynamic")
+        }
+        boolean italics = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)
                 && group.isDynamic();
         boolean red = false;
         if (highlight2Cells != null) {
@@ -94,54 +102,66 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             }
         }
         String name = group.getName();
-        if (name.length() > MAX_DISPLAYED_LETTERS)
-            name = name.substring(0, MAX_DISPLAYED_LETTERS - 2) + "...";
+        if (name.length() > GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS) {
+            name = name.substring(0, GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS - 2) + "...";
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
-        if (red)
+        if (red) {
             sb.append("<font color=\"#FF0000\">");
-        if (underline)
+        }
+        if (underline) {
             sb.append("<u>");
-        if (italics)
+        }
+        if (italics) {
             sb.append("<i>");
-        sb.append(Util.quoteForHTML(name));
+        }
+        sb.append(StringUtil.quoteForHTML(name));
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
             if (group instanceof ExplicitGroup) {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
                 for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()) {
-                    if (group.contains(entry))
+                    if (group.contains(entry)) {
                         hits++;
+                    }
                 }
                 sb.append(" [").append(hits).append("]");
             }
         }
-        if (italics)
+        if (italics) {
             sb.append("</i>");
-        if (underline)
+        }
+        if (underline) {
             sb.append("</u>");
-        if (red)
+        }
+        if (red) {
             sb.append("</font>");
+        }
         sb.append("</html>");
         final String text = sb.toString();
 
-        if (!label.getText().equals(text))
+        if (!label.getText().equals(text)) {
             label.setText(text);
+        }
         label.setToolTipText("<html>" + group.getShortDescription() + "</html>");
-        if (Globals.prefs.getBoolean("groupShowIcons")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
-            case AbstractGroup.REFINING:
-                if (label.getIcon() != groupRefiningIcon)
-                    label.setIcon(groupRefiningIcon);
+            case REFINING:
+                if (label.getIcon() != GroupTreeCellRenderer.groupRefiningIcon) {
+                    label.setIcon(GroupTreeCellRenderer.groupRefiningIcon);
+                }
                 break;
-            case AbstractGroup.INCLUDING:
-                if (label.getIcon() != groupIncludingIcon)
-                    label.setIcon(groupIncludingIcon);
+            case INCLUDING:
+                if (label.getIcon() != GroupTreeCellRenderer.groupIncludingIcon) {
+                    label.setIcon(GroupTreeCellRenderer.groupIncludingIcon);
+                }
                 break;
             default:
-                if (label.getIcon() != groupRegularIcon)
-                    label.setIcon(groupRegularIcon);
+                if (label.getIcon() != GroupTreeCellRenderer.groupRegularIcon) {
+                    label.setIcon(GroupTreeCellRenderer.groupRegularIcon);
+                }
                 break;
             }
         } else {

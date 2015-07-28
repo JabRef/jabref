@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.util.Util;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -38,6 +39,7 @@ public class EndnoteImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "Refer/Endnote";
     }
@@ -46,6 +48,7 @@ public class EndnoteImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "refer";
     }
@@ -53,6 +56,7 @@ public class EndnoteImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         // Our strategy is to look for the "%A *" line.
@@ -60,8 +64,9 @@ public class EndnoteImporter extends ImportFormat {
         Pattern pat1 = Pattern.compile("%A .*"), pat2 = Pattern.compile("%E .*");
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).matches() || pat2.matcher(str).matches())
+            if (pat1.matcher(str).matches() || pat2.matcher(str).matches()) {
                 return true;
+            }
         }
         return false;
     }
@@ -70,9 +75,10 @@ public class EndnoteImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String ENDOFRECORD = "__EOREOR__";
 
@@ -88,14 +94,15 @@ public class EndnoteImporter extends ImportFormat {
                     sb.append(ENDOFRECORD);
                 }
                 sb.append(str);
-            } else
+            } else {
                 sb.append(str);
+            }
             sb.append("\n");
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
         HashMap<String, String> hm = new HashMap<String, String>();
-        String author = "", Type = "", editor = "", artnum = "";
+        String author, Type, editor, artnum;
         for (String entry : entries) {
             hm.clear();
             author = "";
@@ -108,8 +115,9 @@ public class EndnoteImporter extends ImportFormat {
             //String lastPrefix = "";
             for (String field : fields) {
 
-                if (field.length() < 3)
+                if (field.length() < 3) {
                     continue;
+                }
 
                 /*
                    * Details of Refer format for Journal Article and Book:
@@ -129,80 +137,88 @@ public class EndnoteImporter extends ImportFormat {
                 String val = field.substring(2);
 
                 if (prefix.equals("A")) {
-                    if (author.equals(""))
+                    if (author.equals("")) {
                         author = val;
-                    else
+                    } else {
                         author += " and " + val;
+                    }
                 } else if (prefix.equals("E")) {
-                    if (editor.equals(""))
+                    if (editor.equals("")) {
                         editor = val;
-                    else
+                    } else {
                         editor += " and " + val;
-                } else if (prefix.equals("T"))
+                    }
+                } else if (prefix.equals("T")) {
                     hm.put("title", val);
-                else if (prefix.equals("0")) {
-                    if (val.indexOf("Journal") == 0)
+                } else if (prefix.equals("0")) {
+                    if (val.indexOf("Journal") == 0) {
                         Type = "article";
-                    else if ((val.indexOf("Book Section") == 0))
+                    } else if ((val.indexOf("Book Section") == 0)) {
                         Type = "incollection";
-                    else if ((val.indexOf("Book") == 0))
+                    } else if ((val.indexOf("Book") == 0)) {
                         Type = "book";
-                    else if (val.indexOf("Edited Book") == 0) {
+                    } else if (val.indexOf("Edited Book") == 0) {
                         Type = "book";
                         IsEditedBook = true;
-                    } else if (val.indexOf("Conference") == 0) // Proceedings
+                    } else if (val.indexOf("Conference") == 0) {
                         Type = "inproceedings";
-                    else if (val.indexOf("Report") == 0) // Techreport
+                    } else if (val.indexOf("Report") == 0) {
                         Type = "techreport";
-                    else if (val.indexOf("Review") == 0)
+                    } else if (val.indexOf("Review") == 0) {
                         Type = "article";
-                    else if (val.indexOf("Thesis") == 0)
+                    } else if (val.indexOf("Thesis") == 0) {
                         Type = "phdthesis";
-                    else
+                    }
+                    else {
                         Type = "misc"; //
-                } else if (prefix.equals("7"))
+                    }
+                } else if (prefix.equals("7")) {
                     hm.put("edition", val);
-                else if (prefix.equals("C"))
+                } else if (prefix.equals("C")) {
                     hm.put("address", val);
-                else if (prefix.equals("D"))
+                } else if (prefix.equals("D")) {
                     hm.put("year", val);
-                else if (prefix.equals("8"))
+                } else if (prefix.equals("8")) {
                     hm.put("date", val);
-                else if (prefix.equals("J")) {
+                } else if (prefix.equals("J")) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
-                    if (hm.get("journal") == null)
+                    if (hm.get("journal") == null) {
                         hm.put("journal", val);
+                    }
                 } else if (prefix.equals("B")) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
-                    if (Type.equals("article"))
+                    if (Type.equals("article")) {
                         hm.put("journal", val);
-                    else if (Type.equals("book") || Type.equals("inbook"))
+                    } else if (Type.equals("book") || Type.equals("inbook")) {
                         hm.put(
                                 "series", val);
-                    else
+                    } else {
                         /* if (Type.equals("inproceedings")) */
                         hm.put("booktitle", val);
+                    }
                 } else if (prefix.equals("I")) {
-                    if (Type.equals("phdthesis"))
+                    if (Type.equals("phdthesis")) {
                         hm.put("school", val);
-                    else
+                    } else {
                         hm.put("publisher", val);
+                    }
                 }
                 // replace single dash page ranges (23-45) with double dashes (23--45):
-                else if (prefix.equals("P"))
+                else if (prefix.equals("P")) {
                     hm.put("pages", val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
-                else if (prefix.equals("V"))
+                } else if (prefix.equals("V")) {
                     hm.put("volume", val);
-                else if (prefix.equals("N"))
+                } else if (prefix.equals("N")) {
                     hm.put("number", val);
-                else if (prefix.equals("U"))
+                } else if (prefix.equals("U")) {
                     hm.put("url", val);
-                else if (prefix.equals("R")) {
+                } else if (prefix.equals("R")) {
                     String doi = val;
-                    if (doi.startsWith("doi:"))
+                    if (doi.startsWith("doi:")) {
                         doi = doi.substring(4);
+                    }
                     hm.put("doi", doi);
                 } else if (prefix.equals("O")) {
                     // Notes may contain Article number
@@ -212,19 +228,22 @@ public class EndnoteImporter extends ImportFormat {
                     } else {
                         hm.put("note", val);
                     }
-                } else if (prefix.equals("K"))
+                } else if (prefix.equals("K")) {
                     hm.put("keywords", val);
-                else if (prefix.equals("X"))
+                } else if (prefix.equals("X")) {
                     hm.put("abstract", val);
-                else if (prefix.equals("9")) {
+                } else if (prefix.equals("9")) {
                     //Util.pr(val);
-                    if (val.indexOf("Ph.D.") == 0)
+                    if (val.indexOf("Ph.D.") == 0) {
                         Type = "phdthesis";
-                    if (val.indexOf("Masters") == 0)
+                    }
+                    if (val.indexOf("Masters") == 0) {
                         Type = "mastersthesis";
-                } else if (prefix.equals("F"))
+                    }
+                } else if (prefix.equals("F")) {
                     hm.put(BibtexFields.KEY_FIELD, Util
                             .checkLegalKey(val));
+                }
             }
 
             // For Edited Book, EndNote puts the editors in the author field.
@@ -235,21 +254,25 @@ public class EndnoteImporter extends ImportFormat {
             }
 
             //fixauthorscomma
-            if (!author.equals(""))
+            if (!author.equals("")) {
                 hm.put("author", fixAuthor(author));
-            if (!editor.equals(""))
+            }
+            if (!editor.equals("")) {
                 hm.put("editor", fixAuthor(editor));
+            }
             //if pages missing and article number given, use the article number
-            if (((hm.get("pages") == null) || hm.get("pages").equals("-")) && !artnum.equals(""))
+            if (((hm.get("pages") == null) || hm.get("pages").equals("-")) && !artnum.equals("")) {
                 hm.put("pages", artnum);
+            }
 
             BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                     .getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             //if (hm.isEmpty())
-            if (b.getAllFields().size() > 0)
+            if (b.getAllFields().size() > 0) {
                 bibitems.add(b);
+            }
 
         }
         return bibitems;
@@ -267,15 +290,17 @@ public class EndnoteImporter extends ImportFormat {
      */
     private String fixAuthor(String s) {
         int index = s.indexOf(" and ");
-        if (index >= 0)
+        if (index >= 0) {
             return AuthorList.fixAuthor_lastNameFirst(s);
+        }
         // Look for the comma at the end:
         index = s.lastIndexOf(",");
-        if (index == s.length() - 1) {
+        if (index == (s.length() - 1)) {
             String mod = s.substring(0, s.length() - 1).replaceAll(", ", " and ");
             return AuthorList.fixAuthor_lastNameFirst(mod);
-        } else
+        } else {
             return AuthorList.fixAuthor_lastNameFirst(s);
+        }
     }
 
 }

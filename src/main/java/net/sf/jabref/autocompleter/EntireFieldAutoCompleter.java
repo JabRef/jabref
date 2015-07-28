@@ -19,37 +19,34 @@ import net.sf.jabref.BibtexEntry;
 
 /**
  * Stores the full original value of one field of the given BibtexEntries.
- * 
+ *
  * @author kahlert, cordes
- * 
  */
-public class EntireFieldAutoCompleter extends AbstractAutoCompleter {
+class EntireFieldAutoCompleter extends AbstractAutoCompleter {
 
-    public String _fieldName;
-
+    private final String fieldName;
 
     /**
      * @see AutoCompleterFactory
      */
-    protected EntireFieldAutoCompleter(String fieldName) {
-        _fieldName = fieldName;
+    EntireFieldAutoCompleter(String fieldName) {
+        this.fieldName = fieldName;
     }
 
+    @Override
     public boolean isSingleUnitField() {
         return true;
     }
 
-    public String[] complete(String s) {
-        return super.complete(s);
-    }
-
     @Override
     public void addBibtexEntry(BibtexEntry entry) {
-        if (entry != null) {
-            String fieldValue = entry.getField(_fieldName);
-            if (fieldValue != null) {
-                addWordToIndex(fieldValue.trim());
-            }
+        if (entry == null) {
+            return;
+        }
+
+        String fieldValue = entry.getField(fieldName);
+        if (fieldValue != null) {
+            addWordToIndex(fieldValue.trim());
         }
     }
 }

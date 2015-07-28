@@ -26,6 +26,7 @@ public abstract class SpecialField {
     // currently, menuString is used for undo string
     // public static String TEXT_UNDO;
 
+    // Plain string; NOT treated by Globals.lang
     public String TEXT_DONE_PATTERN;
 
     private List<SpecialFieldValue> values;
@@ -33,7 +34,7 @@ public abstract class SpecialField {
     private HashMap<String, SpecialFieldValue> map;
 
 
-    protected void setValues(List<SpecialFieldValue> values) {
+    void setValues(List<SpecialFieldValue> values) {
         this.values = values;
         this.keywords = new ArrayList<String>();
         this.map = new HashMap<String, SpecialFieldValue>();

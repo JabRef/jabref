@@ -44,46 +44,47 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.Util;
 
-public class ContentSelectorDialog2 extends JDialog {
+class ContentSelectorDialog2 extends JDialog {
 
-    ActionListener wordEditFieldListener = null;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JPanel fieldPan = new JPanel(),
-            wordPan = new JPanel(),
-            buttonPan = new JPanel(),
-            fieldNamePan = new JPanel(),
-            wordEditPan = new JPanel();
+    private ActionListener wordEditFieldListener = null;
+    private final GridBagLayout gbl = new GridBagLayout();
+    private final GridBagConstraints con = new GridBagConstraints();
+    private final JPanel fieldPan = new JPanel();
+    private final JPanel wordPan = new JPanel();
+    private final JPanel buttonPan = new JPanel();
+    private final JPanel fieldNamePan = new JPanel();
+    private final JPanel wordEditPan = new JPanel();
 
     final String
-            WORD_EMPTY_TEXT = Globals.lang("<no field>"),
-            WORD_FIRSTLINE_TEXT = Globals.lang("<select word>"),
-            FIELD_FIRST_LINE = Globals.lang("<field name>");
-    MetaData metaData;
-    String currentField = null;
-    TreeSet<String> fieldSet, wordSet;
-    JabRefFrame frame;
-    BasePanel panel;
-    JButton help = new JButton(Globals.lang("Help")),
-            newField = new JButton(Globals.lang("New")),
-            removeField = new JButton(Globals.lang("Remove")),
-            newWord = new JButton(Globals.lang("New")),
-            removeWord = new JButton(Globals.lang("Remove")),
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(),
-            apply = new JButton(Globals.lang("Apply"));
-    DefaultListModel fieldListModel = new DefaultListModel(),
-            wordListModel = new DefaultListModel();
-    JList fieldList = new JList(fieldListModel),
-            wordList = new JList(wordListModel);
-    JTextField fieldNameField = new JTextField("", 20),
-            wordEditField = new JTextField("", 20);
-    JScrollPane fPane = new JScrollPane(fieldList),
-            wPane = new JScrollPane(wordList);
+            WORD_EMPTY_TEXT = Globals.lang("<no field>");
+    private final String WORD_FIRSTLINE_TEXT = Globals.lang("<select word>");
+    private final String FIELD_FIRST_LINE = Globals.lang("<field name>");
+    private final MetaData metaData;
+    private String currentField = null;
+    TreeSet<String> fieldSet;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final JButton help = new JButton(Globals.lang("Help"));
+    private final JButton newField = new JButton(Globals.lang("New"));
+    private final JButton removeField = new JButton(Globals.lang("Remove"));
+    private final JButton newWord = new JButton(Globals.lang("New"));
+    private final JButton removeWord = new JButton(Globals.lang("Remove"));
+    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton cancel = new JButton();
+    private final JButton apply = new JButton(Globals.lang("Apply"));
+    private final DefaultListModel fieldListModel = new DefaultListModel();
+    private DefaultListModel wordListModel = new DefaultListModel();
+    private final JList fieldList = new JList(fieldListModel);
+    private final JList wordList = new JList(wordListModel);
+    private final JTextField fieldNameField = new JTextField("", 20);
+    private final JTextField wordEditField = new JTextField("", 20);
+    private final JScrollPane fPane = new JScrollPane(fieldList);
+    private final JScrollPane wPane = new JScrollPane(wordList);
 
-    HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
-    ArrayList<String> removedFields = new ArrayList<String>();
+    private final HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
+    private final ArrayList<String> removedFields = new ArrayList<String>();
 
 
     /**
@@ -115,8 +116,9 @@ public class ContentSelectorDialog2 extends JDialog {
         setupActions();
         Util.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
         int fieldInd = fieldListModel.indexOf(currentField);
-        if (fieldInd >= 0)
+        if (fieldInd >= 0) {
             fieldList.setSelectedIndex(fieldInd);
+        }
 
         pack();
     }
@@ -125,6 +127,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         wordList.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 wordEditField.setText((String) wordList.getSelectedValue());
                 wordEditField.selectAll();
@@ -134,6 +137,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         newWord.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 newWordAction();
             }
@@ -141,6 +145,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         wordEditFieldListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
                 String old = (String) wordList.getSelectedValue(),
@@ -173,19 +178,23 @@ public class ContentSelectorDialog2 extends JDialog {
 
         removeWord.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
-                if (index == -1)
+                if (index == -1) {
                     return;
+                }
                 wordListModel.remove(index);
                 wordEditField.setText("");
-                if (wordListModel.size() > 0)
+                if (wordListModel.size() > 0) {
                     wordList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
+                }
             }
         });
 
         fieldList.addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 currentField = (String) fieldList.getSelectedValue();
                 fieldNameField.setText("");
@@ -195,6 +204,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         newField.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {
                     // only add <field name> once
@@ -212,6 +222,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         fieldNameField.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 fieldNameField.transferFocus();
             }
@@ -222,6 +233,7 @@ public class ContentSelectorDialog2 extends JDialog {
             /**
              * Adds the text value to the list
              */
+            @Override
             public void focusLost(FocusEvent e) {
                 String s = fieldNameField.getText();
                 fieldNameField.setText("");
@@ -253,22 +265,26 @@ public class ContentSelectorDialog2 extends JDialog {
 
         removeField.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int index = fieldList.getSelectedIndex();
-                if (index == -1)
+                if (index == -1) {
                     return;
+                }
                 String fieldName = (String) fieldListModel.get(index);
                 removedFields.add(fieldName);
                 fieldListModel.remove(index);
                 wordListModels.remove(fieldName);
                 fieldNameField.setText("");
-                if (fieldListModel.size() > 0)
+                if (fieldListModel.size() > 0) {
                     fieldList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
+                }
             }
         });
 
         help.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
             }
@@ -276,6 +292,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     applyChanges();
@@ -290,6 +307,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
         apply.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // Store if an entry is currently being edited:
                 if (!wordEditField.getText().equals("")) {
@@ -308,6 +326,7 @@ public class ContentSelectorDialog2 extends JDialog {
         @SuppressWarnings("serial")
         Action cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -318,8 +337,9 @@ public class ContentSelectorDialog2 extends JDialog {
 
     private void newWordAction() {
         if ((wordListModel.size() == 0) ||
-                !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT))
+                !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT)) {
             wordListModel.add(0, WORD_FIRSTLINE_TEXT);
+        }
         wordList.setSelectedIndex(0);
         wPane.getVerticalScrollBar().setValue(0);
     }
@@ -338,14 +358,17 @@ public class ContentSelectorDialog2 extends JDialog {
         // Cycle through all fields that we have created listmodels for:
         for (String fieldName : wordListModels.keySet()) {
             // For each field name, store the values:
-            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
+            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName)) {
                 continue;
+            }
             DefaultListModel lm = wordListModels.get(fieldName);
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
-            if (lm.size() > 0)
-                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+            if (lm.size() > 0) {
+                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT)) {
                     start++;
+                }
+            }
             Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
             boolean newField = false;
             if (data == null) {
@@ -353,14 +376,16 @@ public class ContentSelectorDialog2 extends JDialog {
                 data = new Vector<String>();
                 changedFieldSet = true;
 
-            } else
+            } else {
                 data.clear();
+            }
             for (int wrd = start; wrd < lm.size(); wrd++) {
                 String word = (String) lm.get(wrd);
                 data.add(word);
             }
-            if (newField)
+            if (newField) {
                 metaData.putData(Globals.SELECTOR_META_PREFIX + fieldName, data);
+            }
         }
 
         // System.out.println("TODO: remove metadata for removed selector field.");
@@ -372,7 +397,7 @@ public class ContentSelectorDialog2 extends JDialog {
         } else {
             panel.updateAllContentSelectors();
         }
-        panel.addContentSelectorValuesToAutoCompleters();
+        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.metaData);
 
     }
 
@@ -428,7 +453,7 @@ public class ContentSelectorDialog2 extends JDialog {
             // wordListModel.addElement(WORD_FIRSTLINE_TEXT);
             Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
             if (items != null) {
-                wordSet = new TreeSet<String>(items);
+                TreeSet<String> wordSet = new TreeSet<String>(items);
                 int index = 0;
                 for (String s : wordSet) {
                     wordListModel.add(index, s);

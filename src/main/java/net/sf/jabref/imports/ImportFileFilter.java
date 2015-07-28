@@ -22,10 +22,10 @@ import java.io.File;
  * File filter that lets the user choose export format while choosing file to
  * export to. Contains a reference to the ExportFormat in question.
  */
-public class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
+class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
 
-    private ImportFormat format;
-    private String name;
+    private final ImportFormat format;
+    private final String name;
 
 
     public ImportFileFilter(ImportFormat format) {
@@ -37,6 +37,7 @@ public class ImportFileFilter extends FileFilter implements Comparable<ImportFil
         return format;
     }
 
+    @Override
     public boolean accept(File file) {
         return true;
         /*if (file.isDirectory())
@@ -45,10 +46,12 @@ public class ImportFileFilter extends FileFilter implements Comparable<ImportFil
             return file.getPath().toLowerCase().endsWith(extension);*/
     }
 
+    @Override
     public String getDescription() {
         return name;
     }
 
+    @Override
     public int compareTo(ImportFileFilter o) {
         return name.compareTo(o.name);
     }

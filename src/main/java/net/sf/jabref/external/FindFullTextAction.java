@@ -28,7 +28,7 @@ import java.io.IOException;
  */
 public class FindFullTextAction extends AbstractWorker {
 
-    private BasePanel basePanel;
+    private final BasePanel basePanel;
     private BibtexEntry entry = null;
     private FindFullText.FindResult result = null;
 
@@ -37,16 +37,19 @@ public class FindFullTextAction extends AbstractWorker {
         this.basePanel = basePanel;
     }
 
+    @Override
     public void init() throws Throwable {
         basePanel.output(Globals.lang("Looking for full text document..."));
     }
 
+    @Override
     public void run() {
         entry = basePanel.getSelectedEntries()[0];
         FindFullText fft = new FindFullText();
         result = fft.findFullText(entry);
     }
 
+    @Override
     public void update() {
         //pdfURL = new URL("http://geog-www.sbs.ohio-state.edu/faculty/bmark/abbott_etal_ppp03.pdf");
         if (result.url != null) {
@@ -63,6 +66,7 @@ public class FindFullTextAction extends AbstractWorker {
             try {
                 def.download(result.url, new DownloadExternalFile.DownloadCallback() {
 
+                    @Override
                     public void downloadComplete(FileListEntry file) {
                         System.out.println("finished");
                         FileListTableModel tm = new FileListTableModel();

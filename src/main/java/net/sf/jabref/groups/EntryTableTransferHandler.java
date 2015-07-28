@@ -34,7 +34,9 @@ import javax.swing.TransferHandler;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
@@ -49,17 +51,17 @@ import spl.PdfImporter.ImportPdfFilesResult;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
-    protected final MainTable entryTable;
+    private final MainTable entryTable;
 
-    protected JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    private BasePanel panel;
+    private final BasePanel panel;
 
-    protected DataFlavor urlFlavor;
+    private DataFlavor urlFlavor;
 
-    protected DataFlavor stringFlavor;
+    private final DataFlavor stringFlavor;
 
-    protected static boolean DROP_ALLOWED = true;
+    private static final boolean DROP_ALLOWED = true;
 
 
     /**
@@ -95,6 +97,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     /**
      * This method is called when dragging stuff *from* the table.
      */
+    @Override
     public Transferable createTransferable(JComponent c) {
         if (!draggingFile) {
             /* so we can assume it will never be called if entryTable==null: */
@@ -113,6 +116,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      * database.
      * 
      */
+    @Override
     public boolean importData(JComponent comp, Transferable t) {
 
         // If the drop target is the main table, we want to record which
@@ -210,14 +214,16 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-        if (!DROP_ALLOWED)
+        if (!EntryTableTransferHandler.DROP_ALLOWED) {
             return false;
+        }
 
         // accept this if any input flavor matches any of our supported flavors
         for (DataFlavor inflav : transferFlavors) {
             if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                    || inflav.match(DataFlavor.javaFileListFlavor))
+                    || inflav.match(DataFlavor.javaFileListFlavor)) {
                 return true;
+            }
         }
 
         // System.out.println("drop type forbidden");
@@ -226,9 +232,10 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
 
-    boolean draggingFile = false;
+    private boolean draggingFile = false;
 
 
+    @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         /* TODO: add support for dragging file link from table icon into other apps */
         if (e instanceof MouseEvent) {
@@ -248,11 +255,13 @@ public class EntryTableTransferHandler extends TransferHandler {
         super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
     }
 
+    @Override
     protected void exportDone(JComponent source, Transferable data, int action) {
         // default implementation is OK
         super.exportDone(source, data, action);
     }
 
+    @Override
     public void exportToClipboard(JComponent comp, Clipboard clip, int action) {
         // default implementation is OK
         super.exportToClipboard(comp, clip, action);
@@ -260,13 +269,15 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     // add-ons -----------------------
 
-    protected boolean handleDropTransfer(String dropStr, final int dropRow) throws IOException {
+    private boolean handleDropTransfer(String dropStr, final int dropRow) throws IOException {
         if (dropStr.startsWith("file:")) {
             // This appears to be a dragged file link and not a reference
             // format. Check if we can map this to a set of files:
             if (handleDraggedFilenames(dropStr, dropRow))
+             {
                 return true;
             // If not, handle it in the normal way...
+            }
         } else if (dropStr.startsWith("http:")) {
             // This is the way URL links are received on OS X and KDE (Gnome?):
             URL url = new URL(dropStr);
@@ -317,16 +328,18 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
 
             // Unless an exception was thrown, we should have the sanitized path:
-            if (fl != null)
+            if (fl != null) {
                 line = fl.getPath();
-            else if (line.startsWith("file:"))
+            } else if (line.startsWith("file:")) {
                 line = line.substring(5);
-            else
+            } else {
                 continue;
+            }
             // Under Gnome, the link is given as file:///...., so we
             // need to strip the extra slashes:
-            if (line.startsWith("//"))
+            if (line.startsWith("//")) {
                 line = line.substring(2);
+            }
 
             File f = new File(line);
             if (f.exists()) {
@@ -347,7 +360,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     private boolean handleDraggedFilenames(String s, final int dropRow) {
 
-        return handleDraggedFiles(getFilesFromDraggedFilesString(s), dropRow);
+        return handleDraggedFiles(EntryTableTransferHandler.getFilesFromDraggedFilesString(s), dropRow);
 
     }
 
@@ -369,8 +382,9 @@ public class EntryTableTransferHandler extends TransferHandler {
         // Try to load bib files normally, and import the rest into the current
         // database.
         // This process must be spun off into a background thread:
-        new Thread(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
             public void run() {
                 // Done by MrDlib
                 final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
@@ -380,7 +394,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 //loadOrImportFiles(fileNames, dropRow);
                 // Done by MrDlib
             }
-        }).start();
+        });
 
         return true;
     }
@@ -398,7 +412,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
         ArrayList<String> notBibFiles = new ArrayList<String>();
-        String encoding = Globals.prefs.get("defaultEncoding");
+        String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             String extension = "";
@@ -434,7 +448,7 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if (fileType != null && dropRow >= 0) {
+            if ((fileType != null) && (dropRow >= 0)) {
 
                 /*
                  * TODO: need to signal if this is a local or autodownloaded
@@ -468,7 +482,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             					if (panel == null) {
             						// // Create a new, empty, database.
             						BibtexDatabase database = new BibtexDatabase();
-            						frame.addTab(database, null, null, Globals.prefs.get("defaultEncoding"),
+            						frame.addTab(database, null, null, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING),
             							true);
             						frame.output(Globals.lang("New database created."));
             						panel = frame.basePanel();
@@ -482,7 +496,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             						BibtexEntry e = (BibtexEntry) it.next();
 
             						try {
-            							e.setId(Util.createNeutralId());
+            							e.setId(Util.next());
             							database.insertEntry(e);
             							ce.addEdit(new UndoableInsertEntry(database, e, panel));
             						} catch (Exception e2) {
@@ -512,7 +526,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         }
     }
 
-    protected boolean handleDropTransfer(URL dropLink, int dropRow) throws IOException {
+    private boolean handleDropTransfer(URL dropLink, int dropRow) throws IOException {
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 

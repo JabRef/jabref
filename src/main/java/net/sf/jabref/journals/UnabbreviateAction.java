@@ -15,47 +15,48 @@
 */
 package net.sf.jabref.journals;
 
+import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.undo.NamedCompound;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Sep 17, 2005
- * Time: 12:48:23 AM
- * To browseOld this template use File | Settings | File Templates.
+ * Converts journal abbreviations back to full name for all selected entries.
  */
 public class UnabbreviateAction extends AbstractWorker {
 
-    BasePanel panel;
-    String message = "";
+    private final BasePanel panel;
+    private String message = "";
 
 
     public UnabbreviateAction(BasePanel panel) {
         this.panel = panel;
     }
 
+    @Override
     public void init() {
-        //  new FieldWeightDialog(frame).setVisible(true);
         panel.output("Unabbreviating...");
     }
 
+    @Override
     public void run() {
-        //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
-
         BibtexEntry[] entries = panel.getSelectedEntries();
-        if (entries == null)
+        if (entries == null) {
             return;
+        }
+
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbrev);
+
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
         int count = 0;
         for (BibtexEntry entry : entries) {
-            if (Globals.journalAbbrev.unabbreviate(panel.database(), entry, "journal", ce))
+            if (undoableAbbreviator.unabbreviate(panel.database(), entry, "journal", ce)) {
                 count++;
-            if (Globals.journalAbbrev.unabbreviate(panel.database(), entry, "journaltitle", ce))
+            }
+            if (undoableAbbreviator.unabbreviate(panel.database(), entry, "journaltitle", ce)) {
                 count++;
+            }
         }
         if (count > 0) {
             ce.end();
@@ -67,6 +68,7 @@ public class UnabbreviateAction extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
         panel.output(message);
     }

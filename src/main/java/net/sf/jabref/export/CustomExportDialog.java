@@ -27,7 +27,8 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -37,29 +38,15 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 class CustomExportDialog extends JDialog {
 
-    JTextField
-            name = new JTextField(60),
-            layoutFile = new JTextField(60),
-            extension = new JTextField(60);
-    JLabel
-            nl = new JLabel(Globals.lang("Export name") + ":"),
-            nr = new JLabel(Globals.lang("Main layout file") + ":"),
-            nf = new JLabel(Globals.lang("File extension") + ":");
-    JButton
-            ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel")),
-            browse = new JButton(Globals.lang("Browse"));
-    JPanel
-            main = new JPanel(),
-            buttons = new JPanel();
+    private final JTextField
+            name = new JTextField(60);
+    private final JTextField layoutFile = new JTextField(60);
+    private final JTextField extension = new JTextField(60);
     private boolean ok_pressed = false;
     private int index;
-    private JabRefFrame parent;
+    private final JabRefFrame parent;
 
     private String oldName, oldRegexp, oldField;
-
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
 
 
     public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {
@@ -74,12 +61,13 @@ class CustomExportDialog extends JDialog {
         parent = parent_;
         ActionListener okListener = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 // Check that there are no empty strings.
-                if ((layoutFile.getText().equals("")) ||
-                        (name.getText().equals("")) ||
-                        (extension.getText().equals("")) ||
+                if ((layoutFile.getText().isEmpty()) ||
+                        (name.getText().isEmpty()) ||
+                        (extension.getText().isEmpty()) ||
                         (!layoutFile.getText().endsWith(".layout"))) {
                     //JOptionPane.showMessageDialog
                     //    (parent, Globals.lang("You must provide a name, a search "
@@ -95,6 +83,7 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
+        JButton ok = new JButton(Globals.lang("Ok"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);
@@ -102,43 +91,51 @@ class CustomExportDialog extends JDialog {
 
         AbstractAction cancelAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         };
 
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(cancelAction);
 
+        JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                File directory = new File(Globals.prefs.get("exportWorkingDirectory"));
+                File directory = new File(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 String chosenStr = FileDialogs.getNewFile(parent, directory, ".layout",
                         JFileChooser.OPEN_DIALOG, false);
-                if (chosenStr == null)
+                if (chosenStr == null) {
                     return;
+                }
                 File chosen = new File(chosenStr);
 
                 // Update working directory for layout files.
-                Globals.prefs.put("exportWorkingDirectory", chosen.getParent());
+                Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, chosen.getParent());
 
                 layoutFile.setText(chosen.getPath());
             }
         });
 
         // Key bindings:
+        JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent.prefs().getKey("Close dialog"), "close");
         am.put("close", cancelAction);
 
         // Layout starts here.
+        GridBagLayout gbl = new GridBagLayout();
         main.setLayout(gbl);
         main.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
                         Globals.lang("Export properties")));
 
         // Main panel:
+        GridBagConstraints con = new GridBagConstraints();
         con.weightx = 0;
         con.gridwidth = 1;
         con.insets = new Insets(3, 5, 3, 5);
@@ -146,12 +143,15 @@ class CustomExportDialog extends JDialog {
         con.fill = GridBagConstraints.NONE;
         con.gridx = 0;
         con.gridy = 0;
+        JLabel nl = new JLabel(Globals.lang("Export name") + ':');
         gbl.setConstraints(nl, con);
         main.add(nl);
         con.gridy = 1;
+        JLabel nr = new JLabel(Globals.lang("Main layout file") + ':');
         gbl.setConstraints(nr, con);
         main.add(nr);
         con.gridy = 2;
+        JLabel nf = new JLabel(Globals.lang("File extension") + ':');
         gbl.setConstraints(nf, con);
         main.add(nf);
 
@@ -178,6 +178,7 @@ class CustomExportDialog extends JDialog {
         gbl.setConstraints(extension, con);
         main.add(extension);
 
+        JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         bb.addGlue();
@@ -224,12 +225,13 @@ class CustomExportDialog extends JDialog {
 
     public String extension() {
         String ext = extension.getText();
-        if (ext.startsWith("."))
+        if (ext.startsWith(".")) {
             return ext;
-        else if (ext.startsWith("*."))
+        } else if (ext.startsWith("*.")) {
             return ext.substring(1);
-        else
-            return "." + ext;
+        } else {
+            return '.' + ext;
+        }
     }
 
 }

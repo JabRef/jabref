@@ -20,11 +20,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
-import net.sf.jabref.AuthorList;
+
+import net.sf.jabref.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -37,6 +34,7 @@ public class JstorImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "JStor (tab delimited)";
     }
@@ -45,6 +43,7 @@ public class JstorImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "jstor";
     }
@@ -52,6 +51,7 @@ public class JstorImporter extends ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
         return true;
     }
@@ -60,24 +60,29 @@ public class JstorImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         String s = "";
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        while ((s != null) && !s.startsWith("Item Type"))
+        while ((s != null) && !s.startsWith("Item Type")) {
             s = in.readLine();
+        }
 
         while ((s = in.readLine()) != null) {
-            if (s.equals(""))
+            if (s.equals("")) {
                 continue;
-            if (s.startsWith("-----------------------------"))
+            }
+            if (s.startsWith("-----------------------------")) {
                 break;
+            }
             String[] fields = s.split("\t");
-            BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+            BibtexEntry be = new BibtexEntry(IdGenerator.next());
             try {
-                if (fields[0].equals("FLA"))
+                if (fields[0].equals("FLA")) {
                     be.setType(BibtexEntryType
                             .getType("article"));
+                }
                 ImportFormatReader.setIfNecessary(be, "title", fields[2]);
                 ImportFormatReader.setIfNecessary(be, "author", AuthorList.fixAuthor_lastNameFirst(fields[4].replaceAll("; ", " and ")));
                 ImportFormatReader.setIfNecessary(be, "journal", fields[7]);
@@ -86,8 +91,9 @@ public class JstorImporter extends ImportFormat {
                 String[] datefield = fields[12].split(" ");
                 ImportFormatReader.setIfNecessary(be, "year", datefield[datefield.length - 1]);
                 if (datefield.length > 1) {
-                    if (datefield[0].endsWith(","))
+                    if (datefield[0].endsWith(",")) {
                         datefield[0] = datefield[0].substring(0, datefield[0].length() - 1);
+                    }
                     ImportFormatReader.setIfNecessary(be, "month", datefield[0]);
                 }
                 //for (int i=0; i<fields.length; i++)

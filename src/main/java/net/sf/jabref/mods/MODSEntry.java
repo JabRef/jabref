@@ -39,38 +39,35 @@ import org.w3c.dom.Node;
  * @author Michael Wrighton
  *
  */
-public class MODSEntry {
+class MODSEntry {
 
-    protected String entryType = "mods"; // could also be relatedItem
-    protected String id;
-    protected List<PersonName> authors = null;
+    private String entryType = "mods"; // could also be relatedItem
+    private String id;
+    private List<PersonName> authors = null;
 
     // should really be handled with an enum
-    protected String issuance = "monographic";
-    protected PageNumbers pages = null;
+    private String issuance = "monographic";
+    private PageNumbers pages = null;
 
-    protected String publisher = null;
-    protected String date = null;
-    protected String place = null;
+    private String publisher = null;
+    private String date = null;
 
-    protected String title = null;
-    // should really be handled with an enum
-    protected String type = "text";
+    private String title = null;
 
-    protected String number;
-    protected String volume;
-    protected String genre = null;
-    protected Set<String> handledExtensions;
+    private String number;
+    private String volume;
+    private String genre = null;
+    private final Set<String> handledExtensions;
 
-    protected MODSEntry host;
-    Map<String, String> extensionFields;
+    private MODSEntry host;
+    private final Map<String, String> extensionFields;
 
-    public static String BIBTEX = "bibtex_";
+    private static final String BIBTEX = "bibtex_";
 
     private final boolean CHARFORMAT = false;
 
 
-    public MODSEntry() {
+    private MODSEntry() {
         extensionFields = new HashMap<String, String>();
         handledExtensions = new HashSet<String>();
 
@@ -78,115 +75,126 @@ public class MODSEntry {
 
     public MODSEntry(BibtexEntry bibtex) {
         this();
-        handledExtensions.add(BIBTEX + "publisher");
-        handledExtensions.add(BIBTEX + "title");
-        handledExtensions.add(BIBTEX + "bibtexkey");
-        handledExtensions.add(BIBTEX + "author");
+        handledExtensions.add(MODSEntry.BIBTEX + "publisher");
+        handledExtensions.add(MODSEntry.BIBTEX + "title");
+        handledExtensions.add(MODSEntry.BIBTEX + "bibtexkey");
+        handledExtensions.add(MODSEntry.BIBTEX + "author");
         populateFromBibtex(bibtex);
     }
 
-    protected void populateFromBibtex(BibtexEntry bibtex) {
+    private void populateFromBibtex(BibtexEntry bibtex) {
         LayoutFormatter chars = new XMLChars();
         if (bibtex.getField("title") != null) {
-            if (CHARFORMAT)
+            if (CHARFORMAT) {
                 title = chars.format(bibtex.getField("title"));
-            else
+            } else {
                 title = bibtex.getField("title");
+            }
         }
 
         if (bibtex.getField("publisher") != null) {
-            if (CHARFORMAT)
+            if (CHARFORMAT) {
                 publisher = chars.format(bibtex.getField("publisher"));
-            else
+            } else {
                 publisher = bibtex.getField("publisher");
+            }
         }
 
-        if (bibtex.getField("bibtexkey") != null)
+        if (bibtex.getField("bibtexkey") != null) {
             id = bibtex.getField("bibtexkey");
+        }
         if (bibtex.getField("place") != null) {
-            if (CHARFORMAT)
+            String place = null;
+            if (CHARFORMAT) {
                 place = chars.format(bibtex.getField("place"));
-            else
+            } else {
                 place = bibtex.getField("place");
+            }
         }
 
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
-        if (bibtex.getField("author") != null)
+        if (bibtex.getField("author") != null) {
             authors = getAuthors(bibtex.getField("author"));
-        if (bibtex.getType() == BibtexEntryType.ARTICLE ||
-                bibtex.getType() == BibtexEntryType.INPROCEEDINGS)
+        }
+        if ((bibtex.getType() == BibtexEntryType.ARTICLE) ||
+                (bibtex.getType() == BibtexEntryType.INPROCEEDINGS))
         {
             host = new MODSEntry();
             host.entryType = "relatedItem";
             host.title = bibtex.getField("booktitle");
             host.publisher = bibtex.getField("publisher");
             host.number = bibtex.getField("number");
-            if (bibtex.getField("pages") != null)
+            if (bibtex.getField("pages") != null) {
                 host.volume = bibtex.getField("volume");
+            }
             host.issuance = "continuing";
-            if (bibtex.getField("pages") != null)
+            if (bibtex.getField("pages") != null) {
                 host.pages = new PageNumbers(bibtex.getField("pages"));
+            }
         }
 
         populateExtensionFields(bibtex);
 
     }
 
-    protected void populateExtensionFields(BibtexEntry e) {
+    private void populateExtensionFields(BibtexEntry e) {
 
         for (String field : e.getAllFields()) {
             String value = e.getField(field);
-            field = BIBTEX + field;
+            field = MODSEntry.BIBTEX + field;
             extensionFields.put(field, value);
         }
     }
 
-    protected List<PersonName> getAuthors(String authors) {
+    private List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new LinkedList<PersonName>();
         LayoutFormatter chars = new XMLChars();
 
         if (!authors.contains(" and ")) {
-            if (CHARFORMAT)
+            if (CHARFORMAT) {
                 result.add(new PersonName(chars.format(authors)));
-            else
+            } else {
                 result.add(new PersonName(authors));
+            }
         }
         else
         {
             String[] names = authors.split(" and ");
             for (String name : names) {
-                if (CHARFORMAT)
+                if (CHARFORMAT) {
                     result.add(new PersonName(chars.format(name)));
-                else
+                } else {
                     result.add(new PersonName(name));
+                }
             }
         }
         return result;
     }
 
     /* construct a MODS date object */
-    protected String getDate(BibtexEntry bibtex) {
+    private String getDate(BibtexEntry bibtex) {
         String result = "";
-        if (bibtex.getField("year") != null)
+        if (bibtex.getField("year") != null) {
             result += (bibtex.getField("year"));
-        if (bibtex.getField("month") != null)
-            result += "-" + bibtex.getField("month");
+        }
+        if (bibtex.getField("month") != null) {
+            result += '-' + bibtex.getField("month");
+        }
 
         return result;
     }
 
     // must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
-    protected String getMODSgenre(BibtexEntry bibtex) {
-        String bibtexType = bibtex.getType().getName();
+    private String getMODSgenre(BibtexEntry bibtex) {
         /**
          * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
          * "theses"; else result = "conference publication"; // etc... </pre>
          */
-        return bibtexType;
+        return bibtex.getType().getName();
     }
 
-    public Node getDOMrepresentation() {
+    private Node getDOMrepresentation() {
         Node result = null;
         try {
             DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -262,6 +270,7 @@ public class MODSEntry {
 
             }
             Element typeOfResource = d.createElement("typeOfResource");
+            String type = "text";
             typeOfResource.appendChild(d.createTextNode(stripNonValidXMLCharacters(type)));
             mods.appendChild(typeOfResource);
 
@@ -286,8 +295,9 @@ public class MODSEntry {
                 Element extension = d.createElement("extension");
                 String field = theEntry.getKey();
                 String value = theEntry.getValue();
-                if (handledExtensions.contains(field))
+                if (handledExtensions.contains(field)) {
                     continue;
+                }
                 Element theData = d.createElement(field);
                 theData.appendChild(d.createTextNode(stripNonValidXMLCharacters(value)));
                 extension.appendChild(theData);
@@ -316,12 +326,14 @@ public class MODSEntry {
      * @param in The String whose non-valid characters we want to remove.
      * @return The in String, stripped of non-valid characters.
      */
-    public String stripNonValidXMLCharacters(String in) {
+    private String stripNonValidXMLCharacters(String in) {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if (in == null || ("".equals(in)))
+        if ((in == null) || (in != null && in.isEmpty()))
+         {
             return ""; // vacancy test.
+        }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
             if ((current == 0x9) ||
@@ -329,8 +341,9 @@ public class MODSEntry {
                     (current == 0xD) ||
                     ((current >= 0x20) && (current <= 0xD7FF)) ||
                     ((current >= 0xE000) && (current <= 0xFFFD)) ||
-                    ((current >= 0x10000) && (current <= 0x10FFFF)))
+                    ((current >= 0x10000) && (current <= 0x10FFFF))) {
                 out.append(current);
+            }
         }
         return out.toString();
     }
@@ -339,6 +352,7 @@ public class MODSEntry {
      * render as XML
      * 
      */
+    @Override
     public String toString() {
         StringWriter sresult = new StringWriter();
         try {

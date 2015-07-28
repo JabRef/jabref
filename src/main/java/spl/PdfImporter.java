@@ -17,6 +17,8 @@ import net.sf.jabref.imports.PdfContentImporter;
 import net.sf.jabref.imports.PdfXmpImporter;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;
 
 import spl.filter.PdfFileFilter;
@@ -31,8 +33,8 @@ import spl.gui.ImportDialog;
  */
 public class PdfImporter {
 
-    private JabRefFrame frame;
-    private BasePanel panel;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
     private MainTable entryTable;
     private int dropRow;
 
@@ -99,8 +101,9 @@ public class PdfImporter {
      * @return true if the import succeeded, false otherwise
      */
     private List<BibtexEntry> importPdfFiles(List<String> fileNames, OutputPrinter status) {
-        if (panel == null)
+        if (panel == null) {
             return Collections.emptyList();
+        }
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
         boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
@@ -165,7 +168,7 @@ public class PdfImporter {
                     FileListTableModel tm = new FileListTableModel();
                     File toLink = new File(fileName);
                     tm.addEntry(0, new FileListEntry(toLink.getName(),
-                            Util.shortenFileName(toLink, dirsS).getPath(),
+                            FileUtil.shortenFileName(toLink, dirsS).getPath(),
                             Globals.prefs.getExternalFileTypeByName("pdf")));
                     entry.setField(GUIGlobals.FILE_FIELD, tm.getStringRepresentation());
                     res.add(entry);
@@ -220,7 +223,7 @@ public class PdfImporter {
                     dfh = new DroppedFileHandler(frame, panel);
                     dfh.linkPdfToEntry(fileName, entryTable, entry);
                     panel.highlightEntry(entry);
-                    if (Globals.prefs.getBoolean("autoOpenForm")) {
+                    if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                         EntryEditor editor = panel.getEntryEditor(entry);
                         panel.showEntryEditor(editor);
                         panel.adjustSplitter();
@@ -252,7 +255,7 @@ public class PdfImporter {
     }
 
     private boolean fieldExists(String string) {
-        return string != null && !string.isEmpty();
+        return (string != null) && !string.isEmpty();
     }
 
     private BibtexEntry createNewEntry() {
@@ -265,7 +268,7 @@ public class PdfImporter {
         BibtexEntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not cancelled.
-            String id = Util.createNeutralId();
+            String id = IdGenerator.next();
             final BibtexEntry be = new BibtexEntry(id, type);
             try {
                 panel.database().insertEntry(be);

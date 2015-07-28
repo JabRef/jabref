@@ -44,12 +44,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Changes {\^o} or {\^{o}} to ?
- * 
- * @author $author$
- * @version $Revision$
  */
 public class XMLChars implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
 
         fieldText = firstFormat(fieldText);
@@ -57,8 +55,9 @@ public class XMLChars implements LayoutFormatter {
         for (Map.Entry<String, String> entry : Globals.XML_CHARS.entrySet()) {
             String s = entry.getKey();
             String repl = entry.getValue();
-            if (repl != null)
+            if (repl != null) {
                 fieldText = fieldText.replaceAll(s, repl);
+            }
         }
         return restFormat(fieldText);
     }
@@ -68,7 +67,7 @@ public class XMLChars implements LayoutFormatter {
     }
 
 
-    boolean[] forceReplace;
+    private boolean[] forceReplace;
 
 
     private String restFormat(String toFormat) {
@@ -105,8 +104,8 @@ public class XMLChars implements LayoutFormatter {
             }
 
             // TODO: Check whether > 125 is correct here or whether it should rather be >=  
-            if (code > 125 || forceReplace[code]) {
-                buffer.append("&#").append(code).append(";");
+            if ((code > 125) || forceReplace[code]) {
+                buffer.append("&#").append(code).append(';');
             } else {
                 buffer.append((char) code);
             }
@@ -118,8 +117,9 @@ public class XMLChars implements LayoutFormatter {
             String s = entry.getKey();
             String repl = entry.getValue();
 
-            if (repl != null)
+            if (repl != null) {
                 fieldText = fieldText.replaceAll(s, repl);
+            }
         }
 
         return fieldText;

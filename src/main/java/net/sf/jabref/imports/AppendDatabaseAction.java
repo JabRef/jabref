@@ -22,25 +22,16 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BaseAction;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.MergeDialog;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.util.Util;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,11 +40,11 @@ import net.sf.jabref.undo.UndoableInsertString;
  * Time: 9:49:02 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AppendDatabaseAction extends BaseAction {
+public class AppendDatabaseAction implements BaseAction {
 
-    private JabRefFrame frame;
-    private BasePanel panel;
-    private List<File> filesToOpen = new ArrayList<File>();
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final List<File> filesToOpen = new ArrayList<File>();
 
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
@@ -61,6 +52,7 @@ public class AppendDatabaseAction extends BaseAction {
         this.panel = panel;
     }
 
+    @Override
     public void action() {
 
         filesToOpen.clear();
@@ -68,40 +60,45 @@ public class AppendDatabaseAction extends BaseAction {
         Util.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")),
+            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     null, false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
-            if (chosen == null)
+            if (chosen == null) {
                 return;
-            for (String aChosen : chosen)
+            }
+            for (String aChosen : chosen) {
                 filesToOpen.add(new File(aChosen));
+            }
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                @Override
                 public void run() {
                     openIt(md.importEntries(), md.importStrings(),
                             md.importGroups(), md.importSelectorWords());
                 }
-            }).start();
+
+            });
             //frame.getFileHistory().newFile(panel.fileToOpen.getPath());
         }
 
     }
 
-    void openIt(boolean importEntries, boolean importStrings,
-            boolean importGroups, boolean importSelectorWords) {
-        if (filesToOpen.size() == 0)
+    private void openIt(boolean importEntries, boolean importStrings,
+                        boolean importGroups, boolean importSelectorWords) {
+        if (filesToOpen.size() == 0) {
             return;
+        }
         for (File file : filesToOpen) {
             try {
-                Globals.prefs.put("workingDirectory", file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                String encoding = Globals.prefs.get("defaultEncoding");
+                String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-                mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
+                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
                 panel.output(Globals.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (Throwable ex) {
@@ -113,9 +110,9 @@ public class AppendDatabaseAction extends BaseAction {
         }
     }
 
-    public static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
-            boolean importEntries, boolean importStrings,
-            boolean importGroups, boolean importSelectorWords)
+    private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
+                                        boolean importEntries, boolean importStrings,
+                                        boolean importGroups, boolean importSelectorWords)
             throws KeyCollisionException {
 
         BibtexDatabase fromDatabase = pr.getDatabase();
@@ -127,13 +124,13 @@ public class AppendDatabaseAction extends BaseAction {
         MetaData meta = pr.getMetaData();
 
         if (importEntries) { // Add entries
-            boolean overwriteOwner = Globals.prefs.getBoolean("overwriteOwner");
-            boolean overwriteTimeStamp = Globals.prefs.getBoolean("overwriteTimeStamp");
+            boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
+            boolean overwriteTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP);
 
             for (String key : fromDatabase.getKeySet()) {
                 originalEntry = fromDatabase.getEntryById(key);
                 BibtexEntry be = (BibtexEntry) (originalEntry.clone());
-                be.setId(Util.createNeutralId());
+                be.setId(IdGenerator.next());
                 Util.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
                 database.insertEntry(be);
                 appendedEntries.add(be);
@@ -158,11 +155,11 @@ public class AppendDatabaseAction extends BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = new ExplicitGroup("Imported",
-                            AbstractGroup.INDEPENDENT); // JZTODO lyrics
+                    ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
                     newGroups.setGroup(group);
-                    for (BibtexEntry appendedEntry : appendedEntries)
+                    for (BibtexEntry appendedEntry : appendedEntries) {
                         group.addEntry(appendedEntry);
+                    }
                 }
 
                 // groupsSelector is always created, even when no groups
@@ -177,10 +174,11 @@ public class AppendDatabaseAction extends BaseAction {
                 BibtexEntry entry;
 
                 for (Enumeration<GroupTreeNode> e = newGroups
-                        .preorderEnumeration(); e.hasMoreElements();) {
+                        .preorderEnumeration(); e.hasMoreElements(); ) {
                     node = e.nextElement();
-                    if (!(node.getGroup() instanceof ExplicitGroup))
+                    if (!(node.getGroup() instanceof ExplicitGroup)) {
                         continue;
+                    }
                     group = (ExplicitGroup) node.getGroup();
                     for (int i = 0; i < originalEntries.size(); ++i) {
                         entry = originalEntries.get(i);

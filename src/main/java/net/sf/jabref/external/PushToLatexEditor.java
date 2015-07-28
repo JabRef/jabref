@@ -31,36 +31,42 @@ public class PushToLatexEditor implements PushToApplication {
     private boolean couldNotCall = false;
     private boolean notDefined = false;
     private JPanel settings = null;
-    private JTextField ledPath = new JTextField(30),
-            citeCommand = new JTextField(30);
+    private final JTextField ledPath = new JTextField(30);
+    private final JTextField citeCommand = new JTextField(30);
 
 
+    @Override
     public String getName() {
         return Globals.menuTitle("Insert selected citations into LatexEditor");
     }
 
+    @Override
     public String getApplicationName() {
         return "LatexEditor";
     }
 
+    @Override
     public String getTooltip() {
         return Globals.lang("Push to LatexEditor");
     }
 
+    @Override
     public Icon getIcon() {
         return GUIGlobals.getImage("edit");
     }
 
+    @Override
     public String getKeyStrokeName() {
         return null;
     }
 
+    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
         couldNotCall = false;
         notDefined = false;
 
-        String led = Globals.prefs.get("latexEditorPath");
+        String led = Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH);
 
         if ((led == null) || (led.trim().length() == 0)) {
             notDefined = true;
@@ -68,7 +74,7 @@ public class PushToLatexEditor implements PushToApplication {
         }
 
         try {
-            Runtime.getRuntime().exec(led + " " + "-i " + Globals.prefs.get("citeCommandLed") + "{" + keyString + "}");
+            Runtime.getRuntime().exec(led + " " + "-i " + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_LED) + "{" + keyString + "}");
 
         }
 
@@ -78,6 +84,7 @@ public class PushToLatexEditor implements PushToApplication {
         }
     }
 
+    @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
             panel.output(Globals.lang("Error") + ": " +
@@ -85,21 +92,24 @@ public class PushToLatexEditor implements PushToApplication {
         }
         else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
-                    + Globals.prefs.get("latexEditorPath") + "'.");
-        }
-        else
+                    + Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH) + "'.");
+        } else {
             Globals.lang("Pushed citations to %0", "LatexEditor");
+        }
     }
 
+    @Override
     public boolean requiresBibtexKeys() {
         return true;
     }
 
+    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null)
+        if (settings == null) {
             initSettingsPanel();
-        ledPath.setText(Globals.prefs.get("latexEditorPath"));
-        citeCommand.setText(Globals.prefs.get("citeCommandLed"));
+        }
+        ledPath.setText(Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH));
+        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_LED));
         return settings;
     }
 
@@ -108,7 +118,7 @@ public class PushToLatexEditor implements PushToApplication {
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
         builder.append(new JLabel(Globals.lang("Path to LatexEditor (LEd.exe)") + ":"));
         builder.append(ledPath);
-        BrowseAction action = new BrowseAction(null, ledPath, false);
+        BrowseAction action = BrowseAction.buildForFile(ledPath);
         JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
@@ -118,8 +128,9 @@ public class PushToLatexEditor implements PushToApplication {
         settings = builder.getPanel();
     }
 
+    @Override
     public void storeSettings() {
-        Globals.prefs.put("latexEditorPath", ledPath.getText());
-        Globals.prefs.put("citeCommandLed", citeCommand.getText());
+        Globals.prefs.put(JabRefPreferences.LATEX_EDITOR_PATH, ledPath.getText());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_LED, citeCommand.getText());
     }
 }

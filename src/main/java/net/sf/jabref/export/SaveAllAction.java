@@ -17,6 +17,8 @@ package net.sf.jabref.export;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
+
 import net.sf.jabref.*;
 import spin.Spin;
 
@@ -26,7 +28,7 @@ import spin.Spin;
  */
 public class SaveAllAction extends MnemonicAwareAction implements Worker {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private int databases = 0, saved = 0;
 
 
@@ -34,11 +36,12 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
     public SaveAllAction(JabRefFrame frame) {
         super(GUIGlobals.getImage("saveAll"));
         this.frame = frame;
-        putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Save all"));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Save all open databases"));
-        putValue(NAME, "Save all");
+        putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Save all"));
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Save all open databases"));
+        putValue(Action.NAME, "Save all");
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         databases = frame.getTabbedPane().getTabCount();
         saved = 0;
@@ -48,6 +51,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
         frame.output(Globals.lang("Save all finished."));
     }
 
+    @Override
     public void run() {
         for (int i = 0; i < databases; i++) {
             if (i < frame.getTabbedPane().getTabCount()) {

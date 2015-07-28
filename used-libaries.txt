@@ -48,7 +48,7 @@ License: BSD
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
-License: GPLv2! and Oracle�s FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
+License: GPLv2! and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
 
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
@@ -95,16 +95,14 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: LGPL 3.0
 
+Id:      org.swinglabs:swingx
+Project: SwingX
+URL:     https://swingx.java.net/
+License: LGPL 3.0
+
 Path:    org.postgresql:postgresql
 Project: PostgreSQL JDBC Driver
 URL:     http://jdbc.postgresql.org/download.html
-License: BSD
-
-
-
-Path:    lib/jgoodies/com.jgoodies.uif_lite-2.1.4.jar
-Project: com.jgoodies.uif_lite
-URL:     https://github.com/JabRef/com.jgoodies.uif_lite
 License: BSD
 
 Path:    lib/microba.jar

@@ -91,20 +91,20 @@ public class UnitFormatter implements LayoutFormatter {
     private static final String[] unitCombinations;
 
     static {
-        int uLLength = unitList.length;
-        int uPLLength = unitPrefixList.length;
+        int uLLength = UnitFormatter.unitList.length;
+        int uPLLength = UnitFormatter.unitPrefixList.length;
         int uCLength = uLLength * uPLLength;
         unitCombinations = new String[uCLength];
         for (int i = 0; i < uLLength; i++) {
             for (int j = 0; j < uPLLength; j++) {
-                unitCombinations[i * uPLLength + j] = unitPrefixList[j] + unitList[i];
+                UnitFormatter.unitCombinations[(i * uPLLength) + j] = UnitFormatter.unitPrefixList[j] + UnitFormatter.unitList[i];
             }
         }
 
     }
 
 
-    public String format(String text, String[] listOfWords) {
+    private String format(String text, String[] listOfWords) {
         if (text == null) {
             return null;
         }
@@ -129,11 +129,12 @@ public class UnitFormatter implements LayoutFormatter {
         return text;
     }
 
+    @Override
     public String format(String text) {
         if (text == null) {
             return null;
         }
-        return this.format(text, unitCombinations);
+        return this.format(text, UnitFormatter.unitCombinations);
     }
 
 }

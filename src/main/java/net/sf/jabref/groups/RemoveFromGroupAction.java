@@ -22,12 +22,13 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
 
-    protected GroupTreeNode m_node;
-    protected BasePanel m_panel;
+    private GroupTreeNode m_node;
+    private BasePanel m_panel;
 
 
     public RemoveFromGroupAction(GroupTreeNode node, BasePanel panel) {
@@ -48,17 +49,22 @@ public class RemoveFromGroupAction extends AbstractAction {
         m_panel = panel;
     }
 
+    @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
         if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
                 m_panel.getSelectedEntries(),
                 m_panel.getDatabase(),
                 m_panel.frame()))
+         {
             return; // user aborted operation
+        }
 
         AbstractUndoableEdit undo = m_node.removeFromGroup(m_panel.getSelectedEntries());
         if (undo == null)
+         {
             return; // no changed made
+        }
 
         m_panel.undoManager.addEdit(undo);
         m_panel.markBaseChanged();

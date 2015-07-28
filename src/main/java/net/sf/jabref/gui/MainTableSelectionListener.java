@@ -29,15 +29,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FocusRequester;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.RightClickMenu;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
@@ -48,6 +40,7 @@ import java.util.List;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.util.Util;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
@@ -56,13 +49,13 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    PreviewPanel[] previewPanel = null;
-    int activePreview = Globals.prefs.getInt("activePreview");
-    PreviewPanel preview;
-    MainTable table;
-    BasePanel panel;
-    EventList<BibtexEntry> tableRows;
-    private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
+    private PreviewPanel[] previewPanel = null;
+    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
+    private PreviewPanel preview;
+    private final MainTable table;
+    private final BasePanel panel;
+    private final EventList<BibtexEntry> tableRows;
+    private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
     private boolean workingOnPreview = false;
 
     private boolean enabled = true;
@@ -70,10 +63,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
-    private int[] lastPressed = new int[20];
+    private final int[] lastPressed = new int[20];
     private int lastPressedCount = 0;
     private long lastPressedTime = 0;
-    private long QUICK_JUMP_TIMEOUT = 2000;
 
 
     //private int lastCharPressed = -1;
@@ -93,9 +85,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private void instantiatePreviews() {
         previewPanel = new PreviewPanel[] {
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get("preview0"), true),
+                        .get(JabRefPreferences.PREVIEW_0), true),
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get("preview1"), true)};
+                        .get(JabRefPreferences.PREVIEW_1), true)};
 
         panel.frame().getSearchManager().addSearchListener(previewPanel[0]);
         panel.frame().getSearchManager().addSearchListener(previewPanel[1]);
@@ -103,13 +95,14 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     public void updatePreviews() {
         try {
-            previewPanel[0].readLayout(Globals.prefs.get("preview0"));
-            previewPanel[1].readLayout(Globals.prefs.get("preview1"));
+            previewPanel[0].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+            previewPanel[1].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Override
     public void listChanged(ListEvent<BibtexEntry> e) {
         if (!enabled) {
             return;
@@ -118,11 +111,12 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         Object newSelected = null;
         while (e.next()) {
             if (e.getType() == ListEvent.INSERT) {
-                if (newSelected != null)
+                if (newSelected != null) {
                     return; // More than one new selected. Do nothing.
-                else {
-                    if (e.getIndex() < selected.size())
+                } else {
+                    if (e.getIndex() < selected.size()) {
                         newSelected = selected.get(e.getIndex());
+                    }
                 }
 
             }
@@ -143,17 +137,20 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 // Get an old or new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(toShow);
 
-                if ((oldEditor != null))// && (oldEditor != newEditor))
+                if ((oldEditor != null)) {
                     oldEditor.setMovingToDifferentEntry();
+                }
 
                 // Show the new editor unless it was already visible:
                 if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
 
-                    if (visName != null)
+                    if (visName != null) {
                         newEditor.setVisiblePanel(visName);
+                    }
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             table.ensureVisible(table.getSelectedRow());
                         }
@@ -178,9 +175,12 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private void updatePreview(final BibtexEntry toShow, final boolean changedPreview, int repeats) {
         if (workingOnPreview) {
             if (repeats > 0)
+             {
                 return; // We've already waited once. Give up on this selection.
+            }
             Timer t = new Timer(50, new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     updatePreview(toShow, changedPreview, 1);
                 }
@@ -198,6 +198,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         workingOnPreview = true;
         final Runnable update = new Runnable() {
 
+            @Override
             public void run() {
                 // If nothing was already shown, set the preview and move the separator:
                 if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
@@ -209,12 +210,13 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         };
         final Runnable worker = new Runnable() {
 
+            @Override
             public void run() {
                 preview.setEntry(toShow);
                 SwingUtilities.invokeLater(update);
             }
         };
-        (new Thread(worker)).start();
+        JabRefExecutorService.INSTANCE.execute(worker);
     }
 
     public void editSignalled() {
@@ -233,6 +235,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         new FocusRequester(editor);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         // First find the column and row on which the user has clicked.
         final int col = table.columnAtPoint(e.getPoint()), row = table.rowAtPoint(e.getPoint());
@@ -242,17 +245,20 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
-            if (iconType == null)
+            if (iconType == null) {
                 processPopupTrigger(e, row);
-            else
+            } else {
                 showIconRightClickMenu(e, row, iconType);
+            }
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         // all handling is done in "mouseReleased"
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
 
         // First find the column on which the user has clicked.
@@ -271,8 +277,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         // Workaround for Windows. Right-click is not popup trigger on mousePressed, but
         // on mouseReleased. Therefore we need to avoid taking action at this point, because
         // action will be taken when the button is released:
-        if (Globals.ON_WIN && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1))
+        if (Globals.ON_WIN && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
             return;
+        }
 
         if (iconType != null) {
             // left click on icon field
@@ -294,36 +301,42 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
             Object value = table.getValueAt(row, col);
             if (value == null)
+             {
                 return; // No icon here, so we do nothing.
+            }
 
             final BibtexEntry entry = tableRows.get(row);
 
             // Get the icon type. Corresponds to the field name.
             int hasField = -1;
-            for (int i = iconType.length - 1; i >= 0; i--)
-                if (entry.getField(iconType[i]) != null)
+            for (int i = iconType.length - 1; i >= 0; i--) {
+                if (entry.getField(iconType[i]) != null) {
                     hasField = i;
-            if (hasField == -1)
+                }
+            }
+            if (hasField == -1) {
                 return;
+            }
             final String fieldName = iconType[hasField];
 
             //If this is a file link field with specified file types,
             //we should also pass the types.
             String[] fileTypes = {};
-            if (hasField == 0 && iconType[hasField].equals(GUIGlobals.FILE_FIELD) && iconType.length > 1) {
+            if ((hasField == 0) && iconType[hasField].equals(GUIGlobals.FILE_FIELD) && (iconType.length > 1)) {
                 fileTypes = iconType;
             }
             final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
-            (new Thread() {
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+                @Override
                 public void run() {
-                    panel.output(Globals.lang("External viewer called") + ".");
+                    panel.output(Globals.lang("External viewer called") + '.');
 
                     Object link = entry.getField(fieldName);
                     if (link == null) {
-                        Globals.logger("Error: no link to " + fieldName + ".");
+                        Globals.logger("Error: no link to " + fieldName + '.');
                         return; // There is an icon, but the field is not set.
                     }
 
@@ -339,7 +352,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                             FileListEntry flEntry = null;
                             // If there are one or more links of the correct type,
                             // open the first one:
-                            if (listOfFileTypes.size() > 0) {
+                            if (!listOfFileTypes.isEmpty()) {
                                 for (int i = 0; i < fileList.getRowCount(); i++) {
                                     flEntry = fileList.getEntry(i);
                                     boolean correctType = false;
@@ -396,7 +409,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                     //}
                 }
 
-            }).start();
+            });
         }
     }
 
@@ -406,9 +419,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      * @param e The mouse event defining the popup trigger.
      * @param row The row where the event occured.
      */
-    protected void processPopupTrigger(MouseEvent e, int row) {
+    private void processPopupTrigger(MouseEvent e, int row) {
         int selRow = table.getSelectedRow();
-        if (selRow == -1 || // (getSelectedRowCount() == 0))
+        if ((selRow == -1) || // (getSelectedRowCount() == 0))
         !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
             //panel.updateViewToSelected();
@@ -457,8 +470,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                 }
 
                 String description = flEntry.getDescription();
-                if ((description == null) || (description.trim().length() == 0))
+                if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.getLink();
+                }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
                         flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
                         flEntry.getType()));
@@ -493,18 +507,21 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     public void entryEditorClosing(EntryEditor editor) {
         preview.setEntry(editor.getEntry());
-        if (previewActive)
+        if (previewActive) {
             panel.showPreview(preview);
-        else
+        } else {
             panel.hideBottomComponent();
+        }
         panel.adjustSplitter();
         new FocusRequester(table);
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
 
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
 
     }
@@ -514,22 +531,23 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         if (!previewActive) {
             panel.hideBottomComponent();
         } else {
-            if (table.getSelected().size() > 0) {
+            if (!table.getSelected().isEmpty()) {
                 updatePreview(table.getSelected().get(0), false);
             }
         }
     }
 
     public void switchPreview() {
-        if (activePreview < previewPanel.length - 1)
+        if (activePreview < (previewPanel.length - 1)) {
             activePreview++;
-        else
+        } else {
             activePreview = 0;
-        Globals.prefs.putInt("activePreview", activePreview);
+        }
+        Globals.prefs.putInt(JabRefPreferences.ACTIVE_PREVIEW, activePreview);
         if (previewActive) {
             this.preview = previewPanel[activePreview];
 
-            if (table.getSelected().size() > 0) {
+            if (!table.getSelected().isEmpty()) {
                 updatePreview(table.getSelected().get(0), true);
             }
         }
@@ -541,23 +559,31 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      * letter in the column by which the table is sorted.
      * @param e The KeyEvent
      */
+    @Override
     public void keyTyped(KeyEvent e) {
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
                 //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
-            if (time - lastPressedTime > QUICK_JUMP_TIMEOUT)
+            long QUICK_JUMP_TIMEOUT = 2000;
+            if ((time - lastPressedTime) > QUICK_JUMP_TIMEOUT)
+             {
                 lastPressedCount = 0; // Reset last pressed character
+            }
             // Update timestamp:
             lastPressedTime = time;
             // Add the new char to the search array:
             int c = e.getKeyChar();
-            if (lastPressedCount < lastPressed.length)
-                lastPressed[lastPressedCount++] = c;
+            if (lastPressedCount < lastPressed.length) {
+                lastPressed[lastPressedCount] = c;
+                lastPressedCount++;
+            }
 
             int sortingColumn = table.getSortingColumn(0);
             if (sortingColumn == -1)
+             {
                 return; // No sorting? TODO: look up by author, etc.?
+            }
             // TODO: the following lookup should be done by a faster algorithm,
             // such as binary search. But the table may not be sorted properly,
             // due to marked entries, search etc., which rules out the binary search.
@@ -571,14 +597,16 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             while (!done) {
                 for (int i = startRow; i < table.getRowCount(); i++) {
                     Object o = table.getValueAt(i, sortingColumn);
-                    if (o == null)
+                    if (o == null) {
                         continue;
+                    }
                     String s = o.toString().toLowerCase();
                     if (s.length() >= lastPressedCount)
+                     {
                         for (int j = 0; j < lastPressedCount; j++) {
-                            if (s.charAt(j) != lastPressed[j])
+                            if (s.charAt(j) != lastPressed[j]) {
                                 break; // Escape the loop immediately when we find a mismatch
-                            else if (j == lastPressedCount - 1) {
+                            } else if (j == (lastPressedCount - 1)) {
                                 // We found a match:
                                 table.setRowSelectionInterval(i, i);
                                 table.ensureVisible(i);
@@ -587,13 +615,15 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                         }
                     //if ((s.length() >= 1) && (s.charAt(0) == c)) {
                     //}
+                    }
                 }
                 // Finished, no result. If we didn't start at the beginning of
                 // the table, try that. Otherwise, exit the while loop.
-                if (startRow > 0)
+                if (startRow > 0) {
                     startRow = 0;
-                else
+                } else {
                     done = true;
+                }
 
             }
 
@@ -603,16 +633,20 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         }
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
     }
 
+    @Override
     public void focusGained(FocusEvent e) {
 
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
         lastPressedCount = 0; // Reset quick jump when focus is lost.
     }

@@ -39,15 +39,29 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
+    private final JabRefPreferences _prefs;
 
-    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked;
+    private final JCheckBox autoResizeMode;
+    private final JCheckBox priDesc;
+    private final JCheckBox secDesc;
+    private final JCheckBox terDesc;
+    private final JCheckBox floatMarked;
 
-    private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
-            lastNamesOnly;
+    private final JRadioButton namesAsIs;
+    private final JRadioButton namesFf;
+    private final JRadioButton namesFl;
+    private final JRadioButton namesNatbib;
+    private final JRadioButton abbrNames;
+    private final JRadioButton noAbbrNames;
+    private final JRadioButton lastNamesOnly;
 
-    private JTextField priField, secField, terField, numericFields;
-    private JComboBox priSort, secSort, terSort;
+    private final JTextField priField;
+    private final JTextField secField;
+    private final JTextField terField;
+    private final JTextField numericFields;
+    private final JComboBox priSort;
+    private final JComboBox secSort;
+    private final JComboBox terSort;
 
 
     /**
@@ -99,6 +113,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         priSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (priSort.getSelectedIndex() > 0) {
                     priField.setText(priSort.getSelectedItem().toString());
@@ -108,6 +123,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
         secSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (secSort.getSelectedIndex() > 0) {
                     secField.setText(secSort.getSelectedItem().toString());
@@ -117,6 +133,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
         terSort.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (terSort.getSelectedIndex() > 0) {
                     terField.setText(terSort.getSelectedItem().toString());
@@ -197,7 +214,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(pan);
         builder2 = new DefaultFormBuilder(new FormLayout("left:pref, 8dlu, fill:pref", ""));
-        builder2.append(Globals.lang("Sort the following fields as numeric fields") + ":");
+        builder2.append(Globals.lang("Sort the following fields as numeric fields") + ':');
         builder2.append(numericFields);
         builder.append(builder2.getPanel(), 5);
         builder.nextLine();
@@ -212,6 +229,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         namesNatbib.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent changeEvent) {
                 abbrNames.setEnabled(!namesNatbib.isSelected());
                 lastNamesOnly.setEnabled(!namesNatbib.isSelected());
@@ -220,9 +238,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
     }
 
+    @Override
     public void setValues() {
         autoResizeMode
-                .setSelected((_prefs.getInt("autoResizeMode") == JTable.AUTO_RESIZE_ALL_COLUMNS));
+                .setSelected((_prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS));
 
         priField.setText(_prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD));
         secField.setText(_prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD));
@@ -231,35 +250,38 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
 
-        if (_prefs.getBoolean("namesAsIs"))
+        if (_prefs.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
             namesAsIs.setSelected(true);
-        else if (_prefs.getBoolean("namesFf"))
+        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
             namesFf.setSelected(true);
-        else if (_prefs.getBoolean("namesNatbib"))
+        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_NATBIB)) {
             namesNatbib.setSelected(true);
-        else
+        } else {
             namesFl.setSelected(true);
-        if (_prefs.getBoolean("abbrAuthorNames"))
+        }
+        if (_prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
             abbrNames.setSelected(true);
-        else if (_prefs.getBoolean("namesLastOnly"))
+        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
             lastNamesOnly.setSelected(true);
-        else
+        } else {
             noAbbrNames.setSelected(true);
+        }
         priDesc.setSelected(_prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING));
         secDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
         terDesc.setSelected(_prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
 
-        floatMarked.setSelected(_prefs.getBoolean("floatMarkedEntries"));
+        floatMarked.setSelected(_prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         abbrNames.setEnabled(!namesNatbib.isSelected());
         lastNamesOnly.setEnabled(!namesNatbib.isSelected());
         noAbbrNames.setEnabled(!namesNatbib.isSelected());
 
-        String numF = _prefs.get("numericFields");
-        if (numF == null)
+        String numF = _prefs.get(JabRefPreferences.NUMERIC_FIELDS);
+        if (numF == null) {
             numericFields.setText("");
-        else
+        } else {
             numericFields.setText(numF);
+        }
 
     }
 
@@ -268,15 +290,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      * clicks Ok.
      * 
      */
+    @Override
     public void storeSettings() {
 
-        _prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
-        _prefs.putBoolean("namesFf", namesFf.isSelected());
-        _prefs.putBoolean("namesNatbib", namesNatbib.isSelected());
-        _prefs.putBoolean("namesLastOnly", lastNamesOnly.isSelected());
-        _prefs.putBoolean("abbrAuthorNames", abbrNames.isSelected());
+        _prefs.putBoolean(JabRefPreferences.NAMES_AS_IS, namesAsIs.isSelected());
+        _prefs.putBoolean(JabRefPreferences.NAMES_FIRST_LAST, namesFf.isSelected());
+        _prefs.putBoolean(JabRefPreferences.NAMES_NATBIB, namesNatbib.isSelected());
+        _prefs.putBoolean(JabRefPreferences.NAMES_LAST_ONLY, lastNamesOnly.isSelected());
+        _prefs.putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, abbrNames.isSelected());
 
-        _prefs.putInt("autoResizeMode",
+        _prefs.putInt(JabRefPreferences.AUTO_RESIZE_MODE,
                 autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
         _prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, priDesc.isSelected());
         _prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, secDesc.isSelected());
@@ -289,26 +312,29 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
         _prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
 
-        _prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
+        _prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
         // updatefont
 
-        String oldVal = _prefs.get("numericFields");
+        String oldVal = _prefs.get(JabRefPreferences.NUMERIC_FIELDS);
         String newVal = numericFields.getText().trim();
-        if (newVal.length() == 0)
+        if (newVal.isEmpty()) {
             newVal = null;
+        }
         if (((newVal != null) && (oldVal == null))
                 || ((newVal == null) && (oldVal != null))
                 || ((newVal != null) && !newVal.equals(oldVal))) {
-            _prefs.put("numericFields", newVal);
+            _prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             BibtexFields.setNumericFieldsFromPrefs();
         }
 
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Entry table");
     }

@@ -23,11 +23,11 @@ import java.io.IOException;
 /**
  * 
  */
-public class CookieHandlerImpl extends CookieHandler {
+class CookieHandlerImpl extends CookieHandler {
 
     // "Long" term storage for cookies, not serialized so only
     // for current JVM instance
-    private List<Cookie> cache = new LinkedList<Cookie>();
+    private final List<Cookie> cache = new LinkedList<Cookie>();
 
 
     /**
@@ -40,6 +40,7 @@ public class CookieHandlerImpl extends CookieHandler {
      *                        values representing the response header fields returned
      */
 
+    @Override
     public void put(
             URI uri,
             Map<String, List<String>> responseHeaders)
@@ -83,6 +84,7 @@ public class CookieHandlerImpl extends CookieHandler {
      *         of cookies
      */
 
+    @Override
     public Map<String, List<String>> get(
             URI uri,
             Map<String, List<String>> requestHeaders)

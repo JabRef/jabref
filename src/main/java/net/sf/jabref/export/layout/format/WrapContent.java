@@ -31,20 +31,25 @@ public class WrapContent extends AbstractParamLayoutFormatter {
     private String before = null, after = null;
 
 
+    @Override
     public void setArgument(String arg) {
-        String[] parts = parseArgument(arg);
-        if (parts.length < 2)
+        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        if (parts.length < 2) {
             return;
+        }
         before = parts[0];
         after = parts[1];
     }
 
+    @Override
     public String format(String fieldText) {
-        if (before == null)
+        if (before == null) {
             return "";
-        if (fieldText.length() == 0)
+        }
+        if (fieldText.isEmpty()) {
             return "";
-        else
+        } else {
             return before + fieldText + after;
+        }
     }
 }

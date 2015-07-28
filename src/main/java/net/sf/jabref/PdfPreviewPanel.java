@@ -31,12 +31,13 @@ import javax.swing.JPanel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
+import net.sf.jabref.util.FileUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
-public class PdfPreviewPanel extends JPanel {
+class PdfPreviewPanel extends JPanel {
 
-    private JLabel picLabel;
+    private final JLabel picLabel;
     private final MetaData metaData;
 
 
@@ -56,7 +57,7 @@ public class PdfPreviewPanel extends JPanel {
             return;
         }
 
-        PDDocument document = null;
+        PDDocument document;
         try {
             document = PDDocument.load(input);
         } catch (IOException e) {
@@ -68,7 +69,7 @@ public class PdfPreviewPanel extends JPanel {
         List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
         PDPage page = pages.get(0);
-        BufferedImage image = null;
+        BufferedImage image;
         try {
             image = page.convertToImage();
         } catch (Exception e1) {
@@ -139,7 +140,7 @@ public class PdfPreviewPanel extends JPanel {
         }
 
         if (flEntry != null) {
-            File pdfFile = Util.expandFilename(metaData, flEntry.getLink());
+            File pdfFile = FileUtil.expandFilename(metaData, flEntry.getLink());
             if (pdfFile != null) {
                 renderPDFFile(pdfFile);
             } else {

@@ -51,14 +51,14 @@ import net.sf.jabref.net.URLDownload;
 
 public class UrlDragDrop implements DropTargetListener {
 
-    private static Logger logger = Logger
+    private static final Logger logger = Logger
             .getLogger(UrlDragDrop.class.getName());
 
-    private FieldEditor feditor;
+    private final FieldEditor feditor;
 
-    private EntryEditor editor;
+    private final EntryEditor editor;
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
 
     public UrlDragDrop(EntryEditor _editor, JabRefFrame _frame,
@@ -73,6 +73,7 @@ public class UrlDragDrop implements DropTargetListener {
      *
      * @see java.awt.dnd.DropTargetListener#dragEnter(java.awt.dnd.DropTargetDragEvent)
      */
+    @Override
     public void dragEnter(DropTargetDragEvent dtde) {
     }
 
@@ -81,6 +82,7 @@ public class UrlDragDrop implements DropTargetListener {
      *
      * @see java.awt.dnd.DropTargetListener#dragOver(java.awt.dnd.DropTargetDragEvent)
      */
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {
     }
 
@@ -89,6 +91,7 @@ public class UrlDragDrop implements DropTargetListener {
      *
      * @see java.awt.dnd.DropTargetListener#dropActionChanged(java.awt.dnd.DropTargetDragEvent)
      */
+    @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
     }
 
@@ -97,15 +100,16 @@ public class UrlDragDrop implements DropTargetListener {
      *
      * @see java.awt.dnd.DropTargetListener#dragExit(java.awt.dnd.DropTargetEvent)
      */
+    @Override
     public void dragExit(DropTargetEvent dte) {
     }
 
 
     private static class JOptionChoice {
 
-        private String label;
+        private final String label;
 
-        private int id;
+        private final int id;
 
 
         public JOptionChoice(String _label, int _id) {
@@ -113,6 +117,7 @@ public class UrlDragDrop implements DropTargetListener {
             id = _id;
         }
 
+        @Override
         public String toString() {
             return label;
         }
@@ -130,6 +135,7 @@ public class UrlDragDrop implements DropTargetListener {
      * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
      */
 
+    @Override
     public void drop(DropTargetDropEvent dtde) {
         Transferable tsf = dtde.getTransferable();
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
@@ -138,7 +144,7 @@ public class UrlDragDrop implements DropTargetListener {
         try {
             dtURL = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            logger.log(Level.WARNING,
+            UrlDragDrop.logger.log(Level.WARNING,
                     "Class not found for DnD... should not happen", e);
         }
         try {
@@ -174,7 +180,7 @@ public class UrlDragDrop implements DropTargetListener {
                     editor.updateField(feditor);
 
                 } catch (IOException ioex) {
-                    logger.log(Level.SEVERE, "Error while downloading file",
+                    UrlDragDrop.logger.log(Level.SEVERE, "Error while downloading file",
                             ioex);
                     JOptionPane.showMessageDialog(editor,
                             Globals.lang("File download"),
@@ -188,7 +194,7 @@ public class UrlDragDrop implements DropTargetListener {
         } catch (UnsupportedFlavorException nfe) {
             // not an URL then...
         } catch (IOException ioex) {
-            logger.log(Level.WARNING, "!should not happen!", ioex);
+            UrlDragDrop.logger.log(Level.WARNING, "!should not happen!", ioex);
         }
 
         try {
@@ -212,9 +218,9 @@ public class UrlDragDrop implements DropTargetListener {
             JOptionPane.showMessageDialog(editor,
                     Globals.lang("Operation not supported"),
                     Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
-            logger.log(Level.WARNING, "Transfer exception", nfe);
+            UrlDragDrop.logger.log(Level.WARNING, "Transfer exception", nfe);
         } catch (IOException ioex) {
-            logger.log(Level.WARNING, "Transfer exception", ioex);
+            UrlDragDrop.logger.log(Level.WARNING, "Transfer exception", ioex);
         }
 
     }

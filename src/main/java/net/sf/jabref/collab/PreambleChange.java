@@ -24,35 +24,38 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoablePreambleChange;
 
-public class PreambleChange extends Change {
+class PreambleChange extends Change {
 
-    String tmp, mem, disk;
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
+    private final String mem;
+    private final String disk;
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
 
 
     public PreambleChange(String tmp, String mem, String disk) {
         super("Changed preamble");
         this.disk = disk;
         this.mem = mem;
-        this.tmp = tmp;
 
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         text.append("<FONT SIZE=3>");
         text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
 
-        if ((disk != null) && !disk.equals(""))
+        if ((disk != null) && !disk.isEmpty()) {
             text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
-        else
+        } else {
             text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+        }
 
-        if ((mem != null) && !mem.equals(""))
+        if ((mem != null) && !mem.isEmpty()) {
             text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
+        }
 
         //tp.setContentType("text/html");
         tp.setText(text.toString());
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         panel.database().setPreamble(disk);
         undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
@@ -60,6 +63,7 @@ public class PreambleChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

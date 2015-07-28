@@ -2,6 +2,8 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.JabRefPreferences;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,7 +17,7 @@ import static org.junit.Assert.*;
  */
 public class EntryFromPDFCreatorTest {
 
-    private EntryFromPDFCreator entryCreator = new EntryFromPDFCreator();
+    private final EntryFromPDFCreator entryCreator = new EntryFromPDFCreator();
 
 
     @Before
@@ -26,21 +28,21 @@ public class EntryFromPDFCreatorTest {
 
     @Test
     public void testPDFFileFilter() {
-        assertTrue(entryCreator.accept(new File("aPDF.pdf")));
-        assertTrue(entryCreator.accept(new File("aPDF.PDF")));
-        assertFalse(entryCreator.accept(new File("foo.jpg")));
+        Assert.assertTrue(entryCreator.accept(new File("aPDF.pdf")));
+        Assert.assertTrue(entryCreator.accept(new File("aPDF.PDF")));
+        Assert.assertFalse(entryCreator.accept(new File("foo.jpg")));
     }
 
     @Test
     @Ignore
     public void testCreationOfEntry() {
         BibtexEntry entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
-        assertNull(entry);
+        Assert.assertNull(entry);
 
         entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
-        assertNotNull(entry);
-        assertTrue(entry.getField("file").endsWith(":PDF"));
-        assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.getField("title"));
+        Assert.assertNotNull(entry);
+        Assert.assertTrue(entry.getField("file").endsWith(":PDF"));
+        Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.getField("title"));
 
     }
 }

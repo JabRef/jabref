@@ -49,9 +49,9 @@ import net.sf.jabref.JabRefFrame;
  */
 public class ExportToClipboardAction extends AbstractWorker {
 
-    String message = null;
-    private JabRefFrame frame;
-    private BibtexDatabase database;
+    private String message = null;
+    private final JabRefFrame frame;
+    private final BibtexDatabase database;
 
 
     public ExportToClipboardAction(JabRefFrame frame, BibtexDatabase database) {
@@ -59,10 +59,12 @@ public class ExportToClipboardAction extends AbstractWorker {
         this.database = database;
     }
 
+    @Override
     public void run() {
         BasePanel panel = frame.basePanel();
-        if (panel == null)
+        if (panel == null) {
             return;
+        }
         if (panel.getSelectedEntries().length == 0) {
             message = Globals.lang("No entries selected.");
             getCallBack().update();
@@ -90,8 +92,9 @@ public class ExportToClipboardAction extends AbstractWorker {
                 new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
                 Globals.lang("Ok"));
 
-        if (answer == JOptionPane.NO_OPTION)
+        if (answer == JOptionPane.NO_OPTION) {
             return;
+        }
 
         IExportFormat format = formats[list.getSelectedIndex()];
 
@@ -126,8 +129,9 @@ public class ExportToClipboardAction extends AbstractWorker {
             tmp.deleteOnExit();
             BibtexEntry[] bes = panel.getSelectedEntries();
             HashSet<String> entries = new HashSet<String>(bes.length);
-            for (BibtexEntry be : bes)
+            for (BibtexEntry be : bes) {
                 entries.add(be.getId());
+            }
 
             // Write to file:
             format.performExport(database, panel.metaData(),
@@ -141,6 +145,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             }
             ClipboardOwner owner = new ClipboardOwner() {
 
+                @Override
                 public void lostOwnership(Clipboard clipboard, Transferable content) {
                 }
             };
@@ -155,18 +160,21 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Globals.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
-            if (tmp != null)
+            if (tmp != null) {
                 tmp.delete();
-            if (reader != null)
+            }
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+            }
         }
 
     }
 
+    @Override
     public void update() {
         frame.output(message);
     }

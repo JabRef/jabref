@@ -15,9 +15,7 @@
 */
 package net.sf.jabref;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JCheckBox;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,18 +24,18 @@ import java.awt.Insets;
 public class CheckBoxMessage extends JPanel {
 
     BorderLayout borderLayout1 = new BorderLayout();
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    JCheckBox cb;
+    private final JCheckBox cb;
 
 
     public CheckBoxMessage(String message, String cbText, boolean defaultValue) {
         cb = new JCheckBox(cbText, defaultValue);
+        GridBagLayout gbl = new GridBagLayout();
         setLayout(gbl);
+        GridBagConstraints con = new GridBagConstraints();
         con.gridwidth = GridBagConstraints.REMAINDER;
 
-        JLabel lab = new JLabel(message + "\n");
-        cb.setHorizontalAlignment(JLabel.LEFT);
+        JLabel lab = new JLabel(message + '\n');
+        cb.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
         add(lab);
         con.anchor = GridBagConstraints.WEST;

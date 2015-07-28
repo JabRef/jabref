@@ -39,14 +39,10 @@ import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.export.FileActions;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.groups.SearchGroup;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
@@ -67,9 +63,9 @@ import net.sf.jabref.sql.SQLUtil;
 
 public abstract class DBExporter extends DBImporterExporter {
 
-    String fieldStr = SQLUtil.getFieldStr();
+    private final String fieldStr = SQLUtil.getFieldStr();
     DBStrings dbStrings = null;
-    ArrayList<String> dbNames = new ArrayList<String>();
+    private final ArrayList<String> dbNames = new ArrayList<String>();
 
 
     /**
@@ -122,15 +118,15 @@ public abstract class DBExporter extends DBImporterExporter {
      */
     private void populateEntriesTable(int database_id,
             List<BibtexEntry> entries, Object out) throws SQLException {
-        String query = "";
-        String val = "";
+        String query;
+        String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, "
                 + fieldStr + ", database_id) VALUES (";
         for (BibtexEntry entry : entries) {
-            query = insert + "'" + entry.getId() + "'"
+            query = insert + '\'' + entry.getId() + '\''
                     + ", (SELECT entry_types_id FROM entry_types WHERE label='"
                     + entry.getType().getName().toLowerCase() + "'), '"
-                    + entry.getCiteKey() + "'";
+                    + entry.getCiteKey() + '\'';
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query = query + ", ";
                 val = entry.getField(SQLUtil.getAllFields().get(i));
@@ -139,7 +135,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     val = val.replace("\"", "\\\"");
                     val = val.replace("\'", "''");
                     val = val.replace("`", "\\`");
-                    query = query + "'" + val + "'";
+                    query = query + '\'' + val + '\'';
                 } else {
                     query = query + "NULL";
                 }
@@ -176,14 +172,14 @@ public abstract class DBExporter extends DBImporterExporter {
                         "INSERT INTO entry_group (entries_id, groups_id) "
                                 + "VALUES ("
                                 + "(SELECT entries_id FROM entries WHERE jabref_eid="
-                                + "'"
+                                + '\''
                                 + be.getId()
                                 + "' AND database_id = "
                                 + database_id
                                 + "), "
                                 + "(SELECT groups_id FROM groups WHERE database_id="
-                                + "'" + database_id + "' AND parent_id=" + "'"
-                                + parentID + "' AND label=" + "'"
+                                + '\'' + database_id + "' AND parent_id=" + '\''
+                                + parentID + "' AND label=" + '\''
                                 + grp.getName() + "')" + ");");
             }
         }
@@ -194,16 +190,18 @@ public abstract class DBExporter extends DBImporterExporter {
                         + database_id + "' AND parent_id='" + parentID + "';");
         // setting values to ID and myID to be used in case of textual SQL
         // export
-        int myID = ++currentID;
+        ++currentID;
+        int myID = currentID;
         if (response instanceof Statement) {
             ResultSet rs = ((Statement) response).getResultSet();
             rs.next();
             myID = rs.getInt("groups_id");
         }
         for (Enumeration<GroupTreeNode> e = cursor.children(); e
-                .hasMoreElements();)
+                .hasMoreElements();) {
             currentID = populateEntryGroupsTable(e.nextElement(), myID,
                     currentID, out, database_id);
+        }
         return currentID;
     }
 
@@ -217,7 +215,7 @@ public abstract class DBExporter extends DBImporterExporter {
      */
 
     private void populateEntryTypesTable(Object out) throws SQLException {
-        String query = "";
+        String query;
         ArrayList<String> fieldRequirement = new ArrayList<String>();
 
         ArrayList<String> existentTypes = new ArrayList<String>();
@@ -248,9 +246,9 @@ public abstract class DBExporter extends DBImporterExporter {
             if (!existentTypes.contains(val.getName().toLowerCase())) {
                 String insert = "INSERT INTO entry_types (label, " + fieldStr
                         + ") VALUES (";
-                query = insert + "'" + val.getName().toLowerCase() + "'";
+                query = insert + '\'' + val.getName().toLowerCase() + '\'';
                 for (String aFieldRequirement : fieldRequirement) {
-                    query = query + ", '" + aFieldRequirement + "'";
+                    query = query + ", '" + aFieldRequirement + '\'';
                 }
                 query = query + ");";
             } else {
@@ -260,7 +258,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     query += update[i] + "='" + fieldRequirement.get(i) + "',";
                 }
                 query = query.substring(0, query.lastIndexOf(","));
-                query += " WHERE label='" + val.getName().toLowerCase() + "'";
+                query += " WHERE label='" + val.getName().toLowerCase() + '\'';
             }
             SQLUtil.processQuery(out, query);
         }
@@ -286,7 +284,7 @@ public abstract class DBExporter extends DBImporterExporter {
 
         AbstractGroup group = cursor.getGroup();
         String searchField = null, searchExpr = null, caseSens = null, reg_exp = null;
-        int hierContext = group.getHierarchicalContext();
+        GroupHierarchyType hierContext = group.getHierarchicalContext();
         if (group instanceof KeywordGroup) {
             searchField = ((KeywordGroup) group).getSearchField();
             searchExpr = ((KeywordGroup) group).getSearchExpression();
@@ -298,10 +296,12 @@ public abstract class DBExporter extends DBImporterExporter {
             reg_exp = ((SearchGroup) group).isRegExp() ? "1" : "0";
         }
         // Protect all quotes in the group descriptions:
-        if (searchField != null)
-            searchField = Util.quote(searchField, "'", '\\');
-        if (searchExpr != null)
-            searchExpr = Util.quote(searchExpr, "'", '\\');
+        if (searchField != null) {
+            searchField = StringUtil.quote(searchField, "'", '\\');
+        }
+        if (searchExpr != null) {
+            searchExpr = StringUtil.quote(searchExpr, "'", '\\');
+        }
 
         SQLUtil.processQuery(
                 out,
@@ -315,15 +315,15 @@ public abstract class DBExporter extends DBImporterExporter {
                         + group.getTypeId()
                         + "')"
                         + ", "
-                        + (searchField != null ? "'" + searchField + "'"
+                        + (searchField != null ? '\'' + searchField + '\''
                                 : "NULL")
                         + ", "
-                        + (searchExpr != null ? "'" + searchExpr + "'" : "NULL")
+                        + (searchExpr != null ? '\'' + searchExpr + '\'' : "NULL")
                         + ", "
-                        + (caseSens != null ? "'" + caseSens + "'" : "NULL")
+                        + (caseSens != null ? '\'' + caseSens + '\'' : "NULL")
                         + ", "
-                        + (reg_exp != null ? "'" + reg_exp + "'" : "NULL")
-                        + ", " + hierContext + ", '" + database_id + "');");
+                        + (reg_exp != null ? '\'' + reg_exp + '\'' : "NULL")
+                        + ", " + hierContext.ordinal() + ", '" + database_id + "');");
         // recurse on child nodes (depth-first traversal)
         Object response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='"
@@ -338,9 +338,11 @@ public abstract class DBExporter extends DBImporterExporter {
             myID = rs.getInt("groups_id");
         }
         for (Enumeration<GroupTreeNode> e = cursor.children(); e
-                .hasMoreElements();)
-            currentID = populateGroupsTable(e.nextElement(), myID, ++currentID,
+                .hasMoreElements();) {
+            ++currentID;
+            currentID = populateGroupsTable(e.nextElement(), myID, currentID,
                     out, database_id);
+        }
         return currentID;
     }
 
@@ -396,16 +398,16 @@ public abstract class DBExporter extends DBImporterExporter {
         String insert = "INSERT INTO strings (label, content, database_id) VALUES (";
 
         if (database.getPreamble() != null) {
-            String dml = insert + "'@PREAMBLE', " + "'"
-                    + Util.quote(database.getPreamble(), "'", '\\') + "', "
-                    + "'" + database_id + "');";
+            String dml = insert + "'@PREAMBLE', " + '\''
+                    + StringUtil.quote(database.getPreamble(), "'", '\\') + "', "
+                    + '\'' + database_id + "');";
             SQLUtil.processQuery(out, dml);
         }
         for (String key : database.getStringKeySet()) {
             BibtexString string = database.getString(key);
-            String dml = insert + "'" + Util.quote(string.getName(), "'", '\\')
-                    + "', " + "'" + Util.quote(string.getContent(), "'", '\\')
-                    + "', " + "'" + database_id + "'" + ");";
+            String dml = insert + '\'' + StringUtil.quote(string.getName(), "'", '\\')
+                    + "', " + '\'' + StringUtil.quote(string.getContent(), "'", '\\')
+                    + "', " + '\'' + database_id + '\'' + ");";
             SQLUtil.processQuery(out, dml);
         }
     }
@@ -452,11 +454,12 @@ public abstract class DBExporter extends DBImporterExporter {
 
         // open output file
         File outfile = new File(file);
-        if (outfile.exists())
+        if (outfile.exists()) {
             outfile.delete();
-        BufferedOutputStream writer = null;
+        }
+        BufferedOutputStream writer;
         writer = new BufferedOutputStream(new FileOutputStream(outfile));
-        PrintStream fout = null;
+        PrintStream fout;
         fout = new PrintStream(writer);
         performExport(database, metaData, keySet, fout, "file");
         fout.close();
@@ -479,7 +482,7 @@ public abstract class DBExporter extends DBImporterExporter {
     public void exportDatabaseToDBMS(final BibtexDatabase database,
             final MetaData metaData, Set<String> keySet, DBStrings dbStrings,
             JabRefFrame frame) throws Exception {
-        String dbName = "";
+        String dbName;
         Connection conn = null;
         boolean redisplay = false;
         try {
@@ -501,8 +504,9 @@ public abstract class DBExporter extends DBImporterExporter {
                 conn.setAutoCommit(true);
             }
             conn.close();
-            if (redisplay)
+            if (redisplay) {
                 exportDatabaseToDBMS(database, metaData, keySet, dbStrings, frame);
+            }
         } catch (SQLException ex) {
             if (conn != null) {
                 if (!conn.getAutoCommit()) {
@@ -545,10 +549,11 @@ public abstract class DBExporter extends DBImporterExporter {
                     }
                 }
             }
-        } else
+        } else {
             dbName = JOptionPane.showInputDialog(frame,
                     "Please enter the desired name:", "SQL Export",
                     JOptionPane.INFORMATION_MESSAGE);
+        }
         return dbName;
     }
 
@@ -572,7 +577,7 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     private boolean isValidDBName(ArrayList<String> dbNames, String desiredName) {
-        return desiredName.trim().length() > 1 && !dbNames.contains(desiredName);
+        return (desiredName.trim().length() > 1) && !dbNames.contains(desiredName);
     }
 
     /**

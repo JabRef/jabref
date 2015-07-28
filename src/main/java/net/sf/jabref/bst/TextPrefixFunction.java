@@ -34,19 +34,17 @@ import net.sf.jabref.bst.VM.BstFunction;
  |right_brace|s.  If any of the types is incorrect, it complains and
  pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class TextPrefixFunction implements BstFunction {
 
-    VM vm;
+    private final VM vm;
 
 
     public TextPrefixFunction(VM vm) {
         this.vm = vm;
     }
 
+    @Override
     public void execute(BstEntry context) {
         Stack<Object> stack = vm.getStack();
 

@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import net.sf.jabref.AuthorList;
@@ -25,17 +24,14 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.SearchRuleSet;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.matchers.Matcher;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -59,34 +55,40 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    public static final String[]
-            PDF = {"pdf", "ps"},
-            URL_FIRST = {"url", "doi"},
-            DOI_FIRST = {"doi", "url"},
-            CITESEER = {"citeseerurl"},
-            ARXIV = {"eprint"},
-            RANKING = {SpecialFieldsUtils.FIELDNAME_RANKING},
-            PRIORITY = {SpecialFieldsUtils.FIELDNAME_PRIORITY},
-            RELEVANCE = {SpecialFieldsUtils.FIELDNAME_RELEVANCE},
-            QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY},
-            PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED},
-            READ = {SpecialFieldsUtils.FIELDNAME_READ},
-            FILE = {GUIGlobals.FILE_FIELD};
+    private static final String[]
+            PDF = {"pdf", "ps"};
+    private static final String[] URL_FIRST = {"url", "doi"};
+    private static final String[] DOI_FIRST = {"doi", "url"};
+    public static final String[] CITESEER = {"citeseerurl"};
+    private static final String[] ARXIV = {"eprint"};
+    private static final String[] RANKING = {SpecialFieldsUtils.FIELDNAME_RANKING};
+    private static final String[] PRIORITY = {SpecialFieldsUtils.FIELDNAME_PRIORITY};
+    private static final String[] RELEVANCE = {SpecialFieldsUtils.FIELDNAME_RELEVANCE};
+    private static final String[] QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY};
+    private static final String[] PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED};
+    private static final String[] READ = {SpecialFieldsUtils.FIELDNAME_READ};
+    public static final String[] FILE = {GUIGlobals.FILE_FIELD};
 
-    BasePanel panel;
+    private final BasePanel panel;
 
     private String[][] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
-    private HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
-    int[][] nameCols = null;
-    boolean namesAsIs, abbr_names, namesNatbib, namesFf, namesLf, namesLastOnly, showShort;
+    private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
+    private int[][] nameCols = null;
+    private boolean namesAsIs;
+    private boolean abbr_names;
+    private boolean namesNatbib;
+    private boolean namesFf;
+    private boolean namesLf;
+    private boolean namesLastOnly;
 
 
     public MainTableFormat(BasePanel panel) {
         this.panel = panel;
     }
 
+    @Override
     public int getColumnCount() {
         return padleft + columns.length;
     }
@@ -94,6 +96,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     /**
      * @return the string that should be put in the column header
      */
+    @Override
     public String getColumnName(int col) {
         if (col == 0) {
             return GUIGlobals.NUMBER_COL;
@@ -103,19 +106,20 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             } else {
                 return null;
             }
-        }
-        else // try to find an alternative fieldname (for display)
+        } else // try to find an alternative fieldname (for display)
         {
             String[] fld = columns[col - padleft];
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < fld.length; i++) {
-                if (i > 0)
+                if (i > 0) {
                     sb.append('/');
+                }
                 String disName = BibtexFields.getFieldDisplayName(fld[i]);
-                if (disName != null)
+                if (disName != null) {
                     sb.append(disName);
-                else
-                    sb.append(Util.nCase(fld[i]));
+                } else {
+                    sb.append(StringUtil.nCase(fld[i]));
+                }
             }
             return sb.toString();
             /*String disName = BibtexFields.getFieldDisplayName(columns[col - padleft]) ;
@@ -130,16 +134,18 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     /**
      * Get the column title, or a string identifying the column if it is an icon
      * column without a title.
+     *
      * @param col The column number
      * @return the String identifying the column
      */
     public String getColumnType(int col) {
         String name = getColumnName(col);
-        if (name != null)
+        if (name != null) {
             return name;
+        }
         String[] icon = getIconTypeForColumn(col);
         if ((icon != null) && (icon.length > 0)) {
-            return ICON_COLUMN_PREFIX + icon[0];
+            return MainTableFormat.ICON_COLUMN_PREFIX + icon[0];
         }
         return null;
     }
@@ -151,34 +157,38 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
      */
     public String[] getIconTypeForColumn(int col) {
         Object o = iconCols.get(new Integer(col));
-        if (o != null)
+        if (o != null) {
             return (String[]) o;
-        else
+        } else {
             return null;
+        }
     }
 
     /**
      * Finds the column index for the given column name.
+     *
      * @param colName The column name
      * @return The column index if any, or -1 if no column has that name.
      */
     public int getColumnIndex(String colName) {
         for (int i = 0; i < columns.length; i++) {
             // TODO: is the following line correct with [0] ?
-            if (columns[i][0].equalsIgnoreCase(colName))
+            if (columns[i][0].equalsIgnoreCase(colName)) {
                 return i + padleft;
+            }
         }
         return -1;
     }
 
     /**
      * Checks, if the Column (int col) is a Ranking-Column
+     *
      * @param col Column Number
      * @return Is Ranking-Column or not?
      */
     public boolean isRankingColumn(int col) {
         if (iconCols.get(col) != null) {
-            if (iconCols.get(col)[0].equals(RANKING[0])) {
+            if (iconCols.get(col)[0].equals(MainTableFormat.RANKING[0])) {
                 return true;
             }
         }
@@ -202,22 +212,22 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return new JLabel(new ImageIcon(bufImg));
     }
 
+    @Override
     public Object getColumnValue(BibtexEntry be, int col) {
         Object o = null;
         String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
 
         if (col == 0) {
             o = "#";// + (row + 1);
-        }
-
-        else if (iconType != null) {
-            int hasField = -1;
+        } else if (iconType != null) {
+            int hasField;
 
             int[] fieldCount = hasField(be, iconType);
             hasField = fieldCount[0];
 
-            if (hasField < 0)
+            if (hasField < 0) {
                 return null;
+            }
 
             // Ok, so we are going to display an icon. Find out which one, and return it:
             if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
@@ -229,7 +239,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
                 // Handle priority column special
                 // Extra handling because the icon depends on a FieldValue
-            } else if (iconType[hasField].equals(PRIORITY[0])) {
+            } else if (iconType[hasField].equals(MainTableFormat.PRIORITY[0])) {
                 SpecialFieldValue prio = Priority.getInstance().parse(be.getField(SpecialFieldsUtils.FIELDNAME_PRIORITY));
                 if (prio != null) {
                     // prio might be null if fieldvalue is an invalid value, therefore we check for != null
@@ -237,14 +247,14 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 }
                 // Handle ranking column special
                 // Extra handling because the icon depends on a FieldValue
-            } else if (iconType[hasField].equals(RANKING[0])) {
+            } else if (iconType[hasField].equals(MainTableFormat.RANKING[0])) {
                 SpecialFieldValue rank = Rank.getInstance().parse(be.getField(SpecialFieldsUtils.FIELDNAME_RANKING));
                 if (rank != null) {
                     o = rank.createLabel();
                 }
                 // Handle read status column special
                 // Extra handling because the icon depends on a FieldValue
-            } else if (iconType[hasField].equals(READ[0])) {
+            } else if (iconType[hasField].equals(MainTableFormat.READ[0])) {
                 SpecialFieldValue status = ReadStatus.getInstance().parse(be.getField(SpecialFieldsUtils.FIELDNAME_READ));
                 if (status != null) {
                     o = status.createLabel();
@@ -261,11 +271,11 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             // Go through the fields until we find one with content:
             int j = 0;
             for (int i = 0; i < fld.length; i++) {
-                if (fld[i].equals(GUIGlobals.TYPE_HEADER))
+                if (fld[i].equals(GUIGlobals.TYPE_HEADER)) {
                     o = be.getType().getName();
-                else {
+                } else {
                     o = be.getFieldOrAlias(fld[i]);
-                    if (getColumnName(col).equals("Author") && o != null) {
+                    if (getColumnName(col).equals("Author") && (o != null)) {
                         o = panel.database().resolveForStrings((String) o);
                     }
                 }
@@ -276,7 +286,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             }
 
             for (int[] nameCol : nameCols) {
-                if ((col - padleft == nameCol[0]) && (nameCol[1] == j)) {
+                if (((col - padleft) == nameCol[0]) && (nameCol[1] == j)) {
                     return formatName(o);
                 }
             }
@@ -288,6 +298,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     /**
      * Format a name field for the table, according to user preferences.
+     *
      * @param o The contents of the name field.
      * @return The formatted name field.
      */
@@ -295,32 +306,34 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (o == null) {
             return null;
         }
-        if (namesAsIs)
+        if (namesAsIs) {
             return o;
-        if (namesNatbib)
+        }
+        if (namesNatbib) {
             o = AuthorList.fixAuthor_Natbib((String) o);
-        else if (namesLastOnly)
+        } else if (namesLastOnly) {
             o = AuthorList.fixAuthor_lastNameOnlyCommas((String) o, false);
-        else if (namesFf)
+        } else if (namesFf) {
             o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names, false);
-        else if (namesLf)
+        } else if (namesLf) {
             o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names, false);
+        }
         return o;
     }
 
-    public boolean hasField(BibtexEntry be, String field) {
+    private boolean hasField(BibtexEntry be, String field) {
         // Returns true iff the entry has a nonzero value in its
         // 'search' field.
         return ((be != null) && (be.getFieldOrAlias(field) != null));
     }
 
-    public int[] hasField(BibtexEntry be, String[] field) {
+    private int[] hasField(BibtexEntry be, String[] field) {
         // If the entry has a nonzero value in any of the
         // 'search' fields, returns the smallest index for which it does. 
         // Otherwise returns -1. When field indicates one or more file types,
         // returns the index of the first present file type.
-        if (be == null || field == null || field.length < 1) {
-            return new int[] {-1, -1};
+        if ((be == null) || (field == null) || (field.length < 1)) {
+            return new int[]{-1, -1};
         }
         int hasField = -1;
         if (!field[0].equals(GUIGlobals.FILE_FIELD)) {
@@ -329,19 +342,17 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     hasField = i;
                 }
             }
-            return new int[] {hasField, -1};
-        }
-        else {
+            return new int[]{hasField, -1};
+        } else {
             // We use a FileListTableModel to parse the field content:
             Object o = be.getField(GUIGlobals.FILE_FIELD);
             FileListTableModel fileList = new FileListTableModel();
             fileList.setContent((String) o);
             if (field.length == 1) {
                 if (fileList.getRowCount() == 0) {
-                    return new int[] {-1, -1};
-                }
-                else {
-                    return new int[] {0, fileList.getRowCount()};
+                    return new int[]{-1, -1};
+                } else {
+                    return new int[]{0, fileList.getRowCount()};
                 }
             }
             int lastLinkPosition = -1, countLinks = 0;
@@ -355,28 +366,28 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     }
                 }
             }
-            return new int[] {lastLinkPosition, countLinks};
+            return new int[]{lastLinkPosition, countLinks};
         }
     }
 
     public void updateTableFormat() {
 
         // Read table columns from prefs:
-        String[] colSettings = Globals.prefs.getStringArray("columnNames");
+        String[] colSettings = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
         columns = new String[colSettings.length][];
         for (int i = 0; i < colSettings.length; i++) {
-            String[] fields = colSettings[i].split(COL_DEFINITION_FIELD_SEPARATOR);
+            String[] fields = colSettings[i].split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
             columns[i] = new String[fields.length];
             System.arraycopy(fields, 0, columns[i], 0, fields.length);
         }
 
         // Read name format options:
-        showShort = Globals.prefs.getBoolean("showShort"); //MK:
-        namesNatbib = Globals.prefs.getBoolean("namesNatbib"); //MK:
-        namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
-        namesAsIs = Globals.prefs.getBoolean("namesAsIs");
-        abbr_names = Globals.prefs.getBoolean("abbrAuthorNames"); //MK:
-        namesFf = Globals.prefs.getBoolean("namesFf");
+        boolean showShort = Globals.prefs.getBoolean(JabRefPreferences.SHOW_SHORT);
+        namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
+        namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
+        namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
+        abbr_names = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
+        namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
         namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
 
         // Set the icon columns, indicating the number of special columns to the left.
@@ -386,40 +397,61 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
 
         // Add special Icon Columns
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING))
-                iconCols.put(coln++, RANKING);
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE))
-                iconCols.put(coln++, RELEVANCE);
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY))
-                iconCols.put(coln++, QUALITY);
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY))
-                iconCols.put(coln++, PRIORITY);
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED))
-                iconCols.put(coln++, PRINTED);
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ))
-                iconCols.put(coln++, READ);
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+                iconCols.put(coln, MainTableFormat.RANKING);
+                coln++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+                iconCols.put(coln, MainTableFormat.RELEVANCE);
+                coln++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+                iconCols.put(coln, MainTableFormat.QUALITY);
+                coln++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+                iconCols.put(coln, MainTableFormat.PRIORITY);
+                coln++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+                iconCols.put(coln, MainTableFormat.PRINTED);
+                coln++;
+            }
+            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+                iconCols.put(coln, MainTableFormat.READ);
+                coln++;
+            }
         }
 
-        if (Globals.prefs.getBoolean("fileColumn"))
-            iconCols.put(coln++, FILE);
-        if (Globals.prefs.getBoolean("pdfColumn"))
-            iconCols.put(coln++, PDF);
-        if (Globals.prefs.getBoolean("urlColumn")) {
-            if (Globals.prefs.getBoolean("preferUrlDoi")) {
-                iconCols.put(coln++, DOI_FIRST);
+        if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
+            iconCols.put(coln, MainTableFormat.FILE);
+            coln++;
+        }
+        if (Globals.prefs.getBoolean(JabRefPreferences.PDF_COLUMN)) {
+            iconCols.put(coln, MainTableFormat.PDF);
+            coln++;
+        }
+        if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
+                iconCols.put(coln, MainTableFormat.DOI_FIRST);
+                coln++;
             } else {
-                iconCols.put(coln++, URL_FIRST);
+                iconCols.put(coln, MainTableFormat.URL_FIRST);
+                coln++;
             }
 
         }
 
-        if (Globals.prefs.getBoolean("arxivColumn"))
-            iconCols.put(coln++, ARXIV);
+        if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
+            iconCols.put(coln, MainTableFormat.ARXIV);
+            coln++;
+        }
 
-        if (Globals.prefs.getBoolean("extraFileColumns")) {
-            String[] desiredColumns = Globals.prefs.getStringArray("listOfFileColumns");
+        if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
+            String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             for (String desiredColumn : desiredColumns) {
-                iconCols.put(coln++, new String[] {GUIGlobals.FILE_FIELD, desiredColumn});
+                iconCols.put(coln, new String[]{GUIGlobals.FILE_FIELD, desiredColumn});
+                coln++;
             }
         }
 
@@ -436,7 +468,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             for (int j = 0; j < columns[i].length; j++) {
                 if (columns[i][j].equals("author")
                         || columns[i][j].equals("editor")) {
-                    tmp.add(new int[] {i, j});
+                    tmp.add(new int[]{i, j});
                 }
             }
         }
@@ -446,32 +478,4 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
     }
 
-    public boolean isIconColumn(int col) {
-        return (getIconTypeForColumn(col) != null);
-    }
-
-
-    static class NoSearchMatcher implements Matcher<BibtexEntry> {
-
-        public boolean matches(BibtexEntry object) {
-            return true;
-        }
-    }
-
-    static class SearchMatcher implements Matcher<BibtexEntry> {
-
-        private SearchRuleSet ruleSet;
-        private Hashtable<String, String> searchOptions;
-
-
-        public SearchMatcher(SearchRuleSet ruleSet, Hashtable<String, String> searchOptions) {
-            this.ruleSet = ruleSet;
-            this.searchOptions = searchOptions;
-        }
-
-        public boolean matches(BibtexEntry entry) {
-            int result = ruleSet.applyRule(searchOptions, entry);
-            return result > 0;
-        }
-    }
 }

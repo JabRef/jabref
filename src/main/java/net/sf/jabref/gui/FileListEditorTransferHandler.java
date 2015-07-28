@@ -37,13 +37,13 @@ import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
-public class FileListEditorTransferHandler extends TransferHandler {
+class FileListEditorTransferHandler extends TransferHandler {
 
-    protected DataFlavor urlFlavor;
-    protected DataFlavor stringFlavor;
-    protected JabRefFrame frame;
-    protected EntryContainer entryContainer;
-    private TransferHandler textTransferHandler;
+    private DataFlavor urlFlavor;
+    private final DataFlavor stringFlavor;
+    private final JabRefFrame frame;
+    private final EntryContainer entryContainer;
+    private final TransferHandler textTransferHandler;
     private DroppedFileHandler dfh = null;
 
 
@@ -82,6 +82,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public boolean importData(JComponent comp, Transferable t) {
         // If the drop target is the main table, we want to record which
@@ -114,12 +115,13 @@ public class FileListEditorTransferHandler extends TransferHandler {
                 final List<File> theFiles = files;
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         //addAll(files);
                         for (File f : theFiles) {
                             // Find the file's extension, if any:
                             String name = f.getAbsolutePath();
-                            String extension = "";
+                            String extension;
                             ExternalFileType fileType = null;
                             int index = name.lastIndexOf('.');
                             if ((index >= 0) && (index < name.length())) {
@@ -146,7 +148,7 @@ public class FileListEditorTransferHandler extends TransferHandler {
 
         // all supported flavors failed
         System.err.println("can't transfer input: ");
-        DataFlavor inflavs[] = t.getTransferDataFlavors();
+        DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
             System.out.println("  " + inflav.toString());
         }
@@ -165,8 +167,9 @@ public class FileListEditorTransferHandler extends TransferHandler {
         // accept this if any input flavor matches any of our supported flavors
         for (DataFlavor inflav : transferFlavors) {
             if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                    || inflav.match(DataFlavor.javaFileListFlavor))
+                    || inflav.match(DataFlavor.javaFileListFlavor)) {
                 return true;
+            }
         }
 
         // nope, never heard of this type

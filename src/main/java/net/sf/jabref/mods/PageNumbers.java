@@ -29,23 +29,24 @@ import org.w3c.dom.Node;
  */
 public class PageNumbers {
 
-    String freeform = null;
-    int start, end;
+    private String freeform = null;
+    private int start;
+    private int end;
 
 
     public PageNumbers(String s) {
         parsePageNums(s);
     }
 
-    protected void parsePageNums(String s) {
+    private void parsePageNums(String s) {
         Pattern p = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
         Matcher m = p.matcher(s);
         if (m.matches()) {
             start = Integer.parseInt(m.group(1));
             end = Integer.parseInt(m.group(2));
-        }
-        else
+        } else {
             freeform = s;
+        }
     }
 
     public Element getDOMrepresentation(Document d) {
@@ -67,11 +68,13 @@ public class PageNumbers {
     }
 
     public String toString(String seperator) {
-        if (freeform != null)
+        if (freeform != null) {
             return freeform;
+        }
         return (start + seperator + end);
     }
 
+    @Override
     public String toString() {
         return toString("--");
     }

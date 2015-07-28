@@ -29,34 +29,34 @@ import javax.swing.event.UndoableEditListener;
  */
 public interface FieldEditor {
 
-    public String getFieldName();
+    String getFieldName();
 
     /*
      * Returns the component to be added to a container. Might be a JScrollPane
      * or the component itself.
      */
-    public JComponent getPane();
+    JComponent getPane();
 
     /*
      * Returns the text component itself.
      */
-    public JComponent getTextComponent();
+    JComponent getTextComponent();
 
-    public JLabel getLabel();
+    JLabel getLabel();
 
-    public void setActiveBackgroundColor();
+    void setActiveBackgroundColor();
 
-    public void setValidBackgroundColor();
+    void setValidBackgroundColor();
 
-    public void setInvalidBackgroundColor();
+    void setInvalidBackgroundColor();
 
-    public void setLabelColor(Color c);
+    void setLabelColor(Color c);
 
-    public void setBackground(Color c);
+    void setBackground(Color c);
 
-    public void updateFontColor();
+    void updateFontColor();
 
-    public String getText();
+    String getText();
 
     /**
      * Sets the given text on the current field editor and marks this text
@@ -64,42 +64,42 @@ public interface FieldEditor {
      * 
      * @param newText
      */
-    public void setText(String newText);
+    void setText(String newText);
 
-    public void append(String text);
+    void append(String text);
 
-    public Container getParent();
+    Container getParent();
 
-    public void requestFocus();
+    void requestFocus();
 
-    public void setEnabled(boolean enabled);
+    void setEnabled(boolean enabled);
 
-    public void updateFont();
+    void updateFont();
 
     /**
      * paste text into component, it should also take some selected text into
      * account
      */
-    public void paste(String textToInsert);
+    void paste(String textToInsert);
 
     /**
      * normally implemented in JTextArea and JTextField
      * 
      * @return
      */
-    public String getSelectedText();
+    String getSelectedText();
 
-    public boolean hasUndoInformation();
+    boolean hasUndoInformation();
 
-    public void undo();
+    void undo();
 
-    public boolean hasRedoInformation();
+    boolean hasRedoInformation();
 
-    public void redo();
+    void redo();
 
-    public void addUndoableEditListener(UndoableEditListener listener);
+    void addUndoableEditListener(UndoableEditListener listener);
 
-    public void setAutoCompleteListener(AutoCompleteListener listener);
+    void setAutoCompleteListener(AutoCompleteListener listener);
 
-    public void clearAutoCompleteSuggestion();
+    void clearAutoCompleteSuggestion();
 }

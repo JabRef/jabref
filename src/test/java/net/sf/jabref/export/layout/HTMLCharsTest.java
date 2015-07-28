@@ -1,6 +1,8 @@
 package net.sf.jabref.export.layout;
 
 import net.sf.jabref.export.layout.format.HTMLChars;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,23 +14,23 @@ public class HTMLCharsTest {
 
         LayoutFormatter layout = new HTMLChars();
 
-        assertEquals("", layout.format(""));
+        Assert.assertEquals("", layout.format(""));
 
-        assertEquals("hallo", layout.format("hallo"));
+        Assert.assertEquals("hallo", layout.format("hallo"));
 
-        assertEquals("Réflexions sur le timing de la quantité", layout
+        Assert.assertEquals("Réflexions sur le timing de la quantité", layout
                 .format("Réflexions sur le timing de la quantité"));
 
-        assertEquals("h&aacute;llo", layout.format("h\\'allo"));
+        Assert.assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 
-        assertEquals("&#305; &#305;", layout.format("\\i \\i"));
-        assertEquals("&#305;", layout.format("\\i"));
-        assertEquals("&#305;", layout.format("\\{i}"));
-        assertEquals("&#305;&#305;", layout.format("\\i\\i"));
+        Assert.assertEquals("&#305; &#305;", layout.format("\\i \\i"));
+        Assert.assertEquals("&#305;", layout.format("\\i"));
+        Assert.assertEquals("&#305;", layout.format("\\{i}"));
+        Assert.assertEquals("&#305;&#305;", layout.format("\\i\\i"));
 
-        assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
+        Assert.assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
 
-        assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
+        Assert.assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
     }
 
     @Test
@@ -36,14 +38,14 @@ public class HTMLCharsTest {
 
         LayoutFormatter layout = new HTMLChars();
 
-        assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
-        assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
 
-        assertEquals("<em>hallo</em>", layout.format("\\textit{hallo}"));
-        assertEquals("<em>hallo</em>", layout.format("{\\textit hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("\\textit{hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("{\\textit hallo}"));
 
-        assertEquals("<b>hallo</b>", layout.format("\\textbf{hallo}"));
-        assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
+        Assert.assertEquals("<b>hallo</b>", layout.format("\\textbf{hallo}"));
+        Assert.assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
     }
 
     /*

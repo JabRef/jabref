@@ -19,30 +19,15 @@ package net.sf.jabref.sql.importer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.*;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.groups.SearchGroup;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * 
@@ -107,9 +92,9 @@ public abstract class DBImporter extends DBImporterExporter {
         String jabrefDBs = "(";
         while (itLista.hasNext())
         {
-            jabrefDBs += "'" + itLista.next() + "',";
+            jabrefDBs += '\'' + itLista.next() + "',";
         }
-        jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ")";
+        jabrefDBs = jabrefDBs.substring(0, jabrefDBs.length() - 1) + ')';
 
         ResultSet rsDatabase = SQLUtil.queryAllFromTable(conn,
                 "jabref_database WHERE database_name IN " + jabrefDBs);
@@ -129,8 +114,9 @@ public abstract class DBImporter extends DBImporterExporter {
             ArrayList<String> colNames = new ArrayList<String>();
             while (rsColumns.next()) {
                 if (!columnsNotConsideredForEntries.contains(rsColumns
-                        .getString(1)))
+                        .getString(1))) {
                     colNames.add(rsColumns.getString(1));
+                }
             }
             rsColumns.getStatement().close();
             String database_id = rsDatabase.getString("database_id");
@@ -140,7 +126,7 @@ public abstract class DBImporter extends DBImporterExporter {
                     "entries WHERE database_id= '" + database_id + "';");
             while (rsEntries.next()) {
                 String id = rsEntries.getString("entries_id");
-                BibtexEntry entry = new BibtexEntry(Util.createNeutralId(),
+                BibtexEntry entry = new BibtexEntry(IdGenerator.next(),
                         types.get(rsEntries.getString("entry_types_id")));
                 entry.setField(BibtexFields.KEY_FIELD,
                         rsEntries.getString("cite_key"));
@@ -159,7 +145,7 @@ public abstract class DBImporter extends DBImporterExporter {
 
             // Import strings and preamble:
             ResultSet rsStrings = SQLUtil.queryAllFromTable(conn,
-                    "strings WHERE database_id='" + database_id + "'");
+                    "strings WHERE database_id='" + database_id + '\'');
             while (rsStrings.next()) {
                 String label = rsStrings.getString("label"), content = rsStrings
                         .getString("content");
@@ -167,7 +153,7 @@ public abstract class DBImporter extends DBImporterExporter {
                     database.setPreamble(content);
                 } else {
                     BibtexString string = new BibtexString(
-                            Util.createNeutralId(), label, content);
+                            IdGenerator.next(), label, content);
                     database.addString(string);
                 }
             }
@@ -194,16 +180,16 @@ public abstract class DBImporter extends DBImporterExporter {
      * @return The name (JabRef type id) of the group type.
      * @throws SQLException
      */
-    public String findGroupTypeName(String groupId, Connection conn)
+    private String findGroupTypeName(String groupId, Connection conn)
             throws SQLException {
         return SQLUtil.processQueryWithSingleResult(conn,
                 "SELECT label FROM group_types WHERE group_types_id='"
                         + groupId + "';");
     }
 
-    public void importGroupsTree(MetaData metaData,
-            HashMap<String, BibtexEntry> entries, Connection conn,
-            String database_id) throws SQLException {
+    private void importGroupsTree(MetaData metaData,
+                                  HashMap<String, BibtexEntry> entries, Connection conn,
+                                  String database_id) throws SQLException {
         HashMap<String, GroupTreeNode> groups = new HashMap<String, GroupTreeNode>();
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<GroupTreeNode, String>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
@@ -220,24 +206,24 @@ public abstract class DBImporter extends DBImporterExporter {
                 groups.put(rsGroups.getString("groups_id"), rootNode);
             } else if (typeId.equals(ExplicitGroup.ID)) {
                 group = new ExplicitGroup(rsGroups.getString("label"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(KeywordGroup.ID)) {
                 System.out.println("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new KeywordGroup(rsGroups.getString("label"),
-                        Util.unquote(rsGroups.getString("search_field"), '\\'),
-                        Util.unquote(rsGroups.getString("search_expression"),
+                        StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
+                        StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(SearchGroup.ID)) {
                 System.out.println("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new SearchGroup(rsGroups.getString("label"),
-                        Util.unquote(rsGroups.getString("search_expression"),
+                        StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             }
 
             if (group != null) {
@@ -249,13 +235,13 @@ public abstract class DBImporter extends DBImporterExporter {
             // Ok, we have collected a map of all groups and their parent IDs,
             // and another map of all group IDs and their group nodes.
             // Now we need to build the groups tree:
-            for (GroupTreeNode node : parentIds.keySet()) {
-                String parentId = parentIds.get(node);
+            for (Map.Entry<GroupTreeNode, String> groupTreeNodeStringEntry : parentIds.entrySet()) {
+                String parentId = groupTreeNodeStringEntry.getValue();
                 GroupTreeNode parent = groups.get(parentId);
                 if (parent == null) {
                     // TODO: missing parent
                 } else {
-                    parent.add(node);
+                    parent.add(groupTreeNodeStringEntry.getKey());
                 }
             }
             ResultSet rsEntryGroup = SQLUtil.queryAllFromTable(conn,

@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.collab;
 
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 
 import java.util.HashMap;
 import java.io.File;
@@ -28,33 +28,27 @@ import java.util.logging.Logger;
  * This thread monitors a set of files, each associated with a FileUpdateListener, for changes
  * in the file's last modification time stamp. The
  */
-public class FileUpdateMonitor extends Thread {
+public class FileUpdateMonitor implements Runnable {
 
-    private static Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
+    private static final Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
 
-    final int WAIT = 4000;
-    static int tmpNum = 0;
-    int no = 0;
-    HashMap<String, Entry> entries = new HashMap<String, Entry>();
-    boolean running;
+    private static final int WAIT = 4000;
 
+    private int numberOfUpdateListener = 0;
+    private final HashMap<String, Entry> entries = new HashMap<String, Entry>();
 
-    public FileUpdateMonitor() {
-        setPriority(MIN_PRIORITY);
-    }
-
+    @Override
     public void run() {
-        running = true;
-
         // The running variable is used to make the thread stop when needed.
-        while (running) {
+        while (true) {
             //System.out.println("Polling...");
             Iterator<String> i = entries.keySet().iterator();
             for (; i.hasNext();) {
                 Entry e = entries.get(i.next());
                 try {
-                    if (e.hasBeenUpdated())
+                    if (e.hasBeenUpdated()) {
                         e.notifyListener();
+                    }
 
                     //else
                     //System.out.println("File '"+e.file.getPath()+"' not modified.");
@@ -65,23 +59,12 @@ public class FileUpdateMonitor extends Thread {
 
             // Sleep for a while before starting a new polling round.
             try {
-                sleep(WAIT);
+                Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                logger.finest("FileUpdateMonitor has been interrupted.");
-                /*  the (?) correct way to interrupt threads, according to
-                 *  http://www.roseindia.net/javatutorials/shutting_down_threads_cleanly.shtml
-                 */
-                Thread.currentThread().interrupt(); // very important
-                break;
+                FileUpdateMonitor.logger.finest("FileUpdateMonitor has been interrupted.");
+                return;
             }
         }
-    }
-
-    /**
-     * Cause the thread to stop monitoring. It will finish the current round before stopping.
-     */
-    public void stopMonitoring() {
-        running = false;
     }
 
     /**
@@ -91,11 +74,11 @@ public class FileUpdateMonitor extends Thread {
      * @throws IOException if the file does not exist.
      */
     public String addUpdateListener(FileUpdateListener ul, File file) throws IOException {
-        // System.out.println(file.getPath());
-        if (!file.exists())
+        if (!file.exists()) {
             throw new IOException("File not found");
-        no++;
-        String key = "" + no;
+        }
+        numberOfUpdateListener++;
+        String key = "" + numberOfUpdateListener;
         entries.put(key, new Entry(ul, file));
         return key;
     }
@@ -106,8 +89,9 @@ public class FileUpdateMonitor extends Thread {
      */
     public boolean hasBeenModified(String handle) throws IllegalArgumentException {
         Object o = entries.get(handle);
-        if (o == null)
+        if (o == null) {
             return false;
+        }
         //	    throw new IllegalArgumentException("Entry not found");
         try {
             return ((Entry) o).hasBeenUpdated();
@@ -126,8 +110,9 @@ public class FileUpdateMonitor extends Thread {
      */
     public void perturbTimestamp(String handle) {
         Object o = entries.get(handle);
-        if (o == null)
+        if (o == null) {
             return;
+        }
         ((Entry) o).timeStamp--;
     }
 
@@ -141,20 +126,12 @@ public class FileUpdateMonitor extends Thread {
 
     public void updateTimeStamp(String key) throws IllegalArgumentException {
         Object o = entries.get(key);
-        if (o == null)
+        if (o == null) {
             throw new IllegalArgumentException("Entry not found");
+        }
         Entry entry = (Entry) o;
         entry.updateTimeStamp();
 
-    }
-
-    public void changeFile(String key, File file) throws IOException, IllegalArgumentException {
-        if (!file.exists())
-            throw new IOException("File not found");
-        Object o = entries.get(key);
-        if (o == null)
-            throw new IllegalArgumentException("Entry not found");
-        ((Entry) o).file = file;
     }
 
     /**
@@ -166,8 +143,9 @@ public class FileUpdateMonitor extends Thread {
      */
     public File getTempFile(String key) throws IllegalArgumentException {
         Object o = entries.get(key);
-        if (o == null)
+        if (o == null) {
             throw new IllegalArgumentException("Entry not found");
+        }
         return ((Entry) o).tmpFile;
     }
 
@@ -175,11 +153,11 @@ public class FileUpdateMonitor extends Thread {
     /**
      * A class containing the File, the FileUpdateListener and the current time stamp for one file.
      */
-    class Entry {
+    static class Entry {
 
-        FileUpdateListener listener;
-        File file;
-        File tmpFile;
+        final FileUpdateListener listener;
+        final File file;
+        final File tmpFile;
         long timeStamp, fileSize;
 
 
@@ -188,7 +166,7 @@ public class FileUpdateMonitor extends Thread {
             file = f;
             timeStamp = file.lastModified();
             fileSize = file.length();
-            tmpFile = getTempFile();
+            tmpFile = FileUpdateMonitor.getTempFile();
             tmpFile.deleteOnExit();
             copy();
         }
@@ -201,15 +179,17 @@ public class FileUpdateMonitor extends Thread {
         public boolean hasBeenUpdated() throws IOException {
             long modified = file.lastModified();
             long fileSizeNow = file.length();
-            if (modified == 0L)
+            if (modified == 0L) {
                 throw new IOException("File deleted");
-            return timeStamp != modified || fileSize != fileSizeNow;
+            }
+            return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
         public void updateTimeStamp() {
             timeStamp = file.lastModified();
-            if (timeStamp == 0L)
+            if (timeStamp == 0L) {
                 notifyFileRemoved();
+            }
             fileSize = file.length();
 
             copy();
@@ -220,9 +200,9 @@ public class FileUpdateMonitor extends Thread {
             //Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
             boolean res = false;
             try {
-                res = Util.copyFile(file, tmpFile, true);
+                res = FileUtil.copyFile(file, tmpFile, true);
             } catch (IOException ex) {
-                Globals.logger("Cannot copy to temporary file '" + tmpFile.getPath() + "'");
+                Globals.logger("Cannot copy to temporary file '" + tmpFile.getPath() + '\'');
             }
             //Util.pr("</copy>");
             return res;
@@ -257,7 +237,7 @@ public class FileUpdateMonitor extends Thread {
     }
 
 
-    static synchronized File getTempFile() {
+    private static synchronized File getTempFile() {
         File f = null;
         // Globals.prefs.get("tempDir")
         //while ((f = File.createTempFile("jabref"+(tmpNum++), null)).exists());

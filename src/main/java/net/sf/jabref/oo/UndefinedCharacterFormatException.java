@@ -19,9 +19,9 @@ package net.sf.jabref.oo;
  * Exception used to indicate that the plugin attempted to set a character format that is
  * not defined in the current OpenOffice document.
  */
-public class UndefinedCharacterFormatException extends Exception {
+class UndefinedCharacterFormatException extends Exception {
 
-    String formatName;
+    private final String formatName;
 
 
     public UndefinedCharacterFormatException(String formatName) {

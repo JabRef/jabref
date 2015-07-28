@@ -35,10 +35,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
@@ -162,7 +159,7 @@ import net.sf.jabref.Util;
  */
 public class RepecNepImporter extends ImportFormat {
 
-    private static Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
+    private static final Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
 
     private final static Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
 
@@ -176,6 +173,7 @@ public class RepecNepImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "REPEC New Economic Papers (NEP)";
     }
@@ -184,6 +182,7 @@ public class RepecNepImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "repecnep";
     }
@@ -192,6 +191,7 @@ public class RepecNepImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getExtensions()
      */
+    @Override
     public String getExtensions() {
         return ".txt";
     }
@@ -200,6 +200,7 @@ public class RepecNepImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getDescription()
      */
+    @Override
     public String getDescription() {
         return
         "Imports a New Economics Papers-Message (see http://nep.repec.org)\n"
@@ -213,6 +214,7 @@ public class RepecNepImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#isRecognizedFormat(java.io.InputStream)
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
@@ -220,7 +222,7 @@ public class RepecNepImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String startOfMessage = "";
         String line = in.readLine();
-        for (int i = 0; i < 25 && line != null; i++) {
+        for (int i = 0; (i < 25) && (line != null); i++) {
             startOfMessage += line;
             line = in.readLine();
         }
@@ -259,7 +261,7 @@ public class RepecNepImporter extends ImportFormat {
     private String readMultipleLines() throws IOException {
         String result = this.lastLine.trim();
         readLine();
-        while (this.lastLine != null && !this.lastLine.trim().equals("") && !startsWithKeyword(recognizedFields) && !isStartOfWorkingPaper()) {
+        while ((this.lastLine != null) && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
             result += this.lastLine.length() == 0 ? this.lastLine.trim() : " " + this.lastLine.trim();
             readLine();
         }
@@ -288,23 +290,23 @@ public class RepecNepImporter extends ImportFormat {
         // read authors and institutions
         String authors = "";
         String institutions = "";
-        while (this.lastLine != null && !this.lastLine.equals("") && !startsWithKeyword(recognizedFields)) {
+        while ((this.lastLine != null) && !this.lastLine.equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
 
             // read single author
-            String author = null;
+            String author;
             String institution = null;
-            boolean institutionDone = false;
+            boolean institutionDone;
             if (this.lastLine.indexOf('(') >= 0) {
                 author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && this.lastLine.indexOf(')') > this.lastLine.indexOf('(') + 1 ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && (this.lastLine.indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
             } else {
                 author = this.lastLine.substring(0, this.lastLine.length()).trim();
                 institutionDone = true;
             }
 
             readLine();
-            while (!institutionDone && this.lastLine != null) {
+            while (!institutionDone && (this.lastLine != null)) {
                 institutionDone = this.lastLine.indexOf(')') > 0;
                 institution += this.lastLine.substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
                 readLine();
@@ -349,12 +351,12 @@ public class RepecNepImporter extends ImportFormat {
     private void parseAdditionalFields(BibtexEntry be, boolean multilineUrlFieldAllowed) throws IOException {
 
         // one empty line is possible before fields start
-        if (this.lastLine != null && this.lastLine.trim().equals("")) {
+        if ((this.lastLine != null) && this.lastLine.trim().equals("")) {
             readLine();
         }
 
         // read other fields
-        while (this.lastLine != null && !isStartOfWorkingPaper() && (startsWithKeyword(recognizedFields) || this.lastLine.equals(""))) {
+        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || this.lastLine.equals(""))) {
 
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = this.lastLine.equals("") ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
@@ -381,7 +383,7 @@ public class RepecNepImporter extends ImportFormat {
                 String content = readMultipleLines();
                 String[] recognizedDateFormats = new String[] {"yyyy-MM-dd", "yyyy-MM", "yyyy"};
                 int i = 0;
-                for (; i < recognizedDateFormats.length && date == null; i++) {
+                for (; (i < recognizedDateFormats.length) && (date == null); i++) {
                     try {
                         date = new SimpleDateFormat(recognizedDateFormats[i]).parse(content);
                     } catch (ParseException e) {
@@ -392,13 +394,13 @@ public class RepecNepImporter extends ImportFormat {
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date != null ? date : new Date());
                 be.setField("year", "" + cal.get(Calendar.YEAR));
-                if (date != null && recognizedDateFormats[i - 1].contains("MM")) {
+                if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
                     be.setField("month", "" + cal.get(Calendar.MONTH));
                 }
 
                 // parse URL field
             } else if (keyword.startsWith("URL")) {
-                String content = null;
+                String content;
                 if (multilineUrlFieldAllowed) {
                     content = readMultipleLines();
                 } else {
@@ -429,6 +431,7 @@ public class RepecNepImporter extends ImportFormat {
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         String paperNoStr = null;
@@ -444,18 +447,18 @@ public class RepecNepImporter extends ImportFormat {
                     this.inOverviewSection = this.preLine.startsWith("In this issue we have");
                 }
                 if (isStartOfWorkingPaper()) {
-                    BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+                    BibtexEntry be = new BibtexEntry(IdGenerator.next());
                     be.setType(BibtexEntryType.getType("techreport"));
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);
-                    if (startsWithKeyword(recognizedFields)) {
+                    if (startsWithKeyword(RepecNepImporter.recognizedFields)) {
                         parseAdditionalFields(be, false);
                     } else {
                         readLine(); // skip empty line
                         parseAuthors(be);
                         readLine(); // skip empty line
                     }
-                    if (!startsWithKeyword(recognizedFields)) {
+                    if (!startsWithKeyword(RepecNepImporter.recognizedFields)) {
                         parseAbstract(be);
                     }
                     parseAdditionalFields(be, true);
@@ -475,7 +478,7 @@ public class RepecNepImporter extends ImportFormat {
                 message += ", paper no. " + paperNoStr + ": ";
             }
             message += e.getMessage();
-            logger.log(Level.SEVERE, message, e);
+            RepecNepImporter.logger.log(Level.SEVERE, message, e);
             if (!(e instanceof IOException)) {
                 e.printStackTrace();
                 e = new IOException(message);

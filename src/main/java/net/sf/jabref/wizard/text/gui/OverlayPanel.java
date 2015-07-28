@@ -35,9 +35,9 @@ import java.awt.*;
 /**
  * Supports an underlying text for JComponent
  */
-public class OverlayPanel extends JPanel {
+class OverlayPanel extends JPanel {
 
-    private JLabel label;
+    private final JLabel label;
 
 
     public OverlayPanel(JComponent overlay, String text) {
@@ -57,11 +57,12 @@ public class OverlayPanel extends JPanel {
         add(scroller);
     }
 
+    @Override
     public void paint(Graphics g) {
         int len = label.getWidth();
 
         Dimension dim = this.getSize();
-        if ((dim.height > 25) && (dim.width > len + 10)) {
+        if ((dim.height > 25) && (dim.width > (len + 10))) {
             int x = (dim.width - len) / 2;
             int y = dim.height / 2;
 

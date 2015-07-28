@@ -28,19 +28,25 @@ public class CrossRefEntryComparator implements Comparator<BibtexEntry> {
     private static final String CROSS_REF_FIELD = "crossref";
 
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2)
             throws ClassCastException {
 
-        Object f1 = e1.getField(CROSS_REF_FIELD), f2 = e2.getField(CROSS_REF_FIELD);
+        Object f1 = e1.getField(CrossRefEntryComparator.CROSS_REF_FIELD), f2 = e2.getField(CrossRefEntryComparator.CROSS_REF_FIELD);
 
         if ((f1 == null) && (f2 == null))
+         {
             return 0; // secComparator.compare(e1, e2);
+        }
         if ((f1 != null) && (f2 != null))
+         {
             return 0; // secComparator.compare(e1, e2);
-        if (f1 != null)
+        }
+        if (f1 != null) {
             return -1;
-        else
+        } else {
             return 1;
+        }
     }
 
 }

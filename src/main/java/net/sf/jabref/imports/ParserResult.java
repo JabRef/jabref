@@ -26,15 +26,15 @@ import net.sf.jabref.MetaData;
 
 public class ParserResult {
 
-    public static ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
-    public static ParserResult FILE_LOCKED = new ParserResult(null, null, null);
-    private BibtexDatabase base;
+    public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
+    public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
+    private final BibtexDatabase base;
     private MetaData metaData;
-    private HashMap<String, BibtexEntryType> entryTypes;
+    private final HashMap<String, BibtexEntryType> entryTypes;
 
     private File file = null;
-    private ArrayList<String> warnings = new ArrayList<String>();
-    private ArrayList<String> duplicateKeys = new ArrayList<String>();
+    private final ArrayList<String> warnings = new ArrayList<String>();
+    private final ArrayList<String> duplicateKeys = new ArrayList<String>();
 
     private String errorMessage = null;
     private String encoding = null; // Which encoding was used?
@@ -146,7 +146,7 @@ public class ParserResult {
 
     /**
      * Returns the name of the encoding used during parsing, or null if not specified
-     * (indicates that prefs.get("defaultEncoding") was used).
+     * (indicates that prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
      */
     public String getEncoding() {
         return encoding;
@@ -158,8 +158,9 @@ public class ParserResult {
      * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-        if (!warnings.contains(s))
+        if (!warnings.contains(s)) {
             warnings.add(s);
+        }
     }
 
     public boolean hasWarnings() {
@@ -168,8 +169,9 @@ public class ParserResult {
 
     public String[] warnings() {
         String[] s = new String[warnings.size()];
-        for (int i = 0; i < warnings.size(); i++)
+        for (int i = 0; i < warnings.size(); i++) {
             s[i] = warnings.get(i);
+        }
         return s;
     }
 
@@ -178,8 +180,9 @@ public class ParserResult {
      * @param key The duplicated key
      */
     public void addDuplicateKey(String key) {
-        if (!duplicateKeys.contains(key))
+        if (!duplicateKeys.contains(key)) {
             duplicateKeys.add(key);
+        }
     }
 
     /**

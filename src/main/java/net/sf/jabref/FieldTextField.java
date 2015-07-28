@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.util.StringUtil;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -30,9 +31,9 @@ import javax.swing.undo.UndoManager;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
-    protected String fieldName;
-    protected JLabel label;
-    protected UndoManager undo;
+    private final String fieldName;
+    private final JLabel label;
+    private UndoManager undo;
     private AutoCompleteListener autoCompleteListener = null;
 
 
@@ -55,10 +56,11 @@ public class FieldTextField extends JTextField implements FieldEditor {
         // was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
-        if (changeColorOnFocus)
+        if (changeColorOnFocus) {
             addFocusListener(new FieldEditorFocusListener());
+        }
         fieldName = fieldName_;
-        label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
+        label = new FieldNameLabel(' ' + StringUtil.nCase(fieldName) + ' ');
         // label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
         // label.setBorder(BorderFactory.createEtchedBorder());
         setBackground(GUIGlobals.validFieldBackgroundColor);
@@ -75,13 +77,14 @@ public class FieldTextField extends JTextField implements FieldEditor {
         label.addMouseListener(popMenu);
     }
 
-    protected void setupUndoRedo() {
+    private void setupUndoRedo() {
         undo = new UndoManager();
         Document doc = getDocument();
 
         // Listen for undo and redo events
         doc.addUndoableEditListener(new UndoableEditListener() {
 
+            @Override
             public void undoableEditHappened(UndoableEditEvent evt) {
                 undo.addEdit(evt.getEdit());
             }
@@ -91,6 +94,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
         getActionMap().put("Undo",
                 new AbstractAction("Undo") {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         try {
                             if (undo.canUndo()) {
@@ -108,6 +112,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
         getActionMap().put("Redo",
                 new AbstractAction("Redo") {
 
+                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         try {
                             if (undo.canRedo()) {
@@ -125,52 +130,64 @@ public class FieldTextField extends JTextField implements FieldEditor {
     @Override
     public void setText(String t) {
         super.setText(t);
-        if (undo != null)
+        if (undo != null) {
             undo.discardAllEdits();
+        }
     }
 
+    @Override
     public void append(String text) {
         setText(getText() + text);
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
     }
 
+    @Override
     public JLabel getLabel() {
         return label;
     }
 
+    @Override
     public void setLabelColor(Color c) {
         label.setForeground(c);
         throw new NullPointerException("ok");
     }
 
+    @Override
     public JComponent getPane() {
         return this;
     }
 
+    @Override
     public JComponent getTextComponent() {
         return this;
 
     }
 
+    @Override
     public void setActiveBackgroundColor() {
         setBackground(GUIGlobals.activeBackground);
     }
 
+    @Override
     public void setValidBackgroundColor() {
         setBackground(GUIGlobals.validFieldBackgroundColor);
     }
 
+    @Override
     public void setInvalidBackgroundColor() {
         setBackground(GUIGlobals.invalidFieldBackgroundColor);
     }
 
+    @Override
     public void updateFontColor() {
         setForeground(GUIGlobals.editorTextColor);
     }
 
+    @Override
     public void updateFont() {
         setFont(GUIGlobals.CURRENTFONT);
     }
@@ -182,6 +199,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
     	super.paint(g2);
     }*/
 
+    @Override
     public void paste(String textToInsert) {
         int sel = getSelectionEnd() - getSelectionStart();
         if (sel < 1) {
@@ -191,10 +209,12 @@ public class FieldTextField extends JTextField implements FieldEditor {
         replaceSelection(textToInsert);
     }
 
+    @Override
     public boolean hasUndoInformation() {
         return false;//undo.canUndo();
     }
 
+    @Override
     public void undo() {
         /*try {
             if (undo.canUndo()) {
@@ -204,10 +224,12 @@ public class FieldTextField extends JTextField implements FieldEditor {
         }*/
     }
 
+    @Override
     public boolean hasRedoInformation() {
         return false;//undo.canRedo();
     }
 
+    @Override
     public void redo() {
         /*try {
             if (undo.canRedo()) {
@@ -218,16 +240,20 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
     }
 
+    @Override
     public void addUndoableEditListener(UndoableEditListener listener) {
         getDocument().addUndoableEditListener(listener);
     }
 
+    @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
         autoCompleteListener = listener;
     }
 
+    @Override
     public void clearAutoCompleteSuggestion() {
-        if (autoCompleteListener != null)
+        if (autoCompleteListener != null) {
             autoCompleteListener.clearCurrentSuggestion(this);
+        }
     }
 }

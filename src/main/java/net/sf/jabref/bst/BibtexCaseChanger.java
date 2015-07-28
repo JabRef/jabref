@@ -17,18 +17,18 @@ package net.sf.jabref.bst;
 
 public class BibtexCaseChanger {
 
-    String s;
+    private final String s;
 
-    char format;
+    private final char format;
 
-    boolean prevColon = true;
+    private boolean prevColon = true;
 
-    int n;
+    private final int n;
 
-    Warn warn;
+    private final Warn warn;
 
 
-    BibtexCaseChanger(String s, char format, Warn warn) {
+    private BibtexCaseChanger(String s, char format, Warn warn) {
         this.s = s;
         this.format = format;
         this.n = s.length();
@@ -49,13 +49,13 @@ public class BibtexCaseChanger {
         while (i < n) {
             if (c[i] == '{') {
                 braceLevel++;
-                if (braceLevel != 1 || i + 4 > n || c[i + 1] != '\\') {
+                if ((braceLevel != 1) || ((i + 4) > n) || (c[i + 1] != '\\')) {
                     prevColon = false;
                     sb.append(c[i]);
                     i++;
                     continue;
                 }
-                if (format == 't' && (i == 0 || (prevColon && Character.isWhitespace(c[i - 1])))) {
+                if ((format == 't') && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
                     sb.append(c[i]);
                     i++;
                     prevColon = false;
@@ -78,17 +78,17 @@ public class BibtexCaseChanger {
             sb.append(c[i]);
             i++;
         }
-        checkBrace(s, braceLevel);
+        BibtexCaseChanger.checkBrace(s, braceLevel);
         return sb.toString();
     }
 
 
-    int braceLevel = 0;
+    private int braceLevel = 0;
 
 
-    int decrBraceLevel(String string, int braceLevel) {
+    private int decrBraceLevel(String string, int braceLevel) {
         if (braceLevel == 0) {
-            complain(string);
+            BibtexCaseChanger.complain(string);
         } else {
             braceLevel--;
         }
@@ -101,7 +101,7 @@ public class BibtexCaseChanger {
 
     static void checkBrace(String s, int braceLevel) {
         if (braceLevel > 0) {
-            complain(s);
+            BibtexCaseChanger.complain(s);
         }
     }
 
@@ -120,25 +120,25 @@ public class BibtexCaseChanger {
      * @param format
      * @return
      */
-    public int convertSpecialChar(StringBuffer sb, char[] c, int i, char format) {
+    private int convertSpecialChar(StringBuffer sb, char[] c, int i, char format) {
 
         sb.append(c[i]);
         i++; // skip over open brace
 
-        while (i < c.length && braceLevel > 0) {
+        while ((i < c.length) && (braceLevel > 0)) {
             sb.append(c[i]);
             i++;
             // skip over the |backslash|
 
-            String s = findSpecialChar(c, i);
+            String s = BibtexCaseChanger.findSpecialChar(c, i);
             if (s != null) {
                 i = convertAccented(c, i, s, sb, format);
             }
 
-            while (i < c.length && braceLevel > 0 && c[i] != '\\') {
-                if (c[i] == '}')
+            while ((i < c.length) && (braceLevel > 0) && (c[i] != '\\')) {
+                if (c[i] == '}') {
                     braceLevel--;
-                else if (c[i] == '{') {
+                } else if (c[i] == '{') {
                     braceLevel++;
                 }
                 i = convertNonControl(c, i, sb, format);
@@ -159,25 +159,26 @@ public class BibtexCaseChanger {
      * @param format
      * @return
      */
-    int convertAccented(char[] c, int pos, String s, StringBuffer sb, char format) {
+    private int convertAccented(char[] c, int pos, String s, StringBuffer sb, char format) {
         pos += s.length();
 
         switch (format) {
         case TITLE_LOWERS:
         case ALL_LOWERS:
-            if ("L O OE AE AA".contains(s))
+            if ("L O OE AE AA".contains(s)) {
                 sb.append(s.toLowerCase());
-            else
+            } else {
                 sb.append(s);
+            }
             break;
         case ALL_UPPERS:
-            if ("l o oe ae aa".contains(s))
+            if ("l o oe ae aa".contains(s)) {
                 sb.append(s.toUpperCase());
-            else if ("i j ss".contains(s)) {
+            } else if ("i j ss".contains(s)) {
 
                 sb.deleteCharAt(sb.length() - 1); // Kill backslash
                 sb.append(s.toUpperCase());
-                while (pos < c.length && Character.isWhitespace(c[pos])) {
+                while ((pos < c.length) && Character.isWhitespace(c[pos])) {
                     pos++;
                 }
             } else {
@@ -188,7 +189,7 @@ public class BibtexCaseChanger {
         return pos;
     }
 
-    int convertNonControl(char[] c, int pos, StringBuffer sb, char format) {
+    private int convertNonControl(char[] c, int pos, StringBuffer sb, char format) {
         switch (format) {
         case TITLE_LOWERS:
         case ALL_LOWERS:
@@ -204,14 +205,14 @@ public class BibtexCaseChanger {
     }
 
 
-    public final static char TITLE_LOWERS = 't';
+    private final static char TITLE_LOWERS = 't';
 
-    public final static char ALL_LOWERS = 'l';
+    private final static char ALL_LOWERS = 'l';
 
-    public final static char ALL_UPPERS = 'u';
+    private final static char ALL_UPPERS = 'u';
 
 
-    int convertChar0(char[] c, int i, StringBuffer sb, char format) {
+    private int convertChar0(char[] c, int i, StringBuffer sb, char format) {
         switch (format) {
         case TITLE_LOWERS:
             if (i == 0) {
@@ -221,10 +222,11 @@ public class BibtexCaseChanger {
             } else {
                 sb.append(Character.toLowerCase(c[i]));
             }
-            if (c[i] == ':')
+            if (c[i] == ':') {
                 prevColon = true;
-            else if (!Character.isWhitespace(c[i]))
+            } else if (!Character.isWhitespace(c[i])) {
                 prevColon = false;
+            }
             break;
         case ALL_LOWERS:
             sb.append(Character.toLowerCase(c[i]));
@@ -237,34 +239,47 @@ public class BibtexCaseChanger {
     }
 
     static String findSpecialChar(char[] c, int pos) {
-        if (pos + 1 < c.length) {
-            if (c[pos] == 'o' && c[pos + 1] == 'e')
+        if ((pos + 1) < c.length) {
+            if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
                 return "oe";
-            if (c[pos] == 'O' && c[pos + 1] == 'E')
+            }
+            if ((c[pos] == 'O') && (c[pos + 1] == 'E')) {
                 return "OE";
-            if (c[pos] == 'a' && c[pos + 1] == 'e')
+            }
+            if ((c[pos] == 'a') && (c[pos + 1] == 'e')) {
                 return "ae";
-            if (c[pos] == 'A' && c[pos + 1] == 'E')
+            }
+            if ((c[pos] == 'A') && (c[pos + 1] == 'E')) {
                 return "AE";
-            if (c[pos] == 's' && c[pos + 1] == 's')
+            }
+            if ((c[pos] == 's') && (c[pos + 1] == 's')) {
                 return "ss";
-            if (c[pos] == 'A' && c[pos + 1] == 'A')
+            }
+            if ((c[pos] == 'A') && (c[pos + 1] == 'A')) {
                 return "AA";
-            if (c[pos] == 'a' && c[pos + 1] == 'a')
+            }
+            if ((c[pos] == 'a') && (c[pos + 1] == 'a')) {
                 return "aa";
+            }
         }
-        if (c[pos] == 'i')
+        if (c[pos] == 'i') {
             return String.valueOf(c[pos]);
-        if (c[pos] == 'j')
+        }
+        if (c[pos] == 'j') {
             return String.valueOf(c[pos]);
-        if (c[pos] == 'o')
+        }
+        if (c[pos] == 'o') {
             return String.valueOf(c[pos]);
-        if (c[pos] == 'O')
+        }
+        if (c[pos] == 'O') {
             return String.valueOf(c[pos]);
-        if (c[pos] == 'l')
+        }
+        if (c[pos] == 'l') {
             return String.valueOf(c[pos]);
-        if (c[pos] == 'L')
+        }
+        if (c[pos] == 'L') {
             return String.valueOf(c[pos]);
+        }
         return null;
     }
 }

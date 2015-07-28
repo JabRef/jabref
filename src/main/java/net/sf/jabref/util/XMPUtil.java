@@ -48,8 +48,6 @@ import org.apache.pdfbox.pdmodel.common.PDMetadata;
  * TODO:
  * 
  * Synchronization
- * 
- * @version $Revision$ ($Date$)
  */
 public class XMPUtil {
 
@@ -62,7 +60,7 @@ public class XMPUtil {
      * @throws IOException
      */
     public static List<BibtexEntry> readXMP(String filename) throws IOException {
-        return readXMP(new File(filename));
+        return XMPUtil.readXMP(new File(filename));
     }
 
     /**
@@ -92,7 +90,7 @@ public class XMPUtil {
      */
     public static void writeXMP(String filename, BibtexEntry entry,
             BibtexDatabase database) throws IOException, TransformerException {
-        writeXMP(new File(filename), entry, database);
+        XMPUtil.writeXMP(new File(filename), entry, database);
     }
 
     /**
@@ -108,7 +106,7 @@ public class XMPUtil {
     public static List<BibtexEntry> readXMP(File file) throws IOException {
         FileInputStream is = new FileInputStream(file);
         try {
-            return readXMP(is);
+            return XMPUtil.readXMP(is);
         } finally {
             is.close();
         }
@@ -140,7 +138,7 @@ public class XMPUtil {
                         "Error: Cannot read metadata from encrypted document.");
             }
 
-            XMPMetadata meta = getXMPMetadata(document);
+            XMPMetadata meta = XMPUtil.getXMPMetadata(document);
 
             // If we did not find any XMP metadata, search for non XMP metadata
             if (meta != null) {
@@ -155,34 +153,38 @@ public class XMPUtil {
                 }
 
                 // If we did not find anything have a look if a Dublin Core exists
-                if (result.size() == 0) {
+                if (result.isEmpty()) {
                     schemas = meta
                             .getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
                     for (XMPSchema schema : schemas) {
                         XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
 
-                        BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
+                        BibtexEntry entry = XMPUtil.getBibtexEntryFromDublinCore(dc);
 
-                        if (entry != null)
+                        if (entry != null) {
                             result.add(entry);
+                        }
                     }
                 }
             }
-            if (result.size() == 0) {
-                BibtexEntry entry = getBibtexEntryFromDocumentInformation(document
+            if (result.isEmpty()) {
+                BibtexEntry entry = XMPUtil.getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
 
-                if (entry != null)
+                if (entry != null) {
                     result.add(entry);
+                }
             }
         } finally {
-            if (document != null)
+            if (document != null) {
                 document.close();
+            }
         }
 
         // return null, if no metadata was found
-        if (result.size() == 0)
+        if (result.isEmpty()) {
             return null;
+        }
         return result;
     }
 
@@ -208,20 +210,24 @@ public class XMPUtil {
         BibtexEntry entry = new BibtexEntry();
 
         String s = di.getAuthor();
-        if (s != null)
+        if (s != null) {
             entry.setField("author", s);
+        }
 
         s = di.getTitle();
-        if (s != null)
+        if (s != null) {
             entry.setField("title", s);
+        }
 
         s = di.getKeywords();
-        if (s != null)
+        if (s != null) {
             entry.setField("keywords", s);
+        }
 
         s = di.getSubject();
-        if (s != null)
+        if (s != null) {
             entry.setField("abstract", s);
+        }
 
         COSDictionary dict = di.getDictionary();
         for (Map.Entry<COSName, COSBase> o : dict.entrySet()) {
@@ -232,15 +238,17 @@ public class XMPUtil {
                 if (key.equals("entrytype")) {
                     BibtexEntryType type = BibtexEntryType
                             .getStandardType(value);
-                    if (type != null)
+                    if (type != null) {
                         entry.setType(type);
-                } else
+                    }
+                } else {
                     entry.setField(key, value);
+                }
             }
         }
 
         // Return null if no values were found
-        return (entry.getAllFields().size() > 0 ? entry : null);
+        return (!entry.getAllFields().isEmpty() ? entry : null);
     }
 
     /**
@@ -279,8 +287,9 @@ public class XMPUtil {
                 }
                 sb.append(it.next());
             }
-            if (sb != null)
+            if (sb != null) {
                 entry.setField("editor", sb.toString());
+            }
         }
 
         /**
@@ -298,15 +307,16 @@ public class XMPUtil {
                 }
                 sb.append(it.next());
             }
-            if (sb != null)
+            if (sb != null) {
                 entry.setField("author", sb.toString());
+            }
         }
 
         /**
          * Year + Month -> Date
          */
         List<String> dates = dcSchema.getSequenceList("dc:date");
-        if (dates != null && dates.size() > 0) {
+        if ((dates != null) && (!dates.isEmpty())) {
             String date = dates.get(0).trim();
             Calendar c = null;
             try {
@@ -326,15 +336,17 @@ public class XMPUtil {
          * Abstract -> Description
          */
         String s = dcSchema.getDescription();
-        if (s != null)
+        if (s != null) {
             entry.setField("abstract", s);
+        }
 
         /**
          * Identifier -> DOI
          */
         s = dcSchema.getIdentifier();
-        if (s != null)
+        if (s != null) {
             entry.setField("doi", s);
+        }
 
         /**
          * Publisher -> Publisher
@@ -351,8 +363,9 @@ public class XMPUtil {
                 }
                 sb.append(it.next());
             }
-            if (sb != null)
+            if (sb != null) {
                 entry.setField("publishers", sb.toString());
+            }
         }
 
         /**
@@ -378,15 +391,17 @@ public class XMPUtil {
          * Rights -> Rights
          */
         s = dcSchema.getRights();
-        if (s != null)
+        if (s != null) {
             entry.setField("rights", s);
+        }
 
         /**
          * Source -> Source
          */
         s = dcSchema.getSource();
-        if (s != null)
+        if (s != null) {
             entry.setField("source", s);
+        }
 
         /**
          * Subject -> Keywords
@@ -397,37 +412,40 @@ public class XMPUtil {
             StringBuffer sb = null;
             while (it.hasNext()) {
                 if (sb != null) {
-                    sb.append(",");
+                    sb.append(',');
                 } else {
                     sb = new StringBuffer();
                 }
                 sb.append(it.next());
             }
-            if (sb != null)
+            if (sb != null) {
                 entry.setField("keywords", sb.toString());
+            }
         }
 
         /**
          * Title -> Title
          */
         s = dcSchema.getTitle();
-        if (s != null)
+        if (s != null) {
             entry.setField("title", s);
+        }
 
         /**
          * Type -> Type
          */
         List<String> l = dcSchema.getTypes();
-        if (l != null && l.size() > 0) {
+        if ((l != null) && (!l.isEmpty())) {
             s = l.get(0);
             if (s != null) {
                 BibtexEntryType type = BibtexEntryType.getStandardType(s);
-                if (type != null)
+                if (type != null) {
                     entry.setType(type);
+                }
             }
         }
 
-        return (entry.getAllFields().size() > 0 ? entry : null);
+        return (!entry.getAllFields().isEmpty() ? entry : null);
     }
 
     /**
@@ -459,7 +477,7 @@ public class XMPUtil {
             BibtexDatabase database) throws IOException, TransformerException {
         List<BibtexEntry> l = new LinkedList<BibtexEntry>();
         l.add(entry);
-        writeXMP(file, l, database, true);
+        XMPUtil.writeXMP(file, l, database, true);
     }
 
     /**
@@ -481,12 +499,13 @@ public class XMPUtil {
      * @see #toXMP(java.util.Collection, net.sf.jabref.BibtexDatabase) if you don't need strings to be
      *      resolved.
      */
-    public static void toXMP(Collection<BibtexEntry> bibtexEntries,
-            BibtexDatabase database, OutputStream outputStream)
+    private static void toXMP(Collection<BibtexEntry> bibtexEntries,
+                              BibtexDatabase database, OutputStream outputStream)
             throws IOException, TransformerException {
 
-        if (database != null)
+        if (database != null) {
             bibtexEntries = database.resolveForStrings(bibtexEntries, true);
+        }
 
         XMPMetadata x = new XMPMetadata();
 
@@ -520,7 +539,7 @@ public class XMPUtil {
             BibtexDatabase database) throws TransformerException {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            toXMP(bibtexEntries, database, bs);
+            XMPUtil.toXMP(bibtexEntries, database, bs);
             return bs.toString();
         } catch (IOException e) {
             throw new TransformerException(e);
@@ -538,7 +557,7 @@ public class XMPUtil {
      *         found.
      * @throws IOException
      */
-    public static XMPMetadata readRawXMP(InputStream inputStream)
+    private static XMPMetadata readRawXMP(InputStream inputStream)
             throws IOException {
         PDDocument document = null;
 
@@ -549,15 +568,16 @@ public class XMPUtil {
                         "Error: Cannot read metadata from encrypted document.");
             }
 
-            return getXMPMetadata(document);
+            return XMPUtil.getXMPMetadata(document);
 
         } finally {
-            if (document != null)
+            if (document != null) {
                 document.close();
+            }
         }
     }
 
-    static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
+    private static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
 
@@ -584,22 +604,23 @@ public class XMPUtil {
     public static XMPMetadata readRawXMP(File file) throws IOException {
         FileInputStream is = new FileInputStream(file);
         try {
-            return readRawXMP(is);
+            return XMPUtil.readRawXMP(is);
         } finally {
             is.close();
         }
     }
 
-    static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
-            BibtexEntry entry, BibtexDatabase database) {
+    private static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
+                                        BibtexEntry entry, BibtexDatabase database) {
 
-        if (database != null)
+        if (database != null) {
             entry = database.resolveForStrings(entry, false);
+        }
 
         // Query privacy filter settings
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         boolean useXmpPrivacyFilter =
-                prefs.getBoolean("useXmpPrivacyFilter");
+                prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
         TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
@@ -846,7 +867,7 @@ public class XMPUtil {
              * relation attribute
              */
             String o = entry.getField(field);
-            dcSchema.addRelation("bibtex/" + field + "/" + o);
+            dcSchema.addRelation("bibtex/" + field + '/' + o);
         }
 
         /**
@@ -875,8 +896,9 @@ public class XMPUtil {
          * Bibtex-Fields used: title
          */
         Object o = entry.getType().getName();
-        if (o != null)
+        if (o != null) {
             dcSchema.addType(o.toString());
+        }
     }
 
     /**
@@ -901,7 +923,7 @@ public class XMPUtil {
         List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         entries.add(entry);
 
-        writeDublinCore(document, entries, database);
+        XMPUtil.writeDublinCore(document, entries, database);
     }
 
     /**
@@ -921,12 +943,13 @@ public class XMPUtil {
      * @throws TransformerException
      */
     @SuppressWarnings("unchecked")
-    public static void writeDublinCore(PDDocument document,
-            Collection<BibtexEntry> entries, BibtexDatabase database)
+    private static void writeDublinCore(PDDocument document,
+                                        Collection<BibtexEntry> entries, BibtexDatabase database)
             throws IOException, TransformerException {
 
-        if (database != null)
+        if (database != null) {
             entries = database.resolveForStrings(entries, false);
+        }
 
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
@@ -947,7 +970,7 @@ public class XMPUtil {
 
         for (BibtexEntry entry : entries) {
             XMPSchemaDublinCore dcSchema = new XMPSchemaDublinCore(meta);
-            writeToDCSchema(dcSchema, entry, null);
+            XMPUtil.writeToDCSchema(dcSchema, entry, null);
             meta.addSchema(dcSchema);
         }
 
@@ -975,18 +998,19 @@ public class XMPUtil {
      *            belong to, which will be used to resolve strings. If the
      *            database is null the strings will not be resolved.
      */
-    public static void writeDocumentInformation(PDDocument document,
-            BibtexEntry entry, BibtexDatabase database) {
+    private static void writeDocumentInformation(PDDocument document,
+                                                 BibtexEntry entry, BibtexDatabase database) {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
-        if (database != null)
+        if (database != null) {
             entry = database.resolveForStrings(entry, false);
+        }
 
         // Query privacy filter settings
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         boolean useXmpPrivacyFilter =
-                prefs.getBoolean("useXmpPrivacyFilter");
+                prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
         TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
@@ -1060,8 +1084,9 @@ public class XMPUtil {
             Collection<BibtexEntry> bibtexEntries, BibtexDatabase database,
             boolean writePDFInfo) throws IOException, TransformerException {
 
-        if (database != null)
+        if (database != null) {
             bibtexEntries = database.resolveForStrings(bibtexEntries, false);
+        }
 
         PDDocument document = null;
 
@@ -1072,10 +1097,10 @@ public class XMPUtil {
                         "Error: Cannot add metadata to encrypted document.");
             }
 
-            if (writePDFInfo && bibtexEntries.size() == 1) {
-                writeDocumentInformation(document, bibtexEntries
+            if (writePDFInfo && (bibtexEntries.size() == 1)) {
+                XMPUtil.writeDocumentInformation(document, bibtexEntries
                         .iterator().next(), null);
-                writeDublinCore(document, bibtexEntries, null);
+                XMPUtil.writeDublinCore(document, bibtexEntries, null);
             }
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1132,7 +1157,7 @@ public class XMPUtil {
      * 
      * @see XMPUtil#main(String[])
      */
-    protected static void usage() {
+    private static void usage() {
         System.out.println("Read or write XMP-metadata from or to pdf file.");
         System.out.println("");
         System.out.println("Usage:");
@@ -1184,7 +1209,7 @@ public class XMPUtil {
 
         switch (args.length) {
         case 0:
-            usage();
+            XMPUtil.usage();
             break;
         case 1: {
 
@@ -1208,7 +1233,7 @@ public class XMPUtil {
                 Collection<BibtexEntry> entries = result.getDatabase()
                         .getEntries();
 
-                if (entries.size() == 0) {
+                if (entries.isEmpty()) {
                     System.err.println("Could not find BibtexEntry in "
                             + args[0]);
                 } else {
@@ -1217,7 +1242,7 @@ public class XMPUtil {
                 }
 
             } else {
-                usage();
+                XMPUtil.usage();
             }
             break;
         }
@@ -1242,7 +1267,7 @@ public class XMPUtil {
                 Collection<BibtexEntry> entries = result.getDatabase()
                         .getEntries();
 
-                if (entries.size() == 0) {
+                if (entries.isEmpty()) {
                     System.err.println("Could not find BibtexEntry in "
                             + args[0]);
                 } else {
@@ -1253,12 +1278,12 @@ public class XMPUtil {
                 break;
             }
 
-            usage();
+            XMPUtil.usage();
             break;
         }
         case 3: {
             if (!args[1].endsWith(".bib") && !args[2].endsWith(".pdf")) {
-                usage();
+                XMPUtil.usage();
                 break;
             }
 
@@ -1278,7 +1303,7 @@ public class XMPUtil {
         }
 
         default:
-            usage();
+            XMPUtil.usage();
         }
     }
 
@@ -1296,7 +1321,7 @@ public class XMPUtil {
     public static boolean hasMetadata(InputStream is) {
         try {
             List<BibtexEntry> l = XMPUtil.readXMP(is);
-            return l.size() > 0;
+            return !l.isEmpty();
         } catch (Exception e) {
             return false;
         }

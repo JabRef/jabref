@@ -27,23 +27,27 @@ import java.awt.event.FocusListener;
  * Time: 18:20:14
  * To change this template use File | Settings | File Templates.
  */
-public class FieldEditorFocusListener implements FocusListener {
+class FieldEditorFocusListener implements FocusListener {
 
     public FieldEditorFocusListener() {
     }
 
+    @Override
     public void focusGained(FocusEvent event) {
-        if (event.getSource() instanceof FieldEditor)
+        if (event.getSource() instanceof FieldEditor) {
             ((FieldEditor) event.getSource()).setActiveBackgroundColor();
-        else
+        } else {
             ((JComponent) event.getSource()).setBackground(GUIGlobals.activeBackground);
+        }
     }
 
+    @Override
     public void focusLost(FocusEvent event) {
-        if (event.getSource() instanceof FieldEditor)
+        if (event.getSource() instanceof FieldEditor) {
             ((FieldEditor) event.getSource()).setValidBackgroundColor();
-        else
+        } else {
             ((JComponent) event.getSource()).setBackground(GUIGlobals.validFieldBackgroundColor);
+        }
     }
 
 }

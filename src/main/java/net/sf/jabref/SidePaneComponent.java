@@ -24,32 +24,34 @@ import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
-import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
+import org.jdesktop.swingx.JXTitledPanel;
 
-public abstract class SidePaneComponent extends SimpleInternalFrame {
+public abstract class SidePaneComponent extends JXTitledPanel {
 
-    protected JButton close = new JButton(GUIGlobals.getImage("close"));
-    protected JButton up = new JButton(GUIGlobals.getImage("up"));
-    protected JButton down = new JButton(GUIGlobals.getImage("down"));
+    private static final long serialVersionUID = 1L;
 
-    protected boolean visible = false;
+    protected final JButton close = new JButton(GUIGlobals.getImage("close"));
 
-    protected SidePaneManager manager;
+    private boolean visible = false;
+
+    private final SidePaneManager manager;
 
     protected BasePanel panel = null;
 
 
     public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
-        super(new ImageIcon(icon), title);
+        super(title);
+        this.add(new JLabel(new ImageIcon(icon)));
         this.manager = manager;
-        setSelected(true);
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));
-        // tlb.setOpaque(false);
         close.setBorder(null);
+        JButton up = new JButton(GUIGlobals.getImage("up"));
         up.setMargin(new Insets(0, 0, 0, 0));
+        JButton down = new JButton(GUIGlobals.getImage("down"));
         down.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
         down.setBorder(null);
@@ -60,24 +62,19 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
         tlb.add(down);
         tlb.add(close);
         close.addActionListener(new CloseButtonListener());
-        setToolBar(tlb);
-        // setBorder(BorderFactory.createEtchedBorder());
+        this.getUI().getTitleBar().add(tlb);
         setBorder(BorderFactory.createEmptyBorder());
-        // setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
-        // setPreferredSize(new java.awt.Dimension
-        // (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
-        // Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
     }
 
-    public void hideAway() {
+    void hideAway() {
         manager.hideComponent(this);
     }
 
-    public void moveUp() {
+    private void moveUp() {
         manager.moveUp(this);
     }
 
-    public void moveDown() {
+    private void moveDown() {
         manager.moveDown(this);
     }
 
@@ -106,42 +103,44 @@ public abstract class SidePaneComponent extends SimpleInternalFrame {
     }
 
     /**
-     * Override this method if the component needs to make any changes before it
-     * can close.
+     * Override this method if the component needs to make any changes before it can close.
      */
     public void componentClosing() {
 
     }
 
     /**
-     * Override this method if the component needs to do any actions when
-     * opening.
+     * Override this method if the component needs to do any actions when opening.
      */
     public void componentOpening() {
 
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
     }
 
 
-    class CloseButtonListener implements ActionListener {
+    private class CloseButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             hideAway();
         }
     }
 
-    class UpButtonListener implements ActionListener {
+    private class UpButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveUp();
         }
     }
 
-    class DownButtonListener implements ActionListener {
+    private class DownButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             moveDown();
         }

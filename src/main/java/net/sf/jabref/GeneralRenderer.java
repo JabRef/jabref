@@ -25,7 +25,8 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/extends DefaultTableCellRenderer {
 
-    Color background, selBackground = null;
+    private Color background;
+    private Color selBackground = null;
 
 
     public GeneralRenderer(Color c) {
@@ -59,27 +60,32 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ex
         this.selBackground = sel;
     }
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object o, boolean isSelected,
             boolean hasFocus, int row, int column) {
-        if (selBackground == null)
+        if (selBackground == null) {
             return super.getTableCellRendererComponent(table, o, isSelected, hasFocus, row, column);
-        else {
+        } else {
             Component c = super.getTableCellRendererComponent(table, o, isSelected, hasFocus, row, column);
-            if (isSelected)
+            if (isSelected) {
                 c.setBackground(selBackground);
-            else
+            } else {
                 c.setBackground(background);
+            }
             return c;
         }
     }
 
+    @Override
     public void firePropertyChange(String propertyName, boolean old, boolean newV) {
     }
 
+    @Override
     public void firePropertyChange(String propertyName, Object old, Object newV) {
     }
 
     /* For enabling the renderer to handle icons. */
+    @Override
     protected void setValue(Object value) {
         //System.out.println(""+value);
         if (value instanceof Icon) {
@@ -91,17 +97,19 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ex
             setIcon(lab.getIcon());
             //table.setToolTipText(lab.getToolTipText());
             setToolTipText(lab.getToolTipText());
-            if (lab.getIcon() != null)
+            if (lab.getIcon() != null) {
                 setText(null);
+            }
         } else {
 
             setIcon(null);
             //table.setToolTipText(null);
             setToolTipText(null);
-            if (value != null)
+            if (value != null) {
                 setText(value.toString());
-            else
+            } else {
                 setText(null);
+            }
         }
     }
 

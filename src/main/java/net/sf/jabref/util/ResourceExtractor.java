@@ -37,9 +37,9 @@ import net.sf.jabref.net.URLDownload;
  */
 public class ResourceExtractor implements Worker {
 
-    final URL resource;
-    final Component parent;
-    final File destination;
+    private final URL resource;
+    private final Component parent;
+    private final File destination;
 
 
     /** Creates a new instance of ResourceExtractor */
@@ -50,6 +50,7 @@ public class ResourceExtractor implements Worker {
         this.destination = destination;
     }
 
+    @Override
     public void run() {
         URLDownload ud = URLDownload.buildMonitoredDownload(parent, resource);
         try {

@@ -25,18 +25,14 @@ import net.sf.jabref.Globals;
 public class SaveException extends Exception
 {
 
-    //~ Instance fields ////////////////////////////////////////////////////////
-
     public static final SaveException FILE_LOCKED = new SaveException
             (Globals.lang("Could not save, file locked by another JabRef instance."));
     public static final SaveException BACKUP_CREATION = new SaveException
             (Globals.lang("Unable to create backup"));
 
-    private BibtexEntry entry;
+    private final BibtexEntry entry;
     private int status = 0;
 
-
-    //~ Constructors ///////////////////////////////////////////////////////////
 
     public SaveException(String message)
     {
@@ -57,8 +53,6 @@ public class SaveException extends Exception
         this.entry = entry;
     }
 
-    //~ Methods ////////////////////////////////////////////////////////////////
-
     public int getStatus() {
         return status;
     }
@@ -73,6 +67,3 @@ public class SaveException extends Exception
         return (entry != null);
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

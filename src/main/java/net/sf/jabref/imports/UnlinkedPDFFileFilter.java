@@ -30,9 +30,11 @@ public class UnlinkedPDFFileFilter implements FileFilter {
         this.lookup = new DatabaseFileLookup(database);
     }
 
+    @Override
     public boolean accept(File pathname) {
-        if (fileFilter.accept(pathname))
+        if (fileFilter.accept(pathname)) {
             return !lookup.lookupDatabase(pathname);
+        }
         return false;
     }
 }

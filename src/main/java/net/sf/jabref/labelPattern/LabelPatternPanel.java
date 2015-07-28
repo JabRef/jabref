@@ -35,27 +35,24 @@ import javax.swing.JTextField;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 
 public class LabelPatternPanel extends JPanel {
 
     // used by both LabelPatternPanel and TabLabelPAttern
-    protected GridBagLayout gbl = new GridBagLayout();
-    protected GridBagConstraints con = new GridBagConstraints();
+    protected final GridBagLayout gbl = new GridBagLayout();
+    protected final GridBagConstraints con = new GridBagConstraints();
 
-    private HelpAction help;
-
-    private JButton btnDefaultAll, btnDefault;
-
-    private JLabel lblEntryType, lblKeyPattern;
+    private final HelpAction help;
 
     // default pattern
-    protected JTextField defaultPat = new JTextField();
+    protected final JTextField defaultPat = new JTextField();
 
     // one field for each type
-    private HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
+    private final HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {
@@ -71,7 +68,7 @@ public class LabelPatternPanel extends JPanel {
         pan.setLayout(gbl);
         setLayout(gbl);
         // The header - can be removed
-        lblEntryType = new JLabel(Globals.lang("Entry type"));
+        JLabel lblEntryType = new JLabel(Globals.lang("Entry type"));
         Font f = new Font("plain", Font.BOLD, 12);
         lblEntryType.setFont(f);
         con.gridx = 0;
@@ -84,7 +81,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(lblEntryType, con);
         pan.add(lblEntryType);
 
-        lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
+        JLabel lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
         lblKeyPattern.setFont(f);
         con.gridx = 1;
         con.gridy = 0;
@@ -105,11 +102,12 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(defaultPat, con);
         pan.add(defaultPat);
         con.insets = new Insets(5, 5, 10, 5);
-        btnDefault = new JButton(Globals.lang("Default"));
+        JButton btnDefault = new JButton(Globals.lang("Default"));
         btnDefault.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
-                defaultPat.setText((String) Globals.prefs.defaults.get("defaultLabelPattern"));
+                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
             }
         });
         con.gridx = 2;
@@ -148,7 +146,7 @@ public class LabelPatternPanel extends JPanel {
         hlb.addActionListener(help);
 
         // And finally a button to reset everything
-        btnDefaultAll = new JButton(Globals.lang("Reset all"));
+        JButton btnDefaultAll = new JButton(Globals.lang("Reset all"));
         con.gridx = 2;
         con.gridy = 2;
 
@@ -169,7 +167,7 @@ public class LabelPatternPanel extends JPanel {
                 }
 
                 // also reset the default pattern
-                defaultPat.setText((String) Globals.prefs.defaults.get("defaultLabelPattern"));
+                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
             }
         });
         add(btnDefaultAll);
@@ -177,7 +175,7 @@ public class LabelPatternPanel extends JPanel {
 
     private JTextField addEntryType(Container c, String name, int y) {
 
-        JLabel lab = new JLabel(Util.nCase(name));
+        JLabel lab = new JLabel(StringUtil.nCase(name));
         name = name.toLowerCase();
         con.gridx = 0;
         con.gridy = y;
@@ -230,9 +228,10 @@ public class LabelPatternPanel extends JPanel {
 
         // each entry type
         for (String s1 : textFields.keySet()) {
-            String s = s1, text = textFields.get(s).getText();
-            if (!"".equals(text.trim()))
-                keypatterns.addLabelPattern(s, text);
+            String text = textFields.get(s1).getText();
+            if (!"".equals(text.trim())) {
+                keypatterns.addLabelPattern(s1, text);
+            }
         }
 
         // default value
@@ -263,9 +262,9 @@ public class LabelPatternPanel extends JPanel {
     }
 
     private void setValue(JTextField tf, String fieldName, LabelPattern keypatterns) {
-        if (keypatterns.isDefaultValue(fieldName))
+        if (keypatterns.isDefaultValue(fieldName)) {
             tf.setText("");
-        else {
+        } else {
             //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
             tf.setText(keypatterns.getValue(fieldName).get(0));
         }

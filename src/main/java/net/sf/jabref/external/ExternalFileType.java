@@ -26,9 +26,13 @@ import net.sf.jabref.GUIGlobals;
  */
 public class ExternalFileType implements Comparable<ExternalFileType> {
 
-    protected String name, extension, openWith, iconName, mimeType;
-    protected ImageIcon icon;
-    protected JLabel label = new JLabel();
+    private String name;
+    String extension;
+    private String openWith;
+    private String iconName;
+    private String mimeType;
+    private ImageIcon icon;
+    private final JLabel label = new JLabel();
 
 
     public ExternalFileType(String name, String extension, String mimeType,
@@ -56,8 +60,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @param val Constructor arguments.
      */
     public ExternalFileType(String[] val) {
-        if ((val == null) || (val.length < 4))
+        if ((val == null) || (val.length < 4)) {
             throw new IllegalArgumentException("Cannot contruct ExternalFileType without four elements in String[] argument.");
+        }
         this.name = val[0];
         label.setToolTipText(this.name);
         this.extension = val[1];
@@ -173,10 +178,12 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         this.icon = icon;
     }
 
+    @Override
     public String toString() {
         return getName();
     }
 
+    @Override
     public int compareTo(ExternalFileType o) {
         return getName().compareTo(o.getName());
     }
@@ -185,6 +192,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return new ExternalFileType(name, extension, mimeType, openWith, iconName);
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
@@ -196,10 +204,12 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @param object The file type to compare with.
      * @return true if the file types are equal.
      */
+    @Override
     public boolean equals(Object object) {
         ExternalFileType other = (ExternalFileType) object;
-        if (other == null)
+        if (other == null) {
             return false;
+        }
         return (name == null ? other.name == null : name.equals(other.name))
                 && (extension == null ? other.extension == null : extension.equals(other.extension))
                 && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))

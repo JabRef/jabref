@@ -23,8 +23,8 @@ import net.sf.jabref.JabRefFrame;
 
 public class SpecialFieldMenuAction extends AbstractAction {
 
-    private JabRefFrame frame;
-    private String actionName;
+    private final JabRefFrame frame;
+    private final String actionName;
 
 
     public SpecialFieldMenuAction(SpecialFieldValue val, JabRefFrame frame) {
@@ -33,6 +33,7 @@ public class SpecialFieldMenuAction extends AbstractAction {
         this.actionName = val.getActionName();
     }
 
+    @Override
     public void actionPerformed(ActionEvent evt) {
         frame.basePanel().runCommand(actionName);
     }

@@ -30,21 +30,22 @@ import net.sf.jabref.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class HelpContent extends JTextPane {
+class HelpContent extends JTextPane {
 
-    static Log log = LogFactory.getLog(HelpContent.class);
+    private static final Log log = LogFactory.getLog(HelpContent.class);
 
-    JScrollPane pane;
+    private final JScrollPane pane;
 
-    private Stack<URL> history, forw;
+    private final Stack<URL> history;
+    private final Stack<URL> forw;
 
-    JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
 
 
     public HelpContent(JabRefPreferences prefs_) {
         super();
-        pane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setDoubleBuffered(true);
         prefs = prefs_;
         history = new Stack<URL>();
@@ -57,6 +58,7 @@ public class HelpContent extends JTextPane {
         // Handles Anchors
         final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(final HyperlinkEvent e) {
                 if (e.getDescription().startsWith("#")) {
                     scrollToReference(e.getDescription().substring(1));
@@ -104,9 +106,11 @@ public class HelpContent extends JTextPane {
             reference = "";
         }
 
-        String middle = prefs.get("language") + "/";
+        String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
         if (middle.equals("en/"))
+         {
             middle = ""; // english in base help dir.
+        }
 
         URL old = getPage();
         try {
@@ -121,24 +125,26 @@ public class HelpContent extends JTextPane {
             // If still not available print a warning
             if (resource == null) {
                 // TODO show warning to user
-                log.error("Could not find html-help for file '" + file + "'.");
+                HelpContent.log.error("Could not find html-help for file '" + file + "'.");
                 return;
             }
-            setPageOnly(new URL(resource.toString() + "#" + reference));
+            setPageOnly(new URL(resource.toString() + '#' + reference));
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         forw.removeAllElements();
-        if (old != null)
+        if (old != null) {
             history.push(old);
+        }
 
     }
 
     /**
      * Convenience method for setPage(String)
      */
+    @Override
     public void setPage(URL url) {
         File f = new File(url.getPath());
         setPage(f.getName(), JabRef.class);
@@ -151,7 +157,7 @@ public class HelpContent extends JTextPane {
             if (url == null) {
                 System.out.println("Error: Help file not set");
             } else {
-                System.out.println("Error: Help file not found '" + url.getFile() + "'");
+                System.out.println("Error: Help file not found '" + url.getFile() + '\'');
             }
         }
     }

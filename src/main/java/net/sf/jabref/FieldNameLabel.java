@@ -15,19 +15,19 @@
 */
 package net.sf.jabref;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class FieldNameLabel extends JLabel {
 
     public FieldNameLabel(String name) {
-        super(name, JLabel.LEFT);
-        setVerticalAlignment(TOP);
+        super(name, SwingConstants.LEFT);
+        setVerticalAlignment(SwingConstants.TOP);
         //setFont(GUIGlobals.fieldNameFont);
         setForeground(GUIGlobals.entryEditorLabelColor);
         //  setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));
@@ -35,6 +35,7 @@ public class FieldNameLabel extends JLabel {
         setBorder(BorderFactory.createEmptyBorder());
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

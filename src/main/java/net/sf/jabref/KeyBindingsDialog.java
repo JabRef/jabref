@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.util.Util;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -56,17 +58,17 @@ class KeyBindingsDialog extends JDialog {
 
     // displays the key binding of the currently selected entry
     // currently not displayed as it does not get updated
-    private JTextField keyTF = new JTextField();
+    private final JTextField keyTF = new JTextField();
 
-    private JButton ok;
-    private JButton cancel;
-    private JButton defB;
+    private final JButton ok;
+    private final JButton cancel;
+    private final JButton defB;
 
     // stores the user-selected key bindings
     private final HashMap<String, String> bindHM;
 
     // stores default key bindings
-    private HashMap<String, String> defBinds;
+    private final HashMap<String, String> defBinds;
 
     private boolean clickedSave = false;
 
@@ -120,6 +122,7 @@ class KeyBindingsDialog extends JDialog {
 
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 clickedSave = false;
                 dispose();
@@ -153,11 +156,13 @@ class KeyBindingsDialog extends JDialog {
     private class JBM_CustomKeyBindingsListener
             extends KeyAdapter {
 
+        @Override
         public void keyPressed(KeyEvent evt) {
             // first check if anything is selected if not the return
             int selRow = table.getSelectedRow();
-            if (selRow < 0)
+            if (selRow < 0) {
                 return;
+            }
 
             String code = KeyEvent.getKeyText(evt.getKeyCode());
             String mod = KeyEvent.getKeyModifiersText(evt.getModifiers());
@@ -214,6 +219,7 @@ class KeyBindingsDialog extends JDialog {
             implements ListSelectionListener {
 
         // This method is called each time the user changes the set of selected items
+        @Override
         public void valueChanged(ListSelectionEvent evt) {
             // When the user release the mouse button and completes the selection,
             // getValueIsAdjusting() becomes false
@@ -248,8 +254,9 @@ class KeyBindingsDialog extends JDialog {
             //listModel.addElement(s + " (" + bindHM.get(s) + ")");
         }
         TreeMap<String, String[]> sorted = new TreeMap<String, String[]>();
-        for (i = 0; i < tableData.length; i++)
+        for (i = 0; i < tableData.length; i++) {
             sorted.put(tableData[i][0], tableData[i]);
+        }
 
         KeystrokeTableModel tableModel = new KeystrokeTableModel(sorted);
         table.setModel(tableModel);
@@ -270,6 +277,7 @@ class KeyBindingsDialog extends JDialog {
             super();
         }
 
+        @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
@@ -282,7 +290,7 @@ class KeyBindingsDialog extends JDialog {
     @SuppressWarnings("serial")
     private class KeystrokeTableModel extends AbstractTableModel {
 
-        String[][] data;
+        final String[][] data;
 
 
         //String[] trData;
@@ -297,22 +305,27 @@ class KeyBindingsDialog extends JDialog {
             //  trData[i] = Globals.lang(data[i][0]);
         }
 
+        @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
 
+        @Override
         public String getColumnName(int col) {
             return (col == 0 ? Globals.lang("Action") : Globals.lang("Shortcut"));
         }
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public int getRowCount() {
             return data.length;
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             //if (columnIndex == 0)
             return data[rowIndex][columnIndex];
@@ -320,6 +333,7 @@ class KeyBindingsDialog extends JDialog {
             //return data[rowIndex][0];
         }
 
+        @Override
         public void setValueAt(Object o, int row, int col) {
             data[row][col] = (String) o;
         }
@@ -330,6 +344,7 @@ class KeyBindingsDialog extends JDialog {
     private void setButtons() {
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // save all the key bindings
                 dispose();
@@ -339,6 +354,7 @@ class KeyBindingsDialog extends JDialog {
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 clickedSave = false;
@@ -346,6 +362,7 @@ class KeyBindingsDialog extends JDialog {
         });
         defB.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 int[] selected = table.getSelectedRows();
                 if (selected.length == 0) {

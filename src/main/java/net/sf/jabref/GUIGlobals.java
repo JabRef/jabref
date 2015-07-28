@@ -46,21 +46,20 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class GUIGlobals {
 
     // Frame titles.
-    public static String
-            frameTitle = "JabRef",
-            version = Globals.VERSION,
-            stringsTitle = "Strings for database",
-            //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
-            untitledTitle = "untitled",
-            helpTitle = "JabRef help",
-            TYPE_HEADER = "entrytype",
-            NUMBER_COL = "#",
-            encPrefix = "Encoding: "; // Part of the signature in written bib files.
+    public static final String
+            frameTitle = "JabRef";
+    public static final String stringsTitle = "Strings for database";
+    public static final String//untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
+            untitledTitle = "untitled";
+    public static String helpTitle = "JabRef help";
+    public static final String TYPE_HEADER = "entrytype";
+    public static final String NUMBER_COL = "#";
+    public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
-    public static Font CURRENTFONT,
-            typeNameFont,
-            jabRefFont,
-            fieldNameFont;
+    public static Font CURRENTFONT;
+    public static Font typeNameFont;
+    public static Font jabRefFont;
+    private static Font fieldNameFont;
 
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE =
@@ -84,32 +83,33 @@ public class GUIGlobals {
             MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
 
     // File names.
-    public static String //configFile = "preferences.dat",
+    public static final String //configFile = "preferences.dat",
     backupExt = ".bak";
 
     // Image paths.
-    public static String
-            imageSize = "24",
-            extension = ".gif",
-            ex = imageSize + extension,
-            pre = "/images/",
-            helpPre = "/help/",
-            fontPath = "/images/font/";
+    private static final String
+            imageSize = "24";
+    private static final String extension = ".gif";
+    public static String ex = GUIGlobals.imageSize + GUIGlobals.extension;
+    public static String pre = "/images/";
+    public static final String helpPre = "/help/";
+    public static String fontPath = "/images/font/";
 
-    static HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
+    private static final HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
     // further below.
-    public static Color activeEditor = new Color(230, 230, 255);
+    public static final Color activeEditor = new Color(230, 230, 255);
 
-    static HashMap<String, String> iconMap;
+    private static HashMap<String, String> iconMap;
 
 
     public static JLabel getTableIcon(String fieldType) {
-        Object o = tableIcons.get(fieldType);
+        Object o = GUIGlobals.tableIcons.get(fieldType);
         if (o == null) {
             Globals.logger("Error: no table icon defined for type '" + fieldType + "'.");
             return null;
-        } else
+        } else {
             return (JLabel) o;
+        }
     }
 
 
@@ -147,25 +147,25 @@ public class GUIGlobals {
 
     //	Colors.
     public static Color
-            lightGray = new Color(230, 30, 30), // Light gray background
-            entryEditorLabelColor = new Color(100, 100, 150), // Empty field, blue.
-            nullFieldColor = new Color(75, 130, 95), // Valid field, green.
-            gradientGray = new Color(112, 121, 165), // Title bar gradient color, sidepaneheader
-            gradientBlue = new Color(0, 27, 102), // Title bar gradient color, sidepaneheader
-            //activeTabbed = Color.black,  // active Database (JTabbedPane)
+            lightGray = new Color(230, 30, 30); // Light gray background
+            public static final Color entryEditorLabelColor = new Color(100, 100, 150); // Empty field, blue.
+            public static final Color nullFieldColor = new Color(75, 130, 95); // Valid field, green.
+            public static Color gradientGray = new Color(112, 121, 165); // Title bar gradient color, sidepaneheader
+            public static Color gradientBlue = new Color(0, 27, 102); // Title bar gradient color, sidepaneheader
+            public static final Color//activeTabbed = Color.black,  // active Database (JTabbedPane)
             //inActiveTabbed = Color.gray.darker(),  // inactive Database
-            activeTabbed = entryEditorLabelColor.darker(), // active Database (JTabbedPane)
-            inActiveTabbed = Color.black, // inactive Database
-            infoField = new Color(254, 255, 225) // color for an info field
+            activeTabbed = GUIGlobals.entryEditorLabelColor.darker(); // active Database (JTabbedPane)
+            public static final Color inActiveTabbed = Color.black; // inactive Database
+            public static final Color infoField = new Color(254, 255, 225) // color for an info field
             ;
 
     public static Color
             editorTextColor = null, validFieldBackgroundColor = null,
             activeBackground = null, invalidFieldBackgroundColor = null;
 
-    public static String META_FLAG = "jabref-meta: ";
-    public static String META_FLAG_OLD = "bibkeeper-meta: ";
-    public static String ENTRYTYPE_FLAG = "jabref-entrytype: ";
+    public static final String META_FLAG = "jabref-meta: ";
+    public static final String META_FLAG_OLD = "bibkeeper-meta: ";
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
 
     // some fieldname constants
     public static final double
@@ -181,7 +181,7 @@ public class GUIGlobals {
 
     public static final String FILE_FIELD = "file";
 
-    public static final String FOLDER_FIELD = "folder";
+    private static final String FOLDER_FIELD = "folder";
 
     public static final double
             SMALL_W = 0.30,
@@ -191,18 +191,18 @@ public class GUIGlobals {
     public static final double PE_HEIGHT = 2;
 
     //	Size constants for EntryTypeForm; small, medium and large.
-    public static int[] FORM_WIDTH = new int[] {500, 650, 820};
-    public static int[] FORM_HEIGHT = new int[] {90, 110, 130};
+    public static final int[] FORM_WIDTH = new int[] {500, 650, 820};
+    public static final int[] FORM_HEIGHT = new int[] {90, 110, 130};
 
     //	Constants controlling formatted bibtex output.
     public static final int
             INDENT = 4,
             LINE_LENGTH = 65; // Maximum
 
-    public static int DEFAULT_FIELD_LENGTH = 100,
-            NUMBER_COL_LENGTH = 32,
-            WIDTH_ICON_COL_RANKING = 35, // Width of Ranking Icon Column
-            WIDTH_ICON_COL = 19;
+    public static final int DEFAULT_FIELD_LENGTH = 100;
+    public static final int NUMBER_COL_LENGTH = 32;
+    public static final int WIDTH_ICON_COL_RANKING = 35; // Width of Ranking Icon Column
+            public static final int WIDTH_ICON_COL = 19;
 
     // Column widths for export customization dialog table:
     public static final int
@@ -223,33 +223,33 @@ public class GUIGlobals {
         LANGUAGES = new TreeMap<String, String>();
 
         // LANGUAGES contains mappings for supported languages.
-        LANGUAGES.put("English", "en");
-        LANGUAGES.put("Dansk", "da");
-        LANGUAGES.put("Deutsch", "de");
-        LANGUAGES.put("Fran\u00E7ais", "fr");
-        LANGUAGES.put("Italiano", "it");
-        LANGUAGES.put("Japanese", "ja");
-        LANGUAGES.put("Nederlands", "nl");
-        LANGUAGES.put("Norsk", "no");
-        LANGUAGES.put("Español", "es");
+        GUIGlobals.LANGUAGES.put("English", "en");
+        GUIGlobals.LANGUAGES.put("Dansk", "da");
+        GUIGlobals.LANGUAGES.put("Deutsch", "de");
+        GUIGlobals.LANGUAGES.put("Fran\u00E7ais", "fr");
+        GUIGlobals.LANGUAGES.put("Italiano", "it");
+        GUIGlobals.LANGUAGES.put("Japanese", "ja");
+        GUIGlobals.LANGUAGES.put("Nederlands", "nl");
+        GUIGlobals.LANGUAGES.put("Norsk", "no");
+        GUIGlobals.LANGUAGES.put("Español", "es");
         //LANGUAGES.put("Polski", "pl");
-        LANGUAGES.put("Turkish", "tr");
-        LANGUAGES.put("Simplified Chinese", "zh");
-        LANGUAGES.put("Vietnamese", "vi");
-        LANGUAGES.put("Bahasa Indonesia", "in");
-        LANGUAGES.put("Brazilian Portugese", "pt_BR");
-        LANGUAGES.put("Russian", "ru");
+        GUIGlobals.LANGUAGES.put("Turkish", "tr");
+        GUIGlobals.LANGUAGES.put("Simplified Chinese", "zh");
+        GUIGlobals.LANGUAGES.put("Vietnamese", "vi");
+        GUIGlobals.LANGUAGES.put("Bahasa Indonesia", "in");
+        GUIGlobals.LANGUAGES.put("Brazilian Portugese", "pt_BR");
+        GUIGlobals.LANGUAGES.put("Russian", "ru");
 
         // Set up entry editor colors, first time:
-        updateEntryEditorColors();
+        GUIGlobals.updateEntryEditorColors();
     }
 
 
     public static void updateEntryEditorColors() {
-        activeBackground = JabRefPreferences.getInstance().getColor("activeFieldEditorBackgroundColor");
-        validFieldBackgroundColor = JabRefPreferences.getInstance().getColor("validFieldBackgroundColor");
-        invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor("invalidFieldBackgroundColor");
-        editorTextColor = JabRefPreferences.getInstance().getColor("fieldEditorTextColor");
+        GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
+        GUIGlobals.validFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR);
+        GUIGlobals.invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR);
+        GUIGlobals.editorTextColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR);
     }
 
     /**
@@ -262,9 +262,9 @@ public class GUIGlobals {
         URL defaultResource = GUIGlobals.class.getResource(prefix + "Icons.properties");
         URL resource = defaultResource;
 
-        if (Globals.prefs.getBoolean("useCustomIconTheme")) {
-            String filename = Globals.prefs.get("customIconThemeFile");
-            if (filename != null)
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CUSTOM_ICON_THEME)) {
+            String filename = Globals.prefs.get(JabRefPreferences.CUSTOM_ICON_THEME_FILE);
+            if (filename != null) {
                 try {
                     File file = new File(filename);
                     String parent = file.getParentFile().getAbsolutePath();
@@ -273,19 +273,21 @@ public class GUIGlobals {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
+            }
         }
         try {
-            iconMap = readIconThemeFile(resource, prefix);
+            GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(resource, prefix);
         } catch (IOException e) {
             System.err.println(Globals.lang("Unable to read icon theme file") + " '" +
-                    resource.toString() + "'");
+                    resource.toString() + '\'');
             // If we were trying to load a custom theme, try the default one as a fallback:
-            if (resource != defaultResource)
+            if (resource != defaultResource) {
                 try {
-                    iconMap = readIconThemeFile(defaultResource, defaultPrefix);
+                    GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(defaultResource, defaultPrefix);
                 } catch (IOException e2) {
                     System.err.println(Globals.lang("Unable to read default icon theme."));
                 }
+            }
 
         }
 
@@ -298,21 +300,23 @@ public class GUIGlobals {
      * @return The URL to the actual image to use.
      */
     public static URL getIconUrl(String name) {
-        if (iconMap.containsKey(name)) {
-            String path = iconMap.get(name);
+        if (GUIGlobals.iconMap.containsKey(name)) {
+            String path = GUIGlobals.iconMap.get(name);
             URL url = GUIGlobals.class.getResource(path);
-            if (url == null)
+            if (url == null) {
                 // This may be a resource outside of the jar file, so we try a general URL:
                 try {
                     url = new URL(path);
                 } catch (MalformedURLException ignored) {
                 }
-            if (url == null)
-                System.err.println(Globals.lang("Could not find image file") + " '" + path + "'");
+            }
+            if (url == null) {
+                System.err.println(Globals.lang("Could not find image file") + " '" + path + '\'');
+            }
             return url;
-        }
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -322,8 +326,8 @@ public class GUIGlobals {
      * @return The ImageIcon for the function.
      */
     public static ImageIcon getImage(String name) {
-        URL u = getIconUrl(name);
-        return u != null ? new ImageIcon(getIconUrl(name)) : null;
+        URL u = GUIGlobals.getIconUrl(name);
+        return u != null ? new ImageIcon(GUIGlobals.getIconUrl(name)) : null;
     }
 
     /**
@@ -331,7 +335,7 @@ public class GUIGlobals {
      * @return A Map containing all icons used in the application.
      */
     public static Map<String, String> getAllIcons() {
-        return Collections.unmodifiableMap(iconMap);
+        return Collections.unmodifiableMap(GUIGlobals.iconMap);
     }
 
     /**
@@ -349,10 +353,11 @@ public class GUIGlobals {
         InputStream in = null;
         try {
             in = file.openStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             int c;
-            while ((c = in.read()) != -1)
+            while ((c = in.read()) != -1) {
                 buffer.append((char) c);
+            }
             String[] lines = buffer.toString().split("\n");
             for (String line1 : lines) {
                 String line = line1.trim();
@@ -365,8 +370,9 @@ public class GUIGlobals {
             }
         } finally {
             try {
-                if (in != null)
+                if (in != null) {
                     in.close();
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -378,11 +384,13 @@ public class GUIGlobals {
     public static String getLocaleHelpPath()
     {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
-        String middle = prefs.get("language") + "/";
+        String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
         if (middle.equals("en/"))
+         {
             middle = ""; // english in base help dir.
+        }
 
-        return (helpPre + middle);
+        return (GUIGlobals.helpPre + middle);
     }
 
     /**
@@ -391,69 +399,69 @@ public class GUIGlobals {
      * on Un*x is unavailable.
      */
     public static void init() {
-        typeNameFont = new Font("dialog", Font.ITALIC + Font.BOLD, 18);
-        fieldNameFont = new Font("arial", Font.ITALIC + Font.BOLD, 14);
+        GUIGlobals.typeNameFont = new Font("dialog", Font.ITALIC + Font.BOLD, 18);
+        GUIGlobals.fieldNameFont = new Font("arial", Font.ITALIC + Font.BOLD, 14);
         JLabel lab;
-        lab = new JLabel(getImage("pdfSmall"));
+        lab = new JLabel(GUIGlobals.getImage("pdfSmall"));
         lab.setToolTipText(Globals.lang("Open") + " PDF");
-        tableIcons.put("pdf", lab);
-        lab = new JLabel(getImage("wwwSmall"));
+        GUIGlobals.tableIcons.put("pdf", lab);
+        lab = new JLabel(GUIGlobals.getImage("wwwSmall"));
         lab.setToolTipText(Globals.lang("Open") + " URL");
-        tableIcons.put("url", lab);
-        lab = new JLabel(getImage("citeseer"));
+        GUIGlobals.tableIcons.put("url", lab);
+        lab = new JLabel(GUIGlobals.getImage("citeseer"));
         lab.setToolTipText(Globals.lang("Open") + " CiteSeer URL");
-        tableIcons.put("citeseerurl", lab);
-        lab = new JLabel(getImage("arxiv"));
+        GUIGlobals.tableIcons.put("citeseerurl", lab);
+        lab = new JLabel(GUIGlobals.getImage("arxiv"));
         lab.setToolTipText(Globals.lang("Open") + " ArXiv URL");
-        tableIcons.put("eprint", lab);
-        lab = new JLabel(getImage("doiSmall"));
+        GUIGlobals.tableIcons.put("eprint", lab);
+        lab = new JLabel(GUIGlobals.getImage("doiSmall"));
         lab.setToolTipText(Globals.lang("Open") + " DOI " + Globals.lang("web link"));
-        tableIcons.put("doi", lab);
-        lab = new JLabel(getImage("psSmall"));
+        GUIGlobals.tableIcons.put("doi", lab);
+        lab = new JLabel(GUIGlobals.getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open") + " PS");
-        tableIcons.put("ps", lab);
-        lab = new JLabel(getImage("psSmall"));
+        GUIGlobals.tableIcons.put("ps", lab);
+        lab = new JLabel(GUIGlobals.getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open folder"));
-        tableIcons.put(GUIGlobals.FOLDER_FIELD, lab);
-        lab = new JLabel(getImage("psSmall"));
+        GUIGlobals.tableIcons.put(GUIGlobals.FOLDER_FIELD, lab);
+        lab = new JLabel(GUIGlobals.getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
-        tableIcons.put(GUIGlobals.FILE_FIELD, lab);
+        GUIGlobals.tableIcons.put(GUIGlobals.FILE_FIELD, lab);
 
         for (ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
             lab = new JLabel(fileType.getIcon());
             lab.setToolTipText(Globals.lang("Open " + fileType.getName() + " file"));
-            tableIcons.put(fileType.getName(), lab);
+            GUIGlobals.tableIcons.put(fileType.getName(), lab);
         }
 
         lab = new JLabel(Relevance.getInstance().getRepresentingIcon());
         lab.setToolTipText(Relevance.getInstance().getToolTip());
-        tableIcons.put(SpecialFieldsUtils.FIELDNAME_RELEVANCE, lab);
+        GUIGlobals.tableIcons.put(SpecialFieldsUtils.FIELDNAME_RELEVANCE, lab);
 
         lab = new JLabel(Quality.getInstance().getRepresentingIcon());
         lab.setToolTipText(Quality.getInstance().getToolTip());
         //tableIcons.put("quality", lab);
-        tableIcons.put(SpecialFieldsUtils.FIELDNAME_QUALITY, lab);
+        GUIGlobals.tableIcons.put(SpecialFieldsUtils.FIELDNAME_QUALITY, lab);
 
         // Ranking item in the menu uses one star
         lab = new JLabel(Rank.getInstance().getRepresentingIcon());
         lab.setToolTipText(Rank.getInstance().getToolTip());
         //        lab.setName("0");
-        tableIcons.put(SpecialFieldsUtils.FIELDNAME_RANKING, lab);
+        GUIGlobals.tableIcons.put(SpecialFieldsUtils.FIELDNAME_RANKING, lab);
 
         // Priority icon used for the menu
         lab = new JLabel(Priority.getInstance().getRepresentingIcon());
         lab.setToolTipText(Rank.getInstance().getToolTip());
-        tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, lab);
+        GUIGlobals.tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, lab);
 
         // Read icon used for menu
         lab = new JLabel(ReadStatus.getInstance().getRepresentingIcon());
         lab.setToolTipText(ReadStatus.getInstance().getToolTip());
-        tableIcons.put(SpecialFieldsUtils.FIELDNAME_READ, lab);
+        GUIGlobals.tableIcons.put(SpecialFieldsUtils.FIELDNAME_READ, lab);
 
         // Print icon used for menu
         lab = new JLabel(Printed.getInstance().getRepresentingIcon());
         lab.setToolTipText(Printed.getInstance().getToolTip());
-        tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRINTED, lab);
+        GUIGlobals.tableIcons.put(SpecialFieldsUtils.FIELDNAME_PRINTED, lab);
 
         //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20); 
 

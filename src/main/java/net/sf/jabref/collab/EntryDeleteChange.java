@@ -22,13 +22,12 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 
-public class EntryDeleteChange extends Change {
+class EntryDeleteChange extends Change {
 
-    BibtexEntry memEntry, tmpEntry, diskEntry;
-    boolean isModifiedLocally;
-    double matchWithTmp;
-    PreviewPanel pp;
-    JScrollPane sp;
+    private final BibtexEntry memEntry;
+    private final BibtexEntry tmpEntry;
+    BibtexEntry diskEntry;
+    private final JScrollPane sp;
 
 
     public EntryDeleteChange(BibtexEntry memEntry, BibtexEntry tmpEntry) {
@@ -38,18 +37,19 @@ public class EntryDeleteChange extends Change {
 
         // Compare the deleted entry in memory with the one in the tmpfile. The
         // entry could have been removed in memory.
-        matchWithTmp = DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry);
+        double matchWithTmp = DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry);
 
         // Check if it has been modified locally, since last tempfile was saved.
-        isModifiedLocally = !(matchWithTmp > 1);
+        boolean isModifiedLocally = !(matchWithTmp > 1);
 
         //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
         //        +" Modifications agree: "+modificationsAgree);
 
-        pp = new PreviewPanel(null, memEntry, null, new MetaData(), Globals.prefs.get("preview0"));
+        PreviewPanel pp = new PreviewPanel(null, memEntry, null, new MetaData(), Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
         panel.database().removeEntry(memEntry.getId());
         undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
@@ -57,6 +57,7 @@ public class EntryDeleteChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

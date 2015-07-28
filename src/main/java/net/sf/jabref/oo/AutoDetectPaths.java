@@ -35,10 +35,10 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
-    boolean foundPaths = false;
-    boolean fileSearchCancelled = false;
-    JDialog prog;
-    private JDialog parent;
+    private boolean foundPaths = false;
+    private boolean fileSearchCancelled = false;
+    private JDialog prog;
+    private final JDialog parent;
 
 
     public AutoDetectPaths(JDialog parent) {
@@ -47,8 +47,9 @@ public class AutoDetectPaths extends AbstractWorker {
 
     public boolean runAutodetection() {
         try {
-            if (checkAutoDetectedPaths())
+            if (AutoDetectPaths.checkAutoDetectedPaths()) {
                 return true;
+            }
             init();
             getWorker().run();
             update();
@@ -59,6 +60,7 @@ public class AutoDetectPaths extends AbstractWorker {
         }
     }
 
+    @Override
     public void run() {
         foundPaths = autoDetectPaths();
     }
@@ -71,26 +73,30 @@ public class AutoDetectPaths extends AbstractWorker {
         return fileSearchCancelled;
     }
 
+    @Override
     public void init() throws Throwable {
         prog = showProgressDialog(parent, Globals.lang("Autodetecting paths..."),
                 Globals.lang("Please wait..."), true);
     }
 
+    @Override
     public void update() {
         prog.dispose();
     }
 
-    public boolean autoDetectPaths() {
+    private boolean autoDetectPaths() {
 
         if (Globals.ON_WIN) {
-            List<File> progFiles = findProgramFilesDir();
+            List<File> progFiles = AutoDetectPaths.findProgramFilesDir();
             File sOffice = null;
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             for (File dir : progFiles) {
                 sOffice = findFileDir(dir, "soffice.exe");
-                if (sOffice != null)
+                if (sOffice != null) {
                     break;
+                }
             }
             if (sOffice == null) {
                 JOptionPane.showMessageDialog(parent, Globals.lang("Unable to autodetect OpenOffice installation. Please choose the installation directory manually."),
@@ -99,36 +105,42 @@ public class AutoDetectPaths extends AbstractWorker {
                 jfc.setDialogType(JFileChooser.OPEN_DIALOG);
                 jfc.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
+                    @Override
                     public boolean accept(File file) {
                         return file.isDirectory();
                     }
 
+                    @Override
                     public String getDescription() {
                         return Globals.lang("Directories");
                     }
                 });
                 jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 jfc.showOpenDialog(parent);
-                if (jfc.getSelectedFile() != null)
+                if (jfc.getSelectedFile() != null) {
                     sOffice = jfc.getSelectedFile();
+                }
             }
-            if (sOffice == null)
+            if (sOffice == null) {
                 return false;
+            }
 
             Globals.prefs.put("ooExecutablePath", new File(sOffice, "soffice.exe").getPath());
             File unoil = findFileDir(sOffice.getParentFile(), "unoil.jar");
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             File jurt = findFileDir(sOffice.getParentFile(), "jurt.jar");
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             if ((unoil != null) && (jurt != null)) {
                 Globals.prefs.put("ooUnoilPath", unoil.getPath());
                 Globals.prefs.put("ooJurtPath", jurt.getPath());
                 return true;
-            }
-            else
+            } else {
                 return false;
+            }
 
         }
         else if (Globals.ON_MAC) {
@@ -144,48 +156,55 @@ public class AutoDetectPaths extends AbstractWorker {
             //System.out.println("Searching for soffice.bin");
             File sOffice = findFileDir(rootDir, "soffice.bin");
             //System.out.println("Found: "+(sOffice != null ? sOffice.getPath() : "-"));
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             if (sOffice != null) {
                 Globals.prefs.put("ooExecutablePath", new File(sOffice, "soffice.bin").getPath());
                 //System.out.println("Searching for unoil.jar");
                 File unoil = findFileDir(rootDir, "unoil.jar");
                 //System.out.println("Found: "+(unoil != null ? unoil.getPath(): "-"));
-                if (fileSearchCancelled)
+                if (fileSearchCancelled) {
                     return false;
+                }
                 //System.out.println("Searching for jurt.jar");
                 File jurt = findFileDir(rootDir, "jurt.jar");
                 //System.out.println("Found: "+(jurt != null ? jurt.getPath(): "-"));
-                if (fileSearchCancelled)
+                if (fileSearchCancelled) {
                     return false;
+                }
                 if ((unoil != null) && (jurt != null)) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
-                }
-                else
+                } else {
                     return false;
-            }
-            else
+                }
+            } else {
                 return false;
+            }
         }
         else {
             // Linux:
             String usrRoot = "/usr/lib";
             File inUsr = findFileDir(new File("/usr/lib"), "soffice");
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             if (inUsr == null) {
                 inUsr = findFileDir(new File("/usr/lib64"), "soffice");
-                if (inUsr != null)
+                if (inUsr != null) {
                     usrRoot = "/usr/lib64";
+                }
             }
 
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             File inOpt = findFileDir(new File("/opt"), "soffice");
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return false;
+            }
             if ((inUsr != null) && (inOpt == null)) {
                 return setupPreferencesForOO(usrRoot, inUsr);
             }
@@ -197,9 +216,9 @@ public class AutoDetectPaths extends AbstractWorker {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
-                }
-                else
+                } else {
                     return false;
+                }
             }
             else if (inOpt != null) { // Found both
                 JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
@@ -213,9 +232,9 @@ public class AutoDetectPaths extends AbstractWorker {
                 b.append(usrRB);
                 int answer = JOptionPane.showConfirmDialog(null, b.getPanel(), Globals.lang("Choose OpenOffice executable"),
                         JOptionPane.OK_CANCEL_OPTION);
-                if (answer == JOptionPane.CANCEL_OPTION)
+                if (answer == JOptionPane.CANCEL_OPTION) {
                     return false;
-                else {
+                } else {
                     if (optRB.isSelected()) {
                         return setupPreferencesForOO("/opt", inOpt);
                     }
@@ -224,9 +243,9 @@ public class AutoDetectPaths extends AbstractWorker {
                     }
 
                 }
-            }
-            else
+            } else {
                 return false;
+            }
         }
 
     }
@@ -234,18 +253,20 @@ public class AutoDetectPaths extends AbstractWorker {
     private boolean setupPreferencesForOO(String usrRoot, File inUsr) {
         Globals.prefs.put("ooExecutablePath", new File(inUsr, "soffice.bin").getPath());
         File unoil = findFileDir(new File(usrRoot), "unoil.jar");
-        if (fileSearchCancelled)
+        if (fileSearchCancelled) {
             return false;
+        }
         File jurt = findFileDir(new File(usrRoot), "jurt.jar");
-        if (fileSearchCancelled)
+        if (fileSearchCancelled) {
             return false;
+        }
         if ((unoil != null) && (jurt != null)) {
             Globals.prefs.put("ooUnoilPath", unoil.getPath());
             Globals.prefs.put("ooJurtPath", jurt.getPath());
             return true;
-        }
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -259,29 +280,29 @@ public class AutoDetectPaths extends AbstractWorker {
         File root = new File("C:\\");
         File[] dirs = root.listFiles(new FileFilter() {
 
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory();
             }
         });
         for (File dir : dirs) {
-            if (dir.getName().toLowerCase().equals("program files"))
+            if (dir.getName().toLowerCase().equals("program files") || dir.getName().toLowerCase().equals("program files (x86)")) {
                 dirList.add(dir);
-            else if (dir.getName().toLowerCase().equals("program files (x86)"))
-                dirList.add(dir);
+            }
         }
         return dirList;
     }
 
-    public static boolean checkAutoDetectedPaths() {
+    private static boolean checkAutoDetectedPaths() {
 
         if (Globals.prefs.hasKey("ooUnoilPath") && Globals.prefs.hasKey("ooJurtPath")
                 && Globals.prefs.hasKey("ooExecutablePath")) {
             return new File(Globals.prefs.get("ooUnoilPath"), "unoil.jar").exists()
                     && new File(Globals.prefs.get("ooJurtPath"), "jurt.jar").exists()
                     && new File(Globals.prefs.get("ooExecutablePath")).exists();
-        }
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -290,20 +311,24 @@ public class AutoDetectPaths extends AbstractWorker {
      * @param filename The name of the file to search for.
      * @return The directory where the file was first found, or null if not found.
      */
-    public File findFileDir(File startDir, String filename) {
-        if (fileSearchCancelled)
+    private File findFileDir(File startDir, String filename) {
+        if (fileSearchCancelled) {
             return null;
+        }
         File[] files = startDir.listFiles();
-        if (files == null)
+        if (files == null) {
             return null;
+        }
         File result = null;
         for (File file : files) {
-            if (fileSearchCancelled)
+            if (fileSearchCancelled) {
                 return null;
+            }
             if (file.isDirectory()) {
                 result = findFileDir(file, filename);
-                if (result != null)
+                if (result != null) {
                     break;
+                }
             } else if (file.getName().equals(filename)) {
                 result = startDir;
                 break;
@@ -315,10 +340,11 @@ public class AutoDetectPaths extends AbstractWorker {
     public JDialog showProgressDialog(JDialog parent, String title, String message, boolean includeCancelButton) {
         fileSearchCancelled = false;
         final JDialog prog;
-        JProgressBar bar = new JProgressBar(JProgressBar.HORIZONTAL);
+        JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 fileSearchCancelled = true;
                 ((JButton) event.getSource()).setEnabled(false);
@@ -327,8 +353,9 @@ public class AutoDetectPaths extends AbstractWorker {
         prog = new JDialog(parent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         bar.setIndeterminate(true);
-        if (includeCancelButton)
+        if (includeCancelButton) {
             prog.add(cancel, BorderLayout.SOUTH);
+        }
         prog.add(new JLabel(message), BorderLayout.NORTH);
         prog.add(bar, BorderLayout.CENTER);
         prog.pack();

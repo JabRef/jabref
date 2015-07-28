@@ -16,22 +16,21 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * This formatter escapes characters so they are suitable for HTML.
- * 
- * @version $Revision$ ($Date$)
  */
 public class HTMLChars implements LayoutFormatter {
 
+    @Override
     public String format(String field) {
         int i;
         field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{2,}", "<p>")
                 .replaceAll("\\n", "<br>");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
 
         char c;
@@ -56,23 +55,23 @@ public class HTMLChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
                     || (Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c)))) {
                 escaped = false;
 
-                if (!incommand)
+                if (!incommand) {
                     sb.append(c);
-                // Else we are in a command, and should not keep the letter.
-                else {
+                } else {
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
                             && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1)
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
+                        }
 
                         String command = currentCommand.toString();
                         i++;
@@ -80,7 +79,7 @@ public class HTMLChars implements LayoutFormatter {
                         // System.out.println("next: "+(char)c);
                         String combody;
                         if (c == '{') {
-                            String part = Util.getPart(field, i, false);
+                            String part = StringUtil.getPart(field, i, false);
                             i += part.length();
                             combody = part;
                         } else {
@@ -89,14 +88,15 @@ public class HTMLChars implements LayoutFormatter {
                         }
                         Object result = Globals.HTMLCHARS.get(command + combody);
 
-                        if (result != null)
+                        if (result != null) {
                             sb.append((String) result);
+                        }
 
                         incommand = false;
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if (i + 1 == field.length()) {
+                        if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
                             Object result = Globals.HTMLCHARS.get(command);
                             /* If found, then use translated version. If not,
@@ -113,7 +113,7 @@ public class HTMLChars implements LayoutFormatter {
                     }
                 }
             } else {
-                String argument = null;
+                String argument;
 
                 if (!incommand) {
                     sb.append(c);
@@ -128,16 +128,16 @@ public class HTMLChars implements LayoutFormatter {
                     // command.
                     // If so, handle.
                     if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
 
                         i += part.length();
                         sb.append("<em>").append(part).append("</em>");
                     } else if (command.equals("textbf")) {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         sb.append("<b>").append(part).append("</b>");
                     } else if (c == '{') {
-                        String part = Util.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         argument = part;
                         if (argument != null) {

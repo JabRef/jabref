@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2013 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,9 +22,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.autocompleter.AutoCompleterFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
-
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -32,17 +31,29 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
-    private JCheckBox autoOpenForm, showSource,
-            defSource, emacsMode, emacsRebindCtrlA, disableOnMultiple, autoComplete;
-    private JRadioButton autoCompBoth, autoCompFF, autoCompLF,
-            autoCompFirstNameMode_Full, autoCompFirstNameMode_Abbr, autoCompFirstNameMode_Both;
-    boolean oldAutoCompFF, oldAutoCompLF,
-            oldAutoCompFModeAbbr, oldAutoCompFModeFull;
-    private JSpinner shortestToComplete;
+    private final JCheckBox autoOpenForm;
+    private final JCheckBox showSource;
+    private final JCheckBox defSource;
+    private final JCheckBox emacsMode;
+    private final JCheckBox emacsRebindCtrlA;
+    private final JCheckBox emacsRebindCtrlF;
+    private final JCheckBox disableOnMultiple;
+    private final JCheckBox autoComplete;
+    private final JRadioButton autoCompBoth;
+    private final JRadioButton autoCompFF;
+    private final JRadioButton autoCompLF;
+    private final JRadioButton autoCompFirstNameMode_Full;
+    private final JRadioButton autoCompFirstNameMode_Abbr;
+    private final JRadioButton autoCompFirstNameMode_Both;
+    private boolean oldAutoCompFF;
+    private boolean oldAutoCompLF;
+    private boolean oldAutoCompFModeAbbr;
+    private boolean oldAutoCompFModeFull;
+    private final JSpinner shortestToComplete;
 
-    private JTextField autoCompFields;
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
+    private final JTextField autoCompFields;
+    private final JabRefPreferences _prefs;
+    private final JabRefFrame _frame;
 
 
     private void setAutoCompleteElementsEnabled(boolean enabled) {
@@ -66,6 +77,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         showSource = new JCheckBox(Globals.lang("Show BibTeX source panel"));
         emacsMode = new JCheckBox(Globals.lang("Use Emacs key bindings"));
         emacsRebindCtrlA = new JCheckBox(Globals.lang("Rebind C-a, too"));
+        emacsRebindCtrlF = new JCheckBox(Globals.lang("Rebind C-f, too"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
 
@@ -94,6 +106,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // We need a listener on showSource to enable and disable the source panel-related choices:
         showSource.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 defSource.setEnabled(showSource.isSelected());
             }
@@ -104,17 +117,29 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         // We need a listener on showSource to enable and disable the source panel-related choices:
         emacsMode.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
             }
         }
                 );
 
+        emacsRebindCtrlF.setMargin(marg);
+        // We need a listener on showSource to enable and disable the source panel-related choices:
+        emacsMode.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                emacsRebindCtrlF.setEnabled(emacsMode.isSelected());
+            }
+        }
+        );
+
+        
         autoCompFields = new JTextField(40);
         // We need a listener on autoComplete to enable and disable the
         // autoCompFields text field:
         autoComplete.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent event) {
                 setAutoCompleteElementsEnabled(autoComplete.isSelected());
             }
@@ -123,13 +148,13 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
         FormLayout layout = new FormLayout
                 (// columns
-                "8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                // rows  1 to 10
-                        "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
-                                // rows 11 to 20
-                                "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
-                                // rows 21 to 29
-                                "pref, pref, pref, pref, 6dlu, pref, pref, pref, pref");
+                 "8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                 // rows  1 to 10
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
+                 // rows 11 to 20
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
+                 // rows 21 to 31
+                 "pref, 6dlu, pref, pref, pref, pref, 6dlu, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.addSeparator(Globals.lang("Editor options"), cc.xyw(1, 1, 5));
@@ -139,60 +164,66 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(defSource, cc.xy(2, 9));
         builder.add(emacsMode, cc.xy(2, 11));
         builder.add(emacsRebindCtrlA, cc.xy(2, 13));
+        builder.add(emacsRebindCtrlF, cc.xy(2, 15));
+        
+        builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 17, 5));
+        builder.add(autoComplete, cc.xy(2, 19));
+        
+        DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
+        JLabel label = new JLabel(Globals.lang("Use autocompletion for the following fields")+":");
 
-        builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 15, 5));
-        builder.add(autoComplete, cc.xy(2, 17));
-
-        DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu", ""));
-        JLabel label = new JLabel(Globals.lang("Use autocompletion for the following fields") + ":");
         builder3.append(label);
         builder3.append(autoCompFields);
         JLabel label2 = new JLabel(Globals.lang("Autocomplete after following number of characters") + ":");
         builder3.append(label2);
         builder3.append(shortestToComplete);
-        builder.add(builder3.getPanel(), cc.xyw(2, 19, 3));
+        builder.add(builder3.getPanel(), cc.xyw(2, 21, 3));
 
-        builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 21, 4));
-        builder.add(autoCompFF, cc.xy(2, 22));
-        builder.add(autoCompLF, cc.xy(2, 23));
-        builder.add(autoCompBoth, cc.xy(2, 24));
-
-        builder.addSeparator(Globals.lang("Treatment of first names"), cc.xyw(2, 26, 4));
-        builder.add(autoCompFirstNameMode_Abbr, cc.xy(2, 27));
-        builder.add(autoCompFirstNameMode_Full, cc.xy(2, 28));
-        builder.add(autoCompFirstNameMode_Both, cc.xy(2, 29));
-
+        builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 23, 4));
+        builder.add(autoCompFF, cc.xy(2,24));
+        builder.add(autoCompLF, cc.xy(2,25));
+        builder.add(autoCompBoth, cc.xy(2,26));
+        
+        builder.addSeparator(Globals.lang("Treatment of first names"), cc.xyw(2, 28, 4));
+        builder.add(autoCompFirstNameMode_Abbr, cc.xy(2,29));
+        builder.add(autoCompFirstNameMode_Full, cc.xy(2,30));
+        builder.add(autoCompFirstNameMode_Both, cc.xy(2,31));
+        
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
     }
 
+    @Override
     public void setValues() {
-        autoOpenForm.setSelected(_prefs.getBoolean("autoOpenForm"));
-        defSource.setSelected(_prefs.getBoolean("defaultShowSource"));
-        showSource.setSelected(_prefs.getBoolean("showSource"));
+        autoOpenForm.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM));
+        defSource.setSelected(_prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE));
+        showSource.setSelected(_prefs.getBoolean(JabRefPreferences.SHOW_SOURCE));
         emacsMode.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS));
         emacsRebindCtrlA.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
-        disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
-        autoComplete.setSelected(_prefs.getBoolean("autoComplete"));
-        autoCompFields.setText(_prefs.get("autoCompleteFields"));
+        emacsRebindCtrlF.setSelected(_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
+        disableOnMultiple.setSelected(_prefs.getBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION));
+        autoComplete.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
+        autoCompFields.setText(_prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS));
         shortestToComplete.setValue(_prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE));
 
-        if (_prefs.getBoolean("autoCompFF"))
+        if (_prefs.getBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST)) {
             autoCompFF.setSelected(true);
-        else if (_prefs.getBoolean("autoCompLF"))
+        } else if (_prefs.getBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST)) {
             autoCompLF.setSelected(true);
-        else
+        } else {
             autoCompBoth.setSelected(true);
+        }
         oldAutoCompFF = autoCompFF.isSelected();
         oldAutoCompLF = autoCompLF.isSelected();
 
-        if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR))
+        if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR)) {
             autoCompFirstNameMode_Abbr.setSelected(true);
-        else if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL))
+        } else if (_prefs.get(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE).equals(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL)) {
             autoCompFirstNameMode_Full.setSelected(true);
-        else
+        } else {
             autoCompFirstNameMode_Both.setSelected(true);
+        }
         // one field less than the option is enough. If one filed changes, another one also changes.
         oldAutoCompFModeAbbr = autoCompFirstNameMode_Abbr.isSelected();
         oldAutoCompFModeFull = autoCompFirstNameMode_Full.isSelected();
@@ -205,14 +236,17 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         setAutoCompleteElementsEnabled(autoComplete.isSelected());
     }
 
+    @Override
     public void storeSettings() {
-        _prefs.putBoolean("autoOpenForm", autoOpenForm.isSelected());
-        _prefs.putBoolean("defaultShowSource", defSource.isSelected());
+        _prefs.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, autoOpenForm.isSelected());
+        _prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
         boolean emacsModeChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected());
-        boolean emacsRebindCtrlAChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected());
-        if (emacsModeChanged || emacsRebindCtrlAChanged) {
+        boolean emacsRebindCtrlAChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected()); 
+        boolean emacsRebindCtrlFChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF) != emacsRebindCtrlF.isSelected()); 
+        if (emacsModeChanged || emacsRebindCtrlAChanged || emacsRebindCtrlFChanged) {
             _prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, emacsMode.isSelected());
             _prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, emacsRebindCtrlA.isSelected());
+            _prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF, emacsRebindCtrlF.isSelected());
             // immediately apply the change
             if (emacsModeChanged) {
                 if (emacsMode.isSelected()) {
@@ -221,40 +255,41 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                     EmacsKeyBindings.unload();
                 }
             } else {
-                // only rebinding of CTRL+a changed
-                assert (emacsMode.isSelected());
-                // we simply reload the emacs mode to activate the CTRL+a change
+                // only rebinding of CTRL+a or CTRL+f changed
+                assert(emacsMode.isSelected());
+                // we simply reload the emacs mode to activate the CTRL+a/CTRL+f change
                 EmacsKeyBindings.unload();
                 EmacsKeyBindings.load();
             }
         }
-        _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
+        _prefs.putBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION, disableOnMultiple.isSelected());
         // We want to know if the following settings have been modified:
-        boolean oldAutoComplete = _prefs.getBoolean("autoComplete");
-        boolean oldShowSource = _prefs.getBoolean("showSource");
-        String oldAutoCompFields = _prefs.get("autoCompleteFields");
+        boolean oldAutoComplete = _prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE);
+        boolean oldShowSource = _prefs.getBoolean(JabRefPreferences.SHOW_SOURCE);
+        String oldAutoCompFields = _prefs.get(JabRefPreferences.AUTO_COMPLETE_FIELDS);
         _prefs.putInt(JabRefPreferences.SHORTEST_TO_COMPLETE, (Integer) shortestToComplete.getValue());
-        _prefs.putBoolean("autoComplete", autoComplete.isSelected());
-        _prefs.put("autoCompleteFields", autoCompFields.getText());
-        _prefs.putBoolean("showSource", showSource.isSelected());
+        _prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
+        _prefs.put(JabRefPreferences.AUTO_COMPLETE_FIELDS, autoCompFields.getText());
+        _prefs.putBoolean(JabRefPreferences.SHOW_SOURCE, showSource.isSelected());
         if (autoCompBoth.isSelected()) {
-            _prefs.putBoolean("autoCompFF", false);
-            _prefs.putBoolean("autoCompLF", false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
         }
         else if (autoCompFF.isSelected()) {
-            _prefs.putBoolean("autoCompFF", true);
-            _prefs.putBoolean("autoCompLF", false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, true);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, false);
         }
         else {
-            _prefs.putBoolean("autoCompFF", false);
-            _prefs.putBoolean("autoCompLF", true);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_FIRST_LAST, false);
+            _prefs.putBoolean(JabRefPreferences.AUTO_COMP_LAST_FIRST, true);
         }
-        if (autoCompFirstNameMode_Abbr.isSelected())
+        if (autoCompFirstNameMode_Abbr.isSelected()) {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR);
-        else if (autoCompFirstNameMode_Full.isSelected())
+        } else if (autoCompFirstNameMode_Full.isSelected()) {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL);
-        else
+        } else {
             _prefs.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        }
 
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
@@ -269,13 +304,15 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             }
         }
         // the autocompleter has to be updated to the new min length to complete 
-        AbstractAutoCompleter.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
+        AutoCompleterFactory.SHORTEST_TO_COMPLETE = (Integer) shortestToComplete.getValue();
     }
 
+    @Override
     public boolean readyToClose() {
         return true;
     }
 
+    @Override
     public String getTabName() {
         return Globals.lang("Entry editor");
     }

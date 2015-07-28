@@ -44,6 +44,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 
 /**
  * Created by Morten O. Alver 2007.02.22
@@ -53,16 +55,16 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private static final Logger logger = Logger.getLogger(FileListEditor.class.getName());
 
-    FieldNameLabel label;
-    FileListEntryEditor editor = null;
-    private JabRefFrame frame;
-    private MetaData metaData;
-    private String fieldName;
-    private EntryEditor entryEditor;
-    private JPanel panel;
-    private FileListTableModel tableModel;
-    private JButton auto;
-    private JPopupMenu menu = new JPopupMenu();
+    private final FieldNameLabel label;
+    private FileListEntryEditor editor = null;
+    private final JabRefFrame frame;
+    private final MetaData metaData;
+    private final String fieldName;
+    private final EntryEditor entryEditor;
+    private final JPanel panel;
+    private final FileListTableModel tableModel;
+    private final JButton auto;
+    private final JPopupMenu menu = new JPopupMenu();
 
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
@@ -71,7 +73,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         this.metaData = metaData;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
+        label = new FieldNameLabel(" " + StringUtil.nCase(fieldName) + " ");
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);
@@ -94,36 +96,42 @@ public class FileListEditor extends JTable implements FieldEditor,
         down.setMargin(new Insets(0, 0, 0, 0));
         add.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 addEntry();
             }
         });
         remove.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 removeEntries();
             }
         });
         up.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 moveEntry(-1);
             }
         });
         down.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 moveEntry(1);
             }
         });
         auto.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 autoSetLinks();
             }
         });
         download.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 downloadFile();
             }
@@ -149,12 +157,14 @@ public class FileListEditor extends JTable implements FieldEditor,
         getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
         getActionMap().put("delete", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int row = getSelectedRow();
                 removeEntries();
                 row = Math.min(row, getRowCount() - 1);
-                if (row >= 0)
+                if (row >= 0) {
                     setRowSelectionInterval(row, row);
+                }
             }
         });
 
@@ -162,6 +172,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         getInputMap().put(KeyStroke.getKeyStroke("INSERT"), "insert");
         getActionMap().put("insert", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 addEntry();
             }
@@ -171,6 +182,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         getInputMap().put(Globals.prefs.getKey("File list editor, move entry up"), "move up");
         getActionMap().put("move up", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 moveEntry(-1);
             }
@@ -180,6 +192,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         getInputMap().put(Globals.prefs.getKey("File list editor, move entry down"), "move down");
         getActionMap().put("move down", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 moveEntry(1);
             }
@@ -189,6 +202,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         menu.add(openLink);
         openLink.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 openSelectedFile();
             }
@@ -206,7 +220,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     try {
                         Util.openFolderAndSelectFile(entry.getLink());
                     } catch (IOException ex) {
-                        logger.fine(ex.getMessage());
+                        FileListEditor.logger.fine(ex.getMessage());
                     }
                 }
             }
@@ -239,6 +253,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         return tableModel;
     }
 
+    @Override
     public String getFieldName() {
         return fieldName;
     }
@@ -247,6 +262,7 @@ public class FileListEditor extends JTable implements FieldEditor,
       * Returns the component to be added to a container. Might be a JScrollPane
     * or the component itself.
     */
+    @Override
     public JComponent getPane() {
         return panel;
     }
@@ -254,49 +270,60 @@ public class FileListEditor extends JTable implements FieldEditor,
     /*
      * Returns the text component itself.
     */
+    @Override
     public JComponent getTextComponent() {
         return this;
     }
 
+    @Override
     public JLabel getLabel() {
         return label;
     }
 
+    @Override
     public void setLabelColor(Color c) {
         label.setForeground(c);
     }
 
+    @Override
     public String getText() {
         return tableModel.getStringRepresentation();
     }
 
+    @Override
     public void setText(String newText) {
         tableModel.setContent(newText);
     }
 
+    @Override
     public void append(String text) {
 
     }
 
+    @Override
     public void updateFont() {
 
     }
 
+    @Override
     public void paste(String textToInsert) {
 
     }
 
+    @Override
     public String getSelectedText() {
         return null;
     }
 
     private void addEntry(String initialLink) {
         int row = getSelectedRow();
-        if (row == -1)
+        if (row == -1) {
             row = 0;
+        }
         FileListEntry entry = new FileListEntry("", initialLink, null);
-        if (editListEntry(entry, true))
+        if (editListEntry(entry, true)) {
             tableModel.addEntry(row, entry);
+        }
         entryEditor.updateField(this);
     }
 
@@ -306,22 +333,26 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private void removeEntries() {
         int[] rows = getSelectedRows();
-        if (rows != null)
+        if (rows != null) {
             for (int i = rows.length - 1; i >= 0; i--) {
                 tableModel.removeEntry(rows[i]);
             }
+        }
         entryEditor.updateField(this);
     }
 
     private void moveEntry(int i) {
         int[] sel = getSelectedRows();
-        if ((sel.length != 1) || (tableModel.getRowCount() < 2))
+        if ((sel.length != 1) || (tableModel.getRowCount() < 2)) {
             return;
+        }
         int toIdx = sel[0] + i;
-        if (toIdx >= tableModel.getRowCount())
+        if (toIdx >= tableModel.getRowCount()) {
             toIdx -= tableModel.getRowCount();
-        if (toIdx < 0)
+        }
+        if (toIdx < 0) {
             toIdx += tableModel.getRowCount();
+        }
         FileListEntry entry = tableModel.getEntry(sel[0]);
         tableModel.removeEntry(sel[0]);
         tableModel.addEntry(toIdx, entry);
@@ -338,12 +369,13 @@ public class FileListEditor extends JTable implements FieldEditor,
     private boolean editListEntry(FileListEntry entry, boolean openBrowse) {
         if (editor == null) {
             editor = new FileListEntryEditor(frame, entry, false, true, metaData);
-        }
-        else
+        } else {
             editor.setEntry(entry);
+        }
         editor.setVisible(true, openBrowse);
-        if (editor.okPressed())
+        if (editor.okPressed()) {
             tableModel.fireTableDataChanged();
+        }
         entryEditor.updateField(this);
         return editor.okPressed();
     }
@@ -352,19 +384,20 @@ public class FileListEditor extends JTable implements FieldEditor,
         auto.setEnabled(false);
         BibtexEntry entry = entryEditor.getEntry();
         JDialog diag = new JDialog(frame, true);
-        Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
                     frame.output(Globals.lang("Finished autosetting external links."));
-                }
-                else
+                } else {
                     frame.output(Globals.lang("Finished autosetting external links.")
                             + " " + Globals.lang("No files found."));
+                }
             }
-        }, diag);
+        }, diag));
 
     }
 
@@ -398,6 +431,7 @@ public class FileListEditor extends JTable implements FieldEditor,
      * of a download operation. This call may never come, if the user cancelled the operation.
      * @param file The FileListEntry linking to the resulting local file.
      */
+    @Override
     public void downloadComplete(FileListEntry file) {
         tableModel.addEntry(tableModel.getRowCount(), file);
         entryEditor.updateField(this);
@@ -406,6 +440,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     class TableClickListener extends MouseAdapter {
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = rowAtPoint(e.getPoint());
@@ -414,18 +449,23 @@ public class FileListEditor extends JTable implements FieldEditor,
                     editListEntry(entry, false);
                 }
             }
-            else if (e.isPopupTrigger())
+            else if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
+            }
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
-            if (e.isPopupTrigger())
+            if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
+            }
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
-            if (e.isPopupTrigger())
+            if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
+            }
         }
 
         private void processPopupTrigger(MouseEvent e) {
@@ -438,38 +478,49 @@ public class FileListEditor extends JTable implements FieldEditor,
     }
 
 
+    @Override
     public boolean hasUndoInformation() {
         return false;
     }
 
+    @Override
     public void undo() {
     }
 
+    @Override
     public boolean hasRedoInformation() {
         return false;
     }
 
+    @Override
     public void redo() {
     }
 
+    @Override
     public void addUndoableEditListener(UndoableEditListener listener) {
     }
 
+    @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
     }
 
+    @Override
     public void clearAutoCompleteSuggestion() {
     }
 
+    @Override
     public void setActiveBackgroundColor() {
     }
 
+    @Override
     public void setValidBackgroundColor() {
     }
 
+    @Override
     public void setInvalidBackgroundColor() {
     }
 
+    @Override
     public void updateFontColor() {
     }
 }

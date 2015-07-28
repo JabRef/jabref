@@ -28,9 +28,11 @@ import java.util.Comparator;
  */
 public class EntryComparator implements Comparator<BibtexEntry> {
 
-    String sortField;
-    boolean descending, binary = false, numeric;
-    Comparator<BibtexEntry> next;
+    private final String sortField;
+    private final boolean descending;
+    private boolean binary = false;
+    private final boolean numeric;
+    private final Comparator<BibtexEntry> next;
 
 
     public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibtexEntry> next) {
@@ -49,33 +51,39 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         this.numeric = BibtexFields.isNumeric(sortField);
     }
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) throws ClassCastException {
 
-        if (e1 == e2)
+        if (e1 == e2) {
             return 0;
+        }
 
         //Util.pr("EntryComparator: "+e1+" : "+e2);
         Object f1 = e1.getField(sortField), f2 = e2.getField(sortField);
 
         if (binary) {
             // We just separate on set and unset fields:
-            if (f1 != null)
+            if (f1 != null) {
                 return (f2 == null) ? -1 :
                         (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
-            else
+            } else {
                 return (f2 == null) ? (next != null ? next.compare(e1, e2) : idCompare(e1, e2))
                         : 1;
+            }
         }
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
         if (sortField.equals("author") || sortField.equals("editor")) {
-            if (f1 != null)
+            if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
+            }
             //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
             if (f2 != null)
+             {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase();
             //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
+            }
 
         } else if (sortField.equals(GUIGlobals.TYPE_HEADER)) {
             // Sort by type.
@@ -95,14 +103,17 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             }
         }
 
-        if ((f1 == null) && (f2 == null))
+        if ((f1 == null) && (f2 == null)) {
             return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
-        if ((f1 != null) && (f2 == null))
+        }
+        if ((f1 != null) && (f2 == null)) {
             return -1;
-        if ((f1 == null) && (f2 != null))
+        }
+        if ((f1 == null) && (f2 != null)) {
             return 1;
+        }
 
-        int result = 0;
+        int result;
 
         //String ours = ((String)e1.getField(sortField)).toLowerCase(),
         //    theirs = ((String)e2.getField(sortField)).toLowerCase();
@@ -120,10 +131,12 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             result = -comp;
         }
         if (result != 0)
+         {
             return (descending ? result : -result); // Primary sort.
-        if (next != null)
+        }
+        if (next != null) {
             return next.compare(e1, e2); // Secondary sort if existent.
-        else {
+        } else {
 
             return idCompare(e1, e2); // If still equal, we use the unique IDs.
         }

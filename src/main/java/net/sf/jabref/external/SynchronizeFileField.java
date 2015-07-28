@@ -24,6 +24,8 @@ import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,12 +42,12 @@ import java.util.List;
  */
 public class SynchronizeFileField extends AbstractWorker {
 
-    private String fieldName = GUIGlobals.FILE_FIELD;
-    private BasePanel panel;
+    private final String fieldName = GUIGlobals.FILE_FIELD;
+    private final BasePanel panel;
     private BibtexEntry[] sel = null;
     private SynchronizeFileField.OptionsDialog optDiag = null;
 
-    Object[] brokenLinkOptions =
+    private final Object[] brokenLinkOptions =
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Remove link"),
             Globals.lang("Remove all broken links"),
             Globals.lang("Quit synchronization")};
@@ -57,6 +59,7 @@ public class SynchronizeFileField extends AbstractWorker {
         this.panel = panel;
     }
 
+    @Override
     public void init() {
         Collection<BibtexEntry> col = panel.database().getEntries();
         goOn = true;
@@ -64,8 +67,9 @@ public class SynchronizeFileField extends AbstractWorker {
         sel = col.toArray(sel);
 
         // Ask about rules for the operation:
-        if (optDiag == null)
+        if (optDiag == null) {
             optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.metaData(), fieldName);
+        }
         Util.placeDialog(optDiag, panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
@@ -78,6 +82,7 @@ public class SynchronizeFileField extends AbstractWorker {
         panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
+    @Override
     public void run() {
         if (!goOn) {
             panel.output(Globals.lang("No entries selected."));
@@ -106,13 +111,8 @@ public class SynchronizeFileField extends AbstractWorker {
             Collections.addAll(entries, sel);
 
             // Start the autosetting process:                
-            Thread t = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
-            // Wait for the autosetting to finish:
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.metaData(), null, null);
+            JabRefExecutorService.INSTANCE.executeAndWait(r);
             /*
                 progress += weightAutoSet;
                 panel.frame().setProgressBarValue(progress);
@@ -151,22 +151,25 @@ public class SynchronizeFileField extends AbstractWorker {
                     // We need to specify which directories to search in for Util.expandFilename:
                     String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<File>();
-                    for (String dirs1 : dirsS)
+                    for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
+                    }
 
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
                         boolean httpLink = flEntry.getLink().toLowerCase().startsWith("http");
                         if (httpLink)
+                         {
                             continue; // Don't check the remote file.
                         // TODO: should there be an option to check remote links?
+                        }
 
                         // A variable to keep track of whether this link gets deleted:
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        File file = Util.expandFilename(flEntry.getLink(), dirsS);
+                        File file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
                         if ((file == null) || !file.exists()) {
                             int answer;
                             if (!removeAllBroken) {
@@ -248,8 +251,9 @@ public class SynchronizeFileField extends AbstractWorker {
                     if (!tableModel.getStringRepresentation().equals(old)) {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();
-                        if (toSet.length() == 0)
+                        if (toSet.length() == 0) {
                             toSet = null;
+                        }
                         ce.addEdit(new UndoableFieldChange(aSel, fieldName, old,
                                 toSet));
                         aSel.setField(fieldName, toSet);
@@ -271,9 +275,11 @@ public class SynchronizeFileField extends AbstractWorker {
         }
     }
 
+    @Override
     public void update() {
-        if (!goOn)
+        if (!goOn) {
             return;
+        }
 
         int entriesChangedCount = 0;
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
@@ -287,13 +293,15 @@ public class SynchronizeFileField extends AbstractWorker {
 
     static class OptionsDialog extends JDialog {
 
-        JRadioButton autoSetUnset, autoSetAll, autoSetNone;
-        JCheckBox checkLinks;
-        JButton ok = new JButton(Globals.lang("Ok")),
-                cancel = new JButton(Globals.lang("Cancel"));
+        final JRadioButton autoSetUnset;
+        final JRadioButton autoSetAll;
+        final JRadioButton autoSetNone;
+        final JCheckBox checkLinks;
+        final JButton ok = new JButton(Globals.lang("Ok"));
+        final JButton cancel = new JButton(Globals.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
-        private MetaData metaData;
+        private final MetaData metaData;
 
 
         public OptionsDialog(JFrame parent, MetaData metaData, String fieldName) {
@@ -302,6 +310,7 @@ public class SynchronizeFileField extends AbstractWorker {
             final String fn = Globals.lang("file");
             ok.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;
                     dispose();
@@ -310,6 +319,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
             Action closeAction = new AbstractAction() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
@@ -372,9 +382,11 @@ public class SynchronizeFileField extends AbstractWorker {
             pack();
         }
 
+        @Override
         public void setVisible(boolean visible) {
-            if (visible)
+            if (visible) {
                 canceled = true;
+            }
 
             String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
             if (dirs.length == 0) {

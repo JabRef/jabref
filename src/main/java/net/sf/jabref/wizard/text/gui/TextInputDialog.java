@@ -75,6 +75,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -117,7 +118,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.imports.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
@@ -129,30 +130,30 @@ public class TextInputDialog
         extends JDialog implements ActionListener
 {
 
-    private JButton okButton = new JButton();
-    private JButton cancelButton = new JButton();
-    private JButton insertButton = new JButton();
-    private JButton parseWithFreeCiteButton = new JButton();
-    private JPanel panel1 = new JPanel();
-    private JPanel buttons = new JPanel();
-    private JPanel rawPanel = new JPanel();
-    private JPanel sourcePanel = new JPanel();
-    private IntegrityMessagePanel warnPanel;
+    private final JButton okButton = new JButton();
+    private final JButton cancelButton = new JButton();
+    private final JButton insertButton = new JButton();
+    private final JButton parseWithFreeCiteButton = new JButton();
+    private final JPanel panel1 = new JPanel();
+    private final JPanel buttons = new JPanel();
+    private final JPanel rawPanel = new JPanel();
+    private final JPanel sourcePanel = new JPanel();
+    private final IntegrityMessagePanel warnPanel;
     private JList fieldList;
     private JRadioButton overRadio;
 
-    private BibtexEntry entry;
+    private final BibtexEntry entry;
 
-    public JPopupMenu inputMenu = new JPopupMenu();
+    private final JPopupMenu inputMenu = new JPopupMenu();
     private StyledDocument doc; // content from inputPane
     private JTextPane textPane;
     private JTextArea preview;
 
-    private boolean inputChanged; // input changed, fired by insert buttons
+    private final boolean inputChanged; // input changed, fired by insert buttons
 
-    private TagToMarkedTextStore marked;
+    private final TagToMarkedTextStore marked;
 
-    private JabRefFrame _frame;
+    private final JabRefFrame _frame;
 
     private boolean okPressed = false;
 
@@ -207,6 +208,7 @@ public class TextInputDialog
                 new ChangeListener()
                 {
 
+                    @Override
                     public void stateChanged(ChangeEvent e)
                     {
                         if (inputChanged)
@@ -232,6 +234,7 @@ public class TextInputDialog
         am.put("close", new AbstractAction()
         {
 
+            @Override
             public void actionPerformed(ActionEvent e)
             {
                 dispose();
@@ -439,7 +442,7 @@ public class TextInputDialog
 
     // ---------------------------------------------------------------------------
     // ---------------------------------------------------------------------------
-    protected void addStylesToDocument(StyledDocument doc)
+    private void addStylesToDocument(StyledDocument doc)
     {
         //Initialize some styles.
         Style def = StyleContext.getDefaultStyleContext().
@@ -511,9 +514,9 @@ public class TextInputDialog
                         if (type.hashCode() == "author".hashCode())
                         {
                             entry.setField(type, old + " and " + txt);
-                        }
-                        else
+                        } else {
                             entry.setField(type, old + txt);
+                        }
                     }
                     else // "null"+"txt" Strings forbidden
                     {
@@ -537,6 +540,7 @@ public class TextInputDialog
 
     //  ActionListener
     //  handling of buttons-click actions
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         Object source = e.getSource();
@@ -617,8 +621,9 @@ public class TextInputDialog
         Collections.addAll(f, req);
         Collections.addAll(f, opt);
         for (String allField : allFields) {
-            if (!f.contains(allField))
+            if (!f.contains(allField)) {
                 f.add(allField);
+            }
         }
         return f.toArray(new String[f.size()]);
     }
@@ -634,6 +639,7 @@ public class TextInputDialog
             super("Paste", "Paste from clipboard", GUIGlobals.getIconUrl("paste"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             String data = ClipBoardManager.clipBoard.getClipboardContents();
@@ -641,7 +647,7 @@ public class TextInputDialog
             {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
-                if (selEnd - selStart > 0)
+                if ((selEnd - selStart) > 0)
                 {
                     textPane.replaceSelection("");
                 }
@@ -666,6 +672,7 @@ public class TextInputDialog
             super("Open", "Open_file", GUIGlobals.getIconUrl("open"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             try
@@ -700,6 +707,7 @@ public class TextInputDialog
             super("Clear", "Clear_inputarea", GUIGlobals.getIconUrl("new"));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             textPane.setText("");
@@ -717,6 +725,7 @@ public class TextInputDialog
             this.setEnabled(false);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e)
         {
         }
@@ -731,6 +740,7 @@ public class TextInputDialog
         private int lastIndex = -1;
 
 
+        @Override
         public void valueChanged(ListSelectionEvent e)
         {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
@@ -767,10 +777,10 @@ public class TextInputDialog
             extends DefaultListCellRenderer
     {
 
-        private Font baseFont;
-        private Font usedFont;
-        private ImageIcon okIcon = GUIGlobals.getImage("complete");
-        private ImageIcon needIcon = GUIGlobals.getImage("wrong");
+        private final Font baseFont;
+        private final Font usedFont;
+        private final ImageIcon okIcon = GUIGlobals.getImage("complete");
+        private final ImageIcon needIcon = GUIGlobals.getImage("wrong");
 
 
         public SimpleCellRenderer(Font normFont)
@@ -782,6 +792,7 @@ public class TextInputDialog
         /* This is the only method defined by ListCellRenderer.  We just
          * reconfigure the Jlabel each time we're called.
          */
+        @Override
         public Component getListCellRendererComponent(
                 JList list,
                 Object value, // value to display
@@ -817,10 +828,11 @@ public class TextInputDialog
 
     //---------------------------------------------------------------
 
-    class FieldListMouseListener
+    private class FieldListMouseListener
             extends MouseAdapter
     {
 
+        @Override
         public void mouseClicked(MouseEvent e)
         {
             if (e.getClickCount() == 2)
@@ -836,7 +848,7 @@ class PopupListener
         extends MouseAdapter
 {
 
-    private JPopupMenu popMenu;
+    private final JPopupMenu popMenu;
 
 
     public PopupListener(JPopupMenu menu)
@@ -844,11 +856,13 @@ class PopupListener
         popMenu = menu;
     }
 
+    @Override
     public void mousePressed(MouseEvent e)
     {
         maybeShowPopup(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e)
     {
         maybeShowPopup(e);
@@ -875,14 +889,14 @@ abstract class BasicAction
     public BasicAction(String text, String description, URL icon)
     {
         super(Globals.lang(text), new ImageIcon(icon));
-        putValue(SHORT_DESCRIPTION, Globals.lang(description));
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
     }
 
     public BasicAction(String text, String description, URL icon, KeyStroke key)
     {
         super(Globals.lang(text), new ImageIcon(icon));
-        putValue(ACCELERATOR_KEY, key);
-        putValue(SHORT_DESCRIPTION, Globals.lang(description));
+        putValue(Action.ACCELERATOR_KEY, key);
+        putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
     }
 
     public BasicAction(String text)
@@ -893,9 +907,10 @@ abstract class BasicAction
     public BasicAction(String text, KeyStroke key)
     {
         super(Globals.lang(text));
-        putValue(ACCELERATOR_KEY, key);
+        putValue(Action.ACCELERATOR_KEY, key);
     }
 
+    @Override
     public abstract void actionPerformed(ActionEvent e);
 }
 //---------------------------------------------------------------

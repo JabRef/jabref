@@ -6,6 +6,7 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.groups.*;
+import net.sf.jabref.groups.structure.AbstractGroup;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -26,13 +27,14 @@ import java.util.Enumeration;
  * Time: 6:24 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GroupAddRemoveDialog extends BaseAction {
+public class GroupAddRemoveDialog implements BaseAction {
 
-    private BasePanel panel;
-    private boolean add, move = false;
+    private final BasePanel panel;
+    private final boolean add;
+    private boolean move = false;
     private BibtexEntry[] selection = null;
-    JTree tree;
-    JButton ok;
+    private JTree tree;
+    private JButton ok;
 
 
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
@@ -70,6 +72,7 @@ public class GroupAddRemoveDialog extends BaseAction {
 
         jbExpandAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 expandAll(tree, true);
             }
@@ -79,6 +82,7 @@ public class GroupAddRemoveDialog extends BaseAction {
         JButton jbCollapseAll = new JButton("Collapse All");
         jbCollapseAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 expandAll(tree, false);
             }
@@ -98,13 +102,16 @@ public class GroupAddRemoveDialog extends BaseAction {
 
         ok.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (doAddOrRemove())
+                if (doAddOrRemove()) {
                     diag.dispose();
+                }
             }
         });
         cancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 diag.dispose();
             }
@@ -119,6 +126,7 @@ public class GroupAddRemoveDialog extends BaseAction {
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
@@ -135,9 +143,10 @@ public class GroupAddRemoveDialog extends BaseAction {
 
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
-    public void expandAll(final JTree tree, final boolean expand) {
+    private void expandAll(final JTree tree, final boolean expand) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 TreeNode root = ((TreeNode) tree.getModel().getRoot());
                 // walk through the tree, beginning at the root:
@@ -166,8 +175,9 @@ public class GroupAddRemoveDialog extends BaseAction {
     }
 
 
-    class SelectionListener implements TreeSelectionListener {
+    private class SelectionListener implements TreeSelectionListener {
 
+        @Override
         public void valueChanged(TreeSelectionEvent e) {
             GroupTreeNode node = (GroupTreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
             AbstractGroup group = node.getGroup();
@@ -176,7 +186,7 @@ public class GroupAddRemoveDialog extends BaseAction {
     }
 
 
-    protected boolean doAddOrRemove() {
+    private boolean doAddOrRemove() {
         GroupTreeNode node = (GroupTreeNode) tree.getSelectionPath().getLastPathComponent();
         AbstractGroup group = node.getGroup();
         if (checkGroupEnable(group)) {
@@ -243,10 +253,11 @@ public class GroupAddRemoveDialog extends BaseAction {
 
             GroupTreeNode node = (GroupTreeNode) value;
             AbstractGroup group = node.getGroup();
-            if (checkGroupEnable(group))
+            if (checkGroupEnable(group)) {
                 c.setForeground(Color.black);
-            else
+            } else {
                 c.setForeground(Color.gray);
+            }
 
             return c;
         }

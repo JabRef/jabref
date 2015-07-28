@@ -33,12 +33,13 @@ import java.io.IOException;
 public class ClipBoardManager implements ClipboardOwner
 {
 
-    public static ClipBoardManager clipBoard = new ClipBoardManager();
+    public static final ClipBoardManager clipBoard = new ClipBoardManager();
 
 
     /**
      * Empty implementation of the ClipboardOwner interface.
      */
+    @Override
     public void lostOwnership(Clipboard aClipboard, Transferable aContents)
     {
         //do nothing

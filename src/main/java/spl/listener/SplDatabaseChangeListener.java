@@ -13,10 +13,10 @@ import net.sf.jabref.gui.MainTable;
  */
 public class SplDatabaseChangeListener implements DatabaseChangeListener {
 
-    private JabRefFrame frame;
-    private BasePanel panel;
-    private MainTable entryTable;
-    private String fileName;
+    private final JabRefFrame frame;
+    private final BasePanel panel;
+    private final MainTable entryTable;
+    private final String fileName;
 
 
     public SplDatabaseChangeListener(JabRefFrame frame, BasePanel panel, MainTable entryTable, String fileName) {

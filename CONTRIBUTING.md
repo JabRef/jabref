@@ -23,6 +23,8 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 
 Ensure your code is formatted according the JabRef formatting guidelines.
 These are provided as Eclipse formatting configuration in [formatter_settings.xml](formatter_settings.xml).
+Ensure that JabRef's code cleanup settings are activated.
+Import [cleanup_settings.xml](cleanup_settings.xml).
 
 
 ### Add your change to the CHANGELOG
@@ -40,7 +42,7 @@ Open `About.html` and add yourself below `Contributions from:`.
 
 The headers of each `.java` file state the authors.
 These entries should match the modifications done.
-If you do not want to add your real name, add yourself as `JabRef contriubtors`.
+If you do not want to add your real name, add yourself as `JabRef contributors`.
 
 For instance,
 

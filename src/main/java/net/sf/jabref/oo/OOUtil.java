@@ -44,11 +44,11 @@ import com.sun.star.uno.UnoRuntime;
 /**
  * Utility methods for processing OO Writer documents.
  */
-public class OOUtil {
+class OOUtil {
 
-    static Pattern htmlTag = Pattern.compile("</?[a-z]+>");
+    private static final Pattern htmlTag = Pattern.compile("</?[a-z]+>");
 
-    static OOPreFormatter postformatter = new OOPreFormatter();
+    static final OOPreFormatter postformatter = new OOPreFormatter();
 
 
     /**
@@ -81,7 +81,7 @@ public class OOUtil {
         entry.setField(UNIQUEFIER_FIELD, oldUniqVal);
 
         // Insert the formatted text:
-        insertOOFormattedTextAtCurrentLocation(text, cursor, lText, parStyle);
+        OOUtil.insertOOFormattedTextAtCurrentLocation(text, cursor, lText, parStyle);
     }
 
     /**
@@ -113,47 +113,49 @@ public class OOUtil {
         //insertTextAtCurrentLocation(text, cursor, "_",
         //    false, false, false, false, false, false);
         //cursor.goLeft((short)1, true);
-        Matcher m = htmlTag.matcher(lText);
+        Matcher m = OOUtil.htmlTag.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (ss.length() > 0) {
-                insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
                         mono > 0, smallCaps > 0, sup > 0, sub > 0);
             }
             String tag = m.group();
             // Handle tags:
-            if (tag.equals("<b>"))
+            if (tag.equals("<b>")) {
                 bold++;
-            else if (tag.equals("</b>"))
+            } else if (tag.equals("</b>")) {
                 bold--;
-            else if (tag.equals("<i>") || tag.equals("<em>"))
+            } else if (tag.equals("<i>") || tag.equals("<em>")) {
                 italic++;
-            else if (tag.equals("</i>") || tag.equals("</em>"))
+            } else if (tag.equals("</i>") || tag.equals("</em>")) {
                 italic--;
-            else if (tag.equals("</monospace>"))
+            } else if (tag.equals("</monospace>")) {
                 mono = 0;
-            else if (tag.equals("<monospace>"))
+            } else if (tag.equals("<monospace>")) {
                 mono = 1;
-            else if (tag.equals("</smallcaps>"))
+            } else if (tag.equals("</smallcaps>")) {
                 smallCaps = 0;
-            else if (tag.equals("<smallcaps>"))
+            } else if (tag.equals("<smallcaps>")) {
                 smallCaps = 1;
-            else if (tag.equals("</sup>"))
+            } else if (tag.equals("</sup>")) {
                 sup = 0;
-            else if (tag.equals("<sup>"))
+            } else if (tag.equals("<sup>")) {
                 sup = 1;
-            else if (tag.equals("</sub>"))
+            } else if (tag.equals("</sub>")) {
                 sub = 0;
-            else if (tag.equals("<sub>"))
+            } else if (tag.equals("<sub>")) {
                 sub = 1;
+            }
 
             piv = m.end();
 
         }
 
-        if (piv < lText.length())
-            insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
+        if (piv < lText.length()) {
+            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
                     (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
+        }
 
         cursor.collapseToEnd();
     }
@@ -171,19 +173,21 @@ public class OOUtil {
         // (which is the string we just inserted) to be bold
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
                 XPropertySet.class, cursor);
-        if (bold)
+        if (bold) {
             xCursorProps.setPropertyValue("CharWeight",
                     com.sun.star.awt.FontWeight.BOLD);
-        else
+        } else {
             xCursorProps.setPropertyValue("CharWeight",
                     com.sun.star.awt.FontWeight.NORMAL);
+        }
 
-        if (italic)
+        if (italic) {
             xCursorProps.setPropertyValue("CharPosture",
                     com.sun.star.awt.FontSlant.ITALIC);
-        else
+        } else {
             xCursorProps.setPropertyValue("CharPosture",
                     com.sun.star.awt.FontSlant.NONE);
+        }
 
         if (smallCaps) {
             xCursorProps.setPropertyValue("CharCaseMap",
@@ -264,7 +268,8 @@ public class OOUtil {
         String[] values = new String[list.size()];
         int ii = 0;
         for (XTextDocument doc : list) {
-            values[ii++] = String.valueOf(getProperty(doc.getCurrentController().getFrame(), "Title"));
+            values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
+            ii++;
         }
         JList sel = new JList(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -273,9 +278,9 @@ public class OOUtil {
                 JOptionPane.OK_CANCEL_OPTION);
         if (ans == JOptionPane.OK_OPTION) {
             return list.get(sel.getSelectedIndex());
-        }
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -287,17 +292,20 @@ public class OOUtil {
      * @return the cloned and processed entry
      */
     public static BibtexEntry createAdaptedEntry(BibtexEntry entry) {
-        if (entry == null)
+        if (entry == null) {
             return null;
+        }
         BibtexEntry e = (BibtexEntry) entry.clone();
         for (String field : e.getAllFields()) {
-            if (field.equals(BibtexFields.KEY_FIELD))
+            if (field.equals(BibtexFields.KEY_FIELD)) {
                 continue;
+            }
             String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (value != null))
-                e.setField(field, postformatter.format(value));
+            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
+                e.setField(field, OOUtil.postformatter.format(value));
+            }
         }
         return e;
     }

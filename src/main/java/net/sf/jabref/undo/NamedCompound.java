@@ -22,8 +22,8 @@ import net.sf.jabref.Globals;
 
 public class NamedCompound extends CompoundEdit {
 
-    String name;
-    boolean hasEdits = false;
+    private final String name;
+    private boolean hasEdits = false;
 
 
     public NamedCompound(String name) {
@@ -31,6 +31,7 @@ public class NamedCompound extends CompoundEdit {
         this.name = name;
     }
 
+    @Override
     public boolean addEdit(UndoableEdit undoableEdit) {
         hasEdits = true;
         return super.addEdit(undoableEdit);
@@ -40,10 +41,12 @@ public class NamedCompound extends CompoundEdit {
         return hasEdits;
     }
 
+    @Override
     public String getUndoPresentationName() {
         return Globals.lang("Undo") + ": " + name;
     }
 
+    @Override
     public String getRedoPresentationName() {
         return Globals.lang("Redo") + ": " + name;
     }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.AbstractWorker;
@@ -30,9 +31,10 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.DBImportExportDialog;
@@ -49,13 +51,12 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class DbImportAction extends AbstractWorker {
 
-    BibtexDatabase database = null;
-    MetaData metaData = null;
-    String errorMessage = null;
-    boolean connectToDB = false;
-    private JabRefFrame frame;
+    private BibtexDatabase database = null;
+    private MetaData metaData = null;
+    private boolean connectToDB = false;
+    private final JabRefFrame frame;
     private DBStrings dbs = null;
-    ArrayList<Object[]> databases = null;
+    private ArrayList<Object[]> databases = null;
 
 
     public DbImportAction(JabRefFrame frame) {
@@ -71,10 +72,11 @@ public class DbImportAction extends AbstractWorker {
 
         public DbImpAction() {
             super(GUIGlobals.getImage("dbImport"));
-            putValue(NAME, "Import from external SQL database");
+            putValue(Action.NAME, "Import from external SQL database");
 
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Util.runAbstractWorker(DbImportAction.this);
@@ -86,6 +88,7 @@ public class DbImportAction extends AbstractWorker {
 
 
     // run first, in EDT:
+    @Override
     public void init() {
 
         dbs = new DBStrings();
@@ -124,6 +127,7 @@ public class DbImportAction extends AbstractWorker {
     }
 
     // run second, on a different thread:
+    @Override
     public void run() {
         performImport();
     }
@@ -146,7 +150,7 @@ public class DbImportAction extends AbstractWorker {
                     matrix.add(v);
                 }
 
-                if (matrix.size() > 0) {
+                if (!matrix.isEmpty()) {
                     DBImportExportDialog dialogo = new DBImportExportDialog(
                             frame, matrix,
                             DBImportExportDialog.DialogType.IMPORTER);
@@ -179,10 +183,10 @@ public class DbImportAction extends AbstractWorker {
 
             } catch (Exception ex) {
                 String preamble = "Could not import from SQL database for the following reason:";
-                errorMessage = SQLUtil.getExceptionMessage(ex);
+                String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
                 JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
-                        + "\n" + errorMessage,
+                        + '\n' + errorMessage,
                         Globals.lang("Import from SQL database"),
                         JOptionPane.ERROR_MESSAGE);
                 frame.output(Globals.lang("Error importing from database"));
@@ -192,15 +196,17 @@ public class DbImportAction extends AbstractWorker {
     }
 
     // run third, on EDT:
+    @Override
     public void update() {
-        if (databases == null)
+        if (databases == null) {
             return;
+        }
         for (Object[] res : databases) {
             database = (BibtexDatabase) res[0];
             metaData = (MetaData) res[1];
             if (database != null) {
                 BasePanel pan = frame.addTab(database, null, metaData,
-                        Globals.prefs.get("defaultEncoding"), true);
+                        Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
                 pan.metaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res[2] + "(Imported)", "Imported DB");
                 pan.markBaseChanged();

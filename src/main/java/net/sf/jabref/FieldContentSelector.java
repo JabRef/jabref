@@ -32,33 +32,28 @@ import javax.swing.KeyStroke;
 
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;
+import net.sf.jabref.util.Util;
 
 /**
  * A combo-box and a manage button that will add selected strings to an
  * associated entry editor.
  * 
  * Used to manage keywords and authors for instance.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class FieldContentSelector extends JComponent {
 
-    JComboBox comboBox;
+    private final JComboBox comboBox;
 
-    FieldEditor editor;
+    private final FieldEditor editor;
 
-    MetaData metaData;
+    private final MetaData metaData;
 
-    JabRefFrame frame;
+    private final JabRefFrame frame;
 
-    Window owner;
+    private final Window owner;
 
-    BasePanel panel;
-
-    private AbstractAction action;
-    String delimiter;
+    private final AbstractAction action;
+    private final String delimiter;
 
 
     /**
@@ -93,17 +88,18 @@ public class FieldContentSelector extends JComponent {
         this.frame = frame;
         this.editor = editor;
         this.metaData = metaData;
-        this.panel = panel;
         this.owner = owner;
         this.action = action;
         this.delimiter = delimiter;
 
         comboBox = new JComboBox() {
 
+            @Override
             public Dimension getPreferredSize() {
                 Dimension parents = super.getPreferredSize();
-                if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)
+                if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH) {
                     parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
+                }
                 return parents;
             }
         };
@@ -130,14 +126,16 @@ public class FieldContentSelector extends JComponent {
 
         comboBox.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 /*
                  * These conditions signify arrow key navigation in the dropdown
                  * list, so we should not react to it. I'm not sure if this is
                  * well defined enough to be guaranteed to work everywhere.
                  */
-                if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0))
+                if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0)) {
                     return;
+                }
 
                 selectionMade();
             }
@@ -146,6 +144,7 @@ public class FieldContentSelector extends JComponent {
         comboBox.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enter");
         comboBox.getActionMap().put("enter", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 selectionMade();
                 comboBox.setPopupVisible(false);
@@ -154,8 +153,9 @@ public class FieldContentSelector extends JComponent {
 
         add(comboBox);
 
-        if (horizontalLayout)
+        if (horizontalLayout) {
             add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2, this)));
+        }
 
         JButton manage = new JButton(Globals.lang("Manage"));
         gbl.setConstraints(manage, con);
@@ -163,6 +163,7 @@ public class FieldContentSelector extends JComponent {
 
         manage.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ContentSelectorDialog2 csd = new ContentSelectorDialog2(FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName());
                 Util.placeDialog(csd, FieldContentSelector.this.frame);
@@ -180,12 +181,14 @@ public class FieldContentSelector extends JComponent {
     private void selectionMade() {
         // The first element is only for show.
         // CO: Why?
-        if (comboBox.getSelectedIndex() == 0)
+        if (comboBox.getSelectedIndex() == 0) {
             return;
+        }
 
         String chosen = (String) comboBox.getSelectedItem();
-        if (chosen == null || chosen.equals(""))
+        if ((chosen == null) || chosen.equals("")) {
             return;
+        }
 
         // The following is not possible at the moment since the
         // combobox cannot be edited!
@@ -195,16 +198,18 @@ public class FieldContentSelector extends JComponent {
         // addWord(chosen);
 
         // TODO: could improve checking as not do add the same item twice
-        if (!editor.getText().equals(""))
+        if (!editor.getText().equals("")) {
             editor.append(FieldContentSelector.this.delimiter);
+        }
 
         editor.append(chosen);
 
         comboBox.setSelectedIndex(0);
 
         // Fire event that we changed the editor
-        if (action != null)
+        if (action != null) {
             action.actionPerformed(new ActionEvent(editor, 0, ""));
+        }
 
         // Transfer focus to the editor.
         editor.requestFocus();
@@ -217,8 +222,9 @@ public class FieldContentSelector extends JComponent {
         comboBox.addItem("");
         Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
         if (items != null) {
-            for (String item : items)
+            for (String item : items) {
                 comboBox.addItem(item);
+            }
         }
     }
 

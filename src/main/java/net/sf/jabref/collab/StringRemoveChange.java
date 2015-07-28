@@ -25,18 +25,19 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveString;
 
-public class StringRemoveChange extends Change {
+class StringRemoveChange extends Change {
 
-    BibtexString string, inMem;
+    private final BibtexString string;
+    private final BibtexString inMem;
 
-    InfoPane tp = new InfoPane();
-    JScrollPane sp = new JScrollPane(tp);
-    private BibtexString tmpString;
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
+    private final BibtexString tmpString;
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
         this.tmpString = tmpString;
-        name = Globals.lang("Removed string") + ": '" + string.getName() + "'";
+        name = Globals.lang("Removed string") + ": '" + string.getName() + '\'';
         this.string = string;
         this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
@@ -44,6 +45,7 @@ public class StringRemoveChange extends Change {
 
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
         try {
@@ -59,6 +61,7 @@ public class StringRemoveChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return sp;
     }

@@ -29,7 +29,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
  */
 public class PluginBasedExportFormat extends ExportFormat {
 
-    public ExportFormatTemplateExtension extension;
+    private final ExportFormatTemplateExtension extension;
 
 
     /**
@@ -47,8 +47,8 @@ public class PluginBasedExportFormat extends ExportFormat {
         String layoutFilename = extension.getLayoutFilename();
         String fileExtension = extension.getExtension();
         String encoding = extension.getEncoding();
-        if ("".equals(fileExtension) || "".equals(displayName)
-                || "".equals(consoleName) || "".equals(layoutFilename)) {
+        if (fileExtension != null && fileExtension.isEmpty() || displayName != null && displayName.isEmpty()
+                || consoleName != null && consoleName.isEmpty() || layoutFilename != null && layoutFilename.isEmpty()) {
             Globals.logger("Could not load extension " + extension.getId());
             return null;
         }
@@ -57,13 +57,14 @@ public class PluginBasedExportFormat extends ExportFormat {
                 layoutFilename, fileExtension, encoding, extension);
     }
 
-    public PluginBasedExportFormat(String displayName, String consoleName,
-            String layoutFileName, String fileExtension, String encoding,
-            ExportFormatTemplateExtension extension) {
+    private PluginBasedExportFormat(String displayName, String consoleName,
+                                    String layoutFileName, String fileExtension, String encoding,
+                                    ExportFormatTemplateExtension extension) {
         super(displayName, consoleName, layoutFileName, null, fileExtension);
         // Set the overriding encoding, if the plugin supplied one:
-        if (encoding != null)
+        if (encoding != null) {
             setEncoding(encoding);
+        }
         this.extension = extension;
     }
 

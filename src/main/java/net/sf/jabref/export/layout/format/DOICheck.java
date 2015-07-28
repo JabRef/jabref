@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.export.layout.format;
 
+import net.sf.jabref.util.DOIUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 
 /**
  * Used to fix [ 1588028 ] export HTML table doi url.
@@ -29,6 +29,7 @@ import net.sf.jabref.Util;
  */
 public class DOICheck implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
 
         if (fieldText == null) {
@@ -39,10 +40,10 @@ public class DOICheck implements LayoutFormatter {
             return "";
         }
 
-        if (Util.checkForDOIwithHTTPprefix(fieldText)) {
+        if (DOIUtil.checkForDOIwithHTTPprefix(fieldText)) {
             return fieldText;
         } else {
-            return Globals.DOI_LOOKUP_PREFIX.concat(Util.getDOI(fieldText));
+            return Globals.DOI_LOOKUP_PREFIX.concat(DOIUtil.getDOI(fieldText));
         }
     }
 }

@@ -17,9 +17,9 @@ package net.sf.jabref;
 
 import java.util.Set;
 
-public class IncrementalSearcher {
+class IncrementalSearcher {
 
-    JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
     private String hitInField;
 
 
@@ -36,8 +36,8 @@ public class IncrementalSearcher {
         return searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
     }
 
-    protected boolean searchFields(Set<String> fields, BibtexEntry bibtexEntry,
-            String searchString) {
+    private boolean searchFields(Set<String> fields, BibtexEntry bibtexEntry,
+                                 String searchString) {
         boolean found = false;
         if (fields != null) {
 
@@ -47,12 +47,14 @@ public class IncrementalSearcher {
                     	       +"' for '"
                     	       +pattern.toString()+"'.");*/
                     if (bibtexEntry.getField(field) != null) {
-                        if (prefs.getBoolean("caseSensitiveSearch")) {
-                            if (bibtexEntry.getField(field).contains(searchString))
+                        if (prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
+                            if (bibtexEntry.getField(field).contains(searchString)) {
                                 found = true;
+                            }
                         } else {
-                            if (bibtexEntry.getField(field).toLowerCase().contains(searchString.toLowerCase()))
+                            if (bibtexEntry.getField(field).toLowerCase().contains(searchString.toLowerCase())) {
                                 found = true;
+                            }
                         }
 
                         if (found) {

@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
  */
 public class MODSDatabase {
 
-    protected Set<MODSEntry> entries;
+    private Set<MODSEntry> entries;
 
 
     public MODSDatabase() {
@@ -47,8 +47,9 @@ public class MODSDatabase {
     }
 
     public MODSDatabase(BibtexDatabase bibtex, Set<String> keySet) {
-        if (keySet == null)
+        if (keySet == null) {
             keySet = bibtex.getKeySet();
+        }
         addEntries(bibtex, keySet);
     }
 

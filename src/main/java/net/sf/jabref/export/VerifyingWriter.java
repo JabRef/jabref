@@ -30,9 +30,9 @@ import java.util.TreeSet;
  */
 public class VerifyingWriter extends OutputStreamWriter {
 
-    CharsetEncoder encoder;
+    private CharsetEncoder encoder;
     private boolean couldEncodeAll = true;
-    private TreeSet<Character> problemCharacters = new TreeSet<Character>();
+    private final TreeSet<Character> problemCharacters = new TreeSet<Character>();
 
 
     public VerifyingWriter(OutputStream out, String encoding)
@@ -41,12 +41,14 @@ public class VerifyingWriter extends OutputStreamWriter {
         encoder = Charset.forName(encoding).newEncoder();
     }
 
+    @Override
     public void write(String str) throws IOException {
         super.write(str);
         if (!encoder.canEncode(str)) {
             for (int i = 0; i < str.length(); i++) {
-                if (!encoder.canEncode(str.charAt(i)))
+                if (!encoder.canEncode(str.charAt(i))) {
                     problemCharacters.add(str.charAt(i));
+                }
             }
             couldEncodeAll = false;
         }

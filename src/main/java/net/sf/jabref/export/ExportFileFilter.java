@@ -22,17 +22,18 @@ import java.io.File;
  * File filter that lets the user choose export format while choosing file to
  * export to. Contains a reference to the ExportFormat in question.
  */
-public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
+class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
 
-    private IExportFormat format;
-    private String extension, name;
+    private final IExportFormat format;
+    private final String extension;
+    private final String name;
 
 
     public ExportFileFilter(IExportFormat format, String extension) {
         this.format = format;
         this.extension = extension;
         this.name = format.getDisplayName() + " (*" + extension
-                + ")";
+                + ')';
     }
 
     public IExportFormat getExportFormat() {
@@ -43,17 +44,21 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         return extension;
     }
 
+    @Override
     public boolean accept(File file) {
-        if (file.isDirectory())
+        if (file.isDirectory()) {
             return true;
-        else
+        } else {
             return file.getPath().toLowerCase().endsWith(extension);
+        }
     }
 
+    @Override
     public String getDescription() {
         return name;
     }
 
+    @Override
     public int compareTo(ExportFileFilter o) {
         return name.compareTo(o.name);
     }

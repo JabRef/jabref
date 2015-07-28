@@ -66,9 +66,9 @@ import net.sf.jabref.*;
 public class AuxSubGenerator
 {
 
-    private HashSet<String> mySet; // all unique bibtex keys in aux file
+    private final HashSet<String> mySet; // all unique bibtex keys in aux file
 
-    private Vector<String> notFoundList; // all not solved bibtex keys
+    private final Vector<String> notFoundList; // all not solved bibtex keys
 
     private BibtexDatabase db; // reference database
     private BibtexDatabase auxDB; // contains only the bibtex keys who found in aux file
@@ -84,7 +84,7 @@ public class AuxSubGenerator
         db = refDBase;
     }
 
-    public final void setReferenceDatabase(BibtexDatabase newRefDB)
+    private void setReferenceDatabase(BibtexDatabase newRefDB)
     {
         db = newRefDB;
     }
@@ -126,21 +126,20 @@ public class AuxSubGenerator
     //
     // \\bibcite{x}{y}
     //   x is a label for an item and y is the index in bibliography
-
-    public final boolean parseAuxFile(String filename)
+    private boolean parseAuxFile(String filename)
     {
         // regular expressions
         Pattern pattern;
         Matcher matcher;
 
         // while condition
-        boolean weiter = false;
+        boolean weiter;
 
         // return value -> default: no error
         boolean back = true;
 
         // fileopen status
-        boolean loopFileOpen = false;
+        boolean loopFileOpen;
 
         // the important tag
         pattern = Pattern.compile("\\\\citation\\{.+\\}");
@@ -155,10 +154,11 @@ public class AuxSubGenerator
         // get the file path
         File dummy = new File(filename);
         String path = dummy.getParent();
-        if (path != null)
+        if (path != null) {
             path = path + File.separator;
-        else
+        } else {
             path = "";
+        }
 
         nestedAuxCounter = -1; // count only the nested reads
 
@@ -240,8 +240,9 @@ public class AuxSubGenerator
                         }
                     }
                 } // line != null
-                else
+ else {
                     weiter = false;
+                }
             } // end of while
 
             if (loopFileOpen) // only close, if open sucessful
@@ -266,7 +267,7 @@ public class AuxSubGenerator
      * Try to find an equivalent bibtex entry into reference database for all keys
      * (found in aux file). This methode will fill up some intern data structures.....
      */
-    public final void resolveTags()
+    private void resolveTags()
     {
         auxDB = new BibtexDatabase();
         notFoundList.clear();
@@ -320,7 +321,7 @@ public class AuxSubGenerator
     private void insertEntry(BibtexDatabase auxDB, BibtexEntry entry) {
         try {
             BibtexEntry clonedEntry = (BibtexEntry) entry.clone();
-            clonedEntry.setId(Util.createNeutralId());
+            clonedEntry.setId(IdGenerator.next());
             auxDB.insertEntry(clonedEntry);
         } catch (KeyCollisionException e) {
             e.printStackTrace();
@@ -346,8 +347,9 @@ public class AuxSubGenerator
 
     public BibtexDatabase getGeneratedDatabase()
     {
-        if (auxDB == null)
+        if (auxDB == null) {
             auxDB = new BibtexDatabase();
+        }
 
         return auxDB;
     }

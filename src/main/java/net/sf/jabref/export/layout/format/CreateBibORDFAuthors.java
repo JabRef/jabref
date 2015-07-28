@@ -47,6 +47,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText) {
         // Yeah, the format is quite verbose... sorry about that :)
 
@@ -70,8 +71,9 @@ public class CreateBibORDFAuthors implements LayoutFormatter
             for (int i = 0; i < names.length; i++)
             {
                 singleAuthor(sb, names[i], (i + 1));
-                if (i < names.length - 1)
-                    sb.append("\n");
+                if (i < (names.length - 1)) {
+                    sb.append('\n');
+                }
             }
         }
 
@@ -85,16 +87,13 @@ public class CreateBibORDFAuthors implements LayoutFormatter
      * @param author
      * @param position
      */
-    protected void singleAuthor(StringBuffer sb, String author, int position) {
+    private void singleAuthor(StringBuffer sb, String author, int position) {
         sb.append("<bibo:contribution>\n");
         sb.append("  <bibo:Contribution>\n");
         sb.append("    <bibo:role rdf:resource=\"http://purl.org/ontology/bibo/roles/author\" />\n");
-        sb.append("    <bibo:contributor><foaf:Person foaf:name=\"" + author + "\"/></bibo:contributor>\n");
-        sb.append("    <bibo:position>" + position + "</bibo:position>\n");
+        sb.append("    <bibo:contributor><foaf:Person foaf:name=\"").append(author).append("\"/></bibo:contributor>\n");
+        sb.append("    <bibo:position>").append(position).append("</bibo:position>\n");
         sb.append("  </bibo:Contribution>\n");
         sb.append("</bibo:contribution>\n");
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

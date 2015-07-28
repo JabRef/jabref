@@ -113,18 +113,22 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
             return new String[] {name, cliId, className, basePath};
         }
 
+        @Override
         public boolean equals(Object o) {
-            return o != null && o instanceof Importer && this.getName().equals(((Importer) o).getName());
+            return (o != null) && (o instanceof Importer) && this.getName().equals(((Importer) o).getName());
         }
 
+        @Override
         public int hashCode() {
             return name.hashCode();
         }
 
+        @Override
         public int compareTo(Importer o) {
             return this.getName().compareTo(o.getName());
         }
 
+        @Override
         public String toString() {
             return this.name;
         }
@@ -139,7 +143,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
     }
 
 
-    private JabRefPreferences prefs;
+    private final JabRefPreferences prefs;
 
 
     public CustomImportList(JabRefPreferences prefs) {
@@ -150,7 +154,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
     private void readPrefs() {
         int i = 0;
-        String[] s = null;
+        String[] s;
         while ((s = prefs.getStringArray("customImportFormat" + i)) != null) {
             try {
                 super.add(new Importer(s));
@@ -162,7 +166,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
         }
     }
 
-    public void addImporter(Importer customImporter) {
+    private void addImporter(Importer customImporter) {
         super.add(customImporter);
     }
 

@@ -19,9 +19,9 @@ package net.sf.jabref.oo;
  * Exception used to indicate that the plugin attempted to set a paragraph format that is
  * not defined in the current OpenOffice document.
  */
-public class UndefinedParagraphFormatException extends Exception {
+class UndefinedParagraphFormatException extends Exception {
 
-    String formatName;
+    private final String formatName;
 
 
     public UndefinedParagraphFormatException(String formatName) {

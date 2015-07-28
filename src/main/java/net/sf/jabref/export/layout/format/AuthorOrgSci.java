@@ -35,12 +35,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * Idea from: http://stuermer.ch/blog/bibliography-reference-management-with-jabref.html
  * </p>
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class AuthorOrgSci implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         AuthorList a = AuthorList.getAuthorList(fieldText);
         if (a.size() == 0) {

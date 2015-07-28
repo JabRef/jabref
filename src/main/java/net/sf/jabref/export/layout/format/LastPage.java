@@ -25,18 +25,19 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class LastPage implements LayoutFormatter {
 
+    @Override
     public String format(String s) {
-        if (s == null)
+        if (s == null) {
             return "";
+        }
         String[] pageParts = s.split("[\\-]+");
-        if (pageParts.length == 2)
+        if (pageParts.length == 2) {
             return pageParts[1];
-        // If we didn't get two parts, it may be that only the number of pages is given.
-        // Return the first part:
-        else if (pageParts.length >= 1)
+        } else if (pageParts.length >= 1) {
             return pageParts[0];
-        else
+        } else {
             return "";
+        }
 
     }
 }

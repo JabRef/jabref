@@ -23,24 +23,25 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
 import net.sf.jabref.undo.NamedCompound;
 
-public abstract class Change extends DefaultMutableTreeNode {
+abstract class Change extends DefaultMutableTreeNode {
 
     String name;
-    boolean accepted = true;
+    private boolean accepted = true;
 
 
-    public Change() {
+    Change() {
         name = "";
     }
 
-    public Change(String name) {
+    Change(String name) {
         this.name = Globals.lang(name);
     }
 
-    public String getName() {
+    private String getName() {
         return name;
     }
 
+    @Override
     public String toString() {
         return getName();
     }
@@ -59,10 +60,11 @@ public abstract class Change extends DefaultMutableTreeNode {
      * @return boolean false if the parent overrides by not being accepted.
      */
     public boolean isAcceptable() {
-        if ((getParent() != null) && (getParent() instanceof Change))
+        if ((getParent() != null) && (getParent() instanceof Change)) {
             return ((Change) getParent()).isAccepted();
-        else
+        } else {
             return true;
+        }
     }
 
     /**

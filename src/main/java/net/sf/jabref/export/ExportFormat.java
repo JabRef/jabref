@@ -35,16 +35,16 @@ import java.util.*;
  */
 public class ExportFormat implements IExportFormat {
 
-    String displayName;
-    String consoleName;
-    String lfFileName;
-    String directory;
-    String extension;
+    private String displayName;
+    private String consoleName;
+    private String lfFileName;
+    private String directory;
+    private String extension;
     String encoding = null; // If this value is set, it will be used to override
     // the default encoding for the basePanel.
 
-    FileFilter fileFilter;
-    boolean customExport = false;
+    private FileFilter fileFilter;
+    private boolean customExport = false;
 
 
     /**
@@ -72,7 +72,7 @@ public class ExportFormat implements IExportFormat {
     }
 
     /** Empty default constructor for subclasses */
-    protected ExportFormat() {
+    ExportFormat() {
         // intentionally empty
     }
 
@@ -91,6 +91,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * @see IExportFormat#getConsoleName()
      */
+    @Override
     public String getConsoleName() {
         return consoleName;
     }
@@ -98,6 +99,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * @see IExportFormat#getDisplayName()
      */
+    @Override
     public String getDisplayName() {
         return displayName;
     }
@@ -107,7 +109,7 @@ public class ExportFormat implements IExportFormat {
      * obtained from the basepanel.
      * @param encoding The name of the encoding to use.
      */
-    protected void setEncoding(String encoding) {
+    void setEncoding(String encoding) {
         this.encoding = encoding;
     }
 
@@ -128,14 +130,14 @@ public class ExportFormat implements IExportFormat {
      * 
      * @return a newly created reader
      */
-    protected Reader getReader(String filename) throws IOException {
+    Reader getReader(String filename) throws IOException {
         // If this is a custom export, just use the given file name:
         String dir;
         if (customExport) {
             dir = "";
         } else {
             dir = Globals.LAYOUT_PREFIX
-                    + (directory == null ? "" : directory + "/");
+                    + (directory == null ? "" : directory + '/');
         }
         return FileActions.getReader(dir + filename);
     }
@@ -164,6 +166,7 @@ public class ExportFormat implements IExportFormat {
      * @see net.sf.jabref.export.IExportFormat#performExport(net.sf.jabref.BibtexDatabase,
      *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
      */
+    @Override
     public void performExport(final BibtexDatabase database,
             final MetaData metaData, final String file,
             final String encoding, Set<String> entryIds) throws Exception {
@@ -180,18 +183,18 @@ public class ExportFormat implements IExportFormat {
 
             }
         }
-        if (ss == null)
+        if (ss == null) {
             ss = getSaveSession(encoding, outFile);
+        }
 
         VerifyingWriter ps = ss.getWriter();
 
         Layout beginLayout = null;
-        Reader reader = null;
+        Reader reader;
 
         // Check if this export filter has bundled name formatters:
-        HashMap<String, String> customNameFormatters = readFormatterFile(lfFileName);
-        // Set a global field, so all layouts have access to the custom name formatters: 
-        Globals.prefs.customExportNameFormatters = customNameFormatters;
+        // Set a global field, so all layouts have access to the custom name formatters:
+        Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
 
         ArrayList<String> missingFormatters = new ArrayList<String>(1);
 
@@ -241,19 +244,20 @@ public class ExportFormat implements IExportFormat {
             ExportFormats.entryNumber++; // Increment entry counter.
             // Get the layout
             String type = entry.getType().getName().toLowerCase();
-            if (layouts.containsKey(type))
+            if (layouts.containsKey(type)) {
                 layout = layouts.get(type);
-            else {
+            } else {
                 try {
                     // We try to get a type-specific layout for this entry.
-                    reader = getReader(lfFileName + "." + type + ".layout");
+                    reader = getReader(lfFileName + '.' + type + ".layout");
                     layoutHelper = new LayoutHelper(reader);
                     layout = layoutHelper
                             .getLayoutFromText(Globals.FORMATTER_PACKAGE);
                     layouts.put(type, layout);
                     reader.close();
-                    if (layout != null)
+                    if (layout != null) {
                         missingFormatters.addAll(layout.getMissingFormatters());
+                    }
 
                 } catch (IOException ex) {
                     // The exception indicates that no type-specific layout
@@ -291,13 +295,14 @@ public class ExportFormat implements IExportFormat {
         // Clear custom name formatters:
         Globals.prefs.customExportNameFormatters = null;
 
-        if (missingFormatters.size() > 0) {
+        if (!missingFormatters.isEmpty()) {
             StringBuilder sb = new StringBuilder("The following formatters could not be found").
                     append(": ");
             for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
                 sb.append(i.next());
-                if (i.hasNext())
+                if (i.hasNext()) {
                     sb.append(", ");
+                }
             }
             System.err.println(sb.toString());
         }
@@ -328,10 +333,11 @@ public class ExportFormat implements IExportFormat {
                 for (String line1 : lines) {
                     String line = line1.trim();
                     // Do not deal with empty lines:
-                    if (line.length() == 0)
+                    if (line.isEmpty()) {
                         continue;
+                    }
                     int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?
-                    if ((index > 0) && (index + 1 < line.length())) {
+                    if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
                         //System.out.println("Name: '"+formatterName+"'");
@@ -344,32 +350,35 @@ public class ExportFormat implements IExportFormat {
                 // TODO: show error message here?
                 ex.printStackTrace();
             } finally {
-                if (in != null)
+                if (in != null) {
                     try {
                         in.close();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+                }
             }
         }
         return formatters;
     }
 
-    protected SaveSession getSaveSession(final String encoding,
-            final File outFile) throws IOException {
+    SaveSession getSaveSession(final String encoding,
+                               final File outFile) throws IOException {
         return new SaveSession(outFile, encoding, false);
     }
 
     /**
      * @see net.sf.jabref.export.IExportFormat#getFileFilter()
      */
+    @Override
     public FileFilter getFileFilter() {
-        if (fileFilter == null)
+        if (fileFilter == null) {
             fileFilter = new ExportFileFilter(this, extension);
+        }
         return fileFilter;
     }
 
-    public void finalizeSaveSession(final SaveSession ss) throws Exception {
+    void finalizeSaveSession(final SaveSession ss) throws Exception {
         ss.getWriter().flush();
         ss.getWriter().close();
 

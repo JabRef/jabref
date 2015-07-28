@@ -1,5 +1,19 @@
-[master]
+[mrdlib_removal]
     - Remove Mr.DLib support as MR.DLib will be shut down in 2015
+[master]
+    - Update dependencies: jersey, commons.logging, pdfbox, jgoodies, lazedlists, JDBC connectors
+    - Refactored preferences
+    - Remove local jgoodies dependency: replace SimpleInteralFrame with swingx JXTitledPanel and UIFSplitPane by JSplitPane
+    - Fix several FindBugs warnings
+    - Fix for bug #1276: OO styles do not consider editor fields anymore for sorting
+    - Fix for bug #1288: Emacs keybindings: Rebinding of C-f can now be configured
+    - Antialiasing is now enabled and set to LCD
+    - Special fields: .bib files edited with 2.11 beta 3 are not compatible with this release. Other versions are not affected.
+    - Journal abbreviation lists: in case entries are defined more than once, a message is output on the console
+    - JabRef metadata ("jabref-meta") @comments are now always written in alphabetical order
+    - Switch vom antlr2 grammar to antlr4 for capturing the search expressions. Should be backwards compatible.
+    - Changed html description of search expressions, expressing the conditional logic more explicitly with brackets.
+    - Fixed INSPIRE searches compatibility problem (by Stefano Gariazzo).
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
@@ -862,7 +876,7 @@
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
         - Fixed bug that made explicit groups appear empty after updating group tree from external
           change.
-        - New windows installer thanks to Uwe St�hr.
+        - New windows installer thanks to Uwe Stöhr.
         - [ 1641247 ] Fixed: No update of preview after generating bibtex key
         - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
@@ -875,7 +889,7 @@
           dropdown menu in the file dialog.
         - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
         - Added warning dialog when exporting failed.
-        - Added fix for exporting special chars in RTF like ���...
+        - Added fix for exporting special chars in RTF like ï¿½ï¿½ï¿½...
         - Added NameFormat LayoutFormatter based on Bibtex method name.format$
         - Added Fetch from ArXiv.org to Web Search
           [ 1587342 ] Quering ArXiv (and any OAI2 Repository)

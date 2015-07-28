@@ -45,18 +45,14 @@ import net.sf.jabref.AuthorList;
 
 /**
  * Create DocBook authors formatter.
- *
- * @author $author$
- * @version $Revision$
  */
 public class CreateDocBookAuthors implements LayoutFormatter
 {
 
-    //~ Methods ////////////////////////////////////////////////////////////////
-
-    static XMLChars xc = new XMLChars();
+    private static final XMLChars xc = new XMLChars();
 
 
+    @Override
     public String format(String fieldText)
     {
 
@@ -99,33 +95,34 @@ public class CreateDocBookAuthors implements LayoutFormatter
         return fieldText;*/
     }
 
-    public void addBody(StringBuilder sb, AuthorList al, String tagName) {
+    void addBody(StringBuilder sb, AuthorList al, String tagName) {
         for (int i = 0; i < al.size(); i++) {
-            sb.append("<").append(tagName).append(">");
+            sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);
-            if ((a.getFirst() != null) && (a.getFirst().length() > 0)) {
+            if ((a.getFirst() != null) && (!a.getFirst().isEmpty())) {
                 sb.append("<firstname>");
-                sb.append(xc.format(a.getFirst()));
+                sb.append(CreateDocBookAuthors.xc.format(a.getFirst()));
                 sb.append("</firstname>");
             }
-            if ((a.getVon() != null) && (a.getVon().length() > 0)) {
+            if ((a.getVon() != null) && (!a.getVon().isEmpty())) {
                 sb.append("<othername>");
-                sb.append(xc.format(a.getVon()));
+                sb.append(CreateDocBookAuthors.xc.format(a.getVon()));
                 sb.append("</othername>");
             }
-            if ((a.getLast() != null) && (a.getLast().length() > 0)) {
+            if ((a.getLast() != null) && (!a.getLast().isEmpty())) {
                 sb.append("<surname>");
-                sb.append(xc.format(a.getLast()));
-                if ((a.getJr() != null) && (a.getJr().length() > 0)) {
-                    sb.append(" ").append(xc.format(a.getJr()));
+                sb.append(CreateDocBookAuthors.xc.format(a.getLast()));
+                if ((a.getJr() != null) && (!a.getJr().isEmpty())) {
+                    sb.append(' ').append(CreateDocBookAuthors.xc.format(a.getJr()));
                 }
                 sb.append("</surname>");
             }
 
-            if (i < al.size() - 1)
+            if (i < (al.size() - 1)) {
                 sb.append("</").append(tagName).append(">\n       ");
-            else
-                sb.append("</").append(tagName).append(">");
+            } else {
+                sb.append("</").append(tagName).append('>');
+            }
         }
     }
 
@@ -181,6 +178,3 @@ public class CreateDocBookAuthors implements LayoutFormatter
         }
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

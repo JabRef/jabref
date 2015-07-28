@@ -29,8 +29,8 @@ import java.util.List;
  */
 public class SearchFixDuplicateLabels extends AbstractWorker {
 
-    private BasePanel panel;
-    HashMap<String, List<BibtexEntry>> dupes = null;
+    private final BasePanel panel;
+    private HashMap<String, List<BibtexEntry>> dupes = null;
 
 
     public SearchFixDuplicateLabels(BasePanel panel) {
@@ -38,6 +38,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         this.panel = panel;
     }
 
+    @Override
     public void run() {
         // Find all multiple occurences of BibTeX keys.
         dupes = new HashMap<String, List<BibtexEntry>>();

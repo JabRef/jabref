@@ -20,13 +20,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-public class InfoPane extends JEditorPane {
+class InfoPane extends JEditorPane {
 
     public InfoPane() {
         setEditable(false);
         setContentType("text/html");
     }
 
+    @Override
     public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

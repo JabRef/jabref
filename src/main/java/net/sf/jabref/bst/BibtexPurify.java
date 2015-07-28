@@ -25,9 +25,6 @@ package net.sf.jabref.bst;
  * pushes the resulting string. If the literal isn't a string, it complains and
  * pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class BibtexPurify {
 
@@ -50,24 +47,24 @@ public class BibtexPurify {
 
         while (i < n) {
             char c = cs[i];
-            if (Character.isWhitespace(c) || c == '-' || c == '~') {
+            if (Character.isWhitespace(c) || (c == '-') || (c == '~')) {
                 sb.append(' ');
             } else if (Character.isLetterOrDigit(c)) {
                 sb.append(c);
             } else if (c == '{') {
                 braceLevel++;
-                if (braceLevel == 1 && i + 1 < n && (cs[i + 1] == '\\')) {
+                if ((braceLevel == 1) && ((i + 1) < n) && (cs[i + 1] == '\\')) {
                     i++; // skip brace
-                    while (i < n && braceLevel > 0) {
+                    while ((i < n) && (braceLevel > 0)) {
                         i++; // skip backslash
                         String specialStart = BibtexCaseChanger.findSpecialChar(cs, i);
                         if (specialStart != null) {
                             sb.append(specialStart);
                         }
-                        while (i < n && Character.isLetter(cs[i])) {
+                        while ((i < n) && Character.isLetter(cs[i])) {
                             i++;
                         }
-                        while (i < n && braceLevel > 0 && (c = cs[i]) != '\\') {
+                        while ((i < n) && (braceLevel > 0) && ((c = cs[i]) != '\\')) {
                             if (Character.isLetterOrDigit(c)) {
                                 sb.append(c);
                             } else if (c == '}') {
@@ -84,14 +81,16 @@ public class BibtexPurify {
                 if (braceLevel > 0) {
                     braceLevel--;
                 } else {
-                    if (warn != null)
+                    if (warn != null) {
                         warn.warn("Unbalanced brace in string for purify$: " + toPurify);
+                    }
                 }
             }
             i++;
         }
-        if (braceLevel != 0 && warn != null)
+        if ((braceLevel != 0) && (warn != null)) {
             warn.warn("Unbalanced brace in string for purify$: " + toPurify);
+        }
 
         return sb.toString();
     }

@@ -26,7 +26,7 @@ public class CaseKeeper implements LayoutFormatter {
         super();
     }
 
-    public String format(String text, String[] listOfWords) {
+    private String format(String text, String[] listOfWords) {
         if (text == null) {
             return null;
         }
@@ -39,6 +39,7 @@ public class CaseKeeper implements LayoutFormatter {
         return text;
     }
 
+    @Override
     public String format(String text) {
         if (text == null) {
             return null;

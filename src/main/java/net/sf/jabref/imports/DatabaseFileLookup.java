@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -25,7 +25,7 @@ import net.sf.jabref.gui.FileListTableModel;
  * @version 09.11.2008 | 21:21:41
  * 
  */
-public class DatabaseFileLookup {
+class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
@@ -46,8 +46,9 @@ public class DatabaseFileLookup {
      *            A {@link BibtexDatabase}.
      */
     public DatabaseFileLookup(BibtexDatabase aDatabase) {
-        if (aDatabase == null)
+        if (aDatabase == null) {
             throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
+        }
         entries = aDatabase.getEntries();
         possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
     }
@@ -98,14 +99,15 @@ public class DatabaseFileLookup {
      * @return <code>true</code>, if the bibtex entry stores the file in its
      *         <i>file</i>-field, otherwise <code>false</code>.
      */
-    public boolean lookupEntry(File aFile, BibtexEntry anEntry) {
+    private boolean lookupEntry(File aFile, BibtexEntry anEntry) {
 
-        if (aFile == null || anEntry == null)
+        if ((aFile == null) || (anEntry == null)) {
             return false;
+        }
 
         FileListTableModel model = new FileListTableModel();
 
-        String fileField = anEntry.getField(KEY_FILE_FIELD);
+        String fileField = anEntry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
         model.setContent(fileField);
 
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -116,8 +118,9 @@ public class DatabaseFileLookup {
                 break;
             }
 
-            File expandedFilename = Util.expandFilename(link, possibleFilePaths);
-            if (expandedFilename != null // file exists
+            File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
+            if ((expandedFilename != null // file exists
+)
                     && expandedFilename.equals(aFile)) {
                 return true;
             }

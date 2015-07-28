@@ -61,24 +61,24 @@ public class IntegrityMessage implements Cloneable
             UNEXPECTED_CLOSING_BRACE_FAILURE = 2010
             ;
 
-    public static int
-            FULL_MODE = 1, // print with Bibtex Entry
-            SINLGE_MODE = 2 // print only Message
+    public static final int
+            FULL_MODE = 1; // print with Bibtex Entry
+            public static final int SINLGE_MODE = 2 // print only Message
             ;
 
-    private static int printMode = SINLGE_MODE;
+    private static int printMode = IntegrityMessage.SINLGE_MODE;
 
-    private int type;
-    private BibtexEntry entry;
-    private String fieldName;
-    private Object additionalInfo;
-    private String msg;
+    private final int type;
+    private final BibtexEntry entry;
+    private final String fieldName;
+    private final Object additionalInfo;
+    private final String msg;
     private boolean fixed; // the user has changed sometings on BibtexEntry
 
 
-    public final synchronized static void setPrintMode(int newMode)
+    public synchronized static void setPrintMode(int newMode)
     {
-        printMode = newMode;
+        IntegrityMessage.printMode = newMode;
     }
 
     public IntegrityMessage(int pType, BibtexEntry pEntry, String pFieldName, Object pAdditionalInfo)
@@ -92,7 +92,7 @@ public class IntegrityMessage implements Cloneable
         msg = getMessage();
     }
 
-    public String getMessage()
+    private String getMessage()
     {
         String back = Globals.getIntegrityMessage("ITEXT_" + type);
         if ((back != null) && (fieldName != null))
@@ -102,10 +102,11 @@ public class IntegrityMessage implements Cloneable
         return back;
     }
 
+    @Override
     public String toString()
     {
         String back = msg;
-        if (printMode == FULL_MODE)
+        if (IntegrityMessage.printMode == IntegrityMessage.FULL_MODE)
         {
             back = "[" + entry.getCiteKey() + "] " + msg;
         }

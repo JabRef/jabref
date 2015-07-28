@@ -15,7 +15,11 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -33,23 +37,37 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.EntryComparator;
+import net.sf.jabref.FieldComparator;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.GeneralRenderer;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.TransferableBibtexEntry;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-
-import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -59,27 +77,28 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  */
 public class SearchResultsDialog {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
     private JDialog diag;
-    private String[] fields = new String[] {
+    private final String[] fields = new String[] {
             "author", "title", "year", "journal"
     };
-    protected final int FILE_COL = 0, URL_COL = 1,
-            PAD = 2;
-    private JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall")),
-            urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
+    private final int FILE_COL = 0;
+    private final int URL_COL = 1;
+    private final int PAD = 2;
+    private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
+    private final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
-    protected Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     private EventTableModel<BibtexEntry> model;
-    private EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
     private SortedList<BibtexEntry> sortedEntries;
-    private HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
+    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
-    protected UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
-    PreviewPanel preview;
+    private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    private PreviewPanel preview;
 
 
     public SearchResultsDialog(JabRefFrame frame, String title) {
@@ -92,9 +111,9 @@ public class SearchResultsDialog {
     private void init(String title) {
         diag = new JDialog(frame, title, false);
 
-        int activePreview = Globals.prefs.getInt("activePreview");
+        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get("preview0") : Globals.prefs.get("preview1"));
+                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
         model = new EventTableModel<BibtexEntry>(sortedEntries,
@@ -106,7 +125,7 @@ public class SearchResultsDialog {
         setWidths();
         TableComparatorChooser<BibtexEntry> tableSorter =
                 TableComparatorChooser.install(entryTable, sortedEntries,
-                        TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                        AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
@@ -121,6 +140,7 @@ public class SearchResultsDialog {
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
@@ -132,8 +152,9 @@ public class SearchResultsDialog {
 
         entryTable.getActionMap().put("copy", new AbstractAction() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                if (selectionModel.getSelected().size() > 0) {
+                if (!selectionModel.getSelected().isEmpty()) {
                     BibtexEntry[] bes = selectionModel.getSelected().toArray
                             (new BibtexEntry[selectionModel.getSelected().size()]);
                     TransferableBibtexEntry trbe
@@ -141,29 +162,31 @@ public class SearchResultsDialog {
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.basePanel());
-                    frame.output(Globals.lang("Copied") + " " + (bes.length > 1 ? bes.length + " "
+                    frame.output(Globals.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
                             + Globals.lang("entries")
-                            : "1 " + Globals.lang("entry") + "."));
+                            : "1 " + Globals.lang("entry") + '.'));
                 }
             }
         });
 
         diag.addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
             }
 
+            @Override
             public void windowClosing(WindowEvent event) {
-                Globals.prefs.putInt("searchDialogWidth", diag.getSize().width);
-                Globals.prefs.putInt("searchDialogHeight", diag.getSize().height);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_WIDTH, diag.getSize().width);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT, diag.getSize().height);
             }
         });
 
         diag.getContentPane().add(contentPane, BorderLayout.CENTER);
         // Remember and default to last size:
-        diag.setSize(new Dimension(Globals.prefs.getInt("searchDialogWidth"), Globals.prefs
-                .getInt("searchDialogHeight")));
+        diag.setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.SEARCH_DIALOG_WIDTH), Globals.prefs
+                .getInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT)));
         diag.setLocationRelativeTo(frame);
     }
 
@@ -176,9 +199,9 @@ public class SearchResultsDialog {
     }
 
     public void selectFirstEntry() {
-        if (entryTable.getRowCount() > 0)
+        if (entryTable.getRowCount() > 0) {
             entryTable.setRowSelectionInterval(0, 0);
-        else {
+        } else {
             contentPane.setDividerLocation(1.0f);
         }
     }
@@ -197,7 +220,7 @@ public class SearchResultsDialog {
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
     @SuppressWarnings("unchecked")
-    protected void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
+    private void setupComparatorChooser(TableComparatorChooser<BibtexEntry> comparatorChooser) {
         // First column:
         java.util.List<Comparator> comparators = comparatorChooser
                 .getComparatorsForColumn(0);
@@ -210,14 +233,15 @@ public class SearchResultsDialog {
         for (int i = 2; i < PAD; i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            if (i == FILE_COL)
+            if (i == FILE_COL) {
                 comparators.add(new IconComparator(new String[] {GUIGlobals.FILE_FIELD}));
-            else if (i == URL_COL)
+            } else if (i == URL_COL) {
                 comparators.add(new IconComparator(new String[] {"url"}));
+            }
 
         }
         // Remaining columns:
-        for (int i = PAD; i < PAD + fields.length; i++) {
+        for (int i = PAD; i < (PAD + fields.length); i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             comparators.add(new FieldComparator(fields[i - PAD]));
@@ -233,7 +257,7 @@ public class SearchResultsDialog {
      * Set column widths according to which field is shown, and lock icon columns
      * to a suitable width.
      */
-    protected void setWidths() {
+    private void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
         for (int i = 0; i < PAD; i++) {
             // Check if the Column is a RankingColumn
@@ -287,12 +311,14 @@ public class SearchResultsDialog {
      */
     class TableClickListener extends MouseAdapter {
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
             }
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
@@ -315,6 +341,7 @@ public class SearchResultsDialog {
             }
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
@@ -331,8 +358,9 @@ public class SearchResultsDialog {
                     if (o != null) {
                         FileListTableModel tableModel = new FileListTableModel();
                         tableModel.setContent((String) o);
-                        if (tableModel.getRowCount() == 0)
+                        if (tableModel.getRowCount() == 0) {
                             return;
+                        }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
                                 p.metaData(), fl.getType())).actionPerformed(null);
@@ -341,8 +369,9 @@ public class SearchResultsDialog {
                 case URL_COL:
                     Object link = entry.getField("url");
                     try {
-                        if (link != null)
+                        if (link != null) {
                             Util.openExternalViewer(p.metaData(), (String) link, "url");
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -375,8 +404,9 @@ public class SearchResultsDialog {
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
                     String description = flEntry.getDescription();
-                    if ((description == null) || (description.trim().length() == 0))
+                    if ((description == null) || (description.trim().isEmpty())) {
                         description = flEntry.getLink();
+                    }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
                             flEntry.getLink(), flEntry.getType().getIcon(), p.metaData(),
                             flEntry.getType()));
@@ -385,8 +415,9 @@ public class SearchResultsDialog {
 
             }
 
-            if (count > 0)
+            if (count > 0) {
                 menu.show(entryTable, e.getX(), e.getY());
+            }
         }
     }
 
@@ -394,8 +425,9 @@ public class SearchResultsDialog {
      * The listener for the Glazed list monitoring the current selection.
      * When selection changes, we need to update the preview panel.
      */
-    class EntrySelectionListener implements ListEventListener<BibtexEntry> {
+    private class EntrySelectionListener implements ListEventListener<BibtexEntry> {
 
+        @Override
         public void listChanged(ListEvent<BibtexEntry> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
                 BibtexEntry entry = listEvent.getSourceList().get(0);
@@ -408,6 +440,7 @@ public class SearchResultsDialog {
                 contentPane.setDividerLocation(0.5f);
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         preview.scrollRectToVisible(toRect);
                     }
@@ -420,19 +453,23 @@ public class SearchResultsDialog {
      * TableFormat for the table shown in the dialog. Handles the display of entry
      * fields and icons for linked files and urls.
      */
-    public class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
+    private class EntryTableFormat implements AdvancedTableFormat<BibtexEntry> {
 
+        @Override
         public int getColumnCount() {
             return PAD + fields.length;
         }
 
+        @Override
         public String getColumnName(int column) {
-            if (column >= PAD)
-                return Util.nCase(fields[column - PAD]);
-            else
+            if (column >= PAD) {
+                return StringUtil.nCase(fields[column - PAD]);
+            } else {
                 return "";
+            }
         }
 
+        @Override
         public Object getColumnValue(BibtexEntry entry, int column) {
             if (column < PAD) {
                 Object o;
@@ -443,18 +480,21 @@ public class SearchResultsDialog {
                         FileListTableModel model = new FileListTableModel();
                         model.setContent((String) o);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0)
+                        if (model.getRowCount() > 0) {
                             fileLabel.setIcon(model.getEntry(0).getType().getIcon());
+                        }
                         return fileLabel;
-                    } else
+                    } else {
                         return null;
+                    }
                 case URL_COL:
                     o = entry.getField("url");
                     if (o != null) {
                         urlLabel.setToolTipText((String) o);
                         return urlLabel;
-                    } else
+                    } else {
                         return null;
+                    }
                 default:
                     return null;
                 }
@@ -464,21 +504,25 @@ public class SearchResultsDialog {
                 if (field.equals("author") || field.equals("editor")) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
-                    if (frame.basePanel() != null)
+                    if (frame.basePanel() != null) {
                         return frame.basePanel().tableFormat.formatName
                                 (entry.getField(field));
+                    }
                 }
                 return entry.getField(field);
             }
         }
 
+        @Override
         public Class<?> getColumnClass(int i) {
-            if (i < PAD)
+            if (i < PAD) {
                 return JLabel.class;
-            else
+            } else {
                 return String.class;
+            }
         }
 
+        @Override
         public Comparator<?> getColumnComparator(int i) {
             return null;
         }

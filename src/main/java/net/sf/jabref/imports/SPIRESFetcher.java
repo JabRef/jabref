@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
@@ -46,7 +45,7 @@ import net.sf.jabref.OutputPrinter;
  */
 public class SPIRESFetcher implements EntryFetcher {
 
-    private static String spiresHost = "www-spires.slac.stanford.edu";
+    private static final String spiresHost = "www-spires.slac.stanford.edu";
 
 
     public SPIRESFetcher() {
@@ -60,14 +59,14 @@ public class SPIRESFetcher implements EntryFetcher {
      * 
      * @return a String denoting the query URL
      */
-    public String constructUrl(String key) {
-        String identifier = "";
+    private String constructUrl(String key) {
+        String identifier;
         try {
             identifier = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        return "http://" + spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + identifier + "&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=";
+        return "http://" + SPIRESFetcher.spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + identifier + "&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=";
     }
 
     /**
@@ -80,13 +79,14 @@ public class SPIRESFetcher implements EntryFetcher {
         String cmd = "j";
         String key = slaccitation.replaceAll("^%%CITATION = ", "").replaceAll(
                 ";%%$", "");
-        if (key.matches("^\\w*-\\w*[ /].*"))
+        if (key.matches("^\\w*-\\w*[ /].*")) {
             cmd = "eprint";
+        }
         try {
             key = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException ignored) {
         }
-        return "http://" + spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + cmd + "+" + key;
+        return "http://" + SPIRESFetcher.spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + cmd + "+" + key;
     }
 
     /**
@@ -102,7 +102,7 @@ public class SPIRESFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        return "http://" + spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+eprint+" + key;
+        return "http://" + SPIRESFetcher.spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+eprint+" + key;
     }
 
     /**
@@ -156,23 +156,23 @@ public class SPIRESFetcher implements EntryFetcher {
     /*
      * @see net.sf.jabref.imports.EntryFetcher
      */
+    @Override
     public String getHelpPage() {
         return "Spires.html";
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
+    @Override
     public String getKeyName() {
         return "SPIRES";
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         // we have no additional options
         return null;
     }
 
+    @Override
     public String getTitle() {
         return Globals.menuTitle(getKeyName());
     }
@@ -186,12 +186,14 @@ public class SPIRESFetcher implements EntryFetcher {
     public void done(int entriesImported) {
     }
 
+    @Override
     public void stopFetching() {
     }
 
     /*
      * @see java.lang.Runnable
      */
+    @Override
     public boolean processQuery(String query, ImportInspector dialog,
             OutputPrinter frame) {
         try {
@@ -203,9 +205,11 @@ public class SPIRESFetcher implements EntryFetcher {
 
             frame.setStatus("Adding fetched entries");
             /* add the entry to the inspection dialog */
-            if (bd.getEntryCount() > 0)
-                for (BibtexEntry entry : bd.getEntries())
+            if (bd.getEntryCount() > 0) {
+                for (BibtexEntry entry : bd.getEntries()) {
                     dialog.addEntry(entry);
+                }
+            }
 
             /* update the dialogs progress bar */
             // dialog.setProgress(i + 1, keys.length);

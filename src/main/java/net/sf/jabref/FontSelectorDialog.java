@@ -126,10 +126,10 @@ class FontSelector extends JButton {
 
     private static final long serialVersionUID = 7745223550102664896L;
 
-    static final String PLAIN = "plain";
-    static final String BOLD = "bold";
-    static final String BOLD_ITALIC = "bold-italic";
-    static final String ITALIC = "italic";
+    private static final String PLAIN = "plain";
+    private static final String BOLD = "bold";
+    private static final String BOLD_ITALIC = "bold-italic";
+    private static final String ITALIC = "italic";
 
 
     /** init with a default font */
@@ -138,12 +138,13 @@ class FontSelector extends JButton {
     }
 
     /** init with the given font */
-    public FontSelector(Font font) {
+    private FontSelector(Font font) {
         setFont(font);
         setRequestFocusEnabled(false);
         addActionListener(new ActionHandler());
     }
 
+    @Override
     public void setFont(Font font) {
         super.setFont(font);
         updateText();
@@ -157,16 +158,16 @@ class FontSelector extends JButton {
         String styleString;
         switch (font.getStyle()) {
         case Font.PLAIN:
-            styleString = PLAIN;
+            styleString = FontSelector.PLAIN;
             break;
         case Font.BOLD:
-            styleString = BOLD;
+            styleString = FontSelector.BOLD;
             break;
         case Font.ITALIC:
-            styleString = ITALIC;
+            styleString = FontSelector.ITALIC;
             break;
         case Font.BOLD | Font.ITALIC:
-            styleString = BOLD_ITALIC;
+            styleString = FontSelector.BOLD_ITALIC;
             break;
         default:
             styleString = "UNKNOWN!!!???";
@@ -180,8 +181,9 @@ class FontSelector extends JButton {
     /**
      * button's action-listener ; open a FontSelectorDialog
      */
-    class ActionHandler implements ActionListener {
+    private class ActionHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
             Font font = new FontSelectorDialog(FontSelector.this, getFont()).getSelectedFont();
             if (font != null) {
@@ -198,10 +200,10 @@ public class FontSelectorDialog extends JDialog {
 
     private static final long serialVersionUID = -8670346696048738055L;
 
-    static final String PLAIN = "plain";
-    static final String BOLD = "bold";
-    static final String BOLD_ITALIC = "bold-italic";
-    static final String ITALIC = "italic";
+    private static final String PLAIN = "plain";
+    private static final String BOLD = "bold";
+    private static final String BOLD_ITALIC = "bold-italic";
+    private static final String ITALIC = "italic";
 
 
     public FontSelectorDialog(Component comp, Font font) {
@@ -227,7 +229,7 @@ public class FontSelectorDialog extends JDialog {
                 sizeList = new JList(sizes));
         listPanel.add(sizePanel);
 
-        String[] styles = {PLAIN, BOLD, ITALIC, BOLD_ITALIC};
+        String[] styles = {FontSelectorDialog.PLAIN, FontSelectorDialog.BOLD, FontSelectorDialog.ITALIC, FontSelectorDialog.BOLD_ITALIC};
 
         JPanel stylePanel = createTextFieldAndListPanel(
                 Globals.lang("Font Style"),
@@ -262,6 +264,7 @@ public class FontSelectorDialog extends JDialog {
             private static final long serialVersionUID = -4191591634265068189L;
 
 
+            @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint
@@ -307,18 +310,19 @@ public class FontSelectorDialog extends JDialog {
         setVisible(true); // show(); -> deprecated since 1.5
     }
 
-    public void ok() {
+    private void ok() {
         isOK = true;
         dispose();
     }
 
-    public void cancel() {
+    private void cancel() {
         dispose();
     }
 
     public Font getSelectedFont() {
-        if (!isOK)
+        if (!isOK) {
             return null;
+        }
 
         int size;
         try {
@@ -333,15 +337,15 @@ public class FontSelectorDialog extends JDialog {
 
     // private members
     private boolean isOK;
-    private JTextField familyField;
-    private JList familyList;
-    private JTextField sizeField;
-    private JList sizeList;
-    private JTextField styleField;
-    private JList styleList;
-    private JLabel preview;
-    private JButton ok;
-    private JButton cancel;
+    private final JTextField familyField;
+    private final JList familyList;
+    private final JTextField sizeField;
+    private final JList sizeList;
+    private final JTextField styleField;
+    private final JList styleList;
+    private final JLabel preview;
+    private final JButton ok;
+    private final JButton cancel;
 
     /**
      * For some reason the default Java fonts show up in the
@@ -361,13 +365,15 @@ public class FontSelectorDialog extends JDialog {
             Vector<String> nameVector = new Vector<String>(nameArray.length);
 
             for (int i = 0, j; i < nameArray.length; i++) {
-                for (j = 0; j < HIDEFONTS.length; j++) {
-                    if (nameArray[i].contains(HIDEFONTS[j]))
+                for (j = 0; j < FontSelectorDialog.HIDEFONTS.length; j++) {
+                    if (nameArray[i].contains(FontSelectorDialog.HIDEFONTS[j])) {
                         break;
+                    }
                 }
 
-                if (j == HIDEFONTS.length)
+                if (j == FontSelectorDialog.HIDEFONTS.length) {
                     nameVector.addElement(nameArray[i]);
+                }
             }
 
             String[] _array = new String[nameVector.size()];
@@ -429,35 +435,41 @@ public class FontSelectorDialog extends JDialog {
     }
 
 
-    class ActionHandler implements ActionListener {
+    private class ActionHandler implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent evt) {
-            if (evt.getSource() == ok)
+            if (evt.getSource() == ok) {
                 ok();
-            else if (evt.getSource() == cancel)
+            } else if (evt.getSource() == cancel) {
                 cancel();
+            }
         }
     }
 
-    class ListHandler implements ListSelectionListener {
+    private class ListHandler implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent evt)
         {
             Object source = evt.getSource();
             if (source == familyList) {
                 String family = (String) familyList.getSelectedValue();
-                if (family != null)
+                if (family != null) {
                     familyField.setText(family);
+                }
             }
             else if (source == sizeList) {
                 String size = (String) sizeList.getSelectedValue();
-                if (size != null)
+                if (size != null) {
                     sizeField.setText(size);
+                }
             }
             else if (source == styleList) {
                 String style = (String) styleList.getSelectedValue();
-                if (style != null)
+                if (style != null) {
                     styleField.setText(style);
+                }
             }
             updatePreview();
         }

@@ -40,10 +40,10 @@ import ca.odell.glazedlists.SortedList;
  * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
  *
  */
-public class OpenDocumentRepresentation {
+class OpenDocumentRepresentation {
 
-    protected Collection<BibtexEntry> entries;
-    private BibtexDatabase database;
+    private final Collection<BibtexEntry> entries;
+    private final BibtexDatabase database;
 
 
     @SuppressWarnings("unchecked")
@@ -59,11 +59,12 @@ public class OpenDocumentRepresentation {
 
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
-        if (keySet == null)
+        if (keySet == null) {
             entryList.addAll(database.getEntries());
-        else {
-            for (String key : keySet)
+        } else {
+            for (String key : keySet) {
                 entryList.add(database.getEntryById(key));
+            }
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
@@ -210,12 +211,12 @@ public class OpenDocumentRepresentation {
         return result;
     }
 
-    protected String getField(BibtexEntry e, String field) {
+    private String getField(BibtexEntry e, String field) {
         String s = BibtexDatabase.getResolvedField(field, e, database);
         return s == null ? "" : s;
     }
 
-    protected void addTableCell(Document doc, Element parent, String content) {
+    private void addTableCell(Document doc, Element parent, String content) {
         Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);
         text.appendChild(textNode);

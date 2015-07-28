@@ -33,34 +33,37 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
      * @param arg The argument string.
      * @return An array of strings representing the parts of the argument.
      */
-    public static String[] parseArgument(String arg) {
+    protected static String[] parseArgument(String arg) {
         List<String> parts = new ArrayList<String>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < arg.length(); i++) {
-            if ((arg.charAt(i) == SEPARATOR) && !escaped) {
+            if ((arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR) && !escaped) {
                 parts.add(current.toString());
                 current = new StringBuilder();
             } else if (arg.charAt(i) == '\\') {
                 if (escaped) {
                     escaped = false;
                     current.append(arg.charAt(i));
-                } else
+                } else {
                     escaped = true;
+                }
             } else if (escaped) {
                 // Handle newline and tab:
-                if (arg.charAt(i) == 'n')
+                if (arg.charAt(i) == 'n') {
                     current.append('\n');
-                else if (arg.charAt(i) == 't')
+                } else if (arg.charAt(i) == 't') {
                     current.append('\t');
-                else {
-                    if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"'))
+                } else {
+                    if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"')) {
                         current.append('\\');
+                    }
                     current.append(arg.charAt(i));
                 }
                 escaped = false;
-            } else
+            } else {
                 current.append(arg.charAt(i));
+            }
         }
         parts.add(current.toString());
         return parts.toArray(new String[parts.size()]);

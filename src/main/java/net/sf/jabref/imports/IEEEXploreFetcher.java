@@ -47,69 +47,61 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
     final CaseKeeperList caseKeeperList = new CaseKeeperList();
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
 
-    ImportInspector dialog = null;
-    OutputPrinter status;
-    final HTMLConverter htmlConverter = new HTMLConverter();
+    private final HTMLConverter htmlConverter = new HTMLConverter();
 
-    private JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
-    private JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
-    private JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
-
-    private CookieManager cm = new CookieManager();
+    private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
+    private final JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
+    private final JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
 
     private static final int MAX_FETCH = 100;
-    private int perPage = MAX_FETCH, hits = 0, unparseable = 0, parsed = 0;
+    private final int perPage = IEEEXploreFetcher.MAX_FETCH;
+    private int hits = 0;
+    private int unparseable = 0;
+    private int parsed = 0;
     private int piv = 0;
     private boolean shouldContinue = false;
     private boolean includeAbstract = false;
     private boolean importBibtex = false;
 
     private String terms;
-    private final String startUrl = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
     private final String endUrl = "&rowsPerPage=" + Integer.toString(perPage) + "&pageNumber=";
     private String searchUrl;
-    private final String importUrl = "http://ieeexplore.ieee.org/xpls/downloadCitations";
 
     private final Pattern hitsPattern = Pattern.compile("([0-9,]+) Results");
     private final Pattern idPattern = Pattern.compile("<input name=\'\' title=\'.*\' type=\'checkbox\'" +
             "value=\'\'\\s*id=\'([0-9]+)\'/>");
     private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
-    private HashMap<String, String> fieldPatterns = new HashMap<String, String>();
+    private final HashMap<String, String> fieldPatterns = new HashMap<String, String>();
     private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
 
     Pattern stdEntryPattern = Pattern.compile(".*<strong>(.+)</strong><br>"
             + "\\s+(.+)");
 
-    Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
-    Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+    private final Pattern publicationPattern = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
+    private final Pattern proceedingPattern = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     Pattern abstractLinkPattern = Pattern.compile(
             "<a href=\'(.+)\'>\\s*<span class=\"more\">View full.*</span> </a>");
-    String abrvPattern = ".*[^,] '?\\d+\\)?";
 
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
-    Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
+    private final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
+    private static final String IMPORT_URL = "http://ieeexplore.ieee.org/xpls/downloadCitations";
+    private static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 
 
     // Common words in IEEE Xplore that should always be 
 
     public IEEEXploreFetcher() {
         super();
-        CookieHandler.setDefault(cm);
+        CookieHandler.setDefault(new CookieManager());
 
         fieldPatterns.put("title", "<a\\s*href=[^<]+>\\s*(.+)\\s*</a>");
         //fieldPatterns.put("author", "</h3>\\s*(.+)");
@@ -125,6 +117,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         fieldPatterns.put("url", "<a href=\"(/stamp/stamp[^\"]+)");
     }
 
+    @Override
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
         pan.setLayout(new BorderLayout());
@@ -142,9 +135,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return pan;
     }
 
+    @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
-        this.dialog = dialog;
-        this.status = status;
         terms = query;
         piv = 0;
         shouldContinue = true;
@@ -190,23 +182,24 @@ public class IEEEXploreFetcher implements EntryFetcher {
             includeAbstract = absCheckBox.isSelected();
             importBibtex = bibButton.isSelected();
 
-            if (hits > MAX_FETCH) {
+            if (hits > IEEEXploreFetcher.MAX_FETCH) {
                 status.showMessage(Globals.lang("%0 entries found. To reduce server load, "
                         + "only %1 will be downloaded.",
-                        new String[] {String.valueOf(hits), String.valueOf(MAX_FETCH)}),
+                        new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
                         Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
-                hits = MAX_FETCH;
+                hits = IEEEXploreFetcher.MAX_FETCH;
             }
 
             parse(dialog, page, 0, 1);
             int firstEntry = perPage;
-            while (shouldContinue && firstEntry < hits) {
+            while (shouldContinue && (firstEntry < hits)) {
                 pageNumber++;
                 searchUrl = makeUrl(pageNumber);
                 page = getResults(new URL(searchUrl));
 
-                if (!shouldContinue)
+                if (!shouldContinue) {
                     break;
+                }
 
                 parse(dialog, page, 0, firstEntry + 1);
                 firstEntry += perPage;
@@ -226,18 +219,17 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return false;
     }
 
+    @Override
     public String getTitle() {
         return "IEEEXplore";
     }
 
-    public URL getIcon() {
-        return GUIGlobals.getIconUrl("www");
-    }
-
+    @Override
     public String getHelpPage() {
         return "IEEEXploreHelp.html";
     }
 
+    @Override
     public String getKeyName() {
         return "IEEEXplore";
     }
@@ -245,12 +237,13 @@ public class IEEEXploreFetcher implements EntryFetcher {
     /**
      * This method is called by the dialog when the user has cancelled the import.
      */
+    @Override
     public void stopFetching() {
         shouldContinue = false;
     }
 
     private String makeUrl(int startIndex) {
-        return startUrl + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
+        return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
     }
 
     private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
@@ -261,7 +254,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //TODO: Login
             ArrayList<String> idSelected = new ArrayList<String>();
             String id;
-            while ((id = parseNextEntryId(text, piv)) != null && shouldContinue) {
+            while (((id = parseNextEntryId(text, piv)) != null) && shouldContinue) {
                 idSelected.add(id);
                 entryNumber++;
             }
@@ -291,13 +284,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private BibtexDatabase parseBibtexDatabase(List<String> id, boolean abs) throws IOException {
-        if (id.isEmpty())
+        if (id.isEmpty()) {
             return null;
-        URL url;
+        }
         URLConnection conn;
         try {
-            url = new URL(importUrl);
-            conn = url.openConnection();
+            conn = new URL(IEEEXploreFetcher.IMPORT_URL).openConnection();
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
@@ -324,14 +316,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
         out.close();
 
         BufferedReader bufr = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char[] buffer = new char[256];
         while (true) {
             int bytesRead = bufr.read(buffer);
-            if (bytesRead == -1)
+            if (bytesRead == -1) {
                 break;
-            for (int i = 0; i < bytesRead; i++)
+            }
+            for (int i = 0; i < bytesRead; i++) {
                 sb.append(buffer[i]);
+            }
         }
         System.out.println(sb.toString());
 
@@ -341,8 +335,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private BibtexEntry cleanup(BibtexEntry entry) {
-        if (entry == null)
+        if (entry == null) {
             return null;
+        }
 
         // clean up title
         String title = entry.getField("title");
@@ -356,7 +351,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts       
-            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
                 title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
                 title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
                 title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
@@ -372,12 +367,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("\\\\infin", "\\\\infty");
 
             // Unit formatting
-            if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                 title = unitFormatter.format(title);
             }
 
             // Automatic case keeping
-            if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                 title = caseKeeper.format(title);
             }
             // Write back
@@ -424,8 +419,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 } else if (mm.group(2).length() == 0) {
                     if (mm.group(4).length() > 0) {
                         date = "#" + mm.group(4).substring(0, 3) + "# " + mm.group(1) + "--" + mm.group(3) + ",";
-                    } else
+                    } else {
                         date += ",";
+                    }
                 } else {
                     date = "#" + mm.group(2).substring(0, 3) + "# " + mm.group(1) + "--#" + mm.group(4).substring(0, 3) + "# " + mm.group(3) + ",";
                 }
@@ -491,6 +487,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             Matcher m1 = publicationPattern.matcher(fullName);
+            String abrvPattern = ".*[^,] '?\\d+\\)?";
             if (m1.find()) {
                 String prefix = m1.group(2).trim();
                 String postfix = m1.group(1).trim();
@@ -516,10 +513,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 
                 fullName = fullName.trim();
-                if (Globals.prefs.getBoolean("useIEEEAbrv")) {
-                    String id = Globals.journalAbbrev.getAbbreviatedName(fullName, false);
-                    if (id != null)
-                        fullName = id;
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+                    fullName = Globals.journalAbbrev.getMedlineAbbreviation(fullName).or(fullName);
                 }
             }
             if (type.getName().equals("Inproceedings")) {
@@ -554,8 +549,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 String year = entry.getField("year");
                 fullName = fullName.replaceAll(", " + year + "\\.?", "");
 
-                if (!fullName.contains("Abstract") && !fullName.contains("Summaries") && !fullName.contains("Conference Record"))
+                if (!fullName.contains("Abstract") && !fullName.contains("Summaries") && !fullName.contains("Conference Record")) {
                     fullName = "Proc. " + fullName;
+                }
             }
             entry.setField(sourceField, fullName);
         }
@@ -570,7 +566,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts       
-            if (Globals.prefs.getBoolean("useConvertToEquation")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
                 abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
                 abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
                 abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
@@ -599,7 +595,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         int index = allText.indexOf("<div class=\"select", startIndex);
         int endIndex = allText.indexOf("</div>", index);
 
-        if (index >= 0 && endIndex > 0) {
+        if ((index >= 0) && (endIndex > 0)) {
             String text = allText.substring(index, endIndex);
             endIndex += 6;
             piv = endIndex;
@@ -619,7 +615,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         int index = allText.indexOf("<div class=\"detail", piv);
         int endIndex = allText.indexOf("</div>", index);
 
-        if (index >= 0 && endIndex > 0) {
+        if ((index >= 0) && (endIndex > 0)) {
             endIndex += 6;
             piv = endIndex;
             String text = allText.substring(index, endIndex);
@@ -661,7 +657,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 System.err.println(text);
             }
 
-            entry = new BibtexEntry(Util.createNeutralId(), type);
+            entry = new BibtexEntry(IdGenerator.next(), type);
 
             if (typeName.equalsIgnoreCase("IEEE Standards")) {
                 entry.setField("organization", "IEEE");
@@ -692,7 +688,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         entry.setField(sourceField, sec_title);
 
                     }
-                    if (field.equals("pages") && fieldMatcher.groupCount() == 2) {
+                    if (field.equals("pages") && (fieldMatcher.groupCount() == 2)) {
                         entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
                     }
                 }
@@ -711,11 +707,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 authorCount++;
             }
             entry.setField("author", authorNames.toString());
-            if (entry.getField("author") == null || entry.getField("author").startsWith("a href") ||
+            if ((entry.getField("author") == null) || entry.getField("author").startsWith("a href") ||
                     entry.getField("author").startsWith("Topic(s)")) { // Fix for some documents without authors
                 entry.setField("author", "");
             }
-            if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
+            if ((entry.getType() == BibtexEntryType.getStandardType("inproceedings")) && entry.getField("author").equals("")) {
                 entry.setType(BibtexEntryType.getStandardType("proceedings"));
             }
 
@@ -756,10 +752,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
-        if (m.find())
+        if (m.find()) {
             return Integer.parseInt(m.group(1));
-        else
+        } else {
             throw new IOException(Globals.lang("Could not parse number of hits"));
+        }
     }
 
     /**
@@ -768,17 +765,19 @@ public class IEEEXploreFetcher implements EntryFetcher {
      * @return
      * @throws IOException
      */
-    public String getResults(URL source) throws IOException {
+    private String getResults(URL source) throws IOException {
 
         InputStream in = source.openStream();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while (true) {
             int bytesRead = in.read(buffer);
-            if (bytesRead == -1)
+            if (bytesRead == -1) {
                 break;
-            for (int i = 0; i < bytesRead; i++)
+            }
+            for (int i = 0; i < bytesRead; i++) {
                 sb.append((char) buffer[i]);
+            }
         }
         return sb.toString();
     }
@@ -791,14 +790,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
      */
     public String getResultsFromFile(File f) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(f));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[256];
         while (true) {
             int bytesRead = in.read(buffer);
-            if (bytesRead == -1)
+            if (bytesRead == -1) {
                 break;
-            for (int i = 0; i < bytesRead; i++)
+            }
+            for (int i = 0; i < bytesRead; i++) {
                 sb.append((char) buffer[i]);
+            }
         }
         return sb.toString();
     }

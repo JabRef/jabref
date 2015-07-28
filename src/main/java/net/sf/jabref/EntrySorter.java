@@ -20,10 +20,10 @@ import java.util.*;
 public class EntrySorter implements DatabaseChangeListener {
 
     //TreeSet set;
-    final ArrayList<BibtexEntry> set;
-    Comparator<BibtexEntry> comp;
-    String[] idArray;
-    BibtexEntry[] entryArray;
+    private final ArrayList<BibtexEntry> set;
+    private final Comparator<BibtexEntry> comp;
+    private String[] idArray;
+    private BibtexEntry[] entryArray;
     private boolean changed = false;
 
 
@@ -32,15 +32,15 @@ public class EntrySorter implements DatabaseChangeListener {
         set = new ArrayList<BibtexEntry>();
         this.comp = comp;
         Set<String> keySet = entries.keySet();
-        for (String aKeySet : keySet) {
-            set.add(entries.get(aKeySet));
+        for (Map.Entry<String, BibtexEntry> stringBibtexEntryEntry : entries.entrySet()) {
+            set.add(stringBibtexEntryEntry.getValue());
         }
         //Collections.sort(set, comp);
         changed = true;
         index();
     }
 
-    public void index() {
+    private void index() {
 
         /*  Old version, from when set was a TreeSet.
 
@@ -78,8 +78,7 @@ public class EntrySorter implements DatabaseChangeListener {
     }
 
     public boolean isOutdated() {
-        boolean outdated = false;
-        return outdated;
+        return false;
     }
 
     public String getIdAt(int pos) {
@@ -97,13 +96,15 @@ public class EntrySorter implements DatabaseChangeListener {
 
     public int getEntryCount() {
         synchronized (set) {
-            if (entryArray != null)
+            if (entryArray != null) {
                 return entryArray.length;
-            else
+            } else {
                 return 0;
+            }
         }
     }
 
+    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         synchronized (set) {
             int pos;

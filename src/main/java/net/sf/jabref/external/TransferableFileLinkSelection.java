@@ -16,8 +16,8 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Util;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 
@@ -34,28 +34,31 @@ import java.util.ArrayList;
  */
 public class TransferableFileLinkSelection implements Transferable {
 
-    List<File> fileList = new ArrayList<File>();
+    private final List<File> fileList = new ArrayList<File>();
 
 
     public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
         String s = selection[0].getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
-        if (s != null)
+        if (s != null) {
             tm.setContent(s);
+        }
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
             String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            File expLink = Util.expandFilename(tm.getEntry(0).getLink(), dirs);
+            File expLink = FileUtil.expandFilename(tm.getEntry(0).getLink(), dirs);
             fileList.add(expLink);
 
         }
 
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] {DataFlavor.javaFileListFlavor};//, DataFlavor.stringFlavor};
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
         System.out.println("Query: " + dataFlavor.getHumanPresentableName() + " , " +
                 dataFlavor.getDefaultRepresentationClass() + " , " + dataFlavor.getMimeType());
@@ -63,6 +66,7 @@ public class TransferableFileLinkSelection implements Transferable {
                 || dataFlavor.equals(DataFlavor.stringFlavor);
     }
 
+    @Override
     public Object getTransferData(DataFlavor dataFlavor) throws UnsupportedFlavorException, IOException {
         //if (dataFlavor.equals(DataFlavor.javaFileListFlavor))
         return fileList;

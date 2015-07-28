@@ -23,21 +23,14 @@ import net.sf.jabref.BibtexEntry;
 
 /**
  * Main class for formatting DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision$
  */
 public class Layout
 {
 
-    //~ Instance fields ////////////////////////////////////////////////////////
+    private final LayoutEntry[] layoutEntries;
 
-    private LayoutEntry[] layoutEntries;
+    private final ArrayList<String> missingFormatters = new ArrayList<String>();
 
-    private ArrayList<String> missingFormatters = new ArrayList<String>();
-
-
-    //~ Constructors ///////////////////////////////////////////////////////////
 
     public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception
     {
@@ -51,20 +44,19 @@ public class Layout
         for (StringInt parsedEntry : parsedEntries) {
             si = parsedEntry;
 
-            if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
-            } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+            if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             } else if (si.i == LayoutHelper.IS_FIELD_START) {
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_FIELD_END) {
-                if (blockStart != null && blockEntries != null) {
+                if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out.println(blockStart + "\n" + si.s);
+                        System.out.println(blockStart + '\n' + si.s);
                         System.out.println(
                                 "Nested field entries are not implemented !!!");
                         Thread.dumpStack();
@@ -74,7 +66,7 @@ public class Layout
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_GROUP_END) {
-                if (blockStart != null && blockEntries != null) {
+                if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix,
@@ -129,7 +121,7 @@ public class Layout
      */
     public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight)
     {
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
             String fieldText = layoutEntry.doLayout(bibtex, database, wordsToHighlight);
@@ -138,8 +130,9 @@ public class Layout
             // The following change means we treat null fields as "". This is to fix the
             // problem of whitespace disappearing after missing fields. Hoping there are
             // no side effects.
-            if (fieldText == null)
+            if (fieldText == null) {
                 fieldText = "";
+            }
 
             sb.append(fieldText);
         }
@@ -156,7 +149,7 @@ public class Layout
     public String doLayout(BibtexDatabase database, String encoding)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
         String fieldText;
         boolean previousSkipped = false;
 
@@ -194,6 +187,3 @@ public class Layout
         return missingFormatters;
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

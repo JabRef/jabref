@@ -20,11 +20,11 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
-public class TextAnalyzer {
+class TextAnalyzer {
 
-    BibtexEntry be = null;
+    private final BibtexEntry be = null;
 
 
     public TextAnalyzer(String text) {
@@ -35,13 +35,13 @@ public class TextAnalyzer {
         return be;
     }
 
-    public void guessBibtexFields(String text) {
+    private void guessBibtexFields(String text) {
 
         TreeSet<Substring> usedParts = new TreeSet<Substring>();
 
         text = "  " + text + "  ";
 
-        String[] split = null;
+        String[] split;
 
         // Look for the year:
         String year = null;
@@ -59,8 +59,9 @@ public class TextAnalyzer {
             int good = -1, yearFound = -1;
             for (int i = 0; i < cand.length; i++) {
                 int number = Integer.parseInt(cand[i].trim());
-                if (number == yearFound)
+                if (number == yearFound) {
                     continue;
+                }
                 if (number < 2500) {
                     if (good == -1) {
                         good = i;
@@ -86,7 +87,7 @@ public class TextAnalyzer {
         }
 
         // Look for Pages:
-        String pages = null;
+        String pages;
         String pagesRx = "\\s(\\d{1,4})( ??)-( ??)(\\d{1,4})(\\.|,|\\s)";
         cand = getMatches(text, pagesRx);
         if (cand.length == 1) {
@@ -100,7 +101,7 @@ public class TextAnalyzer {
                 split = clean(cand[i].replaceAll("\\s", "")).split("-");
                 //   Util.pr("Pg: "+pages);
                 int first = Integer.parseInt(split[0]), second = Integer.parseInt(split[1]);
-                if (second - first > 3) {
+                if ((second - first) > 3) {
                     found = i;
                     break;
                 }
@@ -114,7 +115,7 @@ public class TextAnalyzer {
         }
 
         //String journalRx = "(\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((vol\\.|Vol\\.|Volume|volume))??(.??)(\\d{1,3})(\\.|,|\\s)";
-        String journal = null, volume = null;
+        String journal, volume;
         String journalRx = "(,|\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((.){0,2})((vol\\.|Vol\\.|Volume|volume))??\\s??(\\d{1,3})(\\.|,|\\s|:)";
         cand = getMatches(text, journalRx);
         if (cand.length > 0) {
@@ -129,8 +130,9 @@ public class TextAnalyzer {
                 pos = journal.lastIndexOf(' ');
                 if (pos > 0) {
                     String last = journal.substring(pos + 1).toLowerCase();
-                    if (last.equals("volume") || last.equals("vol") || last.equals("v"))
+                    if (last.equals("volume") || last.equals("vol") || last.equals("v")) {
                         journal = clean(journal.substring(0, pos));
+                    }
                 }
                 pos = text.indexOf(journal);
                 usedParts.add(new Substring("journal", pos, pos + journal.length()));
@@ -139,7 +141,6 @@ public class TextAnalyzer {
             //Util.pr("Journal? '"+cand[0]+"'");
         } else {
             // No journal found. Maybe the year precedes the volume? Try another regexp:
-            journalRx = "(,|\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((.){0,2})\\s??(\\d{1,3})(\\.|,|\\s|:)";
         }
 
         // Then try to find title and authors.
@@ -148,13 +149,13 @@ public class TextAnalyzer {
         int piv = 0;
         for (Substring usedPart : usedParts) {
             ss = usedPart;
-            if (ss.begin() - piv > 10) {
+            if ((ss.begin() - piv) > 10) {
                 Util.pr("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
         }
-        if (text.length() - piv > 10) {
+        if ((text.length() - piv) > 10) {
             free.add(clean(text.substring(piv)));
         }
         Util.pr("Free parts:");
@@ -163,11 +164,12 @@ public class TextAnalyzer {
         }
     }
 
-    public String[] getMatches(String text, String regexp) {
+    private String[] getMatches(String text, String regexp) {
         int piv = 0;
         String[] test = text.split(regexp);
-        if (test.length < 2)
+        if (test.length < 2) {
             return new String[0];
+        }
 
         String[] out = new String[test.length - 1];
         for (int i = 0; i < out.length; i++) {
@@ -182,22 +184,24 @@ public class TextAnalyzer {
     private String clean(String s) {
         boolean found = false;
         int left = 0, right = s.length() - 1;
-        while (!found && left < s.length()) {
+        while (!found && (left < s.length())) {
             char c = s.charAt(left);
             if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == '(')
-                    || (c == ':') || (c == ')'))
+                    || (c == ':') || (c == ')')) {
                 left++;
-            else
+            } else {
                 found = true;
+            }
         }
         found = false;
-        while (!found && right > left) {
+        while (!found && (right > left)) {
             char c = s.charAt(right);
             if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == ')')
-                    || (c == ':') || (c == '('))
+                    || (c == ':') || (c == '(')) {
                 right--;
-            else
+            } else {
                 found = true;
+            }
         }
         //Util.pr(s+"\n"+left+" "+right);
         return s.substring(left, Math.min(right + 1, s.length()));
@@ -206,7 +210,8 @@ public class TextAnalyzer {
 
     private class Substring implements Comparable<Substring> {
 
-        int begin, end;
+        final int begin;
+        final int end;
 
 
         public Substring(String name, int begin, int end) {
@@ -222,6 +227,7 @@ public class TextAnalyzer {
             return end;
         }
 
+        @Override
         public int compareTo(Substring other) {
             return (new Integer(begin)).compareTo(other.begin());
         }

@@ -19,8 +19,8 @@ import net.sf.jabref.Globals;
 
 public abstract class Rank extends SpecialField {
 
-    public Rank() {
-        TEXT_DONE_PATTERN = Globals.lang("Set rank to '%0' for %1 entries");
+    Rank() {
+        TEXT_DONE_PATTERN = "Set rank to '%0' for %1 entries";
     }
 
     public static Rank getInstance() {
@@ -31,14 +31,17 @@ public abstract class Rank extends SpecialField {
         }
     }
 
+    @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_RANKING;
     }
 
+    @Override
     public String getToolTip() {
         return Globals.lang("Rank");
     }
 
+    @Override
     public String getMenuString() {
         return Globals.lang("Rank");
     }

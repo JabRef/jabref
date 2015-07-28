@@ -23,15 +23,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +37,7 @@ public class FileActions {
     }
 
 
-    private static Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
+    private static final Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static BibtexString.Type previousStringType;
 
 
@@ -53,7 +45,7 @@ public class FileActions {
         if (preamble != null) {
             fw.write("@PREAMBLE{");
             fw.write(preamble);
-            fw.write("}" + Globals.NEWLINE + Globals.NEWLINE);
+            fw.write('}' + Globals.NEWLINE + Globals.NEWLINE);
         }
     }
 
@@ -66,7 +58,7 @@ public class FileActions {
      * @throws IOException If anthing goes wrong in writing.
      */
     private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
-        previousStringType = BibtexString.Type.AUTHOR;
+        FileActions.previousStringType = BibtexString.Type.AUTHOR;
         List<BibtexString> strings = new ArrayList<BibtexString>();
         for (String s : database.getStringKeySet()) {
             strings.add(database.getString(s));
@@ -82,8 +74,8 @@ public class FileActions {
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
             for (BibtexString bs : strings) {
-                if (remaining.containsKey(bs.getName()) && bs.getType() == t) {
-                    writeString(fw, bs, remaining, maxKeyLength);
+                if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
+                    FileActions.writeString(fw, bs, remaining, maxKeyLength);
                 }
             }
         }
@@ -99,20 +91,20 @@ public class FileActions {
         // that the string order will be acceptable for BibTeX.
         String content = bs.getContent();
         Matcher m;
-        while ((m = refPat.matcher(content)).find()) {
+        while ((m = FileActions.refPat.matcher(content)).find()) {
             String foundLabel = m.group(1);
             int restIndex = content.indexOf(foundLabel) + foundLabel.length();
             content = content.substring(restIndex);
             Object referred = remaining.get(foundLabel.substring(1, foundLabel.length() - 1));
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (referred != null) {
-                writeString(fw, (BibtexString) referred, remaining, maxKeyLength);
+                FileActions.writeString(fw, (BibtexString) referred, remaining, maxKeyLength);
             }
         }
 
-        if (previousStringType != bs.getType()) {
+        if (FileActions.previousStringType != bs.getType()) {
             fw.write(Globals.NEWLINE);
-            previousStringType = bs.getType();
+            FileActions.previousStringType = bs.getType();
         }
 
         String suffix = "";
@@ -121,13 +113,13 @@ public class FileActions {
         }
 
         fw.write("@String { " + bs.getName() + suffix + " = ");
-        if (!bs.getContent().equals("")) {
+        if (!bs.getContent().isEmpty()) {
             try {
                 String formatted = (new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING);
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
-                        Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + "\n"
+                        Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n'
                                 + Globals.lang("Before saving, please edit any strings containing the # character."));
             }
 
@@ -147,7 +139,7 @@ public class FileActions {
     private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
         out.write("% ");
         out.write(GUIGlobals.SIGNATURE);
-        out.write(" " + GUIGlobals.version + "." + Globals.NEWLINE + "% "
+        out.write(' ' + Globals.BUILD_INFO.getVersion() + '.' + Globals.NEWLINE + "% "
                 + GUIGlobals.encPrefix + encoding + Globals.NEWLINE + Globals.NEWLINE);
     }
 
@@ -165,7 +157,7 @@ public class FileActions {
 
         TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>();
 
-        boolean backup = prefs.getBoolean("backup");
+        boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
             backup = false;
         }
@@ -181,7 +173,7 @@ public class FileActions {
             // we must catch all exceptions to be able notify users that
             // saving failed, no matter what the reason was
             // (and they won't just quit JabRef thinking
-            // everyting worked and loosing data)
+            // everything worked and loosing data)
             e.printStackTrace();
             throw new SaveException(e.getMessage());
         }
@@ -193,19 +185,19 @@ public class FileActions {
             VerifyingWriter fw = session.getWriter();
 
             // Write signature.
-            writeBibFileHeader(fw, encoding);
+            FileActions.writeBibFileHeader(fw, encoding);
 
             // Write preamble if there is one.
-            writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(fw, database.getPreamble());
 
             // Write strings if there are any.
-            writeStrings(fw, database);
+            FileActions.writeStrings(fw, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<BibtexEntry> sorter = getSortedEntries(database, metaData, null, true);
+            List<BibtexEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
@@ -224,11 +216,11 @@ public class FileActions {
                 // Check if the entry should be written.
                 boolean write = true;
 
-                if (checkSearch && !nonZeroField(be, BibtexFields.SEARCH)) {
+                if (checkSearch && !FileActions.nonZeroField(be, BibtexFields.SEARCH)) {
                     write = false;
                 }
 
-                if (checkGroup && !nonZeroField(be, BibtexFields.GROUPSEARCH)) {
+                if (checkGroup && !FileActions.nonZeroField(be, BibtexFields.GROUPSEARCH)) {
                     write = false;
                 }
 
@@ -244,9 +236,9 @@ public class FileActions {
             }
 
             // Write type definitions, if any:
-            if (types.size() > 0) {
-                for (String s : types.keySet()) {
-                    BibtexEntryType type = types.get(s);
+            if (!types.isEmpty()) {
+                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                    BibtexEntryType type = stringBibtexEntryTypeEntry.getValue();
                     if (type instanceof CustomEntryType) {
                         CustomEntryType tp = (CustomEntryType) type;
                         tp.save(fw);
@@ -362,7 +354,7 @@ public class FileActions {
         // that we must save along with entries using them.
 
         BibtexEntry be = null;
-        boolean backup = prefs.getBoolean("backup");
+        boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
 
         SaveSession session;
         try {
@@ -378,20 +370,20 @@ public class FileActions {
 
             if (saveType != DatabaseSaveType.PLAIN_BIBTEX) {
                 // Write signature.
-                writeBibFileHeader(fw, encoding);
+                FileActions.writeBibFileHeader(fw, encoding);
             }
 
             // Write preamble if there is one.
-            writePreamble(fw, database.getPreamble());
+            FileActions.writePreamble(fw, database.getPreamble());
 
             // Write strings if there are any.
-            writeStrings(fw, database);
+            FileActions.writeStrings(fw, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            List<Comparator<BibtexEntry>> comparators = getSaveComparators(true, metaData);
+            List<Comparator<BibtexEntry>> comparators = FileActions.getSaveComparators(true, metaData);
 
             // Use glazed lists to get a sorted view of the entries:
             List<BibtexEntry> sorter = new ArrayList<BibtexEntry>(bes.length);
@@ -416,14 +408,14 @@ public class FileActions {
             }
 
             // Write meta data.
-            if (saveType != DatabaseSaveType.PLAIN_BIBTEX && metaData != null) {
+            if ((saveType != DatabaseSaveType.PLAIN_BIBTEX) && (metaData != null)) {
                 metaData.writeMetaData(fw);
             }
 
             // Write type definitions, if any:
-            if (types.size() > 0) {
-                for (String s : types.keySet()) {
-                    CustomEntryType tp = (CustomEntryType) types.get(s);
+            if (!types.isEmpty()) {
+                for (Map.Entry<String, BibtexEntryType> stringBibtexEntryTypeEntry : types.entrySet()) {
+                    CustomEntryType tp = (CustomEntryType) stringBibtexEntryTypeEntry.getValue();
                     tp.save(fw);
                     fw.write(Globals.NEWLINE);
                 }
@@ -447,7 +439,7 @@ public class FileActions {
      * unsuccessful (e.g. file not found), an IOException is thrown.
      */
     public static Reader getReader(String name) throws IOException {
-        Reader reader = null;
+        Reader reader;
         // Try loading as a resource first. This works for files inside the jar:
         URL reso = Globals.class.getResource(name);
 
@@ -482,13 +474,13 @@ public class FileActions {
         if (isSaveOperation) {
             Vector<String> storedSaveOrderConfig = metaData.getData(net.sf.jabref.gui.DatabasePropertiesDialog.SAVE_ORDER_CONFIG);
             if (storedSaveOrderConfig == null) {
-                inOriginalOrder = Globals.prefs.getBoolean("saveInOriginalOrder");
+                inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
             } else {
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
                 inOriginalOrder = saveOrderConfig.saveInOriginalOrder;
             }
         } else {
-            inOriginalOrder = Globals.prefs.getBoolean("exportInOriginalOrder");
+            inOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         }
         List<Comparator<BibtexEntry>> comparators;
         if (inOriginalOrder) {
@@ -498,7 +490,7 @@ public class FileActions {
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
         } else {
-            comparators = getSaveComparators(isSaveOperation, metaData);
+            comparators = FileActions.getSaveComparators(isSaveOperation, metaData);
         }
 
         FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
@@ -530,7 +522,3 @@ public class FileActions {
         return ((o != null) && !o.equals("0"));
     }
 }
-
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

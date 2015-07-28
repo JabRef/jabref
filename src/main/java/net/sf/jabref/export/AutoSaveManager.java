@@ -18,6 +18,7 @@ package net.sf.jabref.export;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,7 +31,7 @@ import java.io.File;
  */
 public class AutoSaveManager {
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private Timer t = null;
 
 
@@ -40,9 +41,14 @@ public class AutoSaveManager {
     }
 
     public void startAutoSaveTimer() {
+        if(t != null) {
+            // shut down any previously set timer to not leak any timers
+            t.cancel();
+        }
+
         TimerTask task = new AutoSaveTask();
         t = new Timer();
-        long interval = (long) (60000 * Globals.prefs.getInt("autoSaveInterval"));
+        long interval = 60000 * Globals.prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL);
         t.scheduleAtFixedRate(task, interval, interval);
     }
 
@@ -51,26 +57,24 @@ public class AutoSaveManager {
     }
 
 
-    class AutoSaveTask extends TimerTask {
+    private class AutoSaveTask extends TimerTask {
 
+        @Override
         public void run() {
             // Since this method is running in the background, we must be prepared that
             // there could be changes done by the user while this method is running.
 
             List<BasePanel> panels = new ArrayList<BasePanel>();
-            for (int i = 0; i < frame.baseCount(); i++)
+            for (int i = 0; i < frame.baseCount(); i++) {
                 panels.add(frame.baseAt(i));
+            }
 
-            int i = 0;
             for (BasePanel panel : panels) {
                 if (panel.isBaseChanged()) {
                     if (panel.getFile() != null) {
-                        autoSave(panel);
+                        AutoSaveManager.autoSave(panel);
                     }
                 }
-                else {
-                }
-                i++;
             }
         }
     }
@@ -83,7 +87,7 @@ public class AutoSaveManager {
      */
     public static File getAutoSaveFile(File f) {
         String n = f.getName();
-        return new File(f.getParentFile(), ".$" + n + "$");
+        return new File(f.getParentFile(), ".$" + n + '$');
     }
 
     /**
@@ -91,8 +95,8 @@ public class AutoSaveManager {
      * @param panel The BasePanel to autosave for.
      * @return true if successful, false otherwise.
      */
-    public static boolean autoSave(BasePanel panel) {
-        File backupFile = getAutoSaveFile(panel.getFile());
+    private static boolean autoSave(BasePanel panel) {
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getFile());
         try {
             SaveSession ss = FileActions.saveDatabase(panel.database(), panel.metaData(),
                     backupFile, Globals.prefs,
@@ -114,14 +118,15 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getFile() == null)
+        if (panel.getFile() == null) {
             return true;
-        File backupFile = getAutoSaveFile(panel.getFile());
+        }
+        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getFile());
         if (backupFile.exists()) {
             return backupFile.delete();
-        }
-        else
+        } else {
             return true;
+        }
     }
 
     /**
@@ -130,10 +135,11 @@ public class AutoSaveManager {
      */
     public void clearAutoSaves() {
         List<BasePanel> panels = new ArrayList<BasePanel>();
-        for (int i = 0; i < frame.baseCount(); i++)
+        for (int i = 0; i < frame.baseCount(); i++) {
             panels.add(frame.baseAt(i));
+        }
         for (BasePanel panel : panels) {
-            deleteAutoSaveFile(panel);
+            AutoSaveManager.deleteAutoSaveFile(panel);
         }
     }
 
@@ -144,7 +150,7 @@ public class AutoSaveManager {
      *   than the given file.
      */
     public static boolean newerAutoSaveExists(File f) {
-        File asFile = getAutoSaveFile(f);
+        File asFile = AutoSaveManager.getAutoSaveFile(f);
         return asFile.exists() && (asFile.lastModified() > f.lastModified());
     }
 }

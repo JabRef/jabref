@@ -16,6 +16,7 @@
 package net.sf.jabref.sql;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  *
@@ -51,10 +52,10 @@ public class DBStrings {
     public void initialize() {
         String[] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
         setServerTypes(servers);
-        setServerType(Globals.prefs.get("dbConnectServerType"));
-        setServerHostname(Globals.prefs.get("dbConnectHostname"));
-        setDatabase(Globals.prefs.get("dbConnectDatabase"));
-        setUsername(Globals.prefs.get("dbConnectUsername"));
+        setServerType(Globals.prefs.get(JabRefPreferences.DB_CONNECT_SERVER_TYPE));
+        setServerHostname(Globals.prefs.get(JabRefPreferences.DB_CONNECT_HOSTNAME));
+        setDatabase(Globals.prefs.get(JabRefPreferences.DB_CONNECT_DATABASE));
+        setUsername(Globals.prefs.get(JabRefPreferences.DB_CONNECT_USERNAME));
         setPassword("");
         isInitialized(true);
     }
@@ -103,7 +104,7 @@ public class DBStrings {
         return serverTypes;
     }
 
-    public void setServerTypes(String[] serverTypes) {
+    private void setServerTypes(String[] serverTypes) {
         this.serverTypes = serverTypes;
     }
 
@@ -111,7 +112,7 @@ public class DBStrings {
         return isInitialized;
     }
 
-    public void isInitialized(boolean isInitialized) {
+    private void isInitialized(boolean isInitialized) {
         this.isInitialized = isInitialized;
     }
 
@@ -127,9 +128,9 @@ public class DBStrings {
      * Store these db strings into JabRef preferences.
      */
     public void storeToPreferences() {
-        Globals.prefs.put("dbConnectServerType", getServerType());
-        Globals.prefs.put("dbConnectHostname", getServerHostname());
-        Globals.prefs.put("dbConnectDatabase", getDatabase());
-        Globals.prefs.put("dbConnectUsername", getUsername());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_SERVER_TYPE, getServerType());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_HOSTNAME, getServerHostname());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_DATABASE, getDatabase());
+        Globals.prefs.put(JabRefPreferences.DB_CONNECT_USERNAME, getUsername());
     }
 }

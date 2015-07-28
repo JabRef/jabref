@@ -23,25 +23,27 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
 import net.sf.jabref.undo.UndoableStringChange;
 
-public class StringNameChange extends Change {
+class StringNameChange extends Change {
 
-    BibtexString string;
-    String mem, tmp, disk, content;
-    private BibtexString tmpString;
+    private final BibtexString string;
+    private final String mem;
+    private final String disk;
+    private final String content;
+    private final BibtexString tmpString;
 
 
     public StringNameChange(BibtexString string, BibtexString tmpString,
             String mem, String tmp, String disk, String content) {
         this.tmpString = tmpString;
-        name = Globals.lang("Renamed string") + ": '" + tmp + "'";
+        name = Globals.lang("Renamed string") + ": '" + tmp + '\'';
         this.string = string;
         this.content = content;
         this.mem = mem;
-        this.tmp = tmp;
         this.disk = disk;
 
     }
 
+    @Override
     public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
         if (panel.database().hasStringLabel(disk)) {
@@ -56,7 +58,7 @@ public class StringNameChange extends Change {
                     disk));
         } else {
             // The string was removed or renamed locally. We guess that it was removed.
-            String newId = Util.createNeutralId();
+            String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
             try {
                 panel.database().addString(bs);
@@ -71,7 +73,7 @@ public class StringNameChange extends Change {
             tmpString.setName(disk);
         }
         else {
-            String newId = Util.createNeutralId();
+            String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
             secondary.addString(bs);
         }
@@ -79,6 +81,7 @@ public class StringNameChange extends Change {
         return true;
     }
 
+    @Override
     JComponent description() {
         return new JLabel(disk + " : " + content);
     }

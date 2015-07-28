@@ -1,6 +1,8 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,43 +25,44 @@ public class CopacImporterTest {
     public void testIsRecognizedFormat() throws IOException {
 
         CopacImporter importer = new CopacImporter();
-        assertTrue(importer.isRecognizedFormat(CopacImporterTest.class
+        Assert.assertTrue(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest1.txt")));
 
-        assertTrue(importer.isRecognizedFormat(CopacImporterTest.class
+        Assert.assertTrue(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest2.txt")));
 
-        assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
+        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("IsiImporterTest1.isi")));
 
-        assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
+        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("IsiImporterTestInspec.isi")));
 
-        assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
+        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("IsiImporterTestWOS.isi")));
 
-        assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
+        Assert.assertFalse(importer.isRecognizedFormat(CopacImporterTest.class
                 .getResourceAsStream("IsiImporterTestMedline.isi")));
     }
 
     @Test
-    @Ignore
     public void testImportEntries() throws IOException {
+        Globals.prefs.put("defaultEncoding", "UTF8");
+
         CopacImporter importer = new CopacImporter();
 
         List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
-        assertEquals(1, entries.size());
+        Assert.assertEquals(1, entries.size());
         BibtexEntry entry = entries.get(0);
 
-        assertEquals("The SIS project : software reuse with a natural language approach", entry.getField("title"));
-        assertEquals(
+        Assert.assertEquals("The SIS project : software reuse with a natural language approach", entry.getField("title"));
+        Assert.assertEquals(
                 "Prechelt, Lutz and Universität Karlsruhe. Fakultät für Informatik",
                 entry.getField("author"));
-        assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
-        assertEquals("1992", entry.getField("year"));
-        assertEquals("Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik", entry.getField("publisher"));
-        assertEquals(BibtexEntryType.BOOK, entry.getType());
+        Assert.assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
+        Assert.assertEquals("1992", entry.getField("year"));
+        Assert.assertEquals("Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik", entry.getField("publisher"));
+        Assert.assertEquals(BibtexEntryType.BOOK, entry.getType());
     }
 
     @Test
@@ -68,13 +71,13 @@ public class CopacImporterTest {
 
         List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest2.txt"), new OutputPrinterToNull());
-        assertEquals(2, entries.size());
+        Assert.assertEquals(2, entries.size());
         BibtexEntry one = entries.get(0);
 
-        assertEquals("Computing and operational research at the London Hospital", one.getField("title"));
+        Assert.assertEquals("Computing and operational research at the London Hospital", one.getField("title"));
 
         BibtexEntry two = entries.get(1);
 
-        assertEquals("Real time systems : management and design", two.getField("title"));
+        Assert.assertEquals("Real time systems : management and design", two.getField("title"));
     }
 }

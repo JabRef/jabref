@@ -45,7 +45,7 @@ import net.sf.jabref.BibtexEntry;
 public class IntegrityCheck
 {
 
-    private Vector<IntegrityMessage> messages;
+    private final Vector<IntegrityMessage> messages;
 
 
     public IntegrityCheck()
@@ -69,26 +69,31 @@ public class IntegrityCheck
         return new Vector<IntegrityMessage>(messages);
     }
 
-    public void checkSingleEntry(BibtexEntry entry)
+    private void checkSingleEntry(BibtexEntry entry)
     {
-        if (entry == null)
+        if (entry == null) {
             return;
+        }
 
         Object data = entry.getField("author");
-        if (data != null)
+        if (data != null) {
             authorNameCheck(data.toString(), "author", entry);
+        }
 
         data = entry.getField("editor");
-        if (data != null)
+        if (data != null) {
             authorNameCheck(data.toString(), "editor", entry);
+        }
 
         data = entry.getField("title");
-        if (data != null)
+        if (data != null) {
             titleCheck(data.toString(), "title", entry);
+        }
 
         data = entry.getField("year");
-        if (data != null)
+        if (data != null) {
             yearCheck(data.toString(), "year", entry);
+        }
     }
 
     /** fills the class Vector (of IntegrityMessage Objects) which did inform about
@@ -100,7 +105,7 @@ public class IntegrityCheck
     {
         // try to extract the structure of author tag
         // N = name, ","= seperator, "a" = and
-        StringBuffer structure = new StringBuffer();
+        StringBuilder structure = new StringBuilder();
         int len = names.length();
         int mode = -1;
         for (int t = 0; t < len; t++)
@@ -109,42 +114,48 @@ public class IntegrityCheck
             switch (ch)
             {
             case ',':
-                if (mode == 5) // "and"
+                if (mode == 5) {
                     structure.append('a');
-                else
+                } else {
                     structure.append('N');
+                }
 
                 structure.append(',');
                 mode = 0;
                 break;
 
             case ' ':
-                if (mode == 5) // "and"
+                if (mode == 5) {
                     structure.append('a');
-                else if (mode != 0)
+                } else if (mode != 0) {
                     structure.append('N');
+                }
                 mode = -1; // blank processed
                 break;
             case 'a':
-                if (mode == -1)
+                if (mode == -1) {
                     mode = 2;
+                }
                 break;
             case 'n':
-                if (mode == 2)
+                if (mode == 2) {
                     mode = 3;
+                }
                 break;
             case 'd':
-                if (mode == 3)
+                if (mode == 3) {
                     mode = 5;
+                }
                 break;
             default:
                 mode = 1;
             }
         }
-        if (mode == 5) // "and"
+        if (mode == 5) {
             structure.append('a');
-        else if (mode != 0)
+        } else if (mode != 0) {
             structure.append('N');
+        }
 
         // Check
         len = structure.length();
@@ -253,8 +264,9 @@ public class IntegrityCheck
                 fourDigitsBlock = digitCounter == 4;
             } else
             {
-                if (fourDigitsBlock)
+                if (fourDigitsBlock) {
                     containsFourDigits = true;
+                }
 
                 digitCounter = 0;
             }

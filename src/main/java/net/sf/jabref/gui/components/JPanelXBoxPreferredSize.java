@@ -18,7 +18,7 @@ package net.sf.jabref.gui.components;
 import java.awt.Component;
 import java.awt.Dimension;
 
-public class JPanelXBoxPreferredSize extends JPanelXBox {
+class JPanelXBoxPreferredSize extends JPanelXBox {
 
     public JPanelXBoxPreferredSize() {
         // nothing special
@@ -28,6 +28,7 @@ public class JPanelXBoxPreferredSize extends JPanelXBox {
         add(c);
     }
 
+    @Override
     public Dimension getMaximumSize() {
         return getPreferredSize();
     }

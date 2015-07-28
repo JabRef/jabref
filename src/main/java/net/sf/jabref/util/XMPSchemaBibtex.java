@@ -36,7 +36,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      */
     public static final String NAMESPACE = "http://jabref.sourceforge.net/bibteXMP/";
 
-    public static final String KEY = "bibtex";
+    private static final String KEY = "bibtex";
 
 
     /**
@@ -45,7 +45,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param parent
      */
     public XMPSchemaBibtex(XMPMetadata parent) {
-        super(parent, KEY, NAMESPACE);
+        super(parent, XMPSchemaBibtex.KEY, XMPSchemaBibtex.NAMESPACE);
     }
 
     /**
@@ -55,11 +55,11 @@ public class XMPSchemaBibtex extends XMPSchema {
      *            The existing XML element.
      */
     public XMPSchemaBibtex(Element e, String namespace) {
-        super(e, KEY);
+        super(e, XMPSchemaBibtex.KEY);
     }
 
-    protected String makeProperty(String propertyName) {
-        return KEY + ":" + propertyName;
+    private String makeProperty(String propertyName) {
+        return XMPSchemaBibtex.KEY + ':' + propertyName;
     }
 
     /**
@@ -87,53 +87,64 @@ public class XMPSchemaBibtex extends XMPSchema {
         }
     }
 
+    @Override
     public String getTextProperty(String field) {
         return super.getTextProperty(makeProperty(field));
     }
 
+    @Override
     public void setTextProperty(String field, String value) {
         super.setTextProperty(makeProperty(field), value);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<String> getBagList(String bagName) {
         return super.getBagList(makeProperty(bagName));
     }
 
+    @Override
     public void removeBagValue(String bagName, String value) {
         super.removeBagValue(makeProperty(bagName), value);
     }
 
+    @Override
     public void addBagValue(String bagName, String value) {
         super.addBagValue(makeProperty(bagName), value);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<String> getSequenceList(String seqName) {
         return super.getSequenceList(makeProperty(seqName));
     }
 
+    @Override
     public void removeSequenceValue(String seqName, String value) {
         super.removeSequenceValue(makeProperty(seqName), value);
     }
 
+    @Override
     public void addSequenceValue(String seqName, String value) {
         super.addSequenceValue(makeProperty(seqName), value);
     }
 
+    @Override
     public List<Calendar> getSequenceDateList(String seqName) throws IOException {
         return super.getSequenceDateList(makeProperty(seqName));
     }
 
+    @Override
     public void removeSequenceDateValue(String seqName, Calendar date) {
         super.removeSequenceDateValue(makeProperty(seqName), date);
     }
 
+    @Override
     public void addSequenceDateValue(String field, Calendar date) {
         super.addSequenceDateValue(makeProperty(field), date);
     }
 
-    public static String getContents(NodeList seqList) {
+    private static String getContents(NodeList seqList) {
 
         Element seqNode = (Element) seqList.item(0);
         StringBuffer seq = null;
@@ -146,7 +157,7 @@ public class XMPSchemaBibtex extends XMPSchema {
             } else {
                 seq.append(" and ");
             }
-            seq.append(getTextContent(li));
+            seq.append(XMPSchemaBibtex.getTextContent(li));
         }
         if (seq != null) {
             return seq.toString();
@@ -176,19 +187,20 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (int i = 0; i < n; i++) {
             Node node = nodes.item(i);
-            if (node.getNodeType() != Node.ATTRIBUTE_NODE
-                    && node.getNodeType() != Node.ELEMENT_NODE)
+            if ((node.getNodeType() != Node.ATTRIBUTE_NODE)
+                    && (node.getNodeType() != Node.ELEMENT_NODE)) {
                 continue;
+            }
 
             String nodeName = node.getNodeName();
 
             String[] split = nodeName.split(":");
 
-            if (split.length == 2 && split[0].equals(namespaceName)) {
+            if ((split.length == 2) && split[0].equals(namespaceName)) {
                 NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
                 if (seqList.getLength() > 0) {
 
-                    String seq = getContents(seqList);
+                    String seq = XMPSchemaBibtex.getContents(seqList);
 
                     if (seq != null) {
                         result.put(split[1], seq);
@@ -197,13 +209,13 @@ public class XMPSchemaBibtex extends XMPSchema {
                     NodeList bagList = ((Element) node).getElementsByTagName("rdf:Bag");
                     if (bagList.getLength() > 0) {
 
-                        String seq = getContents(bagList);
+                        String seq = XMPSchemaBibtex.getContents(bagList);
 
                         if (seq != null) {
                             result.put(split[1], seq);
                         }
                     } else {
-                        result.put(split[1], getTextContent(node));
+                        result.put(split[1], XMPSchemaBibtex.getTextContent(node));
                     }
                 }
             }
@@ -217,7 +229,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
             String nodeName = attr.getNodeName();
             String[] split = nodeName.split(":");
-            if (split.length == 2 && split[0].equals(namespaceName)) {
+            if ((split.length == 2) && split[0].equals(namespaceName)) {
                 result.put(split[1], attr.getNodeValue());
             }
         }
@@ -236,8 +248,9 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (Map.Entry<String, String> entry : result.entrySet()) {
             String key = entry.getKey();
-            if (preserveWhiteSpace.contains(key))
+            if (XMPSchemaBibtex.preserveWhiteSpace.contains(key)) {
                 continue;
+            }
             entry.setValue(entry.getValue().replaceAll("\\s+", " ").trim());
         }
 
@@ -245,11 +258,11 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
 
-    public static HashSet<String> preserveWhiteSpace = new HashSet<String>();
+    private static final HashSet<String> preserveWhiteSpace = new HashSet<String>();
     static {
-        preserveWhiteSpace.add("abstract");
-        preserveWhiteSpace.add("note");
-        preserveWhiteSpace.add("review");
+        XMPSchemaBibtex.preserveWhiteSpace.add("abstract");
+        XMPSchemaBibtex.preserveWhiteSpace.add("note");
+        XMPSchemaBibtex.preserveWhiteSpace.add("review");
     }
 
 
@@ -267,7 +280,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         Set<String> fields = entry.getAllFields();
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
-        if (prefs.getBoolean("useXmpPrivacyFilter")) {
+        if (prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER)) {
             TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
             fields.removeAll(filters);
         }
@@ -287,15 +300,16 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         String type = getTextProperty("entrytype");
         BibtexEntryType t;
-        if (type != null)
+        if (type != null) {
             t = BibtexEntryType.getStandardType(type);
-        else
+        } else {
             t = BibtexEntryType.OTHER;
+        }
 
-        BibtexEntry e = new BibtexEntry(Util.createNeutralId(), t);
+        BibtexEntry e = new BibtexEntry(IdGenerator.next(), t);
 
         // Get Text Properties
-        Map<String, String> text = getAllProperties(this, "bibtex");
+        Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");
         text.remove("entrytype");
         e.setField(text);
         return e;

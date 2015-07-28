@@ -33,16 +33,13 @@ import net.sf.jabref.OutputPrinter;
  * Documentation can be found online at:
  * 
  * http://copac.ac.uk/faq/#format
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class CopacImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
         return "Copac";
     }
@@ -52,17 +49,19 @@ public class CopacImporter extends ImportFormat {
      * 
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
         return "cpc";
     }
 
 
-    static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
+    private static final Pattern copacPattern = Pattern.compile("^\\s*TI- ");
 
 
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -70,8 +69,9 @@ public class CopacImporter extends ImportFormat {
         String str;
 
         while ((str = in.readLine()) != null) {
-            if (copacPattern.matcher(str).find())
+            if (CopacImporter.copacPattern.matcher(str).find()) {
                 return true;
+            }
         }
 
         return false;
@@ -81,9 +81,11 @@ public class CopacImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        if (stream == null)
+        if (stream == null) {
             throw new IOException("No stream given.");
+        }
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
@@ -95,8 +97,9 @@ public class CopacImporter extends ImportFormat {
 
             while ((str = in.readLine()) != null) {
 
-                if (str.length() < 4)
+                if (str.length() < 4) {
                     continue;
+                }
 
                 String code = str.substring(0, 4);
 
@@ -114,8 +117,9 @@ public class CopacImporter extends ImportFormat {
                     sb.append('\n').append(str);
                 }
             }
-            if (sb.length() > 0)
+            if (sb.length() > 0) {
                 entries.add(sb.toString());
+            }
         }
 
         List<BibtexEntry> results = new LinkedList<BibtexEntry>();
@@ -131,32 +135,34 @@ public class CopacImporter extends ImportFormat {
 
             for (String line1 : lines) {
                 String line = line1.trim();
-                if (line.length() < 4)
+                if (line.length() < 4) {
                     continue;
+                }
                 String code = line.substring(0, 4);
 
-                if (code.equals("TI- "))
+                if (code.equals("TI- ")) {
                     setOrAppend(b, "title", line.substring(4).trim(), ", ");
-                else if (code.equals("AU- "))
+                } else if (code.equals("AU- ")) {
                     setOrAppend(b, "author", line.substring(4).trim(), " and ");
-                else if (code.equals("PY- "))
+                } else if (code.equals("PY- ")) {
                     setOrAppend(b, "year", line.substring(4).trim(), ", ");
-                else if (code.equals("PU- "))
+                } else if (code.equals("PU- ")) {
                     setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
-                else if (code.equals("SE- "))
+                } else if (code.equals("SE- ")) {
                     setOrAppend(b, "series", line.substring(4).trim(), ", ");
-                else if (code.equals("IS- "))
+                } else if (code.equals("IS- ")) {
                     setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
-                else if (code.equals("KW- "))
+                } else if (code.equals("KW- ")) {
                     setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
-                else if (code.equals("NT- "))
+                } else if (code.equals("NT- ")) {
                     setOrAppend(b, "note", line.substring(4).trim(), ", ");
-                else if (code.equals("PD- "))
+                } else if (code.equals("PD- ")) {
                     setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
-                else if (code.equals("DT- "))
+                } else if (code.equals("DT- ")) {
                     setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
-                else
+                } else {
                     setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
+                }
             }
             results.add(b);
         }
@@ -164,11 +170,12 @@ public class CopacImporter extends ImportFormat {
         return results;
     }
 
-    void setOrAppend(BibtexEntry b, String field, String value, String separator) {
+    private void setOrAppend(BibtexEntry b, String field, String value, String separator) {
         String o = b.getField(field);
-        if (o != null)
+        if (o != null) {
             b.setField(field, o + separator + value);
-        else
+        } else {
             b.setField(field, value);
+        }
     }
 }

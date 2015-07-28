@@ -17,7 +17,7 @@ package net.sf.jabref.sql;
 
 import net.sf.jabref.BaseAction;
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.sql.exporter.DBExporter;
 
@@ -32,9 +32,9 @@ import java.awt.event.ActionEvent;
  * Jan 20th Adjusted to accomodate changes on SQL Exporter module by ifsteinm
  * 
  */
-public class DbConnectAction extends BaseAction {
+public class DbConnectAction implements BaseAction {
 
-    private BasePanel panel;
+    private final BasePanel panel;
 
 
     public DbConnectAction(BasePanel panel) {
@@ -46,8 +46,9 @@ public class DbConnectAction extends BaseAction {
     }
 
 
-    class DbImpAction extends AbstractAction {
+    private class DbImpAction extends AbstractAction {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             action();
 
@@ -55,6 +56,7 @@ public class DbConnectAction extends BaseAction {
     }
 
 
+    @Override
     public void action() {
 
         DBStrings dbs = panel.metaData().getDBStrings();
@@ -94,7 +96,7 @@ public class DbConnectAction extends BaseAction {
                         Globals.lang(preamble) + "  " + errorMessage);
 
                 JOptionPane.showMessageDialog(panel.frame(),
-                        Globals.lang(preamble) + "\n" + errorMessage,
+                        Globals.lang(preamble) + '\n' + errorMessage,
                         Globals.lang("Connect to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
             } finally {

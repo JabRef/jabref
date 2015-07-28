@@ -22,15 +22,16 @@ import java.util.Comparator;
 /**
  * Comparator that handles icon columns. 
  */
-public class IconComparator implements Comparator<BibtexEntry> {
+class IconComparator implements Comparator<BibtexEntry> {
 
-    private String[] fields;
+    private final String[] fields;
 
 
     public IconComparator(String[] fields) {
         this.fields = fields;
     }
 
+    @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
 
         for (String field : fields) {

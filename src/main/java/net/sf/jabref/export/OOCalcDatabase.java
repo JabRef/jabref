@@ -40,9 +40,9 @@ import ca.odell.glazedlists.SortedList;
  * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
  *
  */
-public class OOCalcDatabase {
+class OOCalcDatabase {
 
-    protected Collection<BibtexEntry> entries;
+    private final Collection<BibtexEntry> entries;
 
 
     @SuppressWarnings("unchecked")
@@ -56,11 +56,12 @@ public class OOCalcDatabase {
         BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
-        if (keySet == null)
+        if (keySet == null) {
             entryList.addAll(bibtex.getEntries());
-        else {
-            for (String key : keySet)
+        } else {
+            for (String key : keySet) {
                 entryList.add(bibtex.getEntryById(key));
+            }
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
@@ -206,12 +207,12 @@ public class OOCalcDatabase {
         return result;
     }
 
-    protected String getField(BibtexEntry e, String field) {
+    private String getField(BibtexEntry e, String field) {
         Object o = e.getField(field);
         return o == null ? "" : o.toString();
     }
 
-    protected void addTableCell(Document doc, Element parent, String content) {
+    private void addTableCell(Document doc, Element parent, String content) {
         Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);
         text.appendChild(textNode);

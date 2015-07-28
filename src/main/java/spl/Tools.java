@@ -14,9 +14,9 @@ import java.util.zip.GZIPOutputStream;
  * Time: 10:43:01
  * To change this template use File | Settings | File Templates.
  */
-public class Tools {
+class Tools {
 
-    public static int WEBSERVICE_APP_ID = 9;
+    public static final int WEBSERVICE_APP_ID = 9;
     public static String WEBSERVICE_VERSION_SHORT = "0.1";
 
 
@@ -63,21 +63,23 @@ public class Tools {
 
         Dimension mySize = diag.getSize();
 
-        if (parentSize.width > mySize.width)
+        if (parentSize.width > mySize.width) {
             x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
-        else
+        } else {
             x = topLeft.x;
+        }
 
-        if (parentSize.height > mySize.height)
+        if (parentSize.height > mySize.height) {
             y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
-        else
+        } else {
             y = topLeft.y;
+        }
 
         diag.setLocation(x, y);
     }
 
     public static String getLink(String link, URL mindmapUrl) {
-        if (link == null || link.isEmpty()) {
+        if ((link == null) || link.isEmpty()) {
             return null;
         }
         if (!Tools.isAbsolutePath(link)) {
@@ -108,7 +110,7 @@ public class Tools {
         return link;
     }
 
-    public static boolean isAbsolutePath(String path) {
+    private static boolean isAbsolutePath(String path) {
         // On Windows, we cannot just ask if the file name starts with file
         // separator.
         // If path contains ":" at the second position, then it is not relative,

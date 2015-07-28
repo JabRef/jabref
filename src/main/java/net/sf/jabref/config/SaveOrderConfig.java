@@ -12,7 +12,7 @@ public class SaveOrderConfig {
     public boolean saveInOriginalOrder, saveInSpecifiedOrder;
 
     // quick hack for outside modifications
-    public SortCriterion sortCriteria[] = new SortCriterion[3];
+    public final SortCriterion[] sortCriteria = new SortCriterion[3];
 
 
     public static class SortCriterion {
@@ -44,17 +44,14 @@ public class SaveOrderConfig {
         if (data == null) {
             throw new NullPointerException();
         }
-        if (data.size() == 0) {
+        if (data.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
         String choice = data.elementAt(0);
         if ("original".equals(choice)) {
             setSaveInOriginalOrder();
-        } else if ("specified".equals(choice)) {
-            setSaveInSpecifiedOrder();
         } else {
-            // fallback
             setSaveInSpecifiedOrder();
         }
 
