@@ -1324,8 +1324,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
     }
 
 
-    public static void setupLogging() {
-        // get the root logger. It is NOT GLOBAL_LOGGER_NAME
+    public static void setupLogHandlerForErrorConsole() {
         Logger rootLogger = Logger.getLogger("");
         Globals.handler = new CachebleHandler();
         rootLogger.addHandler(handler);

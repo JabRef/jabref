@@ -102,7 +102,7 @@ public class JabRef {
         }
 
         Globals.startBackgroundTasks();
-        Globals.setupLogging();
+        Globals.setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
         setLanguage(prefs);
         Globals.prefs.setLanguageDependentDefaultValues();
