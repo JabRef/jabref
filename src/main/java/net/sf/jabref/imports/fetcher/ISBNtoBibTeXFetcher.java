@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012, 2015 JabRef contributors.
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -14,12 +14,11 @@
 */
 package net.sf.jabref.imports.fetcher;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Scanner;
 
@@ -36,14 +35,12 @@ import net.sf.jabref.imports.ImportInspector;
 import net.sf.jabref.imports.UnitFormatter;
 
 /**
- * This class uses Manas Tungare's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
- * The online version of the converter is available at http://manas.tungare.name/software/isbn-to-bibtex/
- * This was not approved by him, see discussion https://sourceforge.net/p/jabref/bugs/1241/.
- * We are currently working on sorting things out
+ * This class uses ebook.de's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
+ * There is no separate web-based converter available, just that API
  */
 public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
-    private static final String URL_PATTERN = "http://manas.tungare.name/software/isbn-to-bibtex/isbn-service?isbn=%s";
+    private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?isbn=%s";
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
 
@@ -69,7 +66,6 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
         // Send the request
         URL url;
-        URLConnection conn;
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
@@ -80,20 +76,21 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         InputStream source;
         try {
             source = url.openStream();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            // invalid ISBN --> 404--> FileNotFoundException
+            status.showMessage(Globals.lang("Invalid ISBN"));
+            return false;
+        } catch (java.net.UnknownHostException e) {
+            // It is very unlikely that ebook.de is an unknown host
+            // It is more likely that we don't have an internet connection
+            status.showMessage(Globals.lang("No_Internet_Connection."));
+            return false;
+        } catch (Exception e) {
+            status.showMessage(e.toString());
             return false;
         }
 
         String bibtexString = new Scanner(source).useDelimiter("\\A").next();
-        if (bibtexString.startsWith("@comment")) {
-            // an error occured
-            // the error is nested in @comment{...}
-            String errorMsg = bibtexString.substring("@comment{".length());
-            errorMsg = errorMsg.substring(0, errorMsg.length() - 1);
-            status.showMessage(errorMsg); // showMessage does not work -> NPE
-            return false;
-        }
 
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
         if (entry != null) {
