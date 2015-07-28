@@ -38,7 +38,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
             for(String word : unprocessedWords) {
                 unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", StringUtil.quoteForHTML(word)));
             }
-            String andSeparator = String.join(" %s ", Globals.lang("and"));
+            String andSeparator = String.format(" %s ", Globals.lang("and"));
             String[] unprocessedWordsInHtmlFormatArray = unprocessedWordsInHtmlFormat.toArray(new String[unprocessedWordsInHtmlFormat.size()]);
             searchDescription += StringUtil.join(unprocessedWordsInHtmlFormatArray, andSeparator);
         }
