@@ -115,7 +115,8 @@ dependencies {
 
     compile 'junit:junit:4.12'
 
-    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
+    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar'])
+    generateClasspath 'org.apache.velocity:velocity:1.7'
 }
 
 // use ant targets with prefix antTargets.XXXXX
