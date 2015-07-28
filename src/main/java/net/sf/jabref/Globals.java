@@ -26,9 +26,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.ResourceBundle.Control;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -42,6 +40,8 @@ import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
 import net.sf.jabref.util.logging.CachebleHandler;
 import net.sf.jabref.util.logging.StdoutConsoleHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Globals {
 
@@ -222,11 +222,11 @@ public class Globals {
     public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
 
     // Instantiate logger:
-    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
-    /**
-     * true if we have unix newlines
-     */
+            /**
+             * true if we have unix newlines
+             */
     public static final boolean UNIX_NEWLINE = Globals.NEWLINE.equals("\n");
 
     /**
@@ -265,16 +265,8 @@ public class Globals {
         }
     }
 
-    public static void logger(String s) {
-        Globals.logger.info(s);
-    }
-
-    /**
-     * Should be only called once
-     */
-    public static void turnOnConsoleLogging() {
-        Handler consoleHandler = new ConsoleHandler();
-        Globals.logger.addHandler(consoleHandler);
+    public static void logInfo(String s) {
+        LOGGER.info(s);
     }
 
     public static void setLanguage(String language, String country) {
@@ -1288,7 +1280,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
                     Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    Globals.logger(e.getMessage());
+                    Globals.logInfo(e.getMessage());
                 }
             }
         }
@@ -1298,7 +1290,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {
-                Globals.logger("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
+                Globals.logInfo("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
                         + "' not found.");
             }
         }

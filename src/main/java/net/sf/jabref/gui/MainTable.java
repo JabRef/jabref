@@ -330,7 +330,7 @@ public class MainTable extends JTable {
             try {
                 cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i - tableFormat.padleft]));
             } catch (Throwable ex) {
-                Globals.logger("Exception while setting column widths. Choosing default.");
+                Globals.logInfo("Exception while setting column widths. Choosing default.");
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
             }
 

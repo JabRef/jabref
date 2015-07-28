@@ -105,7 +105,7 @@ public class GUIGlobals {
     public static JLabel getTableIcon(String fieldType) {
         Object o = GUIGlobals.tableIcons.get(fieldType);
         if (o == null) {
-            Globals.logger("Error: no table icon defined for type '" + fieldType + "'.");
+            Globals.logInfo("Error: no table icon defined for type '" + fieldType + "'.");
             return null;
         } else {
             return (JLabel) o;

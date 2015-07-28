@@ -203,7 +203,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 res = FileUtil.copyFile(file, tmpFile, true);
             } catch (IOException ex) {
-                Globals.logger("Cannot copy to temporary file '" + tmpFile.getPath() + '\'');
+                Globals.logInfo("Cannot copy to temporary file '" + tmpFile.getPath() + '\'');
             }
             //Util.pr("</copy>");
             return res;

@@ -337,7 +337,7 @@ public class ImportFormatReader {
         if (!f.exists() && !f.canRead() && !f.isFile()) {
             System.err.println("Error " + filename
                     + " is not a valid file and|or is not readable.");
-            Globals.logger("Error " + filename + " is not a valid file and|or is not readable.");
+            Globals.logInfo("Error " + filename + " is not a valid file and|or is not readable.");
 
             return null;
         } else {

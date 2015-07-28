@@ -110,7 +110,7 @@ public class DownloadExternalFile {
             JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                     + ex.getMessage(), Globals.lang("Download file"),
                     JOptionPane.ERROR_MESSAGE);
-            Globals.logger("Error while downloading " + "'" + res + "'");
+            Globals.logInfo("Error while downloading " + "'" + res + "'");
             return;
         }
         final URL urlF = url;
@@ -131,7 +131,7 @@ public class DownloadExternalFile {
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                                     + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
-                    Globals.logger("Error while downloading " + "'" + urlF.toString() + "'");
+                    Globals.logInfo("Error while downloading " + "'" + urlF.toString() + "'");
                     return;
                 }
 

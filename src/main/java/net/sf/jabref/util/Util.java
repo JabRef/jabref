@@ -115,7 +115,7 @@ public class Util {
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
 
     public static void pr(String s) {
-        Globals.logger(s);
+        Globals.logInfo(s);
     }
 
     /**
@@ -1575,7 +1575,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            Globals.logger(Globals.lang("Wrong Format").concat(" ").concat(e.toString()));
+            Globals.logInfo(Globals.lang("Wrong Format").concat(" ").concat(e.toString()));
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);

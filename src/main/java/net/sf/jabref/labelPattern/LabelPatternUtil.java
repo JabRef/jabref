@@ -614,7 +614,7 @@ public class LabelPatternUtil {
                     }
 
                 } else {
-                    Globals.logger("Key generator warning: unknown modifier '"
+                    Globals.logInfo("Key generator warning: unknown modifier '"
                             + modifier + "'.");
                 }
             }

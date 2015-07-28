@@ -48,7 +48,7 @@ class StringNameChange extends Change {
 
         if (panel.database().hasStringLabel(disk)) {
             // The name to change to is already in the database, so we can't comply.
-            Globals.logger("Cannot rename string '" + mem + "' to '" + disk + "' because the name "
+            Globals.logInfo("Cannot rename string '" + mem + "' to '" + disk + "' because the name "
                     + "is already in use.");
         }
 
@@ -64,7 +64,7 @@ class StringNameChange extends Change {
                 panel.database().addString(bs);
                 undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
             } catch (KeyCollisionException ex) {
-                Globals.logger("Error: could not add string '" + bs.getName() + "': " + ex.getMessage());
+                Globals.logInfo("Error: could not add string '" + bs.getName() + "': " + ex.getMessage());
             }
         }
 

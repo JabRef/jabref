@@ -1014,7 +1014,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                             try {
                                 Util.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
-                                Globals.logger("Error opening file");
+                                Globals.logInfo("Error opening file");
                             }
                         }
                     } else {

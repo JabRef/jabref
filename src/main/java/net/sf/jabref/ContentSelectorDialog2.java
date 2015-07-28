@@ -299,7 +299,7 @@ class ContentSelectorDialog2 extends JDialog {
                     dispose();
                 }
                 catch (Exception ex) {
-                    Globals.logger("Could not apply changes in \"Setup selectors\"");
+                    Globals.logInfo("Could not apply changes in \"Setup selectors\"");
                     JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
                 }
             }
@@ -317,7 +317,7 @@ class ContentSelectorDialog2 extends JDialog {
                     applyChanges();
                 }
                 catch (Exception ex) {
-                    Globals.logger("Could not apply changes in \"Setup selectors\"");
+                    Globals.logInfo("Could not apply changes in \"Setup selectors\"");
                     JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
                 }
             }

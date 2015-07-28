@@ -43,7 +43,7 @@ class StringAddChange extends Change {
 
         if (panel.database().hasStringLabel(string.getName())) {
             // The name to change to is already in the database, so we can't comply.
-            Globals.logger("Cannot add string '" + string.getName() + "' because the name "
+            Globals.logInfo("Cannot add string '" + string.getName() + "' because the name "
                     + "is already in use.");
         }
 
@@ -51,13 +51,13 @@ class StringAddChange extends Change {
             panel.database().addString(string);
             undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
         } catch (KeyCollisionException ex) {
-            Globals.logger("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+            Globals.logInfo("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
         }
         try {
             secondary.addString(new BibtexString(IdGenerator.next(), string.getName(),
                     string.getContent()));
         } catch (KeyCollisionException ex) {
-            Globals.logger("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage());
+            Globals.logInfo("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage());
         }
         return true;
     }

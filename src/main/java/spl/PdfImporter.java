@@ -157,7 +157,7 @@ public class PdfImporter {
 
                     if ((localRes == null) || (localRes.size() == 0)) {
                         // import failed -> generate default entry
-                        Globals.logger(Globals.lang("Import failed"));
+                        Globals.logInfo(Globals.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -187,7 +187,7 @@ public class PdfImporter {
                         in = new FileInputStream(file);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        Globals.logger(Globals.lang("Import failed"));
+                        Globals.logInfo(Globals.lang("Import failed"));
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -197,7 +197,7 @@ public class PdfImporter {
                         localRes = contentImporter.importEntries(in, status);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        Globals.logger(Globals.lang("Import failed"));
+                        Globals.logInfo(Globals.lang("Import failed"));
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);

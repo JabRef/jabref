@@ -49,7 +49,7 @@ public class PluginBasedExportFormat extends ExportFormat {
         String encoding = extension.getEncoding();
         if (fileExtension != null && fileExtension.isEmpty() || displayName != null && displayName.isEmpty()
                 || consoleName != null && consoleName.isEmpty() || layoutFilename != null && layoutFilename.isEmpty()) {
-            Globals.logger("Could not load extension " + extension.getId());
+            Globals.logInfo("Could not load extension " + extension.getId());
             return null;
         }
 

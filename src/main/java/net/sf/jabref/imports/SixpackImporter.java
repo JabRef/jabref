@@ -173,7 +173,7 @@ public class SixpackImporter extends ImportFormat {
                 }
                 bibitems.add(entry);
             } catch (NullPointerException ex) {
-                Globals.logger("Problem parsing Sixpack entry, ignoring entry.");
+                Globals.logInfo("Problem parsing Sixpack entry, ignoring entry.");
             }
         }
 

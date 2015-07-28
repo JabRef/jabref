@@ -336,7 +336,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
                     Object link = entry.getField(fieldName);
                     if (link == null) {
-                        Globals.logger("Error: no link to " + fieldName + '.');
+                        Globals.logInfo("Error: no link to " + fieldName + '.');
                         return; // There is an icon, but the field is not set.
                     }
 

@@ -264,7 +264,7 @@ public class CustomEntryType extends BibtexEntryType {
             //System.out.println("o '"+optFields+"'");
             return new CustomEntryType(name, reqFields, optFields);
         } catch (IndexOutOfBoundsException ex) {
-            Globals.logger("Ill-formed entrytype comment in BibTeX file.");
+            Globals.logInfo("Ill-formed entrytype comment in BibTeX file.");
             return null;
         }
 

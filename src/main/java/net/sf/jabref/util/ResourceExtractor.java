@@ -56,7 +56,7 @@ public class ResourceExtractor implements Worker {
         try {
             ud.downloadToFile(destination);
         } catch (IOException ex) {
-            Globals.logger("Error extracting resource: " + ex.getMessage());
+            Globals.logInfo("Error extracting resource: " + ex.getMessage());
         }
     }
 }

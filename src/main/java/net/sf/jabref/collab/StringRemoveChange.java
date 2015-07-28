@@ -52,7 +52,7 @@ class StringRemoveChange extends Change {
             panel.database().removeString(inMem.getId());
             undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
         } catch (Exception ex) {
-            Globals.logger("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+            Globals.logInfo("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
         }
 
         // Update tmp database:

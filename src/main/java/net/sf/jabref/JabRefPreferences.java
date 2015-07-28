@@ -450,7 +450,7 @@ public class JabRefPreferences {
                 importPreferences("jabref.xml");
             }
         } catch (IOException e) {
-            Globals.logger("Could not import preferences from jabref.xml:" + e.getLocalizedMessage());
+            Globals.logInfo("Could not import preferences from jabref.xml:" + e.getLocalizedMessage());
         }
 
         // load user preferences 
@@ -857,7 +857,7 @@ public class JabRefPreferences {
             defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
             defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
-            Globals.logger("Hostname not found.");
+            Globals.logInfo("Hostname not found.");
             defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
             defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
         }
@@ -1105,7 +1105,7 @@ public class JabRefPreferences {
             if (s == null) {
                 // there isn't even a default value
                 // Output error
-                Globals.logger("Could not get key binding for \"" + bindName + '"');
+                Globals.logInfo("Could not get key binding for \"" + bindName + '"');
                 // fall back to a default value
                 s = "Not associated";
             }
@@ -1181,7 +1181,7 @@ public class JabRefPreferences {
             try {
                 exportPreferences("jabref.xml");
             } catch (IOException e) {
-                Globals.logger("Could not save preferences for memory stick mode: " + e.getLocalizedMessage());
+                Globals.logInfo("Could not save preferences for memory stick mode: " + e.getLocalizedMessage());
             }
         }
         try {
@@ -1227,7 +1227,7 @@ public class JabRefPreferences {
                 }
             }
         } catch (BackingStoreException ex) {
-            Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
+            Globals.logInfo("BackingStoreException in JabRefPreferences.getKeyPattern");
         }
         return JabRefPreferences.keyPattern;
     }
@@ -1245,7 +1245,7 @@ public class JabRefPreferences {
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
-            Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
+            Globals.logInfo("BackingStoreException in JabRefPreferences.putKeyPattern");
         }
 
         for (Map.Entry<String, ArrayList<String>> stringArrayListEntry : pattern.entrySet()) {

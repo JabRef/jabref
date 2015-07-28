@@ -196,7 +196,7 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Globals.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
                             Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    Globals.logger(Globals.lang("Error writing XMP to file: %0", finalFile
+                    Globals.logInfo(Globals.lang("Error writing XMP to file: %0", finalFile
                             .getAbsolutePath()));
                     output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
 
@@ -204,7 +204,7 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
                             Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
+                    Globals.logInfo(Globals.lang("Error while converting BibtexEntry to XMP %0",
                             finalFile.getAbsolutePath()));
                     output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
@@ -357,7 +357,7 @@ public class ExternalFilePanel extends JPanel {
                         JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL") + ": "
                                         + e2.getMessage(), Globals.lang("Download file"),
                                 JOptionPane.ERROR_MESSAGE);
-                        Globals.logger("Error while downloading " + url.toString());
+                        Globals.logInfo("Error while downloading " + url.toString());
                         return;
                     }
                     output(Globals.lang("Download completed"));
