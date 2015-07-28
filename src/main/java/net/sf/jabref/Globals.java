@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.ResourceBundle.Control;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -270,34 +269,12 @@ public class Globals {
         Globals.logger.info(s);
     }
 
-    public static void turnOffLogging() { // only log exceptions
-        Globals.logger.setLevel(java.util.logging.Level.SEVERE);
-    }
-
     /**
      * Should be only called once
      */
     public static void turnOnConsoleLogging() {
         Handler consoleHandler = new ConsoleHandler();
         Globals.logger.addHandler(consoleHandler);
-    }
-
-    /**
-     * Should be only called once
-     */
-    public static void turnOnFileLogging() {
-        Globals.logger.setLevel(java.util.logging.Level.ALL);
-        java.util.logging.Handler handler;
-        handler = new ConsoleHandler();
-        Globals.logger.addHandler(handler);
-
-        handler.setFilter(new Filter() { // select what gets logged
-
-            @Override
-            public boolean isLoggable(LogRecord record) {
-                return true;
-            }
-        });
     }
 
     public static void setLanguage(String language, String country) {
