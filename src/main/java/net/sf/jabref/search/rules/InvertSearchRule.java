@@ -5,7 +5,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.search.SearchRule;
 
 /**
- * Inverts result score.
+ * Inverts the search result.
  *
  * Example:
  * false --> true

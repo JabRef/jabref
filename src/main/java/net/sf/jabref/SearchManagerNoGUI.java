@@ -22,9 +22,6 @@ import java.util.Vector;
 
 import net.sf.jabref.imports.*;
 import net.sf.jabref.search.SearchRules;
-import net.sf.jabref.search.rules.BasicRegexSearchRule;
-import net.sf.jabref.search.rules.BasicSearchRule;
-import net.sf.jabref.search.rules.SearchExpression;
 import net.sf.jabref.search.SearchRule;
 
 /**

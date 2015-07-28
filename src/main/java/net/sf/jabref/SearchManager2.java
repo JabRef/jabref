@@ -21,9 +21,7 @@ import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.search.SearchRules;
 import net.sf.jabref.search.matchers.SearchMatcher;
-import net.sf.jabref.search.rules.BasicRegexSearchRule;
-import net.sf.jabref.search.rules.BasicSearchRule;
-import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.rules.GrammarBasedSearchRule;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -802,7 +800,7 @@ public class SearchManager2 extends SidePaneComponent
     }
 
     private boolean isSpecificSearch() {
-        return !increment.isSelected() && SearchExpression.isValid(caseSensitive.isSelected(), regExpSearch.isSelected(), searchField.getText());
+        return !increment.isSelected() && GrammarBasedSearchRule.isValid(caseSensitive.isSelected(), regExpSearch.isSelected(), searchField.getText());
     }
 
     @Override

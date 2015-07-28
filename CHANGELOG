@@ -12,6 +12,7 @@
     - Switch vom antlr2 grammar to antlr4 for capturing the search expressions. Should be backwards compatible.
     - Changed html description of search expressions, expressing the conditional logic more explicitly with brackets.
     - Fixed INSPIRE searches compatibility problem (by Stefano Gariazzo).
+    - BREAKING: Search groups now use same search logic as UI --> avoids confusion when converting a UI search into a search group. Behaviour before: contains/regex check of whole search string; behaviour after: contains/regex check of every word of the search string. The new search is more powerful and con simulate the old behaviour: enclose everything in double quotes, e.g., process language --> "process language".
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+

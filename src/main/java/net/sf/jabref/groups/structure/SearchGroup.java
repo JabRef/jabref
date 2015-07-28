@@ -15,17 +15,17 @@
 */
 package net.sf.jabref.groups.structure;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
-import net.sf.jabref.*;
-import net.sf.jabref.search.describer.BasicSearchDescriber;
-import net.sf.jabref.search.describer.SearchExpressionDescriber;
-import net.sf.jabref.search.rules.RegExpSearchRule;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.rules.SearchExpression;
-import net.sf.jabref.search.rules.SimpleSearchRule;
+import net.sf.jabref.search.SearchRules;
+import net.sf.jabref.search.describer.SearchDescribers;
 import net.sf.jabref.util.QuotedStringTokenizer;
 import net.sf.jabref.util.StringUtil;
+
+import javax.swing.undo.AbstractUndoableEdit;
 
 /**
  * Internally, it consists of a search pattern.
@@ -40,14 +40,7 @@ public class SearchGroup extends AbstractGroup {
     private final boolean caseSensitive;
     private final boolean regExp;
 
-    /**
-     * If searchExpression is in valid syntax for advanced search, <b>this
-     * </b> will do the search; otherwise, either <b>RegExpSearchRule </b> or
-     * <b>SimpleSearchRule </b> will be used.
-     */
     private final SearchRule searchRule;
-    private final SearchExpression expressionSearchRule;
-
 
     /**
      * Creates a SearchGroup with the specified properties.
@@ -58,15 +51,7 @@ public class SearchGroup extends AbstractGroup {
         this.caseSensitive = caseSensitive;
         this.regExp = regExp;
 
-        // TODO why use other search rules instead of "normal" search in JabRef. This WILL cause confusion!
-        expressionSearchRule = new SearchExpression(caseSensitive, regExp);
-        if (expressionSearchRule.validateSearchStrings(this.searchExpression)) {
-            searchRule = expressionSearchRule;  // do advanced search
-        } else if (this.regExp) {
-            searchRule = new RegExpSearchRule(this.caseSensitive);
-        } else {
-            searchRule = new SimpleSearchRule(this.caseSensitive);
-        }
+        this.searchRule = SearchRules.getSearchRuleByQuery(searchExpression, caseSensitive, regExp);
     }
 
     /**
@@ -76,7 +61,7 @@ public class SearchGroup extends AbstractGroup {
      *          SearchGroup.toString(), or null if incompatible
      */
     public static AbstractGroup fromString(String s, BibtexDatabase db,
-                                           int version) throws Exception {
+            int version) throws Exception {
         if (!s.startsWith(SearchGroup.ID)) {
             throw new Exception(
                     "Internal error: SearchGroup cannot be created from \"" + s
@@ -86,33 +71,33 @@ public class SearchGroup extends AbstractGroup {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
         switch (version) {
-            case 0:
-            case 1:
-            case 2: {
-                String name = tok.nextToken();
-                String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-                // version 0 contained 4 additional booleans to specify search
-                // fields; these are ignored now, all fields are always searched
-                return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                        GroupHierarchyType.INDEPENDENT);
-            }
-            case 3: {
-                String name = tok.nextToken();
-                int context = Integer.parseInt(tok.nextToken());
-                String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-                // version 0 contained 4 additional booleans to specify search
-                // fields; these are ignored now, all fields are always searched
-                return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                        GroupHierarchyType.getByNumber(context));
-            }
-            default:
-                throw new UnsupportedVersionException("SearchGroup", version);
+        case 0:
+        case 1:
+        case 2: {
+            String name = tok.nextToken();
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            // version 0 contained 4 additional booleans to specify search
+            // fields; these are ignored now, all fields are always searched
+            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                    GroupHierarchyType.INDEPENDENT);
+        }
+        case 3: {
+            String name = tok.nextToken();
+            int context = Integer.parseInt(tok.nextToken());
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            // version 0 contained 4 additional booleans to specify search
+            // fields; these are ignored now, all fields are always searched
+            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
+                    .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                    GroupHierarchyType.getByNumber(context));
+        }
+        default:
+            throw new UnsupportedVersionException("SearchGroup", version);
         }
     }
 
@@ -227,11 +212,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        if(expressionSearchRule.getTree() != null) {
-            return new SearchExpressionDescriber(caseSensitive, regExp, expressionSearchRule.getTree()).getDescription();
-        } else {
-            return new BasicSearchDescriber(caseSensitive, regExp, searchExpression).getDescription();
-        }
+        return SearchDescribers.getSearchDescriberFor(searchRule, searchExpression).getDescription();
     }
 
     @Override
@@ -250,14 +231,14 @@ public class SearchGroup extends AbstractGroup {
         sb.append(" <b>").
                 append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
         switch (getHierarchicalContext()) {
-            case INCLUDING:
-                sb.append(", ").append(Globals.lang("includes subgroups"));
-                break;
-            case REFINING:
-                sb.append(", ").append(Globals.lang("refines supergroup"));
-                break;
-            default:
-                break;
+        case INCLUDING:
+            sb.append(", ").append(Globals.lang("includes subgroups"));
+            break;
+        case REFINING:
+            sb.append(", ").append(Globals.lang("refines supergroup"));
+            break;
+        default:
+            break;
         }
         return sb.toString();
     }

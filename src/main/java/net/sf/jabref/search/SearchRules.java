@@ -1,8 +1,8 @@
 package net.sf.jabref.search;
 
-import net.sf.jabref.search.rules.BasicRegexSearchRule;
-import net.sf.jabref.search.rules.BasicSearchRule;
-import net.sf.jabref.search.rules.SearchExpression;
+import net.sf.jabref.search.rules.RegexBasedSearchRule;
+import net.sf.jabref.search.rules.ContainBasedSearchRule;
+import net.sf.jabref.search.rules.GrammarBasedSearchRule;
 
 public class SearchRules {
 
@@ -17,7 +17,7 @@ public class SearchRules {
     public static SearchRule getSearchRuleByQuery(String query, boolean caseSensitive, boolean regex) {
         // this searches specified fields if specified,
         // and all fields otherwise
-        SearchRule searchExpression = new SearchExpression(caseSensitive, regex);
+        SearchRule searchExpression = new GrammarBasedSearchRule(caseSensitive, regex);
         if (searchExpression.validateSearchStrings(query)) {
             return searchExpression;
         } else {
@@ -27,9 +27,9 @@ public class SearchRules {
 
     private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
         if (regex) {
-            return new BasicRegexSearchRule(caseSensitive);
+            return new RegexBasedSearchRule(caseSensitive);
         } else {
-            return new BasicSearchRule(caseSensitive);
+            return new ContainBasedSearchRule(caseSensitive);
         }
     }
 
