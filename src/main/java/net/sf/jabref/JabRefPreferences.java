@@ -855,7 +855,7 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-        defaults.put(USE_IEEE_ABRV, Boolean.TRUE);
+        defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
