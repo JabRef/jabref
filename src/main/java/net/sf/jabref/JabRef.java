@@ -80,13 +80,6 @@ public class JabRef {
     private boolean graphicFailure = false;
     private JabRefCLI cli;
     private SplashScreenLifecycle splashScreen = new SplashScreenLifecycle();
-    
-    //initialize logging system
-    static {
-        LogFactory factory = LogFactory.getFactory();
-        //tell commons logging to default to Java's internal logging implementation
-        factory.setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-    }
 
     public void start(String[] args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
