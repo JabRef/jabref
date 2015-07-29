@@ -1,6 +1,6 @@
 package net.sf.jabref.export.layout;
 
-import net.sf.jabref.export.layout.format.HTMLChars;
+import net.sf.jabref.export.layout.format.HTMLCharFormatter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +12,7 @@ public class HTMLCharsTest {
     @Test
     public void testBasicFormat() {
 
-        LayoutFormatter layout = new HTMLChars();
+        LayoutFormatter layout = new HTMLCharFormatter();
 
         Assert.assertEquals("", layout.format(""));
 
@@ -36,7 +36,7 @@ public class HTMLCharsTest {
     @Test
     public void testLaTeXHighlighting() {
 
-        LayoutFormatter layout = new HTMLChars();
+        LayoutFormatter layout = new HTMLCharFormatter();
 
         Assert.assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
         Assert.assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));

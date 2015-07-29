@@ -105,7 +105,7 @@ public class LayoutEntryTest {
         // define the highlighting settings
         Globals.prefs.putBoolean("caseSensitiveSearch", false);
 
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, new ArrayList<String>());
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLCharFormatter]{\\abstract}\\end{abstract}</font>", mBTE, new ArrayList<String>());
         String expecting = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices</font>";
 
         Assert.assertEquals(expecting, result);
@@ -126,7 +126,7 @@ public class LayoutEntryTest {
         // define the highlighting settings
         Globals.prefs.putBoolean("caseSensitiveSearch", false);
 
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLCharFormatter]{\\abstract}\\end{abstract}</font>", mBTE, words);
         String containing = "<span style=\"background-color:#3399FF;\">Google</span>";
 
         // check
@@ -149,7 +149,7 @@ public class LayoutEntryTest {
         // define the highlighting settings
         Globals.prefs.putBoolean("caseSensitiveSearch", false);
 
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLCharFormatter]{\\abstract}\\end{abstract}</font>", mBTE, words);
 
         String containing = "<span style=\"background-color:#3399FF;\">Android</span>";
         String containing2 = "<span style=\"background-color:#3399FF;\">study</span>";
@@ -174,7 +174,7 @@ public class LayoutEntryTest {
         // define the highlighting settings
         Globals.prefs.putBoolean("caseSensitiveSearch", true);
 
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLCharFormatter]{\\abstract}\\end{abstract}</font>", mBTE, words);
         String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android <span style=\"background-color:#3399FF;\">google</span> Open-Source Devices</font>";
 
         // check
@@ -199,7 +199,7 @@ public class LayoutEntryTest {
         Globals.prefs.putBoolean("caseSensitiveSearch", false);
 
         String highlightColor = "#3399FF;";
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, words);
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLCharFormatter]{\\abstract}\\end{abstract}</font>", mBTE, words);
         String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal <span style=\"background-color:" + highlightColor + "\">study</span> of security on <span style=\"background-color:" + highlightColor + "\">Android</span>: Google's new <span style=\"background-color:" + highlightColor + "\">open</span>-source platform for mobile devices. Tags: Paper <span style=\"background-color:" + highlightColor + "\">android</span> google <span style=\"background-color:" + highlightColor + "\">Open</span>-Source Devices</font>";
 
         // check
