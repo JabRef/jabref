@@ -73,7 +73,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             tm.setContent(field);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
-                if ((flEntry.getType() != null) && (flEntry.getType().getName().toLowerCase().equals("pdf"))) {
+                if (flEntry.getType() != null && flEntry.getType().getName().toLowerCase().equals("pdf")) {
                     f = FileUtil.expandFilename(flEntry.getLink(), dirs);
                     if (f != null) {
                         files.add(f);
@@ -113,7 +113,8 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             if (files.isEmpty()) {
                 message = Globals.lang("No PDF linked") + ".\n";
             } else {
-                int written = 0, error = 0;
+                int written = 0;
+                int error = 0;
                 for (File file : files) {
                     if (!file.exists()) {
                         if (files.size() == 1) {

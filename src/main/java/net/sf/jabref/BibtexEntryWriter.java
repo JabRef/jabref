@@ -89,7 +89,7 @@ public class BibtexEntryWriter {
         out.write('@' + entry.getType().getName() + '{');
 
         String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
+        out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         // Write required fields first.
@@ -108,7 +108,8 @@ public class BibtexEntryWriter {
         }
         // Then optional fields.
         s = entry.getOptionalFields();
-        boolean first = true, previous;
+        boolean first = true;
+        boolean previous;
         previous = false;
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
@@ -125,8 +126,8 @@ public class BibtexEntryWriter {
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
-            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
-                    BibtexFields.isDisplayableField(key));
+            boolean writeIt = write ? BibtexFields.isWriteableField(key) :
+                    BibtexFields.isDisplayableField(key);
             if (!written.containsKey(key) && writeIt) {
                 remainingFields.add(key);
             }
@@ -153,7 +154,7 @@ public class BibtexEntryWriter {
         out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 
         String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
+        out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
@@ -179,8 +180,8 @@ public class BibtexEntryWriter {
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
-            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
-                    BibtexFields.isDisplayableField(key));
+            boolean writeIt = write ? BibtexFields.isWriteableField(key) :
+                    BibtexFields.isDisplayableField(key);
             if (!written.containsKey(key) && writeIt) {
                 remainingFields.add(key);
             }
@@ -198,7 +199,7 @@ public class BibtexEntryWriter {
         out.write('@' + entry.getType().getName() + '{');
 
         String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
-        out.write(((str == null) ? "" : str) + ',' + Globals.NEWLINE);
+        out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
@@ -216,14 +217,15 @@ public class BibtexEntryWriter {
         }
 
         // Then write remaining fields in alphabetic order.
-        boolean first, previous;
+        boolean first;
+        boolean previous;
         previous = false;
         //STA get remaining fields
         TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
             //iterate through all fields
-            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
-                    BibtexFields.isDisplayableField(key));
+            boolean writeIt = write ? BibtexFields.isWriteableField(key) :
+                    BibtexFields.isDisplayableField(key);
             //find the ones has not been written.
             if (!written.containsKey(key) && writeIt) {
                 remainingFields.add(key);
@@ -255,7 +257,7 @@ public class BibtexEntryWriter {
      */
     private boolean writeField(BibtexEntry entry, Writer out, String name, boolean isNotFirst, boolean isNextGroup) throws IOException {
         String o = entry.getField(name);
-        if ((o != null) || includeEmptyFields) {
+        if (o != null || includeEmptyFields) {
             if (isNotFirst) {
                 out.write(',' + Globals.NEWLINE);
             }

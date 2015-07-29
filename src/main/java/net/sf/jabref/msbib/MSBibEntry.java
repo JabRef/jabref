@@ -296,7 +296,7 @@ class MSBibEntry {
 
         NodeList nodeLst = entry.getElementsByTagName(_bcol + "Author");
         if (nodeLst.getLength() > 0) {
-            getAuthors((Element) (nodeLst.item(0)), _bcol);
+            getAuthors((Element) nodeLst.item(0), _bcol);
         }
     }
 
@@ -428,7 +428,7 @@ class MSBibEntry {
         }
 
         if ((sourceType.equals("InternetSite") || sourceType.equals("DocumentFromInternetSite"))
-                && (bibtex.getField("title") != null)) {
+                && bibtex.getField("title") != null) {
             internetSiteTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "accessed") != null) {
@@ -444,13 +444,13 @@ class MSBibEntry {
         if ((sourceType.equals("ElectronicSource")
                 || sourceType.equals("Art")
                 || sourceType.equals("Misc"))
-                && (bibtex.getField("title") != null)) {
+                && bibtex.getField("title") != null) {
             publicationTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "medium") != null) {
             medium = bibtex.getField(MSBIB + "medium");
         }
-        if (sourceType.equals("SoundRecording") && (bibtex.getField("title") != null)) {
+        if (sourceType.equals("SoundRecording") && bibtex.getField("title") != null) {
             albumTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "recordingnumber") != null) {
@@ -462,7 +462,7 @@ class MSBibEntry {
         if (bibtex.getField(MSBIB + "distributor") != null) {
             distributor = bibtex.getField(MSBIB + "distributor");
         }
-        if (sourceType.equals("Interview") && (bibtex.getField("title") != null)) {
+        if (sourceType.equals("Interview") && bibtex.getField("title") != null) {
             broadcastTitle = bibtex.getField("title");
         }
         if (bibtex.getField(MSBIB + "broadcaster") != null) {
@@ -593,11 +593,11 @@ class MSBibEntry {
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        nodeLst = ((Element) (nodeLst.item(0))).getElementsByTagName(_bcol + "NameList");
+        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagName(_bcol + "NameList");
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        NodeList person = ((Element) (nodeLst.item(0))).getElementsByTagName(_bcol + "Person");
+        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagName(_bcol + "Person");
         if (person.getLength() <= 0) {
             return result;
         }
@@ -605,9 +605,9 @@ class MSBibEntry {
         result = new LinkedList<PersonName>();
         for (int i = 0; i < person.getLength(); i++)
         {
-            NodeList firstName = ((Element) (person.item(i))).getElementsByTagName(_bcol + "First");
-            NodeList lastName = ((Element) (person.item(i))).getElementsByTagName(_bcol + "Last");
-            NodeList middleName = ((Element) (person.item(i))).getElementsByTagName(_bcol + "Middle");
+            NodeList firstName = ((Element) person.item(i)).getElementsByTagName(_bcol + "First");
+            NodeList lastName = ((Element) person.item(i)).getElementsByTagName(_bcol + "Last");
+            NodeList middleName = ((Element) person.item(i)).getElementsByTagName(_bcol + "Middle");
             PersonName name = new PersonName();
             if (firstName.getLength() > 0) {
                 name.setFirstname(firstName.item(0).getTextContent());
@@ -663,7 +663,7 @@ class MSBibEntry {
     protected String getDate(BibtexEntry bibtex) {
         String result = "";
         if (bibtex.getField("year") != null) {
-            result += (bibtex.getField("year"));
+            result += bibtex.getField("year");
         }
         if (bibtex.getField("month") != null) {
             result += '-' + bibtex.getField("month");
@@ -818,7 +818,7 @@ class MSBibEntry {
         // tested using http://www.javaregex.com/test.html
         Pattern p = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
         Matcher m = p.matcher(address);
-        if (m.matches() && (m.groupCount() > 3))
+        if (m.matches() && m.groupCount() > 3)
         {
             addField(d, parent, "City", m.group(1));
             addField(d, parent, "StateProvince", m.group(2));
@@ -840,7 +840,7 @@ class MSBibEntry {
         // tested using http://www.javaregex.com/test.html
         Pattern p = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
         Matcher m = p.matcher(date);
-        if (m.matches() && (m.groupCount() > 3))
+        if (m.matches() && m.groupCount() > 3)
         {
             addField(d, parent, "Month" + extra, m.group(1));
             addField(d, parent, "Day" + extra, m.group(2));
@@ -1320,18 +1320,18 @@ class MSBibEntry {
         StringBuilder out = new StringBuilder(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if ((in == null) || (in != null && in.isEmpty()))
+        if (in == null || in != null && in.isEmpty())
          {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if ((current == 0x9) ||
-                    (current == 0xA) ||
-                    (current == 0xD) ||
-                    ((current >= 0x20) && (current <= 0xD7FF)) ||
-                    ((current >= 0xE000) && (current <= 0xFFFD)) ||
-                    ((current >= 0x10000) && (current <= 0x10FFFF))) {
+            if (current == 0x9 ||
+                    current == 0xA ||
+                    current == 0xD ||
+                    current >= 0x20 && current <= 0xD7FF ||
+                    current >= 0xE000 && current <= 0xFFFD ||
+                    current >= 0x10000 && current <= 0x10FFFF) {
                 out.append(current);
             }
         }

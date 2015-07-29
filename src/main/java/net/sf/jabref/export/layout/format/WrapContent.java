@@ -28,7 +28,8 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
  */
 public class WrapContent extends AbstractParamLayoutFormatter {
 
-    private String before = null, after = null;
+    private String before = null;
+    private String after = null;
 
 
     @Override

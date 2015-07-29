@@ -222,7 +222,7 @@ public class RepecNepImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String startOfMessage = "";
         String line = in.readLine();
-        for (int i = 0; (i < 25) && (line != null); i++) {
+        for (int i = 0; i < 25 && line != null; i++) {
             startOfMessage += line;
             line = in.readLine();
         }
@@ -261,7 +261,7 @@ public class RepecNepImporter extends ImportFormat {
     private String readMultipleLines() throws IOException {
         String result = this.lastLine.trim();
         readLine();
-        while ((this.lastLine != null) && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
+        while (this.lastLine != null && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
             result += this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim();
             readLine();
         }
@@ -290,7 +290,7 @@ public class RepecNepImporter extends ImportFormat {
         // read authors and institutions
         String authors = "";
         String institutions = "";
-        while ((this.lastLine != null) && !this.lastLine.equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
+        while (this.lastLine != null && !this.lastLine.equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields)) {
 
             // read single author
             String author;
@@ -299,14 +299,14 @@ public class RepecNepImporter extends ImportFormat {
             if (this.lastLine.indexOf('(') >= 0) {
                 author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && (this.lastLine.indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && this.lastLine.indexOf(')') > this.lastLine.indexOf('(') + 1 ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
             } else {
                 author = this.lastLine.substring(0, this.lastLine.length()).trim();
                 institutionDone = true;
             }
 
             readLine();
-            while (!institutionDone && (this.lastLine != null)) {
+            while (!institutionDone && this.lastLine != null) {
                 institutionDone = this.lastLine.indexOf(')') > 0;
                 institution += this.lastLine.substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
                 readLine();
@@ -351,12 +351,12 @@ public class RepecNepImporter extends ImportFormat {
     private void parseAdditionalFields(BibtexEntry be, boolean multilineUrlFieldAllowed) throws IOException {
 
         // one empty line is possible before fields start
-        if ((this.lastLine != null) && this.lastLine.trim().equals("")) {
+        if (this.lastLine != null && this.lastLine.trim().equals("")) {
             readLine();
         }
 
         // read other fields
-        while ((this.lastLine != null) && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || this.lastLine.equals(""))) {
+        while (this.lastLine != null && !isStartOfWorkingPaper() && (startsWithKeyword(RepecNepImporter.recognizedFields) || this.lastLine.equals(""))) {
 
             // if multiple lines for a field are allowed and field consists of multiple lines, join them
             String keyword = this.lastLine.equals("") ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
@@ -383,7 +383,7 @@ public class RepecNepImporter extends ImportFormat {
                 String content = readMultipleLines();
                 String[] recognizedDateFormats = new String[] {"yyyy-MM-dd", "yyyy-MM", "yyyy"};
                 int i = 0;
-                for (; (i < recognizedDateFormats.length) && (date == null); i++) {
+                for (; i < recognizedDateFormats.length && date == null; i++) {
                     try {
                         date = new SimpleDateFormat(recognizedDateFormats[i]).parse(content);
                     } catch (ParseException e) {
@@ -394,7 +394,7 @@ public class RepecNepImporter extends ImportFormat {
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date != null ? date : new Date());
                 be.setField("year", "" + cal.get(Calendar.YEAR));
-                if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
+                if (date != null && recognizedDateFormats[i - 1].contains("MM")) {
                     be.setField("month", "" + cal.get(Calendar.MONTH));
                 }
 

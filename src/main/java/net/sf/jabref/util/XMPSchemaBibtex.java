@@ -187,8 +187,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (int i = 0; i < n; i++) {
             Node node = nodes.item(i);
-            if ((node.getNodeType() != Node.ATTRIBUTE_NODE)
-                    && (node.getNodeType() != Node.ELEMENT_NODE)) {
+            if (node.getNodeType() != Node.ATTRIBUTE_NODE
+                    && node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
@@ -196,7 +196,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
             String[] split = nodeName.split(":");
 
-            if ((split.length == 2) && split[0].equals(namespaceName)) {
+            if (split.length == 2 && split[0].equals(namespaceName)) {
                 NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
                 if (seqList.getLength() > 0) {
 
@@ -229,7 +229,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
             String nodeName = attr.getNodeName();
             String[] split = nodeName.split(":");
-            if ((split.length == 2) && split[0].equals(namespaceName)) {
+            if (split.length == 2 && split[0].equals(namespaceName)) {
                 result.put(split[1], attr.getNodeValue());
             }
         }
@@ -333,7 +333,7 @@ public class XMPSchemaBibtex extends XMPSchema {
                 hasTextContent = true;
             }
         }
-        return (hasTextContent ? buffer.toString() : "");
+        return hasTextContent ? buffer.toString() : "";
     }
 
 }

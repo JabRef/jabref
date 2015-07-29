@@ -242,7 +242,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
         preferences.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
 
-        if ((useDefault.isSelected() == oldUseDef) ||
+        if (useDefault.isSelected() == oldUseDef ||
                 !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
                     Globals.lang("You have changed the look and feel setting.")

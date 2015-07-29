@@ -72,8 +72,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
         isTypeHeader = this.field[0].equals(GUIGlobals.TYPE_HEADER);
-        isNameField = (this.field[0].equals("author")
-                || this.field[0].equals("editor"));
+        isNameField = this.field[0].equals("author")
+                || this.field[0].equals("editor");
         isYearField = this.field[0].equals("year");
         isMonthField = this.field[0].equals("month");
         isNumeric = BibtexFields.isNumeric(this.field[0]);
@@ -81,7 +81,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
     @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
-        Object f1, f2;
+        Object f1;
+        Object f2;
 
         if (isTypeHeader) {
             // Sort by type.
@@ -137,7 +138,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         }
 
         if (isNumeric) {
-            Integer i1 = null, i2 = null;
+            Integer i1 = null;
+            Integer i2 = null;
             try {
                 i1 = Util.intValueOf((String) f1);
             } catch (NumberFormatException ex) {
@@ -150,7 +152,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
                 // Parsing failed.
             }
 
-            if ((i2 != null) && (i1 != null)) {
+            if (i2 != null && i1 != null) {
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
@@ -169,16 +171,17 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         }
 
         int result;
-        if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-            result = (((Integer) f1).compareTo((Integer) f2));
+        if (f1 instanceof Integer && f2 instanceof Integer) {
+            result = ((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = new Integer(f1.toString());
-            result = -((f1AsInteger).compareTo((Integer) f2));
+            result = -f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
             Integer f2AsInteger = new Integer(f2.toString());
-            result = -(((Integer) f1).compareTo(f2AsInteger));
+            result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
-            String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
+            String ours = ((String) f1).toLowerCase();
+            String theirs = ((String) f2).toLowerCase();
             result = FieldComparator.collator.compare(ours, theirs);//ours.compareTo(theirs);
         }
 

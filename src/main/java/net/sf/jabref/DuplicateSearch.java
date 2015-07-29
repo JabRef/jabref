@@ -49,7 +49,7 @@ public class DuplicateSearch implements Runnable {
         boolean autoRemoveExactDuplicates = false;
         panel.output(Globals.lang("Searching for duplicates..."));
         Object[] keys = panel.database.getKeySet().toArray();
-        if ((keys.length < 2)) {
+        if (keys.length < 2) {
             return;
         }
         bes = new BibtexEntry[keys.length];
@@ -62,7 +62,7 @@ public class DuplicateSearch implements Runnable {
         int current = 0;
 
         final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
-        while (!st.finished() || (current < duplicates.size()))
+        while (!st.finished() || current < duplicates.size())
         {
 
             if (current >= duplicates.size())
@@ -98,12 +98,12 @@ public class DuplicateSearch implements Runnable {
                     DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
                             askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
                                     DuplicateResolverDialog.DUPLICATE_SEARCH);
-                    ((CallBack) (Spin.over(cb))).update();
+                    ((CallBack) Spin.over(cb)).update();
 
                     duplicateCounter++;
                     int answer = cb.getSelected();
-                    if ((answer == DuplicateResolverDialog.KEEP_UPPER)
-                            || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
+                    if (answer == DuplicateResolverDialog.KEEP_UPPER
+                            || answer == DuplicateResolverDialog.AUTOREMOVE_EXACT) {
                         toRemove.add(be[1]);
                         if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
                          {
@@ -152,8 +152,8 @@ public class DuplicateSearch implements Runnable {
 
         @Override
         public void run() {
-            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
-                for (int j = i + 1; (j < bes.length) && !finished; j++) {
+            for (int i = 0; i < bes.length - 1 && !finished; i++) {
+                for (int j = i + 1; j < bes.length && !finished; j++) {
                     boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
                     // If (suspected) duplicates, add them to the duplicates vector.

@@ -185,7 +185,7 @@ public class SpecialFieldsUtils {
      * @return true if given field is a special field, false otherwise
      */
     public static boolean isSpecialField(String fieldName) {
-        return (SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName) != null);
+        return SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName) != null;
     }
 
     public static boolean keywordSyncEnabled() {

@@ -68,8 +68,12 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Abbreviation that = (Abbreviation) o;
         return Objects.equal(name, that.name);
     }

@@ -66,7 +66,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
          {
             return false; // wow, did we ever reach version 3?
         }
-        return (pr.getJabrefMinorVersion() <= 2);
+        return pr.getJabrefMinorVersion() <= 2;
     }
 
     /**

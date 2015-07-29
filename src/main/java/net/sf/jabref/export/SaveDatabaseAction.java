@@ -39,7 +39,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     private final BasePanel panel;
     private final JabRefFrame frame;
-    private boolean success = false, cancelled = false, fileLockedError = false;
+    private boolean success = false;
+    private boolean cancelled = false;
+    private boolean fileLockedError = false;
 
 
     public SaveDatabaseAction(BasePanel panel) {
@@ -119,7 +121,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 else { // User indicated to store anyway.
                        // See if the database has the protected flag set:
                     Vector<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
-                    boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
+                    boolean databaseProtectionFlag = pd != null && Boolean.parseBoolean(pd.get(0));
                     if (databaseProtectionFlag) {
                         JOptionPane.showMessageDialog(frame, Globals.lang("Database is protected. Cannot save until external changes have been reviewed."),
                                 Globals.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
@@ -158,7 +160,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled || (panel.getFile() == null)) {
+        if (cancelled || panel.getFile() == null) {
             return;
         }
 
@@ -240,7 +242,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 // Error occured during processing of
                 // be. Highlight it:
-                int row = panel.mainTable.findEntry(ex.getEntry()), topShow = Math.max(0, row - 3);
+                int row = panel.mainTable.findEntry(ex.getEntry());
+                int topShow = Math.max(0, row - 3);
                 panel.mainTable.setRowSelectionInterval(row, row);
                 panel.mainTable.scrollTo(topShow);
                 panel.showEntry(ex.getEntry());
@@ -357,10 +360,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             f = new File(chosenFile);
             // Check if the file already exists:
-            if (f.exists() && (JOptionPane.showConfirmDialog
+            if (f.exists() && JOptionPane.showConfirmDialog
                     (frame, '\'' + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                             Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                        != JOptionPane.OK_OPTION)) {
+                        != JOptionPane.OK_OPTION) {
                 f = null;
             }
         }

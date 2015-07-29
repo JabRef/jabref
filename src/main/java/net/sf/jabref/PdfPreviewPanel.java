@@ -100,7 +100,7 @@ class PdfPreviewPanel extends JPanel {
             int height, int type) {
         int h = originalImage.getHeight();
         int w = originalImage.getWidth();
-        if ((height == 0) || (width == 0)) {
+        if (height == 0 || width == 0) {
             height = h;
             width = w;
         } else {

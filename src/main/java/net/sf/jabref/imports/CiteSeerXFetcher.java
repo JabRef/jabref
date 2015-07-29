@@ -105,8 +105,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
             urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
             String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
+            while ((nextPage = getCitationsFromUrl(urlQuery, ids)) != null
+                    && count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD) {
                 urlQuery = nextPage;
                 count++;
                 if (stopFetching) {

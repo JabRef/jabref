@@ -521,11 +521,11 @@ public class GroupSelector extends SidePaneComponent implements
                 if (node.isRoot()) {
                     return;
                 }
-                if ((e.getClickCount() == 2)
-                        && (e.getButton() == MouseEvent.BUTTON1)) { // edit
+                if (e.getClickCount() == 2
+                        && e.getButton() == MouseEvent.BUTTON1) { // edit
                     editGroupAction.actionPerformed(null); // dummy event
-                } else if ((e.getClickCount() == 1)
-                        && (e.getButton() == MouseEvent.BUTTON1)) {
+                } else if (e.getClickCount() == 1
+                        && e.getButton() == MouseEvent.BUTTON1) {
                     annotationEvent(node);
                 }
             }
@@ -710,14 +710,14 @@ public class GroupSelector extends SidePaneComponent implements
      * @param deletion != addition
      */
     public void updateGroupContentIfEnabled(boolean deletion) {
-        if ((groupsTree == null) || (groupsTree.getSelectionCount() == 0)) {
+        if (groupsTree == null || groupsTree.getSelectionCount() == 0) {
             return;
         }
         if (!this.editModeIndicator) {
             // add button selected
             return;
         }
-        GroupTreeNode curNode = (GroupTreeNode) ((groupsTree.getSelectionPaths())[0].getLastPathComponent());
+        GroupTreeNode curNode = (GroupTreeNode) (groupsTree.getSelectionPaths())[0].getLastPathComponent();
         updateGroupContent(curNode);
     }
 
@@ -742,9 +742,9 @@ public class GroupSelector extends SidePaneComponent implements
             return; // ignore this event
         }
         final TreePath[] selection = groupsTree.getSelectionPaths();
-        if ((selection == null)
-                || (selection.length == 0)
-                || ((selection.length == 1) && (((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup))) {
+        if (selection == null
+                || selection.length == 0
+                || selection.length == 1 && ((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup) {
             panel.stopShowingGroup();
             panel.mainTable.stopShowingFloatGrouping();
             if (showOverlappingGroups.isSelected()) {
@@ -1350,7 +1350,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveUp() || ((undo = node.moveUp(GroupSelector.this)) == null)) {
+        if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" up.", node.getGroup().getName()));
             return false; // not possible
@@ -1375,7 +1375,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveDown() || ((undo = node.moveDown(GroupSelector.this)) == null)) {
+        if (!node.canMoveDown() || (undo = node.moveDown(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" down.", node.getGroup().getName()));
             return false; // not possible
@@ -1400,7 +1400,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveLeft() || ((undo = node.moveLeft(GroupSelector.this)) == null)) {
+        if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" left.", node.getGroup().getName()));
             return false; // not possible
@@ -1424,7 +1424,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo;
-        if (!node.canMoveRight() || ((undo = node.moveRight(GroupSelector.this)) == null)) {
+        if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" right.", node.getGroup().getName()));
             return false; // not possible
@@ -1522,7 +1522,7 @@ public class GroupSelector extends SidePaneComponent implements
      * If entries is null or has zero length, highlight is cleared.
      */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
-        if ((entries == null) || (entries.length == 0)) { // nothing selected
+        if (entries == null || entries.length == 0) { // nothing selected
             groupsTree.setHighlight3Cells(null);
             groupsTree.revalidate();
             return;
@@ -1543,7 +1543,7 @@ public class GroupSelector extends SidePaneComponent implements
                     }
                 }
             }
-            if (requireAll && (i >= entries.length)) // did not break from loop
+            if (requireAll && i >= entries.length) // did not break from loop
             {
                 vec.add(node);
             }

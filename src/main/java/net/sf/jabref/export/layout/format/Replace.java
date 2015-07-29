@@ -48,7 +48,8 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
  */
 public class Replace extends AbstractParamLayoutFormatter {
 
-    private String regex = null, replaceWith = null;
+    private String regex = null;
+    private String replaceWith = null;
 
 
     @Override

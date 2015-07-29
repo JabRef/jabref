@@ -52,7 +52,9 @@ public class SynchronizeFileField extends AbstractWorker {
             Globals.lang("Remove all broken links"),
             Globals.lang("Quit synchronization")};
 
-    private boolean goOn = true, autoSet = true, checkExisting = true;
+    private boolean goOn = true;
+    private boolean autoSet = true;
+    private boolean checkExisting = true;
 
 
     public SynchronizeFileField(BasePanel panel) {
@@ -144,7 +146,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
-                if ((old != null) && !old.equals("")) {
+                if (old != null && !old.equals("")) {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old);
 
@@ -170,7 +172,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
                         // Get an absolute path representation:
                         File file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
-                        if ((file == null) || !file.exists()) {
+                        if (file == null || !file.exists()) {
                             int answer;
                             if (!removeAllBroken) {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
@@ -211,7 +213,7 @@ public class SynchronizeFileField extends AbstractWorker {
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:
-                        if (!deleted && (flEntry.getType() instanceof UnknownExternalFileType)) {
+                        if (!deleted && flEntry.getType() instanceof UnknownExternalFileType) {
                             String[] options = new String[]
                             {Globals.lang("Define '%0'", flEntry.getType().getName()),
                                     Globals.lang("Change file type"), Globals.lang("Cancel")};

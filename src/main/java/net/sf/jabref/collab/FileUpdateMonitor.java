@@ -159,7 +159,8 @@ public class FileUpdateMonitor implements Runnable {
         final FileUpdateListener listener;
         final File file;
         final File tmpFile;
-        long timeStamp, fileSize;
+        long timeStamp;
+        long fileSize;
 
 
         public Entry(FileUpdateListener ul, File f) {
@@ -183,7 +184,7 @@ public class FileUpdateMonitor implements Runnable {
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
-            return (timeStamp != modified) || (fileSize != fileSizeNow);
+            return timeStamp != modified || fileSize != fileSizeNow;
         }
 
         public void updateTimeStamp() {

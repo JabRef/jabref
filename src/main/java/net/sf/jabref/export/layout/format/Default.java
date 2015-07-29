@@ -33,6 +33,6 @@ public class Default implements ParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return (fieldText != null) && (!fieldText.isEmpty()) ? fieldText : defValue;
+        return fieldText != null && !fieldText.isEmpty() ? fieldText : defValue;
     }
 }

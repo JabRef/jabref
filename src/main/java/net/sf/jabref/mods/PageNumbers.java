@@ -71,7 +71,7 @@ public class PageNumbers {
         if (freeform != null) {
             return freeform;
         }
-        return (start + seperator + end);
+        return start + seperator + end;
     }
 
     @Override

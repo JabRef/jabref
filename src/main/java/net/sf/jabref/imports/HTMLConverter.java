@@ -892,7 +892,7 @@ public class HTMLConverter implements LayoutFormatter {
     private int readTag(String text, StringBuffer sb, int position) {
         // Have just read the < character that starts the tag.
         int index = text.indexOf('>', position);
-        if ((index > position) && ((index - position) < MAX_TAG_LENGTH)) {
+        if (index > position && index - position < MAX_TAG_LENGTH) {
             //System.out.println("Removed tag: "+text.substring(position, index));
             return index; // Just skip the tag.
         }

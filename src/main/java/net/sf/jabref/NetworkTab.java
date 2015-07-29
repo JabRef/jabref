@@ -117,14 +117,14 @@ public class NetworkTab extends JPanel implements PrefsTab {
         if (useProxy.isSelected()) {
             String host = defProxyHostname.getText();
             String port = defProxyPort.getText();
-            if ((host == null) || (host.trim().isEmpty()) ||
-                    (port == null) || (port.trim().isEmpty())) {
+            if (host == null || host.trim().isEmpty() ||
+                    port == null || port.trim().isEmpty()) {
                 validSetting = false;
             } else {
                 Integer p;
                 try {
                     p = Integer.parseInt(port);
-                    validSetting = (p > 0);
+                    validSetting = p > 0;
                 } catch (NumberFormatException e) {
                     validSetting = false;
                 }

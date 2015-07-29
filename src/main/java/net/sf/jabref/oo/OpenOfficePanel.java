@@ -95,7 +95,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
     private static boolean useDefaultAuthoryearStyle = false;
     private static boolean useDefaultNumericalStyle = false;
     private StyleSelectDialog styleDialog = null;
-    private boolean dialogOkPressed = false, autoDetected = false;
+    private boolean dialogOkPressed = false;
+    private boolean autoDetected = false;
     private String sOffice = null;
     private Throwable connectException = null;
 
@@ -120,7 +121,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         OpenOfficePanel.selectDocument.setToolTipText(Globals.lang("Select Writer document"));
         OpenOfficePanel.update = new JButton(GUIGlobals.getImage("refresh"));
         OpenOfficePanel.update.setToolTipText(Globals.lang("Sync OO bibliography"));
-        String defExecutable, defJarsDir;
+        String defExecutable;
+        String defJarsDir;
         if (Globals.ON_WIN) {
             Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 3");
             Globals.prefs.putDefaultValue("ooExecutablePath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\soffice.exe");
@@ -313,7 +315,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                             (databases, OpenOfficePanel.style);
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
                     //ooBase.sync(frame.basePanel().database(), style);
-                    if (unresolvedKeys.size() > 0) {
+                    if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                 unresolvedKeys.get(0)), Globals.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     }
@@ -490,7 +492,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             return;
         }*/
 
-        String unoilDir, ooBaseDirectory;
+        String unoilDir;
+        String ooBaseDirectory;
         if (auto) {
             AutoDetectPaths adp = new AutoDetectPaths(diag);
 
@@ -574,7 +577,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             OpenOfficePanel.addURL(jarList);
 
             // Show progress dialog:
-            final JDialog progDiag = (new AutoDetectPaths(diag)).showProgressDialog(diag, Globals.lang("Connecting"),
+            final JDialog progDiag = new AutoDetectPaths(diag).showProgressDialog(diag, Globals.lang("Connecting"),
                     Globals.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();
@@ -773,7 +776,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (acd.cancelled()) {
                 return;
             }
-            if (acd.getPageInfo().length() > 0) {
+            if (!acd.getPageInfo().isEmpty()) {
                 pageInfo = acd.getPageInfo();
             }
             inParenthesis = acd.isInParenthesisCite();
@@ -959,7 +962,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (acd.cancelled()) {
                 return;
             }
-            if (acd.getPageInfo().length() > 0) {
+            if (!acd.getPageInfo().isEmpty()) {
                 pageInfo = acd.getPageInfo();
             }
             inParenthesis = acd.isInParenthesisCite();

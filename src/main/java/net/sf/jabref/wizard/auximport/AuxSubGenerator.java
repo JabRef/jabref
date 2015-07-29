@@ -283,7 +283,7 @@ public class AuxSubGenerator
                 // we don't already have in our list of entries to include. If so,
                 // pull in that entry as well:
                 String crossref = entry.getField("crossref");
-                if ((crossref != null) && (!mySet.contains(crossref))) {
+                if (crossref != null && !mySet.contains(crossref)) {
                     BibtexEntry refEntry = db.getEntryByKey(crossref);
                     /**
                      * [ 1717849 ] Patch for aux import by Kai Eckert

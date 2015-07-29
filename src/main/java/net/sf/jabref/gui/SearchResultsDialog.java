@@ -348,7 +348,8 @@ public class SearchResultsDialog {
                 return;
             }
             //if (e.)
-            final int col = entryTable.columnAtPoint(e.getPoint()), row = entryTable.rowAtPoint(e.getPoint());
+            final int col = entryTable.columnAtPoint(e.getPoint());
+            final int row = entryTable.rowAtPoint(e.getPoint());
             if (col < PAD) {
                 BibtexEntry entry = sortedEntries.get(row);
                 BasePanel p = entryHome.get(entry);

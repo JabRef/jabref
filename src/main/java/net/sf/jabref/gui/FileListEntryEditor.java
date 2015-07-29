@@ -68,8 +68,10 @@ public class FileListEntryEditor {
 
     private FileListEntry entry;
     private final MetaData metaData;
-    private boolean okPressed = false, okDisabledExternally = false,
-            openBrowseWhenShown = false, dontOpenBrowseUntilDisposed = false;
+    private boolean okPressed = false;
+    private boolean okDisabledExternally = false;
+    private boolean openBrowseWhenShown = false;
+    private boolean dontOpenBrowseUntilDisposed = false;
 
     private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 

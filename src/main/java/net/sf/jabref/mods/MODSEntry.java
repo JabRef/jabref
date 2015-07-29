@@ -117,8 +117,8 @@ class MODSEntry {
         if (bibtex.getField("author") != null) {
             authors = getAuthors(bibtex.getField("author"));
         }
-        if ((bibtex.getType() == BibtexEntryType.ARTICLE) ||
-                (bibtex.getType() == BibtexEntryType.INPROCEEDINGS))
+        if (bibtex.getType() == BibtexEntryType.ARTICLE ||
+                bibtex.getType() == BibtexEntryType.INPROCEEDINGS)
         {
             host = new MODSEntry();
             host.entryType = "relatedItem";
@@ -176,7 +176,7 @@ class MODSEntry {
     private String getDate(BibtexEntry bibtex) {
         String result = "";
         if (bibtex.getField("year") != null) {
-            result += (bibtex.getField("year"));
+            result += bibtex.getField("year");
         }
         if (bibtex.getField("month") != null) {
             result += '-' + bibtex.getField("month");
@@ -330,18 +330,18 @@ class MODSEntry {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if ((in == null) || (in != null && in.isEmpty()))
+        if (in == null || in != null && in.isEmpty())
          {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if ((current == 0x9) ||
-                    (current == 0xA) ||
-                    (current == 0xD) ||
-                    ((current >= 0x20) && (current <= 0xD7FF)) ||
-                    ((current >= 0xE000) && (current <= 0xFFFD)) ||
-                    ((current >= 0x10000) && (current <= 0x10FFFF))) {
+            if (current == 0x9 ||
+                    current == 0xA ||
+                    current == 0xD ||
+                    current >= 0x20 && current <= 0xD7FF ||
+                    current >= 0xE000 && current <= 0xFFFD ||
+                    current >= 0x10000 && current <= 0x10FFFF) {
                 out.append(current);
             }
         }

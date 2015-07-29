@@ -61,7 +61,7 @@ public class RightClickMenu extends JPopupMenu
         metaData = metaData_;
 
         // Are multiple entries selected? 
-        boolean multiple = (panel.mainTable.getSelectedRowCount() > 1);
+        boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
 
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibtexEntry be = null;
@@ -182,7 +182,7 @@ public class RightClickMenu extends JPopupMenu
         } else if (be != null) {
             String marked = be.getField(BibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
-            if ((marked == null) || (marked.isEmpty())) {
+            if (marked == null || marked.isEmpty()) {
                 add(new AbstractAction(Globals.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
 
                     @Override

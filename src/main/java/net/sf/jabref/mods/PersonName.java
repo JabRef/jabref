@@ -79,7 +79,7 @@ public class PersonName {
         else {
             givenName = v.get(0);
             middleName = "";
-            for (int i = 1; i < (amountOfNames - 1); i++) {
+            for (int i = 1; i < amountOfNames - 1; i++) {
                 middleName += ' ' + v.get(i);
             }
             middleName = middleName.trim();
@@ -131,13 +131,13 @@ public class PersonName {
     public String getFullname()
     {
         String fullName = "";
-        if ((givenName != null) && !givenName.isEmpty()) {
+        if (givenName != null && !givenName.isEmpty()) {
             fullName += givenName + ' ';
         }
-        if ((middleName != null) && !middleName.isEmpty()) {
+        if (middleName != null && !middleName.isEmpty()) {
             fullName += middleName + ' ';
         }
-        if ((surname != null) && !surname.isEmpty()) {
+        if (surname != null && !surname.isEmpty()) {
             fullName += surname;
         }
 

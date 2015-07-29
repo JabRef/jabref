@@ -29,7 +29,8 @@ import spin.Spin;
 public class SaveAllAction extends MnemonicAwareAction implements Worker {
 
     private final JabRefFrame frame;
-    private int databases = 0, saved = 0;
+    private int databases = 0;
+    private int saved = 0;
 
 
     /** Creates a new instance of SaveAllAction */

@@ -133,7 +133,7 @@ public class FieldContentSelector extends JComponent {
                  * list, so we should not react to it. I'm not sure if this is
                  * well defined enough to be guaranteed to work everywhere.
                  */
-                if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0)) {
+                if (e.getActionCommand().equals("comboBoxChanged") && e.getModifiers() == 0) {
                     return;
                 }
 
@@ -186,7 +186,7 @@ public class FieldContentSelector extends JComponent {
         }
 
         String chosen = (String) comboBox.getSelectedItem();
-        if ((chosen == null) || chosen.equals("")) {
+        if (chosen == null || chosen.equals("")) {
             return;
         }
 

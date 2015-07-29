@@ -207,7 +207,7 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 String bibtexType = "misc";
                 // to find type, first check TW, then RT
-                for (int i = 1; (i >= 0) && bibtexType.equals("misc"); --i) {
+                for (int i = 1; i >= 0 && bibtexType.equals("misc"); --i) {
                     if (type[i] == null) {
                         continue;
                     }
@@ -263,7 +263,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 }
 
                 // concatenate pages
-                if ((pages[0] != null) || (pages[1] != null)) {
+                if (pages[0] != null || pages[1] != null) {
                     hm.put("pages",
                             (pages[0] != null ? pages[0] : "")
                                     + (pages[1] != null ? "--" + pages[1] : ""));
@@ -294,7 +294,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 continue;
             }
             // new key
-            if (line.startsWith("--") && (line.length() >= 7)
+            if (line.startsWith("--") && line.length() >= 7
                     && line.substring(4, 7).equals("-- ")) {
                 lines.put(line.substring(2, 4), previousLine = new StringBuffer(line
                         .substring(7)));

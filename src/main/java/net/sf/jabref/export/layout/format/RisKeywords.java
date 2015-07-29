@@ -33,7 +33,7 @@ public class RisKeywords implements LayoutFormatter {
         for (int i = 0; i < keywords.size(); i++) {
             sb.append("KW  - ");
             sb.append(keywords.get(i));
-            if (i < (keywords.size() - 1)) {
+            if (i < keywords.size() - 1) {
                 sb.append(Globals.NEWLINE);
             }
         }

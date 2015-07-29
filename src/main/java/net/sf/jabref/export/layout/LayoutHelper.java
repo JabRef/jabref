@@ -72,9 +72,9 @@ public class LayoutHelper {
         for (StringInt parsedEntry : parsedEntries) {
             si = parsedEntry;
 
-            if ((si.i == LayoutHelper.IS_SIMPLE_FIELD) || (si.i == LayoutHelper.IS_FIELD_START) ||
-                    (si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_START) ||
-                    (si.i == LayoutHelper.IS_GROUP_END)) {
+            if (si.i == LayoutHelper.IS_SIMPLE_FIELD || si.i == LayoutHelper.IS_FIELD_START ||
+                    si.i == LayoutHelper.IS_FIELD_END || si.i == LayoutHelper.IS_GROUP_START ||
+                    si.i == LayoutHelper.IS_GROUP_END) {
                 si.s = si.s.trim().toLowerCase();
             }
         }
@@ -118,7 +118,7 @@ public class LayoutHelper {
                 return null;
             }
 
-            if ((c == '{') || (c == '}'))
+            if (c == '{' || c == '}')
             {
                 if (c == '}')
                 {
@@ -202,16 +202,16 @@ public class LayoutHelper {
 
                 return null;
             }
-            if (!inQuotes && ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}')))))
+            if (!inQuotes && (c == ']' || c == '[' || doneWithOptions && (c == '{' || c == '}')))
             //if ((c == '{') || (c == '}') || (c == ']') || (c == '['))
             {
-                if ((c == ']') || (doneWithOptions && (c == '}')))
+                if (c == ']' || doneWithOptions && c == '}')
                 {
                     // changed section start - arudert
                     // buffer may be null for parameters
                     //if (buffer != null)
                     //{
-                    if ((c == ']') && (buffer != null))
+                    if (c == ']' && buffer != null)
                     {
                         // changed section end - arudert
                         option = buffer.toString();
@@ -313,7 +313,7 @@ public class LayoutHelper {
                 return null;
             }
 
-            if ((c == '\\') && (peek() != '\\') && !escaped) {
+            if (c == '\\' && peek() != '\\' && !escaped) {
                 if (buffer != null) {
                     parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
 
@@ -330,12 +330,12 @@ public class LayoutHelper {
                     buffer = new StringBuffer(100);
                 }
 
-                if ((c != '\\') || escaped)// (previous == '\\')))
+                if (c != '\\' || escaped)// (previous == '\\')))
                 {
                     buffer.append((char) c);
                 }
 
-                escaped = (c == '\\') && !escaped;
+                escaped = c == '\\' && !escaped;
             }
         }
 
@@ -361,7 +361,7 @@ public class LayoutHelper {
                 _eof = true;
             }
 
-            if (!Character.isLetter((char) c) && (c != '_') && (c != '-'))
+            if (!Character.isLetter((char) c) && c != '_' && c != '-')
             {
                 unread(c);
 
@@ -504,7 +504,7 @@ public class LayoutHelper {
         {
             c = read();
 
-            if ((c == -1) || (c == 65535))
+            if (c == -1 || c == 65535)
             {
                 _eof = true;
 

@@ -115,7 +115,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
         @Override
         public boolean equals(Object o) {
-            return (o != null) && (o instanceof Importer) && this.getName().equals(((Importer) o).getName());
+            return o != null && o instanceof Importer && this.getName().equals(((Importer) o).getName());
         }
 
         @Override

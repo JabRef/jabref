@@ -80,7 +80,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
      * @return
      */
     public BibtexEntry createEntry(File f, boolean addPathTokensAsKeywords) {
-        if ((f == null) || !f.exists()) {
+        if (f == null || !f.exists()) {
             return null;
         }
         BibtexEntry newEntry = createBibtexEntry(f);
@@ -149,7 +149,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     void appendToField(BibtexEntry entry, String field, String value) {
-        if ((value == null) || "".equals(value)) {
+        if (value == null || "".equals(value)) {
             return;
         }
         String oVal = entry.getField(field);

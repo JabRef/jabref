@@ -16,10 +16,13 @@ public class StringUtil {
         if (s == null) {
             return null;
         }
-        char ch, ch2;
-        int beg = 0, end = s.length();
+        char ch;
+        char ch2;
+        int beg = 0;
+        int end = s.length();
         // We start out assuming nothing will be removed.
-        boolean begok = false, endok = false;
+        boolean begok = false;
+        boolean endok = false;
         while (!begok) {
             if (beg < s.length()) {
                 ch = s.charAt(beg);
@@ -34,7 +37,7 @@ public class StringUtil {
 
         }
         while (!endok) {
-            if (end > (beg + 1)) {
+            if (end > beg + 1) {
                 ch = s.charAt(end - 1);
                 if (Character.isWhitespace(ch)) {
                     end--;
@@ -46,10 +49,10 @@ public class StringUtil {
             }
         }
 
-        if (end > (beg + 1)) {
+        if (end > beg + 1) {
             ch = s.charAt(beg);
             ch2 = s.charAt(end - 1);
-            if (((ch == '{') && (ch2 == '}')) || ((ch == '"') && (ch2 == '"'))) {
+            if (ch == '{' && ch2 == '}' || ch == '"' && ch2 == '"') {
                 beg++;
                 end--;
             }
@@ -79,7 +82,7 @@ public class StringUtil {
      * @return
      */
     public static String join(String[] strings, String separator, int from, int to) {
-        if ((strings.length == 0) || (from >= to)) {
+        if (strings.length == 0 || from >= to) {
             return "";
         }
 
@@ -87,7 +90,7 @@ public class StringUtil {
         to = Math.min(strings.length, to);
 
         StringBuilder sb = new StringBuilder();
-        for (int i = from; i < (to - 1); i++) {
+        for (int i = from; i < to - 1; i++) {
             sb.append(strings[i]).append(separator);
         }
         return sb.append(strings[to - 1]).toString();
@@ -152,8 +155,8 @@ public class StringUtil {
      * @return
      */
     public static String stripBrackets(String s) {
-        int beginIndex = (s.startsWith("[") ? 1 : 0);
-        int endIndex = (s.endsWith("]") ? s.length() - 1 : s.length());
+        int beginIndex = s.startsWith("[") ? 1 : 0;
+        int endIndex = s.endsWith("]") ? s.length() - 1 : s.length();
         return s.substring(beginIndex, endIndex);
     }
 
@@ -191,18 +194,18 @@ public class StringUtil {
 
         // advance to first char and skip whitespace
         i++;
-        while ((i < text.length()) && Character.isWhitespace(text.charAt(i))) {
+        while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
             i++;
         }
 
         // then grab whathever is the first token (counting braces)
         while (i < text.length()) {
             c = text.charAt(i);
-            if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
+            if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
                 // end argument and leave whitespace for further processing
                 break;
             }
-            if ((c == '}') && (--count < 0)) {
+            if (c == '}' && --count < 0) {
                 break;
             } else if (c == '{') {
                 count++;
@@ -252,7 +255,7 @@ public class StringUtil {
 
         while (p < res.length()) {
             int q = res.indexOf(" ", p + wrapAmount);
-            if ((q < 0) || (q >= res.length())) {
+            if (q < 0 || q >= res.length()) {
                 break;
             }
 
@@ -302,10 +305,10 @@ public class StringUtil {
         boolean isSpecial;
         for (int i = 0; i < s.length(); ++i) {
             c = s.charAt(i);
-            isSpecial = (specials.indexOf(c) >= 0) || (c == quoteChar);
+            isSpecial = specials.indexOf(c) >= 0 || c == quoteChar;
             // linebreak?
-            if ((linewrap > 0)
-                    && ((++lineLength >= linewrap) || (isSpecial && (lineLength >= (linewrap - 1))))) {
+            if (linewrap > 0
+                    && (++lineLength >= linewrap || isSpecial && lineLength >= linewrap - 1)) {
                 sb.append(quoteChar);
                 sb.append('\n');
                 lineLength = 0;

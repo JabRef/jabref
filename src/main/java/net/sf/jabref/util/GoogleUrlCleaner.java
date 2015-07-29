@@ -38,7 +38,7 @@ public class GoogleUrlCleaner {
 
     // clean Google URL
     public static String cleanUrl(String dirty) {
-        if ((dirty == null) || (dirty.isEmpty())) {
+        if (dirty == null || dirty.isEmpty()) {
             return dirty;
         }
         try {

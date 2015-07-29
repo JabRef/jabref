@@ -90,7 +90,7 @@ public class EntryMarker {
                 if (m.find()) {
                     try {
                         int prevMarkLevel = Integer.parseInt(m.group(1));
-                        if (!onlyMaxLevel || (prevMarkLevel == MARK_COLOR_LEVELS)) {
+                        if (!onlyMaxLevel || prevMarkLevel == MARK_COLOR_LEVELS) {
                             if (prevMarkLevel > 1) {
                                 newValue = s.substring(0, m.start(1)) +
                                         s.substring(m.end(1));

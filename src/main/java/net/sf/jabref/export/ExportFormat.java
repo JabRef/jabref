@@ -337,7 +337,7 @@ public class ExportFormat implements IExportFormat {
                         continue;
                     }
                     int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?
-                    if ((index > 0) && ((index + 1) < line.length())) {
+                    if (index > 0 && index + 1 < line.length()) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
                         //System.out.println("Name: '"+formatterName+"'");

@@ -82,7 +82,7 @@ class BstWrapper {
         ArrayList<Integer> endIndices = new ArrayList<Integer>();
         ArrayList<String> keys = new ArrayList<String>();
         while (m.find()) {
-            if (indices.size() > 0) {
+            if (!indices.isEmpty()) {
                 endIndices.add(m.start());
             }
             System.out.println(m.start() + "  " + m.end());
@@ -92,7 +92,7 @@ class BstWrapper {
             keys.add(key);
         }
         int lastI = result.lastIndexOf("\\end{thebibliography}");
-        if ((lastI > 0) && (lastI > indices.get(indices.size() - 1))) {
+        if (lastI > 0 && lastI > indices.get(indices.size() - 1)) {
             endIndices.add(lastI);
         }
         for (int i = 0; i < keys.size(); i++) {

@@ -111,7 +111,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         }
         else {
             draggingFile = false;
-            return (new TransferableFileLinkSelection(panel, entryTable.getSelectedEntries()));//.getTransferable();
+            return new TransferableFileLinkSelection(panel, entryTable.getSelectedEntries());//.getTransferable();
         }
     }
 
@@ -424,7 +424,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             String extension = "";
             ExternalFileType fileType = null;
             int index = fileName.lastIndexOf('.');
-            if ((index >= 0) && (index < fileName.length())) {
+            if (index >= 0 && index < fileName.length()) {
                 extension = fileName.substring(index + 1).toLowerCase();
                 fileType = Globals.prefs.getExternalFileTypeByExt(extension);
             }
@@ -432,7 +432,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 File f = new File(fileName);
                 try {
                     ParserResult pr = OpenDatabaseAction.loadDatabase(f, encoding);
-                    if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                    if (pr == null || pr == ParserResult.INVALID_FORMAT) {
                         notBibFiles.add(fileName);
                     } else {
                         openAction.addNewDatabase(pr, f, true);
@@ -454,7 +454,7 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if ((fileType != null) && (dropRow >= 0)) {
+            if (fileType != null && dropRow >= 0) {
 
                 /*
                  * TODO: need to signal if this is a local or autodownloaded
@@ -527,7 +527,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
             // Import into new if entryTable==null, otherwise into current
             // database:
-            ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
+            ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
             importer.automatedImport(toImport);
         }
     }
@@ -542,7 +542,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         URLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
 
         // Import into new if entryTable==null, otherwise into current database:
-        ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
+        ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
         importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
 
         return true;

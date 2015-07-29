@@ -23,7 +23,8 @@ public class PushToTeXstudio implements PushToApplication {
     private final JTextField citeCommand = new JTextField(30);
     private final JTextField progPath = new JTextField(30);
 
-    private boolean couldNotConnect = false, couldNotRunClient = false;
+    private boolean couldNotConnect = false;
+    private boolean couldNotRunClient = false;
 
 
     @Override

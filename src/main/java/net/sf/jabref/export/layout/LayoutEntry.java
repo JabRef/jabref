@@ -107,16 +107,16 @@ class LayoutEntry {
         type = layoutType;
         text = si.s;
 
-        for (int i = 1; i < (parsedEntries.size() - 1); i++) {
+        for (int i = 1; i < parsedEntries.size() - 1; i++) {
             si = parsedEntries.get(i);
 
             // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
             if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
-            } else if ((si.i == LayoutHelper.IS_FIELD_START)
-                    || (si.i == LayoutHelper.IS_GROUP_START)) {
+            } else if (si.i == LayoutHelper.IS_FIELD_START
+                    || si.i == LayoutHelper.IS_GROUP_START) {
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
-            } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
+            } else if (si.i == LayoutHelper.IS_FIELD_END || si.i == LayoutHelper.IS_GROUP_END) {
                 if (blockStart.equals(si.s)) {
                     blockEntries.add(si);
                     if (si.i == LayoutHelper.IS_GROUP_END) {
@@ -211,9 +211,9 @@ class LayoutEntry {
                 }
             }
 
-            if ((field == null)
-                    || ((type == LayoutHelper.IS_GROUP_START) && (field.equalsIgnoreCase(LayoutHelper
-                            .getCurrentGroup())))) {
+            if (field == null
+                    || type == LayoutHelper.IS_GROUP_START && field.equalsIgnoreCase(LayoutHelper
+                            .getCurrentGroup())) {
                 return null;
             } else {
                 if (type == LayoutHelper.IS_GROUP_START) {
@@ -227,7 +227,7 @@ class LayoutEntry {
                     fieldText = layoutEntries[i].doLayout(bibtex, database);
 
                     if (fieldText == null) {
-                        if ((i + 1) < layoutEntries.length) {
+                        if (i + 1 < layoutEntries.length) {
                             if (layoutEntries[i + 1].doLayout(bibtex, database).trim().isEmpty()) {
                                 i++;
                                 previousSkipped = true;
@@ -241,8 +241,8 @@ class LayoutEntry {
                         if (previousSkipped) {
                             int eol = 0;
 
-                            while ((eol < fieldText.length())
-                                    && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
+                            while (eol < fieldText.length()
+                                    && (fieldText.charAt(eol) == '\n' || fieldText.charAt(eol) == '\r')) {
                                 eol++;
                             }
 
@@ -333,10 +333,10 @@ class LayoutEntry {
         } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
             throw new UnsupportedOperationException(
                     "bibtex entry fields not allowed in begin or end layout");
-        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_GROUP_START)) {
+        } else if (type == LayoutHelper.IS_FIELD_START || type == LayoutHelper.IS_GROUP_START) {
             throw new UnsupportedOperationException(
                     "field and group starts not allowed in begin or end layout");
-        } else if ((type == LayoutHelper.IS_FIELD_END) || (type == LayoutHelper.IS_GROUP_END)) {
+        } else if (type == LayoutHelper.IS_FIELD_END || type == LayoutHelper.IS_GROUP_END) {
             throw new UnsupportedOperationException(
                     "field and group ends not allowed in begin or end layout");
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {

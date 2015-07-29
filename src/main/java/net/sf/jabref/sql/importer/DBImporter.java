@@ -147,8 +147,9 @@ public abstract class DBImporter extends DBImporterExporter {
             ResultSet rsStrings = SQLUtil.queryAllFromTable(conn,
                     "strings WHERE database_id='" + database_id + '\'');
             while (rsStrings.next()) {
-                String label = rsStrings.getString("label"), content = rsStrings
-                        .getString("content");
+                String label = rsStrings.getString("label");
+                String content = rsStrings
+                                        .getString("content");
                 if (label.equals("@PREAMBLE")) {
                     database.setPreamble(content);
                 } else {
@@ -247,8 +248,9 @@ public abstract class DBImporter extends DBImporterExporter {
             ResultSet rsEntryGroup = SQLUtil.queryAllFromTable(conn,
                     "entry_group");
             while (rsEntryGroup.next()) {
-                String entryId = rsEntryGroup.getString("entries_id"), groupId = rsEntryGroup
-                        .getString("groups_id");
+                String entryId = rsEntryGroup.getString("entries_id");
+                String groupId = rsEntryGroup
+                                        .getString("groups_id");
                 GroupTreeNode node = groups.get(groupId);
                 if ((node != null)
                         && (node.getGroup() instanceof ExplicitGroup)) {

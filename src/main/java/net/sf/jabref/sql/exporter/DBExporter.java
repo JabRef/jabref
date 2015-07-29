@@ -283,7 +283,10 @@ public abstract class DBExporter extends DBImporterExporter {
             int currentID, Object out, int database_id) throws SQLException {
 
         AbstractGroup group = cursor.getGroup();
-        String searchField = null, searchExpr = null, caseSens = null, reg_exp = null;
+        String searchField = null;
+        String searchExpr = null;
+        String caseSens = null;
+        String reg_exp = null;
         GroupHierarchyType hierContext = group.getHierarchicalContext();
         if (group instanceof KeywordGroup) {
             searchField = ((KeywordGroup) group).getSearchField();

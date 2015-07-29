@@ -137,7 +137,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return (col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String"));
+                return col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String");
             }
 
             @Override
@@ -285,8 +285,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (((rows[i] + i) - 1) < tableRows.size()) {
-                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
+                if (rows[i] + i - 1 < tableRows.size()) {
+                    tableRows.add(Math.max(0, rows[i] + i - 1), new TableRow());
                 }
             }
             rowCount += rows.length;
@@ -309,7 +309,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     public void storeSettings() {
 
         if (table.isEditing()) {
-            int col = table.getEditingColumn(), row = table.getEditingRow();
+            int col = table.getEditingColumn();
+            int row = table.getEditingRow();
             table.getCellEditor(row, col).stopCellEditing();
         }
 
@@ -326,7 +327,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 }
             }
             // Then we make arrays
-            String[] names = new String[tableRows.size()], formats = new String[tableRows.size()];
+            String[] names = new String[tableRows.size()];
+            String[] formats = new String[tableRows.size()];
 
             for (i = 0; i < tableRows.size(); i++) {
                 TableRow tr = tableRows.elementAt(i);

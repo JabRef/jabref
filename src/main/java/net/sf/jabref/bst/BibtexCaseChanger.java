@@ -205,11 +205,11 @@ public class BibtexCaseChanger {
     }
 
 
-    private final static char TITLE_LOWERS = 't';
+    private static final char TITLE_LOWERS = 't';
 
-    private final static char ALL_LOWERS = 'l';
+    private static final char ALL_LOWERS = 'l';
 
-    private final static char ALL_UPPERS = 'u';
+    private static final char ALL_UPPERS = 'u';
 
 
     private int convertChar0(char[] c, int i, StringBuffer sb, char format) {

@@ -52,7 +52,7 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
             String leading = pageSource.substring(0, index);
             String marker = "href=";
             index = leading.toLowerCase().lastIndexOf(marker);
-            if ((index > -1) && ((index + marker.length() + 1) < leading.length())) {
+            if (index > -1 && index + marker.length() + 1 < leading.length()) {
                 int endIndex = leading.indexOf("\"", index + marker.length() + 1);
 
                 try {

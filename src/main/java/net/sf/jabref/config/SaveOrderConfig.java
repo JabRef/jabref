@@ -9,7 +9,8 @@ import java.util.Vector;
  */
 public class SaveOrderConfig {
 
-    public boolean saveInOriginalOrder, saveInSpecifiedOrder;
+    public boolean saveInOriginalOrder;
+    public boolean saveInSpecifiedOrder;
 
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
@@ -90,7 +91,7 @@ public class SaveOrderConfig {
         if (saveInOriginalOrder) {
             res.insertElementAt("original", 0);
         } else {
-            assert (saveInSpecifiedOrder);
+            assert saveInSpecifiedOrder;
             res.insertElementAt("specified", 0);
         }
 

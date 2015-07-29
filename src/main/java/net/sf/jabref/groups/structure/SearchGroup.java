@@ -161,9 +161,9 @@ public class SearchGroup extends AbstractGroup {
         SearchGroup other = (SearchGroup) o;
         return name.equals(other.name)
                 && searchExpression.equals(other.searchExpression)
-                && (caseSensitive == other.caseSensitive)
-                && (regExp == other.regExp)
-                && (getHierarchicalContext() == other.getHierarchicalContext());
+                && caseSensitive == other.caseSensitive
+                && regExp == other.regExp
+                && getHierarchicalContext() == other.getHierarchicalContext();
     }
 
     /*

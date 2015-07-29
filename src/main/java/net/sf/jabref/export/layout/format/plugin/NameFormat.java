@@ -102,7 +102,8 @@ public class NameFormat implements LayoutFormatter {
                 } else {
                     String[] range = formats[j].split("\\.\\.");
 
-                    int s, e;
+                    int s;
+                    int e;
                     if (range.length == 2) {
                         s = Integer.parseInt(range[0]);
                         e = Integer.parseInt(range[1]);
@@ -121,7 +122,7 @@ public class NameFormat implements LayoutFormatter {
                         s = temp;
                     }
 
-                    if ((s <= i) && (i <= e)) {
+                    if (s <= i && i <= e) {
                         sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
                         break;
                     }
@@ -136,7 +137,7 @@ public class NameFormat implements LayoutFormatter {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
-        if ((parameters == null) || (parameters.isEmpty())) {
+        if (parameters == null || parameters.isEmpty()) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
         }
 

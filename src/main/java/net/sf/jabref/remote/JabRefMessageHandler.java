@@ -36,7 +36,7 @@ public class JabRefMessageHandler implements MessageHandler {
 
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.elementAt(i);
-            JabRef.jrf.addParserResult(pr, (i == 0));
+            JabRef.jrf.addParserResult(pr, i == 0);
         }
     }
 }

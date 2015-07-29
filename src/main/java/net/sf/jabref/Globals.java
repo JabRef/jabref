@@ -102,8 +102,9 @@ public class Globals {
 
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
-    private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
-            INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
+    private static final String RESOURCE_PREFIX = "resource/JabRef";
+    private static final String MENU_RESOURCE_PREFIX = "resource/Menu";
+    private static final String INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
     public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
 
@@ -122,11 +123,13 @@ public class Globals {
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
-    public static final String FILETYPE_PREFS_EXT = "_dir", SELECTOR_META_PREFIX = "selector_",
-            PROTECTED_FLAG_META = "protectedFlag",
-            MAC = "Mac OS X",
-            DOI_LOOKUP_PREFIX = "http://dx.doi.org/", NONE = "_non__",
-            FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
+    public static final String FILETYPE_PREFS_EXT = "_dir";
+    public static final String SELECTOR_META_PREFIX = "selector_";
+    public static final String PROTECTED_FLAG_META = "protectedFlag";
+    public static final String MAC = "Mac OS X";
+    public static final String DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
+    public static final String NONE = "_non__";
+    public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
     public static final String[] ENCODINGS;
     private static final String[] ALL_ENCODINGS = // (String[])
@@ -192,9 +195,9 @@ public class Globals {
 
     public static final String osName = System.getProperty("os.name", "def");
 
-    public static final boolean ON_MAC = (Globals.osName.equals(Globals.MAC)),
-            ON_WIN = Globals.osName.startsWith("Windows"),
-            ON_LINUX = Globals.osName.startsWith("Linux");
+    public static final boolean ON_MAC = Globals.osName.equals(Globals.MAC);
+    public static final boolean ON_WIN = Globals.osName.startsWith("Windows");
+    public static final boolean ON_LINUX = Globals.osName.startsWith("Linux");
 
     public static SidePaneManager sidePaneManager;
 
@@ -265,7 +268,7 @@ public class Globals {
             translation = key;
         }
 
-        if ((translation != null) && (translation.length() != 0)) {
+        if (translation != null && !translation.isEmpty()) {
             translation = translation.replaceAll("_", " ");
             StringBuffer sb = new StringBuffer();
             boolean b = false;
@@ -281,7 +284,7 @@ public class Globals {
                         b = false;
                         try {
                             int index = Integer.parseInt(String.valueOf(c));
-                            if ((params != null) && (index >= 0) && (index <= params.length)) {
+                            if (params != null && index >= 0 && index <= params.length) {
                                 sb.append(params[index]);
                             }
                         } catch (NumberFormatException e) {
@@ -319,7 +322,7 @@ public class Globals {
         } catch (MissingResourceException ex) {
             translation = key;
         }
-        if ((translation != null) && (translation.length() != 0)) {
+        if (translation != null && !translation.isEmpty()) {
             return translation.replaceAll("_", " ");
         } else {
             return key;
@@ -339,7 +342,7 @@ public class Globals {
             // for \""
             // + key + "\"");
         }
-        if ((translation != null) && (translation.length() != 0)) {
+        if (translation != null && !translation.isEmpty()) {
             return translation;
         } else {
             return key;
@@ -380,7 +383,7 @@ public class Globals {
         // Read external lists, if any (in reverse order, so the upper lists
         // override the lower):
         String[] lists = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((lists != null) && (lists.length > 0)) {
+        if (lists != null && lists.length > 0) {
             for (int i = lists.length - 1; i >= 0; i--) {
                 try {
                     Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
@@ -407,7 +410,7 @@ public class Globals {
      * Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
      */
     public static Pattern getPatternForWords(ArrayList<String> words) {
-        if ((words == null) || (words.isEmpty()) || (words.get(0).isEmpty())) {
+        if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
         }
 

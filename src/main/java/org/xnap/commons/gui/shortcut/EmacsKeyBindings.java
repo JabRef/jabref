@@ -512,7 +512,7 @@ public class EmacsKeyBindings
                 try {
                     int start = jtc.getCaretPosition();
                     int end = Utilities.getRowEnd(jtc, start);
-                    if ((start == end) && jtc.isEditable()) {
+                    if (start == end && jtc.isEditable()) {
                         Document doc = jtc.getDocument();
                         doc.remove(end, 1);
                     }
@@ -557,7 +557,7 @@ public class EmacsKeyBindings
 
         public static boolean isMarked(JTextComponent jt)
         {
-            return ((SetMarkCommandAction.jtc == jt) && (SetMarkCommandAction.position != -1));
+            return SetMarkCommandAction.jtc == jt && SetMarkCommandAction.position != -1;
         }
 
         public static void reset()
@@ -622,10 +622,10 @@ public class EmacsKeyBindings
         public void actionPerformed(ActionEvent event)
         {
             JTextComponent jtc = getTextComponent(event);
-            boolean jtcNotNull = (jtc != null);
-            boolean jtcIsCurrentTextComponent = (KillRing.getInstance().getCurrentTextComponent() == jtc);
-            boolean caretPositionIsEndOfLastYank = (jtc.getCaretPosition() == YankAction.end);
-            boolean killRingNotEmpty = (!KillRing.getInstance().isEmpty());
+            boolean jtcNotNull = jtc != null;
+            boolean jtcIsCurrentTextComponent = KillRing.getInstance().getCurrentTextComponent() == jtc;
+            boolean caretPositionIsEndOfLastYank = jtc.getCaretPosition() == YankAction.end;
+            boolean killRingNotEmpty = !KillRing.getInstance().isEmpty();
             if (jtcNotNull && jtcIsCurrentTextComponent && caretPositionIsEndOfLastYank && killRingNotEmpty) {
                 jtc.setSelectionStart(YankAction.start);
                 jtc.setSelectionEnd(YankAction.end);
@@ -680,7 +680,7 @@ public class EmacsKeyBindings
          */
         void add(String text)
         {
-            if (text.length() == 0) {
+            if (text.isEmpty()) {
                 return;
             }
 

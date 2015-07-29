@@ -121,7 +121,7 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < req.length; i++) {
             sb.append(req[i]);
-            sb.append(((i <= (req.length - 1)) && (req.length > 1)) ? ", " : "");
+            sb.append(i <= req.length - 1 && req.length > 1 ? ", " : "");
         }
         return sb.toString();
     }
@@ -130,7 +130,7 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < opt.length; i++) {
             sb.append(opt[i]);
-            sb.append(((i <= (opt.length - 1)) && (opt.length > 1)) ? ", " : "");
+            sb.append(i <= opt.length - 1 && opt.length > 1 ? ", " : "");
         }
         return sb.toString();
     }
@@ -172,7 +172,8 @@ public class CustomEntryType extends BibtexEntryType {
             return false;
         }
         for (String[] reqSet : reqSets) {
-            boolean takesPart = false, oneSet = false;
+            boolean takesPart = false;
+            boolean oneSet = false;
             for (String aReqSet : reqSet) {
                 // If this is the field we're looking for, note that the field is part of the set:
                 if (aReqSet.equalsIgnoreCase(field)) {
@@ -198,13 +199,13 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         int reqSetsPiv = 0;
         for (int i = 0; i < req.length; i++) {
-            if ((reqSets == null) || (reqSetsPiv == reqSets.length)) {
+            if (reqSets == null || reqSetsPiv == reqSets.length) {
                 sb.append(req[i]);
             }
             else if (req[i].equals(reqSets[reqSetsPiv][0])) {
                 for (int j = 0; j < reqSets[reqSetsPiv].length; j++) {
                     sb.append(reqSets[reqSetsPiv][j]);
-                    if (j < (reqSets[reqSetsPiv].length - 1)) {
+                    if (j < reqSets[reqSetsPiv].length - 1) {
                         sb.append('/');
                     }
                 }
@@ -214,7 +215,7 @@ public class CustomEntryType extends BibtexEntryType {
             } else {
                 sb.append(req[i]);
             }
-            if (i < (req.length - 1)) {
+            if (i < req.length - 1) {
                 sb.append(';');
             }
 
@@ -239,7 +240,7 @@ public class CustomEntryType extends BibtexEntryType {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < opt.length; i++) {
             sb.append(opt[i]);
-            if (i < (opt.length - 1)) {
+            if (i < opt.length - 1) {
                 sb.append(';');
             }
         }

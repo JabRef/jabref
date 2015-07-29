@@ -53,11 +53,11 @@ public class DocumentsWrapper {
             int i = 1;
             for (Bean author : authors) {
                 if (i < authors.size()) {
-                    value = value + getNameComplete(((Author) author));
+                    value = value + getNameComplete((Author) author);
                     value = value + ", ";
                 }
                 else {
-                    value = value + getNameComplete(((Author) author));
+                    value = value + getNameComplete((Author) author);
                 }
                 i++;
             }
@@ -66,7 +66,7 @@ public class DocumentsWrapper {
         else {
             vector.add("");
         }
-        if ((xmlDocument.getYear() != null) && (((Year) xmlDocument.getYear()).getValue() != null) && !((Year) xmlDocument.getYear()).getValue().equalsIgnoreCase("null")) {
+        if (xmlDocument.getYear() != null && ((Year) xmlDocument.getYear()).getValue() != null && !((Year) xmlDocument.getYear()).getValue().equalsIgnoreCase("null")) {
             vector.add(((Year) xmlDocument.getYear()).getValue());
         }
         /*if(xmlDocument.getPublishdate() != null && xmlDocument.getPublishdate().getYear() != null && !xmlDocument.getPublishdate().getYear().equalsIgnoreCase("null")){
@@ -108,7 +108,7 @@ public class DocumentsWrapper {
             return null;
         }
         SimpleTypeElementBean simpleTypeElementBean = (SimpleTypeElementBean) bean;
-        if ((simpleTypeElementBean.getValue() == null) || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || (simpleTypeElementBean.getValue().length() <= 0)) {
+        if (simpleTypeElementBean.getValue() == null || simpleTypeElementBean.getValue().equalsIgnoreCase("null") || simpleTypeElementBean.getValue().length() <= 0) {
             return null;
         }
         return simpleTypeElementBean.getValue();
@@ -120,13 +120,13 @@ public class DocumentsWrapper {
 
         while (unsorted) {
             unsorted = false;
-            for (int i = 0; i < (authors.size() - 1); i++) {
+            for (int i = 0; i < authors.size() - 1; i++) {
                 int rank = 99;
                 int otherRank = 99;
-                if ((((Author) authors.get(i)).getRank() != null) && !((Author) authors.get(i)).getRank().equalsIgnoreCase("null")) {
+                if (((Author) authors.get(i)).getRank() != null && !((Author) authors.get(i)).getRank().equalsIgnoreCase("null")) {
                     rank = Integer.parseInt(((Author) authors.get(i)).getRank());
                 }
-                if ((((Author) authors.get(i + 1)).getRank() != null) && !((Author) authors.get(i + 1)).getRank().equalsIgnoreCase("null")) {
+                if (((Author) authors.get(i + 1)).getRank() != null && !((Author) authors.get(i + 1)).getRank().equalsIgnoreCase("null")) {
                     otherRank = Integer.parseInt(((Author) authors.get(i + 1)).getRank());
                 }
 

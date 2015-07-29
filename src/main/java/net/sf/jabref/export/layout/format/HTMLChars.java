@@ -36,11 +36,12 @@ public class HTMLChars implements LayoutFormatter {
         StringBuffer currentCommand = null;
 
         char c;
-        boolean escaped = false, incommand = false;
+        boolean escaped = false;
+        boolean incommand = false;
 
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
-            if (escaped && (c == '\\')) {
+            if (escaped && c == '\\') {
                 sb.append('\\');
                 escaped = false;
             } else if (c == '\\') {
@@ -57,21 +58,21 @@ public class HTMLChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && ((c == '{') || (c == '}'))) {
+            } else if (!incommand && (c == '{' || c == '}')) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || (c == '%')
-                    || (Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c)))) {
+            } else if (Character.isLetter(c) || c == '%'
+                    || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom: if ((currentCommand.length() == 1)
-                            && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
+                    testCharCom: if (currentCommand.length() == 1
+                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= (field.length() - 1)) {
+                        if (i >= field.length() - 1) {
                             break testCharCom;
                         }
 
@@ -98,7 +99,7 @@ public class HTMLChars implements LayoutFormatter {
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if ((i + 1) == field.length()) {
+                        if (i + 1 == field.length()) {
                             String command = currentCommand.toString();
                             Object result = HTML_CHARS.get(command);
                             /* If found, then use translated version. If not,
@@ -119,7 +120,7 @@ public class HTMLChars implements LayoutFormatter {
 
                 if (!incommand) {
                     sb.append(c);
-                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
+                } else if (Character.isWhitespace(c) || c == '{' || c == '}') {
                     // First test if we are already at the end of the string.
                     // if (i >= field.length()-1)
                     // break testContent;

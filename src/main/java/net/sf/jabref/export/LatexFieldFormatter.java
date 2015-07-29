@@ -147,7 +147,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             pos1 = pivot;
             while (goFrom == pos1) {
                 pos1 = text.indexOf('#', goFrom);
-                if ((pos1 > 0) && (text.charAt(pos1 - 1) == '\\')) {
+                if (pos1 > 0 && text.charAt(pos1 - 1) == '\\') {
                     goFrom = pos1 + 1;
                     pos1++;
                 }
@@ -175,12 +175,12 @@ public class LatexFieldFormatter implements FieldFormatter {
             if (pos1 > pivot) {
                 writeText(text, pivot, pos1);
             }
-            if ((pos1 < text.length()) && ((pos2 - 1) > pos1)) {
+            if (pos1 < text.length() && pos2 - 1 > pos1) {
                 // We check that the string label is not empty. That means
                 // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
-                writeStringLabel(text, pos1 + 1, pos2, (pos1 == pivot),
-                        ((pos2 + 1) == text.length()));
+                writeStringLabel(text, pos1 + 1, pos2, pos1 == pivot,
+                        pos2 + 1 == text.length());
             }
 
             if (pos2 > -1) {
@@ -209,7 +209,10 @@ public class LatexFieldFormatter implements FieldFormatter {
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
         sb.append(valueDelimitersZero);
-        boolean escape = false, inCommandName = false, inCommand = false, inCommandOption = false;
+        boolean escape = false;
+        boolean inCommandName = false;
+        boolean inCommand = false;
+        boolean inCommandOption = false;
         int nestedEnvironments = 0;
         StringBuilder commandName = new StringBuilder();
         char c;
@@ -231,9 +234,9 @@ public class LatexFieldFormatter implements FieldFormatter {
                     inCommandOption = true;
                 }
                 // Or the end of an argument:
-                else if (inCommandOption && (c == ']')) {
+                else if (inCommandOption && c == ']') {
                     inCommandOption = false;
-                } else if (!inCommandOption && (c == '{')) {
+                } else if (!inCommandOption && c == '{') {
                     //System.out.println("Read command: '"+commandName.toString()+"'");
                     inCommandName = false;
                     inCommand = true;
@@ -247,13 +250,13 @@ public class LatexFieldFormatter implements FieldFormatter {
                 }
             }
             // If we are in a command body, see if it has ended:
-            if (inCommand && (c == '}')) {
+            if (inCommand && c == '}') {
                 //System.out.println("nestedEnvironments = " + nestedEnvironments);
                 //System.out.println("Done with command: '"+commandName.toString()+"'");
                 if (commandName.toString().equals("begin")) {
                     nestedEnvironments++;
                 }
-                if ((nestedEnvironments > 0) && commandName.toString().equals("end")) {
+                if (nestedEnvironments > 0 && commandName.toString().equals("end")) {
                     nestedEnvironments--;
                 }
                 //System.out.println("nestedEnvironments = " + nestedEnvironments);
@@ -264,14 +267,14 @@ public class LatexFieldFormatter implements FieldFormatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-if ((c == '&') && !escape &&
+if (c == '&' && !escape &&
                     !(inCommand && commandName.toString().equals("url")) &&
-                    (nestedEnvironments == 0)) {
+        nestedEnvironments == 0) {
                 sb.append("\\&");
             } else {
     sb.append(c);
 }
-            escape = (c == '\\');
+            escape = c == '\\';
         }
         sb.append(valueDelimitersOne);
     }
@@ -290,7 +293,8 @@ if ((c == '&') && !escape &&
 
     private void checkBraces(String text) throws IllegalArgumentException {
 
-        Vector<Integer> left = new Vector<Integer>(5, 3), right = new Vector<Integer>(5, 3);
+        Vector<Integer> left = new Vector<Integer>(5, 3);
+        Vector<Integer> right = new Vector<Integer>(5, 3);
         int current = -1;
 
         // First we collect all occurences:
@@ -302,11 +306,11 @@ if ((c == '&') && !escape &&
         }
 
         // Then we throw an exception if the error criteria are met.
-        if ((!right.isEmpty()) && (left.isEmpty())) {
+        if (!right.isEmpty() && left.isEmpty()) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
-        if ((!right.isEmpty()) && (right.elementAt(0)
-                < left.elementAt(0))) {
+        if (!right.isEmpty() && right.elementAt(0)
+                < left.elementAt(0)) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
         if (left.size() != right.size()) {

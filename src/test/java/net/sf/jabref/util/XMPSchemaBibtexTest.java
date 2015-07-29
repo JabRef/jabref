@@ -75,8 +75,8 @@ public class XMPSchemaBibtexTest {
         Assert.assertEquals(2, l.getLength());
 
         Assert.assertEquals("Tom DeMarco", XMLUtil
-                .getStringValue(((Element) l.item(0))));
-        Assert.assertEquals("Kent Beck", XMLUtil.getStringValue(((Element) l.item(1))));
+                .getStringValue((Element) l.item(0)));
+        Assert.assertEquals("Kent Beck", XMLUtil.getStringValue((Element) l.item(1)));
 
         List<String> authors = bibtex.getPersonList("author");
         Assert.assertEquals(2, authors.size());

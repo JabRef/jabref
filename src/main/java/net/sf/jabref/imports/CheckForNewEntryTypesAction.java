@@ -34,7 +34,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
     public boolean isActionNecessary(ParserResult pr) {
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
-            String typeName = (i.next()).toLowerCase();
+            String typeName = i.next().toLowerCase();
             if (BibtexEntryType.ALL_TYPES.get(typeName) != null) {
                 i.remove();
             }

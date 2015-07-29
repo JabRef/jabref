@@ -98,7 +98,7 @@ class DatabaseFileLookup {
      */
     private boolean lookupEntry(File aFile, BibtexEntry anEntry) {
 
-        if ((aFile == null) || (anEntry == null)) {
+        if (aFile == null || anEntry == null) {
             return false;
         }
 
@@ -116,8 +116,7 @@ class DatabaseFileLookup {
             }
 
             File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            if ((expandedFilename != null // file exists
-)
+            if (expandedFilename != null
                     && expandedFilename.equals(aFile)) {
                 return true;
             }

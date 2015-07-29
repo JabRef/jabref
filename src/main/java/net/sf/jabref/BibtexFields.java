@@ -475,10 +475,10 @@ public class BibtexFields {
     {
 
         private static final int
-                STANDARD = 0x01, // it is a standard bibtex-field
-                PRIVATE = 0x02, // internal use, e.g. owner, timestamp
-                DISPLAYABLE = 0x04, // These fields cannot be shown inside the source editor panel
-                WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
+                STANDARD = 0x01; // it is a standard bibtex-field
+                private static final int PRIVATE = 0x02; // internal use, e.g. owner, timestamp
+                private static final int DISPLAYABLE = 0x04; // These fields cannot be shown inside the source editor panel
+                private static final int WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
 
         // the fieldname
         private String name;
@@ -580,7 +580,7 @@ public class BibtexFields {
                     try
                     {
                         weight = Double.parseDouble(wStr);
-                        if ((weight < 0.0) || (weight > GUIGlobals.MAX_FIELD_WEIGHT))
+                        if (weight < 0.0 || weight > GUIGlobals.MAX_FIELD_WEIGHT)
                         {
                             weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
                         }

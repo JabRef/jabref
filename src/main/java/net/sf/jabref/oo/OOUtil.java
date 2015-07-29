@@ -109,15 +109,20 @@ class OOUtil {
 
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
-        int italic = 0, bold = 0, sup = 0, sub = 0, mono = 0, smallCaps = 0;
+        int italic = 0;
+        int bold = 0;
+        int sup = 0;
+        int sub = 0;
+        int mono = 0;
+        int smallCaps = 0;
         //insertTextAtCurrentLocation(text, cursor, "_",
         //    false, false, false, false, false, false);
         //cursor.goLeft((short)1, true);
         Matcher m = OOUtil.htmlTag.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
-            if (ss.length() > 0) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
+            if (!ss.isEmpty()) {
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, bold % 2 > 0, italic % 2 > 0,
                         mono > 0, smallCaps > 0, sup > 0, sub > 0);
             }
             String tag = m.group();
@@ -154,7 +159,7 @@ class OOUtil {
 
         if (piv < lText.length()) {
             OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
-                    (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
+                    bold % 2 > 0, italic % 2 > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
         }
 
         cursor.collapseToEnd();
@@ -303,7 +308,7 @@ class OOUtil {
             String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
+            if (!OpenOfficePanel.postLayoutSupported && value != null) {
                 e.setField(field, OOUtil.postformatter.format(value));
             }
         }

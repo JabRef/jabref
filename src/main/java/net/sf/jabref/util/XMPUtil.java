@@ -248,7 +248,7 @@ public class XMPUtil {
         }
 
         // Return null if no values were found
-        return (!entry.getAllFields().isEmpty() ? entry : null);
+        return !entry.getAllFields().isEmpty() ? entry : null;
     }
 
     /**
@@ -316,7 +316,7 @@ public class XMPUtil {
          * Year + Month -> Date
          */
         List<String> dates = dcSchema.getSequenceList("dc:date");
-        if ((dates != null) && (!dates.isEmpty())) {
+        if (dates != null && !dates.isEmpty()) {
             String date = dates.get(0).trim();
             Calendar c = null;
             try {
@@ -435,7 +435,7 @@ public class XMPUtil {
          * Type -> Type
          */
         List<String> l = dcSchema.getTypes();
-        if ((l != null) && (!l.isEmpty())) {
+        if (l != null && !l.isEmpty()) {
             s = l.get(0);
             if (s != null) {
                 BibtexEntryType type = BibtexEntryType.getStandardType(s);
@@ -445,7 +445,7 @@ public class XMPUtil {
             }
         }
 
-        return (!entry.getAllFields().isEmpty() ? entry : null);
+        return !entry.getAllFields().isEmpty() ? entry : null;
     }
 
     /**
@@ -1097,7 +1097,7 @@ public class XMPUtil {
                         "Error: Cannot add metadata to encrypted document.");
             }
 
-            if (writePDFInfo && (bibtexEntries.size() == 1)) {
+            if (writePDFInfo && bibtexEntries.size() == 1) {
                 XMPUtil.writeDocumentInformation(document, bibtexEntries
                         .iterator().next(), null);
                 XMPUtil.writeDublinCore(document, bibtexEntries, null);

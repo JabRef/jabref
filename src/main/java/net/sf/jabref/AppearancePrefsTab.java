@@ -112,7 +112,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         //p2.add(browseBut);
         //builder.append(p2);
 
-        JPanel upper = new JPanel(), sort = new JPanel(), namesp = new JPanel(), iconCol = new JPanel();
+        JPanel upper = new JPanel();
+        JPanel sort = new JPanel();
+        JPanel namesp = new JPanel();
+        JPanel iconCol = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
         upper.setLayout(gbl);
         sort.setLayout(gbl);
@@ -189,8 +192,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
-            if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
-                    (size != oldMenuFontSize)) {
+            if (overrideFonts.isSelected() != oldOverrideFontSize ||
+                    size != oldMenuFontSize) {
                 _prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Globals.lang("You have changed the menu and label font size.")

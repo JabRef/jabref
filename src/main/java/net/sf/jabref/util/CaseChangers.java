@@ -157,7 +157,7 @@ public class CaseChangers {
                 String word = words[i];
                 // first word is Always capitalized
                 boolean alwaysCapitalizeFirstWord = i == 0;
-                boolean alwaysCapitalizeLastWord = i == (words.length - 1);
+                boolean alwaysCapitalizeLastWord = i == words.length - 1;
                 if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord) {
                     result[i] = StringUtil.nCase(word);
                 } else if (TitleCaseChanger.notToCapitalize.contains(word)) {

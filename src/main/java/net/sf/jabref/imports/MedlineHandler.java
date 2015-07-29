@@ -400,7 +400,7 @@ class MedlineHandler extends DefaultHandler
         else if (localName.equals("Author")) {
             // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
             // when above is the case replace it with initials
-            if ((forename.length() == 3) && (forename.charAt(1) == ' ')) {
+            if (forename.length() == 3 && forename.charAt(1) == ' ') {
                 forename = initials;
             }
 
@@ -578,7 +578,8 @@ class MedlineHandler extends DefaultHandler
         }
         String first = pageRange.substring(0, minusPos).trim();
         String last = pageRange.substring(minusPos + 1).trim();
-        int llast = last.length(), lfirst = first.length();
+        int llast = last.length();
+        int lfirst = first.length();
         if (llast < lfirst) {
             last = first.substring(0, lfirst - llast) + last;
         }

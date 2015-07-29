@@ -647,7 +647,7 @@ public class TextInputDialog
             {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
-                if ((selEnd - selStart) > 0)
+                if (selEnd - selStart > 0)
                 {
                     textPane.replaceSelection("");
                 }

@@ -241,7 +241,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         autoResizeMode
-                .setSelected((_prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS));
+                .setSelected(_prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         priField.setText(_prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD));
         secField.setText(_prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD));
@@ -320,9 +320,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (newVal.isEmpty()) {
             newVal = null;
         }
-        if (((newVal != null) && (oldVal == null))
-                || ((newVal == null) && (oldVal != null))
-                || ((newVal != null) && !newVal.equals(oldVal))) {
+        if (newVal != null && oldVal == null
+                || newVal == null && oldVal != null
+                || newVal != null && !newVal.equals(oldVal)) {
             _prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             BibtexFields.setNumericFieldsFromPrefs();
         }

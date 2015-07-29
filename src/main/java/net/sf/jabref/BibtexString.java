@@ -72,7 +72,7 @@ public class BibtexString {
                 return OTHER;
             }
             if (!(name.charAt(1) + "").toUpperCase().equals(
-                    (name.charAt(1) + ""))) {
+                    name.charAt(1) + "")) {
                 return OTHER;
             }
             for (Type t : Type.values()) {
@@ -123,7 +123,7 @@ public class BibtexString {
     }
 
     public String getContent() {
-        return ((_content == null) ? "" : _content);
+        return _content == null ? "" : _content;
     }
 
     public void setContent(String content) {

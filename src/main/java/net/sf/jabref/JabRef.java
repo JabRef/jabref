@@ -85,7 +85,7 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // See if there are plugins scheduled for deletion:
-        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && (!prefs.get(JabRefPreferences.DELETE_PLUGINS).isEmpty())) {
+        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && !prefs.get(JabRefPreferences.DELETE_PLUGINS).isEmpty()) {
             String[] toDelete = prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
             PluginInstaller.deletePluginsOnStartup(toDelete);
             prefs.put(JabRefPreferences.DELETE_PLUGINS, "");
@@ -159,7 +159,7 @@ public class JabRef {
          * journal names and abbreviations to the list:
          */
         String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if ((personalJournalList != null) && !personalJournalList.isEmpty()) {
+        if (personalJournalList != null && !personalJournalList.isEmpty()) {
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
             } catch (FileNotFoundException e) {
@@ -198,7 +198,8 @@ public class JabRef {
     private void setLanguage(JabRefPreferences prefs) {
         String langStr = prefs.get(JabRefPreferences.LANGUAGE);
         String[] parts = langStr.split("_");
-        String language, country;
+        String language;
+        String country;
         if (parts.length == 1) {
             language = langStr;
             country = "";
@@ -317,7 +318,7 @@ public class JabRef {
         // Vector to put imported/loaded database(s) in.
         Vector<ParserResult> loaded = new Vector<ParserResult>();
         Vector<String> toImport = new Vector<String>();
-        if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
+        if (!cli.isBlank() && cli.getLeftOver().length > 0) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // bib files to open. Other files, and files that could not be opened
@@ -328,7 +329,7 @@ public class JabRef {
                     pr = JabRef.openBibFile(aLeftOver, false);
                 }
 
-                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                if (pr == null || pr == ParserResult.INVALID_FORMAT) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
@@ -389,16 +390,16 @@ public class JabRef {
                 BibtexDatabase newBase = smng.getDBfromMatches(); //newBase contains only match entries
 
                 //export database
-                if ((newBase != null) && (newBase.getEntryCount() > 0)) {
+                if (newBase != null && newBase.getEntryCount() > 0) {
                     String formatName = null;
                     IExportFormat format;
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {
-                    case (3):
+                    case 3:
                         formatName = data[2];
                         break;
-                        case (2):
+                        case 2:
                             //default ExportFormat: HTML table (with Abstract & BibTeX)
                             formatName = "tablerefsabsbib";
                             break;
@@ -588,8 +589,8 @@ public class JabRef {
      */
     private ParserResult fetch(String fetchCommand) {
 
-        if ((fetchCommand == null) || !fetchCommand.contains(":") ||
-                (fetchCommand.split(":").length != 2)) {
+        if (fetchCommand == null || !fetchCommand.contains(":") ||
+                fetchCommand.split(":").length != 2) {
             System.out.println(Globals.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Globals.lang("The following fetchers are available:"));
             return null;
@@ -620,7 +621,7 @@ public class JabRef {
                 " " + Globals.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if ((result == null) || (result.isEmpty())) {
+        if (result == null || result.isEmpty()) {
             System.out.println(Globals.lang(
                     "Query '%0' with fetcher '%1' did not return any results.", query, engine));
             return null;
@@ -675,7 +676,7 @@ public class JabRef {
             Double zoomLevel = null;
             while (keys.hasMoreElements()) {
                 Object key = keys.nextElement();
-                if ((key instanceof String) && (((String) key).endsWith(".font"))) {
+                if (key instanceof String && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {
                         // zoomLevel not yet set, calculate it based on the first found font
@@ -724,7 +725,7 @@ public class JabRef {
         }
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!cli.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
+        if (!cli.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null) {
             // How to handle errors in the databases to open?
             String[] names = Globals.prefs.getStringArray(JabRefPreferences.LAST_EDITED);
             lastEdLoop: for (String name : names) {
@@ -733,7 +734,7 @@ public class JabRef {
                 for (int j = 0; j < loaded.size(); j++) {
                     ParserResult pr = loaded.elementAt(j);
 
-                    if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
+                    if (pr.getFile() != null && pr.getFile().equals(fileToOpen)) {
                         continue lastEdLoop;
                     }
                 }
@@ -868,7 +869,7 @@ public class JabRef {
         // Note that we have to check whether i does not go over baseCount().
         // This is because importToOpen might have been used, which adds to
         // loaded, but not to baseCount()
-        for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.baseCount()); i++) {
+        for (int i = 0; i < loaded.size() && i < JabRef.jrf.baseCount(); i++) {
             ParserResult pr = loaded.elementAt(i);
             BasePanel panel = JabRef.jrf.baseAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
@@ -971,7 +972,7 @@ public class JabRef {
     private static ParserResult importFile(String argument) {
         String[] data = argument.split(",");
         try {
-            if ((data.length > 1) && !"*".equals(data[1])) {
+            if (data.length > 1 && !"*".equals(data[1])) {
                 System.out.println(Globals.lang("Importing") + ": " + data[0]);
                 try {
                     List<BibtexEntry> entries;

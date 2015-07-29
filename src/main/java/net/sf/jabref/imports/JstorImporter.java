@@ -65,7 +65,7 @@ public class JstorImporter extends ImportFormat {
         ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         String s = "";
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        while ((s != null) && !s.startsWith("Item Type")) {
+        while (s != null && !s.startsWith("Item Type")) {
             s = in.readLine();
         }
 

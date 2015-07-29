@@ -49,7 +49,7 @@ public class TestVM {
         Assert.assertEquals(2, vm.getStrings().size());
         Assert.assertEquals(7, vm.getIntegers().size());
         Assert.assertEquals(1, vm.getEntries().size());
-        Assert.assertEquals(5, (vm.getEntries().get(0)).getFields().size());
+        Assert.assertEquals(5, vm.getEntries().get(0).getFields().size());
         Assert.assertEquals(38, vm.getFunctions().size());
 
     }

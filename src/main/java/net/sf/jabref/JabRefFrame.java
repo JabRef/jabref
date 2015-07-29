@@ -209,7 +209,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /* References to the toggle buttons in the toolbar */
     // the groups interface
     public JToggleButton groupToggle;
-    public JToggleButton searchToggle, previewToggle, highlightAny, highlightAll;
+    public JToggleButton searchToggle;
+    public JToggleButton previewToggle;
+    public JToggleButton highlightAny;
+    public JToggleButton highlightAll;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final AbstractAction
@@ -428,7 +431,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction Cleanup = new GeneralAction("Cleanup", "Cleanup entries",
                     Globals.lang("Cleanup entries"),
                     prefs.getKey("Cleanup"),
-                    ("cleanupentries"));
+            "cleanupentries");
 
     private final AbstractAction mergeEntries = new GeneralAction("mergeEntries", "Merge entries",
                     Globals.lang("Merge entries"),
@@ -526,7 +529,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (Globals.ON_MAC) {
                     setState(Frame.ICONIFIED);
                 } else {
-                    (new CloseAction()).actionPerformed(null);
+                    new CloseAction().actionPerformed(null);
                 }
             }
         });
@@ -588,7 +591,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 //if (posX < )
 
-                if ((posX + sizeX) > width) {
+                if (posX + sizeX > width) {
                     if (sizeX <= width) {
                         posX = width - sizeX;
                     } else {
@@ -597,7 +600,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     }
                 }
 
-                if ((posY + sizeY) > height) {
+                if (posY + sizeY > height) {
                     if (sizeY <= height) {
                         posY = height - sizeY;
                     } else {
@@ -715,7 +718,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Check if the file is already open.
         for (int i = 0; i < this.getTabbedPane().getTabCount(); i++) {
             BasePanel bp = this.baseAt(i);
-            if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+            if (bp.getFile() != null && bp.getFile().equals(file)) {
                 //The file is already opened, so just raising its tab.
                 this.getTabbedPane().setSelectedComponent(bp);
                 return;
@@ -828,7 +831,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         prefs.putInt(JabRefPreferences.SIZE_X, JabRefFrame.this.getSize().width);
         prefs.putInt(JabRefPreferences.SIZE_Y, JabRefFrame.this.getSize().height);
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
-        prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState() == Frame.MAXIMIZED_BOTH));
+        prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
         prefs.putBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE, sidePaneManager.isComponentVisible("search"));
@@ -867,7 +870,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Let the search interface store changes to prefs.
         // But which one? Let's use the one that is visible.
         if (basePanel() != null) {
-            (searchManager).updatePrefs();
+            searchManager.updatePrefs();
         }
 
         prefs.flush();
@@ -915,8 +918,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                     Globals.lang("Save before closing"),
                                     JOptionPane.YES_NO_CANCEL_OPTION);
 
-                    if ((answer == JOptionPane.CANCEL_OPTION) ||
-                            (answer == JOptionPane.CLOSED_OPTION)) {
+                    if (answer == JOptionPane.CANCEL_OPTION ||
+                            answer == JOptionPane.CLOSED_OPTION) {
                         return false;
                     }
                     if (answer == JOptionPane.YES_OPTION) {
@@ -1096,10 +1099,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
-        if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
+        if (lastTabbedPanelSelectionIndex > -1 && lastTabbedPanelSelectionIndex < len) {
             tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.inActiveTabbed);
         }
-        if ((now > -1) && (now < len)) {
+        if (now > -1 && now < len) {
             tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
         }
         lastTabbedPanelSelectionIndex = now;
@@ -1204,7 +1207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             if (tabbedPane.getTabCount() > 0) {
                 try {
-                    ((BasePanel) (tabbedPane.getSelectedComponent()))
+                    ((BasePanel) tabbedPane.getSelectedComponent())
                             .runCommand(command);
                 } catch (Throwable ex) {
                     ex.printStackTrace();
@@ -1291,7 +1294,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             if (tabbedPane.getTabCount() > 0) {
-                ((BasePanel) (tabbedPane.getSelectedComponent()))
+                ((BasePanel) tabbedPane.getSelectedComponent())
                         .newEntry(BibtexEntryType.getType(thisType));
             }
             else {
@@ -1330,9 +1333,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void fillMenu() {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
-        JMenu file = JabRefFrame.subMenu("File"), sessions = JabRefFrame.subMenu("Sessions"), edit = JabRefFrame.subMenu("Edit"), search = JabRefFrame.subMenu("Search"), bibtex = JabRefFrame.subMenu("BibTeX"), view = JabRefFrame.subMenu("View"), tools = JabRefFrame.subMenu("Tools"),
-        //web = subMenu("Web search"),
-        options = JabRefFrame.subMenu("Options"), newSpec = JabRefFrame.subMenu("New entry..."), helpMenu = JabRefFrame.subMenu("Help");
+        JMenu file = JabRefFrame.subMenu("File");
+        JMenu sessions = JabRefFrame.subMenu("Sessions");
+        JMenu edit = JabRefFrame.subMenu("Edit");
+        JMenu search = JabRefFrame.subMenu("Search");
+        JMenu bibtex = JabRefFrame.subMenu("BibTeX");
+        JMenu view = JabRefFrame.subMenu("View");
+        JMenu tools = JabRefFrame.subMenu("Tools");
+        JMenu options = JabRefFrame.subMenu("Options");
+        JMenu newSpec = JabRefFrame.subMenu("New entry...");
+        JMenu helpMenu = JabRefFrame.subMenu("Help");
 
         setUpImportMenus();
 
@@ -1966,7 +1976,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 int answer = JOptionPane.showConfirmDialog(JabRefFrame.this,
                         Globals.lang("Database has changed. Do you want to save before closing?"),
                         Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
-                if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
+                if (answer == JOptionPane.CANCEL_OPTION || answer == JOptionPane.CLOSED_OPTION) {
                     close = false; // The user has cancelled.
                 }
                 if (answer == JOptionPane.YES_OPTION) {
@@ -2138,7 +2148,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * enabled for single entries):
          */
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
-                (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || (entries.size() > 1))) {
+                (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || entries.size() > 1)) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -2160,7 +2170,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         } else {
             JabRefFrame.this.addBibEntries(entries, filename, openInNew);
-            if ((panel != null) && (entries.size() == 1)) {
+            if (panel != null && entries.size() == 1) {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -2182,7 +2192,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     private int addBibEntries(List<BibtexEntry> bibentries, String filename,
                               boolean intoNew) {
-        if ((bibentries == null) || (bibentries.isEmpty())) {
+        if (bibentries == null || bibentries.isEmpty()) {
 
             // No entries found. We need a message for this.
             JOptionPane.showMessageDialog(JabRefFrame.this, Globals.lang("No entries found. Please make sure you are "
@@ -2197,7 +2207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                 Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
 
-        if (intoNew || (tabbedPane.getTabCount() == 0)) {
+        if (intoNew || tabbedPane.getTabCount() == 0) {
             // Import into new database.
             BibtexDatabase database = new BibtexDatabase();
             for (BibtexEntry entry : bibentries) {
@@ -2564,13 +2574,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             this.next = next;
             //Util.pr(""+prefs.getKey("Next tab"));
             putValue(Action.ACCELERATOR_KEY,
-                    (next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab")));
+                    next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab"));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             int i = tabbedPane.getSelectedIndex();
-            int newI = (next ? i + 1 : i - 1);
+            int newI = next ? i + 1 : i - 1;
             if (newI < 0) {
                 newI = tabbedPane.getTabCount() - 1;
             }

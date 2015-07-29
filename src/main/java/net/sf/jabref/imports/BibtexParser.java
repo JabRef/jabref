@@ -138,7 +138,7 @@ public class BibtexParser {
      */
     public static BibtexEntry singleFromString(String bibtexString) {
         Collection<BibtexEntry> c = BibtexParser.fromString(bibtexString);
-        if ((c == null) || (c.isEmpty())) {
+        if (c == null || c.isEmpty()) {
             return null;
         }
         return c.iterator().next();
@@ -172,7 +172,7 @@ public class BibtexParser {
 
         while (true) {
             c = read();
-            if ((c == -1) || (c == 65535)) {
+            if (c == -1 || c == 65535) {
                 eof = true;
                 return;
             }
@@ -200,7 +200,7 @@ public class BibtexParser {
         }
         while (true) {
             c = read();
-            if ((c == -1) || (c == 65535)) {
+            if (c == -1 || c == 65535) {
                 eof = true;
                 return sb.toString();
             }
@@ -265,7 +265,7 @@ public class BibtexParser {
                 skipWhitespace();
                 String entryType = parseTextToken();
                 BibtexEntryType tp = BibtexEntryType.getType(entryType);
-                boolean isEntry = (tp != null);
+                boolean isEntry = tp != null;
                 // Util.pr(tp.getName());
                 if (!isEntry) {
                     // The entry type name was not recognized. This can mean
@@ -370,7 +370,7 @@ public class BibtexParser {
                         boolean duplicateKey = database.insertEntry(be);
                         if (duplicateKey) {
                             parserResult.addDuplicateKey(be.getCiteKey());
-                        } else if ((be.getCiteKey() == null) || be.getCiteKey().equals("")) {
+                        } else if (be.getCiteKey() == null || be.getCiteKey().equals("")) {
                             parserResult.addWarning(Globals.lang("empty BibTeX key") + ": "
                                     + be.getAuthorTitleYear(40) + " ("
                                     + Globals.lang("grouping may not work for this entry") + ")");
@@ -452,12 +452,12 @@ public class BibtexParser {
         skipWhitespace();
         consume('{', '(');
         int c = peek();
-        if ((c != '\n') && (c != '\r')) {
+        if (c != '\n' && c != '\r') {
             skipWhitespace();
         }
         String key = parseKey();
 
-        if ((key != null) && key.equals("")) {
+        if (key != null && key.equals("")) {
             key = null;
         }
 
@@ -466,7 +466,7 @@ public class BibtexParser {
 
         while (true) {
             c = peek();
-            if ((c == '}') || (c == ')')) {
+            if (c == '}' || c == ')') {
                 break;
             }
 
@@ -477,7 +477,7 @@ public class BibtexParser {
             skipWhitespace();
 
             c = peek();
-            if ((c == '}') || (c == ')')) {
+            if (c == '}' || c == ')') {
                 break;
             }
             parseField(result);
@@ -524,7 +524,7 @@ public class BibtexParser {
         StringBuilder value = new StringBuilder();
         int c;
 
-        while (((c = peek()) != ',') && (c != '}') && (c != ')')) {
+        while ((c = peek()) != ',' && c != '}' && c != ')') {
 
             if (eof) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
@@ -590,8 +590,8 @@ public class BibtexParser {
         // Check if we are to strip extra pairs of braces before returning:
         if (autoDoubleBraces) {
             // Do it:
-            while ((value.length() > 1) && (value.charAt(0) == '{')
-                    && (value.charAt(value.length() - 1) == '}')) {
+            while (value.length() > 1 && value.charAt(0) == '{'
+                    && value.charAt(value.length() - 1) == '}') {
                 value.deleteCharAt(value.length() - 1);
                 value.deleteCharAt(0);
             }
@@ -628,7 +628,8 @@ public class BibtexParser {
      */
     private boolean hasNegativeBraceCount(String s) {
         // System.out.println(s);
-        int i = 0, count = 0;
+        int i = 0;
+        int count = 0;
         while (i < s.length()) {
             if (s.charAt(i) == '{') {
                 count++;
@@ -659,8 +660,8 @@ public class BibtexParser {
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) c) || (c == ':') || (c == '-') || (c == '_')
-                    || (c == '*') || (c == '+') || (c == '.') || (c == '/') || (c == '\'')) {
+            if (Character.isLetterOrDigit((char) c) || c == ':' || c == '-' || c == '_'
+                    || c == '*' || c == '+' || c == '.' || c == '/' || c == '\'') {
                 token.append((char) c);
             } else {
                 unread(c);
@@ -687,8 +688,8 @@ public class BibtexParser {
             currentChar = (char) read();
             key.append(currentChar);
             lookahead_used++;
-        } while (((currentChar != ',') && (currentChar != '\n') && (currentChar != '='))
-                && (lookahead_used < BibtexParser.LOOKAHEAD));
+        } while (currentChar != ',' && currentChar != '\n' && currentChar != '='
+                && lookahead_used < BibtexParser.LOOKAHEAD);
 
         // Consumed a char too much, back into reader and remove from key:
         unread(currentChar);
@@ -706,14 +707,14 @@ public class BibtexParser {
                 currentChar = key.charAt(i);
 
                 /// Skip spaces:
-                if (!matchedAlpha && (currentChar == ' ')) {
+                if (!matchedAlpha && currentChar == ' ') {
                     continue;
                 }
                 matchedAlpha = true;
 
                 // Begin of entryfieldname (e.g. author) -> push back:
                 unread(currentChar);
-                if ((currentChar == ' ') || (currentChar == '\n')) {
+                if (currentChar == ' ' || currentChar == '\n') {
 
                     /*
                      * found whitespaces, entryfieldname completed -> key in
@@ -807,8 +808,8 @@ public class BibtexParser {
             //
             // G\uFFFDr: $_*+.-\/?"^
             if (!Character.isWhitespace((char) c)
-                    && (Character.isLetterOrDigit((char) c) || (c == ':') || ((c != '#') && (c != '{') && (c != '}')
-                            && (c != '\uFFFD') && (c != '~') && (c != '\uFFFD') && (c != ',') && (c != '=')))) {
+                    && (Character.isLetterOrDigit((char) c) || c == ':' || c != '#' && c != '{' && c != '}'
+                            && c != '\uFFFD' && c != '~' && c != '\uFFFD' && c != ',' && c != '=')) {
                 token.append((char) c);
             } else {
 
@@ -858,10 +859,10 @@ public class BibtexParser {
 
         int brackets = 0;
 
-        while (!((peek() == '}') && (brackets == 0))) {
+        while (!(peek() == '}' && brackets == 0)) {
 
             int j = read();
-            if ((j == -1) || (j == 65535)) {
+            if (j == -1 || j == 65535) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
@@ -912,10 +913,10 @@ public class BibtexParser {
 
         int brackets = 0;
 
-        while (!((peek() == '}') && (brackets == 0))) {
+        while (!(peek() == '}' && brackets == 0)) {
 
             int j = read();
-            if ((j == -1) || (j == 65535)) {
+            if (j == -1 || j == 65535) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
@@ -940,10 +941,10 @@ public class BibtexParser {
 
         int brackets = 0;
 
-        while (!((peek() == '"') && (brackets == 0))) {
+        while (!(peek() == '"' && brackets == 0)) {
 
             int j = read();
-            if ((j == -1) || (j == 65535)) {
+            if (j == -1 || j == 65535) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             } else if (j == '{') {
                 brackets++;
@@ -972,11 +973,11 @@ public class BibtexParser {
 
     private boolean consumeUncritically(char expected) throws IOException {
         int c;
-        while (((c = read()) != expected) && (c != -1) && (c != 65535)) {
+        while ((c = read()) != expected && c != -1 && c != 65535) {
             // do nothing
         }
 
-        if ((c == -1) || (c == 65535)) {
+        if (c == -1 || c == 65535) {
             eof = true;
         }
 
@@ -989,7 +990,7 @@ public class BibtexParser {
 
         int c = read();
 
-        if ((c != expected1) && (c != expected2)) {
+        if (c != expected1 && c != expected2) {
             throw new RuntimeException("Error in line " + line + ": Expected " + expected1 + " or "
                     + expected2 + " but received " + c);
 
@@ -1044,7 +1045,7 @@ public class BibtexParser {
         while (keepon) {
             c = peek();
             headerText.append((char) c);
-            if ((piv == 0) && (Character.isWhitespace((char) c) || (c == '%'))) {
+            if (piv == 0 && (Character.isWhitespace((char) c) || c == '%')) {
                 read();
             } else if (c == GUIGlobals.SIGNATURE.charAt(piv)) {
                 piv++;
@@ -1060,7 +1061,7 @@ public class BibtexParser {
 
                 // Found the standard part. Now read the version number:
                 StringBuilder sb = new StringBuilder();
-                while (((c = read()) != '\n') && (c != -1)) {
+                while ((c = read()) != '\n' && c != -1) {
                     sb.append((char) c);
                 }
                 String versionNum = sb.toString().trim();

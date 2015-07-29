@@ -124,7 +124,7 @@ public class PdfImporter {
         fileNameLoop: for (String fileName : fileNames) {
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
             if (!neverShow && !doNotShowAgain) {
-                importDialog = new ImportDialog((dropRow >= 0), fileName);
+                importDialog = new ImportDialog(dropRow >= 0, fileName);
                 if (!hasXmpEntries(xmpEntriesInFile)) {
                     importDialog.disableXMPChoice();
                 }
@@ -132,8 +132,8 @@ public class PdfImporter {
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.getDoNotShowAgain();
             }
-            if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
-                int choice = (neverShow ? globalChoice : importDialog.getChoice());
+            if (neverShow || importDialog.getResult() == JOptionPane.OK_OPTION) {
+                int choice = neverShow ? globalChoice : importDialog.getChoice();
                 DroppedFileHandler dfh;
                 BibtexEntry entry;
                 BibtexEntryType type;
@@ -159,7 +159,7 @@ public class PdfImporter {
                         }
                     }
 
-                    if ((localRes == null) || (localRes.size() == 0)) {
+                    if (localRes == null || localRes.isEmpty()) {
                         // import failed -> generate default entry
                         LOGGER.info(Globals.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
@@ -214,7 +214,7 @@ public class PdfImporter {
                     }
 
                     // import failed -> generate default entry
-                    if ((localRes == null) || (localRes.size() == 0)) {
+                    if (localRes == null || localRes.isEmpty()) {
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -244,7 +244,7 @@ public class PdfImporter {
                     metaDataListDialog.showDialog();
                     Document document = metaDataListDialog.getXmlDocuments();
                     entry = null; // to satisfy the Java compiler
-                    if ((document != null /*&& documents.getDocuments() != null && documents.getDocuments().size() > 0*/)&& (metaDataListDialog.getResult() == JOptionPane.OK_OPTION)) {
+                    if (document != null && metaDataListDialog.getResult() == JOptionPane.OK_OPTION) {
                         int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
                         if (selected > -1 /*&& selected < documents.getDocuments().size()*/) {
                             //Document document = documents/*.getDocuments().get(selected)*/;
@@ -281,10 +281,10 @@ public class PdfImporter {
                     else if (metaDataListDialog.getResult() == JOptionPane.NO_OPTION) {
                         entry = createNewBlankEntry(fileName);
                     }
-                    else if ((document == null /*|| document.getDocuments() == null || document.getDocuments().size() <= 0*/)&& (metaDataListDialog.getResult() == JOptionPane.OK_OPTION)) {
+                    else if (document == null && metaDataListDialog.getResult() == JOptionPane.OK_OPTION) {
                         entry = createNewBlankEntry(fileName);
                     }
-                    assert (entry != null);
+                    assert entry != null;
                     res.add(entry);
                     break;
                 case ImportDialog.NOMETA:
@@ -296,7 +296,7 @@ public class PdfImporter {
                     Tools.centerRelativeToWindow(metaDataListDialog, frame);
                     metaDataListDialog.showDialog();
                     document = metaDataListDialog.getXmlDocuments();
-                    if ((document != null /*&& document.getDocuments() != null && document.getDocuments().size() > 0*/)&& (metaDataListDialog.getResult() == JOptionPane.OK_OPTION)) {
+                    if (document != null && metaDataListDialog.getResult() == JOptionPane.OK_OPTION) {
                         int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
                         if (selected > -1 /*&& selected < document.getDocuments().size()*/) {
                             //XmlDocument document = documents.getDocuments().get(selected);
@@ -385,7 +385,7 @@ public class PdfImporter {
     }
 
     private boolean fieldExists(String string) {
-        return (string != null) && !string.isEmpty();
+        return string != null && !string.isEmpty();
     }
 
     private BibtexEntry createNewEntry() {
@@ -461,7 +461,7 @@ public class PdfImporter {
     }
 
     private boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile) {
-        return !((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0));
+        return !(xmpEntriesInFile == null || xmpEntriesInFile.isEmpty());
     }
 
     public MainTable getEntryTable() {

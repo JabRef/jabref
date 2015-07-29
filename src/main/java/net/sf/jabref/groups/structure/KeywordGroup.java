@@ -163,14 +163,15 @@ public class KeywordGroup extends AbstractGroup {
         if (!supportsAdd()) {
             return null;
         }
-        if ((entries != null) && (entries.length > 0)) {
+        if (entries != null && entries.length > 0) {
             NamedCompound ce = new NamedCompound(
                     Globals.lang("add entries to group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
                 if (!getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
                     String oldContent = entry
-                            .getField(searchField), pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
+                            .getField(searchField);
+                    String pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
                             + searchExpression;
@@ -198,7 +199,7 @@ public class KeywordGroup extends AbstractGroup {
             return null;
         }
 
-        if ((entries != null) && (entries.length > 0)) {
+        if (entries != null && entries.length > 0) {
             NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
@@ -233,9 +234,9 @@ public class KeywordGroup extends AbstractGroup {
         return name.equals(other.name)
                 && searchField.equals(other.searchField)
                 && searchExpression.equals(other.searchExpression)
-                && (caseSensitive == other.caseSensitive)
-                && (regExp == other.regExp)
-                && (getHierarchicalContext() == other.getHierarchicalContext());
+                && caseSensitive == other.caseSensitive
+                && regExp == other.regExp
+                && getHierarchicalContext() == other.getHierarchicalContext();
     }
 
     /*
@@ -281,7 +282,7 @@ public class KeywordGroup extends AbstractGroup {
             }
             // Found a match. See if it is a complete word:
             if ((index == 0 || !Character.isLetterOrDigit(text.charAt(index - 1))) &&
-                    (((index + word.length()) == text.length())
+                    (index + word.length() == text.length()
                             || !Character.isLetterOrDigit(text.charAt(index + word.length())))) {
                 return true;
             } else {
@@ -305,7 +306,9 @@ public class KeywordGroup extends AbstractGroup {
         StringBuffer haystack = caseSensitive ? sbOrig : sbLower;
         String needle = caseSensitive ? searchExpression
                 : searchExpression.toLowerCase();
-        int i, j, k;
+        int i;
+        int j;
+        int k;
         final String separator = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
         while ((i = haystack.indexOf(needle)) >= 0) {
             sbOrig.replace(i, i + needle.length(), "");
@@ -313,18 +316,18 @@ public class KeywordGroup extends AbstractGroup {
             // reduce spaces at i to 1
             j = i;
             k = i;
-            while (((j - 1) >= 0) && (separator.indexOf(haystack.charAt(j - 1)) >= 0)) {
+            while (j - 1 >= 0 && separator.indexOf(haystack.charAt(j - 1)) >= 0) {
                 --j;
             }
-            while ((k < haystack.length()) && (separator.indexOf(haystack.charAt(k)) >= 0)) {
+            while (k < haystack.length() && separator.indexOf(haystack.charAt(k)) >= 0) {
                 ++k;
             }
-            sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
-            sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
+            sbOrig.replace(j, k, j >= 0 && k < sbOrig.length() ? separator : "");
+            sbLower.replace(j, k, j >= 0 && k < sbOrig.length() ? separator : "");
         }
 
         String result = sbOrig.toString().trim();
-        entry.setField(searchField, (!result.isEmpty() ? result : null));
+        entry.setField(searchField, !result.isEmpty() ? result : null);
     }
 
     @Override

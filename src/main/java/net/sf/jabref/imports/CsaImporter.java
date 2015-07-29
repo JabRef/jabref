@@ -136,7 +136,7 @@ public class CsaImporter extends ImportFormat {
             return fstr; // possible day found in two places
         }
 
-        if ((day != null) && !day.equals("0")) {
+        if (day != null && !day.equals("0")) {
             date.append(day);
             date.append(" ");
         } else {
@@ -171,7 +171,7 @@ public class CsaImporter extends ImportFormat {
         date.append(year);
 
         StringBuilder note = new StringBuilder();
-        if ((day != null) && !day.equals("0")) {
+        if (day != null && !day.equals("0")) {
             note.append("Source Date: ");
             note.append(date);
             note.append(".");
@@ -241,7 +241,7 @@ public class CsaImporter extends ImportFormat {
         line = 1;
         str = readLine(in);
         while (true) {
-            if ((str == null) || (str.isEmpty())) { // end of record
+            if (str == null || str.isEmpty()) { // end of record
                 if (!hm.isEmpty()) { // have a record
                     if (Type == null) {
                         addNote(hm, "Publication Type: [NOT SPECIFIED]");
@@ -251,7 +251,7 @@ public class CsaImporter extends ImportFormat {
 
                     // post-process Journal article
                     if (Type.equals("article") &&
-                            (hm.get("booktitle") != null)) {
+                            hm.get("booktitle") != null) {
                         String booktitle = hm.get("booktitle");
                         hm.remove("booktitle");
                         hm.put("journal", booktitle);
@@ -326,8 +326,8 @@ public class CsaImporter extends ImportFormat {
                     String flow = fstr.toLowerCase();
                     String[] types = flow.split("; ");
                     for (String type : types) {
-                        if ((type.contains("article")) ||
-                                (type.contains("journal article"))) {
+                        if (type.contains("article") ||
+                                type.contains("journal article")) {
                             Type = "article";
                             break;
                         } else if (type.equals("dissertation")) {
@@ -337,11 +337,11 @@ public class CsaImporter extends ImportFormat {
                             Type = "inproceedings";
                             break;
                         } else if (type.equals("book monograph") &&
-                                (Type == null)) {
+                                Type == null) {
                             Type = "book";
                             break;
                         } else if (type.equals("report") &&
-                                (Type == null)) {
+                                Type == null) {
                             Type = "techreport";
                             break;
                         }
@@ -400,7 +400,7 @@ public class CsaImporter extends ImportFormat {
                         } else if (lines[ii].endsWith("]")) {
                             int len = lines[ii].length();
                             urls.append(lines[ii].substring(0, len - 1));
-                            if (ii < (lines.length - 1)) {
+                            if (ii < lines.length - 1) {
                                 urls.append("\n");
                             }
                         } else {

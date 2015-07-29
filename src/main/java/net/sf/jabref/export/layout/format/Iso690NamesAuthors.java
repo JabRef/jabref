@@ -38,7 +38,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
     @Override
     public String format(String s) {
 
-        if ((s == null) || s.trim().isEmpty()) {
+        if (s == null || s.trim().isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
@@ -55,7 +55,8 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                 //parte el string author en varios campos, según el separador " "
                 author = authors[i].split(" ");
                 //declaramos y damos un valor para evitar problemas
-                String name, surname;
+                String name;
+                String surname;
 
                 if (author.length == 1) {// Caso 1.0: Sólo un campo
                     sb.append(author[0].trim().toUpperCase());
@@ -104,9 +105,9 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                 sb.append(", ");
                 sb.append(name);
             }
-            if (i < (authors.length - 2)) { //si hay mas de 2 autores, lo separamos por ", "
+            if (i < authors.length - 2) { //si hay mas de 2 autores, lo separamos por ", "
                 sb.append(", ");
-            } else if (i == (authors.length - 2)) {// si hay 2 autores, lo separamos por " y "
+            } else if (i == authors.length - 2) {// si hay 2 autores, lo separamos por " y "
                 sb.append(" y ");
             }
         }

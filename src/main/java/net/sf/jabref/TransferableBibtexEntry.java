@@ -46,7 +46,7 @@ public class TransferableBibtexEntry implements Transferable {
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return (flavor.equals(TransferableBibtexEntry.entryFlavor) || flavor.equals(DataFlavor.stringFlavor));
+        return flavor.equals(TransferableBibtexEntry.entryFlavor) || flavor.equals(DataFlavor.stringFlavor);
     }
 
     @Override

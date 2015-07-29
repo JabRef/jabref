@@ -89,7 +89,7 @@ public class PdfContentImporter extends ImportFormat {
             return input;
         }
         char lastC = input.charAt(input.length() - 1);
-        while (!Character.isLetter(lastC) && (lastC != ')')) {
+        while (!Character.isLetter(lastC) && lastC != ')') {
             // if there is an asterix, a dot or something else at the end: remove it
             input = input.substring(0, input.length() - 1);
             if (!input.isEmpty()) {
@@ -159,7 +159,7 @@ public class PdfContentImporter extends ImportFormat {
                         } else {
                             res = res.concat(" and ");
                         }
-                        if ((splitNames[i].equalsIgnoreCase("et")) && (splitNames.length > (i + 1)) && (splitNames[i + 1].equalsIgnoreCase("al."))) {
+                        if (splitNames[i].equalsIgnoreCase("et") && splitNames.length > i + 1 && splitNames[i + 1].equalsIgnoreCase("al.")) {
                             res = res.concat("others");
                             break;
                         } else {
@@ -178,7 +178,7 @@ public class PdfContentImporter extends ImportFormat {
                         // last name found
                         res = res.concat(removeNonLettersAtEnd(splitNames[i]));
 
-                        if ((!splitNames[i].isEmpty()) && Character.isLowerCase(splitNames[i].charAt(0))) {
+                        if (!splitNames[i].isEmpty() && Character.isLowerCase(splitNames[i].charAt(0))) {
                             // it is probably be "van", "vom", ...
                             // we just rely on the fact that these things are written in lower case letters
                             // do NOT finish name
@@ -331,7 +331,7 @@ public class PdfContentImporter extends ImportFormat {
 
             // after title: authors
             author = null;
-            while ((i < split.length) && (!split[i].equals(""))) {
+            while (i < split.length && !split[i].equals("")) {
                 // author names are unlikely to be split among different lines
                 // treat them line by line
                 curString = streamlineNames(split[i]);
@@ -352,7 +352,7 @@ public class PdfContentImporter extends ImportFormat {
             // then, abstract and keywords follow
             while (i < split.length) {
                 curString = split[i];
-                if ((curString.length() >= "Abstract".length()) && (curString.substring(0, "Abstract".length()).equalsIgnoreCase("Abstract"))) {
+                if (curString.length() >= "Abstract".length() && curString.substring(0, "Abstract".length()).equalsIgnoreCase("Abstract")) {
                     if (curString.length() == "Abstract".length()) {
                         // only word "abstract" found -- skip line
                         curString = "";
@@ -362,13 +362,13 @@ public class PdfContentImporter extends ImportFormat {
                     i++;
                     // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
                     // whereas we need linebreak as separator
-                    while ((i < split.length) && (!split[i].equals(""))) {
+                    while (i < split.length && !split[i].equals("")) {
                         curString = curString.concat(split[i]).concat(lineBreak);
                         i++;
                     }
                     abstractT = curString;
                     i++;
-                } else if ((curString.length() >= "Keywords".length()) && (curString.substring(0, "Keywords".length()).equalsIgnoreCase("Keywords"))) {
+                } else if (curString.length() >= "Keywords".length() && curString.substring(0, "Keywords".length()).equalsIgnoreCase("Keywords")) {
                     if (curString.length() == "Keywords".length()) {
                         // only word "Keywords" found -- skip line
                         curString = "";
@@ -411,7 +411,7 @@ public class PdfContentImporter extends ImportFormat {
                 extractYear();
 
                 int pos = curString.indexOf("(Eds.)");
-                if ((pos >= 0) && (publisher == null)) {
+                if (pos >= 0 && publisher == null) {
                     // looks like a Springer last line
                     // e.g: A. Persson and J. Stirna (Eds.): PoEM 2009, LNBIP 39, pp. 161-175, 2009.
                     publisher = "Springer";
@@ -441,7 +441,7 @@ public class PdfContentImporter extends ImportFormat {
                         if (pos >= 0) {
                             pos += 3;
                             char delimiter = curString.charAt(pos);
-                            if ((delimiter == ':') || (delimiter == ' ')) {
+                            if (delimiter == ':' || delimiter == ' ') {
                                 pos++;
                             }
                             int nextSpace = curString.indexOf(' ', pos);
@@ -453,7 +453,7 @@ public class PdfContentImporter extends ImportFormat {
                         }
                     }
 
-                    if ((publisher == null) && (curString.contains("IEEE"))) {
+                    if (publisher == null && curString.contains("IEEE")) {
                         // IEEE has the conference things at the end
                         publisher = "IEEE";
 
@@ -471,7 +471,7 @@ public class PdfContentImporter extends ImportFormat {
                                 // before the price, the ISSN is stated
                                 // skip that
                                 pos -= 2;
-                                while ((pos >= 0) && (curString.charAt(pos) != ' ')) {
+                                while (pos >= 0 && curString.charAt(pos) != ' ') {
                                     pos--;
                                 }
                                 if (pos > 0) {
@@ -573,7 +573,7 @@ public class PdfContentImporter extends ImportFormat {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while ((i < split.length) && (split[i].trim().equals(""))) {
+        while (i < split.length && split[i].trim().equals("")) {
             i++;
         }
     }
@@ -591,7 +591,7 @@ public class PdfContentImporter extends ImportFormat {
     private void fillCurStringWithNonEmptyLines() {
         // ensure that curString does not end with " "
         curString = curString.trim();
-        while ((i < split.length) && (!split[i].equals(""))) {
+        while (i < split.length && !split[i].equals("")) {
             String curLine = split[i].trim();
             if (!curLine.equals("")) {
                 if (!curString.isEmpty()) {
@@ -614,7 +614,7 @@ public class PdfContentImporter extends ImportFormat {
      * invariant before/after: i points to line before the last handled block
      */
     private void readLastBlock() {
-        while ((i >= 0) && (split[i].trim().equals(""))) {
+        while (i >= 0 && split[i].trim().equals("")) {
             i--;
         }
         // i is now at the end of a block
@@ -622,7 +622,7 @@ public class PdfContentImporter extends ImportFormat {
         int end = i;
 
         // find beginning
-        while ((i >= 0) && (!split[i].equals(""))) {
+        while (i >= 0 && !split[i].equals("")) {
             i--;
         }
         // i is now the line before the beginning of the block

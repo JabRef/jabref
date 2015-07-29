@@ -80,7 +80,7 @@ public class OvidImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
-        while (((str = in.readLine()) != null) && (i < 50)) {
+        while ((str = in.readLine()) != null && i < 50) {
 
             if (OvidImporter.ovidPattern.matcher(str).find()) {
                 return true;
@@ -103,7 +103,7 @@ public class OvidImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
         while ((line = in.readLine()) != null) {
-            if ((!line.isEmpty()) && (line.charAt(0) != ' ')) {
+            if (!line.isEmpty() && line.charAt(0) != ' ') {
                 sb.append("__NEWFIELD__");
             }
             sb.append(line);
@@ -121,7 +121,7 @@ public class OvidImporter extends ImportFormat {
                 String content = field.substring(linebreak).trim();
 
                 // Check if this is the author field (due to a minor special treatment for this field):
-                boolean isAuthor = (fieldName.indexOf("Author") == 0)
+                boolean isAuthor = fieldName.indexOf("Author") == 0
                         && !fieldName.contains("Author Keywords")
                         && !fieldName.contains("Author e-mail");
 
@@ -201,7 +201,7 @@ public class OvidImporter extends ImportFormat {
             // Now we need to check if a book entry has given editors in the author field;
             // if so, rearrange:
             String auth = h.get("author");
-            if ((auth != null) && (auth.contains(" [Ed]"))) {
+            if (auth != null && auth.contains(" [Ed]")) {
                 h.remove("author");
                 h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
             }

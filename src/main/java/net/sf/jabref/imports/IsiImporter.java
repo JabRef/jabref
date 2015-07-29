@@ -82,7 +82,7 @@ public class IsiImporter extends ImportFormat {
 
         String str;
         int i = 0;
-        while (((str = in.readLine()) != null) && (i < 50)) {
+        while ((str = in.readLine()) != null && i < 50) {
 
             /**
              * The following line gives false positives for RIS files, so it
@@ -258,7 +258,7 @@ public class IsiImporter extends ImportFormat {
 
                     value = value.replaceAll("EOLEOL", " ");
                     String existingKeywords = hm.get("keywords");
-                    if ((existingKeywords != null) && !existingKeywords.contains(value)) {
+                    if (existingKeywords != null && !existingKeywords.contains(value)) {
                         existingKeywords += ", " + value;
                     } else {
                         existingKeywords = value;
@@ -273,7 +273,7 @@ public class IsiImporter extends ImportFormat {
                     int detpos = value.indexOf(' ');
 
                     // tweak for IEEE Explore
-                    if ((detpos != -1) && (!value.substring(0, detpos).trim().isEmpty())) {
+                    if (detpos != -1 && !value.substring(0, detpos).trim().isEmpty()) {
                         value = value.substring(0, detpos);
                     }
 
@@ -338,7 +338,7 @@ public class IsiImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().isEmpty())) {
+                if (content == null || content.trim().isEmpty()) {
                     toRemove.add(key);
                 }
             }
@@ -422,14 +422,14 @@ public class IsiImporter extends ImportFormat {
                 for (int j = 0; j < first.length(); j++) {
                     sb.append(first.charAt(j)).append(".");
 
-                    if (j < (first.length() - 1)) {
+                    if (j < first.length() - 1) {
                         sb.append(" ");
                     }
                 }
             } else {
                 sb.append(first);
             }
-            if (i < (firstParts.length - 1)) {
+            if (i < firstParts.length - 1) {
                 sb.append(" ");
             }
         }

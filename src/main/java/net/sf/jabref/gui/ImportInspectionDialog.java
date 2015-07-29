@@ -995,8 +995,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            final int col = glTable.columnAtPoint(e.getPoint()), row = glTable.rowAtPoint(e
-                    .getPoint());
+            final int col = glTable.columnAtPoint(e.getPoint());
+            final int row = glTable.rowAtPoint(e
+                                .getPoint());
             if (isIconColumn(col)) {
                 BibtexEntry entry = sortedList.get(row);
 
@@ -1135,8 +1136,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
 
             // Check if any other action should be taken:
-            final int col = glTable.columnAtPoint(e.getPoint()), row = glTable.rowAtPoint(e
-                    .getPoint());
+            final int col = glTable.columnAtPoint(e.getPoint());
+            final int row = glTable.rowAtPoint(e
+                                .getPoint());
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibtexEntry first = sortedList.get(row);

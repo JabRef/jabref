@@ -37,7 +37,7 @@ public class YearUtil {
      * @return
      */
     static String toFourDigitYear(String year, int thisYear) {
-        if ((year == null) || (year.length() != 2)) {
+        if (year == null || year.length() != 2) {
             return year;
         }
 
@@ -58,7 +58,7 @@ public class YearUtil {
         public Year(int year) {
             this.year = year;
             this.yearShort = this.year % 100;
-            this.century = (this.year / 100) * 100;
+            this.century = this.year / 100 * 100;
         }
 
         int toFourDigitYear(int relativeYear) {
@@ -67,11 +67,11 @@ public class YearUtil {
             }
             // 20 , 90
             // 99 > 30
-            if ((((relativeYear + 100) - yearShort) % 100) > 30) {
+            if ((relativeYear + 100 - yearShort) % 100 > 30) {
                 if (relativeYear < yearShort) {
                     return century + relativeYear;
                 } else {
-                    return (century - 100) + relativeYear;
+                    return century - 100 + relativeYear;
                 }
             } else {
                 if (relativeYear < yearShort) {

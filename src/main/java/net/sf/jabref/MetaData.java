@@ -91,7 +91,7 @@ public class MetaData implements Iterable<String> {
             putGroups(treeGroupsData, db, groupsVersionOnDisk);
         }
 
-        if (!groupsTreePresent && (flatGroupsData != null)) {
+        if (!groupsTreePresent && flatGroupsData != null) {
             try {
                 groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
                 groupTreeValid = true;
@@ -177,12 +177,12 @@ public class MetaData implements Iterable<String> {
             key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
-        if ((vec != null) && (vec.size() > 0)) {
+        if (vec != null && !vec.isEmpty()) {
             String dir;
             dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
-            if (!(new File(dir)).isAbsolute() && (file != null)) {
+            if (!new File(dir).isAbsolute() && file != null) {
                 String relDir;
                 if (dir.equals(".")) {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
@@ -192,7 +192,7 @@ public class MetaData implements Iterable<String> {
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
-                if ((new File(relDir)).exists()) {
+                if (new File(relDir).exists()) {
                     dir = relDir;
                 }
             }
@@ -206,7 +206,7 @@ public class MetaData implements Iterable<String> {
         }
 
         // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && getFile() != null) {
             // Check if we should add it as primary file dir (first in the list) or not:
             if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
                 dirs.add(0, getFile().getParent());
@@ -273,7 +273,7 @@ public class MetaData implements Iterable<String> {
         }
         // write groups if present. skip this if only the root node exists 
         // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
+        if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");

@@ -50,7 +50,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      */
     @Override
     public boolean accept(File f) {
-        return (f != null) && f.getName().toUpperCase().endsWith(".PDF");
+        return f != null && f.getName().toUpperCase().endsWith(".PDF");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.basePanel(), JabRef.jrf.basePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
         ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
-        assert (res.entries.size() == 1);
+        assert res.entries.size() == 1;
         return res.entries.get(0);
 
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);

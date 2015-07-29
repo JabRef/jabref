@@ -44,7 +44,7 @@ public class QuotedStringTokenizer {
         m_quoteChar = quoteCharacter;
         m_contentLength = m_content.length();
         // skip leading delimiters
-        while (isDelimiter(m_content.charAt(m_index)) && (m_index < m_contentLength)) {
+        while (isDelimiter(m_content.charAt(m_index)) && m_index < m_contentLength) {
             ++m_index;
         }
     }
@@ -65,7 +65,7 @@ public class QuotedStringTokenizer {
                 // advance index until next token or end
                 do {
                     ++m_index;
-                } while ((m_index < m_contentLength) && isDelimiter(m_content.charAt(m_index)));
+                } while (m_index < m_contentLength && isDelimiter(m_content.charAt(m_index)));
                 return sb.toString();
             } else {
                 sb.append(c);

@@ -99,7 +99,7 @@ public class BibtexNameFormatter {
                 i--; // unskip last brace (for last i++ at the end)
                 String control = level1Chars.toString().toLowerCase();
 
-                if (control.length() == 0) {
+                if (control.isEmpty()) {
                     continue;
                 }
 

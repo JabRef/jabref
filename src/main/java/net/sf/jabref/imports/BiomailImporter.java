@@ -208,7 +208,7 @@ public class BiomailImporter extends ImportFormat {
             // the first bibitem is always empty, presumably as a result of trying
             // to parse header informaion. So add only if we have at least author or
             // title fields.
-            if ((hm.get("author") != null) || (hm.get("title") != null)) {
+            if (hm.get("author") != null || hm.get("title") != null) {
                 bibitems.add(b);
             }
         }

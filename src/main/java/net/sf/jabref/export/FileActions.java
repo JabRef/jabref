@@ -74,7 +74,7 @@ public class FileActions {
 
         for (BibtexString.Type t : BibtexString.Type.values()) {
             for (BibtexString bs : strings) {
-                if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
+                if (remaining.containsKey(bs.getName()) && bs.getType() == t) {
                     FileActions.writeString(fw, bs, remaining, maxKeyLength);
                 }
             }
@@ -115,7 +115,7 @@ public class FileActions {
         fw.write("@String { " + bs.getName() + suffix + " = ");
         if (!bs.getContent().isEmpty()) {
             try {
-                String formatted = (new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING);
+                String formatted = new LatexFieldFormatter().format(bs.getContent(), Globals.BIBTEX_STRING);
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
@@ -263,8 +263,12 @@ public class FileActions {
 
     private static class SaveSettings {
 
-        public final String pri, sec, ter;
-        public final boolean priD, secD, terD;
+        public final String pri;
+        public final String sec;
+        public final String ter;
+        public final boolean priD;
+        public final boolean secD;
+        public final boolean terD;
 
 
         public SaveSettings(boolean isSaveOperation, MetaData metaData) {
@@ -280,14 +284,14 @@ public class FileActions {
             }
 
             // This case should never be hit as SaveSettings() is never called if InOriginalOrder is true
-            assert (storedSaveOrderConfig == null) && isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
-            assert (storedSaveOrderConfig == null) && !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+            assert storedSaveOrderConfig == null && isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER);
+            assert storedSaveOrderConfig == null && !isSaveOperation && !Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
 
             if (storedSaveOrderConfig != null) {
                 // follow the metaData
                 SaveOrderConfig saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
-                assert (!saveOrderConfig.saveInOriginalOrder);
-                assert (saveOrderConfig.saveInSpecifiedOrder);
+                assert !saveOrderConfig.saveInOriginalOrder;
+                assert saveOrderConfig.saveInSpecifiedOrder;
                 pri = saveOrderConfig.sortCriteria[0].field;
                 sec = saveOrderConfig.sortCriteria[1].field;
                 ter = saveOrderConfig.sortCriteria[2].field;
@@ -393,7 +397,7 @@ public class FileActions {
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibtexEntry aSorter : sorter) {
-                be = (aSorter);
+                be = aSorter;
 
                 // Check if we must write the type definition for this
                 // entry, as well. Our criterion is that all non-standard
@@ -408,7 +412,7 @@ public class FileActions {
             }
 
             // Write meta data.
-            if ((saveType != DatabaseSaveType.PLAIN_BIBTEX) && (metaData != null)) {
+            if (saveType != DatabaseSaveType.PLAIN_BIBTEX && metaData != null) {
                 metaData.writeMetaData(fw);
             }
 
@@ -504,7 +508,7 @@ public class FileActions {
             Iterator<String> i = keySet.iterator();
 
             for (; i.hasNext();) {
-                sorter.add(database.getEntryById((i.next())));
+                sorter.add(database.getEntryById(i.next()));
             }
         }
 
@@ -517,8 +521,8 @@ public class FileActions {
      * @return true iff the entry has a nonzero value in its field.
      */
     private static boolean nonZeroField(BibtexEntry be, String field) {
-        String o = (be.getField(field));
+        String o = be.getField(field);
 
-        return ((o != null) && !o.equals("0"));
+        return o != null && !o.equals("0");
     }
 }

@@ -69,13 +69,13 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             return c;
         }
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
-        if ((group == null) || !(c instanceof JLabel))
+        if (group == null || !(c instanceof JLabel))
          {
             return c; // sanity check
         }
         JLabel label = (JLabel) c;
 
-        if ((highlightBorderCell != null) && (highlightBorderCell == value)) {
+        if (highlightBorderCell != null && highlightBorderCell == value) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());
@@ -120,7 +120,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
             if (group instanceof ExplicitGroup) {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
-            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+            } else if (group instanceof KeywordGroup || group instanceof SearchGroup) {
                 int hits = 0;
                 for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()) {
                     if (group.contains(entry)) {

@@ -72,7 +72,7 @@ public class SilverPlatterImporter extends ImportFormat {
                 return false; // This is an inspec file, so return false.
             }
 
-            if ((str.length() >= 5) && (str.substring(0, 5).equals("TI:  "))) {
+            if (str.length() >= 5 && str.substring(0, 5).equals("TI:  ")) {
                 return true;
             }
         }
@@ -158,7 +158,7 @@ public class SilverPlatterImporter extends ImportFormat {
                         h.put("publisher", jr.replaceAll("-", " ").trim());
                         frest = frest.substring(m);
                         m = frest.indexOf(", ");
-                        if ((m + 2) < frest.length()) {
+                        if (m + 2 < frest.length()) {
                             String yr = frest.substring(m + 2).trim();
                             try {
                                 Integer.parseInt(yr);

@@ -49,7 +49,7 @@ public class Layout
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_FIELD_END) {
-                if ((blockStart != null) && (blockEntries != null)) {
+                if (blockStart != null && blockEntries != null) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
@@ -66,7 +66,7 @@ public class Layout
                 blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_GROUP_END) {
-                if ((blockStart != null) && (blockEntries != null)) {
+                if (blockStart != null && blockEntries != null) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
                         le = new LayoutEntry(blockEntries, classPrefix,
@@ -161,9 +161,9 @@ public class Layout
                 if (previousSkipped) {
                     int eol = 0;
 
-                    while ((eol < fieldText.length()) &&
-                            ((fieldText.charAt(eol) == '\n') ||
-                            (fieldText.charAt(eol) == '\r'))) {
+                    while (eol < fieldText.length() &&
+                            (fieldText.charAt(eol) == '\n' ||
+                                    fieldText.charAt(eol) == '\r')) {
                         eol++;
                     }
 

@@ -73,16 +73,18 @@ class SearchManagerNoGUI {
     }
 
     private String fieldYear() {
-        String regPt1 = "", regPt2 = "";
+        String regPt1 = "";
+        String regPt2 = "";
         String completeReg = null;
-        boolean reg1Set = false, reg2Set = false; //if beginning of timeframe is BEFORE and end of timeframe is AFTER turn of the century
+        boolean reg1Set = false; //if beginning of timeframe is BEFORE and end of timeframe is AFTER turn of the century
+        boolean reg2Set = false;
         String[] searchTermsToPr = searchTerm.split("=");
         String field = searchTermsToPr[0];
         String[] years = searchTermsToPr[1].split("-");
         int year1 = Integer.parseInt(years[0]);
         int year2 = Integer.parseInt(years[1]);
 
-        if ((year1 < 2000) && (year2 >= 2000)) { //for 199.
+        if (year1 < 2000 && year2 >= 2000) { //for 199.
             regPt1 = "199+[" + years[0].substring(3, 4) + "-9]";
             reg1Set = true;
         } else {
@@ -92,7 +94,7 @@ class SearchManagerNoGUI {
                 reg1Set = true;
             }
         }
-        if ((Integer.parseInt(years[1]) >= 2000) && (year1 < 2000)) { //for 200.
+        if (Integer.parseInt(years[1]) >= 2000 && year1 < 2000) { //for 200.
             regPt2 = "200+[0-" + years[1].substring(3, 4) + "]";
             reg2Set = true;
         } else {

@@ -60,7 +60,7 @@ abstract class Change extends DefaultMutableTreeNode {
      * @return boolean false if the parent overrides by not being accepted.
      */
     public boolean isAcceptable() {
-        if ((getParent() != null) && (getParent() instanceof Change)) {
+        if (getParent() != null && getParent() instanceof Change) {
             return ((Change) getParent()).isAccepted();
         } else {
             return true;

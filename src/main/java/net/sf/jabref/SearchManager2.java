@@ -73,7 +73,9 @@ public class SearchManager2 extends SidePaneComponent
     private final JRadioButton showResultsInDialog;
     private final JRadioButton searchAllBases;
     private final JCheckBoxMenuItem select;
-    private boolean incSearch = false, startedFloatSearch = false, startedFilterSearch = false;
+    private boolean incSearch = false;
+    private boolean startedFloatSearch = false;
+    private boolean startedFilterSearch = false;
 
     private int incSearchPos = -1; // To keep track of where we are in
 
@@ -342,7 +344,7 @@ public class SearchManager2 extends SidePaneComponent
         if (increment.isSelected()) {
             searchField.addKeyListener(this);
         } else {
-            if (searchAutoComplete.isSelected() && (autoCompleteListener != null)) {
+            if (searchAutoComplete.isSelected() && autoCompleteListener != null) {
                 searchField.addKeyListener(autoCompleteListener);
             }
         }
@@ -396,7 +398,7 @@ public class SearchManager2 extends SidePaneComponent
     private void fireSearchlistenerEvent(String t) {
         // parse the Search string to words    	
         ArrayList<String> words;
-        if ((t == null) || (t.isEmpty())) {
+        if (t == null || t.isEmpty()) {
             words = null;
         } else {
             words = getSearchwords(t);
@@ -509,9 +511,9 @@ public class SearchManager2 extends SidePaneComponent
         if (e.getSource() == escape) {
             incSearch = false;
             clearSearchLater();
-        } else if (((e.getSource() == searchField) || (e.getSource() == search))
+        } else if ((e.getSource() == searchField || e.getSource() == search)
                 && !increment.isSelected()
-                && (panel != null)) {
+                && panel != null) {
 
             updatePrefs(); // Make sure the user's choices are recorded.
             if (searchField.getText().isEmpty()) {

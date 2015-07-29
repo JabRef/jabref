@@ -72,7 +72,7 @@ public class AutosaveStartupPrompter implements Runnable {
             ParserResult pr = null;
             while (!done) {
                 pr = JabRef.openBibFile(fileToLoad.getPath(), true);
-                if ((pr != null) && !pr.isInvalid()) {
+                if (pr != null && !pr.isInvalid()) {
                     loaded.add(pr);
                     BasePanel panel = frame.addTab(pr.getDatabase(), file,
                             pr.getMetaData(), pr.getEncoding(), first);
@@ -107,7 +107,7 @@ public class AutosaveStartupPrompter implements Runnable {
                 }
             }
 
-            if ((pr != null) && !pr.isInvalid()) {
+            if (pr != null && !pr.isInvalid()) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP) && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
                     StringBuilder wrn = new StringBuilder();

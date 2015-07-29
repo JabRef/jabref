@@ -25,7 +25,8 @@ import net.sf.jabref.Globals;
 public class UndoableModifySubtree extends AbstractUndoableEdit {
 
     /** A backup of the groups before the modification */
-    private final GroupTreeNode m_groupRoot, m_subtreeBackup;
+    private final GroupTreeNode m_groupRoot;
+    private final GroupTreeNode m_subtreeBackup;
     /** The path to the global groups root node */
     private final int[] m_subtreeRootPath;
     private final GroupSelector m_groupSelector;

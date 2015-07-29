@@ -44,7 +44,7 @@ class LargeHTMLEditorKit extends HTMLEditorKit {
         public View create(Element elem) {
             AttributeSet attrs = elem.getAttributes();
             Object elementName = attrs.getAttribute(AbstractDocument.ElementNameAttribute);
-            Object o = (elementName != null) ? null : attrs.getAttribute(StyleConstants.NameAttribute);
+            Object o = elementName != null ? null : attrs.getAttribute(StyleConstants.NameAttribute);
             if (o instanceof HTML.Tag) {
                 HTML.Tag kind = (HTML.Tag) o;
                 if (kind == HTML.Tag.HTML) {
@@ -52,18 +52,18 @@ class LargeHTMLEditorKit extends HTMLEditorKit {
                 }
                 else if (kind == HTML.Tag.IMPLIED) {
                     String ws = (String) elem.getAttributes().getAttribute(CSS.Attribute.WHITE_SPACE);
-                    if ((ws != null) && ws.equals("pre")) {
+                    if (ws != null && ws.equals("pre")) {
                         return super.create(elem);
                     }
                     return new HTMLParagraphView(elem);
-                } else if ((kind == HTML.Tag.P) ||
-                        (kind == HTML.Tag.H1) ||
-                        (kind == HTML.Tag.H2) ||
-                        (kind == HTML.Tag.H3) ||
-                        (kind == HTML.Tag.H4) ||
-                        (kind == HTML.Tag.H5) ||
-                        (kind == HTML.Tag.H6) ||
-                        (kind == HTML.Tag.DT)) {
+                } else if (kind == HTML.Tag.P ||
+                        kind == HTML.Tag.H1 ||
+                        kind == HTML.Tag.H2 ||
+                        kind == HTML.Tag.H3 ||
+                        kind == HTML.Tag.H4 ||
+                        kind == HTML.Tag.H5 ||
+                        kind == HTML.Tag.H6 ||
+                        kind == HTML.Tag.DT) {
                     // paragraph
                     return new HTMLParagraphView(elem);
                 }

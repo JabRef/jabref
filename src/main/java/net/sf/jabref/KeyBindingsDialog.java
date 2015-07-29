@@ -170,8 +170,8 @@ class KeyBindingsDialog extends JDialog {
 
             if (mod.equals("")) {
                 int kc = evt.getKeyCode();
-                if (!(((kc >= KeyEvent.VK_F1) && (kc <= KeyEvent.VK_F12)) ||
-                        (kc == KeyEvent.VK_ESCAPE) || (kc == KeyEvent.VK_DELETE))) {
+                if (!(kc >= KeyEvent.VK_F1 && kc <= KeyEvent.VK_F12 ||
+                        kc == KeyEvent.VK_ESCAPE || kc == KeyEvent.VK_DELETE)) {
                     return; // need a modifier except for function keys
                 }
             }
@@ -312,7 +312,7 @@ class KeyBindingsDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return (col == 0 ? Globals.lang("Action") : Globals.lang("Shortcut"));
+            return col == 0 ? Globals.lang("Action") : Globals.lang("Shortcut");
         }
 
         @Override

@@ -46,7 +46,7 @@ public class FileHistory extends JMenu implements ActionListener {
         this.prefs = prefs;
         this.frame = frame;
         String[] old = prefs.getStringArray("recentFiles");
-        if ((old != null) && (old.length > 0)) {
+        if (old != null && old.length > 0) {
             for (i = 0; i < old.length; i++) {
                 history.addFirst(old[i]);
             }

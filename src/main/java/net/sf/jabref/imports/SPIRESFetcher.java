@@ -116,7 +116,7 @@ public class SPIRESFetcher implements EntryFetcher {
     private BibtexDatabase importSpiresEntries(String key, OutputPrinter frame) {
         String url = constructUrl(key);
         try {
-            HttpURLConnection conn = (HttpURLConnection) (new URL(url)).openConnection();
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setRequestProperty("User-Agent", "Jabref");
             InputStream inputStream = conn.getInputStream();
 
