@@ -122,6 +122,8 @@ public class Util {
     private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
     
     private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
+    
+    private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
 
     /**
      * This method sets the location of a Dialog such that it is centered with
@@ -252,7 +254,7 @@ public class Util {
      * is the HashMap GLobals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : Globals.UNICODE_CHARS.entrySet()) {
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
         return s;
