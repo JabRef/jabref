@@ -141,7 +141,7 @@ public class JSTORFetcher2 implements EntryFetcher {
         try {
             urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, "UTF-8") + JSTORFetcher2.SEARCH_URL_END;
             int count = 1;
-            String numberOfRefs[] = new String[2];
+            String[] numberOfRefs = new String[2];
             int refsRequested;
             int numberOfPagesRequested = JSTORFetcher2.MAX_PAGES_TO_LOAD;
 

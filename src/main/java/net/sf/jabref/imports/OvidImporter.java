@@ -110,7 +110,7 @@ public class OvidImporter extends ImportFormat {
             sb.append('\n');
         }
 
-        String items[] = sb.toString().split("<[0-9]+>");
+        String[] items = sb.toString().split("<[0-9]+>");
 
         for (int i = 1; i < items.length; i++) {
             HashMap<String, String> h = new HashMap<String, String>();

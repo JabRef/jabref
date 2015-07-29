@@ -205,7 +205,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         // all supported flavors failed
         System.err.println("can't transfer input: ");
-        DataFlavor inflavs[] = t.getTransferDataFlavors();
+        DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
             System.out.println("  " + inflav.toString());
         }
