@@ -114,7 +114,7 @@ public class PushToEmacs implements PushToApplication {
         couldNotConnect = false;
         couldNotRunClient = false;
         String command = Globals.prefs.get(JabRefPreferences.EMACS_PATH);
-        String addParams[] = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
+        String[] addParams = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
         try {
             String[] com = new String[addParams.length + 2];
             com[0] = command;

@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  */
 public class GrammarBasedSearchRule implements SearchRule {
 
-    static public class ThrowingErrorListener extends BaseErrorListener {
+    public static class ThrowingErrorListener extends BaseErrorListener {
 
         public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
 

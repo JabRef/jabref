@@ -46,7 +46,7 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
 
 
 
-    abstract public void addBibtexEntry(BibtexEntry entry);
+    public abstract void addBibtexEntry(BibtexEntry entry);
 
     /**
      * Returns one or more possible completions for a given String. The returned

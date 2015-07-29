@@ -152,7 +152,7 @@ public class JabRefPreferences {
     public static final String NUMBER_COL_WIDTH = "numberColWidth";
     public static final String SHORTEST_TO_COMPLETE = "shortestToComplete";
     public static final String AUTOCOMPLETE_FIRSTNAME_MODE = "autoCompFirstNameMode";
-    public final static String AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both"; // here are the possible values for _MODE:
+    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_BOTH = "both"; // here are the possible values for _MODE:
     public static final String AUTO_COMP_LAST_FIRST = "autoCompLF";
     public static final String AUTO_COMP_FIRST_LAST = "autoCompFF";
     public static final String AUTO_COMPLETE_FIELDS = "autoCompleteFields";
@@ -320,8 +320,8 @@ public class JabRefPreferences {
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
-    public final static String CUSTOM_TAB_NAME = "customTabName_";
-    public final static String CUSTOM_TAB_FIELDS = "customTabFields_";
+    public static final String CUSTOM_TAB_NAME = "customTabName_";
+    public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USER_FILE_DIR_INDIVIDUAL = "userFileDirIndividual";
     public static final String USER_FILE_DIR_IND_LEGACY = "userFileDirInd_Legacy";
     public static final String USER_FILE_DIR = "userFileDir";
@@ -331,13 +331,13 @@ public class JabRefPreferences {
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
     //non-default preferences
-    private final static String CUSTOM_TYPE_NAME = "customTypeName_";
-    private final static String CUSTOM_TYPE_REQ = "customTypeReq_";
-    private final static String CUSTOM_TYPE_OPT = "customTypeOpt_";
-    private final static String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
-    public final static String PDF_PREVIEW = "pdfPreview";
-    public final static String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly";
-    public final static String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
+    private static final String CUSTOM_TYPE_NAME = "customTypeName_";
+    private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
+    private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
+    private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
+    public static final String PDF_PREVIEW = "pdfPreview";
+    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_FULL = "fullOnly";
+    public static final String AUTOCOMPLETE_FIRSTNAME_MODE_ONLY_ABBR = "abbrOnly";
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:

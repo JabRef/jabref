@@ -5,7 +5,7 @@ public class SearchRuleSets {
 
     public enum RuleSetType {
         AND,
-        OR;
+        OR
     }
 
     public static SearchRuleSet build(RuleSetType ruleSet) {

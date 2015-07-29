@@ -78,18 +78,18 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     }
 
-    private final static int
+    private static final int
             FIRST_FIRST = 0;
-    private final static int LAST_FIRST = 1;
-    private final static int LF_FF = 2;
+    private static final int LAST_FIRST = 1;
+    private static final int LF_FF = 2;
 
-    private final static String
+    private static final String
             COMMA = ", ";
-    private final static String AMP = " & ";
-    private final static String COLON = ": ";
-    private final static String SEMICOLON = "; ";
-    private final static String AND = " and ";
-    private final static String OXFORD = ", and ";
+    private static final String AMP = " & ";
+    private static final String COLON = ": ";
+    private static final String SEMICOLON = "; ";
+    private static final String AND = " and ";
+    private static final String OXFORD = ", and ";
 
     private int flMode = Authors.FIRST_FIRST;
 

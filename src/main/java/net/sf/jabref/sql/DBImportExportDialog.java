@@ -204,11 +204,11 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     }
 
     private boolean isImporter() {
-        return this.dialogType.equals(DialogType.IMPORTER);
+        return this.dialogType == DialogType.IMPORTER;
     }
 
     public boolean isExporter() {
-        return this.dialogType.equals(DialogType.EXPORTER);
+        return this.dialogType == DialogType.EXPORTER;
     }
 
     public JDialog getDiag() {

@@ -28,16 +28,16 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ImportSettingsTab extends JPanel implements PrefsTab {
 
-    public final static String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
-    public final static String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
-    public final static int DEFAULT_STYLE = ImportDialog.CONTENT;
+    public static final String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
+    public static final String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
+    public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
 
-    public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
-    private final static String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
+    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
+    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
             "bibtexkey",
             "bibtexkey - title",
     };
-    public final static String[] DEFAULT_FILENAMEPATTERNS = new String[] {
+    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {
             "\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"
     };

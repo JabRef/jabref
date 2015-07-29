@@ -73,7 +73,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
      * Automatically imports the files given as arguments
      * @param filenames List of files to import
      */
-    public void automatedImport(String filenames[]) {
+    public void automatedImport(String[] filenames) {
         // replace the work of the init step:
         MyWorker worker = new MyWorker();
         worker.fileOk = true;

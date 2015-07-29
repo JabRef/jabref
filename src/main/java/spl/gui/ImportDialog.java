@@ -17,12 +17,12 @@ import java.io.File;
 
 public class ImportDialog extends JDialog {
 
-    public final static int NOMETA = 0;
-    public final static int XMP = 1;
-    public final static int CONTENT = 2;
-    public final static int MRDLIB = 3;
-    public final static int ONLYATTACH = 4;
-    public final static int UPDATEEMPTYFIELDS = 5;
+    public static final int NOMETA = 0;
+    public static final int XMP = 1;
+    public static final int CONTENT = 2;
+    public static final int MRDLIB = 3;
+    public static final int ONLYATTACH = 4;
+    public static final int UPDATEEMPTYFIELDS = 5;
 
     private final JPanel contentPane;
     private final JCheckBox checkBoxDoNotShowAgain;

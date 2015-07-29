@@ -26,42 +26,42 @@ import net.sf.jabref.undo.NamedCompound;
 
 public class SpecialFieldsUtils {
 
-    public final static String FIELDNAME_PRIORITY = "priority";
-    public final static String FIELDNAME_RANKING = "ranking";
-    public final static String FIELDNAME_RELEVANCE = "relevance";
-    public final static String FIELDNAME_QUALITY = "qualityassured";
-    public final static String FIELDNAME_READ = "readstatus";
-    public final static String FIELDNAME_PRINTED = "printed";
+    public static final String FIELDNAME_PRIORITY = "priority";
+    public static final String FIELDNAME_RANKING = "ranking";
+    public static final String FIELDNAME_RELEVANCE = "relevance";
+    public static final String FIELDNAME_QUALITY = "qualityassured";
+    public static final String FIELDNAME_READ = "readstatus";
+    public static final String FIELDNAME_PRINTED = "printed";
 
-    public final static String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
-    public final static Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
+    public static final String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
+    public static final Boolean PREF_SPECIALFIELDSENABLED_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
-    public final static Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
+    public static final String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
+    public static final Boolean PREF_SHOWCOLUMN_RANKING_DEFAULT = Boolean.TRUE;
 
-    public final static String PREF_RANKING_COMPACT = "compactRankingColumn";
-    public final static Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.TRUE;
+    public static final String PREF_RANKING_COMPACT = "compactRankingColumn";
+    public static final Boolean PREF_RANKING_COMPACT_DEFAULT = Boolean.TRUE;
 
-    public final static String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
-    public final static Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
+    public static final String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
+    public static final Boolean PREF_SHOWCOLUMN_PRIORITY_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
-    public final static Boolean PREF_SHOWCOLUMN_RELEVANCE_DEFAULT = Boolean.FALSE;
+    public static final String PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
+    public static final Boolean PREF_SHOWCOLUMN_RELEVANCE_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
-    public final static Boolean PREF_SHOWCOLUMN_QUALITY_DEFAULT = Boolean.FALSE;
+    public static final String PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
+    public static final Boolean PREF_SHOWCOLUMN_QUALITY_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_SHOWCOLUMN_READ = "showReadColumn";
-    public final static Boolean PREF_SHOWCOLUMN_READ_DEFAULT = Boolean.FALSE;
+    public static final String PREF_SHOWCOLUMN_READ = "showReadColumn";
+    public static final Boolean PREF_SHOWCOLUMN_READ_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
-    public final static Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
+    public static final String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
+    public static final Boolean PREF_SHOWCOLUMN_PRINTED_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
-    public final static Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
+    public static final String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+    public static final Boolean PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT = Boolean.FALSE;
 
-    public final static String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    public final static Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.TRUE;
+    public static final String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
+    public static final Boolean PREF_SERIALIZESPECIALFIELDS_DEFAULT = Boolean.TRUE;
 
 
     /****************************************************/
