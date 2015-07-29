@@ -30,6 +30,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.search.HitOrMissComparator;
@@ -52,6 +55,8 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  */
 public class MainTable extends JTable {
 
+    private static final long serialVersionUID = 1L;
+    
     private final MainTableFormat tableFormat;
     private final BasePanel panel;
     private final SortedList<BibtexEntry> sortedForMarking;
@@ -81,6 +86,8 @@ public class MainTable extends JTable {
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
     public static final int ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
+    
+    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     static {
         MainTable.updateRenderers();
@@ -330,7 +337,7 @@ public class MainTable extends JTable {
             try {
                 cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i - tableFormat.padleft]));
             } catch (Throwable ex) {
-                Globals.logger("Exception while setting column widths. Choosing default.");
+                LOGGER.info("Exception while setting column widths. Choosing default.", ex);
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
             }
 

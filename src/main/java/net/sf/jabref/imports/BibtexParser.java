@@ -37,11 +37,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.jabref.*;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for importing BibTeX-files.
@@ -65,21 +65,21 @@ import net.sf.jabref.util.Util;
  */
 public class BibtexParser {
 
-    private static final Logger logger = Logger.getLogger(BibtexParser.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
 
-    private final PushbackReader _in;
+    private final PushbackReader pushbackReader;
 
-    private BibtexDatabase _db;
+    private BibtexDatabase database;
 
     private HashMap<String, BibtexEntryType> entryTypes;
 
-    private boolean _eof = false;
+    private boolean eof = false;
 
     private int line = 1;
 
     private final FieldContentParser fieldContentParser = new FieldContentParser();
 
-    private ParserResult _pr;
+    private ParserResult parserResult;
 
     private static final Integer LOOKAHEAD = 64;
 
@@ -95,7 +95,7 @@ public class BibtexParser {
             Globals.prefs = JabRefPreferences.getInstance();
         }
         autoDoubleBraces = Globals.prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES);
-        _in = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
     }
 
     /**
@@ -173,7 +173,7 @@ public class BibtexParser {
         while (true) {
             c = read();
             if ((c == -1) || (c == 65535)) {
-                _eof = true;
+                eof = true;
                 return;
             }
 
@@ -201,7 +201,7 @@ public class BibtexParser {
         while (true) {
             c = read();
             if ((c == -1) || (c == 65535)) {
-                _eof = true;
+                eof = true;
                 return sb.toString();
             }
 
@@ -237,27 +237,27 @@ public class BibtexParser {
     public ParserResult parse() throws IOException {
 
         // If we already parsed this, just return it.
-        if (_pr != null) {
-            return _pr;
+        if (parserResult != null) {
+            return parserResult;
         }
 
-        _db = new BibtexDatabase(); // Bibtex related contents.
+        database = new BibtexDatabase(); // Bibtex related contents.
         HashMap<String, String> meta = new HashMap<String, String>();
         entryTypes = new HashMap<String, BibtexEntryType>(); // To store custem entry types parsed.
-        _pr = new ParserResult(_db, null, entryTypes);
+        parserResult = new ParserResult(database, null, entryTypes);
 
         // First see if we can find the version number of the JabRef version that
         // wrote the file:
         String versionNum = readJabRefVersionNumber();
         if (versionNum != null) {
-            _pr.setJabrefVersion(versionNum);
+            parserResult.setJabrefVersion(versionNum);
             setMajorMinorVersions();
         }
 
         skipWhitespace();
 
         try {
-            while (!_eof) {
+            while (!eof) {
                 boolean found = consumeUncritically('@');
                 if (!found) {
                     break;
@@ -273,13 +273,13 @@ public class BibtexParser {
                     // parse and set accordingly. If not, assume it is an entry
                     // with an unknown type.
                     if (entryType.toLowerCase().equals("preamble")) {
-                        _db.setPreamble(parsePreamble());
+                        database.setPreamble(parsePreamble());
                     } else if (entryType.toLowerCase().equals("string")) {
                         BibtexString bs = parseString();
                         try {
-                            _db.addString(bs);
+                            database.addString(bs);
                         } catch (KeyCollisionException ex) {
-                            _pr.addWarning(Globals.lang("Duplicate string name") + ": "
+                            parserResult.addWarning(Globals.lang("Duplicate string name") + ": "
                                     + bs.getName());
                             // ex.printStackTrace();
                         }
@@ -337,7 +337,7 @@ public class BibtexParser {
                         } else {
                             // FIXME: user comments are simply dropped
                             // at least, we log that we ignored the comment
-                            Globals.logger(Globals.lang("Dropped comment from database") + ":" + comment);
+                            LOGGER.info(Globals.lang("Dropped comment from database") + ":" + comment);
                         }
                     } else {
                         // The entry type was not recognized. This may mean that
@@ -367,17 +367,17 @@ public class BibtexParser {
                     try {
                         BibtexEntry be = parseEntry(tp);
 
-                        boolean duplicateKey = _db.insertEntry(be);
+                        boolean duplicateKey = database.insertEntry(be);
                         if (duplicateKey) {
-                            _pr.addDuplicateKey(be.getCiteKey());
+                            parserResult.addDuplicateKey(be.getCiteKey());
                         } else if ((be.getCiteKey() == null) || be.getCiteKey().equals("")) {
-                            _pr.addWarning(Globals.lang("empty BibTeX key") + ": "
+                            parserResult.addWarning(Globals.lang("empty BibTeX key") + ": "
                                     + be.getAuthorTitleYear(40) + " ("
                                     + Globals.lang("grouping may not work for this entry") + ")");
                         }
                     } catch (IOException ex) {
-                        BibtexParser.logger.log(Level.WARNING, ex.getMessage(), ex);
-                        _pr.addWarning(Globals.lang("Error occured when parsing entry") + ": '"
+                        LOGGER.warn("Could not parse entry", ex);
+                        parserResult.addWarning(Globals.lang("Error occured when parsing entry") + ": '"
                                 + ex.getMessage() + "'. " + Globals.lang("Skipped entry."));
 
                     }
@@ -388,12 +388,12 @@ public class BibtexParser {
 
             // Before returning the database, update entries with unknown type
             // based on parsed type definitions, if possible.
-            checkEntryTypes(_pr);
+            checkEntryTypes(parserResult);
 
             // Instantiate meta data:
-            _pr.setMetaData(new MetaData(meta, _db));
+            parserResult.setMetaData(new MetaData(meta, database));
 
-            return _pr;
+            return parserResult;
         } catch (KeyCollisionException kce) {
             // kce.printStackTrace();
             throw new IOException("Duplicate ID in bibtex file: " + kce.toString());
@@ -408,7 +408,7 @@ public class BibtexParser {
     }
 
     private int read() throws IOException {
-        int c = _in.read();
+        int c = pushbackReader.read();
         if (c == '\n') {
             line++;
         }
@@ -419,7 +419,7 @@ public class BibtexParser {
         if (c == '\n') {
             line--;
         }
-        _in.unread(c);
+        pushbackReader.unread(c);
     }
 
     private BibtexString parseString() throws IOException {
@@ -526,7 +526,7 @@ public class BibtexParser {
 
         while (((c = peek()) != ',') && (c != '}') && (c != ')')) {
 
-            if (_eof) {
+            if (eof) {
                 throw new RuntimeException("Error in line " + line + ": EOF in mid-string");
             }
             if (c == '"') {
@@ -654,7 +654,7 @@ public class BibtexParser {
             int c = read();
             // Util.pr(".. "+c);
             if (c == -1) {
-                _eof = true;
+                eof = true;
 
                 return token.toString();
             }
@@ -728,7 +728,7 @@ public class BibtexParser {
                     }
 
                     // Finished, now reverse newKey and remove whitespaces:
-                    _pr.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key.",
+                    parserResult.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key.",
                             String.valueOf(line)));
                     key = newKey.reverse();
                 }
@@ -737,12 +737,12 @@ public class BibtexParser {
 
         case ',':
 
-            _pr.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
+            parserResult.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
                     String.valueOf(line)));
 
         case '\n':
 
-            _pr.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
+            parserResult.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
                     String.valueOf(line)));
 
             break;
@@ -798,7 +798,7 @@ public class BibtexParser {
             int c = read();
             // Util.pr(".. '"+(char)c+"'\t"+c);
             if (c == -1) {
-                _eof = true;
+                eof = true;
 
                 return token.toString();
             }
@@ -977,7 +977,7 @@ public class BibtexParser {
         }
 
         if ((c == -1) || (c == 65535)) {
-            _eof = true;
+            eof = true;
         }
 
         // Return true if we actually found the character we were looking for:
@@ -999,7 +999,7 @@ public class BibtexParser {
 
     private void checkEntryTypes(ParserResult _pr) {
 
-        for (BibtexEntry be : _db.getEntries()) {
+        for (BibtexEntry be : database.getEntries()) {
             if (be.getType() instanceof UnknownEntryType) {
                 // Look up the unknown type name in our map of parsed types:
 
@@ -1086,20 +1086,20 @@ public class BibtexParser {
      * number
      */
     private void setMajorMinorVersions() {
-        String v = _pr.getJabrefVersion();
+        String v = parserResult.getJabrefVersion();
         Pattern p = Pattern.compile("([0-9]+)\\.([0-9]+).*");
         Pattern p2 = Pattern.compile("([0-9]+)\\.([0-9]+)\\.([0-9]+).*");
         Matcher m = p.matcher(v);
         Matcher m2 = p2.matcher(v);
         if (m.matches()) {
             if (m.groupCount() >= 2) {
-                _pr.setJabrefMajorVersion(Integer.parseInt(m.group(1)));
-                _pr.setJabrefMinorVersion(Integer.parseInt(m.group(2)));
+                parserResult.setJabrefMajorVersion(Integer.parseInt(m.group(1)));
+                parserResult.setJabrefMinorVersion(Integer.parseInt(m.group(2)));
             }
         }
         if (m2.matches()) {
             if (m2.groupCount() >= 3) {
-                _pr.setJabrefMinor2Version(Integer.parseInt(m2.group(3)));
+                parserResult.setJabrefMinor2Version(Integer.parseInt(m2.group(3)));
             }
         }
     }

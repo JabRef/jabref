@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.AuthorList.Author;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
@@ -39,6 +42,8 @@ public class LabelPatternUtil {
 
     // All single characters that we can use for extending a key to make it unique:
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
+    
+    private static final Log LOGGER = LogFactory.getLog(LabelPatternUtil.class);
 
 
     public static ArrayList<String> DEFAULT_LABELPATTERN;
@@ -614,7 +619,7 @@ public class LabelPatternUtil {
                     }
 
                 } else {
-                    Globals.logger("Key generator warning: unknown modifier '"
+                    LOGGER.info("Key generator warning: unknown modifier '"
                             + modifier + "'.");
                 }
             }

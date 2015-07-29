@@ -30,6 +30,8 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.external.ExternalFileType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 import net.sf.jabref.specialfields.Printed;
@@ -60,6 +62,8 @@ public class GUIGlobals {
     public static Font typeNameFont;
     public static Font jabRefFont;
     private static Font fieldNameFont;
+    
+    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE =
@@ -105,7 +109,7 @@ public class GUIGlobals {
     public static JLabel getTableIcon(String fieldType) {
         Object o = GUIGlobals.tableIcons.get(fieldType);
         if (o == null) {
-            Globals.logger("Error: no table icon defined for type '" + fieldType + "'.");
+            LOGGER.info("Error: no table icon defined for type '" + fieldType + "'.");
             return null;
         } else {
             return (JLabel) o;

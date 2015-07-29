@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -39,12 +38,16 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
-    private static final Logger logger = Logger.getLogger(OpenDatabaseAction.class.toString());
+    private static final long serialVersionUID = 1L;
+
+    private static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
 
     private final boolean showDialog;
     private final JabRefFrame frame;
@@ -100,8 +103,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 fileToOpen = new File(chosenFile);
             }*/
         } else {
-            Util.pr(Action.NAME);
-            Util.pr(e.getActionCommand());
+            LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.makeBibtexExtension(e.getActionCommand())));
         }
 
@@ -395,7 +397,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             for (BibtexEntry entry : pr.getDatabase().getEntries()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
             }
-            OpenDatabaseAction.logger.fine(Globals.lang("Synchronized special fields based on keywords"));
+            LOGGER.info(Globals.lang("Synchronized special fields based on keywords"));
         }
 
         if (!pr.getMetaData().isGroupTreeValid()) {

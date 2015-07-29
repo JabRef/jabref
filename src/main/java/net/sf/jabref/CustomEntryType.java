@@ -20,6 +20,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This class is used to represent customized entry types.
  *
@@ -31,6 +34,8 @@ public class CustomEntryType extends BibtexEntryType {
     private final String[] opt;
     private String[] priOpt;
     private String[][] reqSets = null; // Sets of either-or required fields, if any
+    
+    private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
 
     public CustomEntryType(String name_, String[] req_, String[] opt_, String[] opt2_) {
@@ -264,7 +269,7 @@ public class CustomEntryType extends BibtexEntryType {
             //System.out.println("o '"+optFields+"'");
             return new CustomEntryType(name, reqFields, optFields);
         } catch (IndexOutOfBoundsException ex) {
-            Globals.logger("Ill-formed entrytype comment in BibTeX file.");
+            LOGGER.info("Ill-formed entrytype comment in BibTeX file.", ex);
             return null;
         }
 

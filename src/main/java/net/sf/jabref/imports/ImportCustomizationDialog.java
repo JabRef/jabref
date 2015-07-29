@@ -39,11 +39,15 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 import net.sf.jabref.util.Util;
 
 /**
@@ -51,11 +55,15 @@ import net.sf.jabref.util.Util;
  */
 public class ImportCustomizationDialog extends JDialog {
 
+    private static final long serialVersionUID = 1L;
+
     private final JabRefFrame frame;
 
     private JTable customImporterTable;
     private final JabRefPreferences prefs = Globals.prefs;
     private final ImportCustomizationDialog importCustomizationDialog;
+    
+    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
 
     /*
@@ -159,7 +167,7 @@ public class ImportCustomizationDialog extends JDialog {
                     try {
                         zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
                     } catch (IOException exc) {
-                        Globals.logger("Could not open Zip-archive: \n" + exc.getMessage());
+                        LOGGER.info("Could not open Zip-archive: \n" + exc.getMessage(), exc);
                         JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0", basePath)
                                 + "\n" + Globals.lang("Have you chosen the correct package path?"));
                         return;

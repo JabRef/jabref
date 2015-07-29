@@ -70,6 +70,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexDatabase;
@@ -113,10 +116,8 @@ public class Util {
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
-
-    public static void pr(String s) {
-        Globals.logger(s);
-    }
+    
+    private static final Log LOGGER = LogFactory.getLog(Util.class);
 
     /**
      * This method sets the location of a Dialog such that it is centered with
@@ -1575,7 +1576,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            Globals.logger(Globals.lang("Wrong Format").concat(" ").concat(e.toString()));
+            LOGGER.info(Globals.lang("Wrong Format").concat(" ").concat(e.toString()), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);

@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -47,8 +46,6 @@ import net.sf.jabref.util.MonthUtil;
 import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {
-
-    private final Logger logger = Logger.getLogger(CleanUpAction.class.getName());
 
     private final static String
             AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";

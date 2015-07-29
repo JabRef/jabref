@@ -32,6 +32,9 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
@@ -51,6 +54,8 @@ import spl.PdfImporter.ImportPdfFilesResult;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
+    private static final long serialVersionUID = 1L;
+
     private final MainTable entryTable;
 
     private final JabRefFrame frame;
@@ -62,6 +67,8 @@ public class EntryTableTransferHandler extends TransferHandler {
     private final DataFlavor stringFlavor;
 
     private static final boolean DROP_ALLOWED = true;
+    
+    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
 
 
     /**
@@ -81,8 +88,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            Globals.logger("Unable to configure drag and drop for main table");
-            e.printStackTrace();
+            LOGGER.info("Unable to configure drag and drop for main table", e);
         }
     }
 

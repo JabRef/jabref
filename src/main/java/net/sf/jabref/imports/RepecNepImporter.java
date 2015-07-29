@@ -32,10 +32,10 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.jabref.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
@@ -159,7 +159,7 @@ import net.sf.jabref.*;
  */
 public class RepecNepImporter extends ImportFormat {
 
-    private static final Logger logger = Logger.getLogger(RepecNepImporter.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
     private final static Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
 
@@ -478,7 +478,7 @@ public class RepecNepImporter extends ImportFormat {
                 message += ", paper no. " + paperNoStr + ": ";
             }
             message += e.getMessage();
-            RepecNepImporter.logger.log(Level.SEVERE, message, e);
+            LOGGER.error(message, e);
             if (!(e instanceof IOException)) {
                 e.printStackTrace();
                 e = new IOException(message);

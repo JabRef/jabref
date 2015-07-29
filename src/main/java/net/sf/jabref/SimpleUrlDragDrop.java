@@ -34,12 +34,12 @@ import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.EntryEditor.StoreFieldAction;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Erik Putrycz erik.putrycz-at-nrc-cnrc.gc.ca
@@ -47,8 +47,7 @@ import net.sf.jabref.EntryEditor.StoreFieldAction;
 
 class SimpleUrlDragDrop implements DropTargetListener {
 
-    private static final Logger logger = Logger.getLogger(SimpleUrlDragDrop.class
-            .getName());
+    private static final Log LOGGER = LogFactory.getLog(SimpleUrlDragDrop.class);
 
     private final FieldEditor editor;
 
@@ -111,8 +110,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
         try {
             dtURL = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            SimpleUrlDragDrop.logger.log(Level.WARNING,
-                    "Class not found for DnD... should not happen", e);
+            LOGGER.warn("Could not find DropTargetDropEvent class", e);
         }
         try {
             URL url = (URL) tsf.getTransferData(dtURL);
@@ -124,9 +122,9 @@ class SimpleUrlDragDrop implements DropTargetListener {
             JOptionPane.showMessageDialog((Component) editor,
                     Globals.lang("Operation not supported"),
                     Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
-            SimpleUrlDragDrop.logger.log(Level.WARNING, "Transfer exception", nfe);
+            LOGGER.warn("Could not perform drage and drop", nfe);
         } catch (IOException ioex) {
-            SimpleUrlDragDrop.logger.log(Level.WARNING, "!should not happen!", ioex);
+            LOGGER.warn("Could not perform drage and drop", ioex);
         }
     }
 

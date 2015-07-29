@@ -2,7 +2,7 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.util.error.StreamEavesdropper;
-import net.sf.jabref.util.logging.CachebleHandler;
+import net.sf.jabref.util.logging.CacheableHandler;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -25,9 +25,9 @@ public class ErrorConsoleAction extends AbstractAction {
 
     private final JFrame frame;
     private final StreamEavesdropper streamEavesdropper;
-    private final CachebleHandler logHandler;
+    private final CacheableHandler logHandler;
 
-    public ErrorConsoleAction(JFrame frame, StreamEavesdropper streamEavesdropper, CachebleHandler logHandler) {
+    public ErrorConsoleAction(JFrame frame, StreamEavesdropper streamEavesdropper, CacheableHandler logHandler) {
         super(Globals.menuTitle("Show error console"));
         this.streamEavesdropper = streamEavesdropper;
         this.logHandler = logHandler;

@@ -18,6 +18,9 @@ package net.sf.jabref.export;
 import java.io.*;
 import java.net.URL;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExtension;
 
@@ -30,6 +33,8 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
 public class PluginBasedExportFormat extends ExportFormat {
 
     private final ExportFormatTemplateExtension extension;
+    
+    private static final Log LOGGER = LogFactory.getLog(PluginBasedExportFormat.class);
 
 
     /**
@@ -49,7 +54,7 @@ public class PluginBasedExportFormat extends ExportFormat {
         String encoding = extension.getEncoding();
         if (fileExtension != null && fileExtension.isEmpty() || displayName != null && displayName.isEmpty()
                 || consoleName != null && consoleName.isEmpty() || layoutFilename != null && layoutFilename.isEmpty()) {
-            Globals.logger("Could not load extension " + extension.getId());
+            LOGGER.info("Could not load extension " + extension.getId());
             return null;
         }
 

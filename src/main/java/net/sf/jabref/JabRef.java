@@ -33,6 +33,10 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
+
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.export.FileActions;
@@ -53,6 +57,7 @@ import net.sf.jabref.splash.SplashScreenLifecycle;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
+import net.sf.jabref.util.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.sun.jna.Native;
@@ -69,6 +74,8 @@ public class JabRef {
     public static JabRefFrame jrf;
 
     private static final int MAX_DIALOG_WARNINGS = 10;
+    
+    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     private boolean graphicFailure = false;
     private JabRefCLI cli;
@@ -102,7 +109,7 @@ public class JabRef {
         }
 
         Globals.startBackgroundTasks();
-        Globals.setupLogging();
+        setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
         setLanguage(prefs);
         Globals.prefs.setLanguageDependentDefaultValues();
@@ -181,6 +188,11 @@ public class JabRef {
         }
 
         openWindow(loaded);
+    }
+    
+    private void setupLogHandlerForErrorConsole() {
+        Globals.handler = new CacheableHandler();
+        ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
 
     private void setLanguage(JabRefPreferences prefs) {
@@ -294,7 +306,7 @@ public class JabRef {
                 BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
             } catch (IOException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.error("Cannot import preferences", ex);
             }
         }
 
@@ -498,7 +510,7 @@ public class JabRef {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
             } catch (IOException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.error("Cannot export preferences", ex);
             }
         }
 
@@ -900,7 +912,7 @@ public class JabRef {
     }
 
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
-        Globals.logger(Globals.lang("Opening") + ": " + name);
+        LOGGER.info(Globals.lang("Opening") + ": " + name);
         File file = new File(name);
         if (!file.exists()) {
             ParserResult pr = new ParserResult(null, null, null);

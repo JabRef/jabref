@@ -22,12 +22,12 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.plugin.util.Util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginManager;
 import org.java.plugin.PluginManager.PluginLocation;
@@ -56,6 +56,8 @@ public class PluginCore {
 
     static final File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
 
+    private static final Log LOGGER = LogFactory.getLog(PluginCore.class);
+
 
     private static PluginLocation getLocationInsideJar(String context, String manifest) {
         URL jar = PluginCore.class
@@ -82,10 +84,6 @@ public class PluginCore {
     }
 
     private static PluginManager initialize() {
-        // We do not want info messages from JPF.
-        Logger.getLogger("org.java.plugin").setLevel(Level.WARNING);
-
-        Logger log = Logger.getLogger(PluginCore.class.getName());
 
         ObjectFactory objectFactory = ObjectFactory.newInstance();
 
@@ -153,8 +151,7 @@ public class PluginCore {
             }
 
             if (plugins.size() <= 0) {
-                log
-                        .warning(
+                LOGGER.warn(
                         Globals.lang("No plugins were found in the following folders:") +
                                 "\n  " +
                                 Util.join(directoriesToSearch
@@ -182,12 +179,11 @@ public class PluginCore {
                     sb.append("  - ").append(p.getId()).append(" (").append(
                             p.getLocation()).append(")\n");
                 }
-                log.info(sb.toString());
+                LOGGER.info(sb.toString());
             }
 
         } catch (Exception e) {
-            log
-                    .severe(Globals.lang("Error in starting plug-in system. Starting without, but some functionality may be missing.") +
+            LOGGER.error(Globals.lang("Error in starting plug-in system. Starting without, but some functionality may be missing.") +
                             "\n" + e.getLocalizedMessage());
         }
         return result;

@@ -18,13 +18,17 @@ package net.sf.jabref.imports;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.util.Util;
 
 class TextAnalyzer {
 
     private final BibtexEntry be = null;
+    
+    private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
 
 
     public TextAnalyzer(String text) {
@@ -52,7 +56,7 @@ class TextAnalyzer {
             year = clean(cand[0]);
             int pos = text.indexOf(year);
             usedParts.add(new Substring("year", pos, pos + year.length()));
-            Util.pr("Guessing 'year': '" + year + "'");
+            LOGGER.info("Guessing 'year': '" + year + "'");
         } else if (cand.length > 1) {
             // More than one four-digit numbers, so we look for one giving a reasonable year:
 
@@ -82,7 +86,7 @@ class TextAnalyzer {
                 year = clean(cand[good]);
                 int pos = text.indexOf(year);
                 usedParts.add(new Substring("year", pos, pos + year.length()));
-                Util.pr("Guessing 'year': '" + year + "'");
+                LOGGER.info("Guessing 'year': '" + year + "'");
             }
         }
 
@@ -94,7 +98,7 @@ class TextAnalyzer {
             pages = clean(cand[0].replaceAll("-|( - )", "--"));
             int pos = text.indexOf(cand[0]);
             usedParts.add(new Substring("pages", pos, pos + year.length()));
-            Util.pr("Guessing 'pages': '" + pages + "'");
+            LOGGER.info("Guessing 'pages': '" + pages + "'");
         } else if (cand.length > 1) {
             int found = -1;
             for (int i = 0; i < cand.length; i++) {
@@ -109,7 +113,7 @@ class TextAnalyzer {
             if (found >= 0) {
                 pages = clean(cand[found].replaceAll("-|( - )", "--"));
                 int pos = text.indexOf(cand[found]);
-                Util.pr("Guessing 'pages': '" + pages + "'");
+                LOGGER.info("Guessing 'pages': '" + pages + "'");
                 usedParts.add(new Substring("pages", pos, pos + pages.length()));
             }
         }
@@ -124,7 +128,7 @@ class TextAnalyzer {
             int pos = cand[0].lastIndexOf(' ');
             if (pos > 0) {
                 volume = clean(cand[0].substring(pos + 1));
-                Util.pr("Guessing 'volume': '" + volume + "'");
+                LOGGER.info("Guessing 'volume': '" + volume + "'");
                 journal = clean(cand[0].substring(0, pos));
                 //Util.pr("guessing 'journal': '" + journal + "'");
                 pos = journal.lastIndexOf(' ');
@@ -136,7 +140,7 @@ class TextAnalyzer {
                 }
                 pos = text.indexOf(journal);
                 usedParts.add(new Substring("journal", pos, pos + journal.length()));
-                Util.pr("Guessing 'journal': '" + journal + "'");
+                LOGGER.info("Guessing 'journal': '" + journal + "'");
             }
             //Util.pr("Journal? '"+cand[0]+"'");
         } else {
@@ -150,7 +154,7 @@ class TextAnalyzer {
         for (Substring usedPart : usedParts) {
             ss = usedPart;
             if ((ss.begin() - piv) > 10) {
-                Util.pr("... " + text.substring(piv, ss.begin()));
+                LOGGER.info("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
@@ -158,9 +162,9 @@ class TextAnalyzer {
         if ((text.length() - piv) > 10) {
             free.add(clean(text.substring(piv)));
         }
-        Util.pr("Free parts:");
+        LOGGER.info("Free parts:");
         for (String s : free) {
-            Util.pr(": '" + s + "'");
+            LOGGER.info(": '" + s + "'");
         }
     }
 

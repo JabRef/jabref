@@ -24,13 +24,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Filter;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
@@ -39,10 +41,12 @@ import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
-import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
-import net.sf.jabref.util.logging.CachebleHandler;
-import net.sf.jabref.util.logging.StdoutConsoleHandler;
+import net.sf.jabref.util.error.StreamEavesdropper;
+import net.sf.jabref.util.logging.CacheableHandler;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Globals {
 
@@ -131,7 +135,7 @@ public class Globals {
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
     public static StreamEavesdropper streamEavesdropper;
-    public static CachebleHandler handler;
+    public static CacheableHandler handler;
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
@@ -223,11 +227,11 @@ public class Globals {
     public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
 
     // Instantiate logger:
-    private static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-    /**
-     * true if we have unix newlines
-     */
+    private static final Log LOGGER = LogFactory.getLog(Globals.class);
+   
+            /**
+             * true if we have unix newlines
+             */
     public static final boolean UNIX_NEWLINE = Globals.NEWLINE.equals("\n");
 
     /**
@@ -264,40 +268,6 @@ public class Globals {
             Globals.autoSaveManager.clearAutoSaves();
             Globals.autoSaveManager = null;
         }
-    }
-
-    public static void logger(String s) {
-        Globals.logger.info(s);
-    }
-
-    public static void turnOffLogging() { // only log exceptions
-        Globals.logger.setLevel(java.util.logging.Level.SEVERE);
-    }
-
-    /**
-     * Should be only called once
-     */
-    public static void turnOnConsoleLogging() {
-        Handler consoleHandler = new ConsoleHandler();
-        Globals.logger.addHandler(consoleHandler);
-    }
-
-    /**
-     * Should be only called once
-     */
-    public static void turnOnFileLogging() {
-        Globals.logger.setLevel(java.util.logging.Level.ALL);
-        java.util.logging.Handler handler;
-        handler = new ConsoleHandler();
-        Globals.logger.addHandler(handler);
-
-        handler.setFilter(new Filter() { // select what gets logged
-
-            @Override
-            public boolean isLoggable(LogRecord record) {
-                return true;
-            }
-        });
     }
 
     public static void setLanguage(String language, String country) {
@@ -1311,7 +1281,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
                     Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    Globals.logger(e.getMessage());
+                    LOGGER.info("Cannot find file", e);
                 }
             }
         }
@@ -1321,8 +1291,8 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {
-                Globals.logger("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
-                        + "' not found.");
+                LOGGER.info("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
+                        + "' not found.", e);
             }
         }
 
@@ -1355,23 +1325,5 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         return pattern;
     }
 
-
-    public static void setupLogging() {
-        // get the root logger. It is NOT GLOBAL_LOGGER_NAME
-        Logger rootLogger = Logger.getLogger("");
-
-        // disable console logging by removing all handlers
-        Handler[] handlers = rootLogger.getHandlers();
-        for (Handler handler : handlers) {
-            rootLogger.removeHandler(handler);
-        }
-
-        // add new handler logging to System.out
-        StdoutConsoleHandler h = new StdoutConsoleHandler();
-        rootLogger.addHandler(h);
-
-        Globals.handler = new CachebleHandler();
-        rootLogger.addHandler(handler);
-    }
 
 }

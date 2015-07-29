@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -29,9 +28,6 @@ import net.sf.jabref.util.XMPUtil;
  * 
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
-
-    private static Logger logger = Logger.getLogger(EntryFromPDFCreator.class.getName());
-
 
     public EntryFromPDFCreator() {
         super(EntryFromPDFCreator.getPDFExternalFileType());

@@ -20,14 +20,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -37,12 +37,9 @@ import net.sf.jabref.OutputPrinter;
  */
 public class MedlineImporter extends ImportFormat {
 
-    private static final Logger logger = Logger.getLogger(MedlineImporter.class.toString());
+    private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
 
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "Medline";
@@ -138,13 +135,13 @@ public class MedlineImporter extends ImportFormat {
             // object
             bibItems = handler.getItems();
         } catch (javax.xml.parsers.ParserConfigurationException e1) {
-            MedlineImporter.logger.log(Level.SEVERE, e1.getLocalizedMessage(), e1);
+            LOGGER.error("Error with XML parser configuration", e1);
             status.showMessage(e1.getLocalizedMessage());
         } catch (org.xml.sax.SAXException e2) {
-            MedlineImporter.logger.log(Level.SEVERE, e2.getLocalizedMessage(), e2);
+            LOGGER.error("Error during XML parsing", e2);
             status.showMessage(e2.getLocalizedMessage());
         } catch (java.io.IOException e3) {
-            MedlineImporter.logger.log(Level.SEVERE, e3.getLocalizedMessage(), e3);
+            LOGGER.error("Error during file import", e3);
             status.showMessage(e3.getLocalizedMessage());
         }
 

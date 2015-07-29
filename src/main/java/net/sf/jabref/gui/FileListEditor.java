@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -46,6 +45,8 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by Morten O. Alver 2007.02.22
@@ -53,7 +54,7 @@ import net.sf.jabref.util.Util;
 public class FileListEditor extends JTable implements FieldEditor,
         DownloadExternalFile.DownloadCallback {
 
-    private static final Logger logger = Logger.getLogger(FileListEditor.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
     private FileListEntryEditor editor = null;
@@ -220,7 +221,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     try {
                         Util.openFolderAndSelectFile(entry.getLink());
                     } catch (IOException ex) {
-                        FileListEditor.logger.fine(ex.getMessage());
+                        LOGGER.debug("Cannot open folder", ex);
                     }
                 }
             }

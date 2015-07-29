@@ -36,6 +36,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.net.URLDownload;
@@ -65,6 +68,8 @@ public class ExternalFilePanel extends JPanel {
     private BibtexDatabase database;
 
     private final MetaData metaData;
+    
+    private static final Log LOGGER = LogFactory.getLog(ExternalFilePanel.class);
 
 
     public ExternalFilePanel(final String fieldName, final MetaData metaData,
@@ -196,16 +201,16 @@ public class ExternalFilePanel extends JPanel {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Globals.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
                             Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    Globals.logger(Globals.lang("Error writing XMP to file: %0", finalFile
-                            .getAbsolutePath()));
+                    LOGGER.info(Globals.lang("Error writing XMP to file: %0", finalFile
+                            .getAbsolutePath()), e);
                     output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
 
                 } catch (TransformerException e) {
                     JOptionPane.showMessageDialog(editor.getParent(),
                             Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
                             Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
-                            finalFile.getAbsolutePath()));
+                    LOGGER.info(Globals.lang("Error while converting BibtexEntry to XMP %0",
+                            finalFile.getAbsolutePath()), e);
                     output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }
@@ -357,7 +362,7 @@ public class ExternalFilePanel extends JPanel {
                         JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL") + ": "
                                         + e2.getMessage(), Globals.lang("Download file"),
                                 JOptionPane.ERROR_MESSAGE);
-                        Globals.logger("Error while downloading " + url.toString());
+                        LOGGER.info("Error while downloading " + url.toString(), e2);
                         return;
                     }
                     output(Globals.lang("Download completed"));
