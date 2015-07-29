@@ -103,7 +103,7 @@ public class DBImporterExporter {
     private void insertJabRefDatabase(final MetaData metaData, Object out,
             String dbName) throws SQLException {
         String path;
-        if (null == metaData.getFile()) {
+        if (metaData.getFile() == null) {
             path = dbName;
         } else {
             path = metaData.getFile().getAbsolutePath();

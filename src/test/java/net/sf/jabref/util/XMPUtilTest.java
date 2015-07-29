@@ -909,19 +909,18 @@ public class XMPUtilTest {
         /* Test minimal syntaxical completeness */
         Assert.assertTrue(0 < xmp.indexOf("xpacket"));
         Assert.assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
-        Assert.assertTrue((0 < xmp
-                .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>"))
+        Assert.assertTrue((0 < xmp.indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>"))
                 || (0 < xmp.indexOf("bibtex:bibtexkey=")));
-        Assert.assertTrue(0 < xmp.indexOf("<rdf:li>Norton Bar</rdf:li>"));
-        Assert.assertTrue((0 < xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>"))
-                || (0 < xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>")));
-        Assert.assertTrue((0 < xmp
-                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'"))
-                || (0 < xmp
-                        .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"")));
-        Assert.assertTrue(0 < xmp.indexOf("<rdf:Description"));
-        Assert.assertTrue((0 < xmp.indexOf("<?xpacket end='w'?>"))
-                || (0 < xmp.indexOf("<?xpacket end=\"w\"?>")));
+        Assert.assertTrue(xmp.indexOf("<rdf:li>Norton Bar</rdf:li>") > 0);
+        Assert.assertTrue((xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0)
+                || (xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0));
+        Assert.assertTrue((xmp
+                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0)
+                || (xmp
+                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0));
+        Assert.assertTrue(xmp.indexOf("<rdf:Description") > 0);
+        Assert.assertTrue((xmp.indexOf("<?xpacket end='w'?>") > 0)
+                || (xmp.indexOf("<?xpacket end=\"w\"?>") > 0));
 
         /* Test contents of string */
         writeManually(pdfFile, xmp);
@@ -1304,21 +1303,21 @@ public class XMPUtilTest {
             String xmp = s.toString();
 
             /* Test minimal syntaxical completeness */
-            Assert.assertTrue(0 < xmp.indexOf("xpacket"));
-            Assert.assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
-            Assert.assertTrue((0 < xmp
-                    .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>"))
-                    || (0 < xmp.indexOf("bibtex:bibtexkey=")));
-            Assert.assertTrue(0 < xmp.indexOf("<rdf:li>K. Crowston</rdf:li>"));
-            Assert.assertTrue((0 < xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>"))
-                    || (0 < xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>")));
-            Assert.assertTrue((0 < xmp
-                    .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'"))
-                    || (0 < xmp
-                            .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"")));
-            Assert.assertTrue(0 < xmp.indexOf("<rdf:Description"));
-            Assert.assertTrue((0 < xmp.indexOf("<?xpacket end='w'?>"))
-                    || (0 < xmp.indexOf("<?xpacket end=\"w\"?>")));
+            Assert.assertTrue(xmp.indexOf("xpacket") > 0);
+            Assert.assertTrue(xmp.indexOf("adobe:ns:meta") > 0);
+            Assert.assertTrue((xmp
+                    .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>") > 0)
+                    || (xmp.indexOf("bibtex:bibtexkey=") > 0));
+            Assert.assertTrue(xmp.indexOf("<rdf:li>K. Crowston</rdf:li>") > 0);
+            Assert.assertTrue((xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0)
+                    || (xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0));
+            Assert.assertTrue((xmp
+                    .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0)
+                    || (xmp
+                    .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0));
+            Assert.assertTrue(xmp.indexOf("<rdf:Description") > 0);
+            Assert.assertTrue((xmp.indexOf("<?xpacket end='w'?>") > 0)
+                    || (xmp.indexOf("<?xpacket end=\"w\"?>") > 0));
 
             /* Test contents of string */
             writeManually(pdfFile, xmp);
