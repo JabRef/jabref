@@ -47,7 +47,6 @@ import net.sf.jabref.util.logging.CacheableHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Jdk14Logger;
 
 public class Globals {
 
