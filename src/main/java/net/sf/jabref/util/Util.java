@@ -118,6 +118,8 @@ public class Util {
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
     
     private static final Log LOGGER = LogFactory.getLog(Util.class);
+    
+    private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
     /**
      * This method sets the location of a Dialog such that it is centered with
@@ -373,7 +375,7 @@ public class Util {
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
-                link = Globals.ARXIV_LOOKUP_PREFIX + link;
+                link = ARXIV_LOOKUP_PREFIX + link;
             }
         }
 
