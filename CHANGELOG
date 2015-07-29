@@ -1,4 +1,5 @@
 [master]
+    - Streamline logging API: Replace usages of java.util.logging with commons.logging
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)
     - Update dependencies: jersey, commons.logging, pdfbox, jgoodies, lazedlists, JDBC connectors
     - Refactored preferences

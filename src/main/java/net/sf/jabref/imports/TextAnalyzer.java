@@ -22,14 +22,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 
 class TextAnalyzer {
 
     private final BibtexEntry be = null;
     
     private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
-
+    
+    // Needs to give a year definitely in the future.
+    // Used for guessing the
+    // year field when parsing textual data. :-)
+    private static final int FUTURE_YEAR = 2050;
 
     public TextAnalyzer(String text) {
         guessBibtexFields(text);
@@ -72,10 +75,10 @@ class TextAnalyzer {
                         yearFound = number;
                     } else {
                         // More than one found. Be a bit more specific.
-                        if ((yearFound < Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                        if ((yearFound < FUTURE_YEAR) && (number < FUTURE_YEAR)) {
                             good = -1;
                             break; // Give up, both seem good enough.
-                        } else if ((yearFound >= Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                        } else if ((yearFound >= FUTURE_YEAR) && (number < FUTURE_YEAR)) {
                             good = i;
                             yearFound = number;
                         }
