@@ -115,7 +115,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel bp = frame.baseAt(i);
-                if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+                if (bp.getFile() != null && bp.getFile().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -176,7 +176,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
 
     public void openIt(File file, boolean raisePanel) {
-        if ((file != null) && (file.exists())) {
+        if (file != null && file.exists()) {
             File fileToLoad = file;
             frame.output(Globals.lang("Opening") + ": '" + file.getPath() + "'");
             boolean tryingAutosave = false;
@@ -209,8 +209,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modTime = FileBasedLock.getLockFileTimeStamp(file);
-                    if ((modTime != -1) && ((System.currentTimeMillis() - modTime)
-                            > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                    if (modTime != -1 && System.currentTimeMillis() - modTime
+                            > SaveSession.LOCKFILE_CRITICAL_AGE) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null, "<html>" + Globals.lang("Error opening file")
                                 + " '" + fileName + "'. " + Globals.lang("File is locked by another JabRef instance.")
@@ -239,7 +239,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     errorMessage = ex.getMessage();
                     pr = null;
                 }
-                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                if (pr == null || pr == ParserResult.INVALID_FORMAT) {
                     JOptionPane.showMessageDialog(null, Globals.lang("Error opening file") + " '" + fileName + "'",
                             Globals.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
@@ -374,7 +374,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         //System.out.println(suppliedEncoding != null ? "Encoding: '"+suppliedEncoding+"' Len: "+suppliedEncoding.length() : "no supplied encoding");
 
-        if ((suppliedEncoding != null)) {
+        if (suppliedEncoding != null) {
             try {
                 reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
                 encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
@@ -417,7 +417,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             while (keepon) {
                 c = reader.read();
-                if ((piv == 0) && ((c == '%') || (Character.isWhitespace((char) c)))) {
+                if (piv == 0 && (c == '%' || Character.isWhitespace((char) c))) {
                     offset++;
                 } else {
                     headerText.append((char) c);
@@ -440,7 +440,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         // keep reading
                     }
                     // If the next line starts with something like "% ", handle this:
-                    while (((c = reader.read()) == '%') || (Character.isWhitespace((char) c))) {
+                    while ((c = reader.read()) == '%' || Character.isWhitespace((char) c)) {
                         // keep reading
                     }
                     // Then we must skip the "Encoding: ". We may already have read the first

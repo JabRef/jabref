@@ -175,7 +175,7 @@ class EntryEditorTab {
                 pan.add(ex, BorderLayout.NORTH);
                 builder.append(pan);
             }
-            if (((i + 1) % fieldsPerRow) == 0) {
+            if ((i + 1) % fieldsPerRow == 0) {
                 builder.nextLine();
             }
         }
@@ -216,7 +216,7 @@ class EntryEditorTab {
             return getEntry().getField(f.getFieldName()) != null;
         } else {
             Object entryValue = getEntry().getField(f.getFieldName());
-            return (entryValue == null) || !entryValue.toString().equals(text);
+            return entryValue == null || !entryValue.toString().equals(text);
         }
     }
 
@@ -277,7 +277,7 @@ class EntryEditorTab {
             updating = true;
             for (FieldEditor editor : editors.values()) {
                 Object content = entry.getField(editor.getFieldName());
-                String toSet = (content == null) ? "" : content.toString();
+                String toSet = content == null ? "" : content.toString();
                 if (!toSet.equals(editor.getText())) {
                     editor.setText(toSet);
                 }

@@ -101,9 +101,9 @@ public class RisImporter extends ImportFormat {
             for (int j = 0; j < fields.length; j++) {
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
-                while (!done && (j < (fields.length - 1))) {
-                    if ((fields[j + 1].length() >= 6) && !fields[j + 1].substring(2, 6).equals("  - ")) {
-                        if ((current.length() > 0)
+                while (!done && j < fields.length - 1) {
+                    if (fields[j + 1].length() >= 6 && !fields[j + 1].substring(2, 6).equals("  - ")) {
+                        if (current.length() > 0
                                 && !Character.isWhitespace(current.charAt(current.length() - 1))
                                 && !Character.isWhitespace(fields[j + 1].charAt(0))) {
                             current.append(' ');
@@ -199,10 +199,10 @@ public class RisImporter extends ImportFormat {
                         }
                     } else if (lab.equals("UR")) {
                         hm.put("url", val);
-                    } else if ((lab.equals("Y1") || lab.equals("PY")) && (val.length() >= 4)) {
+                    } else if ((lab.equals("Y1") || lab.equals("PY")) && val.length() >= 4) {
                         String[] parts = val.split("/");
                         hm.put("year", parts[0]);
-                        if ((parts.length > 1) && (!parts[1].isEmpty())) {
+                        if (parts.length > 1 && !parts[1].isEmpty()) {
                             try {
 
                                 int monthNumber = Integer.parseInt(parts[1]);
@@ -260,7 +260,7 @@ public class RisImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().isEmpty())) {
+                if (content == null || content.trim().isEmpty()) {
                     toRemove.add(key);
                 }
             }

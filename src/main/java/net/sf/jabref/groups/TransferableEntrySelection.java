@@ -54,7 +54,7 @@ class TransferableEntrySelection implements Transferable {
         StringBuilder keys = new StringBuilder();
         for (int i = 0; i < selectedEntries.length; ++i) {
             keys.append(selectedEntries[i].getCiteKey());
-            if ((i + 1) < selectedEntries.length) {
+            if (i + 1 < selectedEntries.length) {
                 keys.append(",");
             }
         }

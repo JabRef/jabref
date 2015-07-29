@@ -40,7 +40,7 @@ public class YearUtilTest {
             Assert.assertTrue("" + i, thisYear <= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 + i) % 100))));
         }
         for (int i = 0; i < 70; i++) {
-            Assert.assertTrue("" + i, thisYear >= Integer.parseInt(YearUtil.toFourDigitYear(f.format(((d2 - i) + 100) % 100))));
+            Assert.assertTrue("" + i, thisYear >= Integer.parseInt(YearUtil.toFourDigitYear(f.format((d2 - i + 100) % 100))));
         }
     }
 

@@ -304,7 +304,7 @@ class ManageJournalsPanel extends JPanel {
 
     private void setupExternals() {
         String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((externalFiles == null) || (externalFiles.length == 0)) {
+        if (externalFiles == null || externalFiles.length == 0) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
@@ -324,7 +324,7 @@ class ManageJournalsPanel extends JPanel {
     private void setupUserTable() {
         JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
         String filename = personalFile.getText();
-        if (!filename.equals("") && (new File(filename)).exists()) {
+        if (!filename.equals("") && new File(filename).exists()) {
             try {
                 userAbbr.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
@@ -343,10 +343,10 @@ class ManageJournalsPanel extends JPanel {
         if (newFile.isSelected()) {
             if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
-                return (!f.exists() || (JOptionPane.showConfirmDialog
+                return !f.exists() || JOptionPane.showConfirmDialog
                         (this, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                                 Globals.lang("Store journal abbreviations"), JOptionPane.OK_CANCEL_OPTION)
-                == JOptionPane.OK_OPTION));
+                == JOptionPane.OK_OPTION;
             } else {
                 if (tableModel.getRowCount() > 0) {
                     JOptionPane.showMessageDialog(this, Globals.lang("You must choose a file name to store journal abbreviations"),

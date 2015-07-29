@@ -78,10 +78,10 @@ public class DuplicateCheck {
             fields = one.getType().getOptionalFields();
             if (fields != null) {
                 double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
-                double totValue = ((DuplicateCheck.reqWeight * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.reqWeight) + opt[1]);
+                double totValue = (DuplicateCheck.reqWeight * req[0] * req[1] + opt[0] * opt[1]) / (req[1] * DuplicateCheck.reqWeight + opt[1]);
                 return totValue >= DuplicateCheck.duplicateThreshold;
             } else {
-                return (req[0] >= DuplicateCheck.duplicateThreshold);
+                return req[0] >= DuplicateCheck.duplicateThreshold;
             }
         }
     }
@@ -191,7 +191,7 @@ public class DuplicateCheck {
         int score = 0;
         for (String field : allFields) {
             Object en = one.getField(field), to = two.getField(field);
-            if ((en != null) && (to != null) && (en.equals(to)) || (en == null) && (to == null)) {
+            if (en != null && to != null && en.equals(to) || en == null && to == null) {
                 score++;
             }
         }
@@ -200,7 +200,7 @@ public class DuplicateCheck {
             // use score>1 without
             // trouble.
         } else {
-            return ((double) score) / allFields.size();
+            return (double) score / allFields.size();
         }
     }
 
@@ -244,18 +244,18 @@ public class DuplicateCheck {
                 misses++;
             }
         }
-        double missRate = ((double) misses) / ((double) n);
+        double missRate = (double) misses / (double) n;
         return 1 - missRate;
     }
 
     private static double correlateStrings(String s1, String s2, boolean truncate) {
         int minLength = Math.min(s1.length(), s2.length());
-        if (truncate && (minLength == 1)) {
+        if (truncate && minLength == 1) {
             return s1.charAt(0) == s2.charAt(0) ? 1.0 : 0.0;
-        } else if ((s1.length() == 1) && (s2.length() == 1)) {
+        } else if (s1.length() == 1 && s2.length() == 1) {
             return s1.equals(s2) ? 1.0 : 0.0;
         } else if (minLength == 0) {
-            return (s1.isEmpty()) && (s2.isEmpty()) ? 1.0 : 0;
+            return s1.isEmpty() && s2.isEmpty() ? 1.0 : 0;
         }
 
         // Convert strings to numbers and harmonize length in a method dependent on truncate:
@@ -299,7 +299,7 @@ public class DuplicateCheck {
         }
         sigma1 = Math.sqrt(sigma1);
         sigma2 = Math.sqrt(sigma2);
-        if ((sigma1 > 0) && (sigma2 > 0)) {
+        if (sigma1 > 0 && sigma2 > 0) {
             return corr / (sigma1 * sigma2);
         } else {
             return 0;
@@ -315,17 +315,17 @@ public class DuplicateCheck {
     }
 
     private static double[] stretchArray(double[] array, int length) {
-        if ((length <= array.length) || (array.length == 0)) {
+        if (length <= array.length || array.length == 0) {
             return array;
         }
-        double multip = ((double) array.length) / ((double) length);
+        double multip = (double) array.length / (double) length;
         double[] newArray = new double[length];
         for (int i = 0; i < newArray.length; i++) {
-            double index = (i) * multip;
+            double index = i * multip;
             int baseInd = (int) Math.floor(index);
             double dist = index - Math.floor(index);
-            newArray[i] = (dist * array[Math.min(array.length - 1, baseInd + 1)])
-                    + ((1.0 - dist) * array[baseInd]);
+            newArray[i] = dist * array[Math.min(array.length - 1, baseInd + 1)]
+                    + (1.0 - dist) * array[baseInd];
         }
         return newArray;
     }

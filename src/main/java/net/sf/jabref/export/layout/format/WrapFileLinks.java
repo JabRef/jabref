@@ -99,11 +99,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     public void setArgument(String arg) {
         String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
         format = parseFormatString(parts[0]);
-        if ((parts.length > 1) && (!parts[1].trim().isEmpty())) {
+        if (parts.length > 1 && !parts[1].trim().isEmpty()) {
             fileType = parts[1];
         }
         if (parts.length > 2) {
-            for (int i = 2; i < (parts.length - 1); i += 2) {
+            for (int i = 2; i < parts.length - 1; i += 2) {
                 replacements.put(parts[i], parts[i + 1]);
             }
         }
@@ -124,7 +124,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             FileListEntry flEntry = tableModel.getEntry(i);
             // Use this entry if we don't discriminate on types, or if the type fits:
-            if ((fileType == null) || flEntry.getType().getName().toLowerCase().equals(fileType)) {
+            if (fileType == null || flEntry.getType().getName().toLowerCase().equals(fileType)) {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
@@ -187,7 +187,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             break;
                         }
                         int index = flEntry.getLink().lastIndexOf('.');
-                        if ((index >= 0) && (index < (flEntry.getLink().length() - 1))) {
+                        if (index >= 0 && index < flEntry.getLink().length() - 1) {
                             sb.append(replaceStrings(flEntry.getLink().substring(index + 1)));
                         }
                         break;

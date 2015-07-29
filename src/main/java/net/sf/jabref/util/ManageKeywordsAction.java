@@ -181,8 +181,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 } else {
                     int idx = 0;
                     String element = (String) keywordListModel.getElementAt(idx);
-                    while ((idx < keywordListModel.size()) &&
-                            (element.compareTo(text) < 0)) {
+                    while (idx < keywordListModel.size() &&
+                            element.compareTo(text) < 0) {
                         idx++;
                     }
                     if (idx == keywordListModel.size()) {
@@ -415,7 +415,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
-            assert (intersectKeywords.isSelected());
+            assert intersectKeywords.isSelected();
 
             // all keywords from first entry have to be added
             BibtexEntry firstEntry = entries[0];

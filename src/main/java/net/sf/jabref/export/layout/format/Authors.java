@@ -222,15 +222,15 @@ public class Authors extends AbstractParamLayoutFormatter {
             else if (comp(key, "Amp")) {
                 lastSeparator = Authors.AMP;
             }
-            else if (comp(key, "Sep") && (!value.isEmpty())) {
+            else if (comp(key, "Sep") && !value.isEmpty()) {
                 separator = value;
                 setSep = true;
             }
-            else if (comp(key, "LastSep") && (!value.isEmpty())) {
+            else if (comp(key, "LastSep") && !value.isEmpty()) {
                 lastSeparator = value;
             }
         }
-        else if (key.trim().toLowerCase().equals("etal") && (!value.isEmpty())) {
+        else if (key.trim().toLowerCase().equals("etal") && !value.isEmpty()) {
             etAlString = value;
         }
         else if (Authors.numberPattern.matcher(key.trim()).matches()) {
@@ -262,15 +262,15 @@ public class Authors extends AbstractParamLayoutFormatter {
         StringBuilder sb = new StringBuilder();
         AuthorList al = AuthorList.getAuthorList(fieldText);
 
-        if ((maxAuthors < 0) || (al.size() <= maxAuthors)) {
+        if (maxAuthors < 0 || al.size() <= maxAuthors) {
             for (int i = 0; i < al.size(); i++) {
                 AuthorList.Author a = al.getAuthor(i);
 
-                addSingleName(sb, a, (flMode == Authors.FIRST_FIRST) || ((flMode == Authors.LF_FF) && (i > 0)));
+                addSingleName(sb, a, flMode == Authors.FIRST_FIRST || flMode == Authors.LF_FF && i > 0);
 
-                if (i < (al.size() - 2)) {
+                if (i < al.size() - 2) {
                     sb.append(separator);
-                } else if (i < (al.size() - 1)) {
+                } else if (i < al.size() - 1) {
                     sb.append(lastSeparator);
                 }
             }
@@ -293,19 +293,19 @@ public class Authors extends AbstractParamLayoutFormatter {
         String firstNamePart = a.getFirst();
         String lastNamePart = a.getLast();
         String von = a.getVon();
-        if ((von != null) && (!von.isEmpty())) {
+        if (von != null && !von.isEmpty()) {
             lastNamePart = von + ' ' + lastNamePart;
         }
         String jr = a.getJr();
-        if ((jr != null) && (!jr.isEmpty())) {
+        if (jr != null && !jr.isEmpty()) {
             String jrSeparator = " ";
             lastNamePart = lastNamePart + jrSeparator + jr;
         }
 
-        if (abbreviate && (firstNamePart != null)) {
+        if (abbreviate && firstNamePart != null) {
             firstNamePart = a.getFirstAbbr();
 
-            if (firstInitialOnly && (firstNamePart.length() > 2)) {
+            if (firstInitialOnly && firstNamePart.length() > 2) {
                 firstNamePart = firstNamePart.substring(0, 2);
             } else if (middleInitial) {
                 String abbr = firstNamePart;
@@ -328,7 +328,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             }
         }
 
-        if (lastNameOnly || (firstNamePart == null)) {
+        if (lastNameOnly || firstNamePart == null) {
             sb.append(lastNamePart);
         }
         else if (firstFirst) {

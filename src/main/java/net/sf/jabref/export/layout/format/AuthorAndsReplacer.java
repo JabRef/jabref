@@ -50,7 +50,7 @@ public class AuthorAndsReplacer implements LayoutFormatter {
             x = authors.length;
             StringBuffer sb = new StringBuffer();
 
-            for (i = 0; i < (x - 2); i++) {
+            for (i = 0; i < x - 2; i++) {
                 sb.append(authors[i]).append("; ");
             }
             sb.append(authors[i]).append(" & ").append(authors[i + 1]);

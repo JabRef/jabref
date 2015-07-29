@@ -189,8 +189,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
-            if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
-                    (size != oldMenuFontSize)) {
+            if (overrideFonts.isSelected() != oldOverrideFontSize ||
+                    size != oldMenuFontSize) {
                 _prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Globals.lang("You have changed the menu and label font size.")

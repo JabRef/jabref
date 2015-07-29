@@ -182,9 +182,9 @@ class PrefsDialog3 extends JDialog {
                 }
                 File file = new File(filename);
                 if (!file.exists()
-                        || (JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
+                        || JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
                                 + "' " + Globals.lang("exists. Overwrite file?"),
-                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
                     try {
                         prefs.exportPreferences(filename);

@@ -20,7 +20,7 @@ public class DOIUtil {
      * Check if the String matches a DOI (with http://...)
      */
     public static boolean checkForDOIwithHTTPprefix(String check) {
-        return (check != null) && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
+        return check != null && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
     }
 
     /**
@@ -29,7 +29,7 @@ public class DOIUtil {
      * @return true if "check" contains a DOI
      */
     public static boolean checkForPlainDOI(String check) {
-        return (check != null) && check.matches(".*" + REGEXP_PLAINDOI + ".*");
+        return check != null && check.matches(".*" + REGEXP_PLAINDOI + ".*");
     }
 
     /**

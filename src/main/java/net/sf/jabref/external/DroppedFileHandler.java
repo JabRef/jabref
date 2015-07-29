@@ -163,7 +163,7 @@ public class DroppedFileHandler {
         if (linkInPlace.isSelected()) {
             destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
         } else {
-            destFilename = (renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName());
+            destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
                 success = doCopy(fileName, fileType, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
@@ -209,7 +209,7 @@ public class DroppedFileHandler {
         if (linkInPlace.isSelected()) {
             destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
         } else {
-            destFilename = (renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName());
+            destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
                 success = doCopy(fileName, fileType, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
@@ -230,7 +230,7 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
-        BibtexEntry single = (isSingle ? xmpEntriesInFile.get(0) : null);
+        BibtexEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
 
         boolean success = true;
 
@@ -286,7 +286,7 @@ public class DroppedFileHandler {
             return false;
         }
 
-        if ((xmpEntriesInFile == null) || (xmpEntriesInFile.isEmpty())) {
+        if (xmpEntriesInFile == null || xmpEntriesInFile.isEmpty()) {
             return false;
         }
 
@@ -317,7 +317,7 @@ public class DroppedFileHandler {
          */
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
-        BibtexEntry single = (isSingle ? xmpEntriesInFile.get(0) : null);
+        BibtexEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
 
         boolean success = true;
 
@@ -392,9 +392,9 @@ public class DroppedFileHandler {
             @Override
             public void stateChanged(ChangeEvent arg0) {
                 renameCheckBox.setEnabled(!linkInPlace.isSelected()
-                        && (!multipleEntries));
+                        && !multipleEntries);
                 renameToTextBox.setEnabled(!linkInPlace.isSelected()
-                        && (!multipleEntries));
+                        && !multipleEntries);
                 if (multipleEntries) {
                     renameToTextBox.setText("Multiple entries");
                 }
@@ -473,13 +473,13 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            String absFilename = (!(new File(filename).isAbsolute()) && (dirs.length > 0)) ?
+            String absFilename = !new File(filename).isAbsolute() && dirs.length > 0 ?
                     FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = (!(new File(flEntry.getLink()).isAbsolute()) && (dirs.length > 0)) ?
+                String absName = !new File(flEntry.getLink()).isAbsolute() && dirs.length > 0 ?
                         FileUtil.expandFilename(flEntry.getLink(), dirs).getAbsolutePath() : flEntry.getLink();
                 System.out.println("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:

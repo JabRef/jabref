@@ -84,7 +84,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         int dotDotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
 
         return extSet.contains(filenm.substring(dotPos)) ||
-                ((dotDotPos >= 0) && extSet.contains(filenm.substring(dotDotPos)));
+                dotDotPos >= 0 && extSet.contains(filenm.substring(dotDotPos));
     }
 
     public String getSuffix(String filenm) {

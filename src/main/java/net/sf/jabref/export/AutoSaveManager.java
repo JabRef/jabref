@@ -151,6 +151,6 @@ public class AutoSaveManager {
      */
     public static boolean newerAutoSaveExists(File f) {
         File asFile = AutoSaveManager.getAutoSaveFile(f);
-        return asFile.exists() && (asFile.lastModified() > f.lastModified());
+        return asFile.exists() && asFile.lastModified() > f.lastModified();
     }
 }

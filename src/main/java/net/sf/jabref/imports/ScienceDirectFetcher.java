@@ -125,8 +125,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
             urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, "UTF-8");
             int count = 1;
             String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < ScienceDirectFetcher.MAX_PAGES_TO_LOAD)) {
+            while ((nextPage = getCitationsFromUrl(urlQuery, ids)) != null
+                    && count < ScienceDirectFetcher.MAX_PAGES_TO_LOAD) {
                 urlQuery = nextPage;
                 count++;
             }

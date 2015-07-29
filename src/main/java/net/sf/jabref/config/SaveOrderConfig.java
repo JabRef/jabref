@@ -90,7 +90,7 @@ public class SaveOrderConfig {
         if (saveInOriginalOrder) {
             res.insertElementAt("original", 0);
         } else {
-            assert (saveInSpecifiedOrder);
+            assert saveInSpecifiedOrder;
             res.insertElementAt("specified", 0);
         }
 

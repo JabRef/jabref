@@ -152,7 +152,7 @@ public class Util {
             if (!s.isEmpty()) {
                 char c = s.charAt(0);
                 // String reference or not?
-                if ((c == '{') || (c == '"')) {
+                if (c == '{' || c == '"') {
                     result.append(StringUtil.shaveString(string));
                 } else {
                     // This part should normally be a string reference, but if it's
@@ -225,8 +225,8 @@ public class Util {
             StringBuilder newKey = new StringBuilder();
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"')
-                        && (c != '}') && (c != ',')) {
+                if (!Character.isWhitespace(c) && c != '{' && c != '\\' && c != '"'
+                        && c != '}' && c != ',') {
                     newKey.append(c);
                 }
             }
@@ -236,8 +236,8 @@ public class Util {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"')
-                    && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
+            if (!Character.isWhitespace(c) && c != '#' && c != '{' && c != '\\' && c != '"'
+                    && c != '}' && c != '~' && c != ',' && c != '^' && c != '\'') {
                 newKey.append(c);
             }
         }
@@ -318,12 +318,12 @@ public class Util {
             BibtexEntry be = db.getEntryById(s);
             for (String field : fields) {
                 String val = be.getField(field);
-                if ((val != null) && (!val.isEmpty())) {
+                if (val != null && !val.isEmpty()) {
                     AuthorList al = AuthorList.getAuthorList(val);
                     for (int i = 0; i < al.size(); i++) {
                         AuthorList.Author a = al.getAuthor(i);
                         String lastName = a.getLast();
-                        if ((lastName != null) && (!lastName.isEmpty())) {
+                        if (lastName != null && !lastName.isEmpty()) {
                             res.add(lastName);
                         }
                     }
@@ -349,7 +349,7 @@ public class Util {
             File file = FileUtil.expandFilename(link, dir);
 
             // Check that the file exists:
-            if ((file == null) || !file.exists()) {
+            if (file == null || !file.exists()) {
                 throw new IOException(Globals.lang("File not found") + " (" + fieldName + "): '"
                         + link + "'.");
             }
@@ -361,7 +361,7 @@ public class Util {
                 if (split[split.length - 1].equalsIgnoreCase("pdf")) {
                     fieldName = "pdf";
                 } else if (split[split.length - 1].equalsIgnoreCase("ps")
-                        || ((split.length >= 3) && split[split.length - 2].equalsIgnoreCase("ps"))) {
+                        || split.length >= 3 && split[split.length - 2].equalsIgnoreCase("ps")) {
                     fieldName = "ps";
                 }
             }
@@ -548,7 +548,7 @@ public class Util {
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && (fileType != null)) {
+        if ((httpLink || file.exists()) && fileType != null) {
             // Open the file:
             String filePath = httpLink ? link : file.getPath();
             Util.openExternalFilePlatformIndependent(fileType, filePath);
@@ -569,12 +569,12 @@ public class Util {
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
         if (Globals.ON_MAC) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-            String[] cmd = ((fileType.getOpenWith() != null) && (!fileType.getOpenWith().isEmpty())) ?
+            String[] cmd = fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty() ?
                     new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
                     new String[] {"/usr/bin/open", filePath};
             Runtime.getRuntime().exec(cmd);
         } else if (Globals.ON_WIN) {
-            if ((fileType.getOpenWith() != null) && (!fileType.getOpenWith().isEmpty())) {
+            if (fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty()) {
                 // Application is specified. Use it:
                 Util.openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
             } else {
@@ -583,7 +583,7 @@ public class Util {
         } else {
             // Use the given app if specified, and the universal "xdg-open" otherwise:
             String[] openWith;
-            if ((fileType.getOpenWith() != null) && (!fileType.getOpenWith().isEmpty())) {
+            if (fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty()) {
                 openWith = fileType.getOpenWith().split(" ");
             } else {
                 openWith = new String[] {"xdg-open"};
@@ -766,10 +766,10 @@ public class Util {
             int start = i;
             if (Character.isJavaIdentifierStart(c[i])) {
                 i++;
-                while ((i < c.length) && (Character.isJavaIdentifierPart(c[i]) || (c[i] == '.'))) {
+                while (i < c.length && (Character.isJavaIdentifierPart(c[i]) || c[i] == '.')) {
                     i++;
                 }
-                if ((i < c.length) && (c[i] == '(')) {
+                if (i < c.length && c[i] == '(') {
 
                     String method = calls.substring(start, i);
 
@@ -786,8 +786,8 @@ public class Util {
                             int startParam = i;
                             i++;
                             boolean escaped = false;
-                            while (((i + 1) < c.length) &&
-                                    !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
+                            while (i + 1 < c.length &&
+                                    !(!escaped && c[i] == '"' && c[i + 1] == ')')) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
                                 } else {
@@ -805,7 +805,7 @@ public class Util {
 
                             int startParam = i;
 
-                            while ((i < c.length) && (c[i] != ')')) {
+                            while (i < c.length && c[i] != ')') {
                                 i++;
                             }
 
@@ -885,9 +885,9 @@ public class Util {
         // Iterate through all entries
         for (BibtexEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner &&
-                    (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
+                    (overwriteOwner || curEntry.getField(BibtexFields.OWNER) == null);
             boolean setTimeStamp = globalSetTimeStamp &&
-                    (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
+                    (overwriteTimestamp || curEntry.getField(timeStampField) == null);
             Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
                     timestamp);
             if (markEntries) {
@@ -914,9 +914,9 @@ public class Util {
         String timestamp = dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER) &&
-                (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
+                (overwriteOwner || entry.getField(BibtexFields.OWNER) == null);
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) &&
-                (overwriteTimestamp || (entry.getField(timeStampField) == null));
+                (overwriteTimestamp || entry.getField(timeStampField) == null);
 
         Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
@@ -958,7 +958,7 @@ public class Util {
                 newGen = genFields.replaceAll(";abstract;", ";");
             } else if (genFields.indexOf("abstract;") == 0) {
                 newGen = genFields.replaceAll("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
+            } else if (genFields.indexOf(";abstract") == genFields.length() - 9) {
                 newGen = genFields.replaceAll(";abstract", "");
             } else {
                 newGen = genFields;
@@ -1125,12 +1125,12 @@ public class Util {
                 inBrace++;
             } else if (c == '}') {
                 inBrace--;
-            } else if (!escaped && (c == '#')) {
+            } else if (!escaped && c == '#') {
                 inString = !inString;
             }
 
             // See if we should start bracing:
-            if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
+            if (inBrace == 0 && !isBracing && !inString && Character.isLetter((char) c)
                     && Character.isUpperCase((char) c)) {
 
                 buf.append('{');
@@ -1148,7 +1148,7 @@ public class Util {
             buf.append((char) c);
 
             // Check if we are entering an escape sequence:
-            escaped = (c == '\\') && !escaped;
+            escaped = c == '\\' && !escaped;
 
         }
         // Check if we have an unclosed brace:
@@ -1306,7 +1306,7 @@ public class Util {
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && (!(oldVal).isEmpty())) {
+            if (!overwriteValues && oldVal != null && !oldVal.isEmpty()) {
                 continue;
             }
             if (text != null) {
@@ -1335,13 +1335,13 @@ public class Util {
         for (BibtexEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
-            if ((valToMove == null) || (valToMove.isEmpty())) {
+            if (valToMove == null || valToMove.isEmpty()) {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
             // nonempy value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && (!valInNewField.isEmpty())) {
+            if (!overwriteValues && valInNewField != null && !valInNewField.isEmpty()) {
                 continue;
             }
 
@@ -1385,9 +1385,9 @@ public class Util {
         boolean sign = false;
         char ch;
 
-        if ((str == null) || ((end = str.length()) == 0) ||
-                ((((ch = str.charAt(0)) < '0') || (ch > '9'))
-                && (!(sign = ch == '-') || (++idx == end) || (((ch = str.charAt(idx)) < '0') || (ch > '9'))))) {
+        if (str == null || (end = str.length()) == 0 ||
+                ((ch = str.charAt(0)) < '0' || ch > '9')
+                && (!(sign = ch == '-') || ++idx == end || (ch = str.charAt(idx)) < '0' || ch > '9')) {
             throw new NumberFormatException(str);
         }
 
@@ -1397,7 +1397,7 @@ public class Util {
             if (++idx == end) {
                 return sign ? ival : -ival;
             }
-            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+            if ((ch = str.charAt(idx)) < '0' || ch > '9') {
                 throw new NumberFormatException(str);
             }
         }
@@ -1413,7 +1413,7 @@ public class Util {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
             sb.append(Util.encodeStringArray(values[i]));
-            if (i < (values.length - 1)) {
+            if (i < values.length - 1) {
                 sb.append(';');
             }
         }
@@ -1430,7 +1430,7 @@ public class Util {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entry.length; i++) {
             sb.append(Util.encodeString(entry[i]));
-            if (i < (entry.length - 1)) {
+            if (i < entry.length - 1) {
                 sb.append(':');
             }
 
@@ -1452,15 +1452,15 @@ public class Util {
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
-            if (!escaped && (c == '\\')) {
+            if (!escaped && c == '\\') {
                 escaped = true;
                 continue;
             }
-            else if (!escaped && (c == ':')) {
+            else if (!escaped && c == ':') {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
             }
-            else if (!escaped && (c == ';')) {
+            else if (!escaped && c == ';') {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
                 newList.add(thisEntry);
@@ -1495,7 +1495,7 @@ public class Util {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\')) {
+            if (c == ';' || c == ':' || c == '\\') {
                 sb.append('\\');
             }
             sb.append(c);
@@ -1628,10 +1628,10 @@ public class Util {
         } else {
             newValue = null;
         }
-        if ((oldValue == null) && (newValue == null)) {
+        if (oldValue == null && newValue == null) {
             return;
         }
-        if ((oldValue == null) || (!oldValue.equals(newValue))) {
+        if (oldValue == null || !oldValue.equals(newValue)) {
             entry.setField("keywords", newValue);
             if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
@@ -1651,14 +1651,14 @@ public class Util {
      */
     public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
         String oldValue = be.getField(field);
-        if (nullFieldIfValueIsTheSame && (oldValue != null) && (oldValue.equals(newValue))) {
+        if (nullFieldIfValueIsTheSame && oldValue != null && oldValue.equals(newValue)) {
             // if oldValue == newValue then reset field if required by parameter
             newValue = null;
         }
-        if ((oldValue == null) && (newValue == null)) {
+        if (oldValue == null && newValue == null) {
             return;
         }
-        if ((oldValue == null) || (!oldValue.equals(newValue))) {
+        if (oldValue == null || !oldValue.equals(newValue)) {
             be.setField(field, newValue);
             if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
@@ -1718,7 +1718,7 @@ public class Util {
     }
 
     public static boolean updateTimeStampIsSet() {
-        return (Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
     }
 
     /**
@@ -1817,7 +1817,7 @@ public class Util {
                             tableModel.setContent(oldVal);
                         }
                     } else {
-                        assert (entries.size() == 1);
+                        assert entries.size() == 1;
                         tableModel = singleTableModel;
                     }
                     List<File> files = result.get(anEntry);
@@ -1837,7 +1837,7 @@ public class Util {
                             foundAny = true;
                             ExternalFileType type;
                             int index = f.getPath().lastIndexOf('.');
-                            if ((index >= 0) && (index < (f.getPath().length() - 1))) {
+                            if (index >= 0 && index < f.getPath().length() - 1) {
                                 type = Globals.prefs.getExternalFileTypeByExt
                                         (f.getPath().substring(index + 1).toLowerCase());
                             } else {
@@ -2006,7 +2006,7 @@ public class Util {
             // First, look for exact matches:
             for (BibtexEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && (!citeKey.isEmpty())) {
+                if (citeKey != null && !citeKey.isEmpty()) {
                     if (dot > 0) {
                         if (name.substring(0, dot).equals(citeKey)) {
                             result.get(entry).add(file);
@@ -2020,7 +2020,7 @@ public class Util {
             if (!exactOnly) {
                 for (BibtexEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && (!citeKey.isEmpty())) {
+                    if (citeKey != null && !citeKey.isEmpty()) {
                         if (name.startsWith(citeKey)) {
                             result.get(entry).add(file);
                             continue nextFile;
@@ -2075,7 +2075,7 @@ public class Util {
             return null;
         }
 
-        if ((afterColon == null) || (afterColon.isEmpty())) {
+        if (afterColon == null || afterColon.isEmpty()) {
             return fieldValue;
         }
 

@@ -92,7 +92,7 @@ class BstWrapper {
             keys.add(key);
         }
         int lastI = result.lastIndexOf("\\end{thebibliography}");
-        if ((lastI > 0) && (lastI > indices.get(indices.size() - 1))) {
+        if (lastI > 0 && lastI > indices.get(indices.size() - 1)) {
             endIndices.add(lastI);
         }
         for (int i = 0; i < keys.size(); i++) {

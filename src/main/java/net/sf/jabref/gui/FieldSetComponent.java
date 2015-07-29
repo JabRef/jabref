@@ -241,7 +241,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         }
 
         String testString = Util.checkLegalKey(s);
-        if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
+        if (!testString.equals(s) || s.indexOf('&') >= 0) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
                     + "characters") + ": # { } ~ , ^ &",
@@ -346,10 +346,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         if (src == add) {
             // Selection has been made, or add button pressed:
-            if ((sel != null) && (sel.getSelectedItem() != null)) {
+            if (sel != null && sel.getSelectedItem() != null) {
                 String s = sel.getSelectedItem().toString();
                 addField(s);
-            } else if ((input != null) && !input.getText().equals("")) {
+            } else if (input != null && !input.getText().equals("")) {
                 addField(input.getText());
             }
         }
@@ -361,7 +361,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             removeSelected();
         }
         else if (src == sel) {
-            if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0)) {
+            if (e.getActionCommand().equals("comboBoxChanged") && e.getModifiers() == 0) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
                 // everywhere.

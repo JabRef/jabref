@@ -64,7 +64,7 @@ public class PushToWinEdt implements PushToApplication {
         notDefined = false;
 
         String winEdt = Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH);
-        if ((winEdt == null) || (winEdt.trim().isEmpty())) {
+        if (winEdt == null || winEdt.trim().isEmpty()) {
             notDefined = true;
             return;
         }

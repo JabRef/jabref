@@ -574,7 +574,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             OpenOfficePanel.addURL(jarList);
 
             // Show progress dialog:
-            final JDialog progDiag = (new AutoDetectPaths(diag)).showProgressDialog(diag, Globals.lang("Connecting"),
+            final JDialog progDiag = new AutoDetectPaths(diag).showProgressDialog(diag, Globals.lang("Connecting"),
                     Globals.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();

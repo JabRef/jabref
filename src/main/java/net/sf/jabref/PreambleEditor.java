@@ -57,7 +57,7 @@ class PreambleEditor extends JDialog {
 
             @Override
             protected boolean accept(Component c) {
-                return (super.accept(c) && (c instanceof FieldEditor));
+                return super.accept(c) && c instanceof FieldEditor;
             }
         });
 
@@ -74,7 +74,7 @@ class PreambleEditor extends JDialog {
 
         String content = base.getPreamble();
 
-        ed = new FieldTextArea(Globals.lang("Preamble"), ((content != null) ? content : ""));
+        ed = new FieldTextArea(Globals.lang("Preamble"), content != null ? content : "");
         //ed.addUndoableEditListener(panel.undoListener);
         setupJTextComponent((FieldTextArea) ed);
 
@@ -153,7 +153,7 @@ class PreambleEditor extends JDialog {
             if (toSet == null) {
                 set = base.getPreamble() != null;
             } else {
-                set = !((base.getPreamble() != null)
+                set = !(base.getPreamble() != null
                         && toSet.equals(base.getPreamble()));
             }
 
@@ -161,7 +161,7 @@ class PreambleEditor extends JDialog {
                 panel.undoManager.addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
-                if ((toSet != null) && (!toSet.isEmpty())) {
+                if (toSet != null && !toSet.isEmpty()) {
                     ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
                     ed.setValidBackgroundColor();
                 } else {

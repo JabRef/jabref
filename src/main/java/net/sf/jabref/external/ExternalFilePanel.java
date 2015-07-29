@@ -151,11 +151,11 @@ public class ExternalFilePanel extends JPanel {
     }
 
     private BibtexDatabase getDatabase() {
-        return (database != null ? database : entryEditor.getDatabase());
+        return database != null ? database : entryEditor.getDatabase();
     }
 
     private BibtexEntry getEntry() {
-        return (entry != null ? entry : entryEditor.getEntry());
+        return entry != null ? entry : entryEditor.getEntry();
     }
 
     private Object getKey() {
@@ -228,7 +228,7 @@ public class ExternalFilePanel extends JPanel {
 
         String dir = editor.getText(), retVal;
 
-        if ((directory == null) || !(new File(dir)).isAbsolute()) {
+        if (directory == null || !new File(dir).isAbsolute()) {
             if (directory != null) {
                 dir = directory;
             } else {
@@ -243,7 +243,7 @@ public class ExternalFilePanel extends JPanel {
             File newFile = new File(chosenFile);
             String position = newFile.getParent();
 
-            if ((directory != null) && position.startsWith(directory)) {
+            if (directory != null && position.startsWith(directory)) {
                 // Construct path relative to pdf base dir
                 String relPath = position.substring(directory.length(), position.length())
                         + File.separator + newFile.getName();
@@ -271,7 +271,7 @@ public class ExternalFilePanel extends JPanel {
         final String res = JOptionPane.showInputDialog(parent,
                 Globals.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().isEmpty())) {
+        if (res == null || res.trim().isEmpty()) {
             return;
         }
 
@@ -300,7 +300,7 @@ public class ExternalFilePanel extends JPanel {
                 } else {
                     plannedName = JOptionPane.showInputDialog(parent,
                             Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));
-                    if ((plannedName != null) && !off.accept(plannedName)) {
+                    if (plannedName != null && !off.accept(plannedName)) {
                         plannedName += suffix;
                     }
                 }
@@ -382,7 +382,7 @@ public class ExternalFilePanel extends JPanel {
                      * Check if we should update the editor text field, or
                      * update the target entry directly:
                      */
-                    if ((entryEditor == null) || (entryEditor.getEntry() != targetEntry)) {
+                    if (entryEditor == null || entryEditor.getEntry() != targetEntry) {
                         /*
                          * Editor has probably changed to show a different
                          * entry. So we must update the target entry directly
@@ -443,7 +443,7 @@ public class ExternalFilePanel extends JPanel {
      */
     public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
-        if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
+        if (o == null || Globals.prefs.get(fieldName + "Directory") == null) {
             output(Globals.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
                     + '.');

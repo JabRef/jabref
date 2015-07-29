@@ -69,11 +69,11 @@ public class UnlinkedFilesCrawler {
      */
     public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, int[] state, ChangeListener changeListener) {
         /* Cancellation of the search from outside! */
-        if ((state == null) || (state.length < 1) || (state[0] != 1)) {
+        if (state == null || state.length < 1 || state[0] != 1) {
             return null;
         }
         /* Return null if the directory is not valid. */
-        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
+        if (directory == null || !directory.exists() || !directory.isDirectory()) {
             return null;
         }
 
@@ -85,7 +85,7 @@ public class UnlinkedFilesCrawler {
         File[] subDirectories = directory.listFiles(directoryFilter);
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
-            if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
+            if (subRoot != null && subRoot.getChildCount() > 0) {
                 filesCount += ((FileNodeWrapper) subRoot.getUserObject()).fileCount;
                 root.add(subRoot);
             }

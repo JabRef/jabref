@@ -202,29 +202,29 @@ public class UtilTest {
     public void testParseMethodCalls() {
 
         Assert.assertEquals(1, Util.parseMethodsCalls("bla").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla").get(0)))[0]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla").get(0))[0]);
 
         Assert.assertEquals(1, Util.parseMethodsCalls("bla,").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla,").get(0)))[0]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla,").get(0))[0]);
 
         Assert.assertEquals(1, Util.parseMethodsCalls("_bla.bla.blub,").size());
-        Assert.assertEquals("_bla.bla.blub", ((Util.parseMethodsCalls("_bla.bla.blub,").get(0)))[0]);
+        Assert.assertEquals("_bla.bla.blub", (Util.parseMethodsCalls("_bla.bla.blub,").get(0))[0]);
 
         Assert.assertEquals(2, Util.parseMethodsCalls("bla,foo").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla,foo").get(0)))[0]);
-        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla,foo").get(1)))[0]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla,foo").get(0))[0]);
+        Assert.assertEquals("foo", (Util.parseMethodsCalls("bla,foo").get(1))[0]);
 
         Assert.assertEquals(2, Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[0]);
-        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[0]);
-        Assert.assertEquals("test", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[1]);
-        Assert.assertEquals("fark", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[1]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[0]);
+        Assert.assertEquals("foo", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[0]);
+        Assert.assertEquals("test", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[1]);
+        Assert.assertEquals("fark", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[1]);
 
         Assert.assertEquals(2, Util.parseMethodsCalls("bla(test),foo(fark)").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[0]);
-        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[0]);
-        Assert.assertEquals("test", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[1]);
-        Assert.assertEquals("fark", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[1]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[0]);
+        Assert.assertEquals("foo", (Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[0]);
+        Assert.assertEquals("test", (Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[1]);
+        Assert.assertEquals("fark", (Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[1]);
     }
 
     @Test

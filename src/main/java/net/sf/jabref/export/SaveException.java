@@ -64,6 +64,6 @@ public class SaveException extends Exception
 
     public boolean specificEntry()
     {
-        return (entry != null);
+        return entry != null;
     }
 }

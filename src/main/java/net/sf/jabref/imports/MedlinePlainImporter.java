@@ -114,12 +114,12 @@ public class MedlinePlainImporter extends ImportFormat {
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
 
-                while (!done && (j < (fields.length - 1))) {
+                while (!done && j < fields.length - 1) {
                     if (fields[j + 1].length() <= 4) {
                         System.out.println("aaa");
                     }
                     if (fields[j + 1].charAt(4) != '-') {
-                        if ((current.length() > 0)
+                        if (current.length() > 0
                                 && !Character.isWhitespace(current.charAt(current.length() - 1))) {
                             current.append(' ');
                         }
@@ -207,10 +207,10 @@ public class MedlinePlainImporter extends ImportFormat {
                     } else {
                         hm.put("abstract", oldAb + "\n" + val);
                     }
-                } else if ((lab.equals("DP"))) {
+                } else if (lab.equals("DP")) {
                     String[] parts = val.split(" ");
                     hm.put("year", parts[0]);
-                    if ((parts.length > 1) && (!parts[1].isEmpty())) {
+                    if (parts.length > 1 && !parts[1].isEmpty()) {
                         hm.put("month", parts[1]);
                     }
                 } else if (lab.equals("MH") || lab.equals("OT")) {
@@ -263,7 +263,7 @@ public class MedlinePlainImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().isEmpty())) {
+                if (content == null || content.trim().isEmpty()) {
                     toRemove.add(key);
                 }
             }

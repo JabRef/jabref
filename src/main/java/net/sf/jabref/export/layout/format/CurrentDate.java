@@ -52,7 +52,7 @@ public class CurrentDate implements LayoutFormatter
     public String format(String fieldText)
     {
         String format = CurrentDate.defaultFormat;
-        if ((fieldText != null) && fieldText.trim() != null && !fieldText.trim().isEmpty()) {
+        if (fieldText != null && fieldText.trim() != null && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }
         return new SimpleDateFormat(format).format(new Date());

@@ -192,7 +192,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             parse(dialog, page, 0, 1);
             int firstEntry = perPage;
-            while (shouldContinue && (firstEntry < hits)) {
+            while (shouldContinue && firstEntry < hits) {
                 pageNumber++;
                 searchUrl = makeUrl(pageNumber);
                 page = getResults(new URL(searchUrl));
@@ -254,7 +254,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //TODO: Login
             ArrayList<String> idSelected = new ArrayList<String>();
             String id;
-            while (((id = parseNextEntryId(text, piv)) != null) && shouldContinue) {
+            while ((id = parseNextEntryId(text, piv)) != null && shouldContinue) {
                 idSelected.add(id);
                 entryNumber++;
             }
@@ -272,7 +272,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //for
         } else {
             BibtexEntry entry;
-            while (((entry = parseNextEntry(text, piv)) != null) && shouldContinue) {
+            while ((entry = parseNextEntry(text, piv)) != null && shouldContinue) {
                 if (entry.getField("title") != null) {
                     dialog.addEntry(entry);
                     dialog.setProgress(parsed + unparseable, hits);
@@ -399,7 +399,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }*/
         // clean up month
         String month = entry.getField("month");
-        if ((month != null) && (!month.isEmpty())) {
+        if (month != null && !month.isEmpty()) {
             month = month.replaceAll("\\.", "");
             month = month.toLowerCase();
 
@@ -595,7 +595,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         int index = allText.indexOf("<div class=\"select", startIndex);
         int endIndex = allText.indexOf("</div>", index);
 
-        if ((index >= 0) && (endIndex > 0)) {
+        if (index >= 0 && endIndex > 0) {
             String text = allText.substring(index, endIndex);
             endIndex += 6;
             piv = endIndex;
@@ -615,7 +615,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         int index = allText.indexOf("<div class=\"detail", piv);
         int endIndex = allText.indexOf("</div>", index);
 
-        if ((index >= 0) && (endIndex > 0)) {
+        if (index >= 0 && endIndex > 0) {
             endIndex += 6;
             piv = endIndex;
             String text = allText.substring(index, endIndex);
@@ -688,7 +688,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         entry.setField(sourceField, sec_title);
 
                     }
-                    if (field.equals("pages") && (fieldMatcher.groupCount() == 2)) {
+                    if (field.equals("pages") && fieldMatcher.groupCount() == 2) {
                         entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
                     }
                 }
@@ -707,11 +707,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 authorCount++;
             }
             entry.setField("author", authorNames.toString());
-            if ((entry.getField("author") == null) || entry.getField("author").startsWith("a href") ||
+            if (entry.getField("author") == null || entry.getField("author").startsWith("a href") ||
                     entry.getField("author").startsWith("Topic(s)")) { // Fix for some documents without authors
                 entry.setField("author", "");
             }
-            if ((entry.getType() == BibtexEntryType.getStandardType("inproceedings")) && entry.getField("author").equals("")) {
+            if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
                 entry.setType(BibtexEntryType.getStandardType("proceedings"));
             }
 

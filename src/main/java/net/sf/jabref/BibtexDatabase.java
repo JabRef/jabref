@@ -188,7 +188,7 @@ public class BibtexDatabase {
         Set<String> keySet = _entries.keySet();
         for (String entrieID : keySet) {
             BibtexEntry entry = getEntryById(entrieID);
-            if ((entry != null) && (entry.getCiteKey() != null)) {
+            if (entry != null && entry.getCiteKey() != null) {
                 String citeKey = entry.getCiteKey();
                 if (citeKey != null) {
                     if (keyHash == citeKey.hashCode()) {
@@ -506,7 +506,7 @@ public class BibtexDatabase {
                 }
 
             }
-            if (piv < (res.length() - 1)) {
+            if (piv < res.length() - 1) {
                 newRes.append(res.substring(piv));
             }
             res = newRes.toString();
@@ -570,7 +570,7 @@ public class BibtexDatabase {
     //========================================================
     private boolean addKeyToSet(String key) {
         boolean exists = false;
-        if ((key == null) || key.isEmpty())
+        if (key == null || key.isEmpty())
          {
             return false;//don't put empty key
         }
@@ -589,7 +589,7 @@ public class BibtexDatabase {
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
     private void removeKeyFromSet(String key) {
-        if ((key == null) || key.isEmpty()) {
+        if (key == null || key.isEmpty()) {
             return;
         }
         if (allKeys.containsKey(key)) {
@@ -648,7 +648,7 @@ public class BibtexDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibtexFields.KEY_FIELD)) {
+        if (o == null && database != null && database.followCrossrefs && !field.equals(BibtexFields.KEY_FIELD)) {
             Object crossRef = bibtex.getField("crossref");
             if (crossRef != null) {
                 BibtexEntry referred = database.getEntryByKey((String) crossRef);
@@ -672,7 +672,7 @@ public class BibtexDatabase {
      * @return The resolved text or the original text if either the text or the database are null
      */
     public static String getText(String toResolve, BibtexDatabase database) {
-        if ((toResolve != null) && (database != null)) {
+        if (toResolve != null && database != null) {
             return database.resolveForStrings(toResolve);
         }
 

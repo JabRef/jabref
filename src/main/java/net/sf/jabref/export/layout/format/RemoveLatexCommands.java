@@ -32,7 +32,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
         int i;
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
-            if (escaped && (c == '\\')) {
+            if (escaped && c == '\\') {
                 sb.append('\\');
                 escaped = false;
             }
@@ -41,19 +41,19 @@ public class RemoveLatexCommands implements LayoutFormatter {
                 incommand = true;
                 currentCommand = new StringBuffer();
             }
-            else if (!incommand && ((c == '{') || (c == '}'))) {
+            else if (!incommand && (c == '{' || c == '}')) {
                 // Swallow the brace.
             }
 
             else if (Character.isLetter(c) ||
-                    (Globals.SPECIAL_COMMAND_CHARS.contains("" + c))) {
+                    Globals.SPECIAL_COMMAND_CHARS.contains("" + c)) {
                 escaped = false;
                 if (!incommand) {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    if ((currentCommand.length() == 1)
-                            && (Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString()))) {
+                    if (currentCommand.length() == 1
+                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type \^o or \~{n}
                         /*            if (i >= field.length()-1)
                                       break testCharCom;
@@ -95,7 +95,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
             }
             else {
                 //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
-                if (!incommand || (!Character.isWhitespace(c) && (c != '{'))) {
+                if (!incommand || !Character.isWhitespace(c) && c != '{') {
                     sb.append(c);
                 } else {
                     if (c != '{') {

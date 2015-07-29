@@ -34,7 +34,7 @@ public class RisAuthors implements ParamLayoutFormatter {
             sb.append(arg);
             sb.append("  - ");
             sb.append(authors[i]);
-            if (i < (authors.length - 1)) {
+            if (i < authors.length - 1) {
                 sb.append(Globals.NEWLINE);
             }
         }

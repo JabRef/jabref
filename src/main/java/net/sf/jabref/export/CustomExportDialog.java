@@ -65,10 +65,10 @@ class CustomExportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
 
                 // Check that there are no empty strings.
-                if ((layoutFile.getText().isEmpty()) ||
-                        (name.getText().isEmpty()) ||
-                        (extension.getText().isEmpty()) ||
-                        (!layoutFile.getText().endsWith(".layout"))) {
+                if (layoutFile.getText().isEmpty() ||
+                        name.getText().isEmpty() ||
+                        extension.getText().isEmpty() ||
+                        !layoutFile.getText().endsWith(".layout")) {
                     //JOptionPane.showMessageDialog
                     //    (parent, Globals.lang("You must provide a name, a search "
                     //			  +"string and a field name for this group."),

@@ -120,8 +120,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
         final GroupTreeNode target = (GroupTreeNode) path
                 .getLastPathComponent();
-        if ((target == null) || dragNode.isNodeDescendant(target)
-                || (dragNode == target)) {
+        if (target == null || dragNode.isNodeDescendant(target)
+                || dragNode == target) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
             return;
         }
@@ -190,9 +190,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
 
         // auto open
-        if ((Math.abs(cursor.x - idlePoint.x) < GroupsTree.idleMargin)
-                && (Math.abs(cursor.y - idlePoint.y) < GroupsTree.idleMargin)) {
-            if ((currentTime - idleStartTime) >= GroupsTree.idleTimeToExpandNode) {
+        if (Math.abs(cursor.x - idlePoint.x) < GroupsTree.idleMargin
+                && Math.abs(cursor.y - idlePoint.y) < GroupsTree.idleMargin) {
+            if (currentTime - idleStartTime >= GroupsTree.idleTimeToExpandNode) {
                 if (path != null) {
                     expandPath(path);
                 }
@@ -203,14 +203,14 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
 
         // autoscrolling
-        if ((currentTime - GroupsTree.lastDragAutoscroll) < GroupsTree.minAutoscrollInterval) {
+        if (currentTime - GroupsTree.lastDragAutoscroll < GroupsTree.minAutoscrollInterval) {
             return;
         }
         final Rectangle r = getVisibleRect();
-        final boolean scrollUp = (cursor.y - r.y) < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollDown = ((r.y + r.height) - cursor.y) < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollLeft = (cursor.x - r.x) < GroupsTree.dragScrollActivationMargin;
-        final boolean scrollRight = ((r.x + r.width) - cursor.x) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollUp = cursor.y - r.y < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollDown = r.y + r.height - cursor.y < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollLeft = cursor.x - r.x < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollRight = r.x + r.width - cursor.x < GroupsTree.dragScrollActivationMargin;
         if (scrollUp) {
             r.translate(0, -GroupsTree.dragScrollDistance);
         } else if (scrollDown) {
@@ -449,7 +449,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     /** Collapse this node and all its children. */
     public void collapseSubtree(GroupTreeNode node) {
         for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();) {
-            collapsePath(new TreePath((e.nextElement())
+            collapsePath(new TreePath(e.nextElement()
                     .getPath()));
         }
     }

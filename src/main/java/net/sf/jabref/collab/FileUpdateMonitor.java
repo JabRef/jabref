@@ -183,7 +183,7 @@ public class FileUpdateMonitor implements Runnable {
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
-            return (timeStamp != modified) || (fileSize != fileSizeNow);
+            return timeStamp != modified || fileSize != fileSizeNow;
         }
 
         public void updateTimeStamp() {

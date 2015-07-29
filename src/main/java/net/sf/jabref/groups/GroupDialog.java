@@ -300,7 +300,7 @@ class GroupDialog extends JDialog {
                             .trim(), m_kgSearchTerm.getText().trim(),
                             m_kgCaseSensitive.isSelected(), m_kgRegExp
                             .isSelected(), getContext());
-                    if (((m_editedGroup instanceof ExplicitGroup) || (m_editedGroup instanceof SearchGroup))
+                    if ((m_editedGroup instanceof ExplicitGroup || m_editedGroup instanceof SearchGroup)
                             && m_resultingGroup.supportsAdd()) {
                         addPreviousEntries();
                     }
@@ -407,7 +407,7 @@ class GroupDialog extends JDialog {
             s1 = m_kgSearchField.getText().trim();
             okEnabled = okEnabled && s1.matches("\\w+");
             s2 = m_kgSearchTerm.getText().trim();
-            okEnabled = okEnabled && (!s2.isEmpty());
+            okEnabled = okEnabled && !s2.isEmpty();
             if (!okEnabled) {
                 setDescription(Globals.lang("Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             } else {
@@ -430,7 +430,7 @@ class GroupDialog extends JDialog {
             setNameFontItalic(true);
         } else if (m_searchRadioButton.isSelected()) {
             s1 = m_sgSearchExpression.getText().trim();
-            okEnabled = okEnabled & (!s1.isEmpty());
+            okEnabled = okEnabled & !s1.isEmpty();
             if (!okEnabled) {
                 setDescription(Globals.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>"
                         + "<tt>smith</tt><p>"
@@ -523,7 +523,7 @@ class GroupDialog extends JDialog {
         }
         int lastNewline = s.lastIndexOf("<br>");
         int hat = s.lastIndexOf("^");
-        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
+        if (lastNewline >= 0 && hat >= 0 && hat > lastNewline) {
             return s.substring(0, lastNewline + 4)
                     + s.substring(lastNewline + 4).replaceAll(" ", "&nbsp;");
         }

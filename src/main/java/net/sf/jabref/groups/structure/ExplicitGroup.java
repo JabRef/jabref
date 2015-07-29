@@ -196,7 +196,7 @@ public class ExplicitGroup extends AbstractGroup {
             return false;
         }
         return other.name.equals(name)
-                && (other.getHierarchicalContext() == getHierarchicalContext());
+                && other.getHierarchicalContext() == getHierarchicalContext();
     }
 
     /**
@@ -215,7 +215,7 @@ public class ExplicitGroup extends AbstractGroup {
         Set<String> sortedKeys = new TreeSet<String>();
         for (BibtexEntry m_entry : entries) {
             s = m_entry.getCiteKey();
-            if ((s != null) && !s.isEmpty()) {
+            if (s != null && !s.isEmpty()) {
                 sortedKeys.add(s);
             }
         }

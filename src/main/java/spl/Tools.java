@@ -64,13 +64,13 @@ class Tools {
         Dimension mySize = diag.getSize();
 
         if (parentSize.width > mySize.width) {
-            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
+            x = (parentSize.width - mySize.width) / 2 + topLeft.x;
         } else {
             x = topLeft.x;
         }
 
         if (parentSize.height > mySize.height) {
-            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
+            y = (parentSize.height - mySize.height) / 2 + topLeft.y;
         } else {
             y = topLeft.y;
         }
@@ -79,7 +79,7 @@ class Tools {
     }
 
     public static String getLink(String link, URL mindmapUrl) {
-        if ((link == null) || link.isEmpty()) {
+        if (link == null || link.isEmpty()) {
             return null;
         }
         if (!Tools.isAbsolutePath(link)) {
@@ -125,8 +125,8 @@ class Tools {
         String fileSeparator = System.getProperty("file.separator");
         if (osNameStart.equals("Win")) {
             //Todo SciPlore
-            return ((path.length() > 1) && path.substring(1, 2).equals(":"))
-                    || (path.startsWith(fileSeparator) && !path.startsWith("\\\\"));
+            return path.length() > 1 && path.substring(1, 2).equals(":")
+                    || path.startsWith(fileSeparator) && !path.startsWith("\\\\");
         } else if (osNameStart.equals("Mac")) {
             //Koh:Panther (or Java 1.4.2) may change file path rule
             return path.startsWith(fileSeparator);

@@ -47,7 +47,7 @@ public final class EntryFromFileCreatorManager {
     private boolean hasSpecialisedCreatorForExternalFileType(
             ExternalFileType externalFileType) {
         for (EntryFromFileCreator entryCreator : entryCreators) {
-            if ((entryCreator.getExternalFileType() == null) || (entryCreator.getExternalFileType().getExtension() == null)) {
+            if (entryCreator.getExternalFileType() == null || entryCreator.getExternalFileType().getExtension() == null) {
                 continue;
             }
             if (entryCreator.getExternalFileType().getExtension().equals(
@@ -66,7 +66,7 @@ public final class EntryFromFileCreatorManager {
      * @return null if there is no EntryFromFileCreator for this File.
      */
     public EntryFromFileCreator getEntryCreator(File file) {
-        if ((file == null) || !file.exists()) {
+        if (file == null || !file.exists()) {
             return null;
         }
         for (EntryFromFileCreator creator : entryCreators) {
@@ -159,7 +159,7 @@ public final class EntryFromFileCreatorManager {
         }
 
         System.out.println("count = " + count);
-        if ((count > 0) && (panel != null)) {
+        if (count > 0 && panel != null) {
             System.out.println("adding edit");
             ce.end();
             panel.undoManager.addEdit(ce);

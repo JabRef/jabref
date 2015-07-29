@@ -96,9 +96,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    (importer != null ? importer.getExtensions() : null), true);
+                    importer != null ? importer.getExtensions() : null, true);
 
-            if ((filenames != null) && (filenames.length > 0)) {
+            if (filenames != null && filenames.length > 0) {
                 frame.block();
                 frame.output(Globals.lang("Starting import"));
                 fileOk = true;
@@ -191,7 +191,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     // for single entries):
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
                             (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE)
-                            || (bibtexResult.getDatabase().getEntryCount() > 1))) {
+                            || bibtexResult.getDatabase().getEntryCount() > 1)) {
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
                                 Globals.lang("Import"), openInNew);
@@ -294,7 +294,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 ParserResult pr = importResult.parserResult;
 
                 anythingUseful = anythingUseful
-                        || ((pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0));
+                        || pr.getDatabase().getEntryCount() > 0 || pr.getDatabase().getStringCount() > 0;
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {
@@ -320,7 +320,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 ParserResult pr = importResult.parserResult;
                 Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
 
-                anythingUseful = anythingUseful | (!entries.isEmpty());
+                anythingUseful = anythingUseful | !entries.isEmpty();
 
                 // set timestamp and owner
                 Util.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
@@ -337,7 +337,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return null;
         }
 
-        if ((imports.size() == 1) && (directParserResult != null)) {
+        if (imports.size() == 1 && directParserResult != null) {
             return directParserResult;
         } else {
 

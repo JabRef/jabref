@@ -240,9 +240,9 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         _prefs.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, autoOpenForm.isSelected());
         _prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
-        boolean emacsModeChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected());
-        boolean emacsRebindCtrlAChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected()); 
-        boolean emacsRebindCtrlFChanged = (_prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF) != emacsRebindCtrlF.isSelected()); 
+        boolean emacsModeChanged = _prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
+        boolean emacsRebindCtrlAChanged = _prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
+        boolean emacsRebindCtrlFChanged = _prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF) != emacsRebindCtrlF.isSelected();
         if (emacsModeChanged || emacsRebindCtrlAChanged || emacsRebindCtrlFChanged) {
             _prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, emacsMode.isSelected());
             _prefs.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, emacsRebindCtrlA.isSelected());
@@ -256,7 +256,7 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 }
             } else {
                 // only rebinding of CTRL+a or CTRL+f changed
-                assert(emacsMode.isSelected());
+                assert emacsMode.isSelected();
                 // we simply reload the emacs mode to activate the CTRL+a/CTRL+f change
                 EmacsKeyBindings.unload();
                 EmacsKeyBindings.load();
@@ -293,11 +293,11 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
         // We need to remove all entry editors from cache if the source panel setting
         // or the autocompletion settings have been changed:
-        if ((oldShowSource != showSource.isSelected()) || (oldAutoComplete != autoComplete.isSelected())
-                || (!oldAutoCompFields.equals(autoCompFields.getText())) ||
-                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
-                (oldAutoCompFModeAbbr != autoCompFirstNameMode_Abbr.isSelected()) ||
-                (oldAutoCompFModeFull != autoCompFirstNameMode_Full.isSelected())) {
+        if (oldShowSource != showSource.isSelected() || oldAutoComplete != autoComplete.isSelected()
+                || !oldAutoCompFields.equals(autoCompFields.getText()) ||
+                oldAutoCompFF != autoCompFF.isSelected() || oldAutoCompLF != autoCompLF.isSelected() ||
+                oldAutoCompFModeAbbr != autoCompFirstNameMode_Abbr.isSelected() ||
+                oldAutoCompFModeFull != autoCompFirstNameMode_Full.isSelected()) {
             for (int j = 0; j < _frame.getTabbedPane().getTabCount(); j++) {
                 BasePanel bp = (BasePanel) _frame.getTabbedPane().getComponentAt(j);
                 bp.entryEditors.clear();

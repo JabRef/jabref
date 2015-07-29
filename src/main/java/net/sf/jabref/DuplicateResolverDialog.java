@@ -126,7 +126,7 @@ public class DuplicateResolverDialog extends JDialog {
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 1;
         con.weighty = 0;
-        TitleLabel lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ? "" :
+        TitleLabel lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
                 Globals.lang("Entry in current database"));
         gbl.setConstraints(lab, con);
         main.add(lab);
@@ -137,7 +137,7 @@ public class DuplicateResolverDialog extends JDialog {
         main.add(sp);
         con.weighty = 0;
         con.insets = new Insets(10, 10, 0, 10);
-        lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ? "" :
+        lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
                 Globals.lang("Entry in import"));
         gbl.setConstraints(lab, con);
         main.add(lab);

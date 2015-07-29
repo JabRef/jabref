@@ -146,17 +146,17 @@ public class JSTORFetcher2 implements EntryFetcher {
             int numberOfPagesRequested = JSTORFetcher2.MAX_PAGES_TO_LOAD;
 
             String nextPage;
-            while ((count <= Math.min(JSTORFetcher2.MAX_PAGES_TO_LOAD, numberOfPagesRequested))
-                    && ((nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null)) {
+            while (count <= Math.min(JSTORFetcher2.MAX_PAGES_TO_LOAD, numberOfPagesRequested)
+                    && (nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null) {
                 // If user has cancelled the import, return null to signal this:
-                if ((count == 1) && (nextPage.equals(JSTORFetcher2.CANCELLED))) {
+                if (count == 1 && nextPage.equals(JSTORFetcher2.CANCELLED)) {
                     return null;
                 }
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + numberOfRefs[0]);
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + " refsRequested=" + numberOfRefs[1]);
                 refsRequested = Integer.valueOf(numberOfRefs[1]);
                 //System.out.println("JSTORFetcher2 getCitations refsRequested=" + Integer.valueOf(refsRequested));
-                numberOfPagesRequested = (((refsRequested - 1) - ((refsRequested - 1) % JSTORFetcher2.REFS_PER_PAGE)) / JSTORFetcher2.REFS_PER_PAGE) + 1;
+                numberOfPagesRequested = (refsRequested - 1 - (refsRequested - 1) % JSTORFetcher2.REFS_PER_PAGE) / JSTORFetcher2.REFS_PER_PAGE + 1;
                 //System.out.println("JSTORFetcher2 getCitations numberOfPagesRequested=" + Integer.valueOf(numberOfPagesRequested));
                 urlQuery = nextPage;
                 //System.out.println("JSTORFetcher2 getcitations count=" + Integer.valueOf(count) + " ids=" + ids);
@@ -215,12 +215,12 @@ public class JSTORFetcher2 implements EntryFetcher {
 
         Matcher m = JSTORFetcher2.idPattern.matcher(cont);
 
-        if (m.find() && ((ids.size() + 1) <= refsRequested)) {
+        if (m.find() && ids.size() + 1 <= refsRequested) {
             do {
                 ids.add(m.group(1));
                 cont = cont.substring(m.end());
                 m = JSTORFetcher2.idPattern.matcher(cont);
-            } while (m.find() && ((ids.size() + 1) <= refsRequested));
+            } while (m.find() && ids.size() + 1 <= refsRequested);
         } else if (entirePage.contains(JSTORFetcher2.noAccessIndicator)) {
             noAccessFound = true;
             return null;

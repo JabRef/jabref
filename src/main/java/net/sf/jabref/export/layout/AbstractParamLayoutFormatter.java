@@ -38,7 +38,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < arg.length(); i++) {
-            if ((arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR) && !escaped) {
+            if (arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR && !escaped) {
                 parts.add(current.toString());
                 current = new StringBuilder();
             } else if (arg.charAt(i) == '\\') {
@@ -55,7 +55,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
                 } else if (arg.charAt(i) == 't') {
                     current.append('\t');
                 } else {
-                    if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"')) {
+                    if (arg.charAt(i) != ',' && arg.charAt(i) != '"') {
                         current.append('\\');
                     }
                     current.append(arg.charAt(i));

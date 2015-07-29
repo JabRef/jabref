@@ -97,7 +97,7 @@ public class UnitFormatter implements LayoutFormatter {
         unitCombinations = new String[uCLength];
         for (int i = 0; i < uLLength; i++) {
             for (int j = 0; j < uPLLength; j++) {
-                UnitFormatter.unitCombinations[(i * uPLLength) + j] = UnitFormatter.unitPrefixList[j] + UnitFormatter.unitList[i];
+                UnitFormatter.unitCombinations[i * uPLLength + j] = UnitFormatter.unitPrefixList[j] + UnitFormatter.unitList[i];
             }
         }
 

@@ -137,7 +137,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return (col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String"));
+                return col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String");
             }
 
             @Override
@@ -285,8 +285,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i = 0; i < rows.length; i++) {
-                if (((rows[i] + i) - 1) < tableRows.size()) {
-                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
+                if (rows[i] + i - 1 < tableRows.size()) {
+                    tableRows.add(Math.max(0, rows[i] + i - 1), new TableRow());
                 }
             }
             rowCount += rows.length;

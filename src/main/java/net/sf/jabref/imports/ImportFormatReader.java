@@ -275,7 +275,7 @@ public class ImportFormatReader {
                     } else {
                         sb.append(names[j]);
                     }
-                    if (j < (names.length - 1)) {
+                    if (j < names.length - 1) {
                         sb.append(", ");
                     }
                 }
@@ -290,7 +290,7 @@ public class ImportFormatReader {
                     sb.append(names[j]);
                 }
             }
-            if (i < (authors.length - 1)) {
+            if (i < authors.length - 1) {
                 sb.append(" and ");
             }
         }
@@ -307,8 +307,8 @@ public class ImportFormatReader {
             return s;
         }
         // If only one character (uppercase letter), add a dot and return immediately:
-        if ((s.length() == 1) && (Character.isLetter(s.charAt(0)) &&
-                Character.isUpperCase(s.charAt(0)))) {
+        if (s.length() == 1 && Character.isLetter(s.charAt(0)) &&
+                Character.isUpperCase(s.charAt(0))) {
             return s + ".";
         }
         StringBuilder sb = new StringBuilder();
@@ -467,8 +467,8 @@ public class ImportFormatReader {
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
                     Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
-            if ((pr.getDatabase().getEntryCount() > 0)
-                    || (pr.getDatabase().getStringCount() > 0)) {
+            if (pr.getDatabase().getEntryCount() > 0
+                    || pr.getDatabase().getStringCount() > 0) {
                 pr.setFile(new File(filename));
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }

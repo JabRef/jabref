@@ -128,7 +128,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             Keymap keymap2 = getKeymap();
             KeyStroke[] keys = keymap2.getBoundKeyStrokes();
             int i = 0;
-            while ((i < keys.length) && (!keys[i].equals(redoKey))) {
+            while (i < keys.length && !keys[i].equals(redoKey)) {
                 i++;
             }
             if (i < keys.length) {
@@ -152,7 +152,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
         // myTa.set
         h.removeAllHighlights();
 
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
+        if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
             return;
         }
         String content = getText();

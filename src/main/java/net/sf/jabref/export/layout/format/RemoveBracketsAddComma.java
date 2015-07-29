@@ -54,7 +54,7 @@ public class RemoveBracketsAddComma implements LayoutFormatter
         for (int i = 0; i < fieldEntry.length(); i++)
         {
             //System.out.print(fieldEntry.charAt(i));
-            if ((fieldEntry.charAt(i) != '{') && (fieldEntry.charAt(i) != '}'))
+            if (fieldEntry.charAt(i) != '{' && fieldEntry.charAt(i) != '}')
             {
                 //System.out.print(fieldEntry.charAt(i));
                 sb.append(fieldEntry.charAt(i));

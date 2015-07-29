@@ -167,7 +167,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
          * If we have been given a panel and the preference option
          * previewPrintButton is set, show the tool bar
          */
-        if ((panel != null)
+        if (panel != null
                 && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
             add(createToolBar(), BorderLayout.LINE_START);
         }
@@ -431,7 +431,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     public boolean hasEntry() {
-        return (entry != null);
+        return entry != null;
     }
 
     /**

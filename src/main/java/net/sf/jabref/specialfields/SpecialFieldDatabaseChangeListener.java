@@ -15,7 +15,7 @@ public class SpecialFieldDatabaseChangeListener implements
 
     @Override
     public void databaseChanged(DatabaseChangeEvent e) {
-        if ((e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) &&
+        if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY &&
                 SpecialFieldsUtils.keywordSyncEnabled()) {
             final BibtexEntry entry = e.getEntry();
             // NamedCompount code similar to SpecialFieldUpdateListener

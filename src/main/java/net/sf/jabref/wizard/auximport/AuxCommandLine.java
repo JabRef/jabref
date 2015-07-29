@@ -55,7 +55,7 @@ public class AuxCommandLine
     public BibtexDatabase perform()
     {
         BibtexDatabase back = null;
-        if ((!auxName.isEmpty()) && (bib != null))
+        if (!auxName.isEmpty() && bib != null)
         {
             AuxSubGenerator auxParser = new AuxSubGenerator(bib);
             Vector<String> returnValue = auxParser.generate(auxName, bib);

@@ -400,7 +400,7 @@ class MedlineHandler extends DefaultHandler
         else if (localName.equals("Author")) {
             // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
             // when above is the case replace it with initials
-            if ((forename.length() == 3) && (forename.charAt(1) == ' ')) {
+            if (forename.length() == 3 && forename.charAt(1) == ' ') {
                 forename = initials;
             }
 

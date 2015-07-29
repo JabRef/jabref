@@ -481,7 +481,7 @@ public class PluginInstaller {
         Collection<PluginDescriptor> descriptors =
                 PluginCore.getManager().getRegistry().getPluginDescriptors();
         for (PluginDescriptor desc : descriptors) {
-            if ((desc.getPluginClassName() == null) || !desc.getPluginClassName()
+            if (desc.getPluginClassName() == null || !desc.getPluginClassName()
                     .equals("net.sf.jabref.plugin.core.JabRefPlugin")) {
                 urls.put(desc.getId(), desc);
             }

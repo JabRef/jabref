@@ -192,7 +192,7 @@ public class Globals {
 
     public static final String osName = System.getProperty("os.name", "def");
 
-    public static final boolean ON_MAC = (Globals.osName.equals(Globals.MAC)),
+    public static final boolean ON_MAC = Globals.osName.equals(Globals.MAC),
             ON_WIN = Globals.osName.startsWith("Windows"),
             ON_LINUX = Globals.osName.startsWith("Linux");
 
@@ -265,7 +265,7 @@ public class Globals {
             translation = key;
         }
 
-        if ((translation != null) && (!translation.isEmpty())) {
+        if (translation != null && !translation.isEmpty()) {
             translation = translation.replaceAll("_", " ");
             StringBuffer sb = new StringBuffer();
             boolean b = false;
@@ -281,7 +281,7 @@ public class Globals {
                         b = false;
                         try {
                             int index = Integer.parseInt(String.valueOf(c));
-                            if ((params != null) && (index >= 0) && (index <= params.length)) {
+                            if (params != null && index >= 0 && index <= params.length) {
                                 sb.append(params[index]);
                             }
                         } catch (NumberFormatException e) {
@@ -319,7 +319,7 @@ public class Globals {
         } catch (MissingResourceException ex) {
             translation = key;
         }
-        if ((translation != null) && (!translation.isEmpty())) {
+        if (translation != null && !translation.isEmpty()) {
             return translation.replaceAll("_", " ");
         } else {
             return key;
@@ -339,7 +339,7 @@ public class Globals {
             // for \""
             // + key + "\"");
         }
-        if ((translation != null) && (!translation.isEmpty())) {
+        if (translation != null && !translation.isEmpty()) {
             return translation;
         } else {
             return key;
@@ -380,7 +380,7 @@ public class Globals {
         // Read external lists, if any (in reverse order, so the upper lists
         // override the lower):
         String[] lists = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((lists != null) && (lists.length > 0)) {
+        if (lists != null && lists.length > 0) {
             for (int i = lists.length - 1; i >= 0; i--) {
                 try {
                     Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
@@ -407,7 +407,7 @@ public class Globals {
      * Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
      */
     public static Pattern getPatternForWords(ArrayList<String> words) {
-        if ((words == null) || (words.isEmpty()) || (words.get(0).isEmpty())) {
+        if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
         }
 

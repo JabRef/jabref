@@ -75,10 +75,10 @@ class TextAnalyzer {
                         yearFound = number;
                     } else {
                         // More than one found. Be a bit more specific.
-                        if ((yearFound < FUTURE_YEAR) && (number < FUTURE_YEAR)) {
+                        if (yearFound < FUTURE_YEAR && number < FUTURE_YEAR) {
                             good = -1;
                             break; // Give up, both seem good enough.
-                        } else if ((yearFound >= FUTURE_YEAR) && (number < FUTURE_YEAR)) {
+                        } else if (yearFound >= FUTURE_YEAR && number < FUTURE_YEAR) {
                             good = i;
                             yearFound = number;
                         }
@@ -108,7 +108,7 @@ class TextAnalyzer {
                 split = clean(cand[i].replaceAll("\\s", "")).split("-");
                 //   Util.pr("Pg: "+pages);
                 int first = Integer.parseInt(split[0]), second = Integer.parseInt(split[1]);
-                if ((second - first) > 3) {
+                if (second - first > 3) {
                     found = i;
                     break;
                 }
@@ -156,13 +156,13 @@ class TextAnalyzer {
         int piv = 0;
         for (Substring usedPart : usedParts) {
             ss = usedPart;
-            if ((ss.begin() - piv) > 10) {
+            if (ss.begin() - piv > 10) {
                 LOGGER.info("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
         }
-        if ((text.length() - piv) > 10) {
+        if (text.length() - piv > 10) {
             free.add(clean(text.substring(piv)));
         }
         LOGGER.info("Free parts:");
@@ -191,20 +191,20 @@ class TextAnalyzer {
     private String clean(String s) {
         boolean found = false;
         int left = 0, right = s.length() - 1;
-        while (!found && (left < s.length())) {
+        while (!found && left < s.length()) {
             char c = s.charAt(left);
-            if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == '(')
-                    || (c == ':') || (c == ')')) {
+            if (Character.isWhitespace(c) || c == '.' || c == ',' || c == '('
+                    || c == ':' || c == ')') {
                 left++;
             } else {
                 found = true;
             }
         }
         found = false;
-        while (!found && (right > left)) {
+        while (!found && right > left) {
             char c = s.charAt(right);
-            if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == ')')
-                    || (c == ':') || (c == '(')) {
+            if (Character.isWhitespace(c) || c == '.' || c == ',' || c == ')'
+                    || c == ':' || c == '(') {
                 right--;
             } else {
                 found = true;
@@ -236,7 +236,7 @@ class TextAnalyzer {
 
         @Override
         public int compareTo(Substring other) {
-            return (new Integer(begin)).compareTo(other.begin());
+            return new Integer(begin).compareTo(other.begin());
         }
     }
 }

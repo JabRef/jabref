@@ -1006,7 +1006,7 @@ public class JabRefPreferences {
 
         if (value.length > 0) {
             StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.length - 1); i++) {
+            for (int i = 0; i < value.length - 1; i++) {
                 linked.append(makeEscape(value[i]));
                 linked.append(';');
             }
@@ -1287,8 +1287,8 @@ public class JabRefPreferences {
         String[] bindNames = getStringArray("bindNames"), bindings = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
-        if ((bindNames == null) || (bindings == null)
-                || (bindNames.length != bindings.length)) {
+        if (bindNames == null || bindings == null
+                || bindNames.length != bindings.length) {
             // Nothing defined in Preferences, or something is wrong.
             keyBinds = new KeyBinds();
             return;
@@ -1312,7 +1312,7 @@ public class JabRefPreferences {
         boolean done = false;
 
         StringBuilder res = new StringBuilder();
-        while (!done && ((c = data.read()) != -1)) {
+        while (!done && (c = data.read()) != -1) {
             if (c == '\\') {
                 if (!escape) {
                     escape = true;
@@ -1348,7 +1348,7 @@ public class JabRefPreferences {
         int c;
         for (int i = 0; i < s.length(); i++) {
             c = s.charAt(i);
-            if ((c == '\\') || (c == ';')) {
+            if (c == '\\' || c == ';') {
                 sb.append('\\');
             }
             sb.append((char) c);
@@ -1454,7 +1454,7 @@ public class JabRefPreferences {
      */
     public ExternalFileType getExternalFileTypeByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
+            if (type.getExtension() != null && type.getExtension().equalsIgnoreCase(extension)) {
                 return type;
             }
         }
@@ -1471,7 +1471,7 @@ public class JabRefPreferences {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && filename.toLowerCase().
+            if (type.getExtension() != null && filename.toLowerCase().
                     endsWith(type.getExtension().toLowerCase())) {
                 if (type.getExtension().length() > longestFound) {
                     longestFound = type.getExtension().length();
@@ -1491,7 +1491,7 @@ public class JabRefPreferences {
      */
     public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
+            if (type.getMimeType() != null && type.getMimeType().equals(mimeType)) {
                 return type;
             }
         }
@@ -1576,7 +1576,7 @@ public class JabRefPreferences {
         // Read the prefs information for file types:
         String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
         for (String[] val : vals) {
-            if ((val.length == 2) && (val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG))) {
+            if (val.length == 2 && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {

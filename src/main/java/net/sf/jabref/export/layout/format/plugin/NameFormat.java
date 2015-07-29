@@ -121,7 +121,7 @@ public class NameFormat implements LayoutFormatter {
                         s = temp;
                     }
 
-                    if ((s <= i) && (i <= e)) {
+                    if (s <= i && i <= e) {
                         sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
                         break;
                     }
@@ -136,7 +136,7 @@ public class NameFormat implements LayoutFormatter {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
 
-        if ((parameters == null) || (parameters.isEmpty())) {
+        if (parameters == null || parameters.isEmpty()) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
         }
 

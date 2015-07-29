@@ -105,8 +105,8 @@ public class FreeCiteImporter extends ImportFormat {
         try {
             XMLStreamReader parser = factory.createXMLStreamReader(conn.getInputStream());
             while (parser.hasNext()) {
-                if ((parser.getEventType() == XMLStreamConstants.START_ELEMENT)
-                        && (parser.getLocalName().equals("citation"))) {
+                if (parser.getEventType() == XMLStreamConstants.START_ELEMENT
+                        && parser.getLocalName().equals("citation")) {
                     parser.nextTag();
 
                     StringBuilder noteSB = new StringBuilder();
@@ -115,7 +115,7 @@ public class FreeCiteImporter extends ImportFormat {
                     // fallback type
                     BibtexEntryType type = BibtexEntryType.INPROCEEDINGS;
 
-                    while (!((parser.getEventType() == XMLStreamConstants.END_ELEMENT)
+                    while (!(parser.getEventType() == XMLStreamConstants.END_ELEMENT
                     && parser.getLocalName().equals("citation"))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                             String ln = parser.getLocalName();
@@ -125,8 +125,8 @@ public class FreeCiteImporter extends ImportFormat {
 
                                 while (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                                     // author is directly nested below authors
-                                    assert (parser.getLocalName()
-                                            .equals("author"));
+                                    assert parser.getLocalName()
+                                            .equals("author");
 
                                     String author = parser.getElementText();
                                     if (sb.length() == 0) {
@@ -136,8 +136,8 @@ public class FreeCiteImporter extends ImportFormat {
                                         sb.append(" and ");
                                         sb.append(author);
                                     }
-                                    assert (parser.getEventType() == XMLStreamConstants.END_ELEMENT);
-                                    assert (parser.getLocalName().equals("author"));
+                                    assert parser.getEventType() == XMLStreamConstants.END_ELEMENT;
+                                    assert parser.getLocalName().equals("author");
                                     parser.nextTag();
                                     // current tag is either begin:author or
                                     // end:authors

@@ -223,7 +223,7 @@ public class IntegrityCheck
             default:
                 if (mode == 0) // out of {}
                 {
-                    if (Character.isUpperCase(ch) && (t > 1))
+                    if (Character.isUpperCase(ch) && t > 1)
                     {
                         upLowCounter++;
                     }
@@ -272,7 +272,7 @@ public class IntegrityCheck
             }
         }
 
-        if ((!containsFourDigits) && (!fourDigitsBlock))
+        if (!containsFourDigits && !fourDigitsBlock)
         {
             messages.add(new IntegrityMessage(IntegrityMessage.FOUR_DIGITS_HINT,
                     entry, fieldName, null));

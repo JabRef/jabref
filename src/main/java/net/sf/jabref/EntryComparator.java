@@ -64,10 +64,10 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         if (binary) {
             // We just separate on set and unset fields:
             if (f1 != null) {
-                return (f2 == null) ? -1 :
-                        (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
+                return f2 == null ? -1 :
+                        next != null ? next.compare(e1, e2) : idCompare(e1, e2);
             } else {
-                return (f2 == null) ? (next != null ? next.compare(e1, e2) : idCompare(e1, e2))
+                return f2 == null ? next != null ? next.compare(e1, e2) : idCompare(e1, e2)
                         : 1;
             }
         }
@@ -103,13 +103,13 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             }
         }
 
-        if ((f1 == null) && (f2 == null)) {
-            return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
+        if (f1 == null && f2 == null) {
+            return next != null ? next.compare(e1, e2) : idCompare(e1, e2);
         }
-        if ((f1 != null) && (f2 == null)) {
+        if (f1 != null && f2 == null) {
             return -1;
         }
-        if ((f1 == null) && (f2 != null)) {
+        if (f1 == null && f2 != null) {
             return 1;
         }
 
@@ -117,14 +117,14 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
         //String ours = ((String)e1.getField(sortField)).toLowerCase(),
         //    theirs = ((String)e2.getField(sortField)).toLowerCase();
-        if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-            result = -(((Integer) f1).compareTo((Integer) f2));
+        if (f1 instanceof Integer && f2 instanceof Integer) {
+            result = -((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = new Integer(f1.toString());
-            result = -((f1AsInteger).compareTo((Integer) f2));
+            result = -f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
             Integer f2AsInteger = new Integer(f2.toString());
-            result = -(((Integer) f1).compareTo(f2AsInteger));
+            result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
             int comp = ours.compareTo(theirs);
@@ -132,7 +132,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         }
         if (result != 0)
          {
-            return (descending ? result : -result); // Primary sort.
+            return descending ? result : -result; // Primary sort.
         }
         if (next != null) {
             return next.compare(e1, e2); // Secondary sort if existent.
@@ -143,7 +143,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
     }
 
     private int idCompare(BibtexEntry b1, BibtexEntry b2) {
-        return ((b1.getId())).compareTo((b2.getId()));
+        return b1.getId().compareTo(b2.getId());
     }
 
 }

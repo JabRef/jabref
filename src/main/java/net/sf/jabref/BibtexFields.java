@@ -580,7 +580,7 @@ public class BibtexFields {
                     try
                     {
                         weight = Double.parseDouble(wStr);
-                        if ((weight < 0.0) || (weight > GUIGlobals.MAX_FIELD_WEIGHT))
+                        if (weight < 0.0 || weight > GUIGlobals.MAX_FIELD_WEIGHT)
                         {
                             weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
                         }

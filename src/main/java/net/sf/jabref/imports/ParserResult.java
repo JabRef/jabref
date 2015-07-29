@@ -164,7 +164,7 @@ public class ParserResult {
     }
 
     public boolean hasWarnings() {
-        return (!warnings.isEmpty());
+        return !warnings.isEmpty();
     }
 
     public String[] warnings() {

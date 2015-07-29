@@ -153,9 +153,9 @@ public class EndnoteImporter extends ImportFormat {
                 } else if (prefix.equals("0")) {
                     if (val.indexOf("Journal") == 0) {
                         Type = "article";
-                    } else if ((val.indexOf("Book Section") == 0)) {
+                    } else if (val.indexOf("Book Section") == 0) {
                         Type = "incollection";
-                    } else if ((val.indexOf("Book") == 0)) {
+                    } else if (val.indexOf("Book") == 0) {
                         Type = "book";
                     } else if (val.indexOf("Edited Book") == 0) {
                         Type = "book";
@@ -261,7 +261,7 @@ public class EndnoteImporter extends ImportFormat {
                 hm.put("editor", fixAuthor(editor));
             }
             //if pages missing and article number given, use the article number
-            if (((hm.get("pages") == null) || hm.get("pages").equals("-")) && !artnum.equals("")) {
+            if ((hm.get("pages") == null || hm.get("pages").equals("-")) && !artnum.equals("")) {
                 hm.put("pages", artnum);
             }
 
@@ -295,7 +295,7 @@ public class EndnoteImporter extends ImportFormat {
         }
         // Look for the comma at the end:
         index = s.lastIndexOf(",");
-        if (index == (s.length() - 1)) {
+        if (index == s.length() - 1) {
             String mod = s.substring(0, s.length() - 1).replaceAll(", ", " and ");
             return AuthorList.fixAuthor_lastNameFirst(mod);
         } else {

@@ -93,7 +93,7 @@ public class MSBibDatabase {
         //    		return bibitems;
         }
 
-        NodeList sourceList = ((Element) (rootLst.item(0))).getElementsByTagName(bcol + "Source");
+        NodeList sourceList = ((Element) rootLst.item(0)).getElementsByTagName(bcol + "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
             MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i), bcol);
             entries.add(entry);

@@ -142,7 +142,7 @@ class CitationManager {
             StringBuilder sb = new StringBuilder();
             for (int j = 0; j < keys.size(); j++) {
                 sb.append(keys.get(j));
-                if (j < (keys.size() - 1)) {
+                if (j < keys.size() - 1) {
                     sb.append(", ");
                 }
             }
@@ -150,8 +150,8 @@ class CitationManager {
         }
 
         public boolean pageInfoChanged() {
-            if (((pageInfo != null) && (origPageInfo == null))
-                    || ((pageInfo == null) && (origPageInfo != null))) {
+            if (pageInfo != null && origPageInfo == null
+                    || pageInfo == null && origPageInfo != null) {
                 return true;
             }
             if (pageInfo != null) {
@@ -201,7 +201,7 @@ class CitationManager {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
+            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0) {
                     SingleCitDialog scd = new SingleCitDialog(list.get(row));

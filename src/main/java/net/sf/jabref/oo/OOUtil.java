@@ -117,7 +117,7 @@ class OOUtil {
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (!ss.isEmpty()) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, bold % 2 > 0, italic % 2 > 0,
                         mono > 0, smallCaps > 0, sup > 0, sub > 0);
             }
             String tag = m.group();
@@ -154,7 +154,7 @@ class OOUtil {
 
         if (piv < lText.length()) {
             OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
-                    (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
+                    bold % 2 > 0, italic % 2 > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
         }
 
         cursor.collapseToEnd();
@@ -303,7 +303,7 @@ class OOUtil {
             String value = e.getField(field);
             // If the running JabRef version doesn't support post-processing in Layout,
             // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
+            if (!OpenOfficePanel.postLayoutSupported && value != null) {
                 e.setField(field, OOUtil.postformatter.format(value));
             }
         }

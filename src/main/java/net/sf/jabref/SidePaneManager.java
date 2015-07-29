@@ -69,7 +69,7 @@ public class SidePaneManager {
     }
 
     public synchronized boolean hasComponent(String name) {
-        return (components.get(name) != null);
+        return components.get(name) != null;
     }
 
     public boolean isComponentVisible(String name) {
@@ -216,8 +216,8 @@ public class SidePaneManager {
             String comp2Name = getComponentName(comp2);
 
             // Manually provide default values, since getOrDefault() doesn't exist prior to Java 8
-            int pos1 = (preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0);
-            int pos2 = (preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0);
+            int pos1 = preferredPositions.containsKey(comp1Name) ? preferredPositions.get(comp1Name) : 0;
+            int pos2 = preferredPositions.containsKey(comp2Name) ? preferredPositions.get(comp2Name) : 0;
 
             return Integer.valueOf(pos1).compareTo(pos2);
         }
@@ -241,7 +241,7 @@ public class SidePaneManager {
     public synchronized void moveDown(SidePaneComponent comp) {
         if (visible.contains(comp)) {
             int currIndex = visible.indexOf(comp);
-            if (currIndex < (visible.size() - 1)) {
+            if (currIndex < visible.size() - 1) {
                 int newIndex = currIndex + 1;
                 visible.remove(currIndex);
                 visible.add(newIndex, comp);

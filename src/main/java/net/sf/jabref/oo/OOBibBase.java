@@ -289,7 +289,7 @@ class OOBibBase {
             String keyString = sb.toString();
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
-                    withText ? (inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT) : OOBibBase.INVISIBLE_CIT);
+                    withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
             //XTextContent content = insertBookMark(bName, xViewCursor);
 
             // If we should store metadata for page info, do that now:
@@ -477,7 +477,7 @@ class OOBibBase {
                     for (int j = 0; j < keys.length; j++) {
                         normCitMarkers[i][j] = cEntries[j].getCiteKey();
                         sb.append(cEntries[j].getCiteKey());
-                        if (j < (keys.length - 1)) {
+                        if (j < keys.length - 1) {
                             sb.append(',');
                         }
                     }
@@ -616,7 +616,7 @@ class OOBibBase {
                         seenBefore.add(bibtexKeys[j][k]);
                     }
                     String uniq = uniquefiers.get(bibtexKeys[j][k]);
-                    if ((uniq != null) && (uniq.length() >= 0)) {
+                    if (uniq != null && uniq.length() >= 0) {
                         needsChange = true;
                         BibtexDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {
@@ -677,7 +677,7 @@ class OOBibBase {
             text.removeTextContent(bm);
 
             insertReferenceMark(names[i], citMarkers[i], cursor, types[i] != OOBibBase.INVISIBLE_CIT, style);
-            if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
+            if (hadBibSection && getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null) {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
@@ -996,7 +996,7 @@ class OOBibBase {
         for (int i = 0; i < charBefore; i++) {
             try {
                 cursor.goLeft((short) 1, true);
-                if ((i >= (charBefore - flex)) && Character.isWhitespace(cursor.getString().charAt(0))) {
+                if (i >= charBefore - flex && Character.isWhitespace(cursor.getString().charAt(0))) {
                     break;
                 }
             } catch (Exception ex) {
@@ -1006,10 +1006,10 @@ class OOBibBase {
         int length = cursor.getString().length();
         int added = length - citPart.length();
         cursor.collapseToStart();
-        for (int i = 0; i < (charAfter + length); i++) {
+        for (int i = 0; i < charAfter + length; i++) {
             try {
                 cursor.goRight((short) 1, true);
-                if (i >= ((charAfter + length) - flex)) {
+                if (i >= charAfter + length - flex) {
                     String strNow = cursor.getString();
                     if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
                         break;
@@ -1158,7 +1158,7 @@ class OOBibBase {
         XTextCursor mxDocCursor = text.createTextCursorByRange(range.getEnd());
         mxDocCursor.goRight((short) 1, true);
         boolean couldExpand = true;
-        while (couldExpand && (compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0)) {
+        while (couldExpand && compare.compareRegionEnds(mxDocCursor, rangeEnd) > 0) {
             couldExpand = mxDocCursor.goRight((short) 1, true);
         }
         // Finally, clear the bibliography:
@@ -1361,7 +1361,7 @@ class OOBibBase {
 
         int piv = 0;
         boolean madeModifications = false;
-        while (piv < (names.length - 1)) {
+        while (piv < names.length - 1) {
             XTextRange r1 = UnoRuntime.queryInterface
                     (XTextContent.class, nameAccess.getByName(names[piv])).getAnchor().getEnd();
             XTextRange r2 = UnoRuntime.queryInterface
@@ -1374,12 +1374,12 @@ class OOBibBase {
             XTextCursor mxDocCursor = r1.getText().createTextCursorByRange(r1);
             mxDocCursor.goRight((short) 1, true);
             boolean couldExpand = true;
-            while (couldExpand && (compare.compareRegionEnds(mxDocCursor, r2) > 0)) {
+            while (couldExpand && compare.compareRegionEnds(mxDocCursor, r2) > 0) {
                 couldExpand = mxDocCursor.goRight((short) 1, true);
             }
             String text = mxDocCursor.getString();
             // Check if the string contains no line breaks and only whitespace:
-            if ((text.indexOf('\n') == -1) && (text.trim().isEmpty())) {
+            if (text.indexOf('\n') == -1 && text.trim().isEmpty()) {
 
                 // If we are supposed to set character format for citations, test this before
                 // making any changes. This way we can throw an exception before any reference

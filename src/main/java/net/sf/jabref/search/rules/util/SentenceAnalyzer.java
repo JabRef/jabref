@@ -22,7 +22,7 @@ public class SentenceAnalyzer {
         boolean quoted = false;
         for(char c : query.toCharArray()) {
             // Check if we are entering an escape sequence:
-            if (!escaped && (c == ESCAPE_CHAR)) {
+            if (!escaped && c == ESCAPE_CHAR) {
                 escaped = true;
             } else {
                 // See if we have reached the end of a word:

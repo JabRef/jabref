@@ -191,8 +191,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
             String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)
-                    && (count < 2)) {
+            while ((nextPage = getCitationsFromUrl(urlQuery, res)) != null
+                    && count < 2) {
                 urlQuery = nextPage;
                 count++;
                 if (stopFetching) {
@@ -261,7 +261,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             String s = new URLDownload(url).downloadToString();
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
-            if ((pr != null) && (pr.getDatabase() != null)) {
+            if (pr != null && pr.getDatabase() != null) {
                 Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
                 if (entries.size() == 1) {
                     BibtexEntry entry = entries.iterator().next();
@@ -317,13 +317,13 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         HashMap<String, String> items = new HashMap<String, String>();
         while (m.find()) {
             String name = m.group(2);
-            if ((name.length() > 2) && (name.charAt(0) == '"')
-                    && (name.charAt(name.length() - 1) == '"')) {
+            if (name.length() > 2 && name.charAt(0) == '"'
+                    && name.charAt(name.length() - 1) == '"') {
                 name = name.substring(1, name.length() - 1);
             }
             String value = m.group(3);
-            if ((value.length() > 2) && (value.charAt(0) == '"')
-                    && (value.charAt(value.length() - 1) == '"')) {
+            if (value.length() > 2 && value.charAt(0) == '"'
+                    && value.charAt(value.length() - 1) == '"') {
                 value = value.substring(1, value.length() - 1);
             }
             items.put(name, value);

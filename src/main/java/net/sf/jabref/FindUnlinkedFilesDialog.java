@@ -394,7 +394,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         }
 
         String path = textfieldDirectoryPath.getText();
-        if ((path == null) || path.equals("")) {
+        if (path == null || path.equals("")) {
             fileChooser.setCurrentDirectory(lastSelectedDirectory);
         } else {
             fileChooser.setCurrentDirectory(new File(path));
@@ -556,7 +556,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         final List<File> fileList = getFileListFromNode(root);
 
-        if ((fileList == null) || fileList.isEmpty()) {
+        if (fileList == null || fileList.isEmpty()) {
             return;
         }
 
@@ -606,7 +606,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void importFinishedHandler(int count, List<String> errors) {
 
-        if ((errors != null) && (!errors.isEmpty())) {
+        if (errors != null && !errors.isEmpty()) {
 
             JOptionPane.showMessageDialog(this, "The import finished with warnings:\n" + "There " + (errors.size() > 1 ? "were " : "was ") + errors.size() + (errors.size() > 1 ? " files" : " file") + (errors.size() > 1 ? " which" : " that") + " could not be imported.",
                     Globals.lang("Warning"),
@@ -720,7 +720,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             CheckableTreeNode child = childs.nextElement();
             if (child.isLeaf() && child.getSelected()) {
                 File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
-                if ((nodeFile != null) && nodeFile.isFile()) {
+                if (nodeFile != null && nodeFile.isFile()) {
                     filesList.add(nodeFile);
                     nodesToRemove.add(child);
                 }
@@ -734,7 +734,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             model.removeNodeFromParent(nodeToRemove);
 
             // remove empty parent node
-            while ((parent != null) && parent.isLeaf()) {
+            while (parent != null && parent.isLeaf()) {
                 DefaultMutableTreeNode pp = (DefaultMutableTreeNode) parent.getParent();
                 if (pp != null) {
                     model.removeNodeFromParent(parent);
@@ -1015,7 +1015,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                     CheckableTreeNode node = (CheckableTreeNode) path.getLastPathComponent();
                     if (e.getClickCount() == 2) {
                         Object userObject = node.getUserObject();
-                        if ((userObject instanceof FileNodeWrapper) && node.isLeaf()) {
+                        if (userObject instanceof FileNodeWrapper && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
                                 Util.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");

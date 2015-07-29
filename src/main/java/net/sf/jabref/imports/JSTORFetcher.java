@@ -217,11 +217,11 @@ public class JSTORFetcher implements EntryFetcher {
             String headerName = conn.getHeaderFieldKey(i);
             String headerValue = conn.getHeaderField(i);
 
-            if ((headerName == null) && (headerValue == null)) {
+            if (headerName == null && headerValue == null) {
                 // No more headers
                 break;
             }
-            if ((headerName != null) && headerName.equals("Set-Cookie")) {
+            if (headerName != null && headerName.equals("Set-Cookie")) {
                 if (headerValue.startsWith(name)) {
                     // several key-value-pairs are separated by ';'
                     StringTokenizer st = new StringTokenizer(headerValue, "; ");

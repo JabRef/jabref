@@ -93,7 +93,7 @@ class StringDialog extends JDialog {
 
             @Override
             protected boolean accept(Component c) {
-                return (super.accept(c) && (c instanceof StringTable));
+                return super.accept(c) && c instanceof StringTable;
             }
         });
 
@@ -225,9 +225,9 @@ class StringDialog extends JDialog {
 
         @Override
         public Object getValueAt(int row, int col) {
-            return ((col == 0) ?
+            return col == 0 ?
                     ((BibtexString) strings[row]).getName() :
-                    ((BibtexString) strings[row]).getContent());
+                    ((BibtexString) strings[row]).getContent();
         }
 
         @Override
@@ -284,7 +284,7 @@ class StringDialog extends JDialog {
 
                 if (!value.equals(subject.getContent())) {
                     try {
-                        (new LatexFieldFormatter()).format((String) value, "__dummy");
+                        new LatexFieldFormatter().format((String) value, "__dummy");
                     } catch (IllegalArgumentException ex) {
                         return;
                     }
@@ -312,8 +312,8 @@ class StringDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return ((col == 0) ?
-                    Globals.lang("Name") : Globals.lang("Content"));
+            return col == 0 ?
+                    Globals.lang("Name") : Globals.lang("Content");
         }
 
         @Override
@@ -484,7 +484,7 @@ class StringDialog extends JDialog {
                 assureNotEditing();
 
                 String msg = Globals.lang("Really delete the selected") + ' ' +
-                        ((sel.length > 1) ? sel.length + " " + Globals.lang("entries")
+                        (sel.length > 1 ? sel.length + " " + Globals.lang("entries")
                                 : Globals.lang("entry")) + '?';
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Globals.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION,

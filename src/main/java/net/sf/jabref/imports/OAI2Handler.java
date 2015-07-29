@@ -91,7 +91,7 @@ public class OAI2Handler extends DefaultHandler {
             entry.setField("pages", pages);
         } else if (qualifiedName.equals("datestamp")) {
             String year = entry.getField("year");
-            if ((year == null) || year.equals("")) {
+            if (year == null || year.equals("")) {
                 entry.setField("year", content.replaceFirst("-.*", ""));
             }
         } else if (qualifiedName.equals("title")) {

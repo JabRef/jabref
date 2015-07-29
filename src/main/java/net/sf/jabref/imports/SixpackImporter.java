@@ -65,7 +65,7 @@ public class SixpackImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
-        while (((str = in.readLine()) != null) && (i < 50)) {
+        while ((str = in.readLine()) != null && i < 50) {
 
             if (str.contains(SEPARATOR)) {
                 return true;

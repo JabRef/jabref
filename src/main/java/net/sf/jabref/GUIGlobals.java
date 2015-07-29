@@ -394,7 +394,7 @@ public class GUIGlobals {
             middle = ""; // english in base help dir.
         }
 
-        return (GUIGlobals.helpPre + middle);
+        return GUIGlobals.helpPre + middle;
     }
 
     /**

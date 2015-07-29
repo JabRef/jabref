@@ -208,7 +208,7 @@ public class UtilFindFiles {
 
         String found = UtilFindFiles.findFile(entry, database, root, file);
 
-        if ((directory == null) || !relative) {
+        if (directory == null || !relative) {
             return found;
         }
 
@@ -222,7 +222,7 @@ public class UtilFindFiles {
                 // Changed by M. Alver 2007.01.04:
                 // Remove first character if it is a directory separator character:
                 String tmp = found.substring(root.getCanonicalPath().length());
-                if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
+                if (tmp.length() > 1 && tmp.charAt(0) == File.separatorChar) {
                     tmp = tmp.substring(1);
                 }
                 return tmp;
@@ -262,7 +262,7 @@ public class UtilFindFiles {
 
         if (fileParts.length > 1) {
 
-            for (int i = 0; i < (fileParts.length - 1); i++) {
+            for (int i = 0; i < fileParts.length - 1; i++) {
 
                 String dirToProcess = fileParts[i];
 
@@ -348,7 +348,7 @@ public class UtilFindFiles {
                         return toMatch.matcher(arg1).matches();
                     }
                 });
-                if ((matches == null) || (matches.length == 0)) {
+                if (matches == null || matches.length == 0) {
                     return null;
                 }
 
@@ -373,7 +373,7 @@ public class UtilFindFiles {
                 return toMatch.matcher(arg1).matches();
             }
         });
-        if ((matches == null) || (matches.length == 0)) {
+        if (matches == null || matches.length == 0) {
             return null;
         }
 

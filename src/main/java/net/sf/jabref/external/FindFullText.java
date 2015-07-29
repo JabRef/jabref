@@ -58,12 +58,12 @@ public class FindFullText {
         String urlText = entry.getField("url");
         String doiText = entry.getField("doi");
         // First try the DOI link, if defined:
-        if ((doiText != null) && (!doiText.trim().isEmpty())) {
+        if (doiText != null && !doiText.trim().isEmpty()) {
             doiText = DOIUtil.getDOI(doiText);
             FindResult resDoi = lookForFullTextAtURL(Globals.DOI_LOOKUP_PREFIX + doiText);
             if (resDoi.status == FindFullText.FOUND_PDF) {
                 return resDoi;
-            } else if ((urlText != null) && (!urlText.trim().isEmpty())) {
+            } else if (urlText != null && !urlText.trim().isEmpty()) {
                 FindResult resUrl = lookForFullTextAtURL(urlText);
                 if (resUrl.status == FindFullText.FOUND_PDF) {
                     return resUrl;
@@ -76,7 +76,7 @@ public class FindFullText {
             }
         }
         // No DOI? Try URL:
-        else if ((urlText != null) && (!urlText.trim().isEmpty())) {
+        else if (urlText != null && !urlText.trim().isEmpty()) {
             return lookForFullTextAtURL(urlText);
         }
         // No URL either? Return error code.
@@ -100,7 +100,7 @@ public class FindFullText {
                         // it could be because the user doesn't have access:
                         try {
                             String mimeType = new URLDownload(result).determineMimeType();
-                            if ((mimeType != null) && (mimeType.toLowerCase().equals("application/pdf"))) {
+                            if (mimeType != null && mimeType.toLowerCase().equals("application/pdf")) {
                                 return new FindResult(result, url);
                             }
                             else {
@@ -148,7 +148,7 @@ public class FindFullText {
             int responseCode = huc.getResponseCode();
             String location = huc.getHeaderField("location");
             huc.disconnect();
-            if ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP) && (redirectCount < 5)) {
+            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP && redirectCount < 5) {
                 //System.out.println(responseCode);
                 //System.out.println(location);
                 try {

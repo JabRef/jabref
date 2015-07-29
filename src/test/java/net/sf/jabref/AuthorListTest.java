@@ -297,7 +297,7 @@ public class AuthorListTest {
     }
 
     public static int size(String bibtex) {
-        return (AuthorList.getAuthorList(bibtex)).size();
+        return AuthorList.getAuthorList(bibtex).size();
     }
 
     @Test

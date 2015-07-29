@@ -73,7 +73,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      *            a <code>String</code>
      */
     public void removeLabelPattern(String type) {
-        if (containsKey(type) && (parent != null)) {
+        if (containsKey(type) && parent != null) {
             remove(type);
         }
     }

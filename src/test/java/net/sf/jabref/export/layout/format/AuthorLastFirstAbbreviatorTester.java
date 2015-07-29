@@ -69,7 +69,7 @@ public class AuthorLastFirstAbbreviatorTester {
     }
 
     protected String abbreviate(String name) {
-        return (new AuthorLastFirstAbbreviator()).format(name);
+        return new AuthorLastFirstAbbreviator().format(name);
     }
 
 }

@@ -119,7 +119,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 else { // User indicated to store anyway.
                        // See if the database has the protected flag set:
                     Vector<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
-                    boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
+                    boolean databaseProtectionFlag = pd != null && Boolean.parseBoolean(pd.get(0));
                     if (databaseProtectionFlag) {
                         JOptionPane.showMessageDialog(frame, Globals.lang("Database is protected. Cannot save until external changes have been reviewed."),
                                 Globals.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
@@ -158,7 +158,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled || (panel.getFile() == null)) {
+        if (cancelled || panel.getFile() == null) {
             return;
         }
 
@@ -357,10 +357,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             f = new File(chosenFile);
             // Check if the file already exists:
-            if (f.exists() && (JOptionPane.showConfirmDialog
+            if (f.exists() && JOptionPane.showConfirmDialog
                     (frame, '\'' + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
                             Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                        != JOptionPane.OK_OPTION)) {
+                        != JOptionPane.OK_OPTION) {
                 f = null;
             }
         }

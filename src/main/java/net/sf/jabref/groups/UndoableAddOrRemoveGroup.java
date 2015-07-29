@@ -116,7 +116,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         GroupTreeNode cursor = m_groupsRootHandle;
         final int childIndex = m_pathToNode[m_pathToNode.length - 1];
         // traverse path up to butlast element
-        for (int i = 0; i < (m_pathToNode.length - 1); ++i) {
+        for (int i = 0; i < m_pathToNode.length - 1; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(m_pathToNode[i]);
         }
         if (undo) {
@@ -127,8 +127,8 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
             case REMOVE_NODE_KEEP_CHILDREN:
                 // move all children to newNode, then add newNode
                 GroupTreeNode newNode = m_subtreeBackup.deepCopy();
-                for (int i = childIndex; i < (childIndex
-                        + m_subtreeRootChildCount); ++i) {
+                for (int i = childIndex; i < childIndex
+                        + m_subtreeRootChildCount; ++i) {
                     newNode.add((GroupTreeNode) cursor.getChildAt(childIndex));
                 }
                 cursor.insert(newNode, childIndex);

@@ -72,7 +72,7 @@ public class NameListNormalizer {
         // comma separation before the last separator. If there are two or more
         // and separators, we can dismiss this possibility.
         // If there is only a single and separator, check closer:
-        if (andSep && (authors.length == 2)) {
+        if (andSep && authors.length == 2) {
             // Check if the first part is semicolon separated:
             String[] semiSep = authors[0].split("; ");
             if (semiSep.length > 1) {
@@ -87,7 +87,7 @@ public class NameListNormalizer {
             else {
                 // Check if there is a comma in the last name. If so, we can assume that comma
                 // is not used to separate the names:
-                boolean lnfn = (authors[1].indexOf(",") > 0);
+                boolean lnfn = authors[1].indexOf(",") > 0;
                 if (!lnfn) {
                     String[] cmSep = authors[0].split(", ");
                     if (cmSep.length > 1) {
@@ -110,7 +110,7 @@ public class NameListNormalizer {
         for (int i = 0; i < authors.length; i++) {
             String norm = NameListNormalizer.normalizeName(authors[i]);
             sb.append(norm);
-            if (i < (authors.length - 1)) {
+            if (i < authors.length - 1) {
                 sb.append(" and ");
             }
         }
@@ -126,7 +126,7 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < (initials.length() - 1)) {
+                if (i < initials.length() - 1) {
                     sb.append(' ');
                 }
             }
@@ -140,7 +140,7 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < (initials.length() - 1)) {
+                if (i < initials.length() - 1) {
                     sb.append(' ');
                 }
             }
@@ -155,7 +155,7 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < (initials.length() - 1)) {
+                if (i < initials.length() - 1) {
                     sb.append(' ');
                 }
             }
@@ -169,7 +169,7 @@ public class NameListNormalizer {
             for (int i = 0; i < initials.length(); i++) {
                 sb.append(initials.charAt(i));
                 sb.append('.');
-                if (i < (initials.length() - 1)) {
+                if (i < initials.length() - 1) {
                     sb.append(' ');
                 }
             }
@@ -180,7 +180,7 @@ public class NameListNormalizer {
             // Name contains comma
             int index = name.lastIndexOf(',');
             // If the comma is at the end of the name, just remove it to prevent index error:
-            if (index == (name.length() - 1)) {
+            if (index == name.length() - 1) {
                 name = name.substring(0, name.length() - 1);
             }
 
@@ -197,7 +197,7 @@ public class NameListNormalizer {
                     } else {
                         sb.append(fParts[i]);
                     }
-                    if (i < (fParts.length - 1)) {
+                    if (i < fParts.length - 1) {
                         sb.append(' ');
                     }
                 }
@@ -212,7 +212,7 @@ public class NameListNormalizer {
                     for (int i = 0; i < initials.length(); i++) {
                         sb.append(initials.charAt(i));
                         sb.append('.');
-                        if (i < (initials.length() - 1)) {
+                        if (i < initials.length() - 1) {
                             sb.append(' ');
                         }
                     }
@@ -237,7 +237,7 @@ public class NameListNormalizer {
                 StringBuilder sb = new StringBuilder(parts[parts.length - 1]);
                 if (parts.length > 1) {
                     sb.append(',');
-                    for (int i = 0; i < (parts.length - 1); i++) {
+                    for (int i = 0; i < parts.length - 1; i++) {
                         sb.append(' ').append(parts[i]);
                         if (parts[i].length() == 1) {
                             sb.append('.');

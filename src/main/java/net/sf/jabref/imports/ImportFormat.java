@@ -156,9 +156,9 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      */
     @Override
     public boolean equals(Object o) {
-        return (o != null)
-                && (o instanceof ImportFormat)
-                && (((ImportFormat) o).getIsCustomImporter() == getIsCustomImporter())
+        return o != null
+                && o instanceof ImportFormat
+                && ((ImportFormat) o).getIsCustomImporter() == getIsCustomImporter()
                 && ((ImportFormat) o).getFormatName().equals(getFormatName());
     }
 

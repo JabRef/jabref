@@ -134,7 +134,7 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if ((unoil != null) && (jurt != null)) {
+            if (unoil != null && jurt != null) {
                 Globals.prefs.put("ooUnoilPath", unoil.getPath());
                 Globals.prefs.put("ooJurtPath", jurt.getPath());
                 return true;
@@ -173,7 +173,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 if (fileSearchCancelled) {
                     return false;
                 }
-                if ((unoil != null) && (jurt != null)) {
+                if (unoil != null && jurt != null) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
@@ -205,14 +205,14 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            if ((inUsr != null) && (inOpt == null)) {
+            if (inUsr != null && inOpt == null) {
                 return setupPreferencesForOO(usrRoot, inUsr);
             }
-            else if ((inOpt != null) && (inUsr == null)) {
+            else if (inOpt != null && inUsr == null) {
                 Globals.prefs.put("ooExecutablePath", new File(inOpt, "soffice.bin").getPath());
                 File unoil = findFileDir(new File("/opt"), "unoil.jar");
                 File jurt = findFileDir(new File("/opt"), "jurt.jar");
-                if ((unoil != null) && (jurt != null)) {
+                if (unoil != null && jurt != null) {
                     Globals.prefs.put("ooUnoilPath", unoil.getPath());
                     Globals.prefs.put("ooJurtPath", jurt.getPath());
                     return true;
@@ -260,7 +260,7 @@ public class AutoDetectPaths extends AbstractWorker {
         if (fileSearchCancelled) {
             return false;
         }
-        if ((unoil != null) && (jurt != null)) {
+        if (unoil != null && jurt != null) {
             Globals.prefs.put("ooUnoilPath", unoil.getPath());
             Globals.prefs.put("ooJurtPath", jurt.getPath());
             return true;

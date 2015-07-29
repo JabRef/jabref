@@ -329,7 +329,7 @@ public class IsiImporterTest {
         BibtexEntry a = entries.get(0);
         BibtexEntry b = entries.get(1);
 
-        if ((a.getField("title")).startsWith("Estrogen")) {
+        if (a.getField("title").startsWith("Estrogen")) {
             BibtexEntry tmp = a;
             a = b;
             b = tmp;

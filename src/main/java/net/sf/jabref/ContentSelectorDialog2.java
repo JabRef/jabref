@@ -342,7 +342,7 @@ class ContentSelectorDialog2 extends JDialog {
     }
 
     private void newWordAction() {
-        if ((wordListModel.isEmpty()) ||
+        if (wordListModel.isEmpty() ||
                 !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT)) {
             wordListModel.add(0, WORD_FIRSTLINE_TEXT);
         }
@@ -364,14 +364,14 @@ class ContentSelectorDialog2 extends JDialog {
         // Cycle through all fields that we have created listmodels for:
         for (String fieldName : wordListModels.keySet()) {
             // For each field name, store the values:
-            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName)) {
+            if (fieldName == null || FIELD_FIRST_LINE.equals(fieldName)) {
                 continue;
             }
             DefaultListModel lm = wordListModels.get(fieldName);
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
             if (!lm.isEmpty()) {
-                while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT)) {
+                while (start < lm.size() && lm.get(start).equals(WORD_FIRSTLINE_TEXT)) {
                     start++;
                 }
             }

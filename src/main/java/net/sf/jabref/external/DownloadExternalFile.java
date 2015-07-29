@@ -73,7 +73,7 @@ public class DownloadExternalFile {
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().isEmpty())) {
+        if (res == null || res.trim().isEmpty()) {
             return;
         }
 
@@ -131,7 +131,7 @@ public class DownloadExternalFile {
                     udlF.downloadToFile(tmp);
                 } catch (IOException e2) {
                     dontShowDialog = true;
-                    if ((editor != null) && (editor.isVisible())) {
+                    if (editor != null && editor.isVisible()) {
                         editor.setVisible(false, false);
                     }
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
@@ -235,8 +235,8 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && entry.getLink().startsWith(directory) &&
-                        (entry.getLink().length() > dirPrefix.length())) {
+                if (directory != null && entry.getLink().startsWith(directory) &&
+                        entry.getLink().length() > dirPrefix.length()) {
                     entry.setLink(entry.getLink().substring(dirPrefix.length()));
                 }
 
@@ -319,7 +319,7 @@ public class DownloadExternalFile {
         try {
             // Try to strip the query string, if any, to get the correct suffix:
             URL url = new URL(link);
-            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
+            if (url.getQuery() != null && url.getQuery().length() < link.length() - 1) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
         } catch (MalformedURLException e) {
@@ -329,7 +329,7 @@ public class DownloadExternalFile {
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
         int index = strippedLink.lastIndexOf('.');
-        if ((index <= 0) || (index == (strippedLink.length() - 1))) {
+        if (index <= 0 || index == strippedLink.length() - 1) {
             suffix = null;
         } else {
             suffix = strippedLink.substring(index + 1);
@@ -340,7 +340,7 @@ public class DownloadExternalFile {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == (strippedLink.length() - 1))) {
+            if (index <= 0 || index == strippedLink.length() - 1) {
                 // No occurence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:

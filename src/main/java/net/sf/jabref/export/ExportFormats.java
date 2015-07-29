@@ -164,7 +164,7 @@ public class ExportFormats {
         int lastBreak = -firstLineSubtr;
 
         for (String name : ExportFormats.exportFormats.keySet()) {
-            if (((sb.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
+            if (sb.length() + 2 + name.length() - lastBreak > maxLineLength) {
                 sb.append(",\n");
                 lastBreak = sb.length();
                 sb.append(linePrefix);
@@ -318,7 +318,7 @@ public class ExportFormats {
                     };
 
                     // Run the export action in a background thread:
-                    (exportWorker.getWorker()).run();
+                    exportWorker.getWorker().run();
                     // Run the update method:
                     exportWorker.update();
                 }

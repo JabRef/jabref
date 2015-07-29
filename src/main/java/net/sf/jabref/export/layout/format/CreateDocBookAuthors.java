@@ -99,26 +99,26 @@ public class CreateDocBookAuthors implements LayoutFormatter
         for (int i = 0; i < al.size(); i++) {
             sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);
-            if ((a.getFirst() != null) && (!a.getFirst().isEmpty())) {
+            if (a.getFirst() != null && !a.getFirst().isEmpty()) {
                 sb.append("<firstname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getFirst()));
                 sb.append("</firstname>");
             }
-            if ((a.getVon() != null) && (!a.getVon().isEmpty())) {
+            if (a.getVon() != null && !a.getVon().isEmpty()) {
                 sb.append("<othername>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getVon()));
                 sb.append("</othername>");
             }
-            if ((a.getLast() != null) && (!a.getLast().isEmpty())) {
+            if (a.getLast() != null && !a.getLast().isEmpty()) {
                 sb.append("<surname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getLast()));
-                if ((a.getJr() != null) && (!a.getJr().isEmpty())) {
+                if (a.getJr() != null && !a.getJr().isEmpty()) {
                     sb.append(' ').append(CreateDocBookAuthors.xc.format(a.getJr()));
                 }
                 sb.append("</surname>");
             }
 
-            if (i < (al.size() - 1)) {
+            if (i < al.size() - 1) {
                 sb.append("</").append(tagName).append(">\n       ");
             } else {
                 sb.append("</").append(tagName).append('>');
@@ -161,11 +161,11 @@ public class CreateDocBookAuthors implements LayoutFormatter
             sb.append("</firstname>");
             sb.append("<othername role=\"mi\">");
 
-            for (int i = 1; i < (v.size() - 1); i++)
+            for (int i = 1; i < v.size() - 1; i++)
             {
                 sb.append(v.get(i));
 
-                if (i < (v.size() - 2))
+                if (i < v.size() - 2)
                 {
                     sb.append(' ');
                 }

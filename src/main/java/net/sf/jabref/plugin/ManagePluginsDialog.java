@@ -246,7 +246,7 @@ class ManagePluginsDialog {
             ud.downloadToFile(tmpFile);
             String path = url.getPath();
             int pos = path.lastIndexOf('/');
-            if ((pos >= 0) && (pos < (path.length() - 1))) {
+            if (pos >= 0 && pos < path.length() - 1) {
                 path = path.substring(pos + 1);
             }
             PluginInstaller.installPlugin(frame, tmpFile, path);

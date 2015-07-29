@@ -121,11 +121,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
-                if ((old != null) && !old.equals("") && !overWriteAllowed) {
+                if (old != null && !old.equals("") && !overWriteAllowed) {
                     continue;
                 }
                 extPan.setEntry(aSel, panel.getDatabase());
-                editor.setText((old != null) ? old : "");
+                editor.setText(old != null ? old : "");
                 JabRefExecutorService.INSTANCE.executeAndWait(extPan.autoSetFile(fieldName, editor));
                 // If something was found, entriesChanged it:
                 if (!editor.getText().equals("") && !editor.getText().equals(old)) {
@@ -144,11 +144,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
-                if ((old != null) && !old.equals("")) {
+                if (old != null && !old.equals("")) {
                     // Get an absolute path representation:
                     File file = FileUtil.expandFilename(old, dirs);
 
-                    if ((file == null) || !file.exists()) {
+                    if (file == null || !file.exists()) {
 
                         int answer =
                                 JOptionPane.showOptionDialog(panel.frame(),

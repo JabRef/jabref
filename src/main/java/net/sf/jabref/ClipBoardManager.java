@@ -68,7 +68,7 @@ public class ClipBoardManager implements ClipboardOwner
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         //odd: the Object param of getContents is not currently used
         Transferable contents = clipboard.getContents(null);
-        if ((contents != null) &&
+        if (contents != null &&
                 contents.isDataFlavorSupported(DataFlavor.stringFlavor))
         {
             try
