@@ -478,7 +478,7 @@ public class RepecNepImporter extends ImportFormat {
                 message += ", paper no. " + paperNoStr + ": ";
             }
             message += e.getMessage();
-            LOGGER.debug(message, e);
+            LOGGER.error(message, e);
             if (!(e instanceof IOException)) {
                 e.printStackTrace();
                 e = new IOException(message);

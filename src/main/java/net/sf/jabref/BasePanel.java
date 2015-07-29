@@ -294,7 +294,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
                         file);
             } catch (IOException ex) {
-                LOGGER.debug("Could not register FileUpdateMonitor", ex);
+                LOGGER.warn("Could not register FileUpdateMonitor", ex);
             }
         }
 
@@ -1340,7 +1340,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             try {
                                 Util.openFolderAndSelectFile(f.getAbsolutePath());
                             } catch (IOException e) {
-                                LOGGER.debug("Could not open folder", e);
+                                LOGGER.info("Could not open folder", e);
                             }
                         }
                     }

@@ -376,7 +376,7 @@ public class BibtexParser {
                                     + Globals.lang("grouping may not work for this entry") + ")");
                         }
                     } catch (IOException ex) {
-                        LOGGER.debug("Could not parse entry", ex);
+                        LOGGER.warn("Could not parse entry", ex);
                         parserResult.addWarning(Globals.lang("Error occured when parsing entry") + ": '"
                                 + ex.getMessage() + "'. " + Globals.lang("Skipped entry."));
 

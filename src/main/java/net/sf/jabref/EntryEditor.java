@@ -1752,7 +1752,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public void actionPerformed(ActionEvent event) {
             FileListEditor fileListEditor = EntryEditor.this.fileListEditor;
             if (fileListEditor == null) {
-                LOGGER.debug("No file list editor found.");
+                LOGGER.warn("No file list editor found.");
             } else {
                 fileListEditor.autoSetLinks();
             }
