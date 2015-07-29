@@ -168,11 +168,8 @@
 				<include name="plugins/**" />
 			</fileset>
 			<fileset dir="${txt.dir}">
-				<include name="gpl2.txt" />
-				<include name="gpl3.txt" />
-				<include name="lesser.txt" />
-				<include name="jgoodies.txt" />
-				<include name="README" />
+				<include name="LICENSE" />
+				<include name="README.md" />
 			</fileset>
 			<manifest>
 				<attribute name="Main-Class" value="net.sf.jabref.JabRefMain" />
@@ -446,10 +443,8 @@ version=${jabref.version}</echo>
 
 		<copy todir="${win.installer.dir}/dist">
 			<fileset dir="${txt.dir}">
-				<include name="gpl2.txt" />
-				<include name="gpl3.txt" />
-				<include name="lesser.txt" />
-				<include name="README" />
+				<include name="LICENSE" />
+				<include name="README.md" />
 			</fileset>
 		</copy>
 

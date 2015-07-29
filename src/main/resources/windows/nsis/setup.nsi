@@ -1,5 +1,5 @@
 # owner		JabRef Team
-# license	GPL version 3
+# license	GPL version 2
 # author	Uwe Stöhr and others
 
 ; To compile this script NSIS 2.23 and newer are required
@@ -25,7 +25,7 @@ Name "JabRef ${VERSION}"
 !define PRODUCT_EXE "JabRef.exe"
 !define PRODUCT_NAME "JabRef"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-!define PRODUCT_LICENSE_FILE "dist\gpl3.txt"
+!define PRODUCT_LICENSE_FILE "dist\LICENSE"
 !define AppUserModelId "JabRef.${VERSION}"
 
 # Variables
