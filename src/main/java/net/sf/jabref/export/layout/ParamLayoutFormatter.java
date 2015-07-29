@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.export.layout;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
-
 /**
  * This interface extends LayoutFormatter, adding the capability of taking
  * and additional parameter. Such a parameter is specified in the layout file

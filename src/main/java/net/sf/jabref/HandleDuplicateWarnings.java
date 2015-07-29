@@ -15,8 +15,6 @@
 */
 package net.sf.jabref;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;
 
