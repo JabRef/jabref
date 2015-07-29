@@ -228,17 +228,16 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public boolean readyToClose() {
         // Test if font size is a number:
-        if (validateIntegerField("Menu and label font size", fontSize.getText(), "Changed font settings") == false) {
+        if (!validateIntegerField("Menu and label font size", fontSize.getText(), "Changed font settings")) {
             return false;
         }
 
         // Test if row padding is a number:
-        if (validateIntegerField("Table row height padding", rowPadding.getText(), "Changed table appearance settings") == false) {
+        if (!validateIntegerField("Table row height padding", rowPadding.getText(), "Changed table appearance settings")) {
             return false;
         }
 
         return true;
-
     }
 
     @Override
