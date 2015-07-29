@@ -15,11 +15,11 @@
 */
 package net.sf.jabref.search;
 
-import java.util.Comparator;
-
-import com.google.common.base.Preconditions;
-import net.sf.jabref.BibtexEntry;
 import ca.odell.glazedlists.matchers.Matcher;
+import net.sf.jabref.BibtexEntry;
+
+import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * This Comparator compares two objects based on whether none, one of them, or both
@@ -30,7 +30,7 @@ public class HitOrMissComparator implements Comparator<BibtexEntry> {
     private final Matcher<BibtexEntry> hitOrMiss;
 
     public HitOrMissComparator(Matcher<BibtexEntry> hitOrMiss) {
-        this.hitOrMiss = Preconditions.checkNotNull(hitOrMiss);
+        this.hitOrMiss = Objects.requireNonNull(hitOrMiss);
     }
 
     @Override

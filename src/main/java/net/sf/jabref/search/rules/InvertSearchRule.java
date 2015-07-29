@@ -1,12 +1,13 @@
 package net.sf.jabref.search.rules;
 
-import com.google.common.base.Preconditions;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.search.SearchRule;
 
+import java.util.Objects;
+
 /**
  * Inverts the search result.
- *
+ * <p>
  * Example:
  * false --> true
  * true --> false
@@ -16,7 +17,7 @@ public class InvertSearchRule implements SearchRule {
     private final SearchRule otherRule;
 
     public InvertSearchRule(SearchRule otherRule) {
-        this.otherRule = Preconditions.checkNotNull(otherRule);
+        this.otherRule = Objects.requireNonNull(otherRule);
     }
 
     @Override

@@ -18,6 +18,7 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -30,7 +31,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.google.common.base.Optional;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
@@ -287,7 +287,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         try {
             return Optional.of(Integer.parseInt(remoteServerPort.getText()));
         } catch (NumberFormatException ex) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

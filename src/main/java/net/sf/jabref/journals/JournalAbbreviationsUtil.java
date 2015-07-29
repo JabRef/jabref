@@ -48,7 +48,7 @@ public class JournalAbbreviationsUtil {
             }
 
             public String toggleAbbreviation(String currentText) {
-                return Globals.journalAbbrev.getNextAbbreviation(currentText).or(currentText);
+                return Globals.journalAbbrev.getNextAbbreviation(currentText).orElse(currentText);
             }
         });
 

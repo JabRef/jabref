@@ -1,18 +1,10 @@
 package net.sf.jabref.journals.logic;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
@@ -22,7 +14,7 @@ public class AbbreviationParser {
     private final List<Abbreviation> abbreviations = new LinkedList<>();
 
     public void readJournalListFromResource(String resourceFileName) {
-        URL url = checkNotNull(JournalAbbreviationRepository.class.getResource(checkNotNull(resourceFileName)));
+        URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
         try {
             readJournalList(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
@@ -32,7 +24,7 @@ public class AbbreviationParser {
     }
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
-        readJournalList(new FileReader(checkNotNull(file)));
+        readJournalList(new FileReader(Objects.requireNonNull(file)));
     }
 
     /**

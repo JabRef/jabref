@@ -15,18 +15,11 @@
 */
 package net.sf.jabref.journals.logic;
 
-import com.google.common.base.Optional;
-
 import net.sf.jabref.Globals;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
@@ -41,7 +34,7 @@ public class JournalAbbreviationRepository {
 
     public void readJournalListFromResource(String resource) {
         AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromResource(checkNotNull(resource));
+        parser.readJournalListFromResource(Objects.requireNonNull(resource));
         for (Abbreviation abbreviation : parser.getAbbreviations()) {
             addEntry(abbreviation);
         }
@@ -49,7 +42,7 @@ public class JournalAbbreviationRepository {
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
         AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromFile(checkNotNull(file));
+        parser.readJournalListFromFile(Objects.requireNonNull(file));
         for (Abbreviation abbreviation : parser.getAbbreviations()) {
             addEntry(abbreviation);
         }
@@ -60,14 +53,14 @@ public class JournalAbbreviationRepository {
     }
 
     public boolean isKnownName(String journalName) {
-        String s = checkNotNull(journalName).trim().toLowerCase();
+        String s = Objects.requireNonNull(journalName).trim().toLowerCase();
         return fullNameLowerCase2Abbreviation.get(s) != null
                 || isoLowerCase2Abbreviation.get(s) != null
                 || medlineLowerCase2Abbreviation.get(s) != null;
     }
 
     public boolean isAbbreviatedName(String journalName) {
-        String s = checkNotNull(journalName).trim().toLowerCase();
+        String s = Objects.requireNonNull(journalName).trim().toLowerCase();
         return isoLowerCase2Abbreviation.get(s) != null
                 || medlineLowerCase2Abbreviation.get(s) != null;
     }
@@ -79,7 +72,7 @@ public class JournalAbbreviationRepository {
      * @return The abbreviated name
      */
     public Optional<Abbreviation> getAbbreviation(String journalName) {
-        String s = checkNotNull(journalName).toLowerCase().trim();
+        String s = Objects.requireNonNull(journalName).toLowerCase().trim();
 
         if (fullNameLowerCase2Abbreviation.containsKey(s)) {
             return Optional.of(fullNameLowerCase2Abbreviation.get(s));
@@ -88,12 +81,12 @@ public class JournalAbbreviationRepository {
         } else if (medlineLowerCase2Abbreviation.containsKey(s)) {
             return Optional.of(medlineLowerCase2Abbreviation.get(s));
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
     public void addEntry(Abbreviation abbreviation) {
-        checkNotNull(abbreviation);
+        Objects.requireNonNull(abbreviation);
 
         if (isKnownName(abbreviation.getName())) {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
@@ -117,7 +110,7 @@ public class JournalAbbreviationRepository {
         Optional<Abbreviation> abbreviation = getAbbreviation(text);
 
         if (!abbreviation.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Abbreviation abbr = abbreviation.get();
@@ -128,7 +121,7 @@ public class JournalAbbreviationRepository {
         Optional<Abbreviation> abbreviation = getAbbreviation(text);
 
         if (!abbreviation.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Abbreviation abbr = abbreviation.get();
@@ -139,7 +132,7 @@ public class JournalAbbreviationRepository {
         Optional<Abbreviation> abbreviation = getAbbreviation(text);
 
         if (!abbreviation.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Abbreviation abbr = abbreviation.get();

@@ -1,6 +1,5 @@
 package net.sf.jabref.search.describer;
 
-import com.google.common.base.Preconditions;
 import net.sf.jabref.Globals;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchParser;
@@ -8,6 +7,7 @@ import net.sf.jabref.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.util.StringUtil;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
@@ -19,7 +19,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
     public GrammarBasedSearchRuleDescriber(boolean caseSensitive, boolean regExp, ParseTree parseTree) {
         this.caseSensitive = caseSensitive;
         this.regExp = regExp;
-        this.parseTree = Preconditions.checkNotNull(parseTree);
+        this.parseTree = Objects.requireNonNull(parseTree);
     }
 
     @Override

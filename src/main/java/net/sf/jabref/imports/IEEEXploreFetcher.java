@@ -514,7 +514,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = Globals.journalAbbrev.getMedlineAbbreviation(fullName).or(fullName);
+                    fullName = Globals.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
                 }
             }
             if (type.getName().equals("Inproceedings")) {
