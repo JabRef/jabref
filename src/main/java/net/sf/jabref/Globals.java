@@ -203,6 +203,8 @@ public class Globals {
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
+    
+    public static JournalAbbreviationRepository journalAbbrev;
 
     /**
      * 	"Fieldname" to indicate that a field should be treated as a bibtex 
@@ -249,10 +251,7 @@ public class Globals {
         javax.swing.JComponent.setDefaultLocale(locale);
     }
 
-
-    public static JournalAbbreviationRepository journalAbbrev;
-
-    public static String lang(String key, String[] params) {
+    public static String lang(String key, String... params) {
         String translation = null;
         try {
             if (Globals.messages != null) {
@@ -308,18 +307,6 @@ public class Globals {
 
     public static String lang(String key) {
         return Globals.lang(key, (String[]) null);
-    }
-
-    public static String lang(String key, String s1) {
-        return Globals.lang(key, new String[] {s1});
-    }
-
-    public static String lang(String key, String s1, String s2) {
-        return Globals.lang(key, new String[] {s1, s2});
-    }
-
-    public static String lang(String key, String s1, String s2, String s3) {
-        return Globals.lang(key, new String[] {s1, s2, s3});
     }
 
     public static String menuTitle(String key) {
