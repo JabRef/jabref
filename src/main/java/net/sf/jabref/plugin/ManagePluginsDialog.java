@@ -19,7 +19,7 @@ import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 import java.awt.*;
@@ -191,14 +191,14 @@ class ManagePluginsDialog {
         }
         SortedList<NameAndVersion> pluginsOther = new SortedList<NameAndVersion>(outsideUserDir);
         TableFormat<NameAndVersion> tableFormatOther = new PluginTableFormat();
-        DefaultEventTableModel<NameAndVersion> tableModel = new DefaultEventTableModel<NameAndVersion>(pluginsOther, tableFormatOther);
+        EventTableModel<NameAndVersion> tableModel = new EventTableModel<NameAndVersion>(pluginsOther, tableFormatOther);
         tableOther.setModel(tableModel);
         tableOther.getColumnModel().getColumn(0).setPreferredWidth(200);
         tableOther.getColumnModel().getColumn(1).setPreferredWidth(50);
         tableOther.getColumnModel().getColumn(2).setPreferredWidth(50);
 
         TableFormat<NameAndVersion> tableFormat = new PluginTableFormat();
-        DefaultEventTableModel<NameAndVersion> tableModelOther = new DefaultEventTableModel<NameAndVersion>(plugins, tableFormat);
+        EventTableModel<NameAndVersion> tableModelOther = new EventTableModel<NameAndVersion>(plugins, tableFormat);
         table.setModel(tableModelOther);
         table.getColumnModel().getColumn(0).setPreferredWidth(200);
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
