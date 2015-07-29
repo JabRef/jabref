@@ -105,8 +105,6 @@ public class Globals {
 
     private static int SHORTCUT_MASK = -1;
 
-    public static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
-
     // used at highlighting in preview area. 
     // Color chosen similar to JTextComponent.getSelectionColor(), which is
     // used at highlighting words at the editor 
