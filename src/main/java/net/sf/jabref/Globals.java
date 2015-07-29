@@ -195,8 +195,6 @@ public class Globals {
     public static final boolean ON_MAC = (Globals.osName.equals(Globals.MAC)), ON_WIN = Globals.osName.startsWith("Windows"),
             ON_LINUX = Globals.osName.startsWith("Linux");
 
-    public static final String SEPARATING_CHARS_NOSPACE = ";,\n";
-
     public static SidePaneManager sidePaneManager;
 
     // will be overridden in initialization due to feature #857

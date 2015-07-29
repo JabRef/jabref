@@ -120,6 +120,8 @@ public class Util {
     private static final Log LOGGER = LogFactory.getLog(Util.class);
     
     private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
+    
+    private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
 
     /**
      * This method sets the location of a Dialog such that it is centered with
@@ -1597,7 +1599,7 @@ public class Util {
         // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
         // if nothing is found, " " is likely to be the separating char.
         // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, Globals.SEPARATING_CHARS_NOSPACE);
+        StringTokenizer tok = new StringTokenizer(keywords, SEPARATING_CHARS_NOSPACE);
         while (tok.hasMoreTokens()) {
             String word = tok.nextToken().trim();
             res.add(word);
