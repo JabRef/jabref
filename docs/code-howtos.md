@@ -49,7 +49,7 @@ When accessing a preference value, the method Globals.prefs.getTYPE(key) has to 
 
 # Test Cases
 
-If Globals.prefs are not initialized in a test case, try to add Globals.prefs = JabRefPreferences.getInstance(); 
+If `Globals.prefs` are not initialized in a test case, try to add `Globals.prefs = JabRefPreferences.getInstance();` 
 
 # UI for Preferences
 
