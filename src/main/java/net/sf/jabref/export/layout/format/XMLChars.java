@@ -45,7 +45,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 /**
  * Changes {\^o} or {\^{o}} to ?
  */
-public class XMLCharFormatter implements LayoutFormatter {
+public class XMLChars implements LayoutFormatter {
 
     private final static XmlCharsMap XML_CHARS = new XmlCharsMap();
     

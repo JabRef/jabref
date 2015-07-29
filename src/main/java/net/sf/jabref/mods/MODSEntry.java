@@ -29,7 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.XMLCharFormatter;
+import net.sf.jabref.export.layout.format.XMLChars;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -83,7 +83,7 @@ class MODSEntry {
     }
 
     private void populateFromBibtex(BibtexEntry bibtex) {
-        LayoutFormatter chars = new XMLCharFormatter();
+        LayoutFormatter chars = new XMLChars();
         if (bibtex.getField("title") != null) {
             if (CHARFORMAT) {
                 title = chars.format(bibtex.getField("title"));
@@ -149,7 +149,7 @@ class MODSEntry {
 
     private List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new LinkedList<PersonName>();
-        LayoutFormatter chars = new XMLCharFormatter();
+        LayoutFormatter chars = new XMLChars();
 
         if (!authors.contains(" and ")) {
             if (CHARFORMAT) {

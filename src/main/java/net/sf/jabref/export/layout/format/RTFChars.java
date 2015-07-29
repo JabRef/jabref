@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  *
  *   5.) Replace --- by \emdash and -- by \endash.
  */
-public class RTFCharFormatter implements LayoutFormatter {
+public class RTFChars implements LayoutFormatter {
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);

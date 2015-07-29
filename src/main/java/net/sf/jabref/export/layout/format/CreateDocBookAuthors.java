@@ -49,7 +49,7 @@ import net.sf.jabref.AuthorList;
 public class CreateDocBookAuthors implements LayoutFormatter
 {
 
-    private static final XMLCharFormatter xc = new XMLCharFormatter();
+    private static final XMLChars xc = new XMLChars();
 
 
     @Override

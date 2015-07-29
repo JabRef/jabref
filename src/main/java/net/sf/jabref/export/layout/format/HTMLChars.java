@@ -22,7 +22,7 @@ import net.sf.jabref.util.StringUtil;
 /**
  * This formatter escapes characters so they are suitable for HTML.
  */
-public class HTMLCharFormatter implements LayoutFormatter {
+public class HTMLChars implements LayoutFormatter {
     
     private static final HtmlCharsMap HTML_CHARS = new HtmlCharsMap();
 
