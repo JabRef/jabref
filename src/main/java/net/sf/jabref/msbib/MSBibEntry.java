@@ -34,7 +34,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.XMLChars;
+import net.sf.jabref.export.layout.format.XMLCharFormatter;
 import net.sf.jabref.mods.PageNumbers;
 import net.sf.jabref.mods.PersonName;
 
@@ -566,7 +566,7 @@ class MSBibEntry {
             return null;
         }
         String result = null;
-        LayoutFormatter chars = new XMLChars();
+        LayoutFormatter chars = new XMLCharFormatter();
         result = chars.format(value);
         return result;
     }

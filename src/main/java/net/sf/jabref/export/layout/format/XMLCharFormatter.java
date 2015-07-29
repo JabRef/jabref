@@ -45,14 +45,17 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 /**
  * Changes {\^o} or {\^{o}} to ?
  */
-public class XMLChars implements LayoutFormatter {
+public class XMLCharFormatter implements LayoutFormatter {
+
+    private static XmlCharsMap xmlChars = new XmlCharsMap();
+
 
     @Override
     public String format(String fieldText) {
 
         fieldText = firstFormat(fieldText);
 
-        for (Map.Entry<String, String> entry : Globals.XML_CHARS.entrySet()) {
+        for (Map.Entry<String, String> entry : xmlChars.entrySet()) {
             String s = entry.getKey();
             String repl = entry.getValue();
             if (repl != null) {
