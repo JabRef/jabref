@@ -170,7 +170,6 @@
 			<fileset dir="${txt.dir}">
 				<include name="gpl2.txt" />
 				<include name="gpl3.txt" />
-				<include name="lesser.txt" />
 				<include name="README.md" />
 			</fileset>
 			<manifest>
