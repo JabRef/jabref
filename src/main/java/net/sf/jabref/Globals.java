@@ -366,13 +366,11 @@ public class Globals {
 
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
-
     public static final HashMap<String, String> HTMLCHARS = new HashMap<String, String>();
     public static final HashMap<String, String> XML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> RTFCHARS = new HashMap<String, String>();
-    private static final HashMap<String, String> URL_CHARS = new HashMap<String, String>();
 
 
     public static int getShortcutMask() {
@@ -389,17 +387,6 @@ public class Globals {
 
 
     static {
-
-        // Special characters in URLs need to be replaced to ensure that the URL
-        // opens properly on all platforms:
-        Globals.URL_CHARS.put("<", "%3c");
-        Globals.URL_CHARS.put(">", "%3e");
-        Globals.URL_CHARS.put("(", "%28");
-        Globals.URL_CHARS.put(")", "%29");
-        Globals.URL_CHARS.put(" ", "%20");
-        Globals.URL_CHARS.put("&", "%26");
-        Globals.URL_CHARS.put("$", "%24");
-
         // Following character definitions contributed by Ervin Kolenovic:
         // HTML named entities from #192 - #255 (UNICODE Latin-1)
         Globals.HTMLCHARS.put("`A", "&Agrave;"); // #192
