@@ -1,5 +1,5 @@
-
 [master]
+    - Remove Mr.DLib support as MR.DLib will be shut down in 2015
     - Streamline logging API: Replace usages of java.util.logging with commons.logging
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)
     - Update dependencies: jersey, commons.logging, pdfbox, jgoodies, lazedlists, JDBC connectors

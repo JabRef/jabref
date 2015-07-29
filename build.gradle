@@ -102,13 +102,7 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'com.sun.jersey:jersey-client:1.19'
-    compile 'com.sun.jersey:jersey-core:1.19'
-    compile 'com.sun.jersey.contribs:jersey-multipart:1.19'
-
-    compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
-
-    compile 'junit:junit:4.12'
+   compile 'junit:junit:4.12'
 }
 
 // use ant targets with prefix antTargets.XXXXX
