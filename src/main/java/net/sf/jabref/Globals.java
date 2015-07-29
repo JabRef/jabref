@@ -43,7 +43,7 @@ import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.util.BuildInfo;
 import net.sf.jabref.util.error.StreamEavesdropper;
-import net.sf.jabref.util.logging.CachebleHandler;
+import net.sf.jabref.util.logging.CacheableHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -136,7 +136,7 @@ public class Globals {
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
     public static StreamEavesdropper streamEavesdropper;
-    public static CachebleHandler handler;
+    public static CacheableHandler handler;
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
@@ -238,7 +238,7 @@ public class Globals {
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
     
     public static void setupLogHandlerForErrorConsole() {
-        Globals.handler = new CachebleHandler();
+        Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(handler);
     }
     
