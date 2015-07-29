@@ -44,7 +44,7 @@ class TextAnalyzer {
 
     private void guessBibtexFields(String text) {
 
-        TreeSet<Substring> usedParts = new TreeSet<Substring>();
+        TreeSet<Substring> usedParts = new TreeSet<>();
 
         text = "  " + text + "  ";
 
@@ -155,7 +155,7 @@ class TextAnalyzer {
 
         // Then try to find title and authors.
         Substring ss;
-        Vector<String> free = new Vector<String>();
+        Vector<String> free = new Vector<>();
         int piv = 0;
         for (Substring usedPart : usedParts) {
             ss = usedPart;

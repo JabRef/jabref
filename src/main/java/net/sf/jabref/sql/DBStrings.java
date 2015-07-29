@@ -104,7 +104,7 @@ public class DBStrings {
         return serverTypes;
     }
 
-    private void setServerTypes(String[] serverTypes) {
+    private void setServerTypes(String... serverTypes) {
         this.serverTypes = serverTypes;
     }
 

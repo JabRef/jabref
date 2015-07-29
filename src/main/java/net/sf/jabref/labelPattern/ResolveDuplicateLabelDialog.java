@@ -33,7 +33,7 @@ import java.util.List;
 class ResolveDuplicateLabelDialog {
 
     private final JDialog diag;
-    private final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
+    private final List<JCheckBox> cbs = new ArrayList<>();
     private boolean okPressed = false;
 
     private static final String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
@@ -91,21 +91,11 @@ class ResolveDuplicateLabelDialog {
 
         diag.pack();
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                okPressed = true;
-                diag.dispose();
-            }
+        ok.addActionListener(actionEvent -> {
+            okPressed = true;
+            diag.dispose();
         });
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                diag.dispose();
-            }
-        });
+        cancel.addActionListener(actionEvent -> diag.dispose());
 
         AbstractAction closeAction = new AbstractAction() {
 

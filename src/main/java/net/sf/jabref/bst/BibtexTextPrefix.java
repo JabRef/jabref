@@ -41,7 +41,7 @@ public class BibtexTextPrefix {
      */
     public static String textPrefix(int numOfChars, String toPrefix, Warn warn) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         char[] cs = toPrefix.toCharArray();
         int n = cs.length;

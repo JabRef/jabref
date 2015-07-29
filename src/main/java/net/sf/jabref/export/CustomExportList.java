@@ -35,13 +35,13 @@ public class CustomExportList {
 
     private final EventList<String[]> list;
     private final SortedList<String[]> sorted;
-    private final TreeMap<String, ExportFormat> formats = new TreeMap<String, ExportFormat>();
+    private final TreeMap<String, ExportFormat> formats = new TreeMap<>();
     private Object[] array;
 
 
     public CustomExportList(Comparator<String[]> comp) {
-        list = new BasicEventList<String[]>();
-        sorted = new SortedList<String[]>(list, comp);
+        list = new BasicEventList<>();
+        sorted = new SortedList<>(list, comp);
     }
 
     public TreeMap<String, ExportFormat> getCustomExportFormats() {
@@ -76,7 +76,7 @@ public class CustomExportList {
         }
     }
 
-    private ExportFormat createFormat(String[] s) {
+    private ExportFormat createFormat(String... s) {
         if (s.length < 3) {
             return null;
         }
@@ -92,13 +92,13 @@ public class CustomExportList {
         return format;
     }
 
-    public void addFormat(String[] s) {
+    public void addFormat(String... s) {
         list.add(s);
         ExportFormat format = createFormat(s);
         formats.put(format.getConsoleName(), format);
     }
 
-    public void remove(String[] toRemove) {
+    public void remove(String... toRemove) {
 
         ExportFormat format = createFormat(toRemove);
         formats.remove(format.getConsoleName());

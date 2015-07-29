@@ -77,13 +77,13 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibtexEntry... entries) {
         // not supported -> ignore
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibtexEntry... entries) {
         // not supported -> ignore
         return null;
     }

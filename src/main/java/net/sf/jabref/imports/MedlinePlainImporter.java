@@ -87,7 +87,7 @@ public class MedlinePlainImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -107,7 +107,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String author = "";
             String editor = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<String, String>();
+            HashMap<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
@@ -138,7 +138,8 @@ public class MedlinePlainImporter extends ImportFormat {
 
                 String lab = entry.substring(0, entry.indexOf('-')).trim();
                 String val = entry.substring(entry.indexOf('-') + 1).trim();
-                if (lab.equals("PT")) {
+                switch (lab) {
+                case "PT":
                     val = val.toLowerCase();
                     if (val.equals("BOOK")) {
                         type = "book";
@@ -163,7 +164,8 @@ public class MedlinePlainImporter extends ImportFormat {
                         type = "other";
                     }
 
-                } else if (lab.equals("TI")) {
+                    break;
+                case "TI":
                     String oldVal = hm.get("title");
                     if (oldVal == null) {
                         hm.put("title", val);
@@ -174,78 +176,102 @@ public class MedlinePlainImporter extends ImportFormat {
                             hm.put("title", oldVal + ": " + val);
                         }
                     }
-                }
+                    break;
                 // =
                 // val;
-                else if (lab.equals("BTI") || lab.equals("CTI")) {
+                case "BTI":
+                case "CTI":
                     hm.put("booktitle", val);
-                } else if (lab.equals("FAU")) {
+                    break;
+                case "FAU":
                     if (author.equals("")) {
                         author = val;
                     } else {
                         author += " and " + val;
                     }
-                } else if (lab.equals("FED")) {
+                    break;
+                case "FED":
                     if (editor.equals("")) {
                         editor = val;
                     } else {
                         editor += " and " + val;
                     }
-                } else if (lab.equals("JT")) {
+                    break;
+                case "JT":
                     if (type.equals("inproceedings")) {
                         hm.put("booktitle", val);
                     } else {
                         hm.put("journal", val);
                     }
-                } else if (lab.equals("PG")) {
+                    break;
+                case "PG":
                     hm.put("pages", val);
-                } else if (lab.equals("PL")) {
+                    break;
+                case "PL":
                     hm.put("address", val);
-                } else if (lab.equals("IS")) {
+                    break;
+                case "IS":
                     hm.put("issn", val);
-                } else if (lab.equals("VI")) {
+                    break;
+                case "VI":
                     hm.put("volume", val);
-                } else if (lab.equals("AB")) {
+                    break;
+                case "AB":
                     String oldAb = hm.get("abstract");
                     if (oldAb == null) {
                         hm.put("abstract", val);
                     } else {
                         hm.put("abstract", oldAb + "\n" + val);
                     }
-                } else if (lab.equals("DP")) {
+                    break;
+                case "DP":
                     String[] parts = val.split(" ");
                     hm.put("year", parts[0]);
                     if (parts.length > 1 && !parts[1].isEmpty()) {
                         hm.put("month", parts[1]);
                     }
-                } else if (lab.equals("MH") || lab.equals("OT")) {
+                    break;
+                case "MH":
+                case "OT":
                     if (!hm.containsKey("keywords")) {
                         hm.put("keywords", val);
                     } else {
                         String kw = hm.get("keywords");
                         hm.put("keywords", kw + ", " + val);
                     }
-                } else if (lab.equals("CON") || lab.equals("CIN") || lab.equals("EIN")
-                        || lab.equals("EFR") || lab.equals("CRI") || lab.equals("CRF")
-                        || lab.equals("PRIN") || lab.equals("PROF") || lab.equals("RPI")
-                        || lab.equals("RPF") || lab.equals("RIN") || lab.equals("ROF")
-                        || lab.equals("UIN") || lab.equals("UOF") || lab.equals("SPIN")
-                        || lab.equals("ORI")) {
+                    break;
+                case "CON":
+                case "CIN":
+                case "EIN":
+                case "EFR":
+                case "CRI":
+                case "CRF":
+                case "PRIN":
+                case "PROF":
+                case "RPI":
+                case "RPF":
+                case "RIN":
+                case "ROF":
+                case "UIN":
+                case "UOF":
+                case "SPIN":
+                case "ORI":
                     if (!comment.isEmpty()) {
                         comment = comment + "\n";
                     }
                     comment = comment + val;
-                }
+                    break;
                 //                // Added ID import 2005.12.01, Morten Alver:
                 //                else if (lab.equals("ID"))
                 //                    hm.put("refid", val);
                 //                    // Added doi import (sciencedirect.com) 2011.01.10, Alexander Hug <alexander@alexanderhug.info>
-                else if (lab.equals("AID")) {
+                case "AID":
                     String doi = val;
                     if (doi.startsWith("doi:")) {
                         doi = doi.replaceAll("(?i)doi:", "").trim();
                         hm.put("doi", doi);
                     }
+                    break;
                 }
             }
             // fix authors
@@ -265,7 +291,7 @@ public class MedlinePlainImporter extends ImportFormat {
                     .getEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<Object>();
+            ArrayList<Object> toRemove = new ArrayList<>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
                 if (content == null || content.trim().isEmpty()) {

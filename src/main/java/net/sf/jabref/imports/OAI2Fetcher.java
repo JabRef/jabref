@@ -113,9 +113,7 @@ public class OAI2Fetcher implements EntryFetcher {
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
     }

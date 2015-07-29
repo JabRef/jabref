@@ -99,7 +99,7 @@ public class GUIGlobals {
     public static final String helpPre = "/help/";
     public static String fontPath = "/images/font/";
 
-    private static final HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
+    private static final HashMap<String, JLabel> tableIcons = new HashMap<>(); // Contains table icon mappings. Set up
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
 
@@ -226,7 +226,7 @@ public class GUIGlobals {
     public static final Map<String, String> LANGUAGES;
 
     static {
-        LANGUAGES = new TreeMap<String, String>();
+        LANGUAGES = new TreeMap<>();
 
         // LANGUAGES contains mappings for supported languages.
         GUIGlobals.LANGUAGES.put("English", "en");
@@ -356,7 +356,7 @@ public class GUIGlobals {
      * @throws IOException
      */
     private static HashMap<String, String> readIconThemeFile(URL file, String prefix) throws IOException {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         InputStream in = null;
         try {
             in = file.openStream();

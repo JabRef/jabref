@@ -210,24 +210,20 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         public void actionPerformed(ActionEvent arg0) {
 
             // Background this, as it takes a while.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                try {
+                    PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+                    pras.add(new JobName(entry.getCiteKey(), null));
+                    previewPane.print(null, null, true, null, pras, false);
 
-                @Override
-                public void run() {
-                    try {
-                        PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                        pras.add(new JobName(entry.getCiteKey(), null));
-                        previewPane.print(null, null, true, null, pras, false);
+                } catch (PrinterException e) {
 
-                    } catch (PrinterException e) {
-
-                        // Inform the user... we don't know what to do.
-                        JOptionPane.showMessageDialog(PreviewPanel.this,
-                                Globals.lang("Could not print preview") + ".\n"
-                                        + e.getMessage(),
-                                Globals.lang("Printing Entry Preview"),
-                                JOptionPane.ERROR_MESSAGE);
-                    }
+                    // Inform the user... we don't know what to do.
+                    JOptionPane.showMessageDialog(PreviewPanel.this,
+                            Globals.lang("Could not print preview") + ".\n"
+                                    + e.getMessage(),
+                            Globals.lang("Printing Entry Preview"),
+                            JOptionPane.ERROR_MESSAGE);
                 }
             });
         }
@@ -338,18 +334,14 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         previewPane.setEditable(false);
         previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
         previewPane.setContentType("text/html");
-        previewPane.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-                if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        String address = hyperlinkEvent.getURL().toString();
-                        Util.openExternalViewer(PreviewPanel.this.metaData,
-                                address, "url");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        previewPane.addHyperlinkListener(hyperlinkEvent -> {
+            if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    String address = hyperlinkEvent.getURL().toString();
+                    Util.openExternalViewer(PreviewPanel.this.metaData,
+                            address, "url");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -416,13 +408,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
         // Scroll to top:
         final JScrollBar bar = scrollPane.getVerticalScrollBar();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                bar.setValue(0);
-            }
-        });
+        SwingUtilities.invokeLater(() -> bar.setValue(0));
 
         // update pdf preview
         if (pdfPreviewPanel != null) {

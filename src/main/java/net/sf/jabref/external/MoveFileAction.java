@@ -175,11 +175,7 @@ public class MoveFileAction extends AbstractAction {
                                 Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
                     }
 
-                } catch (SecurityException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not move file") + ": " + ex.getMessage(),
-                            Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
-                } catch (IOException ex) {
+                } catch (SecurityException | IOException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(frame, Globals.lang("Could not move file") + ": " + ex.getMessage(),
                             Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);

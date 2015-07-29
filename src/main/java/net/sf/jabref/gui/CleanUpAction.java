@@ -121,13 +121,7 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpPageNumbers = new JCheckBox(Globals.lang("Ensure that page ranges are of the form num1--num2"));
         cleanUpMakePathsRelative = new JCheckBox(Globals.lang("Make paths of linked files relative (if possible)"));
         cleanUpRenamePDF = new JCheckBox(Globals.lang("Rename PDFs to given file name format pattern"));
-        cleanUpRenamePDF.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
-            }
-        });
+        cleanUpRenamePDF.addChangeListener(arg0 -> cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected()));
         cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Globals.lang("Rename only PDFs having a relative path"));
         cleanUpUpgradeExternalLinks = new JCheckBox(Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
         cleanUpHTML = new JCheckBox(Globals.lang("Run HTML converter on title"));
@@ -267,7 +261,7 @@ public class CleanUpAction extends AbstractWorker {
         // first upgrade the external links
         // we have to use it separately as the Utils function generates a separate Named Compound
         if (choiceCleanUpUpgradeExternalLinks) {
-            NamedCompound ce = Util.upgradePdfPsToFile(Arrays.asList(panel.getSelectedEntries()), new String[]{"pdf", "ps"});
+            NamedCompound ce = Util.upgradePdfPsToFile(Arrays.asList(panel.getSelectedEntries()), "pdf", "ps");
             if (ce.hasEdits()) {
                 panel.undoManager.addEdit(ce);
                 panel.markBaseChanged();

@@ -91,7 +91,7 @@ public class MedlineImporter extends ImportFormat {
             URLConnection data = url.openConnection();
             return new MedlineImporter().importEntries(data.getInputStream(), status);
         } catch (IOException e) {
-            return new ArrayList<BibtexEntry>();
+            return new ArrayList<>();
         }
     }
 

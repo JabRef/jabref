@@ -47,7 +47,7 @@ public class SearchManager2 extends SidePaneComponent
     /**
      * subscribed Objects
      */
-    private final Vector<SearchTextListener> listeners = new Vector<SearchTextListener>();
+    private final Vector<SearchTextListener> listeners = new Vector<>();
 
     //private JabRefFrame frame;
     private final JTextField searchField = new JTextField("", 12);
@@ -140,15 +140,11 @@ public class SearchManager2 extends SidePaneComponent
             searchOpt.setEnabled(false);
             searchGen.setEnabled(false);
         }
-        searchAll.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                boolean state = !searchAll.isSelected();
-                searchReq.setEnabled(state);
-                searchOpt.setEnabled(state);
-                searchGen.setEnabled(state);
-            }
+        searchAll.addChangeListener(event -> {
+            boolean state = !searchAll.isSelected();
+            searchReq.setEnabled(state);
+            searchOpt.setEnabled(state);
+            searchGen.setEnabled(state);
         });
 
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
@@ -221,16 +217,12 @@ public class SearchManager2 extends SidePaneComponent
             }
         });
 
-        searchAutoComplete.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, searchAutoComplete.isSelected());
-                if (SearchManager2.this.frame.basePanel() != null) {
-                    SearchManager2.this.frame.basePanel().updateSearchManager();
-                }
-
+        searchAutoComplete.addActionListener(actionEvent -> {
+            Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, searchAutoComplete.isSelected());
+            if (SearchManager2.this.frame.basePanel() != null) {
+                SearchManager2.this.frame.basePanel().updateSearchManager();
             }
+
         });
         Insets margin = new Insets(0, 2, 0, 2);
         //search.setMargin(margin);
@@ -385,7 +377,7 @@ public class SearchManager2 extends SidePaneComponent
     private ArrayList<String> getSearchwords(String t) {
         // for now ... just seperate words by whitespace
         String[] strings = t.split(" ");
-        ArrayList<String> words = new ArrayList<String>(strings.length);
+        ArrayList<String> words = new ArrayList<>(strings.length);
         Collections.addAll(words, strings);
         return words;
     }
@@ -494,13 +486,7 @@ public class SearchManager2 extends SidePaneComponent
             return;
         }
 
-        Runnable t = new Runnable() {
-
-            @Override
-            public void run() {
-                clearSearch();
-            }
-        };
+        Runnable t = this::clearSearch;
         // do this after the button action is over
         SwingUtilities.invokeLater(t);
     }
@@ -726,44 +712,40 @@ public class SearchManager2 extends SidePaneComponent
     private void goIncremental() {
         incSearch = true;
         escape.setEnabled(true);
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(() -> {
+            String text = searchField.getText();
 
-            @Override
-            public void run() {
-                String text = searchField.getText();
+            if (incSearchPos >= panel.getDatabase().getEntryCount()) {
+                panel.output('\'' + text + "' : " +
+                        Globals.lang("Incremental search failed. Repeat to search from top.") + '.');
+                incSearchPos = -1;
+                return;
+            }
 
-                if (incSearchPos >= panel.getDatabase().getEntryCount()) {
+            if (searchField.getText().isEmpty()) {
+                return;
+            }
+            if (incSearchPos < 0) {
+                incSearchPos = 0;
+            }
+            BibtexEntry be = panel.mainTable.getEntryAt(incSearchPos);
+            while (!incSearcher.search(text, be)) {
+                incSearchPos++;
+                if (incSearchPos < panel.getDatabase().getEntryCount()) {
+                    be = panel.mainTable.getEntryAt(incSearchPos);
+                } else {
                     panel.output('\'' + text + "' : " +
-                            Globals.lang("Incremental search failed. Repeat to search from top.") + '.');
+                            Globals.lang("Incremental search failed. Repeat to search from top."));
                     incSearchPos = -1;
                     return;
                 }
+            }
+            if (incSearchPos >= 0) {
 
-                if (searchField.getText().isEmpty()) {
-                    return;
-                }
-                if (incSearchPos < 0) {
-                    incSearchPos = 0;
-                }
-                BibtexEntry be = panel.mainTable.getEntryAt(incSearchPos);
-                while (!incSearcher.search(text, be)) {
-                    incSearchPos++;
-                    if (incSearchPos < panel.getDatabase().getEntryCount()) {
-                        be = panel.mainTable.getEntryAt(incSearchPos);
-                    } else {
-                        panel.output('\'' + text + "' : " +
-                                Globals.lang("Incremental search failed. Repeat to search from top."));
-                        incSearchPos = -1;
-                        return;
-                    }
-                }
-                if (incSearchPos >= 0) {
+                panel.selectSingleEntry(incSearchPos);
+                panel.output('\'' + text + "' " +
+                        Globals.lang("found") + '.');
 
-                    panel.selectSingleEntry(incSearchPos);
-                    panel.output('\'' + text + "' " +
-                            Globals.lang("found") + '.');
-
-                }
             }
         });
     }

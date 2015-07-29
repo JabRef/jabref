@@ -28,7 +28,7 @@ public class Quality extends SpecialField {
 
 
     private Quality() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // DO NOT TRANSLATE "qualityAssured" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Globals.lang("Toogle quality assured"), GUIGlobals.getImage("qualityAssured"), Globals.lang("Toogle quality assured")));
         this.setValues(values);

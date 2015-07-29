@@ -75,7 +75,7 @@ public class JabRef {
     private JabRefCLI cli;
     private SplashScreenLifecycle splashScreen = new SplashScreenLifecycle();
 
-    public void start(String[] args) {
+    public void start(String... args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // See if there are plugins scheduled for deletion:
@@ -309,8 +309,8 @@ public class JabRef {
         GUIGlobals.setUpIconTheme();
 
         // Vector to put imported/loaded database(s) in.
-        Vector<ParserResult> loaded = new Vector<ParserResult>();
-        Vector<String> toImport = new Vector<String>();
+        Vector<ParserResult> loaded = new Vector<>();
+        Vector<String> toImport = new Vector<>();
         if (!cli.isBlank() && cli.getLeftOver().length > 0) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
@@ -665,10 +665,10 @@ public class JabRef {
         if (overrideDefaultFonts) {
             int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
             UIDefaults defaults = UIManager.getDefaults();
-            Enumeration<Object> keys = defaults.keys();
+            Iterator<Object> iterator = defaults.keySet().iterator();
             Double zoomLevel = null;
-            while (keys.hasMoreElements()) {
-                Object key = keys.nextElement();
+            while (iterator.hasNext()) {
+                Object key = iterator.next();
                 if (key instanceof String && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {
@@ -759,9 +759,9 @@ public class JabRef {
         // Add all loaded databases to the frame:
 
         boolean first = true;
-        List<File> postponed = new ArrayList<File>();
-        List<ParserResult> failed = new ArrayList<ParserResult>();
-        List<ParserResult> toOpenTab = new ArrayList<ParserResult>();
+        List<File> postponed = new ArrayList<>();
+        List<ParserResult> failed = new ArrayList<>();
+        List<ParserResult> toOpenTab = new ArrayList<>();
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();

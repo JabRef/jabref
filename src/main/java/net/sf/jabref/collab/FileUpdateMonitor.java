@@ -36,7 +36,7 @@ public class FileUpdateMonitor implements Runnable {
     private static final int WAIT = 4000;
 
     private int numberOfUpdateListener = 0;
-    private final HashMap<String, Entry> entries = new HashMap<String, Entry>();
+    private final HashMap<String, Entry> entries = new HashMap<>();
 
     @Override
     public void run() {

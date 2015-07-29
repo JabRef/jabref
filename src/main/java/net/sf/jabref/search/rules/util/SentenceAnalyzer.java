@@ -15,7 +15,7 @@ public class SentenceAnalyzer {
     }
 
     public List<String> getWords() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         StringBuffer sb = new StringBuffer();
         boolean escaped = false;

@@ -34,7 +34,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
 
         if(words.size() > 1) {
             List<String> unprocessedWords = words.subList(1, words.size());
-            List<String> unprocessedWordsInHtmlFormat = new LinkedList<String>();
+            List<String> unprocessedWordsInHtmlFormat = new LinkedList<>();
             for(String word : unprocessedWords) {
                 unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", StringUtil.quoteForHTML(word)));
             }

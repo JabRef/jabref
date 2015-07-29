@@ -27,7 +27,7 @@ class CookieHandlerImpl extends CookieHandler {
 
     // "Long" term storage for cookies, not serialized so only
     // for current JVM instance
-    private final List<Cookie> cache = new LinkedList<Cookie>();
+    private final List<Cookie> cache = new LinkedList<>();
 
 
     /**
@@ -109,7 +109,7 @@ class CookieHandlerImpl extends CookieHandler {
 
         // Map to return
         Map<String, List<String>> cookieMap =
-                new HashMap<String, List<String>>(requestHeaders);
+                new HashMap<>(requestHeaders);
 
         // Convert StringBuilder to List, store in map
         if (cookies.length() > 0) {

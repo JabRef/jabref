@@ -82,13 +82,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
         Document doc = getDocument();
 
         // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
+        doc.addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
 
         // Create an undo action and add it to the text component
         getActionMap().put("Undo",

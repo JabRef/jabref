@@ -59,7 +59,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      *
      * @param val Constructor arguments.
      */
-    public ExternalFileType(String[] val) {
+    public ExternalFileType(String... val) {
         if (val == null || val.length < 4) {
             throw new IllegalArgumentException("Cannot contruct ExternalFileType without four elements in String[] argument.");
         }

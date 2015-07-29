@@ -89,7 +89,7 @@ public class CopacImporter extends ImportFormat {
 
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-        List<String> entries = new LinkedList<String>();
+        List<String> entries = new LinkedList<>();
 
         // Preprocess entries
         String str;
@@ -121,7 +121,7 @@ public class CopacImporter extends ImportFormat {
             entries.add(sb.toString());
         }
 
-        List<BibtexEntry> results = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> results = new LinkedList<>();
 
         for (String entry : entries) {
 
@@ -139,28 +139,40 @@ public class CopacImporter extends ImportFormat {
                 }
                 String code = line.substring(0, 4);
 
-                if (code.equals("TI- ")) {
+                switch (code) {
+                case "TI- ":
                     setOrAppend(b, "title", line.substring(4).trim(), ", ");
-                } else if (code.equals("AU- ")) {
+                    break;
+                case "AU- ":
                     setOrAppend(b, "author", line.substring(4).trim(), " and ");
-                } else if (code.equals("PY- ")) {
+                    break;
+                case "PY- ":
                     setOrAppend(b, "year", line.substring(4).trim(), ", ");
-                } else if (code.equals("PU- ")) {
+                    break;
+                case "PU- ":
                     setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
-                } else if (code.equals("SE- ")) {
+                    break;
+                case "SE- ":
                     setOrAppend(b, "series", line.substring(4).trim(), ", ");
-                } else if (code.equals("IS- ")) {
+                    break;
+                case "IS- ":
                     setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
-                } else if (code.equals("KW- ")) {
+                    break;
+                case "KW- ":
                     setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
-                } else if (code.equals("NT- ")) {
+                    break;
+                case "NT- ":
                     setOrAppend(b, "note", line.substring(4).trim(), ", ");
-                } else if (code.equals("PD- ")) {
+                    break;
+                case "PD- ":
                     setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
-                } else if (code.equals("DT- ")) {
+                    break;
+                case "DT- ":
                     setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
-                } else {
+                    break;
+                default:
                     setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
+                    break;
                 }
             }
             results.add(b);

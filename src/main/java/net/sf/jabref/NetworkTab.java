@@ -56,14 +56,10 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         // We need a listener on useImportInspector to enable and disable the
         // import inspector related choices;
-        useProxy.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                //useProxy.setEnabled(useProxy.isSelected());
-                defProxyHostname.setEnabled(useProxy.isSelected());
-                defProxyPort.setEnabled(useProxy.isSelected());
-            }
+        useProxy.addChangeListener(event -> {
+            //useProxy.setEnabled(useProxy.isSelected());
+            defProxyHostname.setEnabled(useProxy.isSelected());
+            defProxyPort.setEnabled(useProxy.isSelected());
         });
 
         FormLayout layout = new FormLayout

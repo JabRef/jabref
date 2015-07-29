@@ -157,62 +157,46 @@ class StyleSelectDialog {
         BrowseAction sdBrowse = BrowseAction.buildForDir(styleDir, setDirectory);
         browseStyleDir.addActionListener(sdBrowse);
 
-        showDefaultAuthoryearStyle.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                displayDefaultStyle(true);
-            }
-        });
-        showDefaultNumericalStyle.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                displayDefaultStyle(false);
-            }
-        });
+        showDefaultAuthoryearStyle.addActionListener(actionEvent -> displayDefaultStyle(true));
+        showDefaultNumericalStyle.addActionListener(actionEvent -> displayDefaultStyle(false));
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
-        edit.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                int i = table.getSelectedRow();
-                if (i == -1) {
-                    return;
+        edit.addActionListener(actionEvent -> {
+            int i = table.getSelectedRow();
+            if (i == -1) {
+                return;
+            }
+            ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
+            String link = tableModel.getElementAt(i).getFile().getPath();
+            try {
+                if (type != null) {
+                    Util.openExternalFileAnyFormat(new MetaData(), link, type);
+                } else {
+                    Util.openExternalFileUnknown(frame, null, new MetaData(), link,
+                            new UnknownExternalFileType("jstyle"));
                 }
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
-                String link = tableModel.getElementAt(i).getFile().getPath();
-                try {
-                    if (type != null) {
-                        Util.openExternalFileAnyFormat(new MetaData(), link, type);
-                    } else {
-                        Util.openExternalFileUnknown(frame, null, new MetaData(), link,
-                                new UnknownExternalFileType("jstyle"));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
 
-                }
             }
         });
 
         diag = new JDialog(frame, Globals.lang("Styles"), true);
 
-        styles = new BasicEventList<OOBibStyle>();
-        EventList<OOBibStyle> sortedStyles = new SortedList<OOBibStyle>(styles);
+        styles = new BasicEventList<>();
+        EventList<OOBibStyle> sortedStyles = new SortedList<>(styles);
 
         // Create a preview panel for previewing styles:
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
 
-        tableModel = new EventTableModel<OOBibStyle>(sortedStyles, new StyleTableFormat());
+        tableModel = new EventTableModel<>(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        selectionModel = new EventSelectionModel<OOBibStyle>(sortedStyles);
+        selectionModel = new EventSelectionModel<>(sortedStyles);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -358,13 +342,7 @@ class StyleSelectDialog {
 
         diag.pack();
         diag.setLocationRelativeTo(frame);
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                contentPane.setDividerLocation(contentPane.getSize().height - 150);
-            }
-        });
+        SwingUtilities.invokeLater(() -> contentPane.setDividerLocation(contentPane.getSize().height - 150));
 
     }
 
@@ -595,13 +573,7 @@ class StyleSelectDialog {
             bb.addGlue();
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             dd.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-            ok.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    dd.dispose();
-                }
-            });
+            ok.addActionListener(actionEvent -> dd.dispose());
             dd.pack();
             dd.setLocationRelativeTo(diag);
             dd.setVisible(true);
@@ -625,13 +597,9 @@ class StyleSelectDialog {
                 preview.setLayout(style.getReferenceFormat("default"));
                 // Update the preview's entry:
                 contentPane.setDividerLocation(contentPane.getSize().height - 150);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.update();
-                        preview.scrollRectToVisible(toRect);
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    preview.update();
+                    preview.scrollRectToVisible(toRect);
                 });
             }
         }

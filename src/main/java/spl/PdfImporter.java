@@ -78,8 +78,8 @@ public class PdfImporter {
         // sort fileNames in PDFfiles to import and other files
         // PDFfiles: variable files
         // other files: variable noPdfFiles
-        List<String> files = new ArrayList<String>(Arrays.asList(fileNames));
-        List<String> noPdfFiles = new ArrayList<String>();
+        List<String> files = new ArrayList<>(Arrays.asList(fileNames));
+        List<String> noPdfFiles = new ArrayList<>();
         PdfFileFilter pdfFilter = new PdfFileFilter();
         for (String file : files) {
             if (!pdfFilter.accept(file)) {
@@ -117,7 +117,7 @@ public class PdfImporter {
         // Get a list of file directories:
         String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
 
-        List<BibtexEntry> res = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> res = new ArrayList<>();
 
         fileNameLoop: for (String fileName : fileNames) {
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
@@ -279,7 +279,7 @@ public class PdfImporter {
                 panel.database().insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
-                ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
+                ArrayList<BibtexEntry> list = new ArrayList<>();
                 list.add(be);
                 Util.setAutomaticFields(list, true, true, false);
 

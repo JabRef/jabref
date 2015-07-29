@@ -88,7 +88,7 @@ class ZipFileChooser extends JDialog {
         private ZipFile zipFile = null;
 
 
-        ZipFileChooserTableModel(ZipFile zipFile, ZipEntry[] rows) {
+        ZipFileChooserTableModel(ZipFile zipFile, ZipEntry... rows) {
             super();
             this.rows = rows;
             this.zipFile = zipFile;
@@ -186,7 +186,7 @@ class ZipFileChooser extends JDialog {
      * @return  entries that can be selected
      */
     private ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
-        List<ZipEntry> entries = new ArrayList<ZipEntry>();
+        List<ZipEntry> entries = new ArrayList<>();
         Enumeration<? extends ZipEntry> e = zipFile.entries();
         while (e.hasMoreElements()) {
             ZipEntry entry = e.nextElement();
@@ -212,13 +212,7 @@ class ZipFileChooser extends JDialog {
 
         // cancel: no entry is selected
         JButton cancelButton = new JButton(Globals.lang("Cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        cancelButton.addActionListener(e -> dispose());
 
         // ok: get selected class and check if it is instantiable as an importer
         JButton okButton = new JButton(Globals.lang("Ok"));

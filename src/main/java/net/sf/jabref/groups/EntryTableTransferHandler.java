@@ -300,7 +300,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // System.out.println("importing from " + tmpfile.getAbsolutePath());
 
         ImportMenuItem importer = new ImportMenuItem(frame, false);
-        importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
+        importer.automatedImport(tmpfile.getAbsolutePath());
 
         return true;
     }
@@ -317,7 +317,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     public static List<File> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
         String[] lines = s.replaceAll("\r", "").split("\n");
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;
 
@@ -327,9 +327,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             try {
                 URL url = new URL(line);
                 fl = new File(url.toURI());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
+            } catch (URISyntaxException | MalformedURLException e) {
                 e.printStackTrace();
             }
 
@@ -388,18 +386,14 @@ public class EntryTableTransferHandler extends TransferHandler {
         // Try to load bib files normally, and import the rest into the current
         // database.
         // This process must be spun off into a background thread:
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                // Done by MrDlib
-                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
-                if (importRes.noPdfFiles.length > 0) {
-                    loadOrImportFiles(importRes.noPdfFiles, dropRow);
-                }
-                //loadOrImportFiles(fileNames, dropRow);
-                // Done by MrDlib
+        JabRefExecutorService.INSTANCE.execute(() -> {
+            // Done by MrDlib
+            final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
+            if (importRes.noPdfFiles.length > 0) {
+                loadOrImportFiles(importRes.noPdfFiles, dropRow);
             }
+            //loadOrImportFiles(fileNames, dropRow);
+            // Done by MrDlib
         });
 
         return true;
@@ -417,7 +411,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     private void loadOrImportFiles(String[] fileNames, int dropRow) {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
-        ArrayList<String> notBibFiles = new ArrayList<String>();
+        ArrayList<String> notBibFiles = new ArrayList<>();
         String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
@@ -543,7 +537,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         // Import into new if entryTable==null, otherwise into current database:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
-        importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
+        importer.automatedImport(tmpfile.getAbsolutePath());
 
         return true;
     }

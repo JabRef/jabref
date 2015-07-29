@@ -39,7 +39,7 @@ import net.sf.jabref.BibtexFields;
 
 public class SQLUtil {
 
-    private static final ArrayList<String> reservedDBWords = new ArrayList<String>(
+    private static final ArrayList<String> reservedDBWords = new ArrayList<>(
             Collections.singletonList("key"));
 
     private static ArrayList<String> allFields = null;
@@ -54,7 +54,7 @@ public class SQLUtil {
      */
     private static void refreshFields() {
         if (SQLUtil.allFields == null) {
-            SQLUtil.allFields = new ArrayList<String>();
+            SQLUtil.allFields = new ArrayList<>();
         } else {
             SQLUtil.allFields.clear();
         }
@@ -105,7 +105,7 @@ public class SQLUtil {
      * @return The updated ArrayList with new unique entries
      */
     private static ArrayList<String> uniqueInsert(ArrayList<String> list,
-            String[] array) {
+            String... array) {
         if (array != null) {
             for (String anArray : array) {
                 if (!list.contains(anArray)) {

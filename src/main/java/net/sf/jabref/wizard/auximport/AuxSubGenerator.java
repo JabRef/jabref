@@ -79,8 +79,8 @@ public class AuxSubGenerator
 
     public AuxSubGenerator(BibtexDatabase refDBase)
     {
-        mySet = new HashSet<String>(20);
-        notFoundList = new Vector<String>();
+        mySet = new HashSet<>(20);
+        notFoundList = new Vector<>();
         db = refDBase;
     }
 
@@ -148,7 +148,7 @@ public class AuxSubGenerator
         BufferedReader br = null;
 
         // filelist, used for nested aux files
-        Vector<String> fileList = new Vector<String>(5);
+        Vector<String> fileList = new Vector<>(5);
         fileList.add(filename);
 
         // get the file path

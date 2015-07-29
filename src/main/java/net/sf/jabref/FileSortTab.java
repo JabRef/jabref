@@ -85,27 +85,23 @@ public class FileSortTab extends JPanel implements PrefsTab {
             bg.add(saveInTableOrder);
             bg.add(saveInSpecifiedOrder);
 
-            ActionListener listener = new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    boolean selected = e.getSource() == saveInSpecifiedOrder;
-                    savePriSort.setEnabled(selected);
-                    savePriField.setEnabled(selected);
-                    savePriDesc.setEnabled(selected);
-                    saveSecSort.setEnabled(selected);
-                    saveSecField.setEnabled(selected);
-                    saveSecDesc.setEnabled(selected);
-                    saveTerSort.setEnabled(selected);
-                    saveTerField.setEnabled(selected);
-                    saveTerDesc.setEnabled(selected);
-                }
+            ActionListener listener = e -> {
+                boolean selected = e.getSource() == saveInSpecifiedOrder;
+                savePriSort.setEnabled(selected);
+                savePriField.setEnabled(selected);
+                savePriDesc.setEnabled(selected);
+                saveSecSort.setEnabled(selected);
+                saveSecField.setEnabled(selected);
+                saveSecDesc.setEnabled(selected);
+                saveTerSort.setEnabled(selected);
+                saveTerField.setEnabled(selected);
+                saveTerDesc.setEnabled(selected);
             };
             saveInOriginalOrder.addActionListener(listener);
             saveInTableOrder.addActionListener(listener);
             saveInSpecifiedOrder.addActionListener(listener);
 
-            ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+            ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
             v.add(BibtexFields.KEY_FIELD);
             Collections.sort(v);
             String[] allPlusKey = v.toArray(new String[v.size()]);
@@ -121,34 +117,22 @@ public class FileSortTab extends JPanel implements PrefsTab {
             saveSecSort.insertItemAt(Globals.lang("<select>"), 0);
             saveTerSort.insertItemAt(Globals.lang("<select>"), 0);
 
-            savePriSort.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (savePriSort.getSelectedIndex() > 0) {
-                        savePriField.setText(savePriSort.getSelectedItem().toString());
-                        savePriSort.setSelectedIndex(0);
-                    }
+            savePriSort.addActionListener(e -> {
+                if (savePriSort.getSelectedIndex() > 0) {
+                    savePriField.setText(savePriSort.getSelectedItem().toString());
+                    savePriSort.setSelectedIndex(0);
                 }
             });
-            saveSecSort.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (saveSecSort.getSelectedIndex() > 0) {
-                        saveSecField.setText(saveSecSort.getSelectedItem().toString());
-                        saveSecSort.setSelectedIndex(0);
-                    }
+            saveSecSort.addActionListener(e -> {
+                if (saveSecSort.getSelectedIndex() > 0) {
+                    saveSecField.setText(saveSecSort.getSelectedItem().toString());
+                    saveSecSort.setSelectedIndex(0);
                 }
             });
-            saveTerSort.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (saveTerSort.getSelectedIndex() > 0) {
-                        saveTerField.setText(saveTerSort.getSelectedItem().toString());
-                        saveTerSort.setSelectedIndex(0);
-                    }
+            saveTerSort.addActionListener(e -> {
+                if (saveTerSort.getSelectedIndex() > 0) {
+                    saveTerField.setText(saveTerSort.getSelectedItem().toString());
+                    saveTerSort.setSelectedIndex(0);
                 }
             });
 
@@ -205,27 +189,23 @@ public class FileSortTab extends JPanel implements PrefsTab {
         bg.add(exportInTableOrder);
         bg.add(exportInSpecifiedOrder);
 
-        ActionListener listener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean selected = e.getSource() == exportInSpecifiedOrder;
-                exportPriSort.setEnabled(selected);
-                exportPriField.setEnabled(selected);
-                exportPriDesc.setEnabled(selected);
-                exportSecSort.setEnabled(selected);
-                exportSecField.setEnabled(selected);
-                exportSecDesc.setEnabled(selected);
-                exportTerSort.setEnabled(selected);
-                exportTerField.setEnabled(selected);
-                exportTerDesc.setEnabled(selected);
-            }
+        ActionListener listener = e -> {
+            boolean selected = e.getSource() == exportInSpecifiedOrder;
+            exportPriSort.setEnabled(selected);
+            exportPriField.setEnabled(selected);
+            exportPriDesc.setEnabled(selected);
+            exportSecSort.setEnabled(selected);
+            exportSecField.setEnabled(selected);
+            exportSecDesc.setEnabled(selected);
+            exportTerSort.setEnabled(selected);
+            exportTerField.setEnabled(selected);
+            exportTerDesc.setEnabled(selected);
         };
         exportInOriginalOrder.addActionListener(listener);
         exportInTableOrder.addActionListener(listener);
         exportInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         v.add(BibtexFields.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
@@ -241,34 +221,22 @@ public class FileSortTab extends JPanel implements PrefsTab {
         exportSecSort.insertItemAt(Globals.lang("<select>"), 0);
         exportTerSort.insertItemAt(Globals.lang("<select>"), 0);
 
-        exportPriSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (exportPriSort.getSelectedIndex() > 0) {
-                    exportPriField.setText(exportPriSort.getSelectedItem().toString());
-                    exportPriSort.setSelectedIndex(0);
-                }
+        exportPriSort.addActionListener(e -> {
+            if (exportPriSort.getSelectedIndex() > 0) {
+                exportPriField.setText(exportPriSort.getSelectedItem().toString());
+                exportPriSort.setSelectedIndex(0);
             }
         });
-        exportSecSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (exportSecSort.getSelectedIndex() > 0) {
-                    exportSecField.setText(exportSecSort.getSelectedItem().toString());
-                    exportSecSort.setSelectedIndex(0);
-                }
+        exportSecSort.addActionListener(e -> {
+            if (exportSecSort.getSelectedIndex() > 0) {
+                exportSecField.setText(exportSecSort.getSelectedItem().toString());
+                exportSecSort.setSelectedIndex(0);
             }
         });
-        exportTerSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (exportTerSort.getSelectedIndex() > 0) {
-                    exportTerField.setText(exportTerSort.getSelectedItem().toString());
-                    exportTerSort.setSelectedIndex(0);
-                }
+        exportTerSort.addActionListener(e -> {
+            if (exportTerSort.getSelectedIndex() > 0) {
+                exportTerField.setText(exportTerSort.getSelectedItem().toString());
+                exportTerSort.setSelectedIndex(0);
             }
         });
 

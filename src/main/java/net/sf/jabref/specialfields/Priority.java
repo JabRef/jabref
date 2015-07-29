@@ -30,7 +30,7 @@ public class Priority extends SpecialField {
 
 
     private Priority() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearPriority", Globals.lang("Clear priority"), null, Globals.lang("No priority information")));
         ImageIcon icon;
         icon = GUIGlobals.getImage("red");

@@ -67,15 +67,19 @@ public class OAI2Handler extends DefaultHandler {
 
         String content = characters.toString();
 
-        if (qualifiedName.equals("error")) {
+        switch (qualifiedName) {
+        case "error":
             throw new RuntimeException(content);
-        } else if (qualifiedName.equals("id")) {
+        case "id":
             entry.setField("eprint", content);
-        } else if (qualifiedName.equals("keyname")) {
+            break;
+        case "keyname":
             keyname = content;
-        } else if (qualifiedName.equals("forenames")) {
+            break;
+        case "forenames":
             forenames = content;
-        } else if (qualifiedName.equals("journal-ref")) {
+            break;
+        case "journal-ref": {
             String journal = content.replaceFirst("[0-9].*", "");
             entry.setField("journal", journal);
             String volume = content.replaceFirst(journal, "");
@@ -89,25 +93,34 @@ public class OAI2Handler extends DefaultHandler {
             pages = pages.replaceFirst("\\(" + year + "\\)", "");
             pages = pages.replaceAll(" ", "");
             entry.setField("pages", pages);
-        } else if (qualifiedName.equals("datestamp")) {
+            break;
+        }
+        case "datestamp": {
             String year = entry.getField("year");
             if (year == null || year.equals("")) {
                 entry.setField("year", content.replaceFirst("-.*", ""));
             }
-        } else if (qualifiedName.equals("title")) {
+            break;
+        }
+        case "title":
             entry.setField("title", content);
-        } else if (qualifiedName.equals("abstract")) {
+            break;
+        case "abstract":
             entry.setField("abstract", content);
-        } else if (qualifiedName.equals("comments")) {
+            break;
+        case "comments":
             entry.setField("comments", content);
-        } else if (qualifiedName.equals("report-no")) {
+            break;
+        case "report-no":
             entry.setField("reportno", content);
-        } else if (qualifiedName.equals("author")) {
+            break;
+        case "author":
             String author = forenames + " " + keyname;
             if (authors.length() > 0) {
                 authors.append(" and ");
             }
             authors.append(author);
+            break;
         }
     }
 

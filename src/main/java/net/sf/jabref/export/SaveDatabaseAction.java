@@ -81,38 +81,24 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     cancelled = true;
 
-                    JabRefExecutorService.INSTANCE.execute(new Runnable() {
+                    JabRefExecutorService.INSTANCE.execute(() -> {
 
-                        @Override
-                        public void run() {
+                        if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
+                            // TODO: GUI handling of the situation when the externally modified file keeps being locked.
+                            System.err.println("File locked, this will be trouble.");
+                        }
 
-                            if (!FileBasedLock.waitForFileLock(panel.getFile(), 10)) {
-                                // TODO: GUI handling of the situation when the externally modified file keeps being locked.
-                                System.err.println("File locked, this will be trouble.");
-                            }
-
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
-                            JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
-                            if (scanner.changesFound()) {
-                                scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
-
-                                    @Override
-                                    public void scanResultsResolved(boolean resolved) {
-                                        if (!resolved) {
-                                            cancelled = true;
-                                        } else {
-                                            panel.setUpdatedExternally(false);
-                                            SwingUtilities.invokeLater(new Runnable() {
-
-                                                @Override
-                                                public void run() {
-                                                    panel.getSidePaneManager().hide("fileUpdate");
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-                            }
+                        ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getFile());
+                        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
+                        if (scanner.changesFound()) {
+                            scanner.displayResult(resolved -> {
+                                if (!resolved) {
+                                    cancelled = true;
+                                } else {
+                                    panel.setUpdatedExternally(false);
+                                    SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide("fileUpdate"));
+                                }
+                            });
                         }
                     });
 

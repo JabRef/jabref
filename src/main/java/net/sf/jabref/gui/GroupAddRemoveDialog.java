@@ -70,23 +70,10 @@ public class GroupAddRemoveDialog implements BaseAction {
         //STA add expand and collapse all buttons
         JButton jbExpandAll = new JButton("Expand All");
 
-        jbExpandAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                expandAll(tree, true);
-            }
-
-        });
+        jbExpandAll.addActionListener(e -> expandAll(tree, true));
 
         JButton jbCollapseAll = new JButton("Collapse All");
-        jbCollapseAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                expandAll(tree, false);
-            }
-        });
+        jbCollapseAll.addActionListener(e -> expandAll(tree, false));
         //END add expand and collapse all buttons
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -100,22 +87,12 @@ public class GroupAddRemoveDialog implements BaseAction {
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (doAddOrRemove()) {
-                    diag.dispose();
-                }
-            }
-        });
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        ok.addActionListener(actionEvent -> {
+            if (doAddOrRemove()) {
                 diag.dispose();
             }
         });
+        cancel.addActionListener(actionEvent -> diag.dispose());
         ok.setEnabled(false);
 
         JScrollPane sp = new JScrollPane(tree);
@@ -144,15 +121,11 @@ public class GroupAddRemoveDialog implements BaseAction {
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
     private void expandAll(final JTree tree, final boolean expand) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                TreeNode root = ((TreeNode) tree.getModel().getRoot());
-                // walk through the tree, beginning at the root:
-                expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
-                tree.requestFocusInWindow();
-            }
+        SwingUtilities.invokeLater(() -> {
+            TreeNode root = ((TreeNode) tree.getModel().getRoot());
+            // walk through the tree, beginning at the root:
+            expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
+            tree.requestFocusInWindow();
         });
     }
 

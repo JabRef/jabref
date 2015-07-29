@@ -144,7 +144,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * Returns the node indicated by the specified indexedPath, which contains
      * child indices obtained e.g. by getIndexedPath().
      */
-    public GroupTreeNode getNode(int[] indexedPath) {
+    public GroupTreeNode getNode(int... indexedPath) {
         GroupTreeNode cursor = this;
         for (int anIndexedPath : indexedPath) {
             cursor = (GroupTreeNode) cursor.getChildAt(anIndexedPath);
@@ -161,7 +161,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * path could not be traversed completely (i.e. one of the child
      * indices did not exist), null will be returned.
      */
-    public GroupTreeNode getDescendant(int[] indexedPath) {
+    public GroupTreeNode getDescendant(int... indexedPath) {
         GroupTreeNode cursor = this;
         for (int i = 0; i < indexedPath.length && cursor != null; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
@@ -233,7 +233,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * @return All groups that contain the specified entry.
      */
     public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
-        Vector<AbstractGroup> matchingGroups = new Vector<AbstractGroup>();
+        Vector<AbstractGroup> matchingGroups = new Vector<>();
         Enumeration<GroupTreeNode> e = preorderEnumeration();
         AbstractGroup group;
         while (e.hasMoreElements()) {
@@ -326,7 +326,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * @return The node designated by the specified path, or null if one or more
      * indices in the path could not be resolved.
      */
-    public GroupTreeNode getChildAt(int[] path) {
+    public GroupTreeNode getChildAt(int... path) {
         GroupTreeNode cursor = this;
         for (int i = 0; i < path.length && cursor != null; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(path[i]);
@@ -337,7 +337,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit addToGroup(BibtexEntry... entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -351,7 +351,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
+    public AbstractUndoableEdit removeFromGroup(BibtexEntry... entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }

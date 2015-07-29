@@ -28,7 +28,7 @@ import java.util.HashMap;
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    private static final HashMap<String, String> CHARS = new HashMap<String, String>();
+    private static final HashMap<String, String> CHARS = new HashMap<>();
 
     static {
         // Following character definitions contributed by Ervin Kolenovic:
@@ -241,7 +241,7 @@ public class OOPreFormatter implements LayoutFormatter {
         int i;
         field = field.replaceAll("&|\\\\&", "&");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
 
         char c;

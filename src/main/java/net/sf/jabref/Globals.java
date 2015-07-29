@@ -146,7 +146,7 @@ public class Globals {
     static {
         // Build list of encodings, by filtering out all that are not supported
         // on this system:
-        List<String> encodings = new ArrayList<String>();
+        List<String> encodings = new ArrayList<>();
         for (String ALL_ENCODING : Globals.ALL_ENCODINGS) {
             if (Charset.isSupported(ALL_ENCODING)) {
                 encodings.add(ALL_ENCODING);
@@ -154,7 +154,7 @@ public class Globals {
         }
         ENCODINGS = encodings.toArray(new String[encodings.size()]);
         // Build a map for translating Java encoding names into common encoding names:
-        ENCODING_NAMES_LOOKUP = new HashMap<String, String>();
+        ENCODING_NAMES_LOOKUP = new HashMap<>();
         Globals.ENCODING_NAMES_LOOKUP.put("Cp1250", "windows-1250");
         Globals.ENCODING_NAMES_LOOKUP.put("Cp1251", "windows-1251");
         Globals.ENCODING_NAMES_LOOKUP.put("Cp1252", "windows-1252");
@@ -270,7 +270,7 @@ public class Globals {
 
         if (translation != null && !translation.isEmpty()) {
             translation = translation.replaceAll("_", " ");
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean b = false;
             char c;
             for (int i = 0; i < translation.length(); ++i) {

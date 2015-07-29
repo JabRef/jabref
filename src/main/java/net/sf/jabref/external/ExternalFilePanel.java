@@ -96,38 +96,16 @@ public class ExternalFilePanel extends JPanel {
         JButton xmp = new JButton(Globals.lang("Write XMP"));
         xmp.setToolTipText(Globals.lang("Write BibtexEntry as XMP-metadata to PDF."));
 
-        browseBut.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                browseFile(fieldName, editor);
-                // editor.setText(chosenValue);
-                entryEditor.storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-            }
+        browseBut.addActionListener(e -> {
+            browseFile(fieldName, editor);
+            // editor.setText(chosenValue);
+            entryEditor.storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
         });
 
-        download.addActionListener(new ActionListener() {
+        download.addActionListener(e -> downLoadFile(fieldName, editor, frame));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                downLoadFile(fieldName, editor, frame);
-            }
-        });
-
-        auto.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JabRefExecutorService.INSTANCE.execute(autoSetFile(fieldName, editor));
-            }
-        });
-        xmp.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pushXMP(fieldName, editor);
-            }
-        });
+        auto.addActionListener(e -> JabRefExecutorService.INSTANCE.execute(autoSetFile(fieldName, editor)));
+        xmp.addActionListener(e -> pushXMP(fieldName, editor));
 
         add(browseBut);
         add(download);
@@ -170,49 +148,45 @@ public class ExternalFilePanel extends JPanel {
 
     private void pushXMP(final String fieldName, final FieldEditor editor) {
 
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
+        JabRefExecutorService.INSTANCE.execute(() -> {
 
-            @Override
-            public void run() {
+            output(Globals.lang("Looking for pdf..."));
 
-                output(Globals.lang("Looking for pdf..."));
-
-                // Find the default directory for this field type, if any:
-                String[] dirs = metaData.getFileDirectory(fieldName);
-                File file = null;
-                if (dirs.length > 0) {
-                    File tmp = FileUtil.expandFilename(editor.getText(), dirs);
-                    if (tmp != null) {
-                        file = tmp;
-                    }
+            // Find the default directory for this field type, if any:
+            String[] dirs = metaData.getFileDirectory(fieldName);
+            File file = null;
+            if (dirs.length > 0) {
+                File tmp = FileUtil.expandFilename(editor.getText(), dirs);
+                if (tmp != null) {
+                    file = tmp;
                 }
+            }
 
-                if (file == null) {
-                    file = new File(editor.getText());
-                }
+            if (file == null) {
+                file = new File(editor.getText());
+            }
 
-                final File finalFile = file;
+            final File finalFile = file;
 
-                output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
-                try {
-                    XMPUtil.writeXMP(finalFile, getEntry(), getDatabase());
-                    output(Globals.lang("Wrote XMP to '%0'.", finalFile.getName()));
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(editor.getParent(),
-                            Globals.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
-                            Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info(Globals.lang("Error writing XMP to file: %0", finalFile
-                            .getAbsolutePath()), e);
-                    output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
+            output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
+            try {
+                XMPUtil.writeXMP(finalFile, getEntry(), getDatabase());
+                output(Globals.lang("Wrote XMP to '%0'.", finalFile.getName()));
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(editor.getParent(),
+                        Globals.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
+                        Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+                LOGGER.info(Globals.lang("Error writing XMP to file: %0", finalFile
+                        .getAbsolutePath()), e);
+                output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
 
-                } catch (TransformerException e) {
-                    JOptionPane.showMessageDialog(editor.getParent(),
-                            Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
-                            Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info(Globals.lang("Error while converting BibtexEntry to XMP %0",
-                            finalFile.getAbsolutePath()), e);
-                    output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
-                }
+            } catch (TransformerException e) {
+                JOptionPane.showMessageDialog(editor.getParent(),
+                        Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
+                        Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+                LOGGER.info(Globals.lang("Error while converting BibtexEntry to XMP %0",
+                        finalFile.getAbsolutePath()), e);
+                output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
             }
         });
     }
@@ -407,13 +381,7 @@ public class ExternalFilePanel extends JPanel {
                         fieldEditor.setText(textToSet);
                         fieldEditor.setEnabled(true);
                         updateEditor = false;
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                entryEditor.updateField(fieldEditor);
-                            }
-                        });
+                        SwingUtilities.invokeLater(() -> entryEditor.updateField(fieldEditor));
                     }
 
                 } catch (MalformedURLException e1) {
@@ -453,41 +421,37 @@ public class ExternalFilePanel extends JPanel {
         output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + '.'
                 + fieldName + "'...");
 
-        return new Runnable() {
+        return () -> {
+            /*
+             * Find the following directories to look in for:
+             *
+             * default directory for this field type.
+             *
+             * directory of bibtex-file. // NOT POSSIBLE at the moment.
+             *
+             * JabRef-directory.
+             */
+            LinkedList<String> list = new LinkedList<>();
+            String[] dirs = metaData.getFileDirectory(fieldName);
+            Collections.addAll(list, dirs);
 
-            @Override
-            public void run() {
-                /*
-                 * Find the following directories to look in for:
-                 *
-                 * default directory for this field type.
-                 *
-                 * directory of bibtex-file. // NOT POSSIBLE at the moment.
-                 *
-                 * JabRef-directory.
-                 */
-                LinkedList<String> list = new LinkedList<String>();
-                String[] dirs = metaData.getFileDirectory(fieldName);
-                Collections.addAll(list, dirs);
+            String found = UtilFindFiles.findPdf(getEntry(), fieldName, list
+                    .toArray(new String[list.size()]));// , off);
 
-                String found = UtilFindFiles.findPdf(getEntry(), fieldName, list
-                        .toArray(new String[list.size()]));// , off);
+            // To activate findFile:
+            // String found = Util.findFile(getEntry(), null, dir,
+            // ".*[bibtexkey].*");
 
-                // To activate findFile:
-                // String found = Util.findFile(getEntry(), null, dir,
-                // ".*[bibtexkey].*");
-
-                if (found != null) {
-                    editor.setText(found);
-                    if (entryEditor != null) {
-                        entryEditor.updateField(editor);
-                    }
-                    output(Globals.lang("%0 field set", fieldName.toUpperCase()) + '.');
-                } else {
-                    output(Globals.lang("No %0 found", fieldName.toUpperCase()) + '.');
+            if (found != null) {
+                editor.setText(found);
+                if (entryEditor != null) {
+                    entryEditor.updateField(editor);
                 }
-
+                output(Globals.lang("%0 field set", fieldName.toUpperCase()) + '.');
+            } else {
+                output(Globals.lang("No %0 found", fieldName.toUpperCase()) + '.');
             }
+
         };
     }
 

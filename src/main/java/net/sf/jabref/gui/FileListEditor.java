@@ -95,48 +95,12 @@ public class FileListEditor extends JTable implements FieldEditor,
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
         down.setMargin(new Insets(0, 0, 0, 0));
-        add.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addEntry();
-            }
-        });
-        remove.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeEntries();
-            }
-        });
-        up.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveEntry(-1);
-            }
-        });
-        down.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveEntry(1);
-            }
-        });
-        auto.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                autoSetLinks();
-            }
-        });
-        download.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                downloadFile();
-            }
-        });
+        add.addActionListener(e -> addEntry());
+        remove.addActionListener(e -> removeEntries());
+        up.addActionListener(e -> moveEntry(-1));
+        down.addActionListener(e -> moveEntry(1));
+        auto.addActionListener(e -> autoSetLinks());
+        download.addActionListener(e -> downloadFile());
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.append(up);
@@ -201,13 +165,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
         JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
         menu.add(openLink);
-        openLink.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                openSelectedFile();
-            }
-        });
+        openLink.addActionListener(actionEvent -> openSelectedFile());
 
         JMenuItem openFolder = new JMenuItem(Globals.lang("Open folder"));
         menu.add(openFolder);
@@ -385,18 +343,14 @@ public class FileListEditor extends JTable implements FieldEditor,
         auto.setEnabled(false);
         BibtexEntry entry = entryEditor.getEntry();
         JDialog diag = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                auto.setEnabled(true);
-                if (e.getID() > 0) {
-                    entryEditor.updateField(FileListEditor.this);
-                    frame.output(Globals.lang("Finished autosetting external links."));
-                } else {
-                    frame.output(Globals.lang("Finished autosetting external links.")
-                            + " " + Globals.lang("No files found."));
-                }
+        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, e -> {
+            auto.setEnabled(true);
+            if (e.getID() > 0) {
+                entryEditor.updateField(FileListEditor.this);
+                frame.output(Globals.lang("Finished autosetting external links."));
+            } else {
+                frame.output(Globals.lang("Finished autosetting external links.")
+                        + " " + Globals.lang("No files found."));
             }
         }, diag));
 

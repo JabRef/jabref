@@ -105,11 +105,11 @@ public class SynchronizeFileField extends AbstractWorker {
         //ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
         //FieldTextField editor = new FieldTextField(fieldName, "", false);
 
-        Set<BibtexEntry> changedEntries = new HashSet<BibtexEntry>();
+        Set<BibtexEntry> changedEntries = new HashSet<>();
 
         // First we try to autoset fields
         if (autoSet) {
-            Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+            Collection<BibtexEntry> entries = new ArrayList<>();
             Collections.addAll(entries, sel);
 
             // Start the autosetting process:                
@@ -152,7 +152,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
                     // We need to specify which directories to search in for Util.expandFilename:
                     String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-                    ArrayList<File> dirs = new ArrayList<File>();
+                    ArrayList<File> dirs = new ArrayList<>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
                     }
@@ -232,7 +232,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {
                                     // Get the old list of types, add this one, and update the list in prefs:
-                                    List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
+                                    List<ExternalFileType> fileTypes = new ArrayList<>();
                                     ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
                                     Collections.addAll(fileTypes, oldTypes);
                                     fileTypes.add(newType);
@@ -310,13 +310,9 @@ public class SynchronizeFileField extends AbstractWorker {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             this.metaData = metaData;
             final String fn = Globals.lang("file");
-            ok.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    canceled = false;
-                    dispose();
-                }
+            ok.addActionListener(e -> {
+                canceled = false;
+                dispose();
             });
 
             Action closeAction = new AbstractAction() {

@@ -119,7 +119,7 @@ public class FileUtil {
         // Include the standard "file" directory:
         String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
         // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<String>();
+        ArrayList<String> al = new ArrayList<>();
         for (String aDir : dir) {
             if (!al.contains(aDir)) {
                 al.add(aDir);
@@ -141,7 +141,7 @@ public class FileUtil {
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
-    public static File expandFilename(String name, String[] dir) {
+    public static File expandFilename(String name, String... dir) {
 
         for (String aDir : dir) {
             if (aDir != null) {
@@ -216,7 +216,7 @@ public class FileUtil {
      * @param fileName the file name to be shortened
      * @param dirs directories to check.
      */
-    public static File shortenFileName(File fileName, String[] dirs) {
+    public static File shortenFileName(File fileName, String... dirs) {
         if (fileName == null || fileName.length() == 0) {
             return fileName;
         }

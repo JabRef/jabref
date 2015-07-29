@@ -120,7 +120,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
      */
     private List<String> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<String>();
+        ArrayList<String> ids = new ArrayList<>();
         try {
             urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, "UTF-8");
             int count = 1;

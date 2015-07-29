@@ -51,7 +51,7 @@ public class QuotedStringTokenizer {
 
     public String nextToken() {
         char c;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m_index < m_contentLength) {
             c = m_content.charAt(m_index);
             if (c == m_quoteChar) { // next is quoted

@@ -173,16 +173,10 @@ public class DatabaseFileLookupTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Constructor<? extends T>[] orderByParamCount(Constructor<? extends T>[] constructors) {
+    private static <T> Constructor<? extends T>[] orderByParamCount(Constructor<? extends T>... constructors) {
         List<Constructor<? extends T>> list = Arrays.asList(constructors);
-        Collections.sort(list, new Comparator<Constructor<? extends T>>() {
-
-            @Override
-            public int compare(Constructor<? extends T> c1, Constructor<? extends T> c2) {
-                return new Integer(c1.getParameterTypes().length).compareTo(c2.getParameterTypes().length);
-            }
-        });
-        return new ArrayList<Constructor<? extends T>>(list).toArray(new Constructor[list.size()]);
+        Collections.sort(list, (c1, c2) -> new Integer(c1.getParameterTypes().length).compareTo(c2.getParameterTypes().length));
+        return new ArrayList<>(list).toArray(new Constructor[list.size()]);
     }
 
     private static <T> T getInstanceFromNonDefaultConstructor(Class<T> targetClass) {

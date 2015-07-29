@@ -33,8 +33,8 @@ public final class EntryEditorTabList {
     }
 
     private void init() {
-        list = new ArrayList<List<String>>();
-        names = new ArrayList<String>();
+        list = new ArrayList<>();
+        names = new ArrayList<>();
         int i = 0;
         String name;
         String[] fields;

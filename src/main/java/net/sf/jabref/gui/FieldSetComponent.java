@@ -52,7 +52,7 @@ import net.sf.jabref.util.Util;
  */
 class FieldSetComponent extends JPanel implements ActionListener {
 
-    private final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
+    private final Set<ActionListener> additionListeners = new HashSet<>();
     final JList list;
     private JScrollPane sp = null;
     DefaultListModel listModel;
@@ -66,7 +66,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
     final GridBagConstraints con = new GridBagConstraints();
     final boolean forceLowerCase;
     boolean changesMade = false;
-    private final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
+    private final Set<ListDataListener> modelListeners = new HashSet<>();
 
 
     /** 
@@ -292,7 +292,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * Return the current list.
      */
     public List<String> getFields() {
-        ArrayList<String> res = new ArrayList<String>(listModel.getSize());
+        ArrayList<String> res = new ArrayList<>(listModel.getSize());
         Enumeration elements = listModel.elements();
         while (elements.hasMoreElements()) {
             res.add((String) elements.nextElement());

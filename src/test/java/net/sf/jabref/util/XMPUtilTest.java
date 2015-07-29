@@ -51,7 +51,7 @@ public class XMPUtilTest {
      */
     public static String bibtexXPacket(String bibtexDescriptions) {
 
-        StringBuffer xmp = new StringBuffer();
+        StringBuilder xmp = new StringBuilder();
 
         xmp.append("<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>\n");
         xmp.append("  <x:xmpmeta xmlns:x='adobe:ns:meta/'>\n");
@@ -338,7 +338,7 @@ public class XMPUtilTest {
             BibtexEntry e = t1BibtexEntry();
 
             prefs.putBoolean("useXmpPrivacyFilter", true);
-            prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, new String[] {"author", "title", "note"});
+            prefs.putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS, "author", "title", "note");
 
             XMPUtil.writeXMP(pdfFile, e, null);
 
@@ -346,7 +346,7 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             BibtexEntry x = l.get(0);
 
-            Set<String> expectedFields = new HashSet<String>(Arrays.asList("bibtexkey", "booktitle",
+            Set<String> expectedFields = new HashSet<>(Arrays.asList("bibtexkey", "booktitle",
                     "owner", "timestamp", "url", "year"));
 
             Assert.assertEquals(expectedFields, x.getAllFields());
@@ -356,7 +356,7 @@ public class XMPUtilTest {
         prefs
                 .putStringArray(
                         JabRefPreferences.XMP_PRIVACY_FILTERS,
-                        new String[] {"author;title;note;booktitle;year;owner;timestamp"});
+                        "author;title;note;booktitle;year;owner;timestamp");
 
         BibtexEntry e = t1BibtexEntry();
 
@@ -981,7 +981,7 @@ public class XMPUtilTest {
      */
     @Test
     public void testWriteMultiple() throws IOException, TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(t2BibtexEntry());
         l.add(t3BibtexEntry());
 
@@ -1006,13 +1006,12 @@ public class XMPUtilTest {
 
     @Test
     public void testReadWriteDC() throws IOException, TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
         XMPUtil.writeXMP(pdfFile, l, null, true);
 
-        PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile());
-        try {
+        try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
                 System.err
                         .println("Error: Cannot add metadata to encrypted document.");
@@ -1079,8 +1078,6 @@ public class XMPUtilTest {
             assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil
                     .getBibtexEntryFromDublinCore(dcSchema));
 
-        } finally {
-            document.close();
         }
 
     }
@@ -1088,13 +1085,12 @@ public class XMPUtilTest {
     @Test
     public void testWriteSingleUpdatesDCAndInfo() throws IOException,
             TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
         XMPUtil.writeXMP(pdfFile, l, null, true);
 
-        PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile());
-        try {
+        try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
                 System.err
                         .println("Error: Cannot add metadata to encrypted document.");
@@ -1161,8 +1157,6 @@ public class XMPUtilTest {
             assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil
                     .getBibtexEntryFromDublinCore(dcSchema));
 
-        } finally {
-            document.close();
         }
 
     }
@@ -1238,7 +1232,7 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[] {tempBib.getAbsolutePath()});
+            XMPUtil.main(tempBib.getAbsolutePath());
             System.setOut(oldOut);
             s.close();
             String xmp = s.toString();
@@ -1272,7 +1266,7 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[] {pdfFile.getAbsolutePath()});
+            XMPUtil.main(pdfFile.getAbsolutePath());
             System.setOut(oldOut);
             s.close();
             String bibtex = s.toString();
@@ -1292,7 +1286,7 @@ public class XMPUtilTest {
         ByteArrayOutputStream s = new ByteArrayOutputStream();
         PrintStream oldOut = System.out;
         System.setOut(new PrintStream(s));
-        XMPUtil.main(new String[] {"-x", pdfFile.getAbsolutePath()});
+        XMPUtil.main("-x", pdfFile.getAbsolutePath());
         System.setOut(oldOut);
         s.close();
         String xmp = s.toString();
@@ -1345,8 +1339,7 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
                 try {
-                    XMPUtil.main(new String[] {"canh05",
-                            tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                    XMPUtil.main("canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath());
                 } finally {
                     System.setOut(oldOut);
                     s.close();
@@ -1362,8 +1355,7 @@ public class XMPUtilTest {
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
             try {
-                XMPUtil.main(new String[] {"OezbekC06",
-                        tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                XMPUtil.main("OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath());
             } finally {
                 System.setOut(oldOut);
                 s.close();
@@ -1401,8 +1393,7 @@ public class XMPUtilTest {
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[] {tempBib.getAbsolutePath(),
-                    pdfFile.getAbsolutePath()});
+            XMPUtil.main(tempBib.getAbsolutePath(), pdfFile.getAbsolutePath());
             System.setOut(oldOut);
             s.close();
 
@@ -1549,8 +1540,7 @@ public class XMPUtilTest {
                     "author")));
 
             // Next check from Document Information
-            PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile());
-            try {
+            try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
 
                 Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(document
                         .getDocumentInformation().getAuthor()));
@@ -1590,8 +1580,6 @@ public class XMPUtilTest {
                 b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema);
                 Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b
                         .getField("author")));
-            } finally {
-                document.close();
             }
 
         } finally {

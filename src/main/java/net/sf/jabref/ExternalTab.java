@@ -68,25 +68,13 @@ public class ExternalTab extends JPanel implements PrefsTab {
         bibLocAsPrimaryDir = new JCheckBox(Globals.lang("Use the bib file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Globals.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the bib file location rather than the file directory set above"));
-        bibLocationAsFileDir.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
-            }
-        });
+        bibLocationAsFileDir.addChangeListener(changeEvent -> bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected()));
         JButton editFileTypes = new JButton(Globals.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Globals.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
-        ItemListener regExpListener = new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                regExpTextField.setEditable(useRegExpComboBox.isSelected());
-            }
-        };
+        ItemListener regExpListener = e -> regExpTextField.setEditable(useRegExpComboBox.isSelected());
         useRegExpComboBox.addItemListener(regExpListener);
 
         editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(prefsDiag));
@@ -215,13 +203,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         //pan.add(new JLabel(Globals.lang("Settings for %0", pt.getApplicationName())), BorderLayout.CENTER);
         JButton button = new JButton(Globals.lang("Settings for %0", pt.getApplicationName()),
                 pt.getIcon());
-        button.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                PushToApplicationButton.showSettingsDialog(_frame, pt, pt.getSettingsPanel());
-            }
-        });
+        button.addActionListener(event -> PushToApplicationButton.showSettingsDialog(_frame, pt, pt.getSettingsPanel()));
         p.add(button);//, BorderLayout.CENTER);
         //b.append(button);
         //b.nextLine();

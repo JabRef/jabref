@@ -73,7 +73,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
      * Automatically imports the files given as arguments
      * @param filenames List of files to import
      */
-    public void automatedImport(String[] filenames) {
+    public void automatedImport(String... filenames) {
         // replace the work of the init step:
         MyWorker worker = new MyWorker();
         worker.fileOk = true;
@@ -114,7 +114,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             }
 
             // We import all files and collect their results:
-            List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<ImportFormatReader.UnknownFormatImport>();
+            List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
             for (String filename : filenames) {
                 try {
                     if (importer != null) {
@@ -341,7 +341,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database, new MetaData(), new HashMap<String, BibtexEntryType>());
+            return new ParserResult(database, new MetaData(), new HashMap<>());
 
         }
     }

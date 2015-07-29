@@ -85,7 +85,7 @@ public class BibteXMLImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibItems = new ArrayList<>();
 
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();

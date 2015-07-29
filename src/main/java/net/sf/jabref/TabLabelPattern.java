@@ -150,13 +150,9 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         gbl.setConstraints(builder.getPanel(), con);
         add(builder.getPanel());
 
-        dontOverwrite.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                // Warning before overwriting is only relevant if overwriting can happen:
-                warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
-            }
+        dontOverwrite.addChangeListener(event -> {
+            // Warning before overwriting is only relevant if overwriting can happen:
+            warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
         });
     }
 

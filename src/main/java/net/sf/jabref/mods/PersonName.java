@@ -52,7 +52,7 @@ public class PersonName {
     }
 
     private void parseName(String author) {
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma

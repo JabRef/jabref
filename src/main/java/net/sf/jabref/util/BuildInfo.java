@@ -52,8 +52,7 @@ public class BuildInfo {
         Properties properties = new Properties();
         try {
             properties.load(getClass().getResourceAsStream(path));
-        } catch (IOException ignored) {
-        } catch (NullPointerException ignored) {
+        } catch (IOException | NullPointerException ignored) {
         }
         date = properties.getProperty("builddate", "");
         number = properties.getProperty("build", "1");

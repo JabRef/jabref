@@ -159,7 +159,7 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibtexEntry... entries) {
         if (!supportsAdd()) {
             return null;
         }
@@ -194,7 +194,7 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibtexEntry... entries) {
         if (!supportsRemove()) {
             return null;
         }

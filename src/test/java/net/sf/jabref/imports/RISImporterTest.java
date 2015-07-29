@@ -38,7 +38,7 @@ public class RISImporterTest {
     @Test
     public void testProcessSubSup() {
 
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
         hm.put("title", "/sub 3/");
         IsiImporter.processSubSup(hm);
         Assert.assertEquals("$_3$", hm.get("title"));

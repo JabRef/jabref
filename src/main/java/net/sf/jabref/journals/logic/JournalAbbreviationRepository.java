@@ -33,11 +33,11 @@ import java.util.TreeSet;
  */
 public class JournalAbbreviationRepository {
 
-    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
-    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
-    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
+    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
+    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
+    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
 
-    private final SortedSet<Abbreviation> abbreviations = new TreeSet<Abbreviation>();
+    private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
 
     public void readJournalListFromResource(String resource) {
         AbbreviationParser parser = new AbbreviationParser();

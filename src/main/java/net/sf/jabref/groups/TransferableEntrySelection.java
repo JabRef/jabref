@@ -49,7 +49,7 @@ class TransferableEntrySelection implements Transferable {
     }
 
 
-    public TransferableEntrySelection(BibtexEntry[] selectedEntries) {
+    public TransferableEntrySelection(BibtexEntry... selectedEntries) {
         this.selectedEntries = selectedEntries;
         StringBuilder keys = new StringBuilder();
         for (int i = 0; i < selectedEntries.length; ++i) {

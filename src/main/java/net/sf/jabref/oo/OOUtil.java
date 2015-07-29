@@ -127,30 +127,45 @@ class OOUtil {
             }
             String tag = m.group();
             // Handle tags:
-            if (tag.equals("<b>")) {
+            switch (tag) {
+            case "<b>":
                 bold++;
-            } else if (tag.equals("</b>")) {
+                break;
+            case "</b>":
                 bold--;
-            } else if (tag.equals("<i>") || tag.equals("<em>")) {
+                break;
+            case "<i>":
+            case "<em>":
                 italic++;
-            } else if (tag.equals("</i>") || tag.equals("</em>")) {
+                break;
+            case "</i>":
+            case "</em>":
                 italic--;
-            } else if (tag.equals("</monospace>")) {
+                break;
+            case "</monospace>":
                 mono = 0;
-            } else if (tag.equals("<monospace>")) {
+                break;
+            case "<monospace>":
                 mono = 1;
-            } else if (tag.equals("</smallcaps>")) {
+                break;
+            case "</smallcaps>":
                 smallCaps = 0;
-            } else if (tag.equals("<smallcaps>")) {
+                break;
+            case "<smallcaps>":
                 smallCaps = 1;
-            } else if (tag.equals("</sup>")) {
+                break;
+            case "</sup>":
                 sup = 0;
-            } else if (tag.equals("<sup>")) {
+                break;
+            case "<sup>":
                 sup = 1;
-            } else if (tag.equals("</sub>")) {
+                break;
+            case "</sub>":
                 sub = 0;
-            } else if (tag.equals("<sub>")) {
+                break;
+            case "<sub>":
                 sub = 1;
+                break;
             }
 
             piv = m.end();

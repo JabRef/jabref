@@ -17,13 +17,7 @@ public class BibtexNameFormatterTest {
                     .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
             Assert.assertEquals("de~laVall{\\'e}e~PoussinCharles Louis Xavier~Joseph", BibtexNameFormatter.formatName(al
-                    .getAuthor(0), "{vv}{ll}{jj}{ff}", new Warn() {
-
-                @Override
-                public void warn(String s) {
-                    Assert.fail(s);
-                }
-            }));
+                    .getAuthor(0), "{vv}{ll}{jj}{ff}", Assert::fail));
         }
 
         {
@@ -31,13 +25,7 @@ public class BibtexNameFormatterTest {
                     .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
             Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J.", BibtexNameFormatter.formatName(al
-                    .getAuthor(0), "{vv~}{ll}{, jj}{, f.}", new Warn() {
-
-                @Override
-                public void warn(String s) {
-                    Assert.fail(s);
-                }
-            }));
+                    .getAuthor(0), "{vv~}{ll}{, jj}{, f.}", Assert::fail));
         }
 
         {
@@ -45,27 +33,15 @@ public class BibtexNameFormatterTest {
                     .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
             Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", BibtexNameFormatter.formatName(al
-                    .getAuthor(0), "{vv~}{ll}{, jj}{, f}?", new Warn() {
-
-                @Override
-                public void warn(String s) {
-                    Assert.fail(s);
-                }
-            }));
+                    .getAuthor(0), "{vv~}{ll}{, jj}{, f}?", Assert::fail));
         }
 
         AuthorList al = AuthorList
                 .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         Assert.assertEquals("dlVP", BibtexNameFormatter.formatName(al.getAuthor(0), "{v{}}{l{}}",
-                new Warn() {
-
-                    @Override
-                    public void warn(String s) {
-                        Assert.fail(s);
-                    }
-                }
-                ));
+                Assert::fail
+        ));
 
         assertNameFormatA("Meyer, J?", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
         assertNameFormatB("J.~Meyer", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
@@ -84,14 +60,8 @@ public class BibtexNameFormatterTest {
 
     private void assertNameFormat(String string, String string2, int which, String format) {
         Assert.assertEquals(string, BibtexNameFormatter.formatName(string2, which, format,
-                new Warn() {
-
-                    @Override
-                    public void warn(String s) {
-                        Assert.fail(s);
-                    }
-                }
-                ));
+                Assert::fail
+        ));
     }
 
     private void assertNameFormatC(String string, String string2) {

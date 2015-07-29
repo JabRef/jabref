@@ -128,7 +128,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
             BibtexEntry[] bes = panel.getSelectedEntries();
-            HashSet<String> entries = new HashSet<String>(bes.length);
+            HashSet<String> entries = new HashSet<>(bes.length);
             for (BibtexEntry be : bes) {
                 entries.add(be.getId());
             }
@@ -143,11 +143,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             while ((s = reader.read()) != -1) {
                 sb.append((char) s);
             }
-            ClipboardOwner owner = new ClipboardOwner() {
-
-                @Override
-                public void lostOwnership(Clipboard clipboard, Transferable content) {
-                }
+            ClipboardOwner owner = (clipboard, content) -> {
             };
             //StringSelection ss = new StringSelection(sw.toString());
             RtfSelection rs = new RtfSelection(sb.toString());

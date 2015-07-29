@@ -58,7 +58,7 @@ class LayoutEntry {
             text = si.s.trim();
         } else if (si.i == LayoutHelper.IS_FIELD_START || si.i == LayoutHelper.IS_FIELD_END) {
         } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
-            Vector<String> v = new Vector<String>();
+            Vector<String> v = new Vector<>();
             WSITools.tokenize(v, si.s, "\n");
 
             if (v.size() == 1) {
@@ -73,7 +73,7 @@ class LayoutEntry {
                         String notFound = ((NotFoundFormatter) anOption).getNotFound();
 
                         if (invalidFormatter == null) {
-                            invalidFormatter = new ArrayList<String>();
+                            invalidFormatter = new ArrayList<>();
                         }
                         invalidFormatter.add(notFound);
                     }
@@ -89,7 +89,7 @@ class LayoutEntry {
         String blockEnd;
         StringInt si;
         Vector<StringInt> blockEntries = null;
-        Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>();
+        Vector<LayoutEntry> tmpEntries = new Vector<>();
         LayoutEntry le;
         si = parsedEntries.get(0);
         blockStart = si.s;
@@ -110,7 +110,7 @@ class LayoutEntry {
             if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             } else if (si.i == LayoutHelper.IS_FIELD_START
                     || si.i == LayoutHelper.IS_GROUP_START) {
-                blockEntries = new Vector<StringInt>();
+                blockEntries = new Vector<>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_FIELD_END || si.i == LayoutHelper.IS_GROUP_END) {
                 if (blockStart.equals(si.s)) {
@@ -147,7 +147,7 @@ class LayoutEntry {
             // Note if one of the entries has an invalid formatter:
             if (layoutEntries[i].isInvalidFormatter()) {
                 if (invalidFormatter == null) {
-                    invalidFormatter = new ArrayList<String>(1);
+                    invalidFormatter = new ArrayList<>(1);
                 }
                 invalidFormatter.addAll(layoutEntries[i].getInvalidFormatters());
             }
@@ -397,7 +397,7 @@ class LayoutEntry {
 
         ArrayList<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
-        ArrayList<LayoutFormatter> results = new ArrayList<LayoutFormatter>(formatterStrings.size());
+        ArrayList<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
         Map<String, String> userNameFormatter = NameFormatterTab.getNameFormatters();
 

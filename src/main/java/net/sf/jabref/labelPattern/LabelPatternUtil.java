@@ -69,7 +69,7 @@ public class LabelPatternUtil {
     }
 
     private static String normalize(String content) {
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         int b = 0;
         String and = "";
         String token = "";
@@ -276,7 +276,7 @@ public class LabelPatternUtil {
         String rest = null;
 
         for (int index = 0; index < parts.length; index++) {
-            List<String> part = new ArrayList<String>();
+            List<String> part = new ArrayList<>();
 
             // Cleanup: remove unnecessary words.
             for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
@@ -397,7 +397,7 @@ public class LabelPatternUtil {
      */
     public static ArrayList<String> split(String labelPattern) {
         // A holder for fields of the entry to be used for the key
-        ArrayList<String> _alist = new ArrayList<String>();
+        ArrayList<String> _alist = new ArrayList<>();
 
         // Before we do anything, we add the parameter to the ArrayLIst
         _alist.add(labelPattern);
@@ -846,7 +846,7 @@ public class LabelPatternUtil {
 
     private static String getTitleWords(int number, BibtexEntry _entry) {
         String ss = new RemoveLatexCommands().format(_entry.getField("title"));
-        StringBuffer _sbvalue = new StringBuffer();
+        StringBuilder _sbvalue = new StringBuilder();
         StringBuffer current;
         int piv = 0;
         int words = 0;
@@ -868,8 +868,8 @@ public class LabelPatternUtil {
             if (word.isEmpty()) {
                 continue;
             }
-            for (int _i = 0; _i < SKIP_WORDS.length; _i++) {
-                if (word.equalsIgnoreCase(SKIP_WORDS[_i])) {
+            for (String SKIP_WORD : SKIP_WORDS) {
+                if (word.equalsIgnoreCase(SKIP_WORD)) {
                     continue mainl;
                 }
             }
@@ -1399,7 +1399,7 @@ public class LabelPatternUtil {
      * @return An array of strings representing the parts of the marker
      */
     private static String[] parseFieldMarker(String arg) {
-        List<String> parts = new ArrayList<String>();
+        List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         int inParenthesis = 0;

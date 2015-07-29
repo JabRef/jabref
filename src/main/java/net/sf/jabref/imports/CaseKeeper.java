@@ -26,7 +26,7 @@ public class CaseKeeper implements LayoutFormatter {
         super();
     }
 
-    private String format(String text, String[] listOfWords) {
+    private String format(String text, String... listOfWords) {
         if (text == null) {
             return null;
         }

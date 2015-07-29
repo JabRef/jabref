@@ -54,14 +54,14 @@ public class TagToMarkedTextStore
 
     public TagToMarkedTextStore()
     {
-        tagMap = new HashMap<String, LinkedList<TMarkedStoreItem>>(10);
+        tagMap = new HashMap<>(10);
     }
 
     /** appends a selection property for tag */
     public void appendPosition(String tag, int start, int end) {
         LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
         if (ll == null) {
-            ll = new LinkedList<TMarkedStoreItem>();
+            ll = new LinkedList<>();
             tagMap.put(tag, ll);
         }
 
@@ -76,7 +76,7 @@ public class TagToMarkedTextStore
         LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
 
         if (ll == null) {
-            ll = new LinkedList<TMarkedStoreItem>();
+            ll = new LinkedList<>();
             tagMap.put(tag, ll);
         } else {
             ll.clear();

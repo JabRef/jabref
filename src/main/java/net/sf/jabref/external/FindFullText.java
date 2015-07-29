@@ -45,7 +45,7 @@ public class FindFullText {
     public static final int IO_EXCEPTION = 4;
     public static final int NO_URLS_DEFINED = 5;
 
-    private final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
+    private final List<FullTextFinder> finders = new ArrayList<>();
 
 
     public FindFullText() {
@@ -120,9 +120,6 @@ public class FindFullText {
             } else {
                 return new FindResult(FindFullText.LINK_NOT_FOUND, url);
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-
         } catch (IOException e) {
             e.printStackTrace();
         }

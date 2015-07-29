@@ -31,7 +31,7 @@ public class RegExpFileSearchTests {
     @Test
     public void testFindFiles() {
         //given
-        List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> entries = new ArrayList<>();
         BibtexEntry entry = new BibtexEntry("123", BibtexEntryType.ARTICLE);
         entry.setField(BibtexFields.KEY_FIELD, "pdfInDatabase");
         entry.setField("year", "2001");

@@ -64,8 +64,8 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     private void updateColumnPrefs() {
         final int columnCount = mainTable.getColumnCount();
-        Vector<String> storedColumns = new Vector<String>(columnCount - 1);
-        Vector<String> columnsWidths = new Vector<String>(columnCount - 1);
+        Vector<String> storedColumns = new Vector<>(columnCount - 1);
+        Vector<String> columnsWidths = new Vector<>(columnCount - 1);
         int ncWidth = -1;
 
         for (int i = 0; i < columnCount; i++) {

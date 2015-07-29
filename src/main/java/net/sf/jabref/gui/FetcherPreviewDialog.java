@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
-    private final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
+    private final EventList<TableEntry> entries = new BasicEventList<>();
     //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
     private boolean okPressed = false;
@@ -37,49 +37,29 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         this.warningLimit = warningLimit;
 
         JButton ok = new JButton(Globals.lang("Ok"));
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (verifySelection()) {
-                    okPressed = true;
-                    dispose();
-                }
-            }
-        });
-        JButton cancel = new JButton(Globals.lang("Cancel"));
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okPressed = false;
+        ok.addActionListener(e -> {
+            if (verifySelection()) {
+                okPressed = true;
                 dispose();
             }
         });
+        JButton cancel = new JButton(Globals.lang("Cancel"));
+        cancel.addActionListener(e -> {
+            okPressed = false;
+            dispose();
+        });
         JButton selectAll = new JButton(Globals.lang("Select all"));
-        selectAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setSelectionAll(true);
-            }
-        });
+        selectAll.addActionListener(e -> setSelectionAll(true));
         JButton deselectAll = new JButton(Globals.lang("Deselect all"));
-        deselectAll.addActionListener(new ActionListener() {
+        deselectAll.addActionListener(e -> setSelectionAll(false));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setSelectionAll(false);
-            }
-        });
-
-        EventTableModel<TableEntry> tableModelGl = new EventTableModel<TableEntry>(entries,
+        EventTableModel<TableEntry> tableModelGl = new EventTableModel<>(entries,
                 new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         glTable.setRowHeight(tableRowHeight);
         glTable.getColumnModel().getColumn(0).setMaxWidth(45);
         glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
-        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<TableEntry>(entries);
+        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<>(entries);
         glTable.setSelectionModel(selectionModel);
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addButton(selectAll);
@@ -143,7 +123,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     }
 
     public Map<String, Boolean> getSelection() {
-        LinkedHashMap<String, Boolean> selection = new LinkedHashMap<String, Boolean>();
+        LinkedHashMap<String, Boolean> selection = new LinkedHashMap<>();
         for (TableEntry e : entries) {
             selection.put(e.id, e.isWanted());
         }

@@ -47,7 +47,7 @@ public class ImportFormats {
         String lastUsedFormat = Globals.prefs.get("lastUsedImport");
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<ImportFileFilter> filters = new TreeSet<ImportFileFilter>();
+        TreeSet<ImportFileFilter> filters = new TreeSet<>();
         for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);
@@ -118,7 +118,7 @@ public class ImportFormats {
                     }
                     ImportMenuItem imi = new ImportMenuItem(frame,
                             openInNew, format);
-                    imi.automatedImport(new String[] {file.getAbsolutePath()});
+                    imi.automatedImport(file.getAbsolutePath());
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:

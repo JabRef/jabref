@@ -65,11 +65,11 @@ public class BiblioscapeImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
-        HashMap<String, String> hm = new HashMap<String, String>();
-        HashMap<String, StringBuffer> lines = new HashMap<String, StringBuffer>();
+        HashMap<String, String> hm = new HashMap<>();
+        HashMap<String, StringBuffer> lines = new HashMap<>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
             if (line.isEmpty())
@@ -85,7 +85,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 String address = null;
                 String titleST = null;
                 String titleTI = null;
-                Vector<String> comments = new Vector<String>();
+                Vector<String> comments = new Vector<>();
                 // add item
                 for (Map.Entry<String, StringBuffer> entry : lines.entrySet()) {
                     if (entry.getKey().equals("AU")) {
@@ -236,30 +236,33 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 // depending on bibtexType, decide where to place the titleRT and
                 // titleTI
-                if (bibtexType.equals("article")) {
+                switch (bibtexType) {
+                case "article":
                     if (titleST != null) {
                         hm.put("journal", titleST);
                     }
                     if (titleTI != null) {
                         hm.put("title", titleTI);
                     }
-                } else if (bibtexType.equals("inbook")) {
+                    break;
+                case "inbook":
                     if (titleST != null) {
                         hm.put("booktitle", titleST);
                     }
                     if (titleTI != null) {
                         hm.put("title", titleTI);
                     }
-                } else {
-                    if (titleST != null)
-                     {
+                    break;
+                default:
+                    if (titleST != null) {
                         hm.put("booktitle", titleST); // should not
                     }
-                                                      // happen, I
-                                                      // think
+                    // happen, I
+                    // think
                     if (titleTI != null) {
                         hm.put("title", titleTI);
                     }
+                    break;
                 }
 
                 // concatenate pages

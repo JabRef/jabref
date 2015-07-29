@@ -10,7 +10,7 @@ public class Cache {
 
     public static final int DEFAULT_CAPACITY = 500;
     private final int capacity;
-    private final Queue<String> queue = new LinkedList<String>();
+    private final Queue<String> queue = new LinkedList<>();
 
     private String cache = "";
     private boolean cacheRefreshNeeded = true;

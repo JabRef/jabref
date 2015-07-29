@@ -61,7 +61,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
             super();
         }
 
-        public Importer(String[] data) {
+        public Importer(String... data) {
             super();
             this.name = data[0];
             this.cliId = data[1];

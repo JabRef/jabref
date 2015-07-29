@@ -28,7 +28,7 @@ public class ImportFormatReader {
     public static final String BIBTEX_FORMAT = "BibTeX";
 
     /** all import formats, in the default order of import formats */
-    private final SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
+    private final SortedSet<ImportFormat> formats = new TreeSet<>();
     
     private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
@@ -172,7 +172,7 @@ public class ImportFormatReader {
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getCustomImportFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<ImportFormat>();
+        SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
             if (format.getIsCustomImporter()) {
                 result.add(format);
@@ -189,7 +189,7 @@ public class ImportFormatReader {
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getBuiltInInputFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<ImportFormat>();
+        SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
             if (!format.getIsCustomImporter()) {
                 result.add(format);

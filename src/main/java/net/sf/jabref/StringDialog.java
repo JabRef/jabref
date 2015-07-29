@@ -197,7 +197,7 @@ class StringDialog extends JDialog {
 
     private void sortStrings() {
         // Rebuild our sorted set of strings:
-        TreeSet<BibtexString> stringsSet = new TreeSet<BibtexString>(new BibtexStringComparator(false));
+        TreeSet<BibtexString> stringsSet = new TreeSet<>(new BibtexStringComparator(false));
         for (String s : base.getStringKeySet()) {
             stringsSet.add(base.getString(s));
         }

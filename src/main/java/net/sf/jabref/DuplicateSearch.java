@@ -34,7 +34,7 @@ public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
     private BibtexEntry[] bes;
-    private final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
+    private final Vector<BibtexEntry[]> duplicates = new Vector<>();
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -61,7 +61,7 @@ public class DuplicateSearch implements Runnable {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
-        final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
+        final ArrayList<BibtexEntry> toRemove = new ArrayList<>();
         while (!st.finished() || current < duplicates.size())
         {
 
@@ -121,25 +121,20 @@ public class DuplicateSearch implements Runnable {
         }
 
         final int dupliC = duplicateCounter;
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // Now, do the actual removal:
-                if (!toRemove.isEmpty()) {
-                    for (BibtexEntry entry : toRemove) {
-                        panel.database.removeEntry(entry.getId());
-                        ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
-                    }
-                    panel.markBaseChanged();
+        SwingUtilities.invokeLater(() -> {
+            // Now, do the actual removal:
+            if (!toRemove.isEmpty()) {
+                for (BibtexEntry entry : toRemove) {
+                    panel.database.removeEntry(entry.getId());
+                    ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
                 }
-                panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Globals.lang("pairs processed") + ": " + dupliC);
-
-                ce.end();
-                panel.undoManager.addEdit(ce);
-
+                panel.markBaseChanged();
             }
+            panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
+                    + ' ' + Globals.lang("pairs processed") + ": " + dupliC);
+
+            ce.end();
+            panel.undoManager.addEdit(ce);
 
         });
 

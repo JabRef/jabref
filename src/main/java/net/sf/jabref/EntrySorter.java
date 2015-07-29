@@ -29,7 +29,7 @@ public class EntrySorter implements DatabaseChangeListener {
 
     public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {
         //set = new TreeSet(comp);
-        set = new ArrayList<BibtexEntry>();
+        set = new ArrayList<>();
         this.comp = comp;
         Set<String> keySet = entries.keySet();
         for (Map.Entry<String, BibtexEntry> stringBibtexEntryEntry : entries.entrySet()) {

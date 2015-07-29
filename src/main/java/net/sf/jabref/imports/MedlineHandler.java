@@ -30,7 +30,7 @@ class MedlineHandler extends DefaultHandler
 {
 
     private static final HTMLConverter htmlConverter = new HTMLConverter();
-    private final ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+    private final ArrayList<BibtexEntry> bibitems = new ArrayList<>();
     private boolean inTitle = false;
     private boolean inYear = false;
     private boolean inJournal = false;
@@ -88,8 +88,8 @@ class MedlineHandler extends DefaultHandler
     private String minorTopics = "";
     private String language = "";
     private String pst = "";
-    private final ArrayList<String> authors = new ArrayList<String>();
-    private final TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
+    private final ArrayList<String> authors = new ArrayList<>();
+    private final TreeSet<String> descriptors = new TreeSet<>(); // To gather keywords
     int rowNum = 0;
 
     private static final String KEYWORD_SEPARATOR = "; ";
@@ -201,12 +201,16 @@ class MedlineHandler extends DefaultHandler
         else if (localName.equals("ArticleId")) {
             for (int i = 0; i < atts.getLength(); i++) {
                 String value = atts.getValue(i);
-                if (value.equals("doi")) {
+                switch (value) {
+                case "doi":
                     inDoi = true;
-                } else if (value.equals("pii")) {
+                    break;
+                case "pii":
                     inPii = true;
-                } else if (value.equals("pmc")) {
+                    break;
+                case "pmc":
                     inPmc = true;
+                    break;
                 }
 
             }
@@ -238,7 +242,8 @@ class MedlineHandler extends DefaultHandler
 
     @Override
     public void endElement(String uri, String localName, String qName) {
-        if (localName.equals("PubmedArticle")) {
+        switch (localName) {
+        case "PubmedArticle":
             //bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
             // check if year ="" then give medline date instead
             if (year.equals("")) {
@@ -254,7 +259,7 @@ class MedlineHandler extends DefaultHandler
 
             // Build a string from the collected keywords:
             StringBuilder sb = new StringBuilder();
-            for (Iterator<String> iterator = descriptors.iterator(); iterator.hasNext();) {
+            for (Iterator<String> iterator = descriptors.iterator(); iterator.hasNext(); ) {
                 String s = iterator.next();
                 sb.append(s);
                 if (iterator.hasNext()) {
@@ -264,7 +269,8 @@ class MedlineHandler extends DefaultHandler
             String keywords = sb.toString();
 
             BibtexEntry b = new BibtexEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            Globals.getEntryType("article")); // id assumes an existing database so don't create one here
+                    Globals.getEntryType("article")); // id assumes an existing database so don't create one here
+
             if (!author.equals("")) {
                 b.setField("author", MedlineHandler.htmlConverter.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
@@ -361,43 +367,42 @@ class MedlineHandler extends DefaultHandler
             String url = "";
             MedlineDate = "";
             descriptors.clear();
-        }
-
-        else if (localName.equals("ArticleTitle")) {
+            break;
+        case "ArticleTitle":
             inTitle = false;
-        }
-        else if (localName.equals("PubDate")) {
+            break;
+        case "PubDate":
             inPubDate = false;
-        }
-        else if (localName.equals("Year")) {
+            break;
+        case "Year":
             inYear = false;
-        }
-        else if (localName.equals("PMID")) {
+            break;
+        case "PMID":
             inPubMedID = false;
-        }
-        else if (localName.equals("MedlineDate")) {
+            break;
+        case "MedlineDate":
             inMedlineDate = false;
-        }
-        else if (localName.equals("MedlineTA")) {
+            break;
+        case "MedlineTA":
             inJournal = false;
-        } //journal name
-        else if (localName.equals("Month")) {
+            break;
+        case "Month":
             inMonth = false;
-        }
-        else if (localName.equals("Volume")) {
+            break;
+        case "Volume":
             inVolume = false;
-        }
-        else if (localName.equals("Language")) {
+            break;
+        case "Language":
             inLanguage = false;
-        }
-        else if (localName.equals("PublicationStatus")) {
+            break;
+        case "PublicationStatus":
             inPst = false;
-        }
-        else if (localName.equals("AuthorList")) {
+            break;
+        case "AuthorList":
             author = join(authors.toArray(), " and ");
             inAuthorList = false;
-        }
-        else if (localName.equals("Author")) {
+            break;
+        case "Author":
             // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
             // when above is the case replace it with initials
             if (forename.length() == 3 && forename.charAt(1) == ' ') {
@@ -425,48 +430,51 @@ class MedlineHandler extends DefaultHandler
             initials = "";
             lastname = "";
             suffix = "";
-        }
-        else if (localName.equals("DescriptorName")) {
+            break;
+        case "DescriptorName":
             inDescriptorName = false;
-        } else if (localName.equals("QualifierName")) {
+            break;
+        case "QualifierName":
             inQualifierName = false;
-        } else if (localName.equals("MeshHeading")) {
+            break;
+        case "MeshHeading":
             inMeshHeader = false;
             if (minorTopics.equals("")) {
                 descriptors.add(majorTopic);
             } else {
                 descriptors.add(majorTopic + ", " + minorTopics);
             }
-        }
-        else if (localName.equals("LastName")) {
+            break;
+        case "LastName":
             inLastName = false;
-        }
-        else if (localName.equals("Suffix")) {
+            break;
+        case "Suffix":
             inSuffix = false;
-        }
-        else if (localName.equals("ForeName") || localName.equals("FirstName")) {
+            break;
+        case "ForeName":
+        case "FirstName":
             inForename = false;
-        }
-        else if (localName.equals("Issue")) {
+            break;
+        case "Issue":
             inIssue = false;
-        }
-        else if (localName.equals("MedlinePgn")) {
+            break;
+        case "MedlinePgn":
             inMedlinePgn = false;
-        }//pagenumber
-        else if (localName.equals("URL")) {
+            break;
+        case "URL":
             inUrl = false;
-        }
-        else if (localName.equals("Initials")) {
+            break;
+        case "Initials":
             //initials= '.' + initials + '.';
             inInitials = false;
-        }
-        else if (localName.equals("AbstractText")) {
+            break;
+        case "AbstractText":
             inAbstractText = false;
-        }
-        else if (localName.equals("Affiliation")) {
+            break;
+        case "Affiliation":
             inAffiliation = false;
-        }
-        else if (localName.equals("ArticleId")) {
+            break;
+        case "ArticleId":
             if (inDoi) {
                 inDoi = false;
             } else if (inPii) {
@@ -474,6 +482,7 @@ class MedlineHandler extends DefaultHandler
             } else if (inPmc) {
                 inPmc = false;
             }
+            break;
         }
     }
 

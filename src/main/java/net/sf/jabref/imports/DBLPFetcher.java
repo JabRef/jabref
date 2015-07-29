@@ -50,7 +50,7 @@ public class DBLPFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector,
             OutputPrinter status) {
 
-        final HashMap<String, Boolean> bibentryKnown = new HashMap<String, Boolean>();
+        final HashMap<String, Boolean> bibentryKnown = new HashMap<>();
 
         boolean res = false;
         this.query = query;
@@ -66,7 +66,7 @@ public class DBLPFetcher implements EntryFetcher {
 
             //System.out.println(page);
             String[] lines = page.split("\n");
-            List<String> bibtexUrlList = new ArrayList<String>();
+            List<String> bibtexUrlList = new ArrayList<>();
             for (final String line : lines) {
                 if (line.startsWith("\"url\"")) {
                     String addr = line.replace("\"url\":\"", "");

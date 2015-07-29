@@ -80,7 +80,7 @@ public class BiomailImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         BufferedReader in =
@@ -112,7 +112,7 @@ public class BiomailImporter extends ImportFormat {
         String[] entries = sb.toString().split("::");
 
         // skip the first entry as it is either empty or has document header
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
 
         for (String entry : entries) {
             String[] fields = entry.split(" ## ");
@@ -139,16 +139,21 @@ public class BiomailImporter extends ImportFormat {
                 String value = field.substring(6);
                 value = value.trim();
 
-                if (beg.equals("PT  - ")) {
+                switch (beg) {
+                case "PT  - ":
                     // PT = value.replaceAll("JOURNAL ARTICLE", "article").replaceAll("Journal Article", "article");
                     Type = "article"; //make all of them PT?
-                } else if (beg.equals("TY  - ")) {
+
+                    break;
+                case "TY  - ":
                     if ("CONF".equals(value)) {
                         Type = "inproceedings";
                     }
-                } else if (beg.equals("JO  - ")) {
+                    break;
+                case "JO  - ":
                     hm.put("booktitle", value);
-                } else if (beg.equals("FAU - ")) {
+                    break;
+                case "FAU - ": {
                     String tmpauthor = value.replaceAll("EOLEOL", " and ");
 
                     // if there is already someone there then append with "and"
@@ -157,7 +162,9 @@ public class BiomailImporter extends ImportFormat {
                     } else {
                         fullauthor = tmpauthor;
                     }
-                } else if (beg.equals("AU  - ")) {
+                    break;
+                }
+                case "AU  - ": {
                     String tmpauthor = value.replaceAll("EOLEOL", " and ").replaceAll(" ", ", ");
 
                     // if there is already someone there then append with "and"
@@ -166,27 +173,40 @@ public class BiomailImporter extends ImportFormat {
                     } else {
                         shortauthor = tmpauthor;
                     }
-                } else if (beg.equals("TI  - ")) {
+                    break;
+                }
+                case "TI  - ":
                     hm.put("title", value.replaceAll("EOLEOL", " "));
-                } else if (beg.equals("TA  - ")) {
+                    break;
+                case "TA  - ":
                     hm.put("journal", value.replaceAll("EOLEOL", " "));
-                } else if (beg.equals("AB  - ")) {
+                    break;
+                case "AB  - ":
                     hm.put("abstract", value.replaceAll("EOLEOL", " "));
-                } else if (beg.equals("PG  - ")) {
+                    break;
+                case "PG  - ":
                     pages = value.replaceAll("-", "--");
-                } else if (beg.equals("IP  - ")) {
+                    break;
+                case "IP  - ":
                     hm.put("number", value);
-                } else if (beg.equals("DP  - ")) {
+                    break;
+                case "DP  - ": {
                     String[] parts = value.split(" "); // sometimes this is just year, sometimes full date
+
                     hm.put("year", parts[0]);
-                } else if (beg.equals("VI  - ")) {
+                    break;
+                }
+                case "VI  - ":
                     hm.put("volume", value);
-                } else if (beg.equals("AID - ")) {
+                    break;
+                case "AID - ": {
                     String[] parts = value.split(" ");
                     if ("[doi]".equals(parts[1])) {
                         hm.put("doi", parts[0]);
                         hm.put("url", "http://dx.doi.org/" + parts[0]);
                     }
+                    break;
+                }
                 }
             }
 

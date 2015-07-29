@@ -34,10 +34,10 @@ import java.util.ArrayList;
  */
 public class TransferableFileLinkSelection implements Transferable {
 
-    private final List<File> fileList = new ArrayList<File>();
+    private final List<File> fileList = new ArrayList<>();
 
 
-    public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
+    public TransferableFileLinkSelection(BasePanel panel, BibtexEntry... selection) {
         String s = selection[0].getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (s != null) {

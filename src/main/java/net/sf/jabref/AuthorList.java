@@ -197,7 +197,7 @@ public class AuthorList {
     private static final int TOKEN_WORD = 3;
 
     // Constant Hashtable containing names of TeX special characters
-    private static final java.util.HashSet<String> tex_names = new java.util.HashSet<String>();
+    private static final java.util.HashSet<String> tex_names = new java.util.HashSet<>();
     // and static constructor to initialize it
     static {
         AuthorList.tex_names.add("aa");
@@ -214,7 +214,7 @@ public class AuthorList {
         AuthorList.tex_names.add("j");
     }
 
-    private static final WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
+    private static final WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<>();
 
 
     /**
@@ -228,7 +228,7 @@ public class AuthorList {
      *            bibtex field.
      */
     private AuthorList(String bibtex_authors) {
-        authors = new Vector<Author>(5); // 5 seems to be reasonable initial size
+        authors = new Vector<>(5); // 5 seems to be reasonable initial size
         orig = bibtex_authors; // initialization
         token_start = 0;
         token_end = 0; // of parser
@@ -344,7 +344,7 @@ public class AuthorList {
      */
     private Author getAuthor() {
 
-        tokens = new Vector<Object>(); // initialization
+        tokens = new Vector<>(); // initialization
         int von_start = -1;
         int last_start = -1;
         int comma_first = -1;
@@ -1330,7 +1330,7 @@ public class AuthorList {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         //String s = "Ford, Jr., Henry and Guy L. {Steele Jr.} and Olaf Nilsen, Jr.";
         String s = "Olaf von Nilsen, Jr.";
         AuthorList al = AuthorList.getAuthorList(s);

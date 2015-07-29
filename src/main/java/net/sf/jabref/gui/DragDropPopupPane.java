@@ -67,19 +67,7 @@ public class DragDropPopupPane extends DragDropPane {
         popupMenu.add(manageSelectorsBtn);
 
         JMenuItem closeBtn = new JMenuItem(Globals.lang("Close"), GUIGlobals.getImage("close"));
-        closeBtn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        closeSelectedTab();
-                    }
-                });
-            }
-        });
+        closeBtn.addActionListener(e -> SwingUtilities.invokeLater(this::closeSelectedTab));
         popupMenu.add(closeBtn);
     }
 

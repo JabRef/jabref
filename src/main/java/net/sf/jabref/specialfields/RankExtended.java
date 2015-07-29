@@ -17,7 +17,7 @@ public class RankExtended extends Rank {
 
     private RankExtended() {
         super();
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearRank", Globals.lang("Clear rank"), null, Globals.lang("No rank information")));
         // DO NOT TRANSLATE "rank1" etc. as this makes the .bib files non portable
         values.add(new SpecialFieldValue(this, "rank1", "setRank1", Globals.lang("Set rank to one star"), GUIGlobals.getImage("rank1"), Globals.lang("One star")));

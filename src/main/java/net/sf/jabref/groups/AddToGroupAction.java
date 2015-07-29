@@ -64,7 +64,7 @@ public class AddToGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         final BibtexEntry[] entries = m_panel.getSelectedEntries();
-        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<GroupTreeNode>(); // used only when moving
+        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
 
         if (m_move) {
             // collect warnings for removal

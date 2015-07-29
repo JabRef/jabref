@@ -116,13 +116,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
         // We need a listener on useImportInspector to enable and disable the
         // import inspector related choices;
-        useImportInspector.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
-                inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
-            }
+        useImportInspector.addChangeListener(event -> {
+            useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
+            inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
         });
 
         FormLayout layout = new FormLayout

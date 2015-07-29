@@ -132,7 +132,7 @@ public class CaseChangers {
         private static final Set<String> notToCapitalize;
 
         static {
-            Set<String> smallerWords = new HashSet<String>();
+            Set<String> smallerWords = new HashSet<>();
 
             smallerWords.addAll(Arrays.asList("a", "an", "the", "and", "but", "or", "for", "nor", "as", "at", "by", "for",
                     "from", "in", "into", "near", "of", "on", "onto", "to", "with"));

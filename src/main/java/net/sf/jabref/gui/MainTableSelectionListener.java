@@ -154,13 +154,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                         newEditor.setVisiblePanel(visName);
                     }
                     panel.showEntryEditor(newEditor);
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            table.ensureVisible(table.getSelectedRow());
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
                 }
 
             } else {
@@ -184,13 +178,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
              {
                 return; // We've already waited once. Give up on this selection.
             }
-            Timer t = new Timer(50, new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    updatePreview(toShow, changedPreview, 1);
-                }
-            });
+            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, changedPreview, 1));
             t.setRepeats(false);
             t.start();
             return;
@@ -202,25 +190,17 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         }
         final int mode = panel.getMode();
         workingOnPreview = true;
-        final Runnable update = new Runnable() {
-
-            @Override
-            public void run() {
-                // If nothing was already shown, set the preview and move the separator:
-                if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
-                    panel.showPreview(preview);
-                    panel.adjustSplitter();
-                }
-                workingOnPreview = false;
+        final Runnable update = () -> {
+            // If nothing was already shown, set the preview and move the separator:
+            if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
+                panel.showPreview(preview);
+                panel.adjustSplitter();
             }
+            workingOnPreview = false;
         };
-        final Runnable worker = new Runnable() {
-
-            @Override
-            public void run() {
-                preview.setEntry(toShow);
-                SwingUtilities.invokeLater(update);
-            }
+        final Runnable worker = () -> {
+            preview.setEntry(toShow);
+            SwingUtilities.invokeLater(update);
         };
         JabRefExecutorService.INSTANCE.execute(worker);
     }
@@ -336,85 +316,80 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
             final List<String> listOfFileTypes = Collections.unmodifiableList(Arrays.asList(fileTypes));
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                panel.output(Globals.lang("External viewer called") + '.');
 
-                @Override
-                public void run() {
-                    panel.output(Globals.lang("External viewer called") + '.');
+                Object link = entry.getField(fieldName);
+                if (link == null) {
+                    LOGGER.info("Error: no link to " + fieldName + '.');
+                    return; // There is an icon, but the field is not set.
+                }
 
-                    Object link = entry.getField(fieldName);
-                    if (link == null) {
-                        LOGGER.info("Error: no link to " + fieldName + '.');
-                        return; // There is an icon, but the field is not set.
+                // See if this is a simple file link field, or if it is a file-list
+                // field that can specify a list of links:
+                if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
+
+                    // We use a FileListTableModel to parse the field content:
+                    FileListTableModel fileList = new FileListTableModel();
+                    fileList.setContent((String) link);
+
+                    FileListEntry flEntry = null;
+                    // If there are one or more links of the correct type,
+                    // open the first one:
+                    if (!listOfFileTypes.isEmpty()) {
+                        for (int i = 0; i < fileList.getRowCount(); i++) {
+                            flEntry = fileList.getEntry(i);
+                            boolean correctType = false;
+                            for (String listOfFileType : listOfFileTypes) {
+                                if (flEntry.getType().toString().equals(listOfFileType)) {
+                                    correctType = true;
+                                }
+                            }
+                            if (correctType) {
+                                break;
+                            }
+                            flEntry = null;
+                        }
                     }
+                    //If there are no file types specified, consider all files.
+                    else if (fileList.getRowCount() > 0) {
+                        flEntry = fileList.getEntry(0);
+                    }
+                    if (flEntry != null) {
+                        //                            if (fileList.getRowCount() > 0) {
+                        //                                FileListEntry flEntry = fileList.getEntry(0);
 
-                    // See if this is a simple file link field, or if it is a file-list
-                    // field that can specify a list of links:
-                    if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
-
-                        // We use a FileListTableModel to parse the field content:
-                        FileListTableModel fileList = new FileListTableModel();
-                        fileList.setContent((String) link);
-
-                        FileListEntry flEntry = null;
-                        // If there are one or more links of the correct type,
-                        // open the first one:
-                        if (!listOfFileTypes.isEmpty()) {
-                            for (int i = 0; i < fileList.getRowCount(); i++) {
-                                flEntry = fileList.getEntry(i);
-                                boolean correctType = false;
-                                for (String listOfFileType : listOfFileTypes) {
-                                    if (flEntry.getType().toString().equals(listOfFileType)) {
-                                        correctType = true;
-                                    }
-                                }
-                                if (correctType) {
-                                    break;
-                                }
-                                flEntry = null;
-                            }
-                        }
-                        //If there are no file types specified, consider all files.
-                        else if (fileList.getRowCount() > 0) {
-                            flEntry = fileList.getEntry(0);
-                        }
-                        if (flEntry != null) {
-                            //                            if (fileList.getRowCount() > 0) {
-                            //                                FileListEntry flEntry = fileList.getEntry(0);
-
-                            ExternalFileMenuItem item = new ExternalFileMenuItem
-                                    (panel.frame(), entry, "",
-                                            flEntry.getLink(), flEntry.getType().getIcon(),
-                                            panel.metaData(), flEntry.getType());
-                            boolean success = item.openLink();
-                            if (!success) {
-                                panel.output(Globals.lang("Unable to open link."));
-                            }
-                        }
-                    } else {
-                        try {
-                            Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
-                        } catch (IOException ex) {
-                            panel.output(Globals.lang("Unable to open link."));
-                        }
-
-                        /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
                         ExternalFileMenuItem item = new ExternalFileMenuItem
                                 (panel.frame(), entry, "",
-                                (String)link, type.getIcon(),
-                                panel.metaData(), type);
+                                        flEntry.getLink(), flEntry.getType().getIcon(),
+                                        panel.metaData(), flEntry.getType());
                         boolean success = item.openLink();
                         if (!success) {
                             panel.output(Globals.lang("Unable to open link."));
-                        } */
-                        //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                        }
+                    }
+                } else {
+                    try {
+                        Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
+                    } catch (IOException ex) {
+                        panel.output(Globals.lang("Unable to open link."));
                     }
 
-                    //catch (IOException ex) {
-                    //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
-                    //}
+                    /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
+                    ExternalFileMenuItem item = new ExternalFileMenuItem
+                            (panel.frame(), entry, "",
+                            (String)link, type.getIcon(),
+                            panel.metaData(), type);
+                    boolean success = item.openLink();
+                    if (!success) {
+                        panel.output(Globals.lang("Unable to open link."));
+                    } */
+                    //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                 }
 
+                //catch (IOException ex) {
+                //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
+                //}
             });
         }
     }
@@ -446,7 +421,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
      * @param iconType A string array containing the resource fields associated with
      *  this table cell.
      */
-    private void showIconRightClickMenu(MouseEvent e, int row, String[] iconType) {
+    private void showIconRightClickMenu(MouseEvent e, int row, String... iconType) {
         BibtexEntry entry = tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
         boolean showDefaultPopup = true;

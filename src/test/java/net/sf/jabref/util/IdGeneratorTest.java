@@ -11,7 +11,7 @@ public class IdGeneratorTest {
     @Test
     public void testCreateNeutralId() {
 
-        HashSet<String> set = new HashSet<String>();
+        HashSet<String> set = new HashSet<>();
         for (int i = 0; i < 10000; i++) {
             String string = IdGenerator.next();
             Assert.assertFalse(set.contains(string));

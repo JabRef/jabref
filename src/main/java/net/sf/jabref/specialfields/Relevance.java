@@ -28,7 +28,7 @@ public class Relevance extends SpecialField {
 
 
     private Relevance() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // action directly set by JabRefFrame
         // DO NOT TRANSLATE "relevant" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Globals.lang("Toggle relevance"), GUIGlobals.getImage("relevant"), Globals.lang("Toggle relevance")));

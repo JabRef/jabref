@@ -86,44 +86,34 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
                 }
             }
         });
-        cancel.addActionListener(new ActionListener() {
+        cancel.addActionListener(e -> dispose());
+        ok.addActionListener(e -> {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                // Perform all accepted changes:
-                // Store all edits in an Undoable object:
-                NamedCompound ce = new NamedCompound(Globals.lang("Merged external changes"));
-                @SuppressWarnings("unchecked")
-                Enumeration<Change> enumer = root.children();
-                boolean anyDisabled = false;
-                while (enumer.hasMoreElements()) {
-                    Change c = enumer.nextElement();
-                    boolean allAccepted = false;
-                    if (c.isAcceptable() && c.isAccepted()) {
-                        allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
-                    }
-
-                    if (!allAccepted) {
-                        anyDisabled = true;
-                    }
+            // Perform all accepted changes:
+            // Store all edits in an Undoable object:
+            NamedCompound ce = new NamedCompound(Globals.lang("Merged external changes"));
+            @SuppressWarnings("unchecked")
+            Enumeration<Change> enumer = root.children();
+            boolean anyDisabled = false;
+            while (enumer.hasMoreElements()) {
+                Change c = enumer.nextElement();
+                boolean allAccepted = false;
+                if (c.isAcceptable() && c.isAccepted()) {
+                    allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
                 }
-                ce.end();
-                panel.undoManager.addEdit(ce);
-                if (anyDisabled) {
-                    panel.markBaseChanged();
+
+                if (!allAccepted) {
+                    anyDisabled = true;
                 }
-                panel.setUpdatedExternally(false);
-                dispose();
-                okPressed = true;
             }
+            ce.end();
+            panel.undoManager.addEdit(ce);
+            if (anyDisabled) {
+                panel.markBaseChanged();
+            }
+            panel.setUpdatedExternally(false);
+            dispose();
+            okPressed = true;
         });
 
         pack();

@@ -88,8 +88,8 @@ class ContentSelectorDialog2 extends JDialog {
     private final JScrollPane fPane = new JScrollPane(fieldList);
     private final JScrollPane wPane = new JScrollPane(wordList);
 
-    private final HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
-    private final ArrayList<String> removedFields = new ArrayList<String>();
+    private final HashMap<String, DefaultListModel> wordListModels = new HashMap<>();
+    private final ArrayList<String> removedFields = new ArrayList<>();
 
     private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog2.class);
     
@@ -131,108 +131,76 @@ class ContentSelectorDialog2 extends JDialog {
 
     private void setupActions() {
 
-        wordList.addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                wordEditField.setText((String) wordList.getSelectedValue());
-                wordEditField.selectAll();
-                new FocusRequester(wordEditField);
-            }
+        wordList.addListSelectionListener(e -> {
+            wordEditField.setText((String) wordList.getSelectedValue());
+            wordEditField.selectAll();
+            new FocusRequester(wordEditField);
         });
 
-        newWord.addActionListener(new ActionListener() {
+        newWord.addActionListener(e -> newWordAction());
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newWordAction();
+        wordEditFieldListener = e -> {
+            int index = wordList.getSelectedIndex();
+            String old = (String) wordList.getSelectedValue();
+            String newVal = wordEditField.getText();
+            if (newVal.equals("") || newVal.equals(old)) {
+                return; // Empty string or no change.
             }
-        });
-
-        wordEditFieldListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int index = wordList.getSelectedIndex();
-                String old = (String) wordList.getSelectedValue();
-                String newVal = wordEditField.getText();
-                if (newVal.equals("") || newVal.equals(old)) {
-                    return; // Empty string or no change.
-                }
-                if (wordListModel.contains(newVal)) {
-                    // ensure that word already in list is visible
-                    index = wordListModel.indexOf(newVal);
-                    wordList.ensureIndexIsVisible(index);
-                    return;
-                }
-
-                int newIndex = findPos(wordListModel, newVal);
-                if (index >= 0) {
-                    // initiate replacement of selected word
-                    wordListModel.remove(index);
-                    if (newIndex > index) {
-                        // newIndex has to be adjusted after removal of previous entry
-                        newIndex--;
-                    }
-                }
-                wordListModel.add(newIndex, newVal);
-                wordList.ensureIndexIsVisible(newIndex);
-                wordEditField.selectAll();
+            if (wordListModel.contains(newVal)) {
+                // ensure that word already in list is visible
+                index = wordListModel.indexOf(newVal);
+                wordList.ensureIndexIsVisible(index);
+                return;
             }
+
+            int newIndex = findPos(wordListModel, newVal);
+            if (index >= 0) {
+                // initiate replacement of selected word
+                wordListModel.remove(index);
+                if (newIndex > index) {
+                    // newIndex has to be adjusted after removal of previous entry
+                    newIndex--;
+                }
+            }
+            wordListModel.add(newIndex, newVal);
+            wordList.ensureIndexIsVisible(newIndex);
+            wordEditField.selectAll();
         };
         wordEditField.addActionListener(wordEditFieldListener);
 
-        removeWord.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int index = wordList.getSelectedIndex();
-                if (index == -1) {
-                    return;
-                }
-                wordListModel.remove(index);
-                wordEditField.setText("");
-                if (!wordListModel.isEmpty()) {
-                    wordList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
-                }
+        removeWord.addActionListener(e -> {
+            int index = wordList.getSelectedIndex();
+            if (index == -1) {
+                return;
+            }
+            wordListModel.remove(index);
+            wordEditField.setText("");
+            if (!wordListModel.isEmpty()) {
+                wordList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
             }
         });
 
-        fieldList.addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                currentField = (String) fieldList.getSelectedValue();
-                fieldNameField.setText("");
-                setupWordSelector();
-            }
+        fieldList.addListSelectionListener(e -> {
+            currentField = (String) fieldList.getSelectedValue();
+            fieldNameField.setText("");
+            setupWordSelector();
         });
 
-        newField.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {
-                    // only add <field name> once
-                    fieldListModel.add(0, FIELD_FIRST_LINE);
-                }
-                fieldList.setSelectedIndex(0);
-                fPane.getVerticalScrollBar().setValue(0);
-                fieldNameField.setEnabled(true);
-                fieldNameField.setText(currentField);
-                fieldNameField.selectAll();
-
-                new FocusRequester(fieldNameField);
+        newField.addActionListener(e -> {
+            if (!fieldListModel.get(0).equals(FIELD_FIRST_LINE)) {
+                // only add <field name> once
+                fieldListModel.add(0, FIELD_FIRST_LINE);
             }
+            fieldList.setSelectedIndex(0);
+            fPane.getVerticalScrollBar().setValue(0);
+            fieldNameField.setEnabled(true);
+            fieldNameField.setText(currentField);
+            fieldNameField.selectAll();
+
+            new FocusRequester(fieldNameField);
         });
 
-        fieldNameField.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                fieldNameField.transferFocus();
-            }
-        });
+        fieldNameField.addActionListener(e -> fieldNameField.transferFocus());
 
         fieldNameField.addFocusListener(new FocusAdapter() {
 
@@ -269,63 +237,45 @@ class ContentSelectorDialog2 extends JDialog {
             }
         });
 
-        removeField.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int index = fieldList.getSelectedIndex();
-                if (index == -1) {
-                    return;
-                }
-                String fieldName = (String) fieldListModel.get(index);
-                removedFields.add(fieldName);
-                fieldListModel.remove(index);
-                wordListModels.remove(fieldName);
-                fieldNameField.setText("");
-                if (!fieldListModel.isEmpty()) {
-                    fieldList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
-                }
+        removeField.addActionListener(e -> {
+            int index = fieldList.getSelectedIndex();
+            if (index == -1) {
+                return;
+            }
+            String fieldName = (String) fieldListModel.get(index);
+            removedFields.add(fieldName);
+            fieldListModel.remove(index);
+            wordListModels.remove(fieldName);
+            fieldNameField.setText("");
+            if (!fieldListModel.isEmpty()) {
+                fieldList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
             }
         });
 
-        help.addActionListener(new ActionListener() {
+        help.addActionListener(e -> frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
+        ok.addActionListener(e -> {
+            try {
+                applyChanges();
+                dispose();
+            }
+            catch (Exception ex) {
+                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
             }
         });
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    applyChanges();
-                    dispose();
-                }
-                catch (Exception ex) {
-                    LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
-                }
+        apply.addActionListener(e -> {
+            // Store if an entry is currently being edited:
+            if (!wordEditField.getText().equals("")) {
+                wordEditFieldListener.actionPerformed(null);
             }
-        });
-
-        apply.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Store if an entry is currently being edited:
-                if (!wordEditField.getText().equals("")) {
-                    wordEditFieldListener.actionPerformed(null);
-                }
-                try {
-                    applyChanges();
-                }
-                catch (Exception ex) {
-                    LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
-                }
+            try {
+                applyChanges();
+            }
+            catch (Exception ex) {
+                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
             }
         });
 
@@ -379,7 +329,7 @@ class ContentSelectorDialog2 extends JDialog {
             boolean newField = false;
             if (data == null) {
                 newField = true;
-                data = new Vector<String>();
+                data = new Vector<>();
                 changedFieldSet = true;
 
             } else {
@@ -413,7 +363,7 @@ class ContentSelectorDialog2 extends JDialog {
      */
     private void setupFieldSelector() {
         fieldListModel.clear();
-        SortedSet<String> contents = new TreeSet<String>();
+        SortedSet<String> contents = new TreeSet<>();
         for (String s : metaData) {
             if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
                 contents.add(s.substring(Globals.SELECTOR_META_PREFIX.length()));
@@ -459,7 +409,7 @@ class ContentSelectorDialog2 extends JDialog {
             // wordListModel.addElement(WORD_FIRSTLINE_TEXT);
             Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
             if (items != null) {
-                TreeSet<String> wordSet = new TreeSet<String>(items);
+                TreeSet<String> wordSet = new TreeSet<>(items);
                 int index = 0;
                 for (String s : wordSet) {
                     wordListModel.add(index, s);

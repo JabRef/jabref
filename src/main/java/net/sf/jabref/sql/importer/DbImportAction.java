@@ -142,10 +142,10 @@ public class DbImportAction extends AbstractWorker {
                 ResultSet rs = SQLUtil.queryAllFromTable(conn,
                         "jabref_database");
                 Vector<String> v;
-                Vector<Vector<String>> matrix = new Vector<Vector<String>>();
+                Vector<Vector<String>> matrix = new Vector<>();
 
                 while (rs.next()) {
-                    v = new Vector<String>();
+                    v = new Vector<>();
                     v.add(rs.getString("database_name"));
                     matrix.add(v);
                 }

@@ -35,7 +35,7 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
 
 
     public GlazedEntrySorter(Map<String, BibtexEntry> entries) {
-        list = new BasicEventList<BibtexEntry>();
+        list = new BasicEventList<>();
         list.getReadWriteLock().writeLock().lock();
         Set<String> keySet = entries.keySet();
         for (String aKeySet : keySet) {

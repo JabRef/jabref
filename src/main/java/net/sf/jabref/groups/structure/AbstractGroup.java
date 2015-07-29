@@ -121,7 +121,7 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit add(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit add(BibtexEntry... entries);
 
     /**
      * Removes the specified entries from this group.
@@ -130,7 +130,7 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit remove(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit remove(BibtexEntry... entries);
 
     /**
      * @param query The search option to apply.
@@ -147,7 +147,7 @@ public abstract class AbstractGroup {
      * @return true if this group contains any of the specified entries, false
      * otherwise.
      */
-    public boolean containsAny(BibtexEntry[] entries) {
+    public boolean containsAny(BibtexEntry... entries) {
         for (BibtexEntry entry : entries) {
             if (contains(entry)) {
                 return true;
@@ -160,7 +160,7 @@ public abstract class AbstractGroup {
      * @return true if this group contains all of the specified entries, false
      * otherwise.
      */
-    public boolean containsAll(BibtexEntry[] entries) {
+    public boolean containsAll(BibtexEntry... entries) {
         for (BibtexEntry entry : entries) {
             if (!contains(entry)) {
                 return false;

@@ -126,25 +126,21 @@ public class PushToTeXstudio implements PushToApplication {
 
             final Process p = Runtime.getRuntime().exec(com);
             System.out.println(keys);
-            Runnable errorListener = new Runnable() {
-
-                @Override
-                public void run() {
-                    InputStream out = p.getErrorStream();
-                    int c;
-                    StringBuilder sb = new StringBuilder();
-                    try {
-                        while ((c = out.read()) != -1) {
-                            sb.append((char) c);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            Runnable errorListener = () -> {
+                InputStream out = p.getErrorStream();
+                int c;
+                StringBuilder sb = new StringBuilder();
+                try {
+                    while ((c = out.read()) != -1) {
+                        sb.append((char) c);
                     }
-                    // Error stream has been closed. See if there were any errors:
-                    if (!sb.toString().trim().isEmpty()) {
-                        //System.out.println(sb.toString());
-                        couldNotConnect = true;
-                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // Error stream has been closed. See if there were any errors:
+                if (!sb.toString().trim().isEmpty()) {
+                    //System.out.println(sb.toString());
+                    couldNotConnect = true;
                 }
             };
             JabRefExecutorService.INSTANCE.executeAndWait(errorListener);

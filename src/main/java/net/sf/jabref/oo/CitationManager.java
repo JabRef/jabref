@@ -51,7 +51,7 @@ class CitationManager {
         diag = new JDialog(frame, Globals.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
-        list = new BasicEventList<CitEntry>();
+        list = new BasicEventList<>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         String[] names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
@@ -60,7 +60,7 @@ class CitationManager {
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new EventTableModel<CitEntry>(list, new CitEntryFormat());
+        tableModel = new EventTableModel<>(list, new CitEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 

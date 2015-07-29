@@ -33,7 +33,7 @@ public class JabRefCLI {
         return cl.hasOption("nogui");
     }
 
-    public JabRefCLI(String[] args) {
+    public JabRefCLI(String... args) {
 
         Options options = getOptions();
 

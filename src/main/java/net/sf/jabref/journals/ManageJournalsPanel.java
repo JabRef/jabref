@@ -64,7 +64,7 @@ class ManageJournalsPanel extends JPanel {
     private final JTextField nameTf = new JTextField();
     private final JTextField newNameTf = new JTextField();
     private final JTextField abbrTf = new JTextField();
-    private final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
+    private final List<ExternalFileEntry> externals = new ArrayList<>(); // To hold references to external journal lists.
     private final JDialog dialog;
     private final JRadioButton newFile = new JRadioButton(Globals.lang("New file"));
     private final JRadioButton oldFile = new JRadioButton(Globals.lang("Existing file"));
@@ -165,16 +165,12 @@ class ManageJournalsPanel extends JPanel {
         builder2.append(abbrTf);
         journalEditPanel = builder2.getPanel();
 
-        viewBuiltin.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                abbr.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
-                JScrollPane pane = new JScrollPane(table);
-                JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
-            }
+        viewBuiltin.addActionListener(e -> {
+            JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+            abbr.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
+            JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
+            JScrollPane pane = new JScrollPane(table);
+            JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
         });
 
         browseNew.addActionListener(new ActionListener() {
@@ -210,17 +206,13 @@ class ManageJournalsPanel extends JPanel {
             }
         });
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (readyToClose()) {
-                    try {
-                        storeSettings();
-                        dialog.dispose();
-                    } catch (FileNotFoundException ex) {
-                        JOptionPane.showMessageDialog(null, Globals.lang("Error opening file") + ": " + ex.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                    }
+        ok.addActionListener(e -> {
+            if (readyToClose()) {
+                try {
+                    storeSettings();
+                    dialog.dispose();
+                } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file") + ": " + ex.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -408,7 +400,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<String>();
+        ArrayList<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!efe.getValue().equals("")) {
                 extFiles.add(efe.getValue());
@@ -509,7 +501,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         public void setJournals(SortedSet<Abbreviation> journals) {
-            this.journals = new ArrayList<JournalEntry>();
+            this.journals = new ArrayList<>();
             for (Abbreviation abbreviation : journals) {
                 this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }
@@ -649,29 +641,21 @@ class ManageJournalsPanel extends JPanel {
 
             pan = builder.getPanel();
 
-            view.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                        abbr.readJournalListFromFile(new File(tf.getText()));
-                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
-                        JScrollPane pane = new JScrollPane(table);
-                        JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
-                    } catch (FileNotFoundException ex) {
-                        JOptionPane.showMessageDialog(null, Globals.lang("File '%0' not found", tf.getText()),
-                                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                    }
+            view.addActionListener(e -> {
+                try {
+                    JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+                    abbr.readJournalListFromFile(new File(tf.getText()));
+                    JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
+                    JScrollPane pane = new JScrollPane(table);
+                    JOptionPane.showMessageDialog(null, pane, Globals.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
+                } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null, Globals.lang("File '%0' not found", tf.getText()),
+                            Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
             });
-            clear.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    externals.remove(ExternalFileEntry.this);
-                    buildExternalsPanel();
-                }
+            clear.addActionListener(e -> {
+                externals.remove(ExternalFileEntry.this);
+                buildExternalsPanel();
             });
             clear.setToolTipText(Globals.lang("Remove"));
         }

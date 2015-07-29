@@ -104,11 +104,8 @@ public class XMPUtil {
      *             than remove a lock or cancel the operation.
      */
     public static List<BibtexEntry> readXMP(File file) throws IOException {
-        FileInputStream is = new FileInputStream(file);
-        try {
+        try (FileInputStream is = new FileInputStream(file)) {
             return XMPUtil.readXMP(is);
-        } finally {
-            is.close();
         }
     }
 
@@ -127,7 +124,7 @@ public class XMPUtil {
     public static List<BibtexEntry> readXMP(InputStream inputStream)
             throws IOException {
 
-        List<BibtexEntry> result = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> result = new LinkedList<>();
 
         PDDocument document = null;
 
@@ -475,7 +472,7 @@ public class XMPUtil {
      */
     public static void writeXMP(File file, BibtexEntry entry,
             BibtexDatabase database) throws IOException, TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(entry);
         XMPUtil.writeXMP(file, l, database, true);
     }
@@ -602,11 +599,8 @@ public class XMPUtil {
      * @throws IOException
      */
     public static XMPMetadata readRawXMP(File file) throws IOException {
-        FileInputStream is = new FileInputStream(file);
-        try {
+        try (FileInputStream is = new FileInputStream(file)) {
             return XMPUtil.readRawXMP(is);
-        } finally {
-            is.close();
         }
     }
 
@@ -622,7 +616,7 @@ public class XMPUtil {
         boolean useXmpPrivacyFilter =
                 prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
-        TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+        TreeSet<String> filters = new TreeSet<>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
         // Set all the values including key and entryType
 
@@ -920,7 +914,7 @@ public class XMPUtil {
     public static void writeDublinCore(PDDocument document, BibtexEntry entry,
             BibtexDatabase database) throws IOException, TransformerException {
 
-        List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> entries = new ArrayList<>();
         entries.add(entry);
 
         XMPUtil.writeDublinCore(document, entries, database);
@@ -1012,7 +1006,7 @@ public class XMPUtil {
         boolean useXmpPrivacyFilter =
                 prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         // Fields for which not to write XMP data later on:
-        TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+        TreeSet<String> filters = new TreeSet<>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
 
         // Set all the values including key and entryType
         Set<String> fields = entry.getAllFields();
@@ -1021,32 +1015,44 @@ public class XMPUtil {
 
             if (useXmpPrivacyFilter && filters.contains(field)) {
                 // erase field instead of adding it
-                if (field.equals("author")) {
+                switch (field) {
+                case "author":
                     di.setAuthor(null);
-                } else if (field.equals("title")) {
+                    break;
+                case "title":
                     di.setTitle(null);
-                } else if (field.equals("keywords")) {
+                    break;
+                case "keywords":
                     di.setKeywords(null);
-                } else if (field.equals("abstract")) {
+                    break;
+                case "abstract":
                     di.setSubject(null);
-                } else {
+                    break;
+                default:
                     di.setCustomMetadataValue("bibtex/" + field,
                             null);
+                    break;
                 }
                 continue;
             }
 
-            if (field.equals("author")) {
+            switch (field) {
+            case "author":
                 di.setAuthor(entry.getField("author"));
-            } else if (field.equals("title")) {
+                break;
+            case "title":
                 di.setTitle(entry.getField("title"));
-            } else if (field.equals("keywords")) {
+                break;
+            case "keywords":
                 di.setKeywords(entry.getField("keywords"));
-            } else if (field.equals("abstract")) {
+                break;
+            case "abstract":
                 di.setSubject(entry.getField("abstract"));
-            } else {
+                break;
+            default:
                 di.setCustomMetadataValue("bibtex/" + field,
                         entry.getField(field));
+                break;
             }
         }
         di
@@ -1199,7 +1205,7 @@ public class XMPUtil {
      * @throws TransformerException
      *             If the given BibtexEntry is malformed.
      */
-    public static void main(String[] args) throws IOException,
+    public static void main(String... args) throws IOException,
             TransformerException {
 
         // Don't forget to initialize the preferences

@@ -74,7 +74,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     private String[][] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
-    private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
+    private final HashMap<Integer, String[]> iconCols = new HashMap<>();
     private int[][] nameCols = null;
     private boolean namesAsIs;
     private boolean abbr_names;
@@ -327,7 +327,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         return ((be != null) && (be.getFieldOrAlias(field) != null));
     }
 
-    private int[] hasField(BibtexEntry be, String[] field) {
+    private int[] hasField(BibtexEntry be, String... field) {
         // If the entry has a nonzero value in any of the
         // 'search' fields, returns the smallest index for which it does. 
         // Otherwise returns -1. When field indicates one or more file types,
@@ -464,7 +464,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         // of names as efficiently as possible.
         // Each subarray contains the column number (before padding) and the
         // subfield number in case a column has fallback fields.
-        Vector<int[]> tmp = new Vector<int[]>(2, 1);
+        Vector<int[]> tmp = new Vector<>(2, 1);
         for (int i = 0; i < columns.length; i++) {
             for (int j = 0; j < columns[i].length; j++) {
                 if (columns[i][j].equals("author")

@@ -117,13 +117,7 @@ public class FromAuxDialog
         panel1.setLayout(new BorderLayout());
         selectInDBButton.setText(Globals.lang("Select"));
         selectInDBButton.setEnabled(false);
-        selectInDBButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                FromAuxDialog.this.select_actionPerformed();
-            }
-        });
+        selectInDBButton.addActionListener(arg0 -> FromAuxDialog.this.select_actionPerformed());
         generateButton.setText(Globals.lang("Generate"));
         generateButton.setEnabled(false);
         generateButton.addActionListener(new FromAuxDialog_generate_actionAdapter(this));

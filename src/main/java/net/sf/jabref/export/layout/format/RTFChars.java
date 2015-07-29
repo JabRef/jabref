@@ -147,16 +147,24 @@ public class RTFChars implements LayoutFormatter {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.
-                        if (command.equals("em") || command.equals("emph") || command.equals("textit")) {
+                        switch (command) {
+                        case "em":
+                        case "emph":
+                        case "textit": {
                             IntAndString part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\i ").append(part.s).append('}');
-                        } else if (command.equals("textbf")) {
+                            break;
+                        }
+                        case "textbf": {
                             IntAndString part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
-                        } else {
+                            break;
+                        }
+                        default:
                             LOGGER.info("Unknown command " + command);
+                            break;
                         }
                         if (c == ' ') {
                             // command was separated with the content by ' '

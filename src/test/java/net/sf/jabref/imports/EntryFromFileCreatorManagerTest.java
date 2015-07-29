@@ -36,7 +36,7 @@ public class EntryFromFileCreatorManagerTest {
         ParserResult result = BibtexParser.parse(new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB));
         BibtexDatabase database = result.getDatabase();
 
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
 
         files.add(ImportDataTest.FILE_NOT_IN_DATABASE);
         files.add(ImportDataTest.NOT_EXISTING_PDF);

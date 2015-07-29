@@ -38,11 +38,11 @@ public class Authors extends AbstractParamLayoutFormatter {
     */
 
     private static final ArrayList<String>
-            authorOrder = new ArrayList<String>();
-    private static final ArrayList<String> authorAbbr = new ArrayList<String>();
-    private static final ArrayList<String> authorPunc = new ArrayList<String>();
-    private static final ArrayList<String> separators = new ArrayList<String>();
-    private static final ArrayList<String> lastSeparators = new ArrayList<String>();
+            authorOrder = new ArrayList<>();
+    private static final ArrayList<String> authorAbbr = new ArrayList<>();
+    private static final ArrayList<String> authorPunc = new ArrayList<>();
+    private static final ArrayList<String> separators = new ArrayList<>();
+    private static final ArrayList<String> lastSeparators = new ArrayList<>();
 
     private static final Pattern numberPattern = Pattern.compile("[0-9]+");
 
@@ -342,7 +342,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Authors format = new Authors();
         format.setArgument("lastfirstfirstfirst , initials,  Nocomma,Amp,Semicolon,30 ,EtAl = m.fl.");
         System.out.println(format.format("Alfredsen, Jr, Jo Arve and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));

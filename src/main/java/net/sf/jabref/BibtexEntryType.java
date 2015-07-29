@@ -904,7 +904,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return true;
     }
 
-    public static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
+    public static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<>();
     private static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
 
     static {
@@ -965,7 +965,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 
         // We need a record of the standard types, in case the user wants
         // to remove a customized version. Therefore we clone the map.
-        STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(BibtexEntryType.ALL_TYPES);
+        STANDARD_TYPES = new TreeMap<>(BibtexEntryType.ALL_TYPES);
     }
 
     /**

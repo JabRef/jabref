@@ -19,15 +19,12 @@ import java.util.List;
  */
 public class AbbreviationParser {
 
-    private final List<Abbreviation> abbreviations = new LinkedList<Abbreviation>();
+    private final List<Abbreviation> abbreviations = new LinkedList<>();
 
     public void readJournalListFromResource(String resourceFileName) {
         URL url = checkNotNull(JournalAbbreviationRepository.class.getResource(checkNotNull(resourceFileName)));
         try {
             readJournalList(new InputStreamReader(url.openStream()));
-        } catch (FileNotFoundException e) {
-            // TODO logging
-            e.printStackTrace();
         } catch (IOException e) {
             // TODO logging
             e.printStackTrace();
@@ -83,6 +80,6 @@ public class AbbreviationParser {
     }
 
     public List<Abbreviation> getAbbreviations() {
-        return new LinkedList<Abbreviation>(abbreviations);
+        return new LinkedList<>(abbreviations);
     }
 }

@@ -28,12 +28,12 @@ public class Layout {
 
     private final LayoutEntry[] layoutEntries;
 
-    private final ArrayList<String> missingFormatters = new ArrayList<String>();
+    private final ArrayList<String> missingFormatters = new ArrayList<>();
 
 
     public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception {
         StringInt si;
-        Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>(parsedEntries.size());
+        Vector<LayoutEntry> tmpEntries = new Vector<>(parsedEntries.size());
 
         Vector<StringInt> blockEntries = null;
         LayoutEntry le;
@@ -44,7 +44,7 @@ public class Layout {
 
             if (si.i == LayoutHelper.IS_LAYOUT_TEXT || si.i == LayoutHelper.IS_SIMPLE_FIELD) {
             } else if (si.i == LayoutHelper.IS_FIELD_START) {
-                blockEntries = new Vector<StringInt>();
+                blockEntries = new Vector<>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_FIELD_END) {
                 if (blockStart != null && blockEntries != null) {
@@ -60,7 +60,7 @@ public class Layout {
                     }
                 }
             } else if (si.i == LayoutHelper.IS_GROUP_START) {
-                blockEntries = new Vector<StringInt>();
+                blockEntries = new Vector<>();
                 blockStart = si.s;
             } else if (si.i == LayoutHelper.IS_GROUP_END) {
                 if (blockStart != null && blockEntries != null) {

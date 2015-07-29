@@ -228,9 +228,9 @@ public class CsaImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
 
         BufferedReader in =
                 new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -353,35 +353,47 @@ public class CsaImporter extends ImportFormat {
                 }
 
                 String ftype = null;
-                if (fabbr.equals("AB")) {
+                switch (fabbr) {
+                case "AB":
                     ftype = "abstract";
-                } else if (fabbr.equals("AF")) {
+                    break;
+                case "AF":
                     ftype = "affiliation";
-                } else if (fabbr.equals("AU")) {
+                    break;
+                case "AU":
                     ftype = "author";
                     if (fstr.contains(";")) {
                         fstr = fstr.replaceAll("; ", " and ");
                     }
-                }
-                else if (fabbr.equals("CA")) {
+                    break;
+                case "CA":
                     ftype = "organization";
-                } else if (fabbr.equals("DE")) {
+                    break;
+                case "DE":
                     ftype = "keywords";
-                } else if (fabbr.equals("DO")) {
+                    break;
+                case "DO":
                     ftype = "doi";
-                } else if (fabbr.equals("ED")) {
+                    break;
+                case "ED":
                     ftype = "editor";
-                } else if (fabbr.equals("IB")) {
+                    break;
+                case "IB":
                     ftype = "ISBN";
-                } else if (fabbr.equals("IS")) {
+                    break;
+                case "IS":
                     ftype = "ISSN";
-                } else if (fabbr.equals("JN")) {
+                    break;
+                case "JN":
                     ftype = "journal";
-                } else if (fabbr.equals("LA")) {
+                    break;
+                case "LA":
                     ftype = "language";
-                } else if (fabbr.equals("PB")) {
+                    break;
+                case "PB":
                     ftype = "publisher";
-                } else if (fabbr.equals("PY")) {
+                    break;
+                case "PY":
                     ftype = "year";
                     if (hm.get("year") != null) {
                         String oyear = hm.get("year");
@@ -390,7 +402,8 @@ public class CsaImporter extends ImportFormat {
                             //			    System.out.println(fstr + " != " + oyear);
                         }
                     }
-                } else if (fabbr.equals("RL")) {
+                    break;
+                case "RL":
                     ftype = "url";
                     String[] lines = fstr.split(" ");
                     StringBuilder urls = new StringBuilder();
@@ -408,7 +421,8 @@ public class CsaImporter extends ImportFormat {
                         }
                     }
                     fstr = urls.toString();
-                } else if (fabbr.equals("SO")) {
+                    break;
+                case "SO":
                     ftype = "booktitle";
 
                     // see if we can extract journal information
@@ -468,16 +482,17 @@ public class CsaImporter extends ImportFormat {
                         fstr = pm.replaceFirst("");
                     }
 
-                    if (fstr.equals(""))
-                     {
+                    if (fstr.equals("")) {
                         continue;
-                    //		    System.out.println("SOURCE: \"" + fstr + "\"");
+                        //		    System.out.println("SOURCE: \"" + fstr + "\"");
                     }
-                } else if (fabbr.equals("TI")) {
+                    break;
+                case "TI":
                     ftype = "title";
-                } else if (fabbr.equals("RE"))
-                 {
+                    break;
+                case "RE":
                     continue; // throw away References
+
                 }
 
                 if (ftype != null) {

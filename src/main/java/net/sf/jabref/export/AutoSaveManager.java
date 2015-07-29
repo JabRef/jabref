@@ -64,7 +64,7 @@ public class AutoSaveManager {
             // Since this method is running in the background, we must be prepared that
             // there could be changes done by the user while this method is running.
 
-            List<BasePanel> panels = new ArrayList<BasePanel>();
+            List<BasePanel> panels = new ArrayList<>();
             for (int i = 0; i < frame.baseCount(); i++) {
                 panels.add(frame.baseAt(i));
             }
@@ -134,7 +134,7 @@ public class AutoSaveManager {
      * if they exist.
      */
     public void clearAutoSaves() {
-        List<BasePanel> panels = new ArrayList<BasePanel>();
+        List<BasePanel> panels = new ArrayList<>();
         for (int i = 0; i < frame.baseCount(); i++) {
             panels.add(frame.baseAt(i));
         }

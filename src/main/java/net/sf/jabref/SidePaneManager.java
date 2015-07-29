@@ -33,10 +33,10 @@ public class SidePaneManager {
 
     private final SidePane sidep;
 
-    private final Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
-    private final Map<SidePaneComponent, String> componentNames = new HashMap<SidePaneComponent, String>();
+    private final Map<String, SidePaneComponent> components = new LinkedHashMap<>();
+    private final Map<SidePaneComponent, String> componentNames = new HashMap<>();
 
-    private final List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
+    private final List<SidePaneComponent> visible = new LinkedList<>();
 
 
     public SidePaneManager(JabRefFrame frame) {
@@ -46,20 +46,8 @@ public class SidePaneManager {
          * side pane components, we get rid of the annoying latency when
          * switching tabs:
          */
-        frame.tabbedPane.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane
-                                .getSelectedComponent());
-                    }
-                });
-            }
-        });
+        frame.tabbedPane.addChangeListener(event -> SwingUtilities.invokeLater(() -> setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane
+                .getSelectedComponent())));
         sidep = new SidePane();
         sidep.setVisible(false);
     }
@@ -159,7 +147,7 @@ public class SidePaneManager {
     }
 
     private Map<String, Integer> getPreferredPositions() {
-        Map<String, Integer> preferredPositions = new HashMap<String, Integer>();
+        Map<String, Integer> preferredPositions = new HashMap<>();
 
         String[] componentNames = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
         String[] componentPositions = Globals.prefs.getStringArray(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);

@@ -87,7 +87,7 @@ class PrefsDialog3 extends JDialog {
         // ----------------------------------------------------------------
         // Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
         // ----------------------------------------------------------------
-        ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
+        ArrayList<PrefsTab> tabs = new ArrayList<>();
         tabs.add(new GeneralTab(frame, prefs));
         tabs.add(new NetworkTab(frame, prefs));
         tabs.add(new FileTab(frame, prefs));
@@ -127,16 +127,12 @@ class PrefsDialog3 extends JDialog {
 
         // Add the selection listener that will show the correct panel when
         // selection changes:
-        chooser.addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) {
-                    return;
-                }
-                String o = (String) chooser.getSelectedValue();
-                cardLayout.show(main, o);
+        chooser.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) {
+                return;
             }
+            String o = (String) chooser.getSelectedValue();
+            cardLayout.show(main, o);
         });
 
         JPanel one = new JPanel();
@@ -173,61 +169,52 @@ class PrefsDialog3 extends JDialog {
         // Import and export actions:
         exportPrefs.setToolTipText(Globals.lang("Export preferences to file"));
         importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
-        exportPrefs.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = FileDialogs.getNewFile(frame, new File(System
-                        .getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
-                if (filename == null) {
-                    return;
-                }
-                File file = new File(filename);
-                if (!file.exists()
-                        || JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
-                                + "' " + Globals.lang("exists. Overwrite file?"),
-                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-
-                    try {
-                        prefs.exportPreferences(filename);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(PrefsDialog3.this,
-                                Globals.lang("Could not export preferences")
-                                        + ": " + ex.getMessage(), Globals.lang("Export preferences"),
-                                JOptionPane.ERROR_MESSAGE);
-                        // ex.printStackTrace();
-                    }
-                }
-
+        exportPrefs.addActionListener(e -> {
+            String filename = FileDialogs.getNewFile(frame, new File(System
+                    .getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
+            if (filename == null) {
+                return;
             }
-        });
-
-        importPrefs.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = FileDialogs.getNewFile(frame, new File(System
-                        .getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
-                if (filename == null) {
-                    return;
-                }
+            File file = new File(filename);
+            if (!file.exists()
+                    || JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
+                            + "' " + Globals.lang("exists. Overwrite file?"),
+                            Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
                 try {
-                    prefs.importPreferences(filename);
-                    setValues();
-                    BibtexEntryType.loadCustomEntryTypes(prefs);
-                    ExportFormats.initAllExports();
-                    frame.removeCachedEntryEditors();
-                    Globals.prefs.updateEntryEditorTabList();
+                    prefs.exportPreferences(filename);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(PrefsDialog3.this,
-                            Globals.lang("Could not import preferences")
-                                    + ": " + ex.getMessage(), Globals.lang("Import preferences"),
+                            Globals.lang("Could not export preferences")
+                                    + ": " + ex.getMessage(), Globals.lang("Export preferences"),
                             JOptionPane.ERROR_MESSAGE);
                     // ex.printStackTrace();
                 }
             }
 
+        });
+
+        importPrefs.addActionListener(e -> {
+            String filename = FileDialogs.getNewFile(frame, new File(System
+                    .getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
+            if (filename == null) {
+                return;
+            }
+
+            try {
+                prefs.importPreferences(filename);
+                setValues();
+                BibtexEntryType.loadCustomEntryTypes(prefs);
+                ExportFormats.initAllExports();
+                frame.removeCachedEntryEditors();
+                Globals.prefs.updateEntryEditorTabList();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(PrefsDialog3.this,
+                        Globals.lang("Could not import preferences")
+                                + ": " + ex.getMessage(), Globals.lang("Import preferences"),
+                        JOptionPane.ERROR_MESSAGE);
+                // ex.printStackTrace();
+            }
         });
 
         setValues();

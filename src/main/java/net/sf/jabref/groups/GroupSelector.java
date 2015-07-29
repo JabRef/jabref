@@ -175,13 +175,7 @@ public class GroupSelector extends SidePaneComponent implements
                 Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected());
             }
         });
-        grayOut.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected());
-            }
-        });
+        grayOut.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
@@ -281,22 +275,18 @@ public class GroupSelector extends SidePaneComponent implements
             }
         });
         JButton reduce = new JButton(GUIGlobals.getImage("up"));
-        reduce.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) - 1;
-                if (i < 1) {
-                    i = 1;
-                }
-                groupsTree.setVisibleRowCount(i);
-                groupsTree.revalidate();
-                groupsTree.repaint();
-                GroupSelector.this.revalidate();
-                // _panel.sidePaneManager.revalidate();
-                GroupSelector.this.repaint();
-                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
+        reduce.addActionListener(e -> {
+            int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) - 1;
+            if (i < 1) {
+                i = 1;
             }
+            groupsTree.setVisibleRowCount(i);
+            groupsTree.revalidate();
+            groupsTree.repaint();
+            GroupSelector.this.revalidate();
+            // _panel.sidePaneManager.revalidate();
+            GroupSelector.this.repaint();
+            Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
         });
 
         editModeCb.addActionListener(new ActionListener() {
@@ -671,8 +661,8 @@ public class GroupSelector extends SidePaneComponent implements
         // Sort entries into current members and non-members of the group
         // Current members will be removed
         // Current non-members will be added
-        ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>(entries.length);
-        ArrayList<BibtexEntry> toAdd = new ArrayList<BibtexEntry>(entries.length);
+        ArrayList<BibtexEntry> toRemove = new ArrayList<>(entries.length);
+        ArrayList<BibtexEntry> toAdd = new ArrayList<>(entries.length);
 
         for (BibtexEntry entry : entries) {
             // Sort according to current state of the entries
@@ -787,7 +777,7 @@ public class GroupSelector extends SidePaneComponent implements
 
         private final SearchRule rules;
         private final String searchTerm;
-        private final ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
+        private final ArrayList<BibtexEntry> matches = new ArrayList<>();
         private final boolean showOverlappingGroupsP;
         int hits = 0;
 
@@ -1527,7 +1517,7 @@ public class GroupSelector extends SidePaneComponent implements
             groupsTree.revalidate();
             return;
         }
-        Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
+        Vector<GroupTreeNode> vec = new Vector<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
             GroupTreeNode node = e.nextElement();
             AbstractGroup group = node.getGroup();
@@ -1564,7 +1554,7 @@ public class GroupSelector extends SidePaneComponent implements
      * of the entries found in the specified search.
      */
     private void showOverlappingGroups(List<BibtexEntry> matches) { //DatabaseSearch search) {
-        List<GroupTreeNode> nodes = new ArrayList<GroupTreeNode>();
+        List<GroupTreeNode> nodes = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
             GroupTreeNode node = e.nextElement();
             SearchRule rule = node.getSearchRule();

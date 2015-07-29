@@ -81,7 +81,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
          * 
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        Vector<String> v = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        Vector<String> v = new Vector<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         v.add(BibtexFields.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
@@ -111,34 +111,22 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort.insertItemAt(Globals.lang("<select>"), 0);
         terSort.insertItemAt(Globals.lang("<select>"), 0);
 
-        priSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (priSort.getSelectedIndex() > 0) {
-                    priField.setText(priSort.getSelectedItem().toString());
-                    priSort.setSelectedIndex(0);
-                }
+        priSort.addActionListener(e -> {
+            if (priSort.getSelectedIndex() > 0) {
+                priField.setText(priSort.getSelectedItem().toString());
+                priSort.setSelectedIndex(0);
             }
         });
-        secSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (secSort.getSelectedIndex() > 0) {
-                    secField.setText(secSort.getSelectedItem().toString());
-                    secSort.setSelectedIndex(0);
-                }
+        secSort.addActionListener(e -> {
+            if (secSort.getSelectedIndex() > 0) {
+                secField.setText(secSort.getSelectedItem().toString());
+                secSort.setSelectedIndex(0);
             }
         });
-        terSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (terSort.getSelectedIndex() > 0) {
-                    terField.setText(terSort.getSelectedItem().toString());
-                    terSort.setSelectedIndex(0);
-                }
+        terSort.addActionListener(e -> {
+            if (terSort.getSelectedIndex() > 0) {
+                terField.setText(terSort.getSelectedItem().toString());
+                terSort.setSelectedIndex(0);
             }
         });
 
@@ -227,14 +215,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
 
-        namesNatbib.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                abbrNames.setEnabled(!namesNatbib.isSelected());
-                lastNamesOnly.setEnabled(!namesNatbib.isSelected());
-                noAbbrNames.setEnabled(!namesNatbib.isSelected());
-            }
+        namesNatbib.addChangeListener(changeEvent -> {
+            abbrNames.setEnabled(!namesNatbib.isSelected());
+            lastNamesOnly.setEnabled(!namesNatbib.isSelected());
+            noAbbrNames.setEnabled(!namesNatbib.isSelected());
         });
     }
 

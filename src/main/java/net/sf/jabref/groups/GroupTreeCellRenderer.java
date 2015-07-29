@@ -184,7 +184,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
      * Highlights the specified cells (in red), or disables highlight if cells ==
      * null.
      */
-    void setHighlight2Cells(Object[] cells) {
+    void setHighlight2Cells(Object... cells) {
         this.highlight2Cells = cells;
     }
 
@@ -192,7 +192,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
      * Highlights the specified cells (by unterlining), or disables highlight if
      * cells == null.
      */
-    void setHighlight3Cells(Object[] cells) {
+    void setHighlight3Cells(Object... cells) {
         this.highlight3Cells = cells;
     }
 

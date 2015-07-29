@@ -55,7 +55,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final ArrayList<PostOpenAction> postOpenActions =
-            new ArrayList<PostOpenAction>();
+            new ArrayList<>();
 
     static {
         // Add the action for checking for new custom entry types loaded from
@@ -79,7 +79,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<File> filesToOpen = new ArrayList<File>();
+        List<File> filesToOpen = new ArrayList<>();
         //File fileToOpen = null;
 
         if (showDialog) {
@@ -133,13 +133,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (File theFile : theFiles) {
-                        openIt(theFile, true);
-                    }
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                for (File theFile : theFiles) {
+                    openIt(theFile, true);
                 }
             });
             for (File theFile : theFiles) {
@@ -272,13 +268,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
                 final ParserResult prf = pr;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        OpenDatabaseAction.performPostOpenActions(panel, prf, true);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> OpenDatabaseAction.performPostOpenActions(panel, prf, true));
             }
 
         }
@@ -311,27 +301,23 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (pr.hasWarnings()) {
             final String[] wrns = pr.warnings();
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    StringBuilder wrn = new StringBuilder();
-                    for (int i = 0; i < wrns.length; i++) {
-                        wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
-                    }
-
-                    if (wrn.length() > 0) {
-                        wrn.deleteCharAt(wrn.length() - 1);
-                    }
-                    // Note to self or to someone else: The following line causes an
-                    // ArrayIndexOutOfBoundsException in situations with a large number of
-                    // warnings; approx. 5000 for the database I opened when I observed the problem
-                    // (duplicate key warnings). I don't think this is a big problem for normal situations,
-                    // and it may possibly be a bug in the Swing code.
-                    JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Globals.lang("Warnings") + " (" + file.getName() + ")",
-                            JOptionPane.WARNING_MESSAGE);
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                StringBuilder wrn = new StringBuilder();
+                for (int i = 0; i < wrns.length; i++) {
+                    wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
                 }
+
+                if (wrn.length() > 0) {
+                    wrn.deleteCharAt(wrn.length() - 1);
+                }
+                // Note to self or to someone else: The following line causes an
+                // ArrayIndexOutOfBoundsException in situations with a large number of
+                // warnings; approx. 5000 for the database I opened when I observed the problem
+                // (duplicate key warnings). I don't think this is a big problem for normal situations,
+                // and it may possibly be a bug in the Swing code.
+                JOptionPane.showMessageDialog(frame, wrn.toString(),
+                        Globals.lang("Warnings") + " (" + file.getName() + ")",
+                        JOptionPane.WARNING_MESSAGE);
             });
         }
         BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());

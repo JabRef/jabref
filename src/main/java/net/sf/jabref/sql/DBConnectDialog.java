@@ -59,7 +59,7 @@ public class DBConnectDialog extends JDialog {
         dbStrings = dbs;
 
         // build collections of components
-        ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+        ArrayList<JLabel> lhs = new ArrayList<>();
         JLabel lblServerType = new JLabel();
         lhs.add(lblServerType);
         JLabel lblServerHostname = new JLabel();
@@ -71,7 +71,7 @@ public class DBConnectDialog extends JDialog {
         JLabel lblPassword = new JLabel();
         lhs.add(lblPassword);
 
-        ArrayList<JComponent> rhs = new ArrayList<JComponent>();
+        ArrayList<JComponent> rhs = new ArrayList<>();
         rhs.add(cmbServerType);
         rhs.add(txtServerHostname);
         rhs.add(txtDatabase);
@@ -146,23 +146,19 @@ public class DBConnectDialog extends JDialog {
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
 
-        ActionListener connectAction = new ActionListener() {
+        ActionListener connectAction = e -> {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+            String errorMessage = checkInput();
 
-                String errorMessage = checkInput();
-
-                if (errorMessage == null) {
-                    storeSettings();
-                    setVisible(false);
-                    setConnectToDB(true);
-                } else {
-                    JOptionPane.showMessageDialog(null, errorMessage,
-                            "Input Error", JOptionPane.ERROR_MESSAGE);
-                }
-
+            if (errorMessage == null) {
+                storeSettings();
+                setVisible(false);
+                setConnectToDB(true);
+            } else {
+                JOptionPane.showMessageDialog(null, errorMessage,
+                        "Input Error", JOptionPane.ERROR_MESSAGE);
             }
+
         };
 
         btnConnect.addActionListener(connectAction);

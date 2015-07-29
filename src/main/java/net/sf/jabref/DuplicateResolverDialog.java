@@ -165,56 +165,36 @@ public class DuplicateResolverDialog extends JDialog {
             options.add(cancel);
         }
 
-        first.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_UPPER;
-                block = false;
-                dispose();
-            }
+        first.addActionListener(e -> {
+            status = DuplicateResolverDialog.KEEP_UPPER;
+            block = false;
+            dispose();
         });
 
-        second.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_LOWER;
-                block = false;
-                dispose();
-            }
+        second.addActionListener(e -> {
+            status = DuplicateResolverDialog.KEEP_LOWER;
+            block = false;
+            dispose();
         });
 
-        both.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.KEEP_BOTH;
-                block = false;
-                dispose();
-            }
+        both.addActionListener(e -> {
+            status = DuplicateResolverDialog.KEEP_BOTH;
+            block = false;
+            dispose();
         });
 
         if (removeExact != null) {
-            removeExact.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    status = DuplicateResolverDialog.AUTOREMOVE_EXACT;
-                    block = false;
-                    dispose();
-                }
+            removeExact.addActionListener(e -> {
+                status = DuplicateResolverDialog.AUTOREMOVE_EXACT;
+                block = false;
+                dispose();
             });
         }
 
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                status = DuplicateResolverDialog.BREAK;
-                block = false;
-                dispose();
-            }
+        cancel.addActionListener(e -> {
+            status = DuplicateResolverDialog.BREAK;
+            block = false;
+            dispose();
         });
 
         getContentPane().add(tabbed, BorderLayout.CENTER);

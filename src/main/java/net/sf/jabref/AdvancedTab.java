@@ -53,7 +53,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox filechooserDisableRename;
     private final JCheckBox useIEEEAbrv;
     private final JCheckBox biblatexMode;
-    private final JComboBox className;
+    private final JComboBox<String> className;
     private final JTextField remoteServerPort;
     JPanel p1 = new JPanel();
     private String oldLnf = "";
@@ -94,7 +94,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                 "javax.swing.plaf.metal.MetalLookAndFeel"
         };
         // Only list L&F which are available
-        List<String> lookAndFeels = new ArrayList<String>();
+        List<String> lookAndFeels = new ArrayList<>();
         for (String lf : possibleLookAndFeels) {
             try {
                 // Try to find L&F, throws exception if not successful
@@ -105,14 +105,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         }
         className = new JComboBox(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         className.setEditable(true);
-        final JComboBox clName = className;
-        useDefault.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                clName.setEnabled(((JCheckBox) e.getSource()).isSelected());
-            }
-        });
+        final JComboBox<String> clName = className;
+        useDefault.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
         useConvertToEquation = new JCheckBox(Globals.lang("Prefer converting subscripts and superscripts to equations rather than text"));
         useCaseKeeperOnSearch = new JCheckBox(Globals.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new JCheckBox(Globals.lang("Format units by adding non-breaking separators and keeping the correct case on search"));

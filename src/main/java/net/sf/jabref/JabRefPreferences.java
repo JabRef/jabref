@@ -60,7 +60,7 @@ public class JabRefPreferences {
     /**
      * HashMap that contains all preferences which are set by default
      */
-    public final HashMap<String, Object> defaults = new HashMap<String, Object>();
+    public final HashMap<String, Object> defaults = new HashMap<>();
 
     /* contents of the defaults HashMap that are defined in this class. 
      * There are more default parameters in this map which belong to separate preference classes.
@@ -355,8 +355,8 @@ public class JabRefPreferences {
     private KeyBinds keyBinds = new KeyBinds();
     private KeyBinds defaultKeyBinds = new KeyBinds();
 
-    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
-    private final HashSet<String> nonWrappableFields = new HashSet<String>(5);
+    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<>(4);
+    private final HashSet<String> nonWrappableFields = new HashSet<>(5);
     private static LabelPattern keyPattern;
 
     // Object containing custom export formats:
@@ -370,7 +370,7 @@ public class JabRefPreferences {
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList = null;
     // Map containing all registered external file types:
-    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
+    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<>();
 
     private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www");
 
@@ -986,7 +986,7 @@ public class JabRefPreferences {
         prefs.putInt(key, value);
     }
 
-    public void putByteArray(String key, byte[] value) {
+    public void putByteArray(String key, byte... value) {
         prefs.putByteArray(key, value);
     }
 
@@ -998,7 +998,7 @@ public class JabRefPreferences {
      * Puts a string array into the Preferences, by linking its elements with ';' into a single string. Escape
      * characters make the process transparent even if strings contain ';'.
      */
-    public void putStringArray(String key, String[] value) {
+    public void putStringArray(String key, String... value) {
         if (value == null) {
             remove(key);
             return;
@@ -1027,7 +1027,7 @@ public class JabRefPreferences {
         }
 
         StringReader rd = new StringReader(names);
-        Vector<String> arr = new Vector<String>();
+        Vector<String> arr = new Vector<>();
         String rs;
         try {
             while ((rs = getNextUnit(rd)) != null) {
@@ -1385,7 +1385,7 @@ public class JabRefPreferences {
         if (priOpt == null) {
             return new CustomEntryType(StringUtil.nCase(name), req, opt);
         }
-        ArrayList<String> secOpt = new ArrayList<String>();
+        ArrayList<String> secOpt = new ArrayList<>();
         Collections.addAll(secOpt, opt);
         for (String aPriOpt : priOpt) {
             secOpt.remove(aPriOpt);
@@ -1396,7 +1396,7 @@ public class JabRefPreferences {
     }
 
     public List<ExternalFileType> getDefaultExternalFileTypes() {
-        List<ExternalFileType> list = new ArrayList<ExternalFileType>();
+        List<ExternalFileType> list = new ArrayList<>();
         list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall"));
         list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall"));
         list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice"));
@@ -1516,7 +1516,7 @@ public class JabRefPreferences {
         // First find a list of the default types:
         List<ExternalFileType> defTypes = getDefaultExternalFileTypes();
         // Make a list of types that are unchanged:
-        List<ExternalFileType> unchanged = new ArrayList<ExternalFileType>();
+        List<ExternalFileType> unchanged = new ArrayList<>();
 
         externalFileTypes.clear();
         for (ExternalFileType type : types) {

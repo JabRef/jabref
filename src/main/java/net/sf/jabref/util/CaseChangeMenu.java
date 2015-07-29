@@ -55,13 +55,7 @@ public class CaseChangeMenu extends JMenu {
         // create menu items, one for each case changer
         for (final CaseChangers.CaseChanger caseChanger : CaseChangers.ALL) {
             JMenuItem menuItem = new JMenuItem(Globals.lang(caseChanger.getName()));
-            menuItem.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    parent.setText(caseChanger.changeCase(parent.getText()));
-                }
-            });
+            menuItem.addActionListener(e -> parent.setText(caseChanger.changeCase(parent.getText())));
             this.add(menuItem);
         }
     }

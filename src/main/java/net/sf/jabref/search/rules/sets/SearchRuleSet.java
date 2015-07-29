@@ -33,7 +33,7 @@ import java.util.Vector;
 
 public abstract class SearchRuleSet implements SearchRule {
 
-    protected final Vector<SearchRule> ruleSet = new Vector<SearchRule>();
+    protected final Vector<SearchRule> ruleSet = new Vector<>();
 
     public void addRule(SearchRule newRule) {
         ruleSet.add(Preconditions.checkNotNull(newRule));

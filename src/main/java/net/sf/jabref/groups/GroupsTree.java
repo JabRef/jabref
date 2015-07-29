@@ -311,9 +311,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else {
                 dtde.rejectDrop();
             }
-        } catch (IOException ioe) {
-            // ignore
-        } catch (UnsupportedFlavorException e) {
+        } catch (IOException | UnsupportedFlavorException ioe) {
             // ignore
         }
     }
@@ -352,7 +350,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * @return Refreshed paths that are all valid.
      */
     public Enumeration<TreePath> refreshPaths(Enumeration<TreePath> paths) {
-        Vector<TreePath> freshPaths = new Vector<TreePath>();
+        Vector<TreePath> freshPaths = new Vector<>();
         while (paths.hasMoreElements()) {
             freshPaths.add(new TreePath(
                     ((DefaultMutableTreeNode) paths.nextElement()
@@ -370,7 +368,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      *            Paths that may have become invalid.
      * @return Refreshed paths that are all valid.
      */
-    public TreePath[] refreshPaths(TreePath[] paths) {
+    public TreePath[] refreshPaths(TreePath... paths) {
         TreePath[] freshPaths = new TreePath[paths.length];
         for (int i = 0; i < paths.length; ++i) {
             freshPaths[i] = new TreePath(((DefaultMutableTreeNode) paths[i]
@@ -386,13 +384,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     /** Highlights the specified cells or disables highlight if cells == null */
-    public void setHighlight2Cells(Object[] cells) {
+    public void setHighlight2Cells(Object... cells) {
         cellRenderer.setHighlight2Cells(cells);
         repaint();
     }
 
     /** Highlights the specified cells or disables highlight if cells == null */
-    public void setHighlight3Cells(Object[] cells) {
+    public void setHighlight3Cells(Object... cells) {
         cellRenderer.setHighlight3Cells(cells);
         repaint();
     }

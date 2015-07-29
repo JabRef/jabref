@@ -85,7 +85,7 @@ public class SilverPlatterImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         boolean isChapter = false;
         String str;
@@ -100,7 +100,7 @@ public class SilverPlatterImporter extends ImportFormat {
         in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
-        HashMap<String, String> h = new HashMap<String, String>();
+        HashMap<String, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.trim().length() < 6) {
                 continue;
@@ -115,9 +115,11 @@ public class SilverPlatterImporter extends ImportFormat {
                 //System.out.println(">"+fields[j]+"<");
                 String f3 = field.substring(0, 2);
                 String frest = field.substring(5);
-                if (f3.equals("TI")) {
+                switch (f3) {
+                case "TI":
                     h.put("title", frest);
-                } else if (f3.equals("AU")) {
+                    break;
+                case "AU":
                     if (frest.trim().endsWith("(ed)")) {
                         String ed = frest.trim();
                         ed = ed.substring(0, ed.length() - 4);
@@ -127,12 +129,15 @@ public class SilverPlatterImporter extends ImportFormat {
                         h.put("author", AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(
                                 ",-", ", ").replaceAll(";", " and ")));
                     }
-                } else if (f3.equals("AB")) {
+                    break;
+                case "AB":
                     h.put("abstract", frest);
-                } else if (f3.equals("DE")) {
+                    break;
+                case "DE":
                     String kw = frest.replaceAll("-;", ",").toLowerCase();
                     h.put("keywords", kw.substring(0, kw.length() - 1));
-                } else if (f3.equals("SO")) {
+                    break;
+                case "SO": {
                     int m = frest.indexOf(".");
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
@@ -151,7 +156,9 @@ public class SilverPlatterImporter extends ImportFormat {
                             }
                         }
                     }
-                } else if (f3.equals("PB")) {
+                    break;
+                }
+                case "PB": {
                     int m = frest.indexOf(":");
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
@@ -171,10 +178,13 @@ public class SilverPlatterImporter extends ImportFormat {
                         }
 
                     }
-                } else if (f3.equals("AF")) {
+                    break;
+                }
+                case "AF":
                     h.put("school", frest.trim());
 
-                } else if (f3.equals("DT")) {
+                    break;
+                case "DT":
                     frest = frest.trim();
                     if (frest.equals("Monograph")) {
                         Type = "book";
@@ -190,6 +200,7 @@ public class SilverPlatterImporter extends ImportFormat {
                     } else {
                         Type = frest.replaceAll(" ", "");
                     }
+                    break;
                 }
             }
 
