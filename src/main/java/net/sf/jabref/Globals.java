@@ -122,8 +122,6 @@ public class Globals {
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
-    private static Locale locale;
-
     public static final String FILETYPE_PREFS_EXT = "_dir", SELECTOR_META_PREFIX = "selector_",
             PROTECTED_FLAG_META = "protectedFlag",
             LAYOUT_PREFIX = "/resource/layout/", MAC = "Mac OS X",
@@ -254,12 +252,12 @@ public class Globals {
     }
 
     public static void setLanguage(String language, String country) {
-        Globals.locale = new Locale(language, country);
-        Globals.messages = ResourceBundle.getBundle(Globals.RESOURCE_PREFIX, Globals.locale, new EncodingControl("UTF-8"));
-        Globals.menuTitles = ResourceBundle.getBundle(Globals.MENU_RESOURCE_PREFIX, Globals.locale, new EncodingControl("UTF-8"));
-        Globals.intMessages = ResourceBundle.getBundle(Globals.INTEGRITY_RESOURCE_PREFIX, Globals.locale, new EncodingControl("UTF-8"));
-        Locale.setDefault(Globals.locale);
-        javax.swing.JComponent.setDefaultLocale(Globals.locale);
+        Locale locale = new Locale(language, country);
+        Globals.messages = ResourceBundle.getBundle(Globals.RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        Globals.menuTitles = ResourceBundle.getBundle(Globals.MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        Globals.intMessages = ResourceBundle.getBundle(Globals.INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        Locale.setDefault(locale);
+        javax.swing.JComponent.setDefaultLocale(locale);
     }
 
 
