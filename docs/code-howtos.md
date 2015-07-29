@@ -7,7 +7,7 @@ All log messages are passed internally to Java's [java.util.logging](http://docs
 
 # Drag and Drop
 
-net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor sets an TransferHandler inherited from FileListEditorTransferHandler. There, at importData, an DroppedFileHandler is instantiated and handleDroppedfile called. 
+`net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor` sets a `TransferHandler` inherited from `FileListEditorTransferHandler`. There, at `importData`, a `DroppedFileHandler` is instantiated and `handleDroppedfile` called. 
 
 # Get the JabRef frame / panel
 
