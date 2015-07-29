@@ -243,16 +243,14 @@ public class AuxSubGenerator
  else {
                     weiter = false;
                 }
-            } // end of while
+            }
 
             if (loopFileOpen) // only close, if open sucessful
             {
-                try
-                {
+                try {
                     br.close();
                     nestedAuxCounter++;
-                } catch (IOException ignored)
-                {
+                } catch (IOException ignored) {
                 }
             }
 

@@ -431,7 +431,7 @@ public class JabRef {
             } else {
                 System.err.println(Globals.lang("The output option depends on a valid input option."));
             } //end if(loaded.size > 0)
-        } //end exportMatches invoked 
+        }
 
         if (cli.isFileExport()) {
             if (loaded.size() > 0) {
