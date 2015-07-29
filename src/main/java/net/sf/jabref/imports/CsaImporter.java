@@ -44,19 +44,19 @@ public class CsaImporter extends ImportFormat {
     private int line;
 
     // pre-compiled patterns
-    private final static Pattern FIELD_PATTERN =
+    private static final Pattern FIELD_PATTERN =
             Pattern.compile("^([A-Z][A-Z]): ([A-Z].*)$");
-    private final static Pattern VOLNOPP_PATTERN =
+    private static final Pattern VOLNOPP_PATTERN =
             Pattern.compile("[;,\\.]\\s+(\\d+[A-Za-z]?)\\((\\d+(?:-\\d+)?)\\)(?:,\\s+|:)(\\d+-\\d+)");
-    private final static Pattern PAGES_PATTERN =
+    private static final Pattern PAGES_PATTERN =
             Pattern.compile("[;,\\.]\\s+(?:(\\[?[vn]\\.?p\\.?\\]?)|(?:pp?\\.?\\s+)(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)|(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)(?:\\s+pp?))");
-    private final static Pattern VOLUME_PATTERN =
+    private static final Pattern VOLUME_PATTERN =
             Pattern.compile("[;,\\.]?\\s+[vV][oO][lL]\\.?\\s+(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)");
-    private final static Pattern NUMBER_PATTERN =
+    private static final Pattern NUMBER_PATTERN =
             Pattern.compile("[;,\\.]\\s+(?:No|no|Part|part|NUMB)\\.?\\s+([A-Z]?\\d+(?:[/-]\\d+)?)");
-    private final static Pattern DATE_PATTERN =
+    private static final Pattern DATE_PATTERN =
             Pattern.compile("[;,\\.]\\s+(?:(\\d+)\\s)?(?:([A-Z][a-z][a-z])[\\.,]*\\s)?\\(?(\\d\\d\\d\\d)\\)?(?:\\s([A-Z][a-z][a-z]))?(?:\\s+(\\d+))?");
-    private final static Pattern LT_PATTERN =
+    private static final Pattern LT_PATTERN =
             Pattern.compile("\\[Lt\\]");
 
     // other constants

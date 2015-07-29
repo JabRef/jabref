@@ -32,11 +32,11 @@ import java.util.regex.Pattern;
 public class CiteSeerXFetcher implements EntryFetcher {
 
     private static final int MAX_PAGES_TO_LOAD = 8;
-    private final static String QUERY_MARKER = "___QUERY___";
-    private final static String URL_START = "http://citeseer.ist.psu.edu";
-    private final static String SEARCH_URL = CiteSeerXFetcher.URL_START + "/search?q=" + CiteSeerXFetcher.QUERY_MARKER
+    private static final String QUERY_MARKER = "___QUERY___";
+    private static final String URL_START = "http://citeseer.ist.psu.edu";
+    private static final String SEARCH_URL = CiteSeerXFetcher.URL_START + "/search?q=" + CiteSeerXFetcher.QUERY_MARKER
             + "&submit=Search&sort=rlv&t=doc";
-    private final static Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
+    private static final Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
 
     private boolean stopFetching = false;
 
@@ -132,11 +132,11 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
 
-    private final static String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
-    private final static Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
-    private final static Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
-    private final static Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
-    private final static Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
+    private static final String basePattern = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER + "\" content=\"(.*)\" />";
+    private static final Pattern titlePattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_title"));
+    private static final Pattern authorPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_authors"));
+    private static final Pattern yearPattern = Pattern.compile(CiteSeerXFetcher.basePattern.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
+    private static final Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
 
     private BibtexEntry getSingleCitation(String urlString) throws IOException {

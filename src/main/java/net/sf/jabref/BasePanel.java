@@ -141,10 +141,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
-    public final static int SHOWING_NOTHING = 0;
-    private final static int SHOWING_PREVIEW = 1;
-    public final static int SHOWING_EDITOR = 2;
-    public final static int WILL_SHOW_EDITOR = 3;
+    public static final int SHOWING_NOTHING = 0;
+    private static final int SHOWING_PREVIEW = 1;
+    public static final int SHOWING_EDITOR = 2;
+    public static final int WILL_SHOW_EDITOR = 3;
 
     /* 
      * The database shown in this panel.

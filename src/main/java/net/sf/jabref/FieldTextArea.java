@@ -38,9 +38,9 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     private String fieldName;
 
-    final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
+    static final Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
 
-    final static Pattern indent = Pattern.compile("\\s+.*");
+    static final Pattern indent = Pattern.compile("\\s+.*");
 
     private AutoCompleteListener autoCompleteListener = null;
 

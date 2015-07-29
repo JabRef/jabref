@@ -84,7 +84,7 @@ public class CaseChangers {
 
     public static class UpperFirstCaseChanger implements CaseChanger {
 
-        private final static Pattern UF_PATTERN = Pattern.compile("\\b\\w");
+        private static final Pattern UF_PATTERN = Pattern.compile("\\b\\w");
 
 
         @Override
@@ -129,7 +129,7 @@ public class CaseChangers {
 
     public static class TitleCaseChanger implements CaseChanger {
 
-        private final static Set<String> notToCapitalize;
+        private static final Set<String> notToCapitalize;
 
         static {
             Set<String> smallerWords = new HashSet<String>();
@@ -173,11 +173,11 @@ public class CaseChangers {
     }
 
 
-    public final static LowerCaseChanger LOWER = new LowerCaseChanger();
-    public final static UpperCaseChanger UPPER = new UpperCaseChanger();
-    public final static UpperFirstCaseChanger UPPER_FIRST = new UpperFirstCaseChanger();
-    public final static UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
-    public final static TitleCaseChanger TITLE = new TitleCaseChanger();
+    public static final LowerCaseChanger LOWER = new LowerCaseChanger();
+    public static final UpperCaseChanger UPPER = new UpperCaseChanger();
+    public static final UpperFirstCaseChanger UPPER_FIRST = new UpperFirstCaseChanger();
+    public static final UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
+    public static final TitleCaseChanger TITLE = new TitleCaseChanger();
 
-    public final static List<CaseChanger> ALL = Arrays.asList(CaseChangers.LOWER, CaseChangers.UPPER, CaseChangers.UPPER_FIRST, CaseChangers.UPPER_EACH_FIRST, CaseChangers.TITLE);
+    public static final List<CaseChanger> ALL = Arrays.asList(CaseChangers.LOWER, CaseChangers.UPPER, CaseChangers.UPPER_FIRST, CaseChangers.UPPER_EACH_FIRST, CaseChangers.TITLE);
 }

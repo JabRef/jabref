@@ -27,14 +27,14 @@ public class DuplicateCheck {
      * Integer values for indicating result of duplicate check (for entries):
      *
      */
-    final static int NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2, EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
+    static final int NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2, EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
 
     public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
     // Non-required fields are investigated only if the required fields give a value within
     // the doubt range of the threshold:
     private static final double doubtRange = 0.05;
 
-    private final static double reqWeight = 3; // Weighting of all required fields
+    private static final double reqWeight = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     private static final HashMap<String, Double> fieldWeights = new HashMap<String, Double>();

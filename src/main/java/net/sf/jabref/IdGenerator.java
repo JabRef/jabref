@@ -9,7 +9,7 @@ import java.text.NumberFormat;
  */
 public class IdGenerator {
 
-    private final static NumberFormat idFormat;
+    private static final NumberFormat idFormat;
 
     static {
         idFormat = NumberFormat.getInstance();
@@ -19,7 +19,7 @@ public class IdGenerator {
 
     private static int idCounter = 0;
 
-    public synchronized static String next() {
+    public static synchronized String next() {
         String result = idFormat.format(idCounter);
         idCounter++;
         return result;

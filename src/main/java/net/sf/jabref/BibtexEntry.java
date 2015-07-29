@@ -49,7 +49,7 @@ import net.sf.jabref.util.MonthUtil;
 public class BibtexEntry
 {
 
-    private final static String ID_FIELD = "id";
+    private static final String ID_FIELD = "id";
     public static final Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
     public static final Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
 

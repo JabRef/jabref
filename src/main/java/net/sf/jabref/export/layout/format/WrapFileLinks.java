@@ -227,7 +227,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     private static final int RELATIVE_FILE_PATH = 6;
 
     // Define which escape sequences give what results:
-    private final static Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
+    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);

@@ -208,7 +208,7 @@ public class AuxSubGenerator
                             String str = matcher.group().substring(matcher.start() + 10,
                                     matcher.end() - 1);
                             // could be an comma separated list of keys
-                            String keys[] = str.split(",");
+                            String[] keys = str.split(",");
                             if (keys != null)
                             {
                                 int keyCount = keys.length;

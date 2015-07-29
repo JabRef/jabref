@@ -161,7 +161,7 @@ public class RepecNepImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
-    private final static Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
+    private static final Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
 
     private int line = 0;
     private String lastLine = "";
