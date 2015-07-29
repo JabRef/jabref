@@ -234,7 +234,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private String makeUrl(int startIndex) {
         StringBuilder sb = new StringBuilder(ACMPortalFetcher.startUrl).append(ACMPortalFetcher.searchUrlPart);
         sb.append(terms.replaceAll(" ", "%20"));
-        sb.append("&start=").append(String.valueOf(startIndex));
+        sb.append("&start=").append(startIndex);
         sb.append(ACMPortalFetcher.searchUrlPartII);
 
         if (acmOrGuide) {

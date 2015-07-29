@@ -243,7 +243,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
+        return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + startIndex;
     }
 
     private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
