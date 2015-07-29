@@ -11,7 +11,7 @@ All log messages are passed internally to Java's [java.util.logging](http://docs
 
 # Get the JabRef frame / panel
 
-```java
+```Java
 net.sf.jabref.JabRefFrame jrf = JabRef.jrf;
 net.sf.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
 ```
