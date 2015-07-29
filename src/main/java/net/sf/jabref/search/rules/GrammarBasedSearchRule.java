@@ -143,18 +143,21 @@ public class GrammarBasedSearchRule implements SearchRule {
                 String content;
                 if (i - searchKeys.length == 0) {
                     // PSEUDOFIELD_TYPE
-                    if (!fieldPattern.matcher("entrytype").matches())
+                    if (!fieldPattern.matcher("entrytype").matches()) {
                         continue;
+                    }
                     content = entry.getType().getName();
                 } else {
                     String searchKey = searchKeys[i];
-                    if (!fieldPattern.matcher(searchKey).matches())
+                    if (!fieldPattern.matcher(searchKey).matches()) {
                         continue;
+                    }
                     content = entry.getField(searchKey);
                 }
                 noSuchField = false;
-                if (content == null)
+                if (content == null) {
                     continue; // paranoia
+                }
 
                 if(matchInField(content)) {
                     return true;
