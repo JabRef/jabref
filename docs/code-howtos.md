@@ -2,8 +2,8 @@ This page provides some development support in the form of howtos.
 
 # Logging
 
-JabRef uses [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/).
-Legacy JabRef code uses Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html) and is going to be replaced by Apache Commons Logging.
+JabRef uses the logging facade [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/).
+All log messages are passed internally to Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html) which handles any filterting, formatting and writing of log messages. 
 
 # Drag and Drop
 
