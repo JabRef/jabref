@@ -2,7 +2,7 @@ package net.sf.jabref.export.layout.format;
 
 import java.util.HashMap;
 
-public class XmlCharsMap extends HashMap<String, String> {
+class XmlCharsMap extends HashMap<String, String> {
 
     private static final long serialVersionUID = 1L;
 

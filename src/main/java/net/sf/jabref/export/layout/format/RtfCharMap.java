@@ -3,7 +3,7 @@ package net.sf.jabref.export.layout.format;
 import java.util.HashMap;
 
 
-public class RtfCharMap extends HashMap<String, String> {
+class RtfCharMap extends HashMap<String, String> {
 
     private static final long serialVersionUID = 1L;
     
