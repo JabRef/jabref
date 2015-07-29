@@ -39,7 +39,7 @@ class MetaDataChange extends Change {
     private final JScrollPane sp = new JScrollPane(tp);
     private final MetaData md;
     private final MetaData mdSecondary;
-    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<>();
+    private final ArrayList<MetaDataChangeUnit> changes = new ArrayList<MetaDataChangeUnit>();
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {

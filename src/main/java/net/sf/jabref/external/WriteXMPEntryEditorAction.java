@@ -55,7 +55,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         BibtexEntry entry = editor.getEntry();
 
         // Make a list of all PDFs linked from this entry:
-        List<File> files = new ArrayList<>();
+        List<File> files = new ArrayList<File>();
 
         // First check the (legacy) "pdf" field:
         String pdf = entry.getField("pdf");

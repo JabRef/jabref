@@ -602,7 +602,7 @@ class MSBibEntry {
             return result;
         }
 
-        result = new LinkedList<>();
+        result = new LinkedList<PersonName>();
         for (int i = 0; i < person.getLength(); i++)
         {
             NodeList firstName = ((Element) person.item(i)).getElementsByTagName(_bcol + "First");
@@ -643,7 +643,7 @@ class MSBibEntry {
     }
 
     private List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new LinkedList<>();
+        List<PersonName> result = new LinkedList<PersonName>();
 
         if (!authors.contains(" and "))
         {
@@ -1043,38 +1043,20 @@ class MSBibEntry {
     private BibtexEntryType mapMSBibToBibtexType(String msbib)
     {
         BibtexEntryType bibtex = BibtexEntryType.OTHER;
-        switch (msbib) {
-        case "Book":
+        if (msbib.equals("Book")) {
             bibtex = BibtexEntryType.BOOK;
-            break;
-        case "BookSection":
+        } else if (msbib.equals("BookSection")) {
             bibtex = BibtexEntryType.INBOOK;
-            break;
-        case "JournalArticle":
-        case "ArticleInAPeriodical":
+        } else if (msbib.equals("JournalArticle") || msbib.equals("ArticleInAPeriodical")) {
             bibtex = BibtexEntryType.ARTICLE;
-            break;
-        case "ConferenceProceedings":
+        } else if (msbib.equals("ConferenceProceedings")) {
             bibtex = BibtexEntryType.CONFERENCE;
-            break;
-        case "Report":
+        } else if (msbib.equals("Report")) {
             bibtex = BibtexEntryType.TECHREPORT;
-            break;
-        case "InternetSite":
-        case "DocumentFromInternetSite":
-        case "ElectronicSource":
-        case "Art":
-        case "SoundRecording":
-        case "Performance":
-        case "Film":
-        case "Interview":
-        case "Patent":
-        case "Case":
+        } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
             bibtex = BibtexEntryType.OTHER;
-            break;
-        default:
+        } else {
             bibtex = BibtexEntryType.MISC;
-            break;
         }
 
         return bibtex;
@@ -1138,7 +1120,7 @@ class MSBibEntry {
         //		else
         //			entry.setType(BibtexEntryType.MISC);
 
-        HashMap<String, String> hm = new HashMap<>();
+        HashMap<String, String> hm = new HashMap<String, String>();
 
         if (tag != null) {
             hm.put("bibtexkey", tag);

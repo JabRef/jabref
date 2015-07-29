@@ -50,8 +50,9 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
+        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
-        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+        try {
 
             //addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
@@ -84,6 +85,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
             //zipEntry = new ZipEntry()
 
+        } finally {
+            out.close();
         }
     }
 
@@ -105,7 +108,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {
-            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8")) {
+            Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");
+            try {
 
                 //            Writer ps = new FileWriter(tmpFile);
                 DOMSource source = new DOMSource(od.getDOMrepresentation());
@@ -113,6 +117,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
+            } finally {
+                ps.close();
             }
         } catch (Exception e) {
             throw new Error(e);

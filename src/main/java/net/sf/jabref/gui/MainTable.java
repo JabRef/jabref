@@ -106,24 +106,24 @@ public class MainTable extends JTable {
         this.panel = panel;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
         // we are going to install, which responds to user sorting selctions:
-        sortedForTable = new SortedList<>(list, null);
+        sortedForTable = new SortedList<BibtexEntry>(list, null);
         // This SortedList applies afterwards, and floats marked entries:
-        sortedForMarking = new SortedList<>(sortedForTable, null);
+        sortedForMarking = new SortedList<BibtexEntry>(sortedForTable, null);
         // This SortedList applies afterwards, and can float search hits:
-        sortedForSearch = new SortedList<>(sortedForMarking, null);
+        sortedForSearch = new SortedList<BibtexEntry>(sortedForMarking, null);
         // This SortedList applies afterwards, and can float grouping hits:
-        sortedForGrouping = new SortedList<>(sortedForSearch, null);
+        sortedForGrouping = new SortedList<BibtexEntry>(sortedForSearch, null);
 
         searchMatcher = null;
         groupMatcher = null;
         searchComparator = null;//new HitOrMissComparator(searchMatcher);
         groupComparator = null;//new HitOrMissComparator(groupMatcher);
 
-        EventTableModel<BibtexEntry> tableModel = new EventTableModel<>(sortedForGrouping, tableFormat);
+        EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        selectionModel = new EventSelectionModel<>(sortedForGrouping);
+        selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
@@ -358,7 +358,7 @@ public class MainTable extends JTable {
     }
 
     private List<Boolean> getCurrentSortOrder() {
-        List<Boolean> order = new ArrayList<>();
+        List<Boolean> order = new ArrayList<Boolean>();
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
         for (Integer i : sortCols) {
             order.add(comparatorChooser.isColumnReverse(i));
@@ -368,7 +368,7 @@ public class MainTable extends JTable {
 
     private List<String> getCurrentSortFields() {
         List<Integer> sortCols = comparatorChooser.getSortingColumns();
-        List<String> fields = new ArrayList<>();
+        List<String> fields = new ArrayList<String>();
         for (Integer i : sortCols) {
             String name = tableFormat.getColumnType(i);
             if (name != null) {
@@ -444,32 +444,37 @@ public class MainTable extends JTable {
         sortedForTable.getReadWriteLock().writeLock().unlock();
 
         // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(actionEvent -> {
-            // Get the information about the current sort order:
-            List<String> fields = getCurrentSortFields();
-            List<Boolean> order = getCurrentSortOrder();
-            // Update preferences:
-            int count = Math.min(fields.size(), order.size());
-            if (count >= 1) {
-                Globals.prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, fields.get(0));
-                Globals.prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, order.get(0));
+        comparatorChooser.addSortActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                // Get the information about the current sort order:
+                List<String> fields = getCurrentSortFields();
+                List<Boolean> order = getCurrentSortOrder();
+                // Update preferences:
+                int count = Math.min(fields.size(), order.size());
+                if (count >= 1) {
+                    Globals.prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, fields.get(0));
+                    Globals.prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, order.get(0));
+                }
+                if (count >= 2) {
+                    Globals.prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, fields.get(1));
+                    Globals.prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, order.get(1));
+                }
+                else {
+                    Globals.prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, "");
+                    Globals.prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, false);
+                }
+                if (count >= 3) {
+                    Globals.prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, fields.get(2));
+                    Globals.prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, order.get(2));
+                }
+                else {
+                    Globals.prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, "");
+                    Globals.prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, false);
+                }
             }
-            if (count >= 2) {
-                Globals.prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, fields.get(1));
-                Globals.prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, order.get(1));
-            }
-            else {
-                Globals.prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, "");
-                Globals.prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, false);
-            }
-            if (count >= 3) {
-                Globals.prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, fields.get(2));
-                Globals.prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, order.get(2));
-            }
-            else {
-                Globals.prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, "");
-                Globals.prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, false);
-            }
+
         });
 
     }
@@ -706,10 +711,14 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
                                                                              Object sortingStrategy) {
         final TableComparatorChooser<BibtexEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
-        result.addSortActionListener(e -> {
-            // We need to reset the stack of sorted list each time sorting order
-            // changes, or the sorting breaks down:
-            refreshSorting();
+        result.addSortActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // We need to reset the stack of sorted list each time sorting order
+                // changes, or the sorting breaks down:
+                refreshSorting();
+            }
         });
         return result;
     }

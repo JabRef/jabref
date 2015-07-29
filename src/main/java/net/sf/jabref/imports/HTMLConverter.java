@@ -742,10 +742,10 @@ public class HTMLConverter implements LayoutFormatter {
             {"866", "sliding"}, // Double rightwards arrow below - requires extraipa
     };
 
-    private final HashMap<String, String> escapedSymbols = new HashMap<>();
-    private final HashMap<Integer, String> escapedAccents = new HashMap<>();
-    private final HashMap<Integer, String> numSymbols = new HashMap<>();
-    private final HashMap<Character, String> unicodeSymbols = new HashMap<>();
+    private final HashMap<String, String> escapedSymbols = new HashMap<String, String>();
+    private final HashMap<Integer, String> escapedAccents = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> numSymbols = new HashMap<Integer, String>();
+    private final HashMap<Character, String> unicodeSymbols = new HashMap<Character, String>();
 
 
     public HTMLConverter() {

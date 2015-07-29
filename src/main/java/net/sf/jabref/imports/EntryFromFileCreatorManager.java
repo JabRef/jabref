@@ -30,7 +30,7 @@ public final class EntryFromFileCreatorManager {
 
     public EntryFromFileCreatorManager() {
 
-        entryCreators = new ArrayList<>(10);
+        entryCreators = new ArrayList<EntryFromFileCreator>(10);
         entryCreators.add(new EntryFromPDFCreator());
 
         // add a creator for each ExternalFileType if there is no specialised
@@ -88,7 +88,7 @@ public final class EntryFromFileCreatorManager {
     public List<String> addEntrysFromFiles(List<File> files,
             BibtexDatabase database, BibtexEntryType entryType,
             boolean generateKeywordsFromPathToFile) {
-        List<String> importGUIMessages = new LinkedList<>();
+        List<String> importGUIMessages = new LinkedList<String>();
         addEntrysFromFiles(files, database, null, entryType,
                 generateKeywordsFromPathToFile, null, importGUIMessages);
         return importGUIMessages;
@@ -210,7 +210,7 @@ public final class EntryFromFileCreatorManager {
      */
     public List<FileFilter> getFileFilterList() {
 
-        List<FileFilter> filters = new ArrayList<>();
+        List<FileFilter> filters = new ArrayList<FileFilter>();
         filters.add(getFileFilter());
         for (FileFilter creator : entryCreators) {
             filters.add(creator);

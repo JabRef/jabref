@@ -49,7 +49,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     private static void storeOpenOfficeFile(File file, InputStream source) throws Exception {
-        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        try {
             ZipEntry zipEntry = new ZipEntry("content.xml");
             out.putNextEntry(zipEntry);
             int c;
@@ -66,6 +67,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
 
             //zipEntry = new ZipEntry()
 
+        } finally {
+            out.close();
         }
     }
 
@@ -88,7 +91,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         OOCalcDatabase od = new OOCalcDatabase(database, keySet);
 
         try {
-            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8")) {
+            Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");
+            try {
 
                 //            Writer ps = new FileWriter(tmpFile);
                 DOMSource source = new DOMSource(od.getDOMrepresentation());
@@ -96,6 +100,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
+            } finally {
+                ps.close();
             }
         } catch (Exception e) {
             throw new Error(e);

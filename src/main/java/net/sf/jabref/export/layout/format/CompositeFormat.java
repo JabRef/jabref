@@ -38,7 +38,7 @@ public class CompositeFormat implements LayoutFormatter {
         formatters = new LayoutFormatter[] {first, second};
     }
 
-    public CompositeFormat(LayoutFormatter... formatters) {
+    public CompositeFormat(LayoutFormatter[] formatters) {
         this.formatters = formatters;
     }
 

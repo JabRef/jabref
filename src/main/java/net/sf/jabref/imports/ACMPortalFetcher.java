@@ -124,7 +124,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         fetchAbstract = absCheckBox.isSelected();
         int firstEntry = 1;
         String address = makeUrl(firstEntry);
-        LinkedHashMap<String, JLabel> previews = new LinkedHashMap<>();
+        LinkedHashMap<String, JLabel> previews = new LinkedHashMap<String, JLabel>();
 
         try {
             URL url = new URL(address);
@@ -421,7 +421,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 number = number.replaceAll(",", "");
                 //System.out.println(number);
                 return Integer.parseInt(number);
-            } catch (NumberFormatException | IllegalStateException ex) {
+            } catch (NumberFormatException ex) {
+                throw new IOException(Globals.lang("Could not parse number of hits"));
+            } catch (IllegalStateException e) {
                 throw new IOException(Globals.lang("Could not parse number of hits"));
             }
         }

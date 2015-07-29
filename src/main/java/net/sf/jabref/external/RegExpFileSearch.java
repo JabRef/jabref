@@ -49,7 +49,7 @@ public class RegExpFileSearch {
     public static Map<BibtexEntry, java.util.List<File>> findFilesForSet(Collection<BibtexEntry> entries,
             Collection<String> extensions, List<File> directories, String regExp) {
 
-        Map<BibtexEntry, java.util.List<File>> res = new HashMap<>();
+        Map<BibtexEntry, java.util.List<File>> res = new HashMap<BibtexEntry, List<File>>();
         for (BibtexEntry entry : entries) {
             res.put(entry, RegExpFileSearch.findFiles(entry, extensions, directories, regExp));
         }
@@ -122,7 +122,7 @@ public class RegExpFileSearch {
      */
     private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, Collection<File> dirs,
                                        String file, String extensionRegExp, boolean relative) {
-        ArrayList<File> res = new ArrayList<>();
+        ArrayList<File> res = new ArrayList<File>();
         for (File directory : dirs) {
             List<File> tmp = RegExpFileSearch.findFile(entry, database, directory.getPath(), file, extensionRegExp, relative);
             if (tmp != null) {
@@ -183,7 +183,7 @@ public class RegExpFileSearch {
     private static List<File> findFile(BibtexEntry entry, BibtexDatabase database, File directory,
                                        String file, String extensionRegExp) {
 
-        ArrayList<File> res = new ArrayList<>();
+        ArrayList<File> res = new ArrayList<File>();
 
         if (file.startsWith("/")) {
             directory = new File(".");
@@ -237,7 +237,7 @@ public class RegExpFileSearch {
                 }
                 // Do for all direct and indirect subdirs
                 if (dirToProcess.equals("**")) {
-                    List<File> toDo = new LinkedList<>();
+                    List<File> toDo = new LinkedList<File>();
                     toDo.add(directory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
@@ -273,8 +273,12 @@ public class RegExpFileSearch {
         final Pattern toMatch = Pattern.compile('^'
                 + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$', Pattern.CASE_INSENSITIVE);
 
-        File[] matches = directory.listFiles((arg0, arg1) -> {
-            return toMatch.matcher(arg1).matches();
+        File[] matches = directory.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File arg0, String arg1) {
+                return toMatch.matcher(arg1).matches();
+            }
         });
         if (matches != null && matches.length > 0) {
             Collections.addAll(res, matches);

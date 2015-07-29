@@ -98,7 +98,7 @@ public class OvidImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
@@ -113,7 +113,7 @@ public class OvidImporter extends ImportFormat {
         String[] items = sb.toString().split("<[0-9]+>");
 
         for (int i = 1; i < items.length; i++) {
-            HashMap<String, String> h = new HashMap<>();
+            HashMap<String, String> h = new HashMap<String, String>();
             String[] fields = items[i].split("__NEWFIELD__");
             for (String field : fields) {
                 int linebreak = field.indexOf('\n');

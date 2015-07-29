@@ -137,7 +137,7 @@ public class JSTORFetcher2 implements EntryFetcher {
      */
     private List<String> getCitations(String query, ImportInspector dialog, OutputPrinter status) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<String>();
         try {
             urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, "UTF-8") + JSTORFetcher2.SEARCH_URL_END;
             int count = 1;

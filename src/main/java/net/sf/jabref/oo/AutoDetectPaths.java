@@ -276,9 +276,15 @@ public class AutoDetectPaths extends AbstractWorker {
      *   find the Program files dir in localized Windows installations.
      */
     private static java.util.List<File> findProgramFilesDir() {
-        List<File> dirList = new ArrayList<>();
+        List<File> dirList = new ArrayList<File>();
         File root = new File("C:\\");
-        File[] dirs = root.listFiles(File::isDirectory);
+        File[] dirs = root.listFiles(new FileFilter() {
+
+            @Override
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
         for (File dir : dirs) {
             if (dir.getName().toLowerCase().equals("program files") || dir.getName().toLowerCase().equals("program files (x86)")) {
                 dirList.add(dir);
@@ -336,9 +342,13 @@ public class AutoDetectPaths extends AbstractWorker {
         final JDialog prog;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         JButton cancel = new JButton(Globals.lang("Cancel"));
-        cancel.addActionListener(event -> {
-            fileSearchCancelled = true;
-            ((JButton) event.getSource()).setEnabled(false);
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                fileSearchCancelled = true;
+                ((JButton) event.getSource()).setEnabled(false);
+            }
         });
         prog = new JDialog(parent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

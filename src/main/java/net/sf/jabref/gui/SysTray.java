@@ -36,7 +36,20 @@ public class SysTray {
     public SysTray(JabRefFrame frame) {
         this.frame = frame;
 
-        final ActionListener showJabref = actionEvent -> SwingUtilities.invokeLater(SysTray.this.frame::showIfMinimizedToSysTray);
+        final ActionListener showJabref = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        SysTray.this.frame.showIfMinimizedToSysTray();
+                    }
+                });
+
+            }
+        };
         MenuItem showWindow = new MenuItem(Globals.lang("Show"));
         showWindow.addActionListener(showJabref);
         PopupMenu popup = new PopupMenu();

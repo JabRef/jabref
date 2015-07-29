@@ -90,9 +90,13 @@ public class ExternalFileTypeEditor extends JDialog {
 
     private void init() {
 
-        ok.addActionListener(e -> {
-            storeSettings();
-            dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                storeSettings();
+                dispose();
+            }
         });
         AbstractAction cancelAction = new AbstractAction() {
 
@@ -103,26 +107,30 @@ public class ExternalFileTypeEditor extends JDialog {
         };
         cancel.addActionListener(cancelAction);
         // The toDefaults resets the entire list to its default values.
-        toDefaults.addActionListener(e -> {
-            /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
-                    Globals.lang("All custom file types will be lost. Proceed?"),
-                    Globals.lang("Reset file type definitons"), JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);*/
-            //if (reply == JOptionPane.YES_OPTION) {
-            java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
-            fileTypes.clear();
-            fileTypes.addAll(list);
-            Collections.sort(fileTypes);
-            //Globals.prefs.resetExternalFileTypesToDefault();
-            //setValues();
-            tableModel.fireTableDataChanged();
-            //}
+        toDefaults.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
+                        Globals.lang("All custom file types will be lost. Proceed?"),
+                        Globals.lang("Reset file type definitons"), JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);*/
+                //if (reply == JOptionPane.YES_OPTION) {
+                java.util.List<ExternalFileType> list = Globals.prefs.getDefaultExternalFileTypes();
+                fileTypes.clear();
+                fileTypes.addAll(list);
+                Collections.sort(fileTypes);
+                //Globals.prefs.resetExternalFileTypesToDefault();
+                //setValues();
+                tableModel.fireTableDataChanged();
+                //}
+            }
         });
 
         add.addActionListener(new AddListener());
         remove.addActionListener(new RemoveListener());
         edit.addActionListener(editListener);
-        fileTypes = new ArrayList<>();
+        fileTypes = new ArrayList<ExternalFileType>();
         setValues();
 
         tableModel = new FileTypeTableModel();

@@ -104,25 +104,47 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         Insets marg = new Insets(0, 20, 3, 0);
         defSource.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        showSource.addChangeListener(event -> defSource.setEnabled(showSource.isSelected())
-        );
+        showSource.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                defSource.setEnabled(showSource.isSelected());
+            }
+        }
+                );
 
         emacsRebindCtrlA.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        emacsMode.addChangeListener(event -> emacsRebindCtrlA.setEnabled(emacsMode.isSelected())
-        );
+        emacsMode.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
+            }
+        }
+                );
 
         emacsRebindCtrlF.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        emacsMode.addChangeListener(event -> emacsRebindCtrlF.setEnabled(emacsMode.isSelected())
+        emacsMode.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                emacsRebindCtrlF.setEnabled(emacsMode.isSelected());
+            }
+        }
         );
 
         
         autoCompFields = new JTextField(40);
         // We need a listener on autoComplete to enable and disable the
         // autoCompFields text field:
-        autoComplete.addChangeListener(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected())
-        );
+        autoComplete.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                setAutoCompleteElementsEnabled(autoComplete.isSelected());
+            }
+        }
+                );
 
         FormLayout layout = new FormLayout
                 (// columns

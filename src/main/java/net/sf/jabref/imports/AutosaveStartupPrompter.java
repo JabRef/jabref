@@ -49,8 +49,8 @@ public class AutosaveStartupPrompter implements Runnable {
     @Override
     public void run() {
         boolean first = frame.baseCount() == 0;
-        List<ParserResult> loaded = new ArrayList<>();
-        Map<ParserResult, Integer> location = new HashMap<>();
+        List<ParserResult> loaded = new ArrayList<ParserResult>();
+        Map<ParserResult, Integer> location = new HashMap<ParserResult, Integer>();
         for (File file : files) {
             File fileToLoad = file;
             boolean tryingAutosave;

@@ -103,7 +103,7 @@ public class TXMLReader
     /** collect all "plain" data of a xml node */
     private String getSimpleElementText(Element node)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++)
         {

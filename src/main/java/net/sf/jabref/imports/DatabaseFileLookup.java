@@ -28,7 +28,7 @@ class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
-    private final HashMap<File, Boolean> fileToFound = new HashMap<>();
+    private final HashMap<File, Boolean> fileToFound = new HashMap<File, Boolean>();
 
     private final Collection<BibtexEntry> entries;
 

@@ -155,7 +155,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
      */
-    private boolean linksFound(BibtexDatabase database, String... fields) {
+    private boolean linksFound(BibtexDatabase database, String[] fields) {
         for (BibtexEntry entry : database.getEntries()) {
             for (String field : fields) {
                 if (entry.getField(field) != null) {

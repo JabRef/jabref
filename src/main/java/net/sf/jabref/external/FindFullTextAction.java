@@ -64,18 +64,22 @@ public class FindFullTextAction extends AbstractWorker {
             DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(),
                     bibtexKey);
             try {
-                def.download(result.url, file -> {
-                    System.out.println("finished");
-                    FileListTableModel tm = new FileListTableModel();
-                    String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
-                    tm.setContent(oldValue);
-                    tm.addEntry(tm.getRowCount(), file);
-                    String newValue = tm.getStringRepresentation();
-                    UndoableFieldChange edit = new UndoableFieldChange(entry,
-                            GUIGlobals.FILE_FIELD, oldValue, newValue);
-                    entry.setField(GUIGlobals.FILE_FIELD, newValue);
-                    basePanel.undoManager.addEdit(edit);
-                    basePanel.markBaseChanged();
+                def.download(result.url, new DownloadExternalFile.DownloadCallback() {
+
+                    @Override
+                    public void downloadComplete(FileListEntry file) {
+                        System.out.println("finished");
+                        FileListTableModel tm = new FileListTableModel();
+                        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+                        tm.setContent(oldValue);
+                        tm.addEntry(tm.getRowCount(), file);
+                        String newValue = tm.getStringRepresentation();
+                        UndoableFieldChange edit = new UndoableFieldChange(entry,
+                                GUIGlobals.FILE_FIELD, oldValue, newValue);
+                        entry.setField(GUIGlobals.FILE_FIELD, newValue);
+                        basePanel.undoManager.addEdit(edit);
+                        basePanel.markBaseChanged();
+                    }
                 });
             } catch (IOException e) {
                 e.printStackTrace();

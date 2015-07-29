@@ -52,7 +52,7 @@ public class LabelPatternPanel extends JPanel {
     protected final JTextField defaultPat = new JTextField();
 
     // one field for each type
-    private final HashMap<String, JTextField> textFields = new HashMap<>();
+    private final HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {
@@ -103,7 +103,13 @@ public class LabelPatternPanel extends JPanel {
         pan.add(defaultPat);
         con.insets = new Insets(5, 5, 10, 5);
         JButton btnDefault = new JButton(Globals.lang("Default"));
-        btnDefault.addActionListener(event -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
+        btnDefault.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+            }
+        });
         con.gridx = 2;
         int y = 2;
         gbl.setConstraints(btnDefault, con);
@@ -150,15 +156,19 @@ public class LabelPatternPanel extends JPanel {
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(20, 5, 0, 5);
         gbl.setConstraints(btnDefaultAll, con);
-        btnDefaultAll.addActionListener(arg0 -> {
-            // reset all fields
-            for (String s : textFields.keySet()) {
-                JTextField tf = textFields.get(s);
-                tf.setText("");
-            }
+        btnDefaultAll.addActionListener(new ActionListener() {
 
-            // also reset the default pattern
-            defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // reset all fields
+                for (String s : textFields.keySet()) {
+                    JTextField tf = textFields.get(s);
+                    tf.setText("");
+                }
+
+                // also reset the default pattern
+                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+            }
         });
         add(btnDefaultAll);
     }
@@ -197,9 +207,13 @@ public class LabelPatternPanel extends JPanel {
         con.insets = new Insets(0, 5, 0, 5);
         gbl.setConstraints(but, con);
         but.setActionCommand(name);
-        but.addActionListener(e -> {
-            JTextField tf1 = textFields.get(e.getActionCommand());
-            tf1.setText("");
+        but.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTextField tf = textFields.get(e.getActionCommand());
+                tf.setText("");
+            }
         });
         c.add(but);
 

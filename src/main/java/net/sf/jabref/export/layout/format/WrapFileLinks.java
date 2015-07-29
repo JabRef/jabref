@@ -92,7 +92,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private String fileType = null;
     private List<FormatEntry> format = null;
-    private final Map<String, String> replacements = new HashMap<>();
+    private final Map<String, String> replacements = new HashMap<String, String>();
 
 
     @Override
@@ -227,7 +227,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     private static final int RELATIVE_FILE_PATH = 6;
 
     // Define which escape sequences give what results:
-    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
+    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<Character, Integer>();
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
@@ -249,7 +249,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
      * @return the resulting format entries.
      */
     private List<FormatEntry> parseFormatString(String format) {
-        List<FormatEntry> l = new ArrayList<>();
+        List<FormatEntry> l = new ArrayList<FormatEntry>();
         StringBuilder sb = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < format.length(); i++) {

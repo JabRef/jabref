@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 class AutoCompleters {
 
-    final HashMap<String, AutoCompleter> autoCompleters = new HashMap<>();
+    final HashMap<String, AutoCompleter> autoCompleters = new HashMap<String, AutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 

@@ -87,7 +87,7 @@ public class SaveOrderConfig {
      * Outputs the current configuration to be consumed later by the constructor
      */
     public Vector<String> getVector() {
-        Vector<String> res = new Vector<>(7);
+        Vector<String> res = new Vector<String>(7);
         if (saveInOriginalOrder) {
             res.insertElementAt("original", 0);
         } else {

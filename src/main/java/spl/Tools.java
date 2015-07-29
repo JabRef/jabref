@@ -123,15 +123,14 @@ class Tools {
 
         String osNameStart = System.getProperty("os.name").substring(0, 3);
         String fileSeparator = System.getProperty("file.separator");
-        switch (osNameStart) {
-        case "Win":
+        if (osNameStart.equals("Win")) {
             //Todo SciPlore
             return path.length() > 1 && path.substring(1, 2).equals(":")
                     || path.startsWith(fileSeparator) && !path.startsWith("\\\\");
-        case "Mac":
+        } else if (osNameStart.equals("Mac")) {
             //Koh:Panther (or Java 1.4.2) may change file path rule
             return path.startsWith(fileSeparator);
-        default:
+        } else {
             return path.startsWith(fileSeparator);
         }
     }

@@ -85,7 +85,7 @@ public class InspecImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -102,7 +102,7 @@ public class InspecImporter extends ImportFormat {
         in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
-        HashMap<String, String> h = new HashMap<>();
+        HashMap<String, String> h = new HashMap<String, String>();
         for (String entry : entries) {
             if (entry.indexOf("Record") != 0) {
                 continue;
@@ -114,26 +114,20 @@ public class InspecImporter extends ImportFormat {
                 //System.out.println(fields[j]);
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
-                switch (f3) {
-                case "TI":
+                if (f3.equals("TI")) {
                     h.put("title", frest);
-                    break;
-                case "PY":
+                } else if (f3.equals("PY")) {
                     h.put("year", frest);
-                    break;
-                case "AU":
+                } else if (f3.equals("AU")) {
                     h.put("author",
                             AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
                                     ";", " and "))
-                    );
-                    break;
-                case "AB":
+                            );
+                } else if (f3.equals("AB")) {
                     h.put("abstract", frest);
-                    break;
-                case "ID":
+                } else if (f3.equals("ID")) {
                     h.put("keywords", frest);
-                    break;
-                case "SO":
+                } else if (f3.equals("SO")) {
                     int m = frest.indexOf(".");
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
@@ -153,22 +147,16 @@ public class InspecImporter extends ImportFormat {
                         }
                     }
 
-                    break;
-                case "RT":
+                } else if (f3.equals("RT")) {
                     frest = frest.trim();
-                    switch (frest) {
-                    case "Journal-Paper":
+                    if (frest.equals("Journal-Paper")) {
                         Type = "article";
-                        break;
-                    case "Conference-Paper":
-                    case "Conference-Paper; Journal-Paper":
+                    } else if (frest.equals("Conference-Paper")
+                            || frest.equals("Conference-Paper; Journal-Paper")) {
                         Type = "inproceedings";
-                        break;
-                    default:
+                    } else {
                         Type = frest.replaceAll(" ", "");
-                        break;
                     }
-                    break;
                 }
             }
             BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals

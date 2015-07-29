@@ -32,7 +32,7 @@ public class MetaData implements Iterable<String> {
     
     private static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
-    private final HashMap<String, Vector<String>> metaData = new HashMap<>();
+    private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
     private boolean groupTreeValid = true;
@@ -60,7 +60,7 @@ public class MetaData implements Iterable<String> {
             for (String key : inData.keySet()) {
                 StringReader data = new StringReader(inData.get(key));
                 String unit;
-                Vector<String> orderedData = new Vector<>();
+                Vector<String> orderedData = new Vector<String>();
                 // We must allow for ; and \ in escape sequences.
                 try {
                     while ((unit = getNextUnit(data)) != null) {
@@ -69,25 +69,19 @@ public class MetaData implements Iterable<String> {
                 } catch (IOException ex) {
                     System.err.println("Weird error while parsing meta data.");
                 }
-                switch (key) {
-                case "groupsversion":
+                if (key.equals("groupsversion")) {
                     if (orderedData.size() >= 1) {
                         groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
                     }
-                    break;
-                case "groupstree":
+                } else if (key.equals("groupstree")) {
                     groupsTreePresent = true;
                     treeGroupsData = orderedData; // save for later user
-
                     // actual import operation is handled later because "groupsversion"
                     // tag might not yet have been read
-                    break;
-                case "groups":
+                } else if (key.equals("groups")) {
                     flatGroupsData = orderedData;
-                    break;
-                default:
+                } else {
                     putData(key, orderedData);
-                    break;
                 }
             }
         }
@@ -118,11 +112,11 @@ public class MetaData implements Iterable<String> {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<String>());
     }
 
     /**
@@ -176,7 +170,7 @@ public class MetaData implements Iterable<String> {
         // order and the first defined setting is used: metadata user-specific directory,
         // metadata general directory, preferences directory.
         String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
-        List<String> dirs = new ArrayList<>();
+        List<String> dirs = new ArrayList<String>();
 
         Vector<String> vec = getData(key);
         if (vec == null) {
@@ -262,7 +256,7 @@ public class MetaData implements Iterable<String> {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        SortedSet<String> sortedKeys = new TreeSet<>(metaData.keySet());
+        SortedSet<String> sortedKeys = new TreeSet<String>(metaData.keySet());
         for (String key : sortedKeys) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
@@ -410,7 +404,7 @@ public class MetaData implements Iterable<String> {
             String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
             ArrayList<String> value = labelPattern.get(key);
             if (value != null) {
-                Vector<String> data = new Vector<>();
+                Vector<String> data = new Vector<String>();
                 data.add(value.get(0));
                 this.putData(metaDataKey, data);
             }
@@ -420,7 +414,7 @@ public class MetaData implements Iterable<String> {
         if (labelPattern.getDefaultValue() == null) {
             this.remove(MetaData.KEYPATTERNDEFAULT);
         } else {
-            Vector<String> data = new Vector<>();
+            Vector<String> data = new Vector<String>();
             data.add(labelPattern.getDefaultValue().get(0));
             this.putData(MetaData.KEYPATTERNDEFAULT, data);
         }

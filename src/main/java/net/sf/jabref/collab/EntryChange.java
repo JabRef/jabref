@@ -49,7 +49,7 @@ class EntryChange extends Change {
         //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
         //        +" Modifications agree: "+modificationsAgree);
 
-        TreeSet<String> allFields = new TreeSet<>();
+        TreeSet<String> allFields = new TreeSet<String>();
         allFields.addAll(memEntry.getAllFields());
         allFields.addAll(tmpEntry.getAllFields());
         allFields.addAll(diskEntry.getAllFields());

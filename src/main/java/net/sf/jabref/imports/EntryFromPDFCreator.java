@@ -130,6 +130,8 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         try {
             List<BibtexEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
             addEntrysToEntry(entry, entrys);
+        } catch (EncryptionNotSupportedException e) {
+            // no canceling here, just no data added.
         } catch (IOException e) {
             // no canceling here, just no data added.
         }

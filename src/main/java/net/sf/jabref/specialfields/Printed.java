@@ -28,7 +28,7 @@ public class Printed extends SpecialField {
 
 
     private Printed() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         // DO NOT TRANSLATE "printed" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Globals.lang("Toogle print status"), GUIGlobals.getImage("printed"), Globals.lang("Toogle print status")));
         this.setValues(values);

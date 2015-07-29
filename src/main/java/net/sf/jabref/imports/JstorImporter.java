@@ -62,7 +62,7 @@ public class JstorImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         String s = "";
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         while (s != null && !s.startsWith("Item Type")) {

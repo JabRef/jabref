@@ -253,7 +253,7 @@ class KeyBindingsDialog extends JDialog {
             i++;
             //listModel.addElement(s + " (" + bindHM.get(s) + ")");
         }
-        TreeMap<String, String[]> sorted = new TreeMap<>();
+        TreeMap<String, String[]> sorted = new TreeMap<String, String[]>();
         for (i = 0; i < tableData.length; i++) {
             sorted.put(tableData[i][0], tableData[i]);
         }
@@ -342,39 +342,51 @@ class KeyBindingsDialog extends JDialog {
 
     // listners
     private void setButtons() {
-        ok.addActionListener(e -> {
-            // save all the key bindings
-            dispose();
-            clickedSave = true;
-            // also displays message: key bindings will take into effect next time you start JBM
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // save all the key bindings
+                dispose();
+                clickedSave = true;
+                // also displays message: key bindings will take into effect next time you start JBM
+            }
         });
-        cancel.addActionListener(e -> {
-            dispose();
-            clickedSave = false;
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                clickedSave = false;
+            }
         });
-        defB.addActionListener(e -> {
-            int[] selected = table.getSelectedRows();
-            if (selected.length == 0) {
-                int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this, Globals.lang("All key bindings will be reset to their defaults.") + " " + Globals.lang("Continue?"), Globals.lang("Resetting all key bindings"),
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE, null,
-                        new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
-                        Globals.lang("Ok"));
-                if (answer == JOptionPane.YES_OPTION) {
-                    bindHM.clear();
-                    Set<Entry<String, String>> entrySet = defBinds.entrySet();
-                    for (Entry<String, String> entry : entrySet) {
-                        bindHM.put(entry.getKey(), entry.getValue());
+        defB.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] selected = table.getSelectedRows();
+                if (selected.length == 0) {
+                    int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this, Globals.lang("All key bindings will be reset to their defaults.") + " " + Globals.lang("Continue?"), Globals.lang("Resetting all key bindings"),
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE, null,
+                            new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
+                            Globals.lang("Ok"));
+                    if (answer == JOptionPane.YES_OPTION) {
+                        bindHM.clear();
+                        Set<Entry<String, String>> entrySet = defBinds.entrySet();
+                        for (Entry<String, String> entry : entrySet) {
+                            bindHM.put(entry.getKey(), entry.getValue());
+                        }
+                        setList();
                     }
-                    setList();
-                }
-            } else {
-                for (int row : selected) {
-                    String name = (String) table.getValueAt(row, 0);
-                    String newKey = setToDefault(name);
-                    keyTF.setText(newKey);
-                    table.setValueAt(newKey, row, 1);
-                    table.repaint();
+                } else {
+                    for (int row : selected) {
+                        String name = (String) table.getValueAt(row, 0);
+                        String newKey = setToDefault(name);
+                        keyTF.setText(newKey);
+                        table.setValueAt(newKey, row, 1);
+                        table.repaint();
+                    }
                 }
             }
         });

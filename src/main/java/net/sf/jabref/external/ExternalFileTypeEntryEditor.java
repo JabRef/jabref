@@ -118,26 +118,40 @@ public class ExternalFileTypeEntryEditor {
         bb.addButton(cancel);
         bb.addGlue();
 
-        ok.addActionListener(e -> {
-            okPressed = true;
-            storeSettings(ExternalFileTypeEntryEditor.this.entry);
-            diag.dispose();
+        ok.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                okPressed = true;
+                storeSettings(ExternalFileTypeEntryEditor.this.entry);
+                diag.dispose();
+
+            }
         });
-        cancel.addActionListener(e -> diag.dispose());
+        cancel.addActionListener(new ActionListener() {
 
-        icon.addActionListener(actionEvent -> {
-            String initSel = ExternalFileTypeEntryEditor.this.entry.getIconName();
-            if (selectedIcon != null) {
-                initSel = selectedIcon;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                diag.dispose();
             }
-            IconSelection ic = new IconSelection(diag, initSel);
-            ic.setVisible(true);
-            if (ic.isOkPressed()) {
-                selectedIcon = ic.getSelectedIconKey();
-                icon.setIcon(GUIGlobals.getImage(selectedIcon));
+        });
+
+        icon.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String initSel = ExternalFileTypeEntryEditor.this.entry.getIconName();
+                if (selectedIcon != null) {
+                    initSel = selectedIcon;
+                }
+                IconSelection ic = new IconSelection(diag, initSel);
+                ic.setVisible(true);
+                if (ic.isOkPressed()) {
+                    selectedIcon = ic.getSelectedIconKey();
+                    icon.setIcon(GUIGlobals.getImage(selectedIcon));
+                }
+                //JOptionPane.showMessageDialog(null, "Sorry, the icon can unfortunately not be changed in this version of JabRef");
             }
-            //JOptionPane.showMessageDialog(null, "Sorry, the icon can unfortunately not be changed in this version of JabRef");
         });
 
         if (Globals.ON_WIN) {

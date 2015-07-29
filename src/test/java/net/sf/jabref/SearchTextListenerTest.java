@@ -36,7 +36,7 @@ public class SearchTextListenerTest {
         Assert.assertEquals("Expected no highlighting area ", 0, highlight.length);
 
         //set up arraylist with "word" and inform the fieldtextarea
-        ArrayList<String> wordsToHighlight = new ArrayList<>();
+        ArrayList<String> wordsToHighlight = new ArrayList<String>();
         wordsToHighlight.add(contentToHighlight1);
         ta.searchText(wordsToHighlight);
 
@@ -87,14 +87,14 @@ public class SearchTextListenerTest {
         String textOne = ta.getText();
 
         //set up arraylist with "word" and inform the fieldtextarea
-        ArrayList<String> wordsToHighlight = new ArrayList<>();
+        ArrayList<String> wordsToHighlight = new ArrayList<String>();
         wordsToHighlight.add(contentToHighlight1);
         ta.searchText(wordsToHighlight);
 
         String textTwo = ta.getText();
 
         //set up empty arraylist and inform the fieldtextarea
-        ArrayList<String> wordsToHighlight2 = new ArrayList<>();
+        ArrayList<String> wordsToHighlight2 = new ArrayList<String>();
         ta.searchText(wordsToHighlight2);
 
         String textThree = ta.getText();

@@ -79,7 +79,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final Pattern idPattern = Pattern.compile("<input name=\'\' title=\'.*\' type=\'checkbox\'" +
             "value=\'\'\\s*id=\'([0-9]+)\'/>");
     private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
-    private final HashMap<String, String> fieldPatterns = new HashMap<>();
+    private final HashMap<String, String> fieldPatterns = new HashMap<String, String>();
     private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
 
     Pattern stdEntryPattern = Pattern.compile(".*<strong>(.+)</strong><br>"
@@ -252,7 +252,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         if (importBibtex) {
             //TODO: Login
-            ArrayList<String> idSelected = new ArrayList<>();
+            ArrayList<String> idSelected = new ArrayList<String>();
             String id;
             while ((id = parseNextEntryId(text, piv)) != null && shouldContinue) {
                 idSelected.add(id);

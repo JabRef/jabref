@@ -48,17 +48,21 @@ class HelpContent extends JTextPane {
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setDoubleBuffered(true);
         prefs = prefs_;
-        history = new Stack<>();
-        forw = new Stack<>();
+        history = new Stack<URL>();
+        forw = new Stack<URL>();
         setEditorKitForContentType("text/html", new MyEditorKit());
         setContentType("text/html");
         setText("");
         setEditable(false);
 
         // Handles Anchors
-        final HyperlinkListener hyperLinkListener = e -> {
-            if (e.getDescription().startsWith("#")) {
-                scrollToReference(e.getDescription().substring(1));
+        final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(final HyperlinkEvent e) {
+                if (e.getDescription().startsWith("#")) {
+                    scrollToReference(e.getDescription().substring(1));
+                }
             }
         };
         addHyperlinkListener(hyperLinkListener);

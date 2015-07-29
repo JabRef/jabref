@@ -78,7 +78,7 @@ public class BibtexFields {
 
     private BibtexFields()
     {
-        fieldSet = new HashMap<>();
+        fieldSet = new HashMap<String, BibtexSingleField>();
         BibtexSingleField dummy;
 
         // FIRST: all standard fields
@@ -248,7 +248,7 @@ public class BibtexFields {
         readXML(ADDITIONAL_FIELDS);
 
         // collect all public fields for the PUBLIC_FIELDS array
-        Vector<String> pFields = new Vector<>(fieldSet.size());
+        Vector<String> pFields = new Vector<String>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
             if (sField.isPublic())
             {
@@ -275,7 +275,7 @@ public class BibtexFields {
             return;
         }
         // Build a Set of field names for the fields that should be sorted numerically:
-        HashSet<String> nF = new HashSet<>();
+        HashSet<String> nF = new HashSet<String>();
         Collections.addAll(nF, numFields);
         // Look through all registered fields, and activate numeric sorting if necessary:
         for (String fieldName : BibtexFields.runtime.fieldSet.keySet()) {
@@ -436,7 +436,7 @@ public class BibtexFields {
 
     /** returns an string-array with only private fieldnames */
     public static String[] getAllPrivateFieldNames() {
-        Vector<String> pFields = new Vector<>();
+        Vector<String> pFields = new Vector<String>();
         for (BibtexSingleField sField : BibtexFields.runtime.fieldSet.values()) {
             if (sField.isPrivate()) {
                 pFields.add(sField.getFieldName());

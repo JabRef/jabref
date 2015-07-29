@@ -175,7 +175,7 @@ public class GenFieldsCustomizer extends JDialog {
     }
 
     private void setFieldsText() {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
@@ -196,7 +196,7 @@ public class GenFieldsCustomizer extends JDialog {
     }
 
     void revert_actionPerformed(ActionEvent e) {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         String name;
         String fields;
         int i = 0;

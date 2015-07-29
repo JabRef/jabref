@@ -191,19 +191,23 @@ public class ImportCustomizationDialog extends JDialog {
         addFromJarButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
 
         JButton showDescButton = new JButton(Globals.lang("Show description"));
-        showDescButton.addActionListener(e -> {
-            int row = customImporterTable.getSelectedRow();
-            if (row != -1) {
-                CustomImportList.Importer importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
-                try {
-                    ImportFormat importFormat = importer.getInstance();
-                    JOptionPane.showMessageDialog(frame, importFormat.getDescription());
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+        showDescButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = customImporterTable.getSelectedRow();
+                if (row != -1) {
+                    CustomImportList.Importer importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
+                    try {
+                        ImportFormat importFormat = importer.getInstance();
+                        JOptionPane.showMessageDialog(frame, importFormat.getDescription());
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                        JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
                 }
-            } else {
-                JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
             }
         });
 

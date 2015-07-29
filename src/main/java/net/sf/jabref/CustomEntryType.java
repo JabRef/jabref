@@ -38,17 +38,17 @@ public class CustomEntryType extends BibtexEntryType {
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
 
-    public CustomEntryType(String name_, String[] req_, String[] opt_, String... opt2_) {
+    public CustomEntryType(String name_, String[] req_, String[] opt_, String[] opt2_) {
         name = name_;
         parseRequiredFields(req_);
-        ArrayList<String> allOpt = new ArrayList<>();
+        ArrayList<String> allOpt = new ArrayList<String>();
         Collections.addAll(allOpt, opt_);
         Collections.addAll(allOpt, opt2_);
         opt = allOpt.toArray(new String[allOpt.size()]);
         priOpt = opt_;
     }
 
-    public CustomEntryType(String name_, String[] req_, String... opt_) {
+    public CustomEntryType(String name_, String[] req_, String[] opt_) {
         this(name_, req_, opt_, new String[0]);
     }
 
@@ -72,9 +72,9 @@ public class CustomEntryType extends BibtexEntryType {
         parseRequiredFields(parts);
     }
 
-    private void parseRequiredFields(String... parts) {
-        ArrayList<String> fields = new ArrayList<>();
-        ArrayList<String[]> sets = new ArrayList<>();
+    private void parseRequiredFields(String[] parts) {
+        ArrayList<String> fields = new ArrayList<String>();
+        ArrayList<String[]> sets = new ArrayList<String[]>();
         for (String part : parts) {
             String[] subParts = part.split("/");
             Collections.addAll(fields, subParts);

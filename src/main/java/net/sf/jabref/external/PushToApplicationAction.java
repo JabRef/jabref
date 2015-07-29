@@ -84,10 +84,16 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         operation.pushEntries(panel.database(), entries, getKeyString(entries), panel.metaData());
 
         // Call the operationCompleted() method on the event dispatch thread:
-        SwingUtilities.invokeLater(() -> operation.operationCompleted(panel));
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                operation.operationCompleted(panel);
+            }
+        });
     }
 
-    private String getKeyString(BibtexEntry... entries) {
+    private String getKeyString(BibtexEntry[] entries) {
         StringBuilder result = new StringBuilder();
         String citeKey;//, message = "";
         boolean first = true;

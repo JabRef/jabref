@@ -187,7 +187,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     @Override
     protected JRootPane createRootPane() {
-        ActionListener actionListener = actionEvent -> setVisible(false);
+        ActionListener actionListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setVisible(false);
+            }
+        };
         JRootPane rootPane = new JRootPane();
         KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -508,19 +514,23 @@ public class FindUnlinkedFilesDialog extends JDialog {
         final FileFilter selectedFileFilter = (FileFilter) comboBoxFileTypeSelection.getSelectedItem();
 
         threadState = new int[] {1};
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(selectedFileFilter, database);
-            CheckableTreeNode rootNode = crawler.searchDirectory(directory, ff, threadState, new ChangeListener() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
-                int counter = 0;
+            @Override
+            public void run() {
+                UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(selectedFileFilter, database);
+                CheckableTreeNode rootNode = crawler.searchDirectory(directory, ff, threadState, new ChangeListener() {
+
+                    int counter = 0;
 
 
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    progressBarSearching.setString(++counter + " files found");
-                }
-            });
-            searchFinishedHandler(rootNode);
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        progressBarSearching.setString(++counter + " files found");
+                    }
+                });
+                searchFinishedHandler(rootNode);
+            }
         });
 
     }
@@ -566,22 +576,26 @@ public class FindUnlinkedFilesDialog extends JDialog {
         final BibtexEntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
 
         threadState = new int[] {1};
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            List<String> errors = new LinkedList<>();
-            int count = creatorManager.addEntrysFromFiles(fileList, database, frame.basePanel(),
-                    entryType,
-                    checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
-                        int counter = 0;
+            @Override
+            public void run() {
+                List<String> errors = new LinkedList<String>();
+                int count = creatorManager.addEntrysFromFiles(fileList, database, frame.basePanel(),
+                        entryType,
+                        checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
+
+                            int counter = 0;
 
 
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            progressBarImporting.setValue(++counter);
-                            progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
-                        }
-                    }, errors);
-            importFinishedHandler(count, errors);
+                            @Override
+                            public void stateChanged(ChangeEvent e) {
+                                progressBarImporting.setValue(++counter);
+                                progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
+                            }
+                        }, errors);
+                importFinishedHandler(count, errors);
+            }
         });
 
     }
@@ -642,12 +656,22 @@ public class FindUnlinkedFilesDialog extends JDialog {
         /**
          * Stores the selected Directory.
          */
-        buttonBrowse.addActionListener(e -> {
-            File selectedDirectory = chooseDirectory();
-            storeLastSelectedDirectory(selectedDirectory);
+        buttonBrowse.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File selectedDirectory = chooseDirectory();
+                storeLastSelectedDirectory(selectedDirectory);
+            }
         });
 
-        buttonScan.addActionListener(e -> startSearch());
+        buttonScan.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startSearch();
+            }
+        });
 
         /**
          * Action for the button "Import...". <br>
@@ -655,11 +679,23 @@ public class FindUnlinkedFilesDialog extends JDialog {
          * Actions on this button will start the import of all file of all
          * selected nodes in this dialogs tree view. <br>
          */
-        ActionListener actionListenerImportEntrys = e -> startImport();
+        ActionListener actionListenerImportEntrys = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startImport();
+            }
+        };
 
         buttonApply.addActionListener(actionListenerImportEntrys);
 
-        buttonClose.addActionListener(e -> dispose());
+        buttonClose.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
     }
 
     /**
@@ -677,9 +713,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     @SuppressWarnings("unchecked")
     private List<File> getFileListFromNode(CheckableTreeNode node) {
-        List<File> filesList = new ArrayList<>();
+        List<File> filesList = new ArrayList<File>();
         Enumeration<CheckableTreeNode> childs = node.depthFirstEnumeration();
-        ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<>();
+        ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<FindUnlinkedFilesDialog.CheckableTreeNode>();
         while (childs.hasMoreElements()) {
             CheckableTreeNode child = childs.nextElement();
             if (child.isLeaf() && child.getSelected()) {
@@ -766,7 +802,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
         checkboxCreateKeywords = new JCheckBox(Globals.lang("Create directory based keywords"));
         checkboxCreateKeywords.setToolTipText(Globals.lang("Creates keywords in created entrys with directory pathnames"));
         checkboxCreateKeywords.setSelected(checkBoxWhyIsThereNoGetSelectedStupidSwing);
-        checkboxCreateKeywords.addItemListener(e -> checkBoxWhyIsThereNoGetSelectedStupidSwing = !checkBoxWhyIsThereNoGetSelectedStupidSwing);
+        checkboxCreateKeywords.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                checkBoxWhyIsThereNoGetSelectedStupidSwing = !checkBoxWhyIsThereNoGetSelectedStupidSwing;
+            }
+        });
 
         textfieldDirectoryPath = new JTextField();
         textfieldDirectoryPath.setText(lastSelectedDirectory == null ? "" : lastSelectedDirectory.getAbsolutePath());
@@ -1012,7 +1054,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         List<FileFilter> fileFilterList = creatorManager.getFileFilterList();
 
-        Vector<FileFilter> vector = new Vector<>();
+        Vector<FileFilter> vector = new Vector<FileFilter>();
         for (FileFilter fileFilter : fileFilterList) {
             vector.add(fileFilter);
         }
@@ -1049,7 +1091,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         TreeMap<String, BibtexEntryType> entryTypes = BibtexEntryType.ALL_TYPES;
         Iterator<BibtexEntryType> iterator = entryTypes.values().iterator();
-        Vector<BibtexEntryTypeWrapper> list = new Vector<>();
+        Vector<BibtexEntryTypeWrapper> list = new Vector<BibtexEntryTypeWrapper>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
             list.add(new BibtexEntryTypeWrapper(iterator.next()));

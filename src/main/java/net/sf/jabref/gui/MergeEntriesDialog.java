@@ -90,7 +90,7 @@ public class MergeEntriesDialog extends JDialog {
         Util.placeDialog(this, this.frame);
     }
 
-    private void init(BibtexEntry... selected) {
+    private void init(BibtexEntry[] selected) {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
@@ -107,11 +107,11 @@ public class MergeEntriesDialog extends JDialog {
         // Create undo-compound
         ce = new NamedCompound(Globals.lang("Merge entries"));
 
-        joint = new TreeSet<>(one.getAllFields());
+        joint = new TreeSet<String>(one.getAllFields());
         joint.addAll(two.getAllFields());
 
         // Remove field starting with __
-        Set<String> toberemoved = new TreeSet<>();
+        Set<String> toberemoved = new TreeSet<String>();
         for (String field : joint) {
             if (field.startsWith("__")) {
                 toberemoved.add(field);
@@ -171,7 +171,13 @@ public class MergeEntriesDialog extends JDialog {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
                 this.add(rb[k][0], cc.xy(5 + (k * 2), 3));
-                rb[k][0].addChangeListener(e -> updateAll());
+                rb[k][0].addChangeListener(new ChangeListener() {
+
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        updateAll();
+                    }
+                });
             }
             rb[0][0].setSelected(true);
         } else {
@@ -224,7 +230,13 @@ public class MergeEntriesDialog extends JDialog {
                     rb[k][row - 3] = new JRadioButton();
                     rbg[row - 3].add(rb[k][row - 3]);
                     this.add(rb[k][row - 3], cc.xy(5 + (k * 2), row));
-                    rb[k][row - 3].addChangeListener(e -> updateAll());
+                    rb[k][row - 3].addChangeListener(new ChangeListener() {
+
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            updateAll();
+                        }
+                    });
                 }
                 if (string1 != null) {
                     mergedEntry.setField(field, string1);
@@ -293,15 +305,33 @@ public class MergeEntriesDialog extends JDialog {
         bb.addGlue();
         JButton cancel = new JButton(Globals.lang("Cancel"));
         cancel.setActionCommand("cancel");
-        cancel.addActionListener(e -> buttonPressed(e.getActionCommand()));
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonPressed(e.getActionCommand());
+            }
+        });
 
         JButton newentry = new JButton(Globals.lang("Add new entry and keep both old entries"));
         newentry.setActionCommand("newentry");
-        newentry.addActionListener(e -> buttonPressed(e.getActionCommand()));
+        newentry.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonPressed(e.getActionCommand());
+            }
+        });
 
         JButton replaceentries = new JButton(Globals.lang("Replace old entries with new entry"));
         replaceentries.setActionCommand("replace");
-        replaceentries.addActionListener(e -> buttonPressed(e.getActionCommand()));
+        replaceentries.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonPressed(e.getActionCommand());
+            }
+        });
 
         bb.addButton(new JButton[] {replaceentries, newentry, cancel});
         this.add(bb.getPanel(), cc.xyw(1, row, 11));
@@ -330,14 +360,12 @@ public class MergeEntriesDialog extends JDialog {
     }
 
     private void buttonPressed(String button) {
-        switch (button) {
-        case "cancel":
+        if (button.equals("cancel")) {
             // Cancelled, throw it away
             panel.output(Globals.lang("Cancelled merging entries"));
 
             dispose();
-            break;
-        case "newentry":
+        } else if (button.equals("newentry")) {
             // Create a new entry and add it to the undo stack
             // Keep the other two entries
             panel.insertEntry(mergedEntry);
@@ -346,8 +374,7 @@ public class MergeEntriesDialog extends JDialog {
             panel.undoManager.addEdit(ce);
             panel.output(Globals.lang("Merged entries into a new and kept the old"));
             dispose();
-            break;
-        case "replace":
+        } else if (button.equals("replace")) {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             panel.insertEntry(mergedEntry);
@@ -360,7 +387,6 @@ public class MergeEntriesDialog extends JDialog {
             panel.undoManager.addEdit(ce);
             panel.output(Globals.lang("Merged entries into a new and removed the old"));
             dispose();
-            break;
         }
     }
 

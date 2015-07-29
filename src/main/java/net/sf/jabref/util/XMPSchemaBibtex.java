@@ -176,7 +176,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     public static Map<String, String> getAllProperties(XMPSchema schema, String namespaceName) {
         NodeList nodes = schema.getElement().getChildNodes();
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<String, String>();
 
         if (nodes == null) {
             return result;
@@ -258,7 +258,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
 
-    private static final HashSet<String> preserveWhiteSpace = new HashSet<>();
+    private static final HashSet<String> preserveWhiteSpace = new HashSet<String>();
     static {
         XMPSchemaBibtex.preserveWhiteSpace.add("abstract");
         XMPSchemaBibtex.preserveWhiteSpace.add("note");
@@ -281,7 +281,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         if (prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER)) {
-            TreeSet<String> filters = new TreeSet<>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+            TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
             fields.removeAll(filters);
         }
 

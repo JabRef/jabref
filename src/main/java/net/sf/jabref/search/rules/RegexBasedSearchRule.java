@@ -70,7 +70,7 @@ public class RegexBasedSearchRule implements SearchRule {
 
         List<String> words = new SentenceAnalyzer(searchString).getWords();
 
-        List<Pattern> patterns = new ArrayList<>();
+        List<Pattern> patterns = new ArrayList<Pattern>();
         try {
             for (String word : words) {
                 patterns.add(Pattern.compile(word, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE));

@@ -236,9 +236,13 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             final String fn = fieldName.toUpperCase();
             this.fieldName = fieldName;
-            ok.addActionListener(e -> {
-                canceled = false;
-                dispose();
+            ok.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    canceled = false;
+                    dispose();
+                }
             });
 
             Action closeAction = new AbstractAction() {

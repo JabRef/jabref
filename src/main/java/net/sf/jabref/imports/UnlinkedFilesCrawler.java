@@ -23,11 +23,15 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directorys only.
      */
-    private final FileFilter directoryFilter = pathname -> {
-        if (pathname == null) {
-            return false;
+    private final FileFilter directoryFilter = new FileFilter() {
+
+        @Override
+        public boolean accept(File pathname) {
+            if (pathname == null) {
+                return false;
+            }
+            return pathname.isDirectory();
         }
-        return pathname.isDirectory();
     };
     private final BibtexDatabase database;
 

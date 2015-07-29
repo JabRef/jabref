@@ -33,8 +33,8 @@ public class ParserResult {
     private final HashMap<String, BibtexEntryType> entryTypes;
 
     private File file = null;
-    private final ArrayList<String> warnings = new ArrayList<>();
-    private final ArrayList<String> duplicateKeys = new ArrayList<>();
+    private final ArrayList<String> warnings = new ArrayList<String>();
+    private final ArrayList<String> duplicateKeys = new ArrayList<String>();
 
     private String errorMessage = null;
     private String encoding = null; // Which encoding was used?
@@ -50,7 +50,7 @@ public class ParserResult {
 
 
     public ParserResult(Collection<BibtexEntry> entries) {
-        this(ImportFormatReader.createDatabase(entries), null, new HashMap<>());
+        this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
     }
 
     public ParserResult(BibtexDatabase base, MetaData metaData, HashMap<String, BibtexEntryType> entryTypes) {

@@ -651,7 +651,7 @@ public class EmacsKeyBindings
     {
 
         private JTextComponent jtc;
-        private final LinkedList<String> ring = new LinkedList<>();
+        private final LinkedList<String> ring = new LinkedList<String>();
         Iterator<String> iter = ring.iterator();
 
         private static final KillRing instance = new KillRing();

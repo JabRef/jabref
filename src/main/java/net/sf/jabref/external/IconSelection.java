@@ -89,9 +89,9 @@ class IconSelection extends JDialog {
 
     private void init(String initialSelection) {
         int initSelIndex = -1;
-        iconKeys = new ArrayList<>();
+        iconKeys = new ArrayList<String>();
         Map<String, String> icns = GUIGlobals.getAllIcons();
-        HashSet<ImageIcon> iconSet = new LinkedHashSet<>();
+        HashSet<ImageIcon> iconSet = new LinkedHashSet<ImageIcon>();
         for (String key : icns.keySet()) {
             ImageIcon icon = GUIGlobals.getImage(key);
             if (!iconSet.contains(icon)) {
@@ -154,16 +154,24 @@ class IconSelection extends JDialog {
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ok.addActionListener(actionEvent -> {
-            okPressed = true;
-            if (icons.getSelectedValue() != null) {
-                selected = icons.getSelectedIndex();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                okPressed = true;
+                if (icons.getSelectedValue() != null) {
+                    selected = icons.getSelectedIndex();
+                }
+                dispose();
             }
-            dispose();
         });
-        cancel.addActionListener(actionEvent -> {
-            okPressed = false;
-            dispose();
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                okPressed = false;
+                dispose();
+            }
         });
 
         getContentPane().add(new JScrollPane(icons), BorderLayout.CENTER);

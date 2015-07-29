@@ -48,8 +48,8 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
      */
     public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,
             Set<BibtexEntry> currentAssignment) {
-        m_previousAssignmentBackup = new HashSet<>(previousAssignment);
-        m_newAssignmentBackup = new HashSet<>(currentAssignment);
+        m_previousAssignmentBackup = new HashSet<BibtexEntry>(previousAssignment);
+        m_newAssignmentBackup = new HashSet<BibtexEntry>(currentAssignment);
     }
 
     public UndoableChangeAssignment(Set<BibtexEntry> previousAssignment,

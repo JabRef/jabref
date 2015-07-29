@@ -34,7 +34,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
      * @return An array of strings representing the parts of the argument.
      */
     protected static String[] parseArgument(String arg) {
-        List<String> parts = new ArrayList<>();
+        List<String> parts = new ArrayList<String>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < arg.length(); i++) {

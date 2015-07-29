@@ -122,24 +122,34 @@ public class DownloadExternalFile {
         final URL urlF = url;
         final URLDownload udlF = udl;
         //System.out.println("Time: "+(System.currentTimeMillis()-time));
-        JabRefExecutorService.INSTANCE.execute(() -> {
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
-            try {
-                udlF.downloadToFile(tmp);
-            } catch (IOException e2) {
-                dontShowDialog = true;
-                if (editor != null && editor.isVisible()) {
-                    editor.setVisible(false, false);
+            @Override
+            public void run() {
+
+                try {
+                    udlF.downloadToFile(tmp);
+                } catch (IOException e2) {
+                    dontShowDialog = true;
+                    if (editor != null && editor.isVisible()) {
+                        editor.setVisible(false, false);
+                    }
+                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
+                                    + e2.getMessage(), Globals.lang("Download file"),
+                            JOptionPane.ERROR_MESSAGE);
+                    LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
+                    return;
                 }
-                JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                                + e2.getMessage(), Globals.lang("Download file"),
-                        JOptionPane.ERROR_MESSAGE);
-                LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
-                return;
-            }
 
-            // Download finished: call the method that stops the progress bar etc.:
-            SwingUtilities.invokeLater(this::downloadFinished);
+                // Download finished: call the method that stops the progress bar etc.:
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        downloadFinished();
+                    }
+                });
+            }
         });
 
         ExternalFileType suggestedType = null;
@@ -174,22 +184,26 @@ public class DownloadExternalFile {
         editor = new FileListEntryEditor(frame, entry, true, false, metaData);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
-        editor.setExternalConfirm(entry1 -> {
-            File f = directory != null ? expandFilename(directory, entry1.getLink())
-                    : new File(entry1.getLink());
-            if (f.isDirectory()) {
-                JOptionPane.showMessageDialog(frame,
-                        Globals.lang("Target file cannot be a directory."), Globals.lang("Download file"),
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            if (f.exists()) {
-                return JOptionPane.showConfirmDialog
-                        (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
-                                Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
-                == JOptionPane.OK_OPTION;
-            } else {
-                return true;
+        editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
+
+            @Override
+            public boolean confirmClose(FileListEntry entry) {
+                File f = directory != null ? expandFilename(directory, entry.getLink())
+                        : new File(entry.getLink());
+                if (f.isDirectory()) {
+                    JOptionPane.showMessageDialog(frame,
+                            Globals.lang("Target file cannot be a directory."), Globals.lang("Download file"),
+                            JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+                if (f.exists()) {
+                    return JOptionPane.showConfirmDialog
+                            (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
+                                    Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
+                    == JOptionPane.OK_OPTION;
+                } else {
+                    return true;
+                }
             }
         });
         if (!dontShowDialog) {

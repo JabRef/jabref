@@ -114,7 +114,7 @@ public class WriteXMPAction extends AbstractWorker {
         for (BibtexEntry entry : entries) {
 
             // Make a list of all PDFs linked from this entry:
-            List<File> files = new ArrayList<>();
+            List<File> files = new ArrayList<File>();
 
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
@@ -209,7 +209,13 @@ public class WriteXMPAction extends AbstractWorker {
             super(parent, Globals.lang("Writing XMP metadata for selected entries..."), false);
             okButton.setEnabled(false);
 
-            okButton.addActionListener(e -> dispose());
+            okButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dispose();
+                }
+            });
 
             AbstractAction cancel = new AbstractAction() {
 

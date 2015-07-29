@@ -156,7 +156,15 @@ public class IntegrityWizard extends JDialog implements ActionListener {
         else if (sender == startButton)
         {
             startButton.setEnabled(false);
-            Runnable scanWork = () -> warnPanel.updateView(dbase);
+            Runnable scanWork = new Runnable()
+            {
+
+                @Override
+                public void run()
+                {
+                    warnPanel.updateView(dbase);
+                }
+            };
             SwingUtilities.invokeLater(scanWork);
             startButton.setEnabled(true);
         }

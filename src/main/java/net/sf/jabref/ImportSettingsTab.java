@@ -69,7 +69,13 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
         fileNamePattern = new JTextField(50);
         selectFileNamePattern = new JButton(Globals.lang("Choose pattern"));
-        selectFileNamePattern.addActionListener(e -> openFilePatternMenu());
+        selectFileNamePattern.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFilePatternMenu();
+            }
+        });
 
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
@@ -164,7 +170,13 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         for (int i = 0; i < ImportSettingsTab.DEFAULT_FILENAMEPATTERNS.length; i++) {
             final JMenuItem item = new JMenuItem(ImportSettingsTab.DEFAULT_FILENAMEPATTERNS_DISPLAY[i]);
             final String toSet = ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[i];
-            item.addActionListener(actionEvent -> fileNamePattern.setText(toSet));
+            item.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    fileNamePattern.setText(toSet);
+                }
+            });
             popup.add(item);
         }
         popup.show(selectFileNamePattern, 0, selectFileNamePattern.getHeight());

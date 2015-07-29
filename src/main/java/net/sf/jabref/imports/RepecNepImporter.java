@@ -433,7 +433,7 @@ public class RepecNepImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         String paperNoStr = null;
         this.line = 0;
 

@@ -100,7 +100,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
      */
     private List<String> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<String>();
         try {
             urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;

@@ -42,12 +42,12 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FieldWeightDialog extends JDialog {
 
     private final JabRefFrame frame;
-    private final HashMap<JSlider, SliderInfo> sliders = new HashMap<>();
+    private final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
     private final JButton ok = new JButton(Globals.lang("Ok"));
     private final JButton cancel = new JButton(Globals.lang("Cancel"));
 
 
-    public static void main(String... args) {
+    public static void main(String[] args) {
         new FieldWeightDialog(null).setVisible(true);
     }
 
@@ -69,7 +69,7 @@ public class FieldWeightDialog extends JDialog {
         builder.appendSeparator(Globals.lang("Field sizes"));
 
         // We use this list to build an alphabetical list of field names:
-        TreeSet<String> fields = new TreeSet<>();
+        TreeSet<String> fields = new TreeSet<String>();
         // We use this map to remember which slider represents which field name:
         sliders.clear();
         for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; i++)
@@ -97,11 +97,21 @@ public class FieldWeightDialog extends JDialog {
 
     private JPanel buildButtonPanel() {
 
-        ok.addActionListener(actionEvent -> {
-            storeSettings();
-            dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                storeSettings();
+                dispose();
+            }
         });
-        cancel.addActionListener(actionEvent -> dispose());
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                dispose();
+            }
+        });
 
         ButtonBarBuilder builder = new ButtonBarBuilder();
         builder.addGlue();

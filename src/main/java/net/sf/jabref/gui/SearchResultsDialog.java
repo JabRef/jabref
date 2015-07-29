@@ -92,9 +92,9 @@ public class SearchResultsDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     private EventTableModel<BibtexEntry> model;
-    private final EventList<BibtexEntry> entries = new BasicEventList<>();
+    private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
     private SortedList<BibtexEntry> sortedEntries;
-    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<>();
+    private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -115,8 +115,8 @@ public class SearchResultsDialog {
         preview = new PreviewPanel(null, new MetaData(),
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
-        sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel<>(sortedEntries,
+        sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
+        model = new EventTableModel<BibtexEntry>(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
@@ -129,7 +129,7 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<>(sortedEntries);
+        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -439,7 +439,13 @@ public class SearchResultsDialog {
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        preview.scrollRectToVisible(toRect);
+                    }
+                });
             }
         }
     }

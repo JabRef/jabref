@@ -50,8 +50,8 @@ public class BibtexEntry
 {
 
     private static final String ID_FIELD = "id";
-    public static final Map<String, String> FieldAliasesOldToNew = new HashMap<>(); // Bibtex to BibLatex
-    public static final Map<String, String> FieldAliasesNewToOld = new HashMap<>(); // BibLatex to Bibtex
+    public static final Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
+    public static final Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
 
     static {
         BibtexEntry.FieldAliasesOldToNew.put("address", "location");
@@ -81,7 +81,7 @@ public class BibtexEntry
 
     private String _id;
     private BibtexEntryType _type;
-    private Map<String, String> _fields = new HashMap<>();
+    private Map<String, String> _fields = new HashMap<String, String>();
     private final VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
@@ -136,7 +136,7 @@ public class BibtexEntry
      * set for this particular entry.
      */
     public Set<String> getAllFields() {
-        return new TreeSet<>(_fields.keySet());
+        return new TreeSet<String>(_fields.keySet());
     }
 
     /**
@@ -278,7 +278,7 @@ public class BibtexEntry
         // No value of this field found, so look at the alias
 
         // Create bidirectional dictionary between field names and their aliases
-        Map<String, String> aliases = new HashMap<>();
+        Map<String, String> aliases = new HashMap<String, String>();
         aliases.putAll(BibtexEntry.FieldAliasesOldToNew);
         aliases.putAll(BibtexEntry.FieldAliasesNewToOld);
 
@@ -502,7 +502,7 @@ public class BibtexEntry
     @Override
     public Object clone() {
         BibtexEntry clone = new BibtexEntry(_id, _type);
-        clone._fields = new HashMap<>(_fields);
+        clone._fields = new HashMap<String, String>(_fields);
         return clone;
     }
 

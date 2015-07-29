@@ -49,7 +49,7 @@ public class XMLChars implements LayoutFormatter {
 
     private static final XmlCharsMap XML_CHARS = new XmlCharsMap();
     
-    private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<>();
+    private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<String, String>();
 
     static {
         ASCII_TO_XML_CHARS.put("<", "&lt;");

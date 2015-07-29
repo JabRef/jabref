@@ -143,14 +143,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final EntryEditor ths = this;
 
-    private final HashSet<FieldContentSelector> contentSelectors = new HashSet<>();
+    private final HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
 
-    private final List<Object> tabs = new ArrayList<>();
+    private final List<Object> tabs = new ArrayList<Object>();
 
     // text area from gettin updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
@@ -249,7 +249,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Globals.lang("Show optional fields"));
                 tabs.add(optPan);
 
-                Set<String> deprecatedFields = new HashSet<>(BibtexEntry.FieldAliasesOldToNew.keySet());
+                Set<String> deprecatedFields = new HashSet<String>(BibtexEntry.FieldAliasesOldToNew.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(entry.getOptionalFields(),
@@ -258,7 +258,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         deprecatedFields.toArray(new String[deprecatedFields.size()]));
 
                 // Get list of all optional fields of this entry and their aliases
-                Set<String> optionalFieldsAndAliases = new HashSet<>();
+                Set<String> optionalFieldsAndAliases = new HashSet<String>();
                 for (String field : entry.getOptionalFields())
                 {
                     optionalFieldsAndAliases.add(field);
@@ -268,7 +268,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Get all optional fields which are deprecated
-                Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
+                Set<String> usedOptionalFieldsDeprecated = new HashSet<String>(deprecatedFields);
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
                 // Add tabs
@@ -497,21 +497,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             ((JComponent) ed).addMouseListener(new ExternalViewerListener());
 
             // but.setBackground(GUIGlobals.lightGray);
-            but.addActionListener(e -> {
-                String dir = ed.getText();
+            but.addActionListener(new ActionListener() {
 
-                if (dir.isEmpty()) {
-                    dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
-                }
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String dir = ed.getText();
 
-                String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
-                        JFileChooser.OPEN_DIALOG, false);
+                    if (dir.isEmpty()) {
+                        dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
+                    }
 
-                if (chosenFile != null) {
-                    File newFile = new File(chosenFile); // chooser.getSelectedFile();
-                    ed.setText(newFile.getPath());
-                    prefs.put(fieldName + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
-                    updateField(ed);
+                    String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
+                            JFileChooser.OPEN_DIALOG, false);
+
+                    if (chosenFile != null) {
+                        File newFile = new File(chosenFile); // chooser.getSelectedFile();
+                        ed.setText(newFile.getPath());
+                        prefs.put(fieldName + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
+                        updateField(ed);
+                    }
                 }
             });
 
@@ -543,9 +547,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         else if (s != null && s.equals("setOwner")) {
             JButton button = new JButton(Globals.lang("Auto"));
-            button.addActionListener(actionEvent -> {
-                ed.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
-                storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+            button.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    ed.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
+                    storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+                }
             });
             return button;
         } else {
@@ -610,14 +618,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // an autogeneration of a BibTeX key.
                 // - ILC (16/02/2010) -
                 //////////////////////////////////////////////////////////
-                SwingUtilities.invokeLater(() -> {
-                    final int row = panel.mainTable.findEntry(entry);
-                    if (row >= 0) {
-                        if (panel.mainTable.getSelectedRowCount() == 0) {
-                            panel.mainTable.setRowSelectionInterval(row, row);
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final int row = panel.mainTable.findEntry(entry);
+                        if (row >= 0) {
+                            if (panel.mainTable.getSelectedRowCount() == 0) {
+                                panel.mainTable.setRowSelectionInterval(row, row);
+                            }
+                            //scrollTo(row);
+                            panel.mainTable.ensureVisible(row);
                         }
-                        //scrollTo(row);
-                        panel.mainTable.ensureVisible(row);
                     }
                 });
                 //////////////////////////////////////////////////////////
@@ -666,12 +678,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
         am.put("prevtab", frame.prevTab);
         try {
-            HashSet<AWTKeyStroke> keys = new HashSet<>(ta
+            HashSet<AWTKeyStroke> keys = new HashSet<AWTKeyStroke>(ta
                     .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.clear();
             keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
             ta.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-            keys = new HashSet<>(ta
+            keys = new HashSet<AWTKeyStroke>(ta
                     .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.clear();
             keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
@@ -942,13 +954,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // panel.refreshTable();
             panel.markBaseChanged();
             ///////////////////////////////////////////////////////
-            SwingUtilities.invokeLater(() -> {
-                final int row = panel.mainTable.findEntry(entry);
-                if (row >= 0) {
-                    //if (panel.mainTable.getSelectedRowCount() == 0)
-                    //    panel.mainTable.setRowSelectionInterval(row, row);
-                    //scrollTo(row);
-                    panel.mainTable.ensureVisible(row);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    final int row = panel.mainTable.findEntry(entry);
+                    if (row >= 0) {
+                        //if (panel.mainTable.getSelectedRowCount() == 0)
+                        //    panel.mainTable.setRowSelectionInterval(row, row);
+                        //scrollTo(row);
+                        panel.mainTable.ensureVisible(row);
+                    }
                 }
             });
 
@@ -1047,13 +1063,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public TypeButton(String type) {
             super(GUIGlobals.getImage("edit"));
             setToolTipText(Globals.lang("Change entry type"));
-            addActionListener(e -> {
-                JPopupMenu typeMenu = new JPopupMenu();
-                for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
-                    typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
-                }
+            addActionListener(new ActionListener() {
 
-                typeMenu.show(ths, 0, 0);
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JPopupMenu typeMenu = new JPopupMenu();
+                    for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+                        typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
+                    }
+
+                    typeMenu.show(ths, 0, 0);
+                }
             });
         }
 
@@ -1135,17 +1155,27 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            SwingUtilities.invokeLater(EntryEditor.this::activateVisible);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    activateVisible();
+                }
+            });
 
             // After the initial event train has finished, we tell the editor
             // tab to update all
             // its fields. This makes sure they are updated even if the tab we
             // just left contained one
             // or more of the same fields as this one:
-            SwingUtilities.invokeLater(() -> {
-                Object activeTab = tabs.get(tabbed.getSelectedIndex());
-                if (activeTab instanceof EntryEditorTab) {
-                    ((EntryEditorTab) activeTab).updateAll();
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    Object activeTab = tabs.get(tabbed.getSelectedIndex());
+                    if (activeTab instanceof EntryEditorTab) {
+                        ((EntryEditorTab) activeTab).updateAll();
+                    }
                 }
             });
 
@@ -1373,13 +1403,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // Should only be done if this editor is currently showing:
             //System.out.println(getType().getName()+": movingAway="+movingAway+", isShowing="+isShowing());
             if (!movingAway && isShowing()) {
-                SwingUtilities.invokeLater(() -> {
-                    final int row = panel.mainTable.findEntry(entry);
-                    if (row >= 0) {
-                        //if (panel.mainTable.getSelectedRowCount() == 0)
-                        //    panel.mainTable.setRowSelectionInterval(row, row);
-                        //scrollTo(row);
-                        panel.mainTable.ensureVisible(row);
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final int row = panel.mainTable.findEntry(entry);
+                        if (row >= 0) {
+                            //if (panel.mainTable.getSelectedRowCount() == 0)
+                            //    panel.mainTable.setRowSelectionInterval(row, row);
+                            //scrollTo(row);
+                            panel.mainTable.ensureVisible(row);
+                        }
                     }
                 });
             }

@@ -206,12 +206,22 @@ public class DatabasePropertiesDialog extends JDialog {
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", closeAction);
 
-        ok.addActionListener(e -> {
-            storeSettings();
-            dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                storeSettings();
+                dispose();
+            }
         });
 
-        cancel.addActionListener(e -> dispose());
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
 
     }
 
@@ -224,24 +234,28 @@ public class DatabasePropertiesDialog extends JDialog {
         bg.add(saveAsConfiguredGlobally);
         bg.add(saveInOriginalOrder);
         bg.add(saveInSpecifiedOrder);
-        ActionListener listener = e -> {
-            boolean selected = e.getSource() == saveInSpecifiedOrder;
-            savePriSort.setEnabled(selected);
-            savePriField.setEnabled(selected);
-            savePriDesc.setEnabled(selected);
-            saveSecSort.setEnabled(selected);
-            saveSecField.setEnabled(selected);
-            saveSecDesc.setEnabled(selected);
-            saveTerSort.setEnabled(selected);
-            saveTerField.setEnabled(selected);
-            saveTerDesc.setEnabled(selected);
+        ActionListener listener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean selected = e.getSource() == saveInSpecifiedOrder;
+                savePriSort.setEnabled(selected);
+                savePriField.setEnabled(selected);
+                savePriDesc.setEnabled(selected);
+                saveSecSort.setEnabled(selected);
+                saveSecField.setEnabled(selected);
+                saveSecDesc.setEnabled(selected);
+                saveTerSort.setEnabled(selected);
+                saveTerField.setEnabled(selected);
+                saveTerDesc.setEnabled(selected);
+            }
         };
 
         saveAsConfiguredGlobally.addActionListener(listener);
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
         v.add(BibtexFields.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
@@ -257,22 +271,34 @@ public class DatabasePropertiesDialog extends JDialog {
         saveSecField = new JTextField(10);
         saveTerField = new JTextField(10);
 
-        savePriSort.addActionListener(e -> {
-            if (savePriSort.getSelectedIndex() > 0) {
-                savePriField.setText(savePriSort.getSelectedItem().toString());
-                savePriSort.setSelectedIndex(0);
+        savePriSort.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (savePriSort.getSelectedIndex() > 0) {
+                    savePriField.setText(savePriSort.getSelectedItem().toString());
+                    savePriSort.setSelectedIndex(0);
+                }
             }
         });
-        saveSecSort.addActionListener(e -> {
-            if (saveSecSort.getSelectedIndex() > 0) {
-                saveSecField.setText(saveSecSort.getSelectedItem().toString());
-                saveSecSort.setSelectedIndex(0);
+        saveSecSort.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (saveSecSort.getSelectedIndex() > 0) {
+                    saveSecField.setText(saveSecSort.getSelectedItem().toString());
+                    saveSecSort.setSelectedIndex(0);
+                }
             }
         });
-        saveTerSort.addActionListener(e -> {
-            if (saveTerSort.getSelectedIndex() > 0) {
-                saveTerField.setText(saveTerSort.getSelectedItem().toString());
-                saveTerSort.setSelectedIndex(0);
+        saveTerSort.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (saveTerSort.getSelectedIndex() > 0) {
+                    saveTerField.setText(saveTerSort.getSelectedItem().toString());
+                    saveTerSort.setSelectedIndex(0);
+                }
             }
         });
 
@@ -423,7 +449,7 @@ public class DatabasePropertiesDialog extends JDialog {
         String newEncoding = (String) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
-        Vector<String> dir = new Vector<>(1);
+        Vector<String> dir = new Vector<String>(1);
         String text = fileDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -432,7 +458,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
-        dir = new Vector<>(1);
+        dir = new Vector<String>(1);
         text = fileDirIndv.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -441,7 +467,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         }
 
-        dir = new Vector<>(1);
+        dir = new Vector<String>(1);
         text = pdfDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -450,7 +476,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove("pdfDirectory");
         }
 
-        dir = new Vector<>(1);
+        dir = new Vector<String>(1);
         text = psDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -460,7 +486,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         if (protect.isSelected()) {
-            dir = new Vector<>(1);
+            dir = new Vector<String>(1);
             dir.add("true");
             metaData.putData(Globals.PROTECTED_FLAG_META, dir);
         } else {

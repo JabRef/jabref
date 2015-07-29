@@ -38,7 +38,7 @@ public class ExplicitGroup extends AbstractGroup {
 
     public static final String ID = "ExplicitGroup:";
 
-    private final Set<BibtexEntry> entries = new HashSet<>();
+    private final Set<BibtexEntry> entries = new HashSet<BibtexEntry>();
 
     public ExplicitGroup(String name, GroupHierarchyType context) {
         super(name, context);
@@ -112,12 +112,12 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry... entries) {
+    public AbstractUndoableEdit add(BibtexEntry[] entries) {
         if (entries.length == 0) {
             return null; // nothing to do
         }
 
-        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<>(this.entries);
+        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(this.entries);
         Collections.addAll(this.entries, entries);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
@@ -128,12 +128,12 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry... entries) {
+    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
         if (entries.length == 0) {
             return null; // nothing to do
         }
 
-        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<>(this.entries);
+        HashSet<BibtexEntry> entriesBeforeEdit = new HashSet<BibtexEntry>(this.entries);
         for (BibtexEntry entry : entries) {
             this.entries.remove(entry);
         }
@@ -172,7 +172,7 @@ public class ExplicitGroup extends AbstractGroup {
         if (entries.size() != other.entries.size()) {
             return false; // add/remove
         }
-        HashSet<String> keys = new HashSet<>();
+        HashSet<String> keys = new HashSet<String>();
         BibtexEntry entry;
         String key;
         // compare bibtex keys for all entries that have one
@@ -212,7 +212,7 @@ public class ExplicitGroup extends AbstractGroup {
                 append(AbstractGroup.SEPARATOR).append(context.ordinal()).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
-        Set<String> sortedKeys = new TreeSet<>();
+        Set<String> sortedKeys = new TreeSet<String>();
         for (BibtexEntry m_entry : entries) {
             s = m_entry.getCiteKey();
             if (s != null && !s.isEmpty()) {
@@ -280,7 +280,7 @@ public class ExplicitGroup extends AbstractGroup {
      */
     @Override
     public void refreshForNewDatabase(BibtexDatabase db) {
-        Set<BibtexEntry> newSet = new HashSet<>();
+        Set<BibtexEntry> newSet = new HashSet<BibtexEntry>();
         for (BibtexEntry entry : entries) {
             BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
             /*if (sameEntry == null) {

@@ -54,7 +54,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     private final JTable table;
 
     // IMPORT
-    public final List<String> listOfDBs = new ArrayList<>();
+    public final List<String> listOfDBs = new ArrayList<String>();
     public boolean moreThanOne = false;
     // EXPORT
     public String selectedDB = "";
@@ -70,7 +70,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     public DBImportExportDialog(JabRefFrame frame, Vector<Vector<String>> rows, DialogType dialogType) {
         this.dialogType = dialogType;
 
-        Vector<String> columns = new Vector<>();
+        Vector<String> columns = new Vector<String>();
         columns.add("Databases");
         table = new JTable();
         DefaultTableModel model = new DefaultTableModel(rows, columns) {
@@ -159,24 +159,44 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         diag.setLocationRelativeTo(frame);
         table.addMouseListener(this);
 
-        importButton.addActionListener(arg0 -> importAction());
+        importButton.addActionListener(new ActionListener() {
 
-        exportButton.addActionListener(arg0 -> exportAction());
-
-        cancelButton.addActionListener(arg0 -> {
-            moreThanOne = false;
-            hasDBSelected = false;
-            diag.dispose();
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                importAction();
+            }
         });
-        removeButton.addActionListener(arg0 -> {
-            moreThanOne = false;
-            hasDBSelected = true;
-            selectedInt = table.getSelectedRow();
-            selectedDB = (String) table.getValueAt(selectedInt, 0);
-            int areYouSure = JOptionPane.showConfirmDialog(diag, "Are you sure you want to remove the already\nexistent SQL DBs?");
-            if (areYouSure == JOptionPane.YES_OPTION) {
-                removeAction = true;
+
+        exportButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                exportAction();
+            }
+        });
+
+        cancelButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                moreThanOne = false;
+                hasDBSelected = false;
                 diag.dispose();
+            }
+        });
+        removeButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                moreThanOne = false;
+                hasDBSelected = true;
+                selectedInt = table.getSelectedRow();
+                selectedDB = (String) table.getValueAt(selectedInt, 0);
+                int areYouSure = JOptionPane.showConfirmDialog(diag, "Are you sure you want to remove the already\nexistent SQL DBs?");
+                if (areYouSure == JOptionPane.YES_OPTION) {
+                    removeAction = true;
+                    diag.dispose();
+                }
             }
         });
         diag.setModal(true);

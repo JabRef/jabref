@@ -16,7 +16,7 @@ public class RankCompact extends Rank {
 
 
     private RankCompact() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         //lab.setName("i");
         values.add(new SpecialFieldValue(this, null, "clearRank", Globals.lang("Clear rank"), null, Globals.lang("No rank information")));
         // DO NOT TRANSLATE "rank1" etc. as this makes the .bib files non portable

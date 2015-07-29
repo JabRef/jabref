@@ -44,7 +44,7 @@ import net.sf.jabref.util.StringUtil;
  */
 public abstract class DBImporter extends DBImporterExporter {
 
-    private final ArrayList<String> columnsNotConsideredForEntries = new ArrayList<>(
+    private final ArrayList<String> columnsNotConsideredForEntries = new ArrayList<String>(
             Arrays.asList("cite_key", "entry_types_id", "database_id",
                     "jabref_eid", "entries_id"));
 
@@ -85,7 +85,7 @@ public abstract class DBImporter extends DBImporterExporter {
      */
     public ArrayList<Object[]> performImport(Set<String> keySet, DBStrings dbs, List<String> listOfDBs)
             throws Exception {
-        ArrayList<Object[]> result = new ArrayList<>();
+        ArrayList<Object[]> result = new ArrayList<Object[]>();
         Connection conn = this.connectToDB(dbs);
 
         Iterator<String> itLista = listOfDBs.iterator();
@@ -101,7 +101,7 @@ public abstract class DBImporter extends DBImporterExporter {
         while (rsDatabase.next()) {
             BibtexDatabase database = new BibtexDatabase();
             // Find entry type IDs and their mappings to type names:
-            HashMap<String, BibtexEntryType> types = new HashMap<>();
+            HashMap<String, BibtexEntryType> types = new HashMap<String, BibtexEntryType>();
             ResultSet rsEntryType = SQLUtil.queryAllFromTable(conn,
                     "entry_types");
             while (rsEntryType.next()) {
@@ -111,7 +111,7 @@ public abstract class DBImporter extends DBImporterExporter {
             rsEntryType.getStatement().close();
 
             ResultSet rsColumns = this.readColumnNames(conn);
-            ArrayList<String> colNames = new ArrayList<>();
+            ArrayList<String> colNames = new ArrayList<String>();
             while (rsColumns.next()) {
                 if (!columnsNotConsideredForEntries.contains(rsColumns
                         .getString(1))) {
@@ -121,7 +121,7 @@ public abstract class DBImporter extends DBImporterExporter {
             rsColumns.getStatement().close();
             String database_id = rsDatabase.getString("database_id");
             // Read the entries and create BibtexEntry instances:
-            HashMap<String, BibtexEntry> entries = new HashMap<>();
+            HashMap<String, BibtexEntry> entries = new HashMap<String, BibtexEntry>();
             ResultSet rsEntries = SQLUtil.queryAllFromTable(conn,
                     "entries WHERE database_id= '" + database_id + "';");
             while (rsEntries.next()) {
@@ -191,8 +191,8 @@ public abstract class DBImporter extends DBImporterExporter {
     private void importGroupsTree(MetaData metaData,
                                   HashMap<String, BibtexEntry> entries, Connection conn,
                                   String database_id) throws SQLException {
-        HashMap<String, GroupTreeNode> groups = new HashMap<>();
-        LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();
+        HashMap<String, GroupTreeNode> groups = new HashMap<String, GroupTreeNode>();
+        LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<GroupTreeNode, String>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
 
         ResultSet rsGroups = SQLUtil.queryAllFromTable(conn,
@@ -202,16 +202,13 @@ public abstract class DBImporter extends DBImporterExporter {
             AbstractGroup group = null;
             String typeId = findGroupTypeName(
                     rsGroups.getString("group_types_id"), conn);
-            switch (typeId) {
-            case AllEntriesGroup.ID:
+            if (typeId.equals(AllEntriesGroup.ID)) {
                 // register the id of the root node:
                 groups.put(rsGroups.getString("groups_id"), rootNode);
-                break;
-            case ExplicitGroup.ID:
+            } else if (typeId.equals(ExplicitGroup.ID)) {
                 group = new ExplicitGroup(rsGroups.getString("label"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
-                break;
-            case KeywordGroup.ID:
+            } else if (typeId.equals(KeywordGroup.ID)) {
                 System.out.println("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new KeywordGroup(rsGroups.getString("label"),
@@ -220,8 +217,7 @@ public abstract class DBImporter extends DBImporterExporter {
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
-                break;
-            case SearchGroup.ID:
+            } else if (typeId.equals(SearchGroup.ID)) {
                 System.out.println("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
                 group = new SearchGroup(rsGroups.getString("label"),
@@ -229,7 +225,6 @@ public abstract class DBImporter extends DBImporterExporter {
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
                         GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
-                break;
             }
 
             if (group != null) {

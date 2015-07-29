@@ -60,7 +60,9 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             StringWriter sw = new StringWriter();
             try {
                 e.getEditorKit().write(sw, e.getDocument(), e.getSelectionStart(), e.getSelectionEnd());
-            } catch (IOException | BadLocationException e1) {
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (BadLocationException e1) {
                 e1.printStackTrace();
             }
 

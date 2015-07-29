@@ -211,7 +211,7 @@ public class PdfContentImporter extends ImportFormat {
 
     @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibtexEntry> res = new ArrayList<>(1);
+        final ArrayList<BibtexEntry> res = new ArrayList<BibtexEntry>(1);
 
         PDDocument document;
         try {

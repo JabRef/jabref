@@ -175,7 +175,13 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             manager.show(getName());
         }
         JMenuItem item = new JMenuItem(Globals.lang("OpenOffice/LibreOffice connection"), GUIGlobals.getImage("openoffice"));
-        item.addActionListener(event -> manager.show(getName()));
+        item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                manager.show(getName());
+            }
+        });
         return item;
     }
 
@@ -196,45 +202,89 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         };
         OpenOfficePanel.connect.addActionListener(al);
 
-        OpenOfficePanel.manualConnect.addActionListener(event -> connect(false));
+        OpenOfficePanel.manualConnect.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                connect(false);
+            }
+        });
         OpenOfficePanel.selectDocument.setToolTipText(Globals.lang("Select which open Writer document to work on"));
-        OpenOfficePanel.selectDocument.addActionListener(event -> {
-            try {
-                OpenOfficePanel.ooBase.selectDocument();
-                OpenOfficePanel.frame.output(Globals.lang("Connected to document") + ": " + OpenOfficePanel.ooBase.getCurrentDocumentTitle());
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, ex.getMessage(), Globals.lang("Error"),
-                        JOptionPane.ERROR_MESSAGE);
+        OpenOfficePanel.selectDocument.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    OpenOfficePanel.ooBase.selectDocument();
+                    OpenOfficePanel.frame.output(Globals.lang("Connected to document") + ": " + OpenOfficePanel.ooBase.getCurrentDocumentTitle());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, ex.getMessage(), Globals.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
-        OpenOfficePanel.setStyleFile.addActionListener(e -> {
-            if (styleDialog == null) {
-                styleDialog = new StyleSelectDialog(OpenOfficePanel.frame, OpenOfficePanel.styleFile);
-            }
-            styleDialog.setVisible(true);
-            if (styleDialog.isOkPressed()) {
-                OpenOfficePanel.useDefaultAuthoryearStyle = Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle");
-                OpenOfficePanel.useDefaultNumericalStyle = Globals.prefs.getBoolean("ooUseDefaultNumericalStyle");
-                OpenOfficePanel.styleFile = Globals.prefs.get("ooBibliographyStyleFile");
-                try {
-                    readStyleFile();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+        OpenOfficePanel.setStyleFile.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (styleDialog == null) {
+                    styleDialog = new StyleSelectDialog(OpenOfficePanel.frame, OpenOfficePanel.styleFile);
+                }
+                styleDialog.setVisible(true);
+                if (styleDialog.isOkPressed()) {
+                    OpenOfficePanel.useDefaultAuthoryearStyle = Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle");
+                    OpenOfficePanel.useDefaultNumericalStyle = Globals.prefs.getBoolean("ooUseDefaultNumericalStyle");
+                    OpenOfficePanel.styleFile = Globals.prefs.get("ooBibliographyStyleFile");
+                    try {
+                        readStyleFile();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });
 
         OpenOfficePanel.pushEntries.setToolTipText(Globals.lang("Cite selected entries"));
-        OpenOfficePanel.pushEntries.addActionListener(e -> pushEntries(true, true, false));
-        OpenOfficePanel.pushEntriesInt.setToolTipText(Globals.lang("Cite selected entries with in-text citation"));
-        OpenOfficePanel.pushEntriesInt.addActionListener(e -> pushEntries(false, true, false));
-        OpenOfficePanel.pushEntriesEmpty.setToolTipText(Globals.lang("Insert a citation without text (the entry will appear in the reference list)"));
-        OpenOfficePanel.pushEntriesEmpty.addActionListener(event -> pushEntries(false, false, false));
-        OpenOfficePanel.pushEntriesAdvanced.setToolTipText(Globals.lang("Cite selected entries with extra information"));
-        OpenOfficePanel.pushEntriesAdvanced.addActionListener(event -> pushEntries(false, true, true));
+        OpenOfficePanel.pushEntries.addActionListener(new ActionListener() {
 
-        OpenOfficePanel.focus.addActionListener(e -> OpenOfficePanel.ooBase.setFocus());
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pushEntries(true, true, false);
+            }
+        });
+        OpenOfficePanel.pushEntriesInt.setToolTipText(Globals.lang("Cite selected entries with in-text citation"));
+        OpenOfficePanel.pushEntriesInt.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pushEntries(false, true, false);
+            }
+        });
+        OpenOfficePanel.pushEntriesEmpty.setToolTipText(Globals.lang("Insert a citation without text (the entry will appear in the reference list)"));
+        OpenOfficePanel.pushEntriesEmpty.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                pushEntries(false, false, false);
+            }
+        });
+        OpenOfficePanel.pushEntriesAdvanced.setToolTipText(Globals.lang("Cite selected entries with extra information"));
+        OpenOfficePanel.pushEntriesAdvanced.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                pushEntries(false, true, true);
+            }
+        });
+
+        OpenOfficePanel.focus.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OpenOfficePanel.ooBase.setFocus();
+            }
+        });
         OpenOfficePanel.update.setToolTipText(Globals.lang("Ensure that the bibliography is up-to-date"));
         Action updateAction = new AbstractAction() {
 
@@ -281,55 +331,77 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         };
         OpenOfficePanel.update.addActionListener(updateAction);
 
-        OpenOfficePanel.insertFullRef.addActionListener(event -> {
-            try {
-                insertFullRefs();
-            } catch (Exception e1) {
-                e1.printStackTrace();
+        OpenOfficePanel.insertFullRef.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    insertFullRefs();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
         });
 
         OpenOfficePanel.merge.setToolTipText(Globals.lang("Combine pairs of citations that are separated by spaces only"));
-        OpenOfficePanel.merge.addActionListener(event -> {
-            try {
-                OpenOfficePanel.ooBase.combineCiteMarkers(getBaseList(), OpenOfficePanel.style);
-            } catch (UndefinedCharacterFormatException e) {
-                reportUndefinedCharacterFormat(e);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        OpenOfficePanel.merge.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    OpenOfficePanel.ooBase.combineCiteMarkers(getBaseList(), OpenOfficePanel.style);
+                } catch (UndefinedCharacterFormatException e) {
+                    reportUndefinedCharacterFormat(e);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
         });
 
-        OpenOfficePanel.settingsB.addActionListener(actionEvent -> showSettingsPopup());
+        OpenOfficePanel.settingsB.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                showSettingsPopup();
+            }
+        });
 
         OpenOfficePanel.help.addActionListener(new HelpAction(Globals.helpDiag, "OpenOfficeIntegration.html"));
 
-        OpenOfficePanel.manageCitations.addActionListener(event -> {
-            try {
-                CitationManager cm = new CitationManager(OpenOfficePanel.frame, OpenOfficePanel.ooBase);
-                cm.showDialog();
-            } catch (Exception e) {
-                e.printStackTrace();
+        OpenOfficePanel.manageCitations.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    CitationManager cm = new CitationManager(OpenOfficePanel.frame, OpenOfficePanel.ooBase);
+                    cm.showDialog();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
-        OpenOfficePanel.test.addActionListener(event -> {
-            try {
-                //pushEntries(false, true, true);
+        OpenOfficePanel.test.addActionListener(new ActionListener() {
 
-                //ooBase.testFrameHandling();
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    //pushEntries(false, true, true);
 
-                //ooBase.combineCiteMarkers(frame.basePanel().database(), style);
-                //insertUsingBST();
-                //ooBase.testFootnote();
-                //ooBase.refreshCiteMarkers(frame.basePanel().database(), style);
-                //ooBase.createBibTextSection(true);
-                //ooBase.clearBibTextSectionContent();
-            } catch (Exception e) {
-                e.printStackTrace();
+                    //ooBase.testFrameHandling();
+
+                    //ooBase.combineCiteMarkers(frame.basePanel().database(), style);
+                    //insertUsingBST();
+                    //ooBase.testFootnote();
+                    //ooBase.refreshCiteMarkers(frame.basePanel().database(), style);
+                    //ooBase.createBibTextSection(true);
+                    //ooBase.clearBibTextSectionContent();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
-
         });
 
         OpenOfficePanel.selectDocument.setEnabled(false);
@@ -392,7 +464,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private java.util.List<BibtexDatabase> getBaseList() {
-        java.util.List<BibtexDatabase> databases = new ArrayList<>();
+        java.util.List<BibtexDatabase> databases = new ArrayList<BibtexDatabase>();
         if (Globals.prefs.getBoolean("useAllOpenBases")) {
             for (int i = 0; i < OpenOfficePanel.frame.baseCount(); i++) {
                 databases.add(OpenOfficePanel.frame.baseAt(i).database());
@@ -579,7 +651,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private static final Class[] parameters = new Class[] {URL.class};
 
 
-    private static void addURL(URL... u) throws IOException {
+    private static void addURL(URL[] u) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
 
@@ -639,22 +711,36 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         JButton ok = new JButton(Globals.lang("Ok"));
         JButton cancel = new JButton(Globals.lang("Cancel"));
         //JButton auto = new JButton(Globals.lang("Autodetect"));
-        ActionListener tfListener = event -> {
-            updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText(),
-                    true);
-            diag.dispose();
+        ActionListener tfListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText(),
+                        true);
+                diag.dispose();
+            }
         };
 
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
-        ok.addActionListener(event -> {
-            updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText(),
-                    true);
-            dialogOkPressed = true;
-            diag.dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText(),
+                        true);
+                dialogOkPressed = true;
+                diag.dispose();
+            }
         });
-        cancel.addActionListener(event -> diag.dispose());
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                diag.dispose();
+            }
+        });
         bb.addGlue();
         bb.addRelatedGap();
         bb.addButton(ok);
@@ -736,10 +822,10 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
               */
             BasePanel panel = OpenOfficePanel.frame.basePanel();
             final BibtexDatabase database = panel.database();
-            Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<>();
+            Map<BibtexEntry, BibtexDatabase> entries = new LinkedHashMap<BibtexEntry, BibtexDatabase>();
             if (panel != null) {
                 BibtexEntry[] e = panel.getSelectedEntries();
-                ArrayList<BibtexEntry> el = new ArrayList<>();
+                ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
                 for (BibtexEntry anE : e) {
                     entries.put(anE, database);
                 }
@@ -776,7 +862,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             final BibtexDatabase database = panel.database();
             if (panel != null) {
                 BibtexEntry[] entries = panel.getSelectedEntries();
-                ArrayList<BibtexEntry> el = new ArrayList<>();
+                ArrayList<BibtexEntry> el = new ArrayList<BibtexEntry>();
                 Collections.addAll(el, entries);
 
                 BstWrapper wrapper = new BstWrapper();
@@ -815,17 +901,39 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(actionEvent -> Globals.prefs.putBoolean("syncOOWhenCiting", autoSync.isSelected()));
-        useAllBases.addActionListener(actionEvent -> Globals.prefs.putBoolean("useAllOpenBases", useAllBases.isSelected()));
-        useActiveBase.addActionListener(actionEvent -> Globals.prefs.putBoolean("useAllOpenBases", !useActiveBase.isSelected()));
-        clearConnectionSettings.addActionListener(actionEvent -> {
-            Globals.prefs.clear("ooPAth");
-            Globals.prefs.clear("ooExecutablePath");
-            Globals.prefs.clear("ooJarsPath");
-            Globals.prefs.clear("connectToOO3");
-            Globals.prefs.clear("ooUnoilPath");
-            Globals.prefs.clear("ooJurtPath");
-            OpenOfficePanel.frame.output(Globals.lang("Cleared connection settings."));
+        autoSync.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Globals.prefs.putBoolean("syncOOWhenCiting", autoSync.isSelected());
+            }
+        });
+        useAllBases.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Globals.prefs.putBoolean("useAllOpenBases", useAllBases.isSelected());
+            }
+        });
+        useActiveBase.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Globals.prefs.putBoolean("useAllOpenBases", !useActiveBase.isSelected());
+            }
+        });
+        clearConnectionSettings.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Globals.prefs.clear("ooPAth");
+                Globals.prefs.clear("ooExecutablePath");
+                Globals.prefs.clear("ooJarsPath");
+                Globals.prefs.clear("connectToOO3");
+                Globals.prefs.clear("ooUnoilPath");
+                Globals.prefs.clear("ooJurtPath");
+                OpenOfficePanel.frame.output(Globals.lang("Cleared connection settings."));
+            }
         });
 
         menu.add(autoSync);
@@ -837,7 +945,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         menu.show(OpenOfficePanel.settingsB, 0, OpenOfficePanel.settingsB.getHeight());
     }
 
-    private void pushEntries(boolean inParenthesis, BibtexEntry... entries) {
+    private void pushEntries(boolean inParenthesis, BibtexEntry[] entries) {
 
         final BibtexDatabase database = OpenOfficePanel.frame.basePanel().database();
         if (entries.length > 0) {

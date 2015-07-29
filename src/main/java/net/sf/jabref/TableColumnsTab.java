@@ -46,7 +46,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JTable colSetup;
     private int rowCount = -1;
     private int ncWidth = -1;
-    private final Vector<TableRow> tableRows = new Vector<>(10);
+    private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
     private final JabRefFrame frame;
 
     private final JCheckBox pdfColumn;
@@ -253,14 +253,24 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         preferUrlDoiGroup.add(preferUrl);
         preferUrlDoiGroup.add(preferDoi);
 
-        urlColumn.addChangeListener(arg0 -> {
-            preferUrl.setEnabled(urlColumn.isSelected());
-            preferDoi.setEnabled(urlColumn.isSelected());
+        urlColumn.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent arg0) {
+                preferUrl.setEnabled(urlColumn.isSelected());
+                preferDoi.setEnabled(urlColumn.isSelected());
+            }
         });
         arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
 
         extraFileColumns = new JCheckBox(Globals.lang("Show Extra columns"));
-        extraFileColumns.addChangeListener(arg0 -> listOfFileColumns.setEnabled(extraFileColumns.isSelected()));
+        extraFileColumns.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent arg0) {
+                listOfFileColumns.setEnabled(extraFileColumns.isSelected());
+            }
+        });
         ExternalFileType[] fileTypes = Globals.prefs.getExternalFileTypeSelection();
         String[] fileTypeNames = new String[fileTypes.length];
         for (int i = 0; i < fileTypes.length; i++) {
@@ -279,20 +289,30 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         specialFieldsEnabled = new JCheckBox(Globals.lang("Enable special fields"));
         //		.concat(". ").concat(Globals.lang("You must restart JabRef for this to come into effect.")));
-        specialFieldsEnabled.addChangeListener(event -> {
-            boolean isEnabled = specialFieldsEnabled.isSelected();
-            rankingColumn.setEnabled(isEnabled);
-            compactRankingColumn.setEnabled(isEnabled && rankingColumn.isSelected());
-            qualityColumn.setEnabled(isEnabled);
-            priorityColumn.setEnabled(isEnabled);
-            relevanceColumn.setEnabled(isEnabled);
-            printedColumn.setEnabled(isEnabled);
-            readStatusColumn.setEnabled(isEnabled);
-            syncKeywords.setEnabled(isEnabled);
-            writeSpecialFields.setEnabled(isEnabled);
+        specialFieldsEnabled.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                boolean isEnabled = specialFieldsEnabled.isSelected();
+                rankingColumn.setEnabled(isEnabled);
+                compactRankingColumn.setEnabled(isEnabled && rankingColumn.isSelected());
+                qualityColumn.setEnabled(isEnabled);
+                priorityColumn.setEnabled(isEnabled);
+                relevanceColumn.setEnabled(isEnabled);
+                printedColumn.setEnabled(isEnabled);
+                readStatusColumn.setEnabled(isEnabled);
+                syncKeywords.setEnabled(isEnabled);
+                writeSpecialFields.setEnabled(isEnabled);
+            }
         });
         rankingColumn = new JCheckBox(Globals.lang("Show rank"));
-        rankingColumn.addChangeListener(event -> compactRankingColumn.setEnabled(rankingColumn.isSelected()));
+        rankingColumn.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                compactRankingColumn.setEnabled(rankingColumn.isSelected());
+            }
+        });
         compactRankingColumn = new JCheckBox(Globals.lang("Compact rank"));
         qualityColumn = new JCheckBox(Globals.lang("Show quality"));
         priorityColumn = new JCheckBox(Globals.lang("Show priority"));
@@ -615,7 +635,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
             // idea: sort elements according to value stored in hash, keep
             // everything not inside hash/mainTable as it was
-            final HashMap<String, Integer> map = new HashMap<>();
+            final HashMap<String, Integer> map = new HashMap<String, Integer>();
 
             // first element (#) not inside tableRows
             for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
@@ -624,13 +644,17 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     map.put(name.toLowerCase(), i);
                 }
             }
-            Collections.sort(tableRows, (o1, o2) -> {
-                Integer n1 = map.get(o1.name);
-                Integer n2 = map.get(o2.name);
-                if (n1 == null || n2 == null) {
-                    return 0;
+            Collections.sort(tableRows, new Comparator<TableRow>() {
+
+                @Override
+                public int compare(TableRow o1, TableRow o2) {
+                    Integer n1 = map.get(o1.name);
+                    Integer n2 = map.get(o2.name);
+                    if (n1 == null || n2 == null) {
+                        return 0;
+                    }
+                    return n1.compareTo(n2);
                 }
-                return n1.compareTo(n2);
             });
 
             colSetup.revalidate();
@@ -706,7 +730,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
         }
         else {
-            _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
+            _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[] {});
         }
 
         _prefs.putBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, showOneLetterHeadingForIconColumns.isSelected());

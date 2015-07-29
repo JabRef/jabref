@@ -205,10 +205,16 @@ public class TextInputDialog
 
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.addChangeListener(
-                e -> {
-                    if (inputChanged)
+                new ChangeListener()
+                {
+
+                    @Override
+                    public void stateChanged(ChangeEvent e)
                     {
-                        warnPanel.updateView(entry);
+                        if (inputChanged)
+                        {
+                            warnPanel.updateView(entry);
+                        }
                     }
                 });
 
@@ -608,7 +614,7 @@ public class TextInputDialog
     // ---------------------------------------------------------------------------
     private String[] getAllFields()
     {
-        ArrayList<String> f = new ArrayList<>();
+        ArrayList<String> f = new ArrayList<String>();
         String[] req = entry.getRequiredFields();
         String[] opt = entry.getOptionalFields();
         String[] allFields = BibtexFields.getAllFieldNames();

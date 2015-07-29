@@ -49,7 +49,7 @@ class EntryEditorTab {
 
     private final EntryEditor parent;
 
-    private final HashMap<String, FieldEditor> editors = new HashMap<>();
+    private final HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
     private FieldEditor activeField = null;
 
@@ -373,12 +373,12 @@ class EntryEditorTab {
         am.put("prevtab", parent.frame.prevTab);
 
         try {
-            HashSet<AWTKeyStroke> keys = new HashSet<>(component
+            HashSet<AWTKeyStroke> keys = new HashSet<AWTKeyStroke>(component
                     .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.clear();
             keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
             component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-            keys = new HashSet<>(component
+            keys = new HashSet<AWTKeyStroke>(component
                     .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.clear();
             keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));

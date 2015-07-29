@@ -86,10 +86,14 @@ public class BibtexKeyPatternDialog extends JDialog {
         getContentPane().setPreferredSize(new Dimension(500, 600));
         pack();
 
-        ok.addActionListener(e -> {
-            metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
-            panel.markNonUndoableBaseChanged();
-            dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                metaData.setLabelPattern(labelPatternPanel.getLabelPattern());
+                panel.markNonUndoableBaseChanged();
+                dispose();
+            }
         });
 
         final JDialog dialog = this;

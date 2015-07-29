@@ -25,7 +25,7 @@ import net.sf.jabref.OutputPrinter;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
-    private final List<BibtexEntry> entries = new LinkedList<>();
+    private final List<BibtexEntry> entries = new LinkedList<BibtexEntry>();
 
 
     @Override

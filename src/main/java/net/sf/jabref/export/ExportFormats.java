@@ -36,7 +36,7 @@ import net.sf.jabref.*;
  */
 public class ExportFormats {
 
-    private static final Map<String, IExportFormat> exportFormats = new TreeMap<>();
+    private static final Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
 
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber = 0;
@@ -192,7 +192,7 @@ public class ExportFormats {
                     Set<String> entryIds = null;
                     if (selectedOnly) {
                         BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
-                        entryIds = new HashSet<>();
+                        entryIds = new HashSet<String>();
                         for (BibtexEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
                         }
@@ -268,7 +268,7 @@ public class ExportFormats {
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<FileFilter> filters = new TreeSet<>();
+        TreeSet<FileFilter> filters = new TreeSet<FileFilter>();
         for (Map.Entry<String, IExportFormat> e : ExportFormats.exportFormats.entrySet()) {
             String formatName = e.getKey();
             IExportFormat format = e.getValue();

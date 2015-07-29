@@ -75,12 +75,12 @@ class BstWrapper {
 
 
     private Map<String, String> parseResult(String result) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<String, String>();
         // Look through for instances of \bibitem :
         Matcher m = BstWrapper.bibitemTag.matcher(result);
-        ArrayList<Integer> indices = new ArrayList<>();
-        ArrayList<Integer> endIndices = new ArrayList<>();
-        ArrayList<String> keys = new ArrayList<>();
+        ArrayList<Integer> indices = new ArrayList<Integer>();
+        ArrayList<Integer> endIndices = new ArrayList<Integer>();
+        ArrayList<String> keys = new ArrayList<String>();
         while (m.find()) {
             if (!indices.isEmpty()) {
                 endIndices.add(m.start());

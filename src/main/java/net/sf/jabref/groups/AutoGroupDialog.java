@@ -110,13 +110,13 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     }
                 }
                 else if (authors.isSelected()) {
-                    List<String> fields = new ArrayList<>(2);
+                    List<String> fields = new ArrayList<String>(2);
                     fields.add("author");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
                     field = "author";
                 }
                 else if (editors.isSelected()) {
-                    List<String> fields = new ArrayList<>(2);
+                    List<String> fields = new ArrayList<String>(2);
                     fields.add("editor");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
                     field = "editor";

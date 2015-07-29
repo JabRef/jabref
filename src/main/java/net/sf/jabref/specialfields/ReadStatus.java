@@ -30,7 +30,7 @@ public class ReadStatus extends SpecialField {
 
 
     private ReadStatus() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Globals.lang("Clear read status"), null, Globals.lang("No read status information")));
         ImageIcon icon;
         icon = GUIGlobals.getImage("readStatusRead");

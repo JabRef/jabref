@@ -448,7 +448,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PushToApplicationButton pushExternalButton;
 
-    private final List<Action> fetcherActions = new LinkedList<>();
+    private final List<Action> fetcherActions = new LinkedList<Action>();
 
     private SearchManager2 searchManager;
 
@@ -605,25 +605,29 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * correct database when the user switches tabs. Without this,
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
-        tabbedPane.addChangeListener(e -> {
-            markActiveBasePanel();
+        tabbedPane.addChangeListener(new ChangeListener() {
 
-            BasePanel bp = basePanel();
-            if (bp != null) {
-                groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
-                previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
-                highlightAny
-                        .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
-                highlightAll
-                        .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
-                Globals.focusListener.setFocused(bp.mainTable);
-                setWindowTitle();
-                // Update search autocompleter with information for the correct database:
-                bp.updateSearchManager();
-                // Set correct enabled state for Back and Forward actions:
-                bp.setBackAndForwardEnabledState();
-                new FocusRequester(bp.mainTable);
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                markActiveBasePanel();
+
+                BasePanel bp = basePanel();
+                if (bp != null) {
+                    groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+                    searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
+                    previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
+                    highlightAny
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
+                    highlightAll
+                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
+                    Globals.focusListener.setFocused(bp.mainTable);
+                    setWindowTitle();
+                    // Update search autocompleter with information for the correct database:
+                    bp.updateSearchManager();
+                    // Set correct enabled state for Back and Forward actions:
+                    bp.setBackAndForwardEnabledState();
+                    new FocusRequester(bp.mainTable);
+                }
             }
         });
 
@@ -692,7 +696,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
             final File theFile = new File(filePath);
-            JabRefExecutorService.INSTANCE.execute(() -> open.openIt(theFile, true));
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    open.openIt(theFile, true);
+                }
+            });
         }
     }
 
@@ -710,13 +720,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             jp.setPage(GUIGlobals.class.getResource("/help/About.html"));//GUIGlobals.aboutPage);
             // We need a hyperlink listener to be able to switch to the license
             // terms and back.
-            jp.addHyperlinkListener(e -> {
-                if (e.getEventType()
-                == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        ((JEditorPane) e.getSource()).setPage(e.getURL());
-                    }
-                    catch (IOException ignored) {
+            jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+
+                @Override
+                public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {
+                    if (e.getEventType()
+                    == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
+                        try {
+                            ((JEditorPane) e.getSource()).setPage(e.getURL());
+                        }
+                        catch (IOException ignored) {
+                        }
                     }
                 }
             });
@@ -859,7 +873,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Ask here if the user really wants to close, if the base
         // has not been saved since last save.
         boolean close = true;
-        Vector<String> filenames = new Vector<>();
+        Vector<String> filenames = new Vector<String>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).isBaseChanged()) {
@@ -1540,7 +1554,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
             } else {
-                List<BibtexEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
+                List<BibtexEntry> entries = new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, "", false);
             }
         } else {
@@ -1670,9 +1684,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public void output(final String s) {
-        SwingUtilities.invokeLater(() -> {
-            statusLine.setText(s);
-            statusLine.repaint();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                statusLine.setText(s);
+                statusLine.repaint();
+            }
         });
     }
 
@@ -1683,12 +1701,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    private List<Object> openDatabaseOnlyActions = new LinkedList<>();
-    private List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+    private List<Object> openDatabaseOnlyActions = new LinkedList<Object>();
+    private List<Object> severalDatabasesOnlyActions = new LinkedList<Object>();
 
 
     private void initActions() {
-        openDatabaseOnlyActions = new LinkedList<>();
+        openDatabaseOnlyActions = new LinkedList<Object>();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
                 mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
@@ -1708,11 +1726,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
-        severalDatabasesOnlyActions = new LinkedList<>();
+        severalDatabasesOnlyActions = new LinkedList<Object>();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
-        tabbedPane.addChangeListener(event -> updateEnabledState());
+        tabbedPane.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                updateEnabledState();
+            }
+        });
 
     }
 
@@ -1840,7 +1864,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             KeyBindingsDialog d = new KeyBindingsDialog
-                    (new HashMap<>(prefs.getKeyBindings()),
+                    (new HashMap<String, String>(prefs.getKeyBindings()),
                             prefs.getDefaultKeys());
             d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
@@ -2079,25 +2103,35 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          */
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
                 (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || entries.size() > 1)) {
-            SwingUtilities.invokeLater(() -> {
-                ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
-                        panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Globals.lang("Import"),
-                        openInNew);
-                diag.addEntries(entries);
-                diag.entryListComplete();
-                // On the one hand, the following statement could help at issues when JabRef is minimized to the systray
-                // On the other hand, users might dislake modality and this is not required to let the GUI work.
-                // Therefore, it is disabled.
-                // diag.setModal(true);
-                Util.placeDialog(diag, JabRefFrame.this);
-                diag.setVisible(true);
-                diag.toFront();
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
+                            panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Globals.lang("Import"),
+                            openInNew);
+                    diag.addEntries(entries);
+                    diag.entryListComplete();
+                    // On the one hand, the following statement could help at issues when JabRef is minimized to the systray
+                    // On the other hand, users might dislake modality and this is not required to let the GUI work.
+                    // Therefore, it is disabled.
+                    // diag.setModal(true);
+                    Util.placeDialog(diag, JabRefFrame.this);
+                    diag.setVisible(true);
+                    diag.toFront();
+                }
             });
 
         } else {
             JabRefFrame.this.addBibEntries(entries, filename, openInNew);
             if (panel != null && entries.size() == 1) {
-                SwingUtilities.invokeLater(() -> panel.highlightEntry(entries.get(0)));
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        panel.highlightEntry(entries.get(0));
+                    }
+                });
             }
         }
     }
@@ -2298,7 +2332,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setVisible(visible);
         } else {
-            SwingUtilities.invokeLater(() -> progressBar.setVisible(visible));
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    progressBar.setVisible(visible);
+                }
+            });
         }
     }
 
@@ -2312,7 +2352,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setValue(value);
         } else {
-            SwingUtilities.invokeLater(() -> progressBar.setValue(value));
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    progressBar.setValue(value);
+                }
+            });
         }
 
     }
@@ -2327,7 +2373,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setIndeterminate(value);
         } else {
-            SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    progressBar.setIndeterminate(value);
+                }
+            });
         }
 
     }
@@ -2344,7 +2396,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setMaximum(value);
         } else {
-            SwingUtilities.invokeLater(() -> progressBar.setMaximum(value));
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    progressBar.setMaximum(value);
+                }
+            });
         }
 
     }
@@ -2364,7 +2422,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
             // previously stored file name.
-            Vector<String> filenames = new Vector<>();
+            Vector<String> filenames = new Vector<String>();
             if (tabbedPane.getTabCount() > 0) {
                 for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                     if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
@@ -2427,30 +2485,34 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             output(Globals.lang("Loading session..."));
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                HashSet<String> currentFiles = new HashSet<>();
-                if (tabbedPane.getTabCount() > 0) {
-                    for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                        if (baseAt(i).getFile() != null) {
-                            currentFiles.add(baseAt(i).getFile().getPath());
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    HashSet<String> currentFiles = new HashSet<String>();
+                    if (tabbedPane.getTabCount() > 0) {
+                        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                            if (baseAt(i).getFile() != null) {
+                                currentFiles.add(baseAt(i).getFile().getPath());
+                            }
                         }
                     }
-                }
-                int i0 = tabbedPane.getTabCount();
-                String[] names = prefs.getStringArray("savedSession");
-                for (int i = 0; i < names.length; i++) {
-                    if (!currentFiles.contains(names[i])) {
-                        File file = new File(names[i]);
-                        if (file.exists()) {
-                            //Util.pr("Opening last edited file:"
-                            //+fileToOpen.getName());
-                            open.openIt(file, i == 0);
+                    int i0 = tabbedPane.getTabCount();
+                    String[] names = prefs.getStringArray("savedSession");
+                    for (int i = 0; i < names.length; i++) {
+                        if (!currentFiles.contains(names[i])) {
+                            File file = new File(names[i]);
+                            if (file.exists()) {
+                                //Util.pr("Opening last edited file:"
+                                //+fileToOpen.getName());
+                                open.openIt(file, i == 0);
+                            }
                         }
                     }
+                    output(Globals.lang("Files opened") + ": " +
+                            (tabbedPane.getTabCount() - i0));
+                    running = false;
                 }
-                output(Globals.lang("Files opened") + ": " +
-                        (tabbedPane.getTabCount() - i0));
-                running = false;
             });
 
         }
@@ -2671,9 +2733,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (sysTray == null) {
                 sysTray = new SysTray(JabRefFrame.this);
             }
-            SwingUtilities.invokeLater(() -> {
-                sysTray.show();
-                JabRefFrame.this.setVisible(false);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    sysTray.show();
+                    JabRefFrame.this.setVisible(false);
+                }
             });
         }
     }

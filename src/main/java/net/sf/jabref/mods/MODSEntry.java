@@ -68,8 +68,8 @@ class MODSEntry {
 
 
     private MODSEntry() {
-        extensionFields = new HashMap<>();
-        handledExtensions = new HashSet<>();
+        extensionFields = new HashMap<String, String>();
+        handledExtensions = new HashSet<String>();
 
     }
 
@@ -148,7 +148,7 @@ class MODSEntry {
     }
 
     private List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new LinkedList<>();
+        List<PersonName> result = new LinkedList<PersonName>();
         LayoutFormatter chars = new XMLChars();
 
         if (!authors.contains(" and ")) {
@@ -327,7 +327,7 @@ class MODSEntry {
      * @return The in String, stripped of non-valid characters.
      */
     private String stripNonValidXMLCharacters(String in) {
-        StringBuilder out = new StringBuilder(); // Used to hold the output.
+        StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
         if (in == null || in != null && in.isEmpty())

@@ -55,7 +55,7 @@ public class BibtexNameFormatter {
      */
     public static String formatName(Author author, String format, Warn warn) {
 
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
 
         char[] c = format.toCharArray();
         int n = c.length;
@@ -69,8 +69,8 @@ public class BibtexNameFormatter {
                 int groupStart = sb.length();
                 i++;
                 braceLevel++;
-                StringBuilder level1Chars = new StringBuilder();
-                StringBuilder wholeChar = new StringBuilder();
+                StringBuffer level1Chars = new StringBuffer();
+                StringBuffer wholeChar = new StringBuffer();
                 while ((i < n) && (braceLevel > 0)) {
                     wholeChar.append(c[i]);
                     if (c[i] == '{') {
@@ -177,7 +177,7 @@ public class BibtexNameFormatter {
                             if (abbreviateThatIsSingleLetter) {
                                 String[] dashes = token.split("-");
 
-                                StringBuilder abbToken = new StringBuilder();
+                                StringBuffer abbToken = new StringBuffer();
                                 for (int t = 0; t < (dashes.length - 1); t++) {
                                     abbToken.append(BibtexNameFormatter.getFirstCharOfString(dashes[t])).append(".-");
                                 }

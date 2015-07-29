@@ -86,7 +86,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private boolean cancelled;
 
-    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
+    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
@@ -116,7 +116,13 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         ButtonGroup group = new ButtonGroup();
         group.add(intersectKeywords);
         group.add(mergeKeywords);
-        ActionListener stateChanged = arg0 -> fillKeyWordList();
+        ActionListener stateChanged = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                fillKeyWordList();
+            }
+        };
         intersectKeywords.addActionListener(stateChanged);
         mergeKeywords.addActionListener(stateChanged);
         intersectKeywords.setSelected(true);
@@ -143,9 +149,13 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ok.addActionListener(e -> {
-            cancelled = false;
-            diag.dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancelled = false;
+                diag.dispose();
+            }
         });
 
         AbstractAction cancelAction = new AbstractAction() {
@@ -158,41 +168,49 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         };
         cancel.addActionListener(cancelAction);
 
-        final ActionListener addActionListener = arg0 -> {
-            String text = keyword.getText().trim();
-            if (text.isEmpty()) {
-                // no text to add, do nothing
-                return;
-            }
-            if (keywordListModel.isEmpty()) {
-                keywordListModel.addElement(text);
-            } else {
-                int idx = 0;
-                String element = (String) keywordListModel.getElementAt(idx);
-                while (idx < keywordListModel.size() &&
-                        element.compareTo(text) < 0) {
-                    idx++;
+        final ActionListener addActionListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                String text = keyword.getText().trim();
+                if (text.isEmpty()) {
+                    // no text to add, do nothing
+                    return;
                 }
-                if (idx == keywordListModel.size()) {
-                    // list is empty or word is greater than last word in list
+                if (keywordListModel.isEmpty()) {
                     keywordListModel.addElement(text);
-                } else if (element.compareTo(text) == 0) {
-                    // nothing to do, word already in table
                 } else {
-                    keywordListModel.add(idx, text);
+                    int idx = 0;
+                    String element = (String) keywordListModel.getElementAt(idx);
+                    while (idx < keywordListModel.size() &&
+                            element.compareTo(text) < 0) {
+                        idx++;
+                    }
+                    if (idx == keywordListModel.size()) {
+                        // list is empty or word is greater than last word in list
+                        keywordListModel.addElement(text);
+                    } else if (element.compareTo(text) == 0) {
+                        // nothing to do, word already in table
+                    } else {
+                        keywordListModel.add(idx, text);
+                    }
                 }
+                keyword.setText(null);
+                keyword.requestFocusInWindow();
             }
-            keyword.setText(null);
-            keyword.requestFocusInWindow();
         };
         add.addActionListener(addActionListener);
 
-        final ActionListener removeActionListenter = arg0 -> {
-            // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-            String[] values = (String[]) keywordList.getSelectedValues();
+        final ActionListener removeActionListenter = new ActionListener() {
 
-            for (String val : values) {
-                keywordListModel.removeElement(val);
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
+                String[] values = (String[]) keywordList.getSelectedValues();
+
+                for (String val : values) {
+                    keywordListModel.removeElement(val);
+                }
             }
         };
         remove.addActionListener(removeActionListenter);
@@ -274,8 +292,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        HashSet<String> keywordsToAdd = new HashSet<>();
-        HashSet<String> userSelectedKeywords = new HashSet<>();
+        HashSet<String> keywordsToAdd = new HashSet<String>();
+        HashSet<String> userSelectedKeywords = new HashSet<String>();
         // build keywordsToAdd and userSelectedKeywords in parallel
         for (Enumeration keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
             String keyword = (String) keywords.nextElement();
@@ -285,7 +303,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         }
 
-        HashSet<String> keywordsToRemove = new HashSet<>();
+        HashSet<String> keywordsToRemove = new HashSet<String>();
         for (String keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
             if (!userSelectedKeywords.contains(keyword)) {
                 keywordsToRemove.add(keyword);
@@ -358,7 +376,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             // we "intercept" with a treeset
             // pro: no duplicates
             // possible con: alphabetical sorting of the keywords
-            TreeSet<String> keywords = new TreeSet<>();
+            TreeSet<String> keywords = new TreeSet<String>();
             keywords.addAll(separatedKeywords);
 
             // update keywords

@@ -84,7 +84,7 @@ public class SixpackImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        HashMap<String, String> fI = new HashMap<>();
+        HashMap<String, String> fI = new HashMap<String, String>();
         fI.put("id", "bibtexkey");
         fI.put("au", "author");
         fI.put("ti", "title");
@@ -113,7 +113,7 @@ public class SixpackImporter extends ImportFormat {
         fI.put("cr", "crossref");
         fI.put("fi", "file");
 
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         in.readLine();
         String ln = in.readLine();
@@ -156,30 +156,23 @@ public class SixpackImporter extends ImportFormat {
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);
                     if (fld != null) {
-                        switch (fld) {
-                        case "author":
-                        case "editor":
+                        if (fld.equals("author") || fld.equals("editor")) {
                             ImportFormatReader.setIfNecessary(entry,
                                     fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
                                             " and "));
-                            break;
-                        case "pages":
+                        } else if (fld.equals("pages")) {
                             ImportFormatReader.setIfNecessary(entry, fld, fields[i]
                                     .replaceAll("-", "--"));
-                            break;
-                        case "file":
+                        } else if (fld.equals("file")) {
                             String fieldName = "pdf"; // We set pdf as default.
-
                             if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz")) {
                                 fieldName = "ps";
                             } else if (fields[i].endsWith("html")) {
                                 fieldName = "url";
                             }
                             ImportFormatReader.setIfNecessary(entry, fieldName, fields[i]);
-                            break;
-                        default:
+                        } else {
                             ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
-                            break;
                         }
                     }
                 }

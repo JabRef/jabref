@@ -46,7 +46,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
     private String name = null;
-    private final SortedSet<String> journals = new TreeSet<>();
+    private final SortedSet<String> journals = new TreeSet<String>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
@@ -54,10 +54,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private Layout defaultBibLayout;
 
     // reference layout mapped from entry type number:
-    private final HashMap<String, Layout> bibLayout = new HashMap<>();
+    private final HashMap<String, Layout> bibLayout = new HashMap<String, Layout>();
 
-    private final HashMap<String, Object> properties = new HashMap<>();
-    private final HashMap<String, Object> citProperties = new HashMap<>();
+    private final HashMap<String, Object> properties = new HashMap<String, Object>();
+    private final HashMap<String, Object> citProperties = new HashMap<String, Object>();
 
     private final Pattern numPattern = Pattern.compile("-?\\d+");
 
@@ -187,7 +187,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private void readFormatFile(Reader in) throws IOException {
 
         // First read all the contents of the file:
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         int c;
         while ((c = in.read()) != -1) {
             sb.append((char) c);
@@ -206,20 +206,19 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 continue;
             }
             // Check if we should change mode:
-            switch (line) {
-            case OOBibStyle.NAME_MARK:
+            if (line.equals(OOBibStyle.NAME_MARK)) {
                 mode = OOBibStyle.NAME;
                 continue;
-            case OOBibStyle.LAYOUT_MRK:
+            } else if (line.equals(OOBibStyle.LAYOUT_MRK)) {
                 mode = OOBibStyle.LAYOUT;
                 continue;
-            case OOBibStyle.PROPERTIES_MARK:
+            } else if (line.equals(OOBibStyle.PROPERTIES_MARK)) {
                 mode = OOBibStyle.PROPERTIES;
                 continue;
-            case OOBibStyle.CITATION_MARK:
+            } else if (line.equals(OOBibStyle.CITATION_MARK)) {
                 mode = OOBibStyle.CITATION;
                 continue;
-            case OOBibStyle.JOURNALS_MARK:
+            } else if (line.equals(OOBibStyle.JOURNALS_MARK)) {
                 mode = OOBibStyle.JOURNALS;
                 continue;
             }
@@ -434,7 +433,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     public String getCitationMarker(BibtexEntry entry, BibtexDatabase database, boolean inParenthesis,
             String uniquefier, int unlimAuthors) {
         return getCitationMarker(new BibtexEntry[] {entry}, database, inParenthesis, new String[] {uniquefier},
-                unlimAuthors);
+                new int[] {unlimAuthors});
     }
 
     /**
@@ -451,7 +450,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The formatted citation.
      */
     public String getCitationMarker(BibtexEntry[] entries, BibtexDatabase database, boolean inParenthesis,
-            String[] uniquefiers, int... unlimAuthors) {
+            String[] uniquefiers, int[] unlimAuthors) {
 
         // Look for groups of uniquefied entries that should be combined in the output.
         // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
@@ -604,9 +603,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                                                   int maxA, String authorSep,
                                                   String andString, String etAlString, String yearSep,
                                                   String startBrace, String endBrace, String citationSeparator,
-                                                  String[] uniquifiers, int... unlimAuthors) {
+                                                  String[] uniquifiers, int[] unlimAuthors) {
 
-        StringBuilder sb = new StringBuilder(startBrace);
+        StringBuffer sb = new StringBuffer(startBrace);
         for (int j = 0; j < entries.length; j++) {
 
             int unlimA = unlimAuthors != null ? unlimAuthors[j] : -1;
@@ -677,8 +676,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                                              String yearField, int maxA, String authorSep,
                                              String andString, String etAlString, String yearSep,
                                              String startBrace, String endBrace, String citationSeparator,
-                                             String[] uniquefiers, int... unlimAuthors) {
-        StringBuilder sb = new StringBuilder();
+                                             String[] uniquefiers, int[] unlimAuthors) {
+        StringBuffer sb = new StringBuffer();
         for (int i = 0; i < entries.length; i++) {
 
             int unlimA = unlimAuthors != null ? unlimAuthors[i] : -1;

@@ -26,11 +26,11 @@ import java.util.*;
  */
 public class JournalAbbreviationRepository {
 
-    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
-    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
-    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
+    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
+    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
+    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
 
-    private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
+    private final SortedSet<Abbreviation> abbreviations = new TreeSet<Abbreviation>();
 
     public void readJournalListFromResource(String resource) {
         AbbreviationParser parser = new AbbreviationParser();

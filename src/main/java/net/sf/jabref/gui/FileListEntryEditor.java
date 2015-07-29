@@ -154,7 +154,13 @@ public class FileListEntryEditor {
         link.addActionListener(okAction);
         description.addActionListener(okAction);
 
-        open.addActionListener(actionEvent -> openFile());
+        open.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                openFile();
+            }
+        });
 
         AbstractAction cancelAction = new AbstractAction() {
 
@@ -200,7 +206,13 @@ public class FileListEntryEditor {
             public void windowActivated(WindowEvent event) {
                 if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
                     dontOpenBrowseUntilDisposed = true;
-                    SwingUtilities.invokeLater(() -> browse.actionPerformed(new ActionEvent(browseBut, 0, "")));
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            browse.actionPerformed(new ActionEvent(browseBut, 0, ""));
+                        }
+                    });
                 }
             }
 

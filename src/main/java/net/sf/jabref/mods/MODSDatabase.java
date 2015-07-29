@@ -39,7 +39,7 @@ public class MODSDatabase {
 
     public MODSDatabase() {
         // maybe make this sorted later...
-        entries = new HashSet<>();
+        entries = new HashSet<MODSEntry>();
     }
 
     public MODSDatabase(BibtexDatabase bibtex) {
@@ -54,7 +54,7 @@ public class MODSDatabase {
     }
 
     private void addEntries(BibtexDatabase database, Set<String> keySet) {
-        entries = new HashSet<>();
+        entries = new HashSet<MODSEntry>();
         for (String aKeySet : keySet) {
             BibtexEntry entry = database.getEntryById(aKeySet);
             MODSEntry newMods = new MODSEntry(entry);

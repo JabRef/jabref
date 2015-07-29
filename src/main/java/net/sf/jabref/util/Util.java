@@ -262,7 +262,7 @@ public class Util {
 
     public static TreeSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field,
             String deliminator) {
-        TreeSet<String> res = new TreeSet<>();
+        TreeSet<String> res = new TreeSet<String>();
 
         for (String s : db.getKeySet()) {
             BibtexEntry be = db.getEntryById(s);
@@ -291,7 +291,7 @@ public class Util {
      * @return a <code>HashSet</code> value
      */
     public static TreeSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
-        TreeSet<String> res = new TreeSet<>();
+        TreeSet<String> res = new TreeSet<String>();
         StringTokenizer tok;
         for (String s : db.getKeySet()) {
             BibtexEntry be = db.getEntryById(s);
@@ -313,7 +313,7 @@ public class Util {
      * @return a set containing the names.
      */
     public static Set<String> findAuthorLastNames(BibtexDatabase db, List<String> fields) {
-        Set<String> res = new TreeSet<>();
+        Set<String> res = new TreeSet<String>();
         for (String s : db.getKeySet()) {
             BibtexEntry be = db.getEntryById(s);
             for (String field : fields) {
@@ -341,9 +341,7 @@ public class Util {
     public static void openExternalViewer(MetaData metaData, String link, String fieldName)
             throws IOException {
 
-        switch (fieldName) {
-        case "ps":
-        case "pdf":
+        if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
             // Find the default directory for this field type:
             String[] dir = metaData.getFileDirectory(fieldName);
@@ -368,15 +366,13 @@ public class Util {
                 }
             }
 
-            break;
-        case "doi":
+        } else if (fieldName.equals("doi")) {
             fieldName = "url";
 
             // sanitizing is done below at the treatment of "URL"
             // in sanatizeUrl a doi-link is correctly treated
 
-            break;
-        case "eprint":
+        } else if (fieldName.equals("eprint")) {
             fieldName = "url";
 
             link = Util.sanitizeUrl(link);
@@ -385,19 +381,16 @@ public class Util {
             if (!link.startsWith("http://")) {
                 link = ARXIV_LOOKUP_PREFIX + link;
             }
-            break;
         }
 
-        switch (fieldName) {
-        case "url":  // html
+        if (fieldName.equals("url")) { // html
             try {
                 Util.openBrowser(link);
             } catch (IOException e) {
                 System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
                 e.printStackTrace();
             }
-            break;
-        case "ps":
+        } else if (fieldName.equals("ps")) {
             try {
                 if (Globals.ON_MAC) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
@@ -423,8 +416,7 @@ public class Util {
                 System.err.println("An error occured on the command: "
                         + Globals.prefs.get("psviewer") + " " + link);
             }
-            break;
-        case "pdf":
+        } else if (fieldName.equals("pdf")) {
             try {
                 if (Globals.ON_MAC) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
@@ -439,9 +431,9 @@ public class Util {
                      * (i > 0) sb.append("\\"); if (spl[i].indexOf(" ") >= 0)
                      * spl[i] = "\"" + spl[i] + "\""; sb.append(spl[i]); }
                      * //pr(sb.toString()); link = sb.toString();
-                     *
+                     * 
                      * String cmd = "cmd.exe /c start " + link;
-                     *
+                     * 
                      * Process child = Runtime.getRuntime().exec(cmd);
                      */
                 } else {
@@ -460,11 +452,9 @@ public class Util {
                         + Globals.prefs.get("pdfviewer") + " #" + link);
                 System.err.println(e.getMessage());
             }
-            break;
-        default:
+        } else {
             System.err
                     .println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
-            break;
         }
     }
 
@@ -615,15 +605,21 @@ public class Util {
             System.out.println("Downloading to '" + temp.getPath() + "'");
             new URLDownload(new URL(link)).downloadToFile(temp);
             System.out.println("Done");
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         final String ln = temp.getPath();
-        SwingUtilities.invokeLater(() -> {
-            try {
-                Util.openExternalFileAnyFormat(metaData, ln, fileType);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    Util.openExternalFileAnyFormat(metaData, ln, fileType);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }
@@ -650,7 +646,7 @@ public class Util {
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<>();
+                List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
                 ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
                 Collections.addAll(fileTypes, oldTypes);
                 fileTypes.add(newType);
@@ -759,7 +755,7 @@ public class Util {
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
-        ArrayList<String[]> result = new ArrayList<>();
+        ArrayList<String[]> result = new ArrayList<String[]>();
 
         char[] c = calls.toCharArray();
 
@@ -981,7 +977,7 @@ public class Util {
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String... fields) {
+    public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
         return Util.upgradePdfPsToFile(database.getEntryMap().values(), fields);
     }
 
@@ -992,7 +988,7 @@ public class Util {
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String... fields) {
+    public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
         NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
 
         for (BibtexEntry entry : entries) {
@@ -1045,7 +1041,7 @@ public class Util {
      */
     public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries,
             BibtexDatabase db, Component parent) {
-        Vector<String> affectedFields = new Vector<>();
+        Vector<String> affectedFields = new Vector<String>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
                 KeywordGroup kg = (KeywordGroup) group;
@@ -1275,7 +1271,13 @@ public class Util {
         details.setLayout(new BorderLayout());
         details.add(scrollPane, BorderLayout.CENTER);
 
-        flip.addActionListener(event -> crd.show(pan, "details"));
+        flip.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                crd.show(pan, "details");
+            }
+        });
         pan.add(simple, "simple");
         pan.add(details, "details");
         // pass the scrollpane to the joptionpane.
@@ -1366,7 +1368,7 @@ public class Util {
      * @return A List of character encodings
      */
     public static List<String> findEncodingsForString(String characters) {
-        List<String> encodings = new ArrayList<>();
+        List<String> encodings = new ArrayList<String>();
         for (int i = 0; i < Globals.ENCODINGS.length; i++) {
             CharsetEncoder encoder = Charset.forName(Globals.ENCODINGS[i]).newEncoder();
             if (encoder.canEncode(characters)) {
@@ -1430,7 +1432,7 @@ public class Util {
      * @param entry The String array.
      * @return The encoded String.
      */
-    private static String encodeStringArray(String... entry) {
+    private static String encodeStringArray(String[] entry) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entry.length; i++) {
             sb.append(Util.encodeString(entry[i]));
@@ -1450,9 +1452,9 @@ public class Util {
      * @return The decoded String array.
      */
     public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<>();
+        ArrayList<ArrayList<String>> newList = new ArrayList<ArrayList<String>>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
+        ArrayList<String> thisEntry = new ArrayList<String>();
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -1468,7 +1470,7 @@ public class Util {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
                 newList.add(thisEntry);
-                thisEntry = new ArrayList<>();
+                thisEntry = new ArrayList<String>();
             } else {
                 sb.append(c);
             }
@@ -1555,8 +1557,8 @@ public class Util {
      * @param subset The subset of values.
      * @return The remainder that is not part of the subset.
      */
-    public static String[] getRemainder(String[] all, String... subset) {
-        ArrayList<String> al = new ArrayList<>();
+    public static String[] getRemainder(String[] all, String[] subset) {
+        ArrayList<String> al = new ArrayList<String>();
         for (String anAll : all) {
             boolean found = false;
             for (String aSubset : subset) {
@@ -1597,7 +1599,7 @@ public class Util {
     }
 
     public static ArrayList<String> getSeparatedKeywords(String keywords) {
-        ArrayList<String> res = new ArrayList<>();
+        ArrayList<String> res = new ArrayList<String>();
         if (keywords == null) {
             return res;
         }
@@ -1789,14 +1791,14 @@ public class Util {
             public void run() {
 
                 // determine directories to search in
-                ArrayList<File> dirs = new ArrayList<>();
+                ArrayList<File> dirs = new ArrayList<File>();
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }
 
                 // determine extensions
-                Collection<String> extensions = new ArrayList<>();
+                Collection<String> extensions = new ArrayList<String>();
                 for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }
@@ -1915,7 +1917,7 @@ public class Util {
             final MetaData metaData,
             final ActionListener callback,
             final JDialog diag) {
-        final Collection<BibtexEntry> entries = new ArrayList<>();
+        final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         entries.add(entry);
 
         return Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
@@ -1973,8 +1975,8 @@ public class Util {
      * 
      * @return list of files. May be empty
      */
-    public static List<File> getListOfLinkedFiles(BibtexEntry[] bes, String... fileDirs) {
-        ArrayList<File> res = new ArrayList<>();
+    public static List<File> getListOfLinkedFiles(BibtexEntry[] bes, String[] fileDirs) {
+        ArrayList<File> res = new ArrayList<File>();
         for (BibtexEntry entry : bes) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField("file"));
@@ -1991,14 +1993,14 @@ public class Util {
     }
 
     public static Map<BibtexEntry, List<File>> findAssociatedFiles(Collection<BibtexEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibtexEntry, List<File>> result = new HashMap<>();
+        HashMap<BibtexEntry, List<File>> result = new HashMap<BibtexEntry, List<File>>();
 
         // First scan directories
         Set<File> filesWithExtension = UtilFindFiles.findFiles(extensions, directories);
 
         // Initialize Result-Set
         for (BibtexEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
+            result.put(entry, new ArrayList<File>());
         }
 
         boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);

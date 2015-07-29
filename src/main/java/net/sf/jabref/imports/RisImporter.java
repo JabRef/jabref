@@ -77,7 +77,7 @@ public class RisImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -99,7 +99,7 @@ public class RisImporter extends ImportFormat {
             String startPage = "";
             String endPage = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<>();
+            HashMap<String, String> hm = new HashMap<String, String>();
 
             String[] fields = entry1.split("\n");
 
@@ -126,33 +126,22 @@ public class RisImporter extends ImportFormat {
                     String lab = entry.substring(0, 2);
                     String val = entry.substring(6).trim();
                     if (lab.equals("TY")) {
-                        switch (val) {
-                        case "BOOK":
+                        if (val.equals("BOOK")) {
                             type = "book";
-                            break;
-                        case "JOUR":
-                        case "MGZN":
+                        } else if (val.equals("JOUR") || val.equals("MGZN")) {
                             type = "article";
-                            break;
-                        case "THES":
+                        } else if (val.equals("THES")) {
                             type = "phdthesis";
-                            break;
-                        case "UNPB":
+                        } else if (val.equals("UNPB")) {
                             type = "unpublished";
-                            break;
-                        case "RPRT":
+                        } else if (val.equals("RPRT")) {
                             type = "techreport";
-                            break;
-                        case "CONF":
+                        } else if (val.equals("CONF")) {
                             type = "inproceedings";
-                            break;
-                        case "CHAP":
+                        } else if (val.equals("CHAP")) {
                             type = "incollection";//"inbook";
-
-                            break;
-                        default:
+                        } else {
                             type = "other";
-                            break;
                         }
                     } else if (lab.equals("T1") || lab.equals("TI")) {
                         String oldVal = hm.get("title");
@@ -273,7 +262,7 @@ public class RisImporter extends ImportFormat {
                     .getEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
                 if (content == null || content.trim().isEmpty()) {

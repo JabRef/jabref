@@ -45,7 +45,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox privacyFilterCheckBox = new JCheckBox(
             Globals.lang("Do not write the following fields to XMP Metadata:"));
 
-    private final Vector<Object> tableRows = new Vector<>(10);
+    private final Vector<Object> tableRows = new Vector<Object>(10);
 
 
     /**

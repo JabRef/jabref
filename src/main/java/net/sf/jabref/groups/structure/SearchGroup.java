@@ -142,13 +142,13 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibtexEntry... entries) {
+    public AbstractUndoableEdit add(BibtexEntry[] entries) {
         // nothing to do, add is not supported
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibtexEntry... entries) {
+    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
         // nothing to do, remove is not supported
         return null;
     }

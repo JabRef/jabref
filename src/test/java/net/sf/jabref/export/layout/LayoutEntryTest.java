@@ -105,7 +105,7 @@ public class LayoutEntryTest {
         // define the highlighting settings
         Globals.prefs.putBoolean("caseSensitiveSearch", false);
 
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, new ArrayList<>());
+        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE, new ArrayList<String>());
         String expecting = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices</font>";
 
         Assert.assertEquals(expecting, result);
@@ -120,7 +120,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<>();
+        ArrayList<String> words = new ArrayList<String>();
         words.add("google");
 
         // define the highlighting settings
@@ -142,7 +142,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<>();
+        ArrayList<String> words = new ArrayList<String>();
         words.add("Android");
         words.add("study");
 
@@ -168,7 +168,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<>();
+        ArrayList<String> words = new ArrayList<String>();
         words.add("google");
 
         // define the highlighting settings
@@ -190,7 +190,7 @@ public class LayoutEntryTest {
         mBTE.setSearchHit(true);
 
         // define the serach words
-        ArrayList<String> words = new ArrayList<>();
+        ArrayList<String> words = new ArrayList<String>();
         words.add("Android");
         words.add("study");
         words.add("Open");

@@ -57,6 +57,8 @@ class ModsExportFormat extends ExportFormat {
 
         try {
             finalizeSaveSession(ss);
+        } catch (SaveException ex) {
+            throw new IOException(ex.getMessage());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }

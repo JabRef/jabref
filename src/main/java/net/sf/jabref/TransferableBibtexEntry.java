@@ -34,7 +34,7 @@ public class TransferableBibtexEntry implements Transferable {
     public static final DataFlavor entryFlavor = new DataFlavor(BibtexEntry.class, "JabRef entry");
 
 
-    public TransferableBibtexEntry(BibtexEntry... data) {
+    public TransferableBibtexEntry(BibtexEntry[] data) {
         this.data = data;
     }
 

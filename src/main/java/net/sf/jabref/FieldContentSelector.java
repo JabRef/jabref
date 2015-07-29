@@ -124,17 +124,21 @@ public class FieldContentSelector extends JComponent {
         con.weightx = 1;
         gbl.setConstraints(comboBox, con);
 
-        comboBox.addActionListener(e -> {
-            /*
-             * These conditions signify arrow key navigation in the dropdown
-             * list, so we should not react to it. I'm not sure if this is
-             * well defined enough to be guaranteed to work everywhere.
-             */
-            if (e.getActionCommand().equals("comboBoxChanged") && e.getModifiers() == 0) {
-                return;
-            }
+        comboBox.addActionListener(new ActionListener() {
 
-            selectionMade();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /*
+                 * These conditions signify arrow key navigation in the dropdown
+                 * list, so we should not react to it. I'm not sure if this is
+                 * well defined enough to be guaranteed to work everywhere.
+                 */
+                if (e.getActionCommand().equals("comboBoxChanged") && e.getModifiers() == 0) {
+                    return;
+                }
+
+                selectionMade();
+            }
         });
         // Add an action for the Enter key that signals a selection:
         comboBox.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enter");
@@ -157,16 +161,20 @@ public class FieldContentSelector extends JComponent {
         gbl.setConstraints(manage, con);
         add(manage);
 
-        manage.addActionListener(e -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName());
-            Util.placeDialog(csd, FieldContentSelector.this.frame);
+        manage.addActionListener(new ActionListener() {
 
-            // Calling setVisible(true) will open the modal dialog and block
-            // for the dialog to close.
-            csd.setVisible(true);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ContentSelectorDialog2 csd = new ContentSelectorDialog2(FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName());
+                Util.placeDialog(csd, FieldContentSelector.this.frame);
 
-            // So we need to rebuild the ComboBox afterwards
-            rebuildComboBox();
+                // Calling setVisible(true) will open the modal dialog and block
+                // for the dialog to close.
+                csd.setVisible(true);
+
+                // So we need to rebuild the ComboBox afterwards
+                rebuildComboBox();
+            }
         });
     }
 

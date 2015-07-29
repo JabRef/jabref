@@ -36,13 +36,13 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
     private static final int SHORTEST_WORD = 4;
 
     // stores the strings as is
-    private final TreeSet<String> indexCaseSensitive = new TreeSet<>();
+    private final TreeSet<String> indexCaseSensitive = new TreeSet<String>();
 
     // stores strings in lowercase
-    private final TreeSet<String> indexCaseInsensitive = new TreeSet<>();
+    private final TreeSet<String> indexCaseInsensitive = new TreeSet<String>();
 
     // stores for a lowercase string the possible expanded strings
-    private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
+    private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<String, TreeSet<String>>();
 
 
 
@@ -69,7 +69,7 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
 
             // As subset only contains lower case strings, 
             // we have to to determine possible strings for each hit
-            ArrayList<String> res = new ArrayList<>();
+            ArrayList<String> res = new ArrayList<String>();
             for (String s : subset) {
                 res.addAll(possibleStringsForSearchString.get(s));
             }
@@ -108,7 +108,7 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
             indexCaseInsensitive.add(word_lcase);
             TreeSet<String> set = possibleStringsForSearchString.get(word_lcase);
             if (set == null) {
-                set = new TreeSet<>();
+                set = new TreeSet<String>();
             }
             set.add(word);
             possibleStringsForSearchString.put(word_lcase, set);

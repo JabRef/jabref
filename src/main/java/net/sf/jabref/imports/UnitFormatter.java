@@ -104,7 +104,7 @@ public class UnitFormatter implements LayoutFormatter {
     }
 
 
-    private String format(String text, String... listOfWords) {
+    private String format(String text, String[] listOfWords) {
         if (text == null) {
             return null;
         }

@@ -78,7 +78,7 @@ public class EndnoteImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String ENDOFRECORD = "__EOREOR__";
@@ -102,7 +102,7 @@ public class EndnoteImporter extends ImportFormat {
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
-        HashMap<String, String> hm = new HashMap<>();
+        HashMap<String, String> hm = new HashMap<String, String>();
         String author;
         String Type;
         String editor;
@@ -140,25 +140,21 @@ public class EndnoteImporter extends ImportFormat {
 
                 String val = field.substring(2);
 
-                switch (prefix) {
-                case "A":
+                if (prefix.equals("A")) {
                     if (author.equals("")) {
                         author = val;
                     } else {
                         author += " and " + val;
                     }
-                    break;
-                case "E":
+                } else if (prefix.equals("E")) {
                     if (editor.equals("")) {
                         editor = val;
                     } else {
                         editor += " and " + val;
                     }
-                    break;
-                case "T":
+                } else if (prefix.equals("T")) {
                     hm.put("title", val);
-                    break;
-                case "0":
+                } else if (prefix.equals("0")) {
                     if (val.indexOf("Journal") == 0) {
                         Type = "article";
                     } else if (val.indexOf("Book Section") == 0) {
@@ -176,75 +172,59 @@ public class EndnoteImporter extends ImportFormat {
                         Type = "article";
                     } else if (val.indexOf("Thesis") == 0) {
                         Type = "phdthesis";
-                    } else {
+                    }
+                    else {
                         Type = "misc"; //
                     }
-                    break;
-                case "7":
+                } else if (prefix.equals("7")) {
                     hm.put("edition", val);
-                    break;
-                case "C":
+                } else if (prefix.equals("C")) {
                     hm.put("address", val);
-                    break;
-                case "D":
+                } else if (prefix.equals("D")) {
                     hm.put("year", val);
-                    break;
-                case "8":
+                } else if (prefix.equals("8")) {
                     hm.put("date", val);
-                    break;
-                case "J":
+                } else if (prefix.equals("J")) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
                     if (hm.get("journal") == null) {
                         hm.put("journal", val);
                     }
-                    break;
-                case "B":
+                } else if (prefix.equals("B")) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
-                    switch (Type) {
-                    case "article":
+                    if (Type.equals("article")) {
                         hm.put("journal", val);
-                        break;
-                    case "book":
-                    case "inbook":
+                    } else if (Type.equals("book") || Type.equals("inbook")) {
                         hm.put(
                                 "series", val);
-                        break;
-                    default:
+                    } else {
                         /* if (Type.equals("inproceedings")) */
                         hm.put("booktitle", val);
-                        break;
                     }
-                    break;
-                case "I":
+                } else if (prefix.equals("I")) {
                     if (Type.equals("phdthesis")) {
                         hm.put("school", val);
                     } else {
                         hm.put("publisher", val);
                     }
-                    break;
+                }
                 // replace single dash page ranges (23-45) with double dashes (23--45):
-                case "P":
+                else if (prefix.equals("P")) {
                     hm.put("pages", val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
-                    break;
-                case "V":
+                } else if (prefix.equals("V")) {
                     hm.put("volume", val);
-                    break;
-                case "N":
+                } else if (prefix.equals("N")) {
                     hm.put("number", val);
-                    break;
-                case "U":
+                } else if (prefix.equals("U")) {
                     hm.put("url", val);
-                    break;
-                case "R":
+                } else if (prefix.equals("R")) {
                     String doi = val;
                     if (doi.startsWith("doi:")) {
                         doi = doi.substring(4);
                     }
                     hm.put("doi", doi);
-                    break;
-                case "O":
+                } else if (prefix.equals("O")) {
                     // Notes may contain Article number
                     if (val.startsWith("Artn")) {
                         String[] tokens = val.split("\\s");
@@ -252,14 +232,11 @@ public class EndnoteImporter extends ImportFormat {
                     } else {
                         hm.put("note", val);
                     }
-                    break;
-                case "K":
+                } else if (prefix.equals("K")) {
                     hm.put("keywords", val);
-                    break;
-                case "X":
+                } else if (prefix.equals("X")) {
                     hm.put("abstract", val);
-                    break;
-                case "9":
+                } else if (prefix.equals("9")) {
                     //Util.pr(val);
                     if (val.indexOf("Ph.D.") == 0) {
                         Type = "phdthesis";
@@ -267,11 +244,9 @@ public class EndnoteImporter extends ImportFormat {
                     if (val.indexOf("Masters") == 0) {
                         Type = "mastersthesis";
                     }
-                    break;
-                case "F":
+                } else if (prefix.equals("F")) {
                     hm.put(BibtexFields.KEY_FIELD, Util
                             .checkLegalKey(val));
-                    break;
                 }
             }
 

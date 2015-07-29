@@ -122,13 +122,23 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         namesp.setLayout(gbl);
         iconCol.setLayout(gbl);
 
-        overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
+        overrideFonts.addActionListener(new ActionListener() {
 
-        fontButton.addActionListener(e -> {
-            Font f = new FontSelectorDialog
-                    (null, GUIGlobals.CURRENTFONT).getSelectedFont();
-            if (f != null) {
-                font = f;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fontSize.setEnabled(overrideFonts.isSelected());
+            }
+        });
+
+        fontButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Font f = new FontSelectorDialog
+                        (null, GUIGlobals.CURRENTFONT).getSelectedFont();
+                if (f != null) {
+                    font = f;
+                }
             }
         });
         /*menuFontButton.addActionListener(new ActionListener() {

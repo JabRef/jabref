@@ -50,7 +50,7 @@ public class IntegrityCheck
 
     public IntegrityCheck()
     {
-        messages = new Vector<>();
+        messages = new Vector<IntegrityMessage>();
     }
 
     public Vector<IntegrityMessage> checkBibtexDatabase(BibtexDatabase base) {
@@ -60,13 +60,13 @@ public class IntegrityCheck
                 checkSingleEntry(entry);
             }
         }
-        return new Vector<>(messages);
+        return new Vector<IntegrityMessage>(messages);
     }
 
     public Vector<IntegrityMessage> checkBibtexEntry(BibtexEntry entry) {
         messages.clear();
         checkSingleEntry(entry);
-        return new Vector<>(messages);
+        return new Vector<IntegrityMessage>(messages);
     }
 
     private void checkSingleEntry(BibtexEntry entry)

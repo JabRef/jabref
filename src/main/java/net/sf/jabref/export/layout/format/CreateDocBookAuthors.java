@@ -133,7 +133,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
     protected void singleAuthor(StringBuffer sb, String author)
     {
         // TODO: replace special characters
-        Vector<String> v = new Vector<>();
+        Vector<String> v = new Vector<String>();
 
         String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 

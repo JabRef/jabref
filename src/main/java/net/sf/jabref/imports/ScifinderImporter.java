@@ -79,7 +79,7 @@ public class ScifinderImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -91,7 +91,7 @@ public class ScifinderImporter extends ImportFormat {
         }
 
         String[] entries = sb.toString().split("START_RECORD");
-        HashMap<String, String> hm = new HashMap<>();
+        HashMap<String, String> hm = new HashMap<String, String>();
         for (int i = 1; i < entries.length; i++) {
             String[] fields = entries[i].split("FIELD ");
             String journal = null;

@@ -119,14 +119,18 @@ public class ChangeScanner implements Runnable {
 
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
-            SwingUtilities.invokeLater(() -> {
-                ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                Util.placeDialog(dial, frame);
-                dial.setVisible(true); // dial.show(); -> deprecated since 1.5
-                fup.scanResultsResolved(dial.isOkPressed());
-                if (dial.isOkPressed()) {
-                    // Overwrite the temp database:
-                    storeTempDatabase();
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
+                    Util.placeDialog(dial, frame);
+                    dial.setVisible(true); // dial.show(); -> deprecated since 1.5
+                    fup.scanResultsResolved(dial.isOkPressed());
+                    if (dial.isOkPressed()) {
+                        // Overwrite the temp database:
+                        storeTempDatabase();
+                    }
                 }
             });
 
@@ -138,22 +142,26 @@ public class ChangeScanner implements Runnable {
     }
 
     private void storeTempDatabase() {
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            try {
-                SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
-                        Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
-                        false, false, panel.getEncoding(), true);
-                ss.commit();
-            } catch (SaveException ex) {
-                System.out.println("Problem updating tmp file after accepting external changes");
-            }
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+            @Override
+            public void run() {
+                try {
+                    SaveSession ss = FileActions.saveDatabase(inTemp, mdInTemp,
+                            Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()), Globals.prefs,
+                            false, false, panel.getEncoding(), true);
+                    ss.commit();
+                } catch (SaveException ex) {
+                    System.out.println("Problem updating tmp file after accepting external changes");
+                }
+
+            }
         });
     }
 
     private void scanMetaData(MetaData inMem, MetaData inTemp, MetaData onDisk) {
         MetaDataChange mdc = new MetaDataChange(inMem, inTemp);
-        ArrayList<String> handledOnDisk = new ArrayList<>();
+        ArrayList<String> handledOnDisk = new ArrayList<String>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
         for (String key : inTemp) {
@@ -194,8 +202,8 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        HashSet<String> used = new HashSet<>(disk.getEntryCount());
-        HashSet<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
+        HashSet<String> used = new HashSet<String>(disk.getEntryCount());
+        HashSet<Integer> notMatched = new HashSet<Integer>(tmp.getEntryCount());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -374,9 +382,9 @@ public class ChangeScanner implements Runnable {
             return;
         }
 
-        HashSet<Object> used = new HashSet<>();
-        HashSet<Object> usedInMem = new HashSet<>();
-        HashSet<String> notMatched = new HashSet<>(onTmp.getStringCount());
+        HashSet<Object> used = new HashSet<Object>();
+        HashSet<Object> usedInMem = new HashSet<Object>();
+        HashSet<String> notMatched = new HashSet<String>(onTmp.getStringCount());
 
         // First try to match by string names.
         //int piv2 = -1;

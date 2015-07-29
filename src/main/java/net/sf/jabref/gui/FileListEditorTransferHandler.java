@@ -119,23 +119,27 @@ class FileListEditorTransferHandler extends TransferHandler {
 
             if (files != null) {
                 final List<File> theFiles = files;
-                SwingUtilities.invokeLater(() -> {
-                    //addAll(files);
-                    for (File f : theFiles) {
-                        // Find the file's extension, if any:
-                        String name = f.getAbsolutePath();
-                        String extension;
-                        ExternalFileType fileType = null;
-                        int index = name.lastIndexOf('.');
-                        if ((index >= 0) && (index < name.length())) {
-                            extension = name.substring(index + 1).toLowerCase();
-                            fileType = Globals.prefs.getExternalFileTypeByExt(extension);
-                        }
-                        if (fileType != null) {
-                            if (dfh == null) {
-                                dfh = new DroppedFileHandler(frame, frame.basePanel());
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        //addAll(files);
+                        for (File f : theFiles) {
+                            // Find the file's extension, if any:
+                            String name = f.getAbsolutePath();
+                            String extension;
+                            ExternalFileType fileType = null;
+                            int index = name.lastIndexOf('.');
+                            if ((index >= 0) && (index < name.length())) {
+                                extension = name.substring(index + 1).toLowerCase();
+                                fileType = Globals.prefs.getExternalFileTypeByExt(extension);
                             }
-                            dfh.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
+                            if (fileType != null) {
+                                if (dfh == null) {
+                                    dfh = new DroppedFileHandler(frame, frame.basePanel());
+                                }
+                                dfh.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
+                            }
                         }
                     }
                 });

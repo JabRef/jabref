@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class AbbreviationTool {
 
-    public static void main(String... args) throws IOException {
+    public static void main(String[] args) throws IOException {
         JournalAbbreviationRepository ap = new JournalAbbreviationRepository();
         ap.readJournalListFromFile(new File(args[0]));
         Files.write(ap.toPropertiesString(), new File(args[0]), Charsets.UTF_8);

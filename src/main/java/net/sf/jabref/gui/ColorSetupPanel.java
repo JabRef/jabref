@@ -37,7 +37,7 @@ public class ColorSetupPanel extends JPanel {
 
     private static final int ICON_WIDTH = 30;
     private static final int ICON_HEIGHT = 20;
-    private final ArrayList<ColorButton> buttons = new ArrayList<>();
+    private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
 
 
     public ColorSetupPanel() {
@@ -131,9 +131,13 @@ public class ColorSetupPanel extends JPanel {
 
         public JButton getDefaultButton() {
             JButton toDefault = new JButton(Globals.lang("Default"));
-            toDefault.addActionListener(e -> {
-                setColor(Globals.prefs.getDefaultColor(key));
-                repaint();
+            toDefault.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setColor(Globals.prefs.getDefaultColor(key));
+                    repaint();
+                }
             });
             return toDefault;
         }

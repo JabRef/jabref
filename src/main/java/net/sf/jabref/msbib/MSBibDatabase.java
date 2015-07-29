@@ -48,7 +48,7 @@ public class MSBibDatabase {
 
     public MSBibDatabase() {
         // maybe make this sorted later...
-        entries = new HashSet<>();
+        entries = new HashSet<MSBibEntry>();
     }
 
     public MSBibDatabase(InputStream stream) {
@@ -68,8 +68,8 @@ public class MSBibDatabase {
     }
 
     public List<BibtexEntry> importEntries(InputStream stream) {
-        entries = new HashSet<>();
-        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        entries = new HashSet<MSBibEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         Document docin = null;
         try {
             DocumentBuilder dbuild = DocumentBuilderFactory.
@@ -104,7 +104,7 @@ public class MSBibDatabase {
     }
 
     private void addEntries(BibtexDatabase database, Set<String> keySet) {
-        entries = new HashSet<>();
+        entries = new HashSet<MSBibEntry>();
         for (String s : keySet) {
             BibtexEntry entry = database.getEntryById(s);
             MSBibEntry newMods = new MSBibEntry(entry);

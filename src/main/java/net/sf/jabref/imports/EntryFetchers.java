@@ -10,7 +10,7 @@ public class EntryFetchers {
 
     public static final EntryFetchers INSTANCE = new EntryFetchers();
 
-    private final List<EntryFetcher> entryFetchers = new LinkedList<>();
+    private final List<EntryFetcher> entryFetchers = new LinkedList<EntryFetcher>();
 
     public EntryFetchers() {
         entryFetchers.add(new ADSFetcher());

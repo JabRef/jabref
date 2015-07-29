@@ -44,7 +44,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    private final HashMap<String, String> entryLinks = new HashMap<>();
+    private final HashMap<String, String> entryLinks = new HashMap<String, String>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
@@ -187,7 +187,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
      */
     private Map<String, JLabel> getCitations(String query) throws IOException {
         String urlQuery;
-        LinkedHashMap<String, JLabel> res = new LinkedHashMap<>();
+        LinkedHashMap<String, JLabel> res = new LinkedHashMap<String, JLabel>();
         try {
             urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
@@ -315,7 +315,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static HashMap<String, String> getFormElements(String page) {
         Matcher m = GoogleScholarFetcher.inputPattern.matcher(page);
-        HashMap<String, String> items = new HashMap<>();
+        HashMap<String, String> items = new HashMap<String, String>();
         while (m.find()) {
             String name = m.group(2);
             if (name.length() > 2 && name.charAt(0) == '"'

@@ -44,7 +44,7 @@ public class UtilFindFiles {
     }
 
     public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
-        Set<File> result = new HashSet<>();
+        Set<File> result = new HashSet<File>();
 
         for (File directory : directories) {
             result.addAll(UtilFindFiles.findFiles(extensions, directory));
@@ -54,7 +54,7 @@ public class UtilFindFiles {
     }
 
     private static Collection<? extends File> findFiles(Collection<String> extensions, File directory) {
-        Set<File> result = new HashSet<>();
+        Set<File> result = new HashSet<File>();
 
         File[] children = directory.listFiles();
         if (children == null)
@@ -90,13 +90,13 @@ public class UtilFindFiles {
      *
      */
     public static String findPdf(BibtexEntry entry, String extension, String directory) {
-        return UtilFindFiles.findPdf(entry, extension, directory);
+        return UtilFindFiles.findPdf(entry, extension, new String[] {directory});
     }
 
     /**
      * Convenience method for findPDF. Can search multiple PDF directories.
      */
-    public static String findPdf(BibtexEntry entry, String extension, String... directories) {
+    public static String findPdf(BibtexEntry entry, String extension, String[] directories) {
 
         String regularExpression;
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
@@ -118,7 +118,7 @@ public class UtilFindFiles {
      */
     public static String findFile(BibtexEntry entry, ExternalFileType fileType, List<String> extraDirs) {
 
-        List<String> dirs = new ArrayList<>();
+        List<String> dirs = new ArrayList<String>();
         dirs.addAll(extraDirs);
         if (Globals.prefs.hasKey(fileType.getExtension() + "Directory")) {
             dirs.add(Globals.prefs.get(fileType.getExtension() + "Directory"));
@@ -302,7 +302,7 @@ public class UtilFindFiles {
                 }
                 // Do for all direct and indirect subdirs
                 if (dirToProcess.equals("**")) {
-                    List<File> toDo = new LinkedList<>();
+                    List<File> toDo = new LinkedList<File>();
                     toDo.add(directory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
@@ -341,8 +341,12 @@ public class UtilFindFiles {
                 final Pattern toMatch = Pattern
                         .compile(dirToProcess.replaceAll("\\\\\\\\", "\\\\"));
 
-                File[] matches = directory.listFiles((arg0, arg1) -> {
-                    return toMatch.matcher(arg1).matches();
+                File[] matches = directory.listFiles(new FilenameFilter() {
+
+                    @Override
+                    public boolean accept(File arg0, String arg1) {
+                        return toMatch.matcher(arg1).matches();
+                    }
                 });
                 if (matches == null || matches.length == 0) {
                     return null;
@@ -362,8 +366,12 @@ public class UtilFindFiles {
         final Pattern toMatch = Pattern.compile('^'
                 + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$');
 
-        File[] matches = directory.listFiles((arg0, arg1) -> {
-            return toMatch.matcher(arg1).matches();
+        File[] matches = directory.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File arg0, String arg1) {
+                return toMatch.matcher(arg1).matches();
+            }
         });
         if (matches == null || matches.length == 0) {
             return null;

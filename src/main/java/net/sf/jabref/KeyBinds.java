@@ -107,7 +107,7 @@ public class KeyBinds {
     public static final String UNMARK_ENTRIES = "Unmark entries";
     public static final String WRITE_XMP = "Write XMP";
 
-    private final HashMap<String, String> keyBindMap = new HashMap<>();
+    private final HashMap<String, String> keyBindMap = new HashMap<String, String>();
 
 
     public KeyBinds() {
@@ -219,7 +219,7 @@ public class KeyBinds {
     }
 
     public HashMap<String, String> getKeyBindings() {
-        return new HashMap<>(Collections.unmodifiableMap(keyBindMap));
+        return new HashMap<String, String>(Collections.unmodifiableMap(keyBindMap));
     }
 
     public void overwriteBindings(Map<String, String> newBindings) {

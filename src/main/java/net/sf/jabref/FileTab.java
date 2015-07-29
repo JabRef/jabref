@@ -122,9 +122,13 @@ public class FileTab extends JPanel implements PrefsTab {
                 //+ "Double braces signal that BibTeX should preserve character case.") + "</HTML>");
                 Globals.lang("Remove double braces around BibTeX fields when loading."));
 
-        autoSave.addChangeListener(changeEvent -> {
-            autoSaveInterval.setEnabled(autoSave.isSelected());
-            promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
+        autoSave.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent changeEvent) {
+                autoSaveInterval.setEnabled(autoSave.isSelected());
+                promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
+            }
         });
 
         FormLayout layout = new FormLayout("left:pref, 4dlu, fill:pref", "");
@@ -196,7 +200,7 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
         //for LWang_AdjustableFieldOrder
         String[] _rbs0 = {"Sort fields in alphabeta order (as ver 2.10)", "Sort fields in old fasion (as ver 2.9.2)", "Save fields as user defined order"};
-        ArrayList<String> _rbs = new ArrayList<>();
+        ArrayList<String> _rbs = new ArrayList<String>();
         for (String _rb : _rbs0) {
             _rbs.add(Globals.lang(_rb));
         }

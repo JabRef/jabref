@@ -242,8 +242,8 @@ public class BibtexParser {
         }
 
         database = new BibtexDatabase(); // Bibtex related contents.
-        HashMap<String, String> meta = new HashMap<>();
-        entryTypes = new HashMap<>(); // To store custem entry types parsed.
+        HashMap<String, String> meta = new HashMap<String, String>();
+        entryTypes = new HashMap<String, BibtexEntryType>(); // To store custem entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
 
         // First see if we can find the version number of the JabRef version that

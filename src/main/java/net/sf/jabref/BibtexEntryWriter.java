@@ -12,7 +12,7 @@ public class BibtexEntryWriter {
     /**
      * Display name map for entry field names.
      */
-    private static final Map<String, String> tagDisplayNameMap = new HashMap<>();
+    private static final Map<String, String> tagDisplayNameMap = new HashMap<String, String>();
 
     static {
         // The field name display map.
@@ -90,7 +90,7 @@ public class BibtexEntryWriter {
 
         String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<>();
+        HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         // Write required fields first.
         // Thereby, write the title field first.
@@ -124,7 +124,7 @@ public class BibtexEntryWriter {
             }
         }
         // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<>();
+        TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key);
@@ -155,7 +155,7 @@ public class BibtexEntryWriter {
 
         String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<>();
+        HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
@@ -178,7 +178,7 @@ public class BibtexEntryWriter {
             }
         }
         // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<>();
+        TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key);
@@ -200,7 +200,7 @@ public class BibtexEntryWriter {
 
         String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<>();
+        HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
 
@@ -221,7 +221,7 @@ public class BibtexEntryWriter {
         boolean previous;
         previous = false;
         //STA get remaining fields
-        TreeSet<String> remainingFields = new TreeSet<>();
+        TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
             //iterate through all fields
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :

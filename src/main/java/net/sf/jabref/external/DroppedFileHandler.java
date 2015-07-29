@@ -387,13 +387,17 @@ public class DroppedFileHandler {
             renameCheckBox.setEnabled(true);
         }
 
-        ChangeListener cl = arg0 -> {
-            renameCheckBox.setEnabled(!linkInPlace.isSelected()
-                    && !multipleEntries);
-            renameToTextBox.setEnabled(!linkInPlace.isSelected()
-                    && !multipleEntries);
-            if (multipleEntries) {
-                renameToTextBox.setText("Multiple entries");
+        ChangeListener cl = new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent arg0) {
+                renameCheckBox.setEnabled(!linkInPlace.isSelected()
+                        && !multipleEntries);
+                renameToTextBox.setEnabled(!linkInPlace.isSelected()
+                        && !multipleEntries);
+                if (multipleEntries) {
+                    renameToTextBox.setText("Multiple entries");
+                }
             }
         };
 

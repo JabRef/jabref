@@ -99,7 +99,7 @@ public class FreeCiteImporter extends ImportFormat {
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
 
-        List<BibtexEntry> res = new ArrayList<>();
+        List<BibtexEntry> res = new ArrayList<BibtexEntry>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try {
@@ -119,8 +119,7 @@ public class FreeCiteImporter extends ImportFormat {
                     && parser.getLocalName().equals("citation"))) {
                         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
                             String ln = parser.getLocalName();
-                            switch (ln) {
-                            case "authors":
+                            if (ln.equals("authors")) {
                                 StringBuilder sb = new StringBuilder();
                                 parser.nextTag();
 
@@ -144,8 +143,7 @@ public class FreeCiteImporter extends ImportFormat {
                                     // end:authors
                                 }
                                 e.setField("author", sb.toString());
-                                break;
-                            case "journal":
+                            } else if (ln.equals("journal")) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
@@ -153,25 +151,22 @@ public class FreeCiteImporter extends ImportFormat {
                                 // we would have to change the whole parser to parse that format.
                                 type = BibtexEntryType.ARTICLE;
                                 e.setField(ln, parser.getElementText());
-                                break;
-                            case "tech":
+                            } else if (ln.equals("tech")) {
                                 type = BibtexEntryType.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
-                                break;
-                            case "doi":
-                            case "institution":
-                            case "location":
-                            case "number":
-                            case "note":
-                            case "title":
-                            case "pages":
-                            case "publisher":
-                            case "volume":
-                            case "year":
+                            } else if (ln.equals("doi")
+                                    || ln.equals("institution")
+                                    || ln.equals("location")
+                                    || ln.equals("number")
+                                    || ln.equals("note")
+                                    || ln.equals("title")
+                                    || ln.equals("pages")
+                                    || ln.equals("publisher")
+                                    || ln.equals("volume")
+                                    || ln.equals("year")) {
                                 e.setField(ln, parser.getElementText());
-                                break;
-                            case "booktitle":
+                            } else if (ln.equals("booktitle")) {
                                 String booktitle = parser.getElementText();
                                 if (booktitle.startsWith("In ")) {
                                     // special treatment for parsing of
@@ -179,17 +174,14 @@ public class FreeCiteImporter extends ImportFormat {
                                     booktitle = booktitle.substring(3);
                                 }
                                 e.setField("booktitle", booktitle);
-                                break;
-                            case "raw_string":
+                            } else if (ln.equals("raw_string")) {
                                 // raw input string is ignored
-                                break;
-                            default:
+                            } else {
                                 // all other tags are stored as note
                                 noteSB.append(ln);
                                 noteSB.append(":");
                                 noteSB.append(parser.getElementText());
                                 noteSB.append(Globals.NEWLINE);
-                                break;
                             }
                         }
                         parser.next();

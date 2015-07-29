@@ -81,7 +81,7 @@ public class SendAsEMailAction extends AbstractWorker {
             }
         }
 
-        ArrayList<String> attachments = new ArrayList<>();
+        ArrayList<String> attachments = new ArrayList<String>();
 
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property 

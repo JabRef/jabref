@@ -78,7 +78,7 @@ public class JabRefFileChooser extends JFileChooser
     //
     //========================================================
 
-    public static void main(String... args) {
+    public static void main(String[] args) {
         JabRefFileChooser fc = new JabRefFileChooser();
         int returnVal = fc.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {

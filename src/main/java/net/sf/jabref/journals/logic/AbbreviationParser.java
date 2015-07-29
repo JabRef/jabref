@@ -11,12 +11,15 @@ import java.util.Objects;
  */
 public class AbbreviationParser {
 
-    private final List<Abbreviation> abbreviations = new LinkedList<>();
+    private final List<Abbreviation> abbreviations = new LinkedList<Abbreviation>();
 
     public void readJournalListFromResource(String resourceFileName) {
         URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
         try {
             readJournalList(new InputStreamReader(url.openStream()));
+        } catch (FileNotFoundException e) {
+            // TODO logging
+            e.printStackTrace();
         } catch (IOException e) {
             // TODO logging
             e.printStackTrace();
@@ -72,6 +75,6 @@ public class AbbreviationParser {
     }
 
     public List<Abbreviation> getAbbreviations() {
-        return new LinkedList<>(abbreviations);
+        return new LinkedList<Abbreviation>(abbreviations);
     }
 }

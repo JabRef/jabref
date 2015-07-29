@@ -44,7 +44,7 @@ public class AppendDatabaseAction implements BaseAction {
 
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final List<File> filesToOpen = new ArrayList<>();
+    private final List<File> filesToOpen = new ArrayList<File>();
 
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
@@ -73,8 +73,15 @@ public class AppendDatabaseAction implements BaseAction {
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(() -> openIt(md.importEntries(), md.importStrings(),
-                    md.importGroups(), md.importSelectorWords()));
+            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    openIt(md.importEntries(), md.importStrings(),
+                            md.importGroups(), md.importSelectorWords());
+                }
+
+            });
             //frame.getFileHistory().newFile(panel.fileToOpen.getPath());
         }
 
@@ -109,8 +116,8 @@ public class AppendDatabaseAction implements BaseAction {
             throws KeyCollisionException {
 
         BibtexDatabase fromDatabase = pr.getDatabase();
-        ArrayList<BibtexEntry> appendedEntries = new ArrayList<>();
-        ArrayList<BibtexEntry> originalEntries = new ArrayList<>();
+        ArrayList<BibtexEntry> appendedEntries = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> originalEntries = new ArrayList<BibtexEntry>();
         BibtexDatabase database = panel.database();
         BibtexEntry originalEntry;
         NamedCompound ce = new NamedCompound(Globals.lang("Append database"));

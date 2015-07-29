@@ -43,7 +43,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     public static Map<String, String> getNameFormatters() {
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<String, String>();
 
         String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
         String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
@@ -73,7 +73,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private int rowCount = -1;
 
-    private final Vector<TableRow> tableRows = new Vector<>(10);
+    private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
 
 
     static class TableRow {

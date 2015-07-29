@@ -88,7 +88,7 @@ public class NameFormatter implements LayoutFormatter {
     public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
 
 
-    private String format(String toFormat, AuthorList al, String... formats) {
+    private String format(String toFormat, AuthorList al, String[] formats) {
 
         StringBuilder sb = new StringBuilder();
 

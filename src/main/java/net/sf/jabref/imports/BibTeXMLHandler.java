@@ -54,7 +54,7 @@ class BibTeXMLHandler extends DefaultHandler {
 
     @Override
     public void startDocument() {
-        bibitems = new ArrayList<>();
+        bibitems = new ArrayList<BibtexEntry>();
     }
 
     @Override

@@ -34,7 +34,7 @@ import net.sf.jabref.external.UnknownExternalFileType;
  */
 public class FileListTableModel extends AbstractTableModel {
 
-    private final ArrayList<FileListEntry> list = new ArrayList<>();
+    private final ArrayList<FileListEntry> list = new ArrayList<FileListEntry>();
 
 
     public FileListTableModel() {
@@ -97,7 +97,13 @@ public class FileListTableModel extends AbstractTableModel {
         synchronized (list) {
             list.add(index, entry);
             if (!SwingUtilities.isEventDispatchThread()) {
-                SwingUtilities.invokeLater(() -> fireTableRowsInserted(index, index));
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        fireTableRowsInserted(index, index);
+                    }
+                });
             } else {
                 fireTableRowsInserted(index, index);
             }
@@ -125,9 +131,9 @@ public class FileListTableModel extends AbstractTableModel {
         if (value == null) {
             value = "";
         }
-        ArrayList<FileListEntry> newList = new ArrayList<>();
+        ArrayList<FileListEntry> newList = new ArrayList<FileListEntry>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
+        ArrayList<String> thisEntry = new ArrayList<String>();
         boolean inXmlChar = false;
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {

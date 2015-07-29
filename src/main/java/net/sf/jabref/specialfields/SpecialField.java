@@ -36,8 +36,8 @@ public abstract class SpecialField {
 
     void setValues(List<SpecialFieldValue> values) {
         this.values = values;
-        this.keywords = new ArrayList<>();
-        this.map = new HashMap<>();
+        this.keywords = new ArrayList<String>();
+        this.map = new HashMap<String, SpecialFieldValue>();
         for (SpecialFieldValue v : values) {
             if (v.getKeyword() != null) {
                 keywords.add(v.getKeyword());

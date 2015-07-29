@@ -59,13 +59,13 @@ public class FileActions {
      */
     private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
         FileActions.previousStringType = BibtexString.Type.AUTHOR;
-        List<BibtexString> strings = new ArrayList<>();
+        List<BibtexString> strings = new ArrayList<BibtexString>();
         for (String s : database.getStringKeySet()) {
             strings.add(database.getString(s));
         }
         Collections.sort(strings, new BibtexStringComparator(true));
         // First, make a Map of all entries:
-        HashMap<String, BibtexString> remaining = new HashMap<>();
+        HashMap<String, BibtexString> remaining = new HashMap<String, BibtexString>();
         int maxKeyLength = 0;
         for (BibtexString string : strings) {
             remaining.put(string.getName(), string);
@@ -155,7 +155,7 @@ public class FileActions {
             boolean checkSearch, boolean checkGroup, String encoding, boolean suppressBackup)
             throws SaveException {
 
-        TreeMap<String, BibtexEntryType> types = new TreeMap<>();
+        TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>();
 
         boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
@@ -328,7 +328,7 @@ public class FileActions {
     private static List<Comparator<BibtexEntry>> getSaveComparators(boolean isSaveOperation, MetaData metaData) {
         SaveSettings saveSettings = new SaveSettings(isSaveOperation, metaData);
 
-        List<Comparator<BibtexEntry>> comparators = new ArrayList<>();
+        List<Comparator<BibtexEntry>> comparators = new ArrayList<Comparator<BibtexEntry>>();
         if (isSaveOperation) {
             comparators.add(new CrossRefEntryComparator());
         }
@@ -349,7 +349,7 @@ public class FileActions {
     public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
             File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding, DatabaseSaveType saveType) throws SaveException {
 
-        TreeMap<String, BibtexEntryType> types = new TreeMap<>(); // Map
+        TreeMap<String, BibtexEntryType> types = new TreeMap<String, BibtexEntryType>(); // Map
         // to
         // collect
         // entry
@@ -390,9 +390,9 @@ public class FileActions {
             List<Comparator<BibtexEntry>> comparators = FileActions.getSaveComparators(true, metaData);
 
             // Use glazed lists to get a sorted view of the entries:
-            List<BibtexEntry> sorter = new ArrayList<>(bes.length);
+            List<BibtexEntry> sorter = new ArrayList<BibtexEntry>(bes.length);
             Collections.addAll(sorter, bes);
-            Collections.sort(sorter, new FieldComparatorStack<>(comparators));
+            Collections.sort(sorter, new FieldComparatorStack<BibtexEntry>(comparators));
 
             BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
 
@@ -490,15 +490,15 @@ public class FileActions {
         if (inOriginalOrder) {
             // Sort entries based on their creation order, utilizing the fact
             // that IDs used for entries are increasing, sortable numbers.
-            comparators = new ArrayList<>();
+            comparators = new ArrayList<Comparator<BibtexEntry>>();
             comparators.add(new CrossRefEntryComparator());
             comparators.add(new IdComparator());
         } else {
             comparators = FileActions.getSaveComparators(isSaveOperation, metaData);
         }
 
-        FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<>(comparators);
-        List<BibtexEntry> sorter = new ArrayList<>();
+        FieldComparatorStack<BibtexEntry> comparatorStack = new FieldComparatorStack<BibtexEntry>(comparators);
+        List<BibtexEntry> sorter = new ArrayList<BibtexEntry>();
 
         if (keySet == null) {
             keySet = database.getKeySet();

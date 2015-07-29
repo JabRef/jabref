@@ -163,20 +163,19 @@ public class SpecialFieldsUtils {
      * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
      */
     public static SpecialField getSpecialFieldInstanceFromFieldName(String fieldName) {
-        switch (fieldName) {
-        case SpecialFieldsUtils.FIELDNAME_PRIORITY:
+        if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_PRIORITY)) {
             return Priority.getInstance();
-        case SpecialFieldsUtils.FIELDNAME_QUALITY:
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_QUALITY)) {
             return Quality.getInstance();
-        case SpecialFieldsUtils.FIELDNAME_RANKING:
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
             return Rank.getInstance();
-        case SpecialFieldsUtils.FIELDNAME_RELEVANCE:
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_RELEVANCE)) {
             return Relevance.getInstance();
-        case SpecialFieldsUtils.FIELDNAME_READ:
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_READ)) {
             return ReadStatus.getInstance();
-        case SpecialFieldsUtils.FIELDNAME_PRINTED:
+        } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_PRINTED)) {
             return Printed.getInstance();
-        default:
+        } else {
             return null;
         }
     }

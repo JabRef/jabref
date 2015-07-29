@@ -142,7 +142,7 @@ public class EntryMarker {
      * @param ce
      */
     private static void unmarkOldStyle(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
-        TreeSet<Object> owners = new TreeSet<>();
+        TreeSet<Object> owners = new TreeSet<Object>();
         for (BibtexEntry entry : database.getEntries()) {
             Object o = entry.getField(BibtexFields.OWNER);
             if (o != null)

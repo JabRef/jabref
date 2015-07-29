@@ -362,7 +362,7 @@ public class FontSelectorDialog extends JDialog {
             Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
 
             String[] nameArray = (String[]) GEClass.getMethod("getAvailableFontFamilyNames").invoke(GEInstance);
-            Vector<String> nameVector = new Vector<>(nameArray.length);
+            Vector<String> nameVector = new Vector<String>(nameArray.length);
 
             for (int i = 0, j; i < nameArray.length; i++) {
                 for (j = 0; j < FontSelectorDialog.HIDEFONTS.length; j++) {

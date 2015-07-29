@@ -65,7 +65,7 @@ public abstract class DBExporter extends DBImporterExporter {
 
     private final String fieldStr = SQLUtil.getFieldStr();
     DBStrings dbStrings = null;
-    private final ArrayList<String> dbNames = new ArrayList<>();
+    private final ArrayList<String> dbNames = new ArrayList<String>();
 
 
     /**
@@ -216,9 +216,9 @@ public abstract class DBExporter extends DBImporterExporter {
 
     private void populateEntryTypesTable(Object out) throws SQLException {
         String query;
-        ArrayList<String> fieldRequirement = new ArrayList<>();
+        ArrayList<String> fieldRequirement = new ArrayList<String>();
 
-        ArrayList<String> existentTypes = new ArrayList<>();
+        ArrayList<String> existentTypes = new ArrayList<String>();
         if (out instanceof Connection) {
             ResultSet rs = ((Statement) SQLUtil.processQueryWithResults(out,
                     "SELECT label FROM entry_types")).getResultSet();
@@ -565,13 +565,13 @@ public abstract class DBExporter extends DBImporterExporter {
         ResultSet rs = SQLUtil.queryAllFromTable(this.connectToDB(dbStrings),
                 "jabref_database");
         Vector<String> v;
-        Vector<Vector<String>> matrix = new Vector<>();
+        Vector<Vector<String>> matrix = new Vector<Vector<String>>();
         dbNames.clear();
-        v = new Vector<>();
+        v = new Vector<String>();
         v.add(Globals.lang("< CREATE NEW DATABASE >"));
         matrix.add(v);
         while (rs.next()) {
-            v = new Vector<>();
+            v = new Vector<String>();
             v.add(rs.getString("database_name"));
             matrix.add(v);
             dbNames.add(rs.getString("database_name"));

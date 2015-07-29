@@ -42,7 +42,7 @@ public class IsiImporterTest {
     @Test
     public void testProcessSubSup() {
 
-        HashMap<String, String> hm = new HashMap<>();
+        HashMap<String, String> hm = new HashMap<String, String>();
         hm.put("title", "/sub 3/");
         IsiImporter.processSubSup(hm);
         Assert.assertEquals("$_3$", hm.get("title"));

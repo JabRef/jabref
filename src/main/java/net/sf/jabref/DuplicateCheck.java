@@ -41,7 +41,7 @@ public class DuplicateCheck {
     private static final double reqWeight = 3; // Weighting of all required fields
 
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
-    private static final HashMap<String, Double> fieldWeights = new HashMap<>();
+    private static final HashMap<String, Double> fieldWeights = new HashMap<String, Double>();
 
     static {
         DuplicateCheck.fieldWeights.put("author", 2.5);
@@ -132,9 +132,7 @@ public class DuplicateCheck {
         }
 
         // Util.pr(field+": '"+s1+"' vs '"+s2+"'");
-        switch (field) {
-        case "author":
-        case "editor": {
+        if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
             String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase();
@@ -149,8 +147,7 @@ public class DuplicateCheck {
                 return NOT_EQUAL;
             }
 
-        }
-        case "pages":
+        } else if (field.equals("pages")) {
             // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
             // We do a replace to harmonize these to a simple "-":
             // After this, a simple test for equality should be enough:
@@ -162,7 +159,7 @@ public class DuplicateCheck {
                 return NOT_EQUAL;
             }
 
-        case "journal": {
+        } else if (field.equals("journal")) {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:
@@ -175,8 +172,7 @@ public class DuplicateCheck {
             } else {
                 return NOT_EQUAL;
             }
-        }
-        default: {
+        } else {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
             double similarity = DuplicateCheck.correlateByWords(s1, s2, false);
@@ -190,12 +186,11 @@ public class DuplicateCheck {
                 return Util.NOT_EQUAL;*/
             }
         }
-        }
 
     }
 
     public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
-        HashSet<String> allFields = new HashSet<>();// one.getAllFields());
+        HashSet<String> allFields = new HashSet<String>();// one.getAllFields());
         allFields.addAll(one.getAllFields());
         allFields.addAll(two.getAllFields());
 
@@ -294,7 +289,7 @@ public class DuplicateCheck {
         return DuplicateCheck.corrCoef(n1, n2);
     }
 
-    private static double corrCoef(double[] n1, double... n2) {
+    private static double corrCoef(double[] n1, double[] n2) {
         // Calculate mean values:
         double mean1 = 0;
         double mean2 = 0;
@@ -346,7 +341,7 @@ public class DuplicateCheck {
         return newArray;
     }
 
-    public static void main(String... args) {
+    public static void main(String[] args) {
         String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
         String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
         String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";

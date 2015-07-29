@@ -250,9 +250,13 @@ class GroupDialog extends JDialog {
         Util.placeDialog(this, jabrefFrame);
 
         // add listeners
-        ItemListener radioButtonItemListener = e -> {
-            setLayoutForSelectedGroup();
-            updateComponents();
+        ItemListener radioButtonItemListener = new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                setLayoutForSelectedGroup();
+                updateComponents();
+            }
         };
         m_explicitRadioButton.addItemListener(radioButtonItemListener);
         m_keywordsRadioButton.addItemListener(radioButtonItemListener);
@@ -316,9 +320,21 @@ class GroupDialog extends JDialog {
             }
         });
 
-        CaretListener caretListener = e -> updateComponents();
+        CaretListener caretListener = new CaretListener() {
 
-        ItemListener itemListener = e -> updateComponents();
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                updateComponents();
+            }
+        };
+
+        ItemListener itemListener = new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                updateComponents();
+            }
+        };
 
         m_name.addCaretListener(caretListener);
         m_kgSearchField.addCaretListener(caretListener);
@@ -463,7 +479,7 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION) {
             return;
         }
-        Vector<BibtexEntry> vec = new Vector<>();
+        Vector<BibtexEntry> vec = new Vector<BibtexEntry>();
         for (BibtexEntry entry : m_basePanel.database().getEntries()) {
             if (m_editedGroup.contains(entry)) {
                 vec.add(entry);

@@ -54,7 +54,7 @@ public class PushToApplicationButton implements ActionListener {
     private JButton menuButton;
     private int selected = 0;
     private JPopupMenu popup = null;
-    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
+    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
     private final MenuAction mAction = new MenuAction();
@@ -66,7 +66,7 @@ public class PushToApplicationButton implements ActionListener {
      */
     static {
         //TODO plugins create collection class
-        applications = new ArrayList<>();
+        applications = new ArrayList<PushToApplication>();
 
         PushToApplicationButton.applications.add(new PushToLyx());
         PushToApplicationButton.applications.add(new PushToEmacs());
@@ -121,13 +121,17 @@ public class PushToApplicationButton implements ActionListener {
         comp.setMaximumSize(comp.getPreferredSize());
 
         optPopup.add(settings);
-        settings.addActionListener(event -> {
-            PushToApplication toApp = pushActions.get(selected);
-            JPanel options = toApp.getSettingsPanel();
-            if (options != null) {
-                PushToApplicationButton.showSettingsDialog(frame, toApp, options);
-            }
+        settings.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                PushToApplication toApp = pushActions.get(selected);
+                JPanel options = toApp.getSettingsPanel();
+                if (options != null) {
+                    PushToApplicationButton.showSettingsDialog(frame, toApp, options);
+                }
+
+            }
         });
 
         buildPopupMenu();
@@ -222,11 +226,21 @@ public class PushToApplicationButton implements ActionListener {
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        ok.addActionListener(event -> {
-            okPressed.value = true;
-            diag.dispose();
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                okPressed.value = true;
+                diag.dispose();
+            }
         });
-        cancel.addActionListener(event -> diag.dispose());
+        cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                diag.dispose();
+            }
+        });
         // Key bindings:
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);

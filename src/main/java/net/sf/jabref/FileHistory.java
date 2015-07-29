@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 public class FileHistory extends JMenu implements ActionListener {
 
     private final JabRefPreferences prefs;
-    private final LinkedList<String> history = new LinkedList<>();
+    private final LinkedList<String> history = new LinkedList<String>();
     private final JabRefFrame frame;
 
 
@@ -137,7 +137,13 @@ public class FileHistory extends JMenu implements ActionListener {
             removeItem(name);
             return;
         }
-        JabRefExecutorService.INSTANCE.execute(() -> frame.open.openIt(fileToOpen, true));
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                frame.open.openIt(fileToOpen, true);
+            }
+        });
 
     }
 

@@ -21,11 +21,11 @@ import java.util.HashSet;
 
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
-    private final HashSet<String> extSet = new HashSet<>();
+    private final HashSet<String> extSet = new HashSet<String>();
     private final String desc;
 
 
-    public OpenFileFilter(String... extensions) {
+    public OpenFileFilter(String[] extensions) {
         StringBuilder buf = new StringBuilder();
         int numExt = extensions.length;
 
@@ -47,7 +47,16 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
     }
 
     public OpenFileFilter() {
-        this(".bib", ".dat", ".txt", ".ris", ".ref", ".fcgi", ".bibx", ".xml");
+        this(new String[] {
+                ".bib",
+                ".dat", // silverplatter ending
+                ".txt", // windows puts ".txt" extentions and for scifinder
+                ".ris",
+                ".ref", // refer/endnote format
+                ".fcgi", // default for pubmed
+                ".bibx", // default for BibTeXML
+                ".xml"
+        });
     }
 
     public OpenFileFilter(String s) {

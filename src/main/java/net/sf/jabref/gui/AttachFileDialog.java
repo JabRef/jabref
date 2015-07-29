@@ -87,15 +87,37 @@ public class AttachFileDialog extends JDialog {
         final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
                 editor, Util.getFileFilterForField(fieldName));
 
-        browse.addActionListener(event -> extPan.browseFile(fieldName, editor));
+        browse.addActionListener(new ActionListener() {
 
-        download.addActionListener(event -> extPan.downLoadFile(fieldName, editor, ths));
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                extPan.browseFile(fieldName, editor);
+            }
+        });
 
-        auto.addActionListener(event -> JabRefExecutorService.INSTANCE.execute(extPan.autoSetFile(fieldName, editor)));
+        download.addActionListener(new ActionListener() {
 
-        ActionListener okListener = event -> {
-            cancelled = false;
-            dispose();
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                extPan.downLoadFile(fieldName, editor, ths);
+            }
+        });
+
+        auto.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                JabRefExecutorService.INSTANCE.execute(extPan.autoSetFile(fieldName, editor));
+            }
+        });
+
+        ActionListener okListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                cancelled = false;
+                dispose();
+            }
         };
 
         ok.addActionListener(okListener);

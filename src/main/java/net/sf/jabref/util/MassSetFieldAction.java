@@ -79,17 +79,29 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         set = new JRadioButton(Globals.lang("Set fields"));
         rename = new JRadioButton(Globals.lang("Rename field to:"));
         rename.setToolTipText(Globals.lang("Move contents of a field into a field with a different name"));
-        set.addChangeListener(e -> {
-            // Entering a text is only relevant if we are setting, not clearing:
-            text.setEnabled(set.isSelected());
+        set.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                // Entering a text is only relevant if we are setting, not clearing:
+                text.setEnabled(set.isSelected());
+            }
         });
-        clear.addChangeListener(event -> {
-            // Overwrite protection makes no sense if we are clearing the field:
-            overwrite.setEnabled(!clear.isSelected());
+        clear.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                // Overwrite protection makes no sense if we are clearing the field:
+                overwrite.setEnabled(!clear.isSelected());
+            }
         });
-        rename.addChangeListener(e -> {
-            // Entering a text is only relevant if we are renaming
-            renameTo.setEnabled(rename.isSelected());
+        rename.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                // Entering a text is only relevant if we are renaming
+                renameTo.setEnabled(rename.isSelected());
+            }
         });
         overwrite = new JCheckBox(Globals.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
@@ -132,18 +144,22 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
-        ok.addActionListener(e -> {
-            // Check if the user tries to rename multiple fields:
-            if (rename.isSelected()) {
-                String[] fields = getFieldNames(field.getText());
-                if (fields.length > 1) {
-                    JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
-                            "", JOptionPane.ERROR_MESSAGE);
-                    return; // Do not close the dialog.
+        ok.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Check if the user tries to rename multiple fields:
+                if (rename.isSelected()) {
+                    String[] fields = getFieldNames(field.getText());
+                    if (fields.length > 1) {
+                        JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
+                                "", JOptionPane.ERROR_MESSAGE);
+                        return; // Do not close the dialog.
+                    }
                 }
+                cancelled = false;
+                diag.dispose();
             }
-            cancelled = false;
-            diag.dispose();
         });
 
         AbstractAction cancelAction = new AbstractAction() {

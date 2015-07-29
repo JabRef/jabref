@@ -9,12 +9,15 @@ public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
-        Thread thread = new Thread(r);
-        thread.setName("JabRef CachedThreadPool");
-        return thread;
+    private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setName("JabRef CachedThreadPool");
+            return thread;
+        }
     });
-    private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<Thread>();
 
     private JabRefExecutorService() {}
 
@@ -39,7 +42,9 @@ public class JabRefExecutorService implements Executor {
             try {
                 future.get();
                 return;
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
         }

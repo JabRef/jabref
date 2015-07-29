@@ -55,19 +55,23 @@ public class PushToLyx implements PushToApplication {
 
         final File lyxpipe = lp;
 
-        JabRefExecutorService.INSTANCE.executeAndWait(() -> {
-            try {
-                FileWriter fw = new FileWriter(lyxpipe);
-                BufferedWriter lyx_out = new BufferedWriter(fw);
-                String citeStr;
+        JabRefExecutorService.INSTANCE.executeAndWait(new Runnable() {
 
-                citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
-                lyx_out.write(citeStr + "\n");
+            @Override
+            public void run() {
+                try {
+                    FileWriter fw = new FileWriter(lyxpipe);
+                    BufferedWriter lyx_out = new BufferedWriter(fw);
+                    String citeStr;
 
-                lyx_out.close();
+                    citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
+                    lyx_out.write(citeStr + "\n");
 
-            } catch (IOException excep) {
-                couldNotWrite = true;
+                    lyx_out.close();
+
+                } catch (IOException excep) {
+                    couldNotWrite = true;
+                }
             }
         });
     }

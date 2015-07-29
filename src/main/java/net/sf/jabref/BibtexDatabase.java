@@ -58,13 +58,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class BibtexDatabase {
 
-    private final Map<String, BibtexEntry> _entries = new Hashtable<>();
+    private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
 
     private String _preamble = null;
 
-    private final HashMap<String, BibtexString> _strings = new HashMap<>();
+    private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
 
-    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
+    private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
     private boolean followCrossrefs = true;
     
@@ -74,7 +74,7 @@ public class BibtexDatabase {
      * use a map instead of a set since i need to know how many of each key is
      * inthere
      */
-    private final HashMap<String, Integer> allKeys = new HashMap<>();
+    private final HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if
@@ -84,40 +84,47 @@ public class BibtexDatabase {
      * Map.
      */
     private final VetoableChangeListener listener =
-            pce -> {
-                if (pce.getPropertyName() == null) {
-                    fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibtexEntry) pce.getSource()));
-                } else if ("id".equals(pce.getPropertyName()))
+            new VetoableChangeListener()
+            {
+
+                @Override
+                public void vetoableChange(PropertyChangeEvent pce)
+                        throws PropertyVetoException
                 {
-                    // locate the entry under its old key
-                    BibtexEntry oldEntry =
-                            _entries.remove(pce.getOldValue());
-
-                    if (oldEntry != pce.getSource())
+                    if (pce.getPropertyName() == null) {
+                        fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibtexEntry) pce.getSource()));
+                    } else if ("id".equals(pce.getPropertyName()))
                     {
-                        // Something is very wrong!
-                        // The entry under the old key isn't
-                        // the one that sent this event.
-                        // Restore the old state.
-                        _entries.put((String) pce.getOldValue(), oldEntry);
-                        throw new PropertyVetoException("Wrong old ID", pce);
-                    }
+                        // locate the entry under its old key
+                        BibtexEntry oldEntry =
+                                _entries.remove(pce.getOldValue());
 
-                    if (_entries.get(pce.getNewValue()) != null)
-                    {
-                        _entries.put((String) pce.getOldValue(), oldEntry);
-                        throw new PropertyVetoException
-                        ("New ID already in use, please choose another",
-                                pce);
-                    }
+                        if (oldEntry != pce.getSource())
+                        {
+                            // Something is very wrong!
+                            // The entry under the old key isn't
+                            // the one that sent this event.
+                            // Restore the old state.
+                            _entries.put((String) pce.getOldValue(), oldEntry);
+                            throw new PropertyVetoException("Wrong old ID", pce);
+                        }
 
-                    // and re-file this entry
-                    _entries.put((String) pce.getNewValue(),
-                            (BibtexEntry) pce.getSource());
-                } else {
-                    fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibtexEntry) pce.getSource()));
-                    //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
-                    //    +"\n"+pce.getNewValue());
+                        if (_entries.get(pce.getNewValue()) != null)
+                        {
+                            _entries.put((String) pce.getOldValue(), oldEntry);
+                            throw new PropertyVetoException
+                            ("New ID already in use, please choose another",
+                                    pce);
+                        }
+
+                        // and re-file this entry
+                        _entries.put((String) pce.getNewValue(),
+                                (BibtexEntry) pce.getSource());
+                    } else {
+                        fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibtexEntry) pce.getSource()));
+                        //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
+                        //    +"\n"+pce.getNewValue());
+                    }
                 }
             };
 
@@ -195,7 +202,7 @@ public class BibtexDatabase {
 
     public synchronized BibtexEntry[] getEntriesByKey(String key) {
 
-        ArrayList<BibtexEntry> entries = new ArrayList<>();
+        ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
 
         for (BibtexEntry entry : _entries.values()) {
             if (key.equals(entry.getCiteKey())) {
@@ -354,7 +361,7 @@ public class BibtexDatabase {
         if (content == null) {
             throw new IllegalArgumentException("Content for resolveForStrings must not be null.");
         }
-        return resolveContent(content, new HashSet<>());
+        return resolveContent(content, new HashSet<String>());
     }
 
     /**
@@ -376,7 +383,7 @@ public class BibtexDatabase {
             throw new NullPointerException();
         }
 
-        List<BibtexEntry> results = new ArrayList<>(entries.size());
+        List<BibtexEntry> results = new ArrayList<BibtexEntry>(entries.size());
 
         for (BibtexEntry entry : entries) {
             results.add(this.resolveForStrings(entry, inPlace));
