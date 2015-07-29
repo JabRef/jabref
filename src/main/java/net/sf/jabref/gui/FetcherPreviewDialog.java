@@ -3,8 +3,8 @@ package net.sf.jabref.gui;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.EventSelectionModel;
+import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
@@ -73,13 +73,13 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
             }
         });
 
-        DefaultEventTableModel<TableEntry> tableModelGl = new DefaultEventTableModel<TableEntry>(entries,
+        EventTableModel<TableEntry> tableModelGl = new EventTableModel<TableEntry>(entries,
                 new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         glTable.setRowHeight(tableRowHeight);
         glTable.getColumnModel().getColumn(0).setMaxWidth(45);
         glTable.setPreferredScrollableViewportSize(new Dimension(1100, 600));
-        DefaultEventSelectionModel<TableEntry> selectionModel = new DefaultEventSelectionModel<TableEntry>(entries);
+        EventSelectionModel<TableEntry> selectionModel = new EventSelectionModel<TableEntry>(entries);
         glTable.setSelectionModel(selectionModel);
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addButton(selectAll);

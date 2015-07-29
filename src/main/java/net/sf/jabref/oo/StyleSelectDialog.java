@@ -15,27 +15,9 @@
 */
 package net.sf.jabref.oo;
 
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.UnknownExternalFileType;
-import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -48,6 +30,56 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.TableColumnModel;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BrowseAction;
+import net.sf.jabref.Globals;
+import net.sf.jabref.IdGenerator;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.util.Util;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.EventSelectionModel;
+import ca.odell.glazedlists.swing.EventTableModel;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+
 /**
  * This class produces a dialog box for choosing a style file.
  */
@@ -59,8 +91,8 @@ class StyleSelectDialog {
     private JDialog diag;
     private JTable table;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    private DefaultEventTableModel<OOBibStyle> tableModel;
-    private DefaultEventSelectionModel<OOBibStyle> selectionModel;
+    private EventTableModel<OOBibStyle> tableModel;
+    private EventSelectionModel<OOBibStyle> selectionModel;
     private final JPopupMenu popup = new JPopupMenu();
     private final JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
     private final JRadioButton useDefaultAuthoryear = new JRadioButton(Globals.lang("Default style (author-year citations)"));
@@ -83,6 +115,7 @@ class StyleSelectDialog {
 
     private boolean okPressed = false;
     private String initSelection;
+
 
     public StyleSelectDialog(JabRefFrame frame, String initSelection) {
 
@@ -173,13 +206,13 @@ class StyleSelectDialog {
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
 
-        tableModel = new DefaultEventTableModel<OOBibStyle>(sortedStyles, new StyleTableFormat());
+        tableModel = new EventTableModel<OOBibStyle>(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        selectionModel = new DefaultEventSelectionModel<OOBibStyle>(sortedStyles);
+        selectionModel = new EventSelectionModel<OOBibStyle>(sortedStyles);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -283,7 +316,8 @@ class StyleSelectDialog {
                                     Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
-                    } else {
+                    }
+                    else {
                         if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
                             JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use a default style."),
                                     Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
@@ -376,7 +410,8 @@ class StyleSelectDialog {
             if (!found && (table.getRowCount() > 0)) {
                 table.setRowSelectionInterval(0, 0);
             }
-        } else {
+        }
+        else {
             if (table.getRowCount() > 0) {
                 table.setRowSelectionInterval(0, 0);
             }
@@ -388,8 +423,7 @@ class StyleSelectDialog {
      * successful. If the string dir indicates a directory, parse all files looking like
      * style files, and add them. The parameter recurse determines whether we should
      * recurse into subdirectories.
-     *
-     * @param dir     the directory or file to handle.
+     * @param dir the directory or file to handle.
      * @param recurse true indicates that we should recurse into subdirectories.
      */
     private void addStyles(String dir, boolean recurse) {
@@ -406,7 +440,8 @@ class StyleSelectDialog {
                     addStyles(file.getPath(), recurse);
                 }
             }
-        } else {
+        }
+        else {
             // The file wasn't a directory, so we simply parse it:
             addSingleFile(dirF);
         }
@@ -414,7 +449,6 @@ class StyleSelectDialog {
 
     /**
      * Parse a single file, and add it to the list of styles if parse was successful.
-     *
      * @param file the file to parse.
      */
     private void addSingleFile(File file) {
@@ -439,7 +473,8 @@ class StyleSelectDialog {
         Globals.prefs.put("ooStyleDirectory", styleDir.getText());
         if (chooseDirectly.isSelected()) {
             Globals.prefs.put("ooBibliographyStyleFile", directFile.getText());
-        } else if (setDirectory.isSelected() && (selected != null)) {
+        }
+        else if (setDirectory.isSelected() && (selected != null)) {
             Globals.prefs.put("ooBibliographyStyleFile", selected.getFile().getPath());
         }
 
@@ -447,7 +482,6 @@ class StyleSelectDialog {
 
     /**
      * Get the currently selected style.
-     *
      * @return the selected style, or null if no style is selected.
      */
     private OOBibStyle getSelectedStyle() {
@@ -469,6 +503,7 @@ class StyleSelectDialog {
         prevEntry.setField("address", "Trondheim");
         prevEntry.setField("www", "http://jabref.sf.net");
     }
+
 
     static class StyleTableFormat implements TableFormat<OOBibStyle> {
 
@@ -507,7 +542,7 @@ class StyleSelectDialog {
 
         private String formatJournals(Set<String> journals) {
             StringBuilder sb = new StringBuilder("");
-            for (Iterator<String> i = journals.iterator(); i.hasNext(); ) {
+            for (Iterator<String> i = journals.iterator(); i.hasNext();) {
                 sb.append(i.next());
                 if (i.hasNext()) {
                     sb.append(", ");
@@ -516,6 +551,7 @@ class StyleSelectDialog {
             return sb.toString();
         }
     }
+
 
     public boolean isOkPressed() {
         return okPressed;
@@ -573,6 +609,7 @@ class StyleSelectDialog {
             ex.printStackTrace();
         }
     }
+
 
     /**
      * The listener for the Glazed list monitoring the current selection.
