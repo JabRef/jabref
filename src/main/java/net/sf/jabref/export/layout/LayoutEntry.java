@@ -46,7 +46,11 @@ class LayoutEntry {
     private final String classPrefix;
 
     private ArrayList<String> invalidFormatter = null;
-
+    
+    // used at highlighting in preview area. 
+    // Color chosen similar to JTextComponent.getSelectionColor(), which is
+    // used at highlighting words at the editor 
+    public static final String HIGHLIGHT_COLOR = "#3399FF";
 
     public LayoutEntry(StringInt si, String classPrefix_) throws Exception {
         type = si.i;
@@ -536,7 +540,7 @@ class LayoutEntry {
         Matcher matcher = Globals.getPatternForWords(toHighlight).matcher(text);
 
         if (Character.isLetterOrDigit(text.charAt(0))) {
-            String hlColor = Globals.highlightColor;
+            String hlColor = HIGHLIGHT_COLOR;
             StringBuffer sb = new StringBuffer();
             boolean foundSomething = false;
 

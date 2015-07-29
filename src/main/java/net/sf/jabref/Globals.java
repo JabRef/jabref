@@ -105,11 +105,6 @@ public class Globals {
 
     private static int SHORTCUT_MASK = -1;
 
-    // used at highlighting in preview area. 
-    // Color chosen similar to JTextComponent.getSelectionColor(), which is
-    // used at highlighting words at the editor 
-    public static final String highlightColor = "#3399FF";
-
     private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
             INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
