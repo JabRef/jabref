@@ -203,11 +203,6 @@ public class Globals {
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
-   
-            /**
-             * true if we have unix newlines
-             */
-    public static final boolean UNIX_NEWLINE = Globals.NEWLINE.equals("\n");
 
     /**
      * 	"Fieldname" to indicate that a field should be treated as a bibtex 
