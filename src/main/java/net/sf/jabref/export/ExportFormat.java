@@ -45,7 +45,7 @@ public class ExportFormat implements IExportFormat {
 
     private FileFilter fileFilter;
     private boolean customExport = false;
-
+    private final String LAYOUT_PREFIX = "/resource/layout/";
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -136,7 +136,7 @@ public class ExportFormat implements IExportFormat {
         if (customExport) {
             dir = "";
         } else {
-            dir = Globals.LAYOUT_PREFIX
+            dir = LAYOUT_PREFIX
                     + (directory == null ? "" : directory + '/');
         }
         return FileActions.getReader(dir + filename);
