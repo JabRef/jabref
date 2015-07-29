@@ -1,4 +1,4 @@
-package net.sf.jabref.splash;
+package net.sf.jabref.gui.splash;
 
 import java.awt.Frame;
 
