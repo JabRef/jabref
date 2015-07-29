@@ -50,10 +50,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class Globals {
 
-
-    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/resource/IEEEJournalList.txt";
-    public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
-
     /**
      * {@link Control} class allowing properties bundles to be in different encodings.
      * 
@@ -101,7 +97,8 @@ public class Globals {
             return bundle;
         }
     }
-
+    
+    public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
     private static int SHORTCUT_MASK = -1;
 
@@ -109,11 +106,9 @@ public class Globals {
             INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
     public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
-    /*
-     * some extra field definitions
-     */
-    public static final String additionalFields = "/resource/fields/fields.xml";
-
+    
+    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/resource/IEEEJournalList.txt";
+    
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
     private static ResourceBundle intMessages;
