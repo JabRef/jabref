@@ -8,8 +8,6 @@ We also have [guidelines for setting up a local workspace](https://github.com/Ja
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get start with JabRef development.
 
-Please keep in mind that JabRef relies on Java 6 due to the availability of Java 6 on older Mac OS X operating system.
-
 In case you have any questions, you can use our [GITTER channel](https://gitter.im/JabRef/jabref) or use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
 
 
@@ -22,9 +20,9 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 ### Ensure consistent formatting
 
 Ensure your code is formatted according the JabRef formatting guidelines.
-These are provided as Eclipse formatting configuration in [formatter_settings.xml](formatter_settings.xml).
+These are provided as Eclipse formatting configuration in [formatter_settings.xml](ide-settings/formatter_settings.xml).
 Ensure that JabRef's code cleanup settings are activated.
-Import [cleanup_settings.xml](cleanup_settings.xml).
+Import [cleanup_settings.xml](ide-settings/cleanup_settings.xml).
 
 
 ### Add your change to the CHANGELOG
