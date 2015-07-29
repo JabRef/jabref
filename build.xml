@@ -171,7 +171,6 @@
 				<include name="gpl2.txt" />
 				<include name="gpl3.txt" />
 				<include name="lesser.txt" />
-				<include name="jgoodies.txt" />
 				<include name="README" />
 			</fileset>
 			<manifest>
