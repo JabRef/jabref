@@ -44,12 +44,6 @@ import net.sf.jabref.export.IExportFormat;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.imports.*;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.PluginInstaller;
-import net.sf.jabref.plugin.SidePanePlugin;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.remote.RemotePreferences;
 import net.sf.jabref.remote.client.RemoteListenerClient;
 import net.sf.jabref.remote.JabRefMessageHandler;
@@ -87,7 +81,6 @@ public class JabRef {
         // See if there are plugins scheduled for deletion:
         if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && !prefs.get(JabRefPreferences.DELETE_PLUGINS).isEmpty()) {
             String[] toDelete = prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
-            PluginInstaller.deletePluginsOnStartup(toDelete);
             prefs.put(JabRefPreferences.DELETE_PLUGINS, "");
         }
 
@@ -596,23 +589,23 @@ public class JabRef {
             return null;
         }
 
-        String engine = fetchCommand.split(":")[0];
-        String query = fetchCommand.split(":")[1];
+        String[] split = fetchCommand.split(":");
+        String engine = split[0];
+        String query = split[1];
 
         EntryFetcher fetcher = null;
-        for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
-                .getEntryFetcherExtensions()) {
-            if (engine.toLowerCase().equals(e.getId().replaceAll("Fetcher", "").toLowerCase())) {
-                fetcher = e.getEntryFetcher();
+        for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
+            if (engine.toLowerCase().equals(e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase())) {
+                fetcher = e;
             }
         }
 
         if (fetcher == null) {
             System.out.println(Globals.lang("Could not find fetcher '%0'", engine));
             System.out.println(Globals.lang("The following fetchers are available:"));
-            for (EntryFetcherExtension e : JabRefPlugin.getInstance(PluginCore.getManager())
-                    .getEntryFetcherExtensions()) {
-                System.out.println("  " + e.getId().replaceAll("Fetcher", "").toLowerCase());
+
+            for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
+                System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
             }
             return null;
         }
@@ -828,9 +821,6 @@ public class JabRef {
             JabRef.jrf.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        // TEST TEST TEST TEST TEST TEST
-        startSidePanePlugins(JabRef.jrf);
-
         for (ParserResult pr : failed) {
             String message = "<html>" + Globals.lang("Error opening file '%0'.", pr.getFile().getName())
                     + "<p>" + pr.getErrorMessage() + "</html>";
@@ -887,25 +877,6 @@ public class JabRef {
         if (!loaded.isEmpty()) {
             JabRef.jrf.tabbedPane.setSelectedIndex(0);
             new FocusRequester(((BasePanel) JabRef.jrf.tabbedPane.getComponentAt(0)).mainTable);
-        }
-    }
-
-    /**
-     * Go through all registered instances of SidePanePlugin, and register them
-     * in the SidePaneManager.
-     *
-     * @param jrf The JabRefFrame.
-     */
-    private void startSidePanePlugins(JabRefFrame jrf) {
-
-        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        List<_JabRefPlugin.SidePanePluginExtension> plugins = jabrefPlugin.getSidePanePluginExtensions();
-        for (_JabRefPlugin.SidePanePluginExtension extension : plugins) {
-            SidePanePlugin plugin = extension.getSidePanePlugin();
-            plugin.init(jrf, jrf.sidePaneManager);
-            SidePaneComponent comp = plugin.getSidePaneComponent();
-            jrf.sidePaneManager.register(comp.getName(), comp);
-            jrf.addPluginMenuItem(plugin.getMenuItem());
         }
     }
 

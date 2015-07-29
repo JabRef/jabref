@@ -126,31 +126,6 @@ Project: Microba
 URL:     https://github.com/tdbear/microba
 License: BSD
 
-Path:    lib/plugin/jpf-boot.jar
-Project: Java Plugin Framework
-URL:     http://jpf.sourceforge.net/
-License: LGPL 2.1+
-
-Path:    lib/plugin/jpf.jar
-Project: Java Plugin Framework
-URL:     http://jpf.sourceforge.net/
-License: LGPL 2.1+
-
-Path:    lib/plugin/JPFCodeGenerator-rt.jar
-Project: Part of JabRef
-URL:     jabref-git-repo:jpfcodegen
-License: LGPL 3.0
-
-Path:    lib/plugin/JPFCodeGenerator.jar
-Project: Part of JabRef
-URL:     jabref-git-repo:jpfcodegen
-License: LGPL 3.0
-
-Path:    lib/plugin/velocity-dep-1.5.jar
-Project: Apache Velocity
-URL:     http://velocity.apache.org/engine/releases/velocity-1.5/
-License: Apache 2.0
-
 Path:    lib/spl/sciplore/mrDlib-serialization-api.jar
 Project: Mr. DLib
 URL:     http://mr-dlib.org/

@@ -26,11 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.*;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatExtension;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatProviderExtension;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExtension;
 
 /**
  * User: alver
@@ -52,17 +47,14 @@ public class ExportFormats {
         ExportFormats.exportFormats.clear();
 
         // Initialize Build-In Export Formats
-        ExportFormats.putFormat(new ExportFormat(
-                Globals.lang("HTML"), "html", "html", null, ".html"));
-        ExportFormats.putFormat(new ExportFormat(
-                Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML"), "html", "html", null, ".html"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("DIN 1505"), "din1505", "din1505winword", "din1505", ".rtf"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
         ExportFormats.putFormat(new ModsExportFormat());
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table"),
-                "tablerefs", "tablerefs", "tablerefs", ".html"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", ".html"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML list"),
                 "listrefs", "listrefs", "listrefs", ".html"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
@@ -71,75 +63,19 @@ public class ExportFormats {
                 "harvard", ".rtf"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
-                "endnote", ".txt"));
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote", "endnote", ".txt"));
         ExportFormats.putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
         ExportFormat ef = new ExportFormat(Globals.lang("RIS"), "ris", "ris", "ris", ".ris");
         ef.encoding = "UTF-8";
         ExportFormats.putFormat(ef);
+
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
         ExportFormats.putFormat(new MSBibExportFormat());
         ExportFormats.putFormat(new MySQLExport());
         ExportFormats.putFormat(new PostgreSQLExport());
-
-        // Add Export Formats contributed by Plugins
-        JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        if (plugin != null) {
-
-            // 1. ExportFormats based on Templates
-            for (ExportFormatTemplateExtension e : plugin.getExportFormatTemplateExtensions()) {
-                ExportFormat format = PluginBasedExportFormat.getFormat(e);
-                if (format != null) {
-                    ExportFormats.putFormat(format);
-                }
-            }
-
-            // 2. ExportFormat classed 
-            for (final ExportFormatExtension e : plugin.getExportFormatExtensions()) {
-                ExportFormats.putFormat(new IExportFormat() {
-
-                    @Override
-                    public String getConsoleName() {
-                        return e.getConsoleName();
-                    }
-
-                    @Override
-                    public String getDisplayName() {
-                        return e.getDisplayName();
-                    }
-
-                    @Override
-                    public FileFilter getFileFilter() {
-                        return new ExportFileFilter(this, e.getExtension());
-                    }
-
-
-                    IExportFormat wrapped;
-
-
-                    @Override
-                    public void performExport(BibtexDatabase database, MetaData metaData,
-                            String file, String encoding, Set<String> entryIds)
-                            throws Exception {
-
-                        if (wrapped == null) {
-                            wrapped = e.getExportFormat();
-                        }
-                        wrapped.performExport(database, metaData, file, encoding, entryIds);
-                    }
-                });
-            }
-
-            // 3. Formatters provided by Export Format Providers
-            for (ExportFormatProviderExtension e : plugin.getExportFormatProviderExtensions()) {
-                IExportFormatProvider formatProvider = e.getFormatProvider();
-                for (IExportFormat exportFormat : formatProvider.getExportFormats()) {
-                    ExportFormats.putFormat(exportFormat);
-                }
-            }
-        }
+        ExportFormats.putFormat(new ModsExportFormat());
 
         // Now add custom export formats
         TreeMap<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats();

@@ -63,8 +63,7 @@ public class LayoutHelper {
         _in = new PushbackReader(in);
     }
 
-    public Layout getLayoutFromText(String classPrefix) throws Exception
-    {
+    public Layout getLayoutFromText(String classPrefix) throws Exception {
         parse();
 
         StringInt si;

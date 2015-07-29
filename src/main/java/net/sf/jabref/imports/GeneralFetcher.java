@@ -70,10 +70,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final EntryFetcher[] fetcherArray;
 
 
-    public GeneralFetcher(SidePaneManager p0, JabRefFrame frame, final List<EntryFetcher> fetchers) {
+    public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
         super(p0, GUIGlobals.getIconUrl("www"), Globals.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
+        List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
         fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];

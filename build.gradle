@@ -60,7 +60,6 @@ sourceSets {
 }
 
 configurations {
-    generateClasspath
     antlr3
     antlr4
 }
@@ -102,8 +101,6 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
 
     compile 'commons-logging:commons-logging:1.2'
-    // not available in maven repository
-    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
 
     compile 'com.sun.jersey:jersey-client:1.19'
     compile 'com.sun.jersey:jersey-core:1.19'
@@ -112,9 +109,6 @@ dependencies {
     compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
 
     compile 'junit:junit:4.12'
-
-    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar'])
-    generateClasspath 'org.apache.velocity:velocity:1.7'
 }
 
 // use ant targets with prefix antTargets.XXXXX
@@ -157,23 +151,9 @@ javadoc {
 // jabref specific tasks
 compileJava.dependsOn "generateSource"
 
-task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchGrammarSource"]) {
+task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
-}
-
-task generatePluginSource(type: JavaExec) {
-    group 'JabRef'
-    description 'Generates _JabRefPlugin.java with JPF.'
-
-    ext.pluginsDir = "src/main/resources/plugins"
-
-    inputs.dir file(ext.pluginsDir)
-    outputs.file file("src/main/gen/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
-
-    main = "net.sf.jabref.plugin.util.CodeGenerator"
-    args = [ext.pluginsDir]
-    classpath = configurations.generateClasspath
 }
 
 task generateBstGrammarSource(type: JavaExec) {

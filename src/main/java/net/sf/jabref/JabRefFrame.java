@@ -77,6 +77,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.imports.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -102,20 +103,8 @@ import net.sf.jabref.gui.WaitForSaveOperation;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
-import net.sf.jabref.imports.EntryFetcher;
-import net.sf.jabref.imports.GeneralFetcher;
-import net.sf.jabref.imports.ImportCustomizationDialog;
-import net.sf.jabref.imports.ImportFormat;
-import net.sf.jabref.imports.ImportFormats;
-import net.sf.jabref.imports.ImportMenuItem;
-import net.sf.jabref.imports.OpenDatabaseAction;
-import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.oo.OpenOfficePanel;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.PluginInstallerAction;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -180,8 +169,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final ToolBar tlb = new ToolBar();
 
     private final JMenuBar mb = new JMenuBar();
-    private final JMenu pluginMenu = JabRefFrame.subMenu("Plugins");
-    private boolean addedToPluginMenu = false;
 
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
@@ -442,7 +429,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             //        Globals.lang("Follow DOI or URL link and try to locate PDF full text document")),
             increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
-    private final AbstractAction installPlugin = new PluginInstallerAction(this);
     private final AbstractAction resolveDuplicateKeys = new GeneralAction("resolveDuplicateKeys", "Resolve duplicate BibTeX keys",
                     Globals.lang("Find and remove duplicate BibTeX keys"),
                     prefs.getKey("Resolve duplicate BibTeX keys"));
@@ -462,7 +448,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PushToApplicationButton pushExternalButton;
 
-    private final List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
     private final List<Action> fetcherActions = new LinkedList<Action>();
 
     private SearchManager2 searchManager;
@@ -680,24 +665,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         Globals.sidePaneManager = this.sidePaneManager;
         Globals.helpDiag = this.helpDiag;
-
-        /*
-         * Load fetchers that are plug-in extensions
-         */
-        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        if (jabrefPlugin != null) {
-            for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()) {
-                try {
-                    EntryFetcher fetcher = ext.getEntryFetcher();
-                    if (fetcher != null) {
-                        fetchers.add(fetcher);
-                    }
-                } catch (ClassCastException ex) {
-                    PluginCore.getManager().disablePlugin(ext.getDeclaringPlugin().getDescriptor());
-                    ex.printStackTrace();
-                }
-            }
-        }
 
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager2(this, sidePaneManager);
@@ -1449,7 +1416,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //search.add(strictDupliCheck);
         search.add(autoSetFile);
         search.addSeparator();
-        GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetchers);
+        GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this);
         search.add(generalFetcher.getAction());
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
@@ -1551,11 +1518,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         });*/
 
-        pluginMenu.add(installPlugin);
-
-        //pluginMenu.setEnabled(false);
-        mb.add(pluginMenu);
-
         options.add(selectKeys);
         mb.add(options);
 
@@ -1598,14 +1560,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
         }
-    }
-
-    public void addPluginMenuItem(JMenuItem item) {
-        if (!addedToPluginMenu) {
-            pluginMenu.addSeparator();
-            addedToPluginMenu = true;
-        }
-        pluginMenu.add(item);
     }
 
     private void createToolBar() {

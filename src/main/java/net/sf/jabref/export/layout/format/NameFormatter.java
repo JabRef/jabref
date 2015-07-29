@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.export.layout.format.plugin;
+package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;
@@ -83,7 +83,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * For more examples see the test-cases.
  *
  */
-public class NameFormat implements LayoutFormatter {
+public class NameFormatter implements LayoutFormatter {
 
     public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
 
@@ -167,7 +167,7 @@ public class NameFormat implements LayoutFormatter {
     }
 
 
-    private String parameter = NameFormat.DEFAULT_FORMAT;
+    private String parameter = NameFormatter.DEFAULT_FORMAT;
 
 
     public void setParameter(String parameter) {

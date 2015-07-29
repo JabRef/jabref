@@ -22,9 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.ImportFormatExtension;
 
 public class ImportFormatReader {
 
@@ -43,39 +40,28 @@ public class ImportFormatReader {
     public void resetImportFormats() {
         formats.clear();
 
-        // Add all our importers to the TreeMap. The map is used to build the import
-        // menus, and .
-        formats.add(new CsaImporter());
-        formats.add(new IsiImporter());
-        formats.add(new EndnoteImporter());
-        formats.add(new BibteXMLImporter());
         formats.add(new BiblioscapeImporter());
-        formats.add(new SixpackImporter());
-        formats.add(new InspecImporter());
-        formats.add(new ScifinderImporter());
-        formats.add(new OvidImporter());
-        formats.add(new RisImporter());
-        formats.add(new JstorImporter());
-        formats.add(new SilverPlatterImporter());
-        formats.add(new BiomailImporter());
-        formats.add(new RepecNepImporter());
-        formats.add(new PdfXmpImporter());
-        formats.add(new CopacImporter());
-        formats.add(new MsBibImporter());
         formats.add(new BibtexImporter());
-
-        /**
-         * Get import formats that are plug-ins
-         */
-        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        if (jabrefPlugin != null) {
-            for (ImportFormatExtension ext : jabrefPlugin.getImportFormatExtensions()) {
-                ImportFormat importFormat = ext.getImportFormat();
-                if (importFormat != null) {
-                    formats.add(importFormat);
-                }
-            }
-        }
+        formats.add(new BibteXMLImporter());
+        formats.add(new BiomailImporter());
+        formats.add(new CopacImporter());
+        formats.add(new CsaImporter());
+        formats.add(new EndnoteImporter());
+        formats.add(new FreeCiteImporter());
+        formats.add(new InspecImporter());
+        formats.add(new IsiImporter());
+        formats.add(new JstorImporter());
+        formats.add(new MedlineImporter());
+        formats.add(new MedlinePlainImporter());
+        formats.add(new MsBibImporter());
+        formats.add(new OvidImporter());
+        formats.add(new PdfContentImporter());
+        formats.add(new PdfXmpImporter());
+        formats.add(new RepecNepImporter());
+        formats.add(new RisImporter());
+        formats.add(new ScifinderImporter());
+        formats.add(new SilverPlatterImporter());
+        formats.add(new SixpackImporter());
 
         /**
          * Get custom import formats
