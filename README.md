@@ -138,6 +138,7 @@ JabRef is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation, either version 2 of the License, or (at your option) any later
 version.
-See the enclosed text files [gpl2.txt](gpl2.txt) and [gpl3.txt](gpl3.txt) for full details.
+See the [LICENSE](LICENSE) for full details.
 
-JabRef also uses libraries distributed by other parties; see the About box for details.
+JabRef also uses libraries distributed by other parties.
+See [external libraries](external-libraries.txt) for details.
