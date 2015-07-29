@@ -155,7 +155,7 @@ public class EntryMarker {
         StringBuilder sb = new StringBuilder();
         for (Object owner : owners) {
             sb.append('[');
-            sb.append(owner.toString());
+            sb.append(owner);
             sb.append(']');
         }
         String newVal = sb.toString();

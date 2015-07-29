@@ -677,7 +677,7 @@ public class Util {
             }
             if (flEntry == null) {
                 // This shouldn't happen, so I'm not sure what to put in here:
-                throw new RuntimeException("Could not find the file list entry " + link + " in " + entry.toString());
+                throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
             }
 
             FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);

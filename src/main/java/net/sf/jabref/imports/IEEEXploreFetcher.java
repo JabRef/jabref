@@ -327,7 +327,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 sb.append(buffer[i]);
             }
         }
-        System.out.println(sb.toString());
+        System.out.println(sb);
 
         ParserResult results = new BibtexParser(bufr).parse();
         bufr.close();

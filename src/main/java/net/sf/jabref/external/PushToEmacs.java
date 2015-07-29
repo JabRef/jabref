@@ -167,7 +167,7 @@ public class PushToEmacs implements PushToApplication {
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        System.out.println(sb.toString());
+                        System.out.println(sb);
                         couldNotConnect = true;
                     }
                 }

@@ -1222,7 +1222,7 @@ public class XMPUtil {
                 for (BibtexEntry entry : l) {
                     StringWriter sw = new StringWriter();
                     bibtexEntryWriter.write(entry, sw);
-                    System.out.println(sw.getBuffer().toString());
+                    System.out.println(sw.getBuffer());
                 }
 
             } else if (args[0].endsWith(".bib")) {

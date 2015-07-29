@@ -81,7 +81,7 @@ public class INSPIREFetcher implements EntryFetcher {
         //sb.append("&action_search=Search&sf=&so=d&rm=&rg=25&sc=0&of=hx");
         sb.append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
         //sb.append("&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=");
-        System.out.print("Inspire URL: " + sb.toString() + "\n");
+        System.out.print("Inspire URL: " + sb + "\n");
         return sb.toString();
     }
 
@@ -154,7 +154,7 @@ public class INSPIREFetcher implements EntryFetcher {
         } catch (IOException e) {
             frame.showMessage(Globals.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e.toString(), Globals.lang(getKeyName()),
+                    + "\n\n" + e, Globals.lang(getKeyName()),
                     JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             frame.showMessage(Globals.lang(

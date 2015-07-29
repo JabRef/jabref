@@ -53,7 +53,7 @@ public class RTFChars implements LayoutFormatter {
 
             System.out.println("incommand=" + incommand + ". escaped=" + escaped
                     + ". currentCommand='" + (currentCommand != null ? currentCommand.toString() : "") + '\'');
-            System.out.println("sb: '" + sb.toString() + '\'');/**/
+            System.out.println("sb: '" + sb + '\'');/**/
 
             char c = field.charAt(i);
 

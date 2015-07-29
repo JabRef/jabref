@@ -304,7 +304,7 @@ public class ExportFormat implements IExportFormat {
                     sb.append(", ");
                 }
             }
-            System.err.println(sb.toString());
+            System.err.println(sb);
         }
 
         finalizeSaveSession(ss);

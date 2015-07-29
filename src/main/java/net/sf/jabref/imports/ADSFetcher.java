@@ -118,7 +118,7 @@ public class ADSFetcher implements EntryFetcher {
         } catch (IOException e) {
             status.showMessage(Globals.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    + "\n\n" + e, Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Globals.lang(
                     "An Error occurred while fetching from ADS (%0):", new String[] {url})
@@ -166,7 +166,7 @@ public class ADSFetcher implements EntryFetcher {
         } catch (IOException e) {
             status.showMessage(Globals.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    + "\n\n" + e, Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(Globals.lang(
                     "An Error occurred while fetching from ADS (%0):", new String[] {url})

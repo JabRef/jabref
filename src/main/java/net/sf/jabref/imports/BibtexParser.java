@@ -396,7 +396,7 @@ public class BibtexParser {
             return parserResult;
         } catch (KeyCollisionException kce) {
             // kce.printStackTrace();
-            throw new IOException("Duplicate ID in bibtex file: " + kce.toString());
+            throw new IOException("Duplicate ID in bibtex file: " + kce);
         }
     }
 
@@ -818,7 +818,7 @@ public class BibtexParser {
                     // the key. Possibly the comma is missing, so we try to
                     // return what we
                     // have found, as the key and try to restore the rest in fixKey().
-                    return token.toString() + fixKey();
+                    return token + fixKey();
                 } else if (c == ',') {
                     unread(c);
                     return token.toString();

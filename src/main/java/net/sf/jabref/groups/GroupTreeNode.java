@@ -91,7 +91,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
             cursor = e.nextElement();
-            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup().toString()).append("\n");
+            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup()).append("\n");
         }
         return sb.toString();
     }

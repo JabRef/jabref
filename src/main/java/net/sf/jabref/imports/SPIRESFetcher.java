@@ -129,7 +129,7 @@ public class SPIRESFetcher implements EntryFetcher {
         } catch (IOException e) {
             frame.showMessage(Globals.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e.toString(), Globals.lang(getKeyName()),
+                    + "\n\n" + e, Globals.lang(getKeyName()),
                     JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             frame.showMessage(Globals.lang(

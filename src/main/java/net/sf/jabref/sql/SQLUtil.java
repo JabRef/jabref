@@ -312,7 +312,7 @@ public class SQLUtil {
         stmnt.execute(qry);
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
-            System.err.println(warn.toString());
+            System.err.println(warn);
         }
         stmnt.close();
     }
@@ -332,7 +332,7 @@ public class SQLUtil {
         SQLWarning warn = stmnt.getWarnings();
         if (warn != null) {
 
-            System.err.println(warn.toString());
+            System.err.println(warn);
         }
         return stmnt;
     }

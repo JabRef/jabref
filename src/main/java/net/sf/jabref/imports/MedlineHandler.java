@@ -219,11 +219,11 @@ class MedlineHandler extends DefaultHandler
 
     private String join(Object[] sa, String delim) {
         StringBuilder sb = new StringBuilder();
-        sb.append(sa[0].toString());
+        sb.append(sa[0]);
         for (int i = 1; i < sa.length; i++)
         {
             sb.append(delim);
-            sb.append(sa[i].toString());
+            sb.append(sa[i]);
         }
         return sb.toString();
     }

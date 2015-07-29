@@ -137,7 +137,7 @@ public class DownloadExternalFile {
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                                     + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while downloading " + "'" + urlF.toString() + "'", e2);
+                    LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
                     return;
                 }
 
