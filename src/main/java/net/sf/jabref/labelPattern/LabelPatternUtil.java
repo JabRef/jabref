@@ -44,6 +44,8 @@ public class LabelPatternUtil {
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
     
     private static final Log LOGGER = LogFactory.getLog(LabelPatternUtil.class);
+    
+    private static final String[] SKIP_WORDS = {"a", "an", "the", "for", "on", "of"};
 
 
     public static ArrayList<String> DEFAULT_LABELPATTERN;
@@ -864,8 +866,8 @@ public class LabelPatternUtil {
             if (word.length() == 0) {
                 continue;
             }
-            for (int _i = 0; _i < Globals.SKIP_WORDS.length; _i++) {
-                if (word.equalsIgnoreCase(Globals.SKIP_WORDS[_i])) {
+            for (int _i = 0; _i < SKIP_WORDS.length; _i++) {
+                if (word.equalsIgnoreCase(SKIP_WORDS[_i])) {
                     continue mainl;
                 }
             }
