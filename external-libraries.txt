@@ -9,14 +9,13 @@ License:
  * GPLv2  means, we haven't checked whether later options are allowed
  * similar for LGPL and other version of GPL
 
-
-Id:      antlr:antlr
-Project: ANTLR
+Id:      org.antlr:antlr
+Project: ANTLR 3
 URL:     http://www.antlr.org/
 License: BSD
 
-Id:      org.antlr:antlr
-Project: ANTLR
+Id:      org.antlr:antlr4
+Project: ANTLR 4
 URL:     http://www.antlr.org/
 License: BSD
 
@@ -95,7 +94,7 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: LGPL 3.0
 
-Id:      org.swinglabs:swingx
+Id:      org.swinglabs.swingx:swingx-core
 Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL 3.0

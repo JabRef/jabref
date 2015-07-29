@@ -1,21 +1,38 @@
-bin
+# no generated files in version control
+src/main/gen/
+
+hs_err*.log
+
+# Ant
+buildant/
 build.number
-build/
-nbproject/private/
+classes/
+user.properties
 src/main/resources/resource/build.properties
 src/main/resources/windows/nsis/dist/
-.gradle
-hs_err*.log
 jabref-launch4j.tmp
-user.properties
+
+# Gradle
+build/
+.gradle
+
+# Netbeans
+nbproject/private/
+
+# IntelliJ IDEA
 out/
-buildant/
 *.iws
 .idea/
-classes/
 *.ipr
 *.iml
+
+# Eclipse
 .settings/
 .classpath
 .project
+bin/
+
+# UNKNWON
 jabref.xml
+
+
