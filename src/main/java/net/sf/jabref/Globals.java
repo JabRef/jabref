@@ -24,10 +24,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
@@ -36,11 +41,13 @@ import net.sf.jabref.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
-import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.BuildInfo;
+import net.sf.jabref.util.error.StreamEavesdropper;
 import net.sf.jabref.util.logging.CachebleHandler;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
 
 public class Globals {
 
@@ -219,9 +226,25 @@ public class Globals {
     // will be overridden in initialization due to feature #857
     public static String NEWLINE = System.getProperty("line.separator");
     public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
+    
+    //initialize logging system
+    static {
+        LogFactory factory = LogFactory.getFactory();
+        //tell commons logging to default to Java's internal logging implementation
+        factory.setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
+    }
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
+    
+    public static void setupLogHandlerForErrorConsole() {
+        Globals.handler = new CachebleHandler();
+        ((Jdk14Logger)LOGGER).getLogger().addHandler(handler);
+    }
+    
+    public static void logInfo(String s) {
+        LOGGER.info(s);
+    }
 
             /**
              * true if we have unix newlines
@@ -262,10 +285,6 @@ public class Globals {
             Globals.autoSaveManager.clearAutoSaves();
             Globals.autoSaveManager = null;
         }
-    }
-
-    public static void logInfo(String s) {
-        LOGGER.info(s);
     }
 
     public static void setLanguage(String language, String country) {
@@ -1323,11 +1342,5 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
         return pattern;
     }
 
-
-    public static void setupLogHandlerForErrorConsole() {
-        Logger rootLogger = Logger.getLogger("");
-        Globals.handler = new CachebleHandler();
-        rootLogger.addHandler(handler);
-    }
 
 }
