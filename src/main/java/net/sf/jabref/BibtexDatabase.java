@@ -53,6 +53,9 @@ import java.util.Set;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class BibtexDatabase {
 
     private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
@@ -64,6 +67,8 @@ public class BibtexDatabase {
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
     private boolean followCrossrefs = true;
+    
+    private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     /**
      * use a map instead of a set since i need to know how many of each key is
@@ -433,7 +438,7 @@ public class BibtexDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    Util.pr("Stopped due to circular reference in strings: " + label);
+                    LOGGER.info("Stopped due to circular reference in strings: " + label);
                     return label;
                 }
                 // If not, log this string's ID now.

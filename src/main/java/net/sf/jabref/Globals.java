@@ -241,11 +241,6 @@ public class Globals {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(handler);
     }
-    
-    public static void logInfo(String s) {
-        LOGGER.info(s);
-    }
-
             /**
              * true if we have unix newlines
              */
@@ -1298,7 +1293,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
                     Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    Globals.logInfo(e.getMessage());
+                    LOGGER.info("Cannot find file", e);
                 }
             }
         }
@@ -1308,8 +1303,8 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {
-                Globals.logInfo("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
-                        + "' not found.");
+                LOGGER.info("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
+                        + "' not found.", e);
             }
         }
 

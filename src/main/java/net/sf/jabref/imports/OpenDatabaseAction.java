@@ -45,6 +45,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
 
     private final boolean showDialog;
@@ -101,8 +103,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 fileToOpen = new File(chosenFile);
             }*/
         } else {
-            Util.pr(Action.NAME);
-            Util.pr(e.getActionCommand());
+            LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.makeBibtexExtension(e.getActionCommand())));
         }
 

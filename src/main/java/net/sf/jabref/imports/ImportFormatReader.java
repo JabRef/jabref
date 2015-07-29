@@ -18,6 +18,9 @@ package net.sf.jabref.imports;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
@@ -29,6 +32,8 @@ public class ImportFormatReader {
 
     /** all import formats, in the default order of import formats */
     private final SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
+    
+    private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
 
     public ImportFormatReader() {
@@ -335,11 +340,10 @@ public class ImportFormatReader {
         File f = new File(filename);
 
         if (!f.exists() && !f.canRead() && !f.isFile()) {
-            System.err.println("Error " + filename
-                    + " is not a valid file and|or is not readable.");
-            Globals.logInfo("Error " + filename + " is not a valid file and|or is not readable.");
-
+            
+            LOGGER.info("Error " + filename + " is not a valid file and|or is not readable.");
             return null;
+            
         } else {
             return f;
         }

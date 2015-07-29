@@ -29,14 +29,19 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -67,7 +72,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private int lastPressedCount = 0;
     private long lastPressedTime = 0;
 
-
+    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    
     //private int lastCharPressed = -1;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
@@ -336,7 +342,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
                     Object link = entry.getField(fieldName);
                     if (link == null) {
-                        Globals.logInfo("Error: no link to " + fieldName + '.');
+                        LOGGER.info("Error: no link to " + fieldName + '.');
                         return; // There is an icon, but the field is not set.
                     }
 

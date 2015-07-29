@@ -18,6 +18,9 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
@@ -27,12 +30,17 @@ import net.sf.jabref.undo.UndoableRemoveString;
 
 class StringRemoveChange extends Change {
 
+
+    private static final long serialVersionUID = 1L;
+    
     private final BibtexString string;
     private final BibtexString inMem;
 
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
+    
+    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
@@ -52,7 +60,7 @@ class StringRemoveChange extends Change {
             panel.database().removeString(inMem.getId());
             undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
         } catch (Exception ex) {
-            Globals.logInfo("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
 
         // Update tmp database:

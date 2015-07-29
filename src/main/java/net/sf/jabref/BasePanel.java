@@ -569,7 +569,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     (new java.io.StringReader((String) (content.getTransferData(
                                             DataFlavor.stringFlavor))));
                             BibtexDatabase db = bp.parse().getDatabase();
-                            Util.pr("Parsed " + db.getEntryCount() + " entries from clipboard text");
+                            LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                             if (db.getEntryCount() > 0) {
                                 bes = db.getEntries().toArray(new BibtexEntry[db.getEntryCount()]);
                             }
@@ -616,7 +616,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 ce.addEdit(new UndoableInsertEntry
                                         (database, be, BasePanel.this));
                             } catch (KeyCollisionException ex) {
-                                Util.pr("KeyCollisionException... this shouldn't happen.");
+                                LOGGER.info("KeyCollisionException... this shouldn't happen.", ex);
                             }
                         }
                         ce.end();
@@ -1747,7 +1747,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //(new Thread() {
         //  public void run() {
         if (actions.get(_command) == null) {
-            Util.pr("No action defined for '" + _command + '\'');
+            LOGGER.info("No action defined for '" + _command + '\'');
         } else {
             Object o = actions.get(_command);
             try {
@@ -1918,7 +1918,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 return be;
             } catch (KeyCollisionException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.info(ex.getMessage(), ex);
             }
         }
         return null;
@@ -2014,7 +2014,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 highlightEntry(bibEntry);
             } catch (KeyCollisionException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.info("Collision for bibtex key" + bibEntry.getId(), ex);
             }
         }
     }
@@ -2988,7 +2988,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Override
     public void fileRemoved() {
-        Util.pr("File '" + getFile().getPath() + "' has been deleted.");
+        LOGGER.info("File '" + getFile().getPath() + "' has been deleted.");
     }
 
     /**

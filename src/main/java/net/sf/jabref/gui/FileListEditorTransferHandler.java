@@ -30,6 +30,9 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.EntryContainer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
@@ -39,12 +42,16 @@ import net.sf.jabref.groups.EntryTableTransferHandler;
 
 class FileListEditorTransferHandler extends TransferHandler {
 
+    private static final long serialVersionUID = 1L;
+    
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
     private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
     private DroppedFileHandler dfh = null;
+    
+    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
 
 
     /**
@@ -61,8 +68,7 @@ class FileListEditorTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            Globals.logInfo("Unable to configure drag and drop for file link table");
-            e.printStackTrace();
+            LOGGER.info("Unable to configure drag and drop for file link table", e);
         }
     }
 

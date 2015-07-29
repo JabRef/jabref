@@ -21,6 +21,8 @@ import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sciplore.beans.Document;
 
 import spl.filter.PdfFileFilter;
@@ -40,6 +42,8 @@ public class PdfImporter {
     private final BasePanel panel;
     private MainTable entryTable;
     private int dropRow;
+    
+    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
 
 
     /**
@@ -157,7 +161,7 @@ public class PdfImporter {
 
                     if ((localRes == null) || (localRes.size() == 0)) {
                         // import failed -> generate default entry
-                        Globals.logInfo(Globals.lang("Import failed"));
+                        LOGGER.info(Globals.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -187,7 +191,7 @@ public class PdfImporter {
                         in = new FileInputStream(file);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        Globals.logInfo(Globals.lang("Import failed"));
+                        LOGGER.info(Globals.lang("Import failed"), e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -197,7 +201,7 @@ public class PdfImporter {
                         localRes = contentImporter.importEntries(in, status);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        Globals.logInfo(Globals.lang("Import failed"));
+                        LOGGER.info(Globals.lang("Import failed"), e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -440,7 +444,7 @@ public class PdfImporter {
                 new FocusRequester(panel.getEntryEditor(be));
                 return be;
             } catch (KeyCollisionException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.info("Key collision occured", ex);
             }
         }
         return null;

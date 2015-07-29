@@ -33,6 +33,9 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.export.FileActions;
@@ -69,6 +72,8 @@ public class JabRef {
     public static JabRefFrame jrf;
 
     private static final int MAX_DIALOG_WARNINGS = 10;
+    
+    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     private boolean graphicFailure = false;
     private JabRefCLI cli;
@@ -294,7 +299,7 @@ public class JabRef {
                 BibtexEntryType.loadCustomEntryTypes(Globals.prefs);
                 ExportFormats.initAllExports();
             } catch (IOException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.error("Cannot import preferences", ex);
             }
         }
 
@@ -498,7 +503,7 @@ public class JabRef {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
             } catch (IOException ex) {
-                Util.pr(ex.getMessage());
+                LOGGER.error("Cannot export preferences", ex);
             }
         }
 
@@ -900,7 +905,7 @@ public class JabRef {
     }
 
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
-        Globals.logInfo(Globals.lang("Opening") + ": " + name);
+        LOGGER.info(Globals.lang("Opening") + ": " + name);
         File file = new File(name);
         if (!file.exists()) {
             ParserResult pr = new ParserResult(null, null, null);

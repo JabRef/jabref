@@ -18,6 +18,9 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
@@ -25,6 +28,7 @@ import net.sf.jabref.undo.UndoableStringChange;
 
 class StringChange extends Change {
 
+    private static final long serialVersionUID = 1L;
     private final BibtexString string;
     private final String mem;
     private final String disk;
@@ -33,6 +37,8 @@ class StringChange extends Change {
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
+    
+    private static final Log LOGGER = LogFactory.getLog(StringChange.class);
 
 
     public StringChange(BibtexString string, BibtexString tmpString, String label,
@@ -81,7 +87,7 @@ class StringChange extends Change {
                 panel.database().addString(bs);
                 undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
             } catch (KeyCollisionException ex) {
-                Globals.logInfo("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+                LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
             }
         }
 

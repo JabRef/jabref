@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 
 /**
@@ -33,6 +36,8 @@ import net.sf.jabref.*;
 public class SixpackImporter extends ImportFormat {
 
     private final String SEPARATOR = new String(new char[] {0, 48});
+    
+    private static final Log LOGGER = LogFactory.getLog(SixpackImporter.class);
 
 
     /**
@@ -173,7 +178,7 @@ public class SixpackImporter extends ImportFormat {
                 }
                 bibitems.add(entry);
             } catch (NullPointerException ex) {
-                Globals.logInfo("Problem parsing Sixpack entry, ignoring entry.");
+                LOGGER.info("Problem parsing Sixpack entry, ignoring entry.", ex);
             }
         }
 

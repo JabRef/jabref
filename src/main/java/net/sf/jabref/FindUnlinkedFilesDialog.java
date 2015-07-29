@@ -62,12 +62,16 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.imports.EntryFromFileCreator;
 import net.sf.jabref.imports.EntryFromFileCreatorManager;
 import net.sf.jabref.imports.UnlinkedFilesCrawler;
 import net.sf.jabref.imports.UnlinkedPDFFileFilter;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 import net.sf.jabref.util.Util;
 
 /**
@@ -149,6 +153,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private int[] threadState = new int[] {1};
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing = false;
+    
+    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
 
     /**
@@ -1014,7 +1020,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                             try {
                                 Util.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
-                                Globals.logInfo("Error opening file");
+                                LOGGER.info("Error opening file", e1);
                             }
                         }
                     } else {

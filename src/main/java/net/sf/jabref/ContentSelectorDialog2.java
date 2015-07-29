@@ -43,11 +43,16 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 import net.sf.jabref.util.Util;
 
 class ContentSelectorDialog2 extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private ActionListener wordEditFieldListener = null;
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
@@ -86,7 +91,8 @@ class ContentSelectorDialog2 extends JDialog {
     private final HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
     private final ArrayList<String> removedFields = new ArrayList<String>();
 
-
+    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog2.class);
+    
     /**
      * 
      * @param owner the parent Window (Dialog or Frame)
@@ -299,7 +305,7 @@ class ContentSelectorDialog2 extends JDialog {
                     dispose();
                 }
                 catch (Exception ex) {
-                    Globals.logInfo("Could not apply changes in \"Setup selectors\"");
+                    LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
                     JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
                 }
             }
@@ -317,7 +323,7 @@ class ContentSelectorDialog2 extends JDialog {
                     applyChanges();
                 }
                 catch (Exception ex) {
-                    Globals.logInfo("Could not apply changes in \"Setup selectors\"");
+                    LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
                     JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
                 }
             }

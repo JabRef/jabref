@@ -18,16 +18,23 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertString;
 
 class StringAddChange extends Change {
 
+    private static final long serialVersionUID = 1L;
+
     private final BibtexString string;
 
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
+    
+    private static final Log LOGGER = LogFactory.getLog(StringAddChange.class);
 
 
     public StringAddChange(BibtexString string) {
@@ -43,7 +50,7 @@ class StringAddChange extends Change {
 
         if (panel.database().hasStringLabel(string.getName())) {
             // The name to change to is already in the database, so we can't comply.
-            Globals.logInfo("Cannot add string '" + string.getName() + "' because the name "
+            LOGGER.info("Cannot add string '" + string.getName() + "' because the name "
                     + "is already in use.");
         }
 
@@ -51,13 +58,13 @@ class StringAddChange extends Change {
             panel.database().addString(string);
             undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
         } catch (KeyCollisionException ex) {
-            Globals.logInfo("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
         try {
             secondary.addString(new BibtexString(IdGenerator.next(), string.getName(),
                     string.getContent()));
         } catch (KeyCollisionException ex) {
-            Globals.logInfo("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage());
+            LOGGER.info("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage(), ex);
         }
         return true;
     }
