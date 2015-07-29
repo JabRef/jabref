@@ -35,6 +35,7 @@ import javax.swing.plaf.FontUIResource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
 
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.ExportFormats;
@@ -56,6 +57,7 @@ import net.sf.jabref.splash.SplashScreenLifecycle;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
+import net.sf.jabref.util.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.sun.jna.Native;
@@ -78,6 +80,13 @@ public class JabRef {
     private boolean graphicFailure = false;
     private JabRefCLI cli;
     private SplashScreenLifecycle splashScreen = new SplashScreenLifecycle();
+    
+    //initialize logging system
+    static {
+        LogFactory factory = LogFactory.getFactory();
+        //tell commons logging to default to Java's internal logging implementation
+        factory.setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
+    }
 
     public void start(String[] args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
@@ -107,7 +116,7 @@ public class JabRef {
         }
 
         Globals.startBackgroundTasks();
-        Globals.setupLogHandlerForErrorConsole();
+        setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
         setLanguage(prefs);
         Globals.prefs.setLanguageDependentDefaultValues();
@@ -186,6 +195,11 @@ public class JabRef {
         }
 
         openWindow(loaded);
+    }
+    
+    private void setupLogHandlerForErrorConsole() {
+        Globals.handler = new CacheableHandler();
+        ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
 
     private void setLanguage(JabRefPreferences prefs) {

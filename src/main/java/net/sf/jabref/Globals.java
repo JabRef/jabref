@@ -226,21 +226,10 @@ public class Globals {
     // will be overridden in initialization due to feature #857
     public static String NEWLINE = System.getProperty("line.separator");
     public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
-    
-    //initialize logging system
-    static {
-        LogFactory factory = LogFactory.getFactory();
-        //tell commons logging to default to Java's internal logging implementation
-        factory.setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-    }
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
-    
-    public static void setupLogHandlerForErrorConsole() {
-        Globals.handler = new CacheableHandler();
-        ((Jdk14Logger)LOGGER).getLogger().addHandler(handler);
-    }
+   
             /**
              * true if we have unix newlines
              */
