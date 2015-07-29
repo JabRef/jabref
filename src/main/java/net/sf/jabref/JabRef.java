@@ -395,19 +395,16 @@ public class JabRef {
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {
-                    case (3): {
+                    case (3):
                         formatName = data[2];
                         break;
-                    }
-                    case (2): {
-                        //default ExportFormat: HTML table (with Abstract & BibTeX)
-                        formatName = "tablerefsabsbib";
-                        break;
-                    }
-                    default: {
-                        System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                        return null; // TODO replace with optional one day
-                    }
+                        case (2):
+                            //default ExportFormat: HTML table (with Abstract & BibTeX)
+                            formatName = "tablerefsabsbib";
+                            break;
+                        default:
+                            System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                            return null; // TODO replace with optional one day
                     } //end switch
 
                     //export new database

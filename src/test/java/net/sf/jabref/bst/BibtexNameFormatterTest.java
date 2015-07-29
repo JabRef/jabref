@@ -54,20 +54,18 @@ public class BibtexNameFormatterTest {
             }));
         }
 
-        {
-            AuthorList al = AuthorList
-                    .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+        AuthorList al = AuthorList
+                .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
-            Assert.assertEquals("dlVP", BibtexNameFormatter.formatName(al.getAuthor(0), "{v{}}{l{}}",
-                    new Warn() {
+        Assert.assertEquals("dlVP", BibtexNameFormatter.formatName(al.getAuthor(0), "{v{}}{l{}}",
+                new Warn() {
 
-                        @Override
-                        public void warn(String s) {
-                            Assert.fail(s);
-                        }
+                    @Override
+                    public void warn(String s) {
+                        Assert.fail(s);
                     }
-                    ));
-        }
+                }
+                ));
 
         assertNameFormatA("Meyer, J?", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
         assertNameFormatB("J.~Meyer", "Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
@@ -122,12 +120,10 @@ public class BibtexNameFormatterTest {
                     .toCharArray(), 12));
             Assert.assertEquals("{WORLD}", sb.toString());
         }
-        {
-            StringBuffer sb = new StringBuffer();
-            Assert.assertEquals(10, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}"
-                    .toCharArray(), 0));
-            Assert.assertEquals("{HE{L{}L}O}", sb.toString());
-        }
+        StringBuffer sb = new StringBuffer();
+        Assert.assertEquals(10, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}"
+                .toCharArray(), 0));
+        Assert.assertEquals("{HE{L{}L}O}", sb.toString());
     }
 
     @Test

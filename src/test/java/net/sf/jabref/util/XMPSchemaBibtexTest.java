@@ -157,11 +157,10 @@ public class XMPSchemaBibtexTest {
             Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
             Assert.assertTrue(l.get(1).equals("Tom DeMarco"));
         }
-        { // Removes both
-            bibtex.removeBagValue("author", "Tom DeMarco");
-            List<String> l = bibtex.getBagList("author");
-            Assert.assertEquals(0, l.size());
-        }
+        // Removes both
+        bibtex.removeBagValue("author", "Tom DeMarco");
+        List<String> l = bibtex.getBagList("author");
+        Assert.assertEquals(0, l.size());
     }
 
     @Test
@@ -200,11 +199,10 @@ public class XMPSchemaBibtexTest {
             Assert.assertTrue(l.get(0).equals("Kent Beck"));
             Assert.assertTrue(l.get(1).equals("Kent Beck"));
         }
-        { // Remvoes all
-            bibtex.removeSequenceValue("author", "Kent Beck");
-            List<String> l = bibtex.getSequenceList("author");
-            Assert.assertEquals(0, l.size());
-        }
+        // Remvoes all
+        bibtex.removeSequenceValue("author", "Kent Beck");
+        List<String> l = bibtex.getSequenceList("author");
+        Assert.assertEquals(0, l.size());
     }
 
     @Test

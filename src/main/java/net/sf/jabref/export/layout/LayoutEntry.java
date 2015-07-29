@@ -278,7 +278,7 @@ class LayoutEntry {
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
-        case LayoutHelper.IS_OPTION_FIELD: {
+        case LayoutHelper.IS_OPTION_FIELD:
             String fieldEntry;
 
             if (text.equals("bibtextype")) {
@@ -309,14 +309,12 @@ class LayoutEntry {
             }
 
             return fieldEntry;
-        }
-        case LayoutHelper.IS_ENCODING_NAME: {
-            // Printing the encoding name is not supported in entry layouts, only
-            // in begin/end layouts. This prevents breakage if some users depend
-            // on a field called "encoding". We simply return this field instead:
-            return BibtexDatabase.getResolvedField("encoding", bibtex, database);
-        }
-        default:
+            case LayoutHelper.IS_ENCODING_NAME:
+                // Printing the encoding name is not supported in entry layouts, only
+                // in begin/end layouts. This prevents breakage if some users depend
+                // on a field called "encoding". We simply return this field instead:
+                return BibtexDatabase.getResolvedField("encoding", bibtex, database);
+            default:
             return "";
         }
     }

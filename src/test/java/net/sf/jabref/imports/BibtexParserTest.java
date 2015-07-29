@@ -123,10 +123,9 @@ public class BibtexParserTest {
             Assert.assertEquals(0, c.size());
 
         }
-        { // Error
-            Collection<BibtexEntry> c = BibtexParser.fromString("@@article@@{{{{{{}");
-            Assert.assertEquals(null, c);
-        }
+        // Error
+        Collection<BibtexEntry> c = BibtexParser.fromString("@@article@@{{{{{{}");
+        Assert.assertEquals(null, c);
 
     }
 

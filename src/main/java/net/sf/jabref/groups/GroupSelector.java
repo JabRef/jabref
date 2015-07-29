@@ -677,10 +677,10 @@ public class GroupSelector extends SidePaneComponent implements
         for (BibtexEntry entry : entries) {
             // Sort according to current state of the entries
             if (group.contains(entry)) {
-                LOGGER.info("Removing entry " + entry.toString());
+                LOGGER.info("Removing entry " + entry);
                 toRemove.add(entry);
             } else {
-                LOGGER.info("Adding entry " + entry.toString());
+                LOGGER.info("Adding entry " + entry);
                 toAdd.add(entry);
             }
         }
@@ -722,7 +722,7 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void annotationEvent(GroupTreeNode node) {
-        LOGGER.info("Performing annotation " + node.toString());
+        LOGGER.info("Performing annotation " + node);
         if (editModeIndicator) {
             updateGroupContent(node);
             panel.markBaseChanged();

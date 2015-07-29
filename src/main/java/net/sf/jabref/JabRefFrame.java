@@ -652,7 +652,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
                 method.invoke(macreg.newInstance(), this);
             } catch (Exception e) {
-                System.err.println("Exception (" + e.getClass().toString() + "): " + e.getMessage());
+                System.err.println("Exception (" + e.getClass() + "): " + e.getMessage());
             }
         }
     }
