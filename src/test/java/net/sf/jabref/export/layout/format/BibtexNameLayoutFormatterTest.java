@@ -1,7 +1,5 @@
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.export.layout.format.plugin.NameFormat;
-
 import org.junit.Assert;
 import org.junit.Test;
 

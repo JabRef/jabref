@@ -17,17 +17,13 @@ package net.sf.jabref.export.layout;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.layout.format.plugin.NameFormat;
+import net.sf.jabref.export.layout.format.NameFormat;
 import net.sf.jabref.export.layout.format.NotFoundFormatter;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.LayoutFormatterExtension;
 import net.sf.jabref.util.Util;
 
 class LayoutEntry {
@@ -369,42 +365,6 @@ class LayoutEntry {
 
     // added section - end (arudert)
 
-    private static Map<String, LayoutFormatter> pluginLayoutFormatter;
-
-
-    private static LayoutFormatter getLayoutFormatterFromPlugins(String formatterName) {
-        if (LayoutEntry.pluginLayoutFormatter == null) {
-            LayoutEntry.pluginLayoutFormatter = new HashMap<String, LayoutFormatter>();
-            JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
-            if (plugin != null) {
-                for (LayoutFormatterExtension e : plugin.getLayoutFormatterExtensions()) {
-                    LayoutFormatter formatter = e.getLayoutFormatter();
-                    String name = e.getName();
-                    if (name == null) {
-                        name = e.getId();
-                    }
-
-                    if (formatter != null) {
-                        LayoutEntry.pluginLayoutFormatter.put(name, formatter);
-                    }
-                }
-            }
-        }
-        // We need to make a new instance of this LayoutFormatter, in case it is a
-        // parameter-accepting layout formatter:
-        if (LayoutEntry.pluginLayoutFormatter.containsKey(formatterName)) {
-            Class<? extends LayoutFormatter> c = LayoutEntry.pluginLayoutFormatter.get(formatterName).getClass();
-            try {
-                return c.getConstructor().newInstance();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            return LayoutEntry.pluginLayoutFormatter.get(formatterName);
-        } else {
-            return null;
-        }
-    }
-
     private static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
             throws Exception {
 
@@ -434,11 +394,9 @@ class LayoutEntry {
     private static LayoutFormatter[] getOptionalLayout(String formatterName,
                                                        String classPrefix) {
 
-        ArrayList<String[]> formatterStrings = Util
-                .parseMethodsCalls(formatterName);
+        ArrayList<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
-        ArrayList<LayoutFormatter> results = new ArrayList<LayoutFormatter>(
-                formatterStrings.size());
+        ArrayList<LayoutFormatter> results = new ArrayList<LayoutFormatter>(formatterStrings.size());
 
         Map<String, String> userNameFormatter = NameFormatterTab.getNameFormatters();
 
@@ -459,8 +417,7 @@ class LayoutEntry {
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className,
-                        classPrefix);
+                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, classPrefix);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if (f instanceof ParamLayoutFormatter) {
@@ -474,27 +431,12 @@ class LayoutEntry {
             }
 
             // Then check whether this is a user defined formatter
-            String formatterParameter = userNameFormatter
-                    .get(className);
+            String formatterParameter = userNameFormatter.get(className);
 
             if (formatterParameter != null) {
                 NameFormat nf = new NameFormat();
                 nf.setParameter(formatterParameter);
                 results.add(nf);
-                continue;
-            }
-
-            // Last load from plug-ins
-            LayoutFormatter f = LayoutEntry.getLayoutFormatterFromPlugins(className);
-            if (f != null) {
-                // If this formatter accepts an argument, check if we have one, and
-                // set it if so:
-                if (f instanceof ParamLayoutFormatter) {
-                    if (strings.length >= 2) {
-                        ((ParamLayoutFormatter) f).setArgument(strings[1]);
-                    }
-                }
-                results.add(f);
                 continue;
             }
 
@@ -541,8 +483,7 @@ class LayoutEntry {
             boolean foundSomething = false;
 
             String found;
-            while (matcher.find())
-            {
+            while (matcher.find()) {
                 matcher.end();
                 found = matcher.group();
                 // color the search keyword	-
@@ -551,8 +492,7 @@ class LayoutEntry {
                 foundSomething = true;
             }
 
-            if (foundSomething)
-            {
+            if (foundSomething) {
                 matcher.appendTail(sb);
                 text = sb.toString();
             }

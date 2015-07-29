@@ -22,9 +22,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.oo.OpenOfficePanel;
-import net.sf.jabref.plugin.PluginCore;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 
 import javax.swing.*;
 
@@ -67,27 +64,19 @@ public class PushToApplicationButton implements ActionListener {
      * Set up the current available choices:
      */
     static {
-
+        //TODO plugins create collection class
         applications = new ArrayList<PushToApplication>();
 
-        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
-        if (jabrefPlugin != null) {
-            List<_JabRefPlugin.PushToApplicationExtension> plugins = jabrefPlugin.getPushToApplicationExtensions();
-            for (_JabRefPlugin.PushToApplicationExtension extension : plugins) {
-                PushToApplicationButton.applications.add(extension.getPushToApp());
-            }
+        PushToApplicationButton.applications.add(new PushToLyx());
+        PushToApplicationButton.applications.add(new PushToEmacs());
+        PushToApplicationButton.applications.add(new PushToWinEdt());
+        PushToApplicationButton.applications.add(new PushToLatexEditor());
+        PushToApplicationButton.applications.add(new PushToVim());
+        PushToApplicationButton.applications.add(OpenOfficePanel.getInstance());
+        PushToApplicationButton.applications.add(new PushToTeXstudio());
 
-            PushToApplicationButton.applications.add(new PushToLyx());
-            PushToApplicationButton.applications.add(new PushToEmacs());
-            PushToApplicationButton.applications.add(new PushToWinEdt());
-            PushToApplicationButton.applications.add(new PushToLatexEditor());
-            PushToApplicationButton.applications.add(new PushToVim());
-            PushToApplicationButton.applications.add(OpenOfficePanel.getInstance());
-            PushToApplicationButton.applications.add(new PushToTeXstudio());
-
-            // Finally, sort the entries:
-            //Collections.sort(applications, new PushToApplicationComparator());
-        }
+        // Finally, sort the entries:
+        //Collections.sort(applications, new PushToApplicationComparator());
     }
 
 
