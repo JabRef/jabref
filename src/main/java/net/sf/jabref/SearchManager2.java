@@ -17,7 +17,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.SearchResultsDialog;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.search.SearchRules;
 import net.sf.jabref.search.matchers.SearchMatcher;

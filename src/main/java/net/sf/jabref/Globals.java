@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.export.AutoSaveManager;
-import net.sf.jabref.help.HelpDialog;
+import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;

@@ -25,7 +25,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.help.HelpAction;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 

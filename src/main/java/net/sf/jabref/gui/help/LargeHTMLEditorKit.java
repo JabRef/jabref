@@ -1,4 +1,4 @@
-package net.sf.jabref.help;
+package net.sf.jabref.gui.help;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

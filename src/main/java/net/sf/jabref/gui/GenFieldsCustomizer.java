@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.*;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;

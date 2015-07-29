@@ -33,7 +33,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.journals.logic.Abbreviation;
 import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
 import net.sf.jabref.net.URLDownload;

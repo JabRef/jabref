@@ -73,7 +73,7 @@ import net.sf.jabref.search.rules.InvertSearchRule;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.SidePaneComponent;
 import net.sf.jabref.SidePaneManager;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.search.rules.sets.SearchRuleSet;
 import net.sf.jabref.undo.NamedCompound;

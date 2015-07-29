@@ -1,4 +1,4 @@
-package net.sf.jabref.help;
+package net.sf.jabref.gui.help;
 
 import java.awt.Point;
 import java.awt.event.ActionEvent;

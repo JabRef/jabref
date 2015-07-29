@@ -39,7 +39,7 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.util.Util;
 
 /**

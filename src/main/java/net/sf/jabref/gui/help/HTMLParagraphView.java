@@ -1,4 +1,4 @@
-package net.sf.jabref.help;
+package net.sf.jabref.gui.help;
 
 import javax.swing.text.Element;
 import javax.swing.text.FlowView;
