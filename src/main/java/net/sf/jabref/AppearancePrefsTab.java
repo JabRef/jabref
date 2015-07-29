@@ -112,7 +112,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         //p2.add(browseBut);
         //builder.append(p2);
 
-        JPanel upper = new JPanel(), sort = new JPanel(), namesp = new JPanel(), iconCol = new JPanel();
+        JPanel upper = new JPanel();
+        JPanel sort = new JPanel();
+        JPanel namesp = new JPanel();
+        JPanel iconCol = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
         upper.setLayout(gbl);
         sort.setLayout(gbl);

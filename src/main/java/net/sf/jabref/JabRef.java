@@ -198,7 +198,8 @@ public class JabRef {
     private void setLanguage(JabRefPreferences prefs) {
         String langStr = prefs.get(JabRefPreferences.LANGUAGE);
         String[] parts = langStr.split("_");
-        String language, country;
+        String language;
+        String country;
         if (parts.length == 1) {
             language = langStr;
             country = "";

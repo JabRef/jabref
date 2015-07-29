@@ -53,7 +53,8 @@ public class PushToApplicationButton implements ActionListener {
     private final JabRefFrame frame;
     private final List<PushToApplication> pushActions;
     private JPanel comp;
-    private JButton pushButton, menuButton;
+    private JButton pushButton;
+    private JButton menuButton;
     private int selected = 0;
     private JPopupMenu popup = null;
     private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();

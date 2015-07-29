@@ -154,8 +154,8 @@ class ContentSelectorDialog2 extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int index = wordList.getSelectedIndex();
-                String old = (String) wordList.getSelectedValue(),
-                newVal = wordEditField.getText();
+                String old = (String) wordList.getSelectedValue();
+                String newVal = wordEditField.getText();
                 if (newVal.equals("") || newVal.equals(old)) {
                     return; // Empty string or no change.
                 }

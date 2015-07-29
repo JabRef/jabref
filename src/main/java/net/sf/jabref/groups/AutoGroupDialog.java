@@ -49,8 +49,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JTextField remove = new JTextField(60);
     private final JTextField field = new JTextField(60);
     private final JTextField deliminator = new JTextField(60);
-    JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
-            nr = new JLabel(Globals.lang("Characters to ignore") + ":");
+    JLabel nf = new JLabel(Globals.lang("Field to group by") + ":");
+    JLabel nr = new JLabel(Globals.lang("Characters to ignore") + ":");
     private final JRadioButton
             keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Globals.lang("Generate groups for author last names"));
@@ -62,7 +62,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final GroupSelector gs;
-    private String oldRemove, oldField;
+    private String oldRemove;
+    private String oldField;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 

@@ -37,7 +37,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         int res;
 
         // First check their names:
-        String name1 = s1.getName().toLowerCase(), name2 = s2.getName().toLowerCase();
+        String name1 = s1.getName().toLowerCase();
+        String name2 = s2.getName().toLowerCase();
 
         res = name1.compareTo(name2);
 
@@ -50,7 +51,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         if (considerRefs) {
 
             // First order them:
-            BibtexString pre, post;
+            BibtexString pre;
+            BibtexString post;
             if (res < 0) {
                 pre = s1;
                 post = s2;
@@ -61,7 +63,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
             // Then see if "pre" refers to "post", which is the only
             // situation when we must change the ordering:
-            String namePost = post.getName().toLowerCase(), textPre = pre.getContent().toLowerCase();
+            String namePost = post.getName().toLowerCase();
+            String textPre = pre.getContent().toLowerCase();
 
             // If that is the case, reverse the order found:
             if (textPre.contains("#" + namePost + "#")) {

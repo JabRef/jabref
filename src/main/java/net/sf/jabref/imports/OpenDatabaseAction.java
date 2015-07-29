@@ -108,7 +108,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
 
         BasePanel toRaise = null;
-        int initialCount = filesToOpen.size(), removed = 0;
+        int initialCount = filesToOpen.size();
+        int removed = 0;
 
         // Check if any of the files are already open:
         for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
@@ -412,7 +413,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         StringBuilder headerText = new StringBuilder();
         try {
             boolean keepon = true;
-            int piv = 0, offset = 0;
+            int piv = 0;
+            int offset = 0;
             int c;
 
             while (keepon) {

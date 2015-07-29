@@ -312,7 +312,8 @@ public class ImportFormatReader {
             return s + ".";
         }
         StringBuilder sb = new StringBuilder();
-        char c = s.charAt(0), d = 0;
+        char c = s.charAt(0);
+        char d = 0;
         for (int i = 1; i < s.length(); i++) {
             d = s.charAt(i);
             if (Character.isLetter(c) && Character.isUpperCase(c) &&

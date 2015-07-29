@@ -108,7 +108,9 @@ class OpenDocumentRepresentation {
             el.appendChild(el2);
             collection.appendChild(el);
 
-            Element body = result.createElement("office:body"), spreadsheet = result.createElement("office:spreadsheet"), table = result.createElement("table:table");
+            Element body = result.createElement("office:body");
+            Element spreadsheet = result.createElement("office:spreadsheet");
+            Element table = result.createElement("table:table");
             table.setAttribute("table:name", "biblio");
             table.setAttribute("table.style-name", "ta1");
 
@@ -217,7 +219,8 @@ class OpenDocumentRepresentation {
     }
 
     private void addTableCell(Document doc, Element parent, String content) {
-        Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
+        Element cell = doc.createElement("table:table-cell");
+        Element text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);
         text.appendChild(textNode);
         //text.setTextContent(content);

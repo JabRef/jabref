@@ -437,8 +437,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             : "1 " + Globals.lang("entry") + '.'));
                 } else {
                     // The user maybe selected a single cell.
-                    int[] rows = mainTable.getSelectedRows(),
-                    cols = mainTable.getSelectedColumns();
+                    int[] rows = mainTable.getSelectedRows();
+                    int[] cols = mainTable.getSelectedColumns();
                     if (cols.length == 1 && rows.length == 1) {
                         // Copy single value.
                         Object o = mainTable.getValueAt(rows[0], cols[0]);
@@ -1805,7 +1805,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (ex.specificEntry()) {
                 // Error occured during processing of
                 // be. Highlight it:
-                int row = mainTable.findEntry(ex.getEntry()), topShow = Math.max(0, row - 3);
+                int row = mainTable.findEntry(ex.getEntry());
+                int topShow = Math.max(0, row - 3);
                 mainTable.setRowSelectionInterval(row, row);
                 mainTable.scrollTo(topShow);
                 showEntry(ex.getEntry());
@@ -2776,7 +2777,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String msg = Globals.lang("Really delete the selected")
-                    + ' ' + Globals.lang("entry") + '?', title = Globals.lang("Delete entry");
+                    + ' ' + Globals.lang("entry") + '?';
+            String title = Globals.lang("Delete entry");
             if (numberOfEntries > 1) {
                 msg = Globals.lang("Really delete the selected")
                         + ' ' + numberOfEntries + ' ' + Globals.lang("entries") + '?';

@@ -44,8 +44,14 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
     private JDialog diag;
-    private JRadioButton all, selected, clear, set, rename;
-    private JTextField field, text, renameTo;
+    private JRadioButton all;
+    private JRadioButton selected;
+    private JRadioButton clear;
+    private JRadioButton set;
+    private JRadioButton rename;
+    private JTextField field;
+    private JTextField text;
+    private JTextField renameTo;
     private boolean cancelled = true;
     private JCheckBox overwrite;
 

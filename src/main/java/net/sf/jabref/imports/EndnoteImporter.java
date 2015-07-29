@@ -61,7 +61,8 @@ public class EndnoteImporter extends ImportFormat {
 
         // Our strategy is to look for the "%A *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("%A .*"), pat2 = Pattern.compile("%E .*");
+        Pattern pat1 = Pattern.compile("%A .*");
+        Pattern pat2 = Pattern.compile("%E .*");
         String str;
         while ((str = in.readLine()) != null) {
             if (pat1.matcher(str).matches() || pat2.matcher(str).matches()) {
@@ -102,7 +103,10 @@ public class EndnoteImporter extends ImportFormat {
 
         String[] entries = sb.toString().split(ENDOFRECORD);
         HashMap<String, String> hm = new HashMap<String, String>();
-        String author, Type, editor, artnum;
+        String author;
+        String Type;
+        String editor;
+        String artnum;
         for (String entry : entries) {
             hm.clear();
             author = "";

@@ -50,7 +50,8 @@ public class EntryFromFileCreatorManagerTest {
          */
         Assert.assertEquals(1, errors.size());
 
-        boolean file1Found = false, file2Found = false;
+        boolean file1Found = false;
+        boolean file2Found = false;
         for (BibtexEntry entry : database.getEntries()) {
             String filesInfo = entry.getField("file");
             if (filesInfo.contains(files.get(0).getName())) {

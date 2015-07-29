@@ -109,7 +109,12 @@ class OOUtil {
 
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
-        int italic = 0, bold = 0, sup = 0, sub = 0, mono = 0, smallCaps = 0;
+        int italic = 0;
+        int bold = 0;
+        int sup = 0;
+        int sub = 0;
+        int mono = 0;
+        int smallCaps = 0;
         //insertTextAtCurrentLocation(text, cursor, "_",
         //    false, false, false, false, false, false);
         //cursor.goLeft((short)1, true);

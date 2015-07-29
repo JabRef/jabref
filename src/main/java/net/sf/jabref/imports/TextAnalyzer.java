@@ -63,7 +63,8 @@ class TextAnalyzer {
         } else if (cand.length > 1) {
             // More than one four-digit numbers, so we look for one giving a reasonable year:
 
-            int good = -1, yearFound = -1;
+            int good = -1;
+            int yearFound = -1;
             for (int i = 0; i < cand.length; i++) {
                 int number = Integer.parseInt(cand[i].trim());
                 if (number == yearFound) {
@@ -107,7 +108,8 @@ class TextAnalyzer {
             for (int i = 0; i < cand.length; i++) {
                 split = clean(cand[i].replaceAll("\\s", "")).split("-");
                 //   Util.pr("Pg: "+pages);
-                int first = Integer.parseInt(split[0]), second = Integer.parseInt(split[1]);
+                int first = Integer.parseInt(split[0]);
+                int second = Integer.parseInt(split[1]);
                 if (second - first > 3) {
                     found = i;
                     break;
@@ -122,7 +124,8 @@ class TextAnalyzer {
         }
 
         //String journalRx = "(\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((vol\\.|Vol\\.|Volume|volume))??(.??)(\\d{1,3})(\\.|,|\\s)";
-        String journal, volume;
+        String journal;
+        String volume;
         String journalRx = "(,|\\.|\\n)\\s??([a-zA-Z\\. ]{8,30}+)((.){0,2})((vol\\.|Vol\\.|Volume|volume))??\\s??(\\d{1,3})(\\.|,|\\s|:)";
         cand = getMatches(text, journalRx);
         if (cand.length > 0) {
@@ -190,7 +193,8 @@ class TextAnalyzer {
 
     private String clean(String s) {
         boolean found = false;
-        int left = 0, right = s.length() - 1;
+        int left = 0;
+        int right = s.length() - 1;
         while (!found && left < s.length()) {
             char c = s.charAt(left);
             if (Character.isWhitespace(c) || c == '.' || c == ',' || c == '('

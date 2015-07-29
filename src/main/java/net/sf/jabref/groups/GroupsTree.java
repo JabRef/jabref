@@ -415,7 +415,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
          {
             return; // nothing to sort
         }
-        GroupTreeNode child1, child2;
+        GroupTreeNode child1;
+        GroupTreeNode child2;
         int j = node.getChildCount() - 1;
         int lastModified;
         while (j > 0) {

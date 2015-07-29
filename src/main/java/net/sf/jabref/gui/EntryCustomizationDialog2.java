@@ -73,7 +73,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
         biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
 
-        JPanel main = new JPanel(), buttons = new JPanel(), right = new JPanel();
+        JPanel main = new JPanel();
+        JPanel buttons = new JPanel();
+        JPanel right = new JPanel();
         main.setLayout(new BorderLayout());
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
@@ -174,8 +176,10 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         if (rl == null) {
             BibtexEntryType type = BibtexEntryType.getType(s);
             if (type != null) {
-                String[] rf = type.getRequiredFieldsForCustomization(), of = type.getOptionalFields();
-                List<String> req, opt;
+                String[] rf = type.getRequiredFieldsForCustomization();
+                String[] of = type.getOptionalFields();
+                List<String> req;
+                List<String> opt;
                 if (rf != null) {
                     req = java.util.Arrays.asList(rf);
                 } else {
@@ -276,7 +280,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
             BibtexEntryType oldType = BibtexEntryType.getType(stringListEntry.getKey());
             if (oldType != null) {
-                String[] oldReq = oldType.getRequiredFields(), oldOpt = oldType.getOptionalFields();
+                String[] oldReq = oldType.getRequiredFields();
+                String[] oldOpt = oldType.getOptionalFields();
                 if (biblatexMode) {
                     String[] priOpt = oldType.getPrimaryOptionalFields();
                     String[] secOpt = Util.getRemainder(oldOpt, priOpt);
@@ -432,8 +437,11 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
             BibtexEntryType type = BibtexEntryType.getStandardType(lastSelected);
             if (type != null) {
-                String[] rf = type.getRequiredFieldsForCustomization(), of = type.getOptionalFields();
-                List<String> req, opt1, opt2;
+                String[] rf = type.getRequiredFieldsForCustomization();
+                String[] of = type.getOptionalFields();
+                List<String> req;
+                List<String> opt1;
+                List<String> opt2;
                 if (rf != null) {
                     req = java.util.Arrays.asList(rf);
                 } else {

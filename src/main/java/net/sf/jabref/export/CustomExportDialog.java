@@ -46,7 +46,9 @@ class CustomExportDialog extends JDialog {
     private int index;
     private final JabRefFrame parent;
 
-    private String oldName, oldRegexp, oldField;
+    private String oldName;
+    private String oldRegexp;
+    private String oldField;
 
 
     public CustomExportDialog(JabRefFrame parent_, String name_, String layoutFile_, String extension_) {

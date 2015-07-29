@@ -37,7 +37,8 @@ public class PushToVim implements PushToApplication {
     private final JTextField vimServer = new JTextField(30);
     private final JTextField citeCommand = new JTextField(30);
 
-    private boolean couldNotConnect = false, couldNotRunClient = false;
+    private boolean couldNotConnect = false;
+    private boolean couldNotRunClient = false;
 
 
     @Override

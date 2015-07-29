@@ -159,7 +159,8 @@ public class FileUpdateMonitor implements Runnable {
         final FileUpdateListener listener;
         final File file;
         final File tmpFile;
-        long timeStamp, fileSize;
+        long timeStamp;
+        long fileSize;
 
 
         public Entry(FileUpdateListener ul, File f) {

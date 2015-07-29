@@ -578,7 +578,8 @@ class MedlineHandler extends DefaultHandler
         }
         String first = pageRange.substring(0, minusPos).trim();
         String last = pageRange.substring(minusPos + 1).trim();
-        int llast = last.length(), lfirst = first.length();
+        int llast = last.length();
+        int lfirst = first.length();
         if (llast < lfirst) {
             last = first.substring(0, lfirst - llast) + last;
         }

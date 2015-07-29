@@ -263,8 +263,12 @@ public class FileActions {
 
     private static class SaveSettings {
 
-        public final String pri, sec, ter;
-        public final boolean priD, secD, terD;
+        public final String pri;
+        public final String sec;
+        public final String ter;
+        public final boolean priD;
+        public final boolean secD;
+        public final boolean terD;
 
 
         public SaveSettings(boolean isSaveOperation, MetaData metaData) {

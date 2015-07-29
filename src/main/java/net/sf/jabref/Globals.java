@@ -102,8 +102,9 @@ public class Globals {
 
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
-    private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
-            INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
+    private static final String RESOURCE_PREFIX = "resource/JabRef";
+    private static final String MENU_RESOURCE_PREFIX = "resource/Menu";
+    private static final String INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
     public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
 
@@ -122,11 +123,13 @@ public class Globals {
 
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
-    public static final String FILETYPE_PREFS_EXT = "_dir", SELECTOR_META_PREFIX = "selector_",
-            PROTECTED_FLAG_META = "protectedFlag",
-            MAC = "Mac OS X",
-            DOI_LOOKUP_PREFIX = "http://dx.doi.org/", NONE = "_non__",
-            FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
+    public static final String FILETYPE_PREFS_EXT = "_dir";
+    public static final String SELECTOR_META_PREFIX = "selector_";
+    public static final String PROTECTED_FLAG_META = "protectedFlag";
+    public static final String MAC = "Mac OS X";
+    public static final String DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
+    public static final String NONE = "_non__";
+    public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
     public static final String[] ENCODINGS;
     private static final String[] ALL_ENCODINGS = // (String[])
@@ -192,9 +195,9 @@ public class Globals {
 
     public static final String osName = System.getProperty("os.name", "def");
 
-    public static final boolean ON_MAC = Globals.osName.equals(Globals.MAC),
-            ON_WIN = Globals.osName.startsWith("Windows"),
-            ON_LINUX = Globals.osName.startsWith("Linux");
+    public static final boolean ON_MAC = Globals.osName.equals(Globals.MAC);
+    public static final boolean ON_WIN = Globals.osName.startsWith("Windows");
+    public static final boolean ON_LINUX = Globals.osName.startsWith("Linux");
 
     public static SidePaneManager sidePaneManager;
 

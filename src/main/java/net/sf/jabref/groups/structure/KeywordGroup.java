@@ -170,7 +170,8 @@ public class KeywordGroup extends AbstractGroup {
             for (BibtexEntry entry : entries) {
                 if (!getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
                     String oldContent = entry
-                            .getField(searchField), pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
+                            .getField(searchField);
+                    String pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
                             + searchExpression;
@@ -305,7 +306,9 @@ public class KeywordGroup extends AbstractGroup {
         StringBuffer haystack = caseSensitive ? sbOrig : sbLower;
         String needle = caseSensitive ? searchExpression
                 : searchExpression.toLowerCase();
-        int i, j, k;
+        int i;
+        int j;
+        int k;
         final String separator = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
         while ((i = haystack.indexOf(needle)) >= 0) {
             sbOrig.replace(i, i + needle.length(), "");

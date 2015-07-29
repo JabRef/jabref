@@ -16,10 +16,13 @@ public class StringUtil {
         if (s == null) {
             return null;
         }
-        char ch, ch2;
-        int beg = 0, end = s.length();
+        char ch;
+        char ch2;
+        int beg = 0;
+        int end = s.length();
         // We start out assuming nothing will be removed.
-        boolean begok = false, endok = false;
+        boolean begok = false;
+        boolean endok = false;
         while (!begok) {
             if (beg < s.length()) {
                 ch = s.charAt(beg);

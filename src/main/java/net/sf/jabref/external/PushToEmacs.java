@@ -39,7 +39,8 @@ public class PushToEmacs implements PushToApplication {
     private final JTextField additionalParams = new JTextField(30);
     private final JCheckBox useEmacs23 = new JCheckBox();
 
-    private boolean couldNotConnect = false, couldNotRunClient = false;
+    private boolean couldNotConnect = false;
+    private boolean couldNotRunClient = false;
 
 
     @Override

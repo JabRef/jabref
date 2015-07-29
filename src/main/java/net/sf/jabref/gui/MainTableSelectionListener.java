@@ -244,7 +244,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     @Override
     public void mouseReleased(MouseEvent e) {
         // First find the column and row on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint()), row = table.rowAtPoint(e.getPoint());
+        final int col = table.columnAtPoint(e.getPoint());
+        final int row = table.rowAtPoint(e.getPoint());
 
         // Check if the user has clicked on an icon cell to open url or pdf.
         final String[] iconType = table.getIconTypeForColumn(col);
@@ -268,7 +269,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     public void mouseClicked(MouseEvent e) {
 
         // First find the column on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint()), row = table.rowAtPoint(e.getPoint());
+        final int col = table.columnAtPoint(e.getPoint());
+        final int row = table.rowAtPoint(e.getPoint());
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {

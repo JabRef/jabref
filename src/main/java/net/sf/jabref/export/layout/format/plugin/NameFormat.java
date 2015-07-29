@@ -102,7 +102,8 @@ public class NameFormat implements LayoutFormatter {
                 } else {
                     String[] range = formats[j].split("\\.\\.");
 
-                    int s, e;
+                    int s;
+                    int e;
                     if (range.length == 2) {
                         s = Integer.parseInt(range[0]);
                         e = Integer.parseInt(range[1]);

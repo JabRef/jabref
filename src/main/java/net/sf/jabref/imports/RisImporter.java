@@ -93,7 +93,12 @@ public class RisImporter extends ImportFormat {
                 continue;
             }
 
-            String type = "", author = "", editor = "", startPage = "", endPage = "", comment = "";
+            String type = "";
+            String author = "";
+            String editor = "";
+            String startPage = "";
+            String endPage = "";
+            String comment = "";
             HashMap<String, String> hm = new HashMap<String, String>();
 
             String[] fields = entry1.split("\n");

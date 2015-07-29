@@ -226,7 +226,8 @@ public class ExternalFilePanel extends JPanel {
             directory = dirs[0]; // Default to the first directory in the list
         }
 
-        String dir = editor.getText(), retVal;
+        String dir = editor.getText();
+        String retVal;
 
         if (directory == null || !new File(dir).isAbsolute()) {
             if (directory != null) {

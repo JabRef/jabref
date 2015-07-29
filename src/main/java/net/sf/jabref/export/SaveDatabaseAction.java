@@ -39,7 +39,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     private final BasePanel panel;
     private final JabRefFrame frame;
-    private boolean success = false, cancelled = false, fileLockedError = false;
+    private boolean success = false;
+    private boolean cancelled = false;
+    private boolean fileLockedError = false;
 
 
     public SaveDatabaseAction(BasePanel panel) {
@@ -240,7 +242,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 // Error occured during processing of
                 // be. Highlight it:
-                int row = panel.mainTable.findEntry(ex.getEntry()), topShow = Math.max(0, row - 3);
+                int row = panel.mainTable.findEntry(ex.getEntry());
+                int topShow = Math.max(0, row - 3);
                 panel.mainTable.setRowSelectionInterval(row, row);
                 panel.mainTable.scrollTo(topShow);
                 panel.showEntry(ex.getEntry());

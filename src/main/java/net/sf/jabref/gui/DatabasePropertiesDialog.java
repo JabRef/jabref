@@ -77,11 +77,18 @@ public class DatabasePropertiesDialog extends JDialog {
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
 
-    private JRadioButton saveAsConfiguredGlobally, saveInOriginalOrder,
-            saveInSpecifiedOrder;
-    private JComboBox savePriSort, saveSecSort, saveTerSort;
-    private JTextField savePriField, saveSecField, saveTerField;
-    private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
+    private JRadioButton saveAsConfiguredGlobally;
+    private JRadioButton saveInOriginalOrder;
+    private JRadioButton saveInSpecifiedOrder;
+    private JComboBox savePriSort;
+    private JComboBox saveSecSort;
+    private JComboBox saveTerSort;
+    private JTextField savePriField;
+    private JTextField saveSecField;
+    private JTextField saveTerField;
+    private JCheckBox savePriDesc;
+    private JCheckBox saveSecDesc;
+    private JCheckBox saveTerDesc;
 
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 

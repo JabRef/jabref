@@ -41,24 +41,24 @@ public class IntegrityMessage implements Cloneable
 
     // Hints and Infos < 1000 :-)
     public static final int
-            GENERIC_HINT = 1,
-            UPPER_AND_LOWER_HINT = 10,
-            FOUR_DIGITS_HINT = 11
+            GENERIC_HINT = 1;
+    public static final int UPPER_AND_LOWER_HINT = 10;
+    public static final int FOUR_DIGITS_HINT = 11
 
             ;
 
     // > 1000 Warnings
     public static final int
-            GENERIC_WARNING = 1001,
-            NAME_START_WARNING = 1010,
-            NAME_END_WARNING = 1011,
-            NAME_SEMANTIC_WARNING = 1012
+            GENERIC_WARNING = 1001;
+    public static final int NAME_START_WARNING = 1010;
+    public static final int NAME_END_WARNING = 1011;
+    public static final int NAME_SEMANTIC_WARNING = 1012
             ;
 
     // > 2000 Failure Messages
     public static final int
-            UNKNONW_FAILURE = 2001,
-            UNEXPECTED_CLOSING_BRACE_FAILURE = 2010
+            UNKNONW_FAILURE = 2001;
+    public static final int UNEXPECTED_CLOSING_BRACE_FAILURE = 2010
             ;
 
     public static final int

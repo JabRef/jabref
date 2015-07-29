@@ -85,7 +85,8 @@ public class BibtexEntry
     private final VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
-    private boolean searchHit, groupHit;
+    private boolean searchHit;
+    private boolean groupHit;
 
 
     public BibtexEntry() {

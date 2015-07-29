@@ -55,7 +55,10 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
             Globals.lang("Quit synchronization")};
 
-    private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
+    private boolean goOn = true;
+    private boolean autoSet = true;
+    private boolean overWriteAllowed = true;
+    private boolean checkExisting = true;
 
     private int entriesChanged = 0;
 

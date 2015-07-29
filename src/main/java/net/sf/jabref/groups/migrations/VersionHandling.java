@@ -47,7 +47,9 @@ public class VersionHandling {
             throws IllegalArgumentException {
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
         final int number = groups.size() / 3;
-        String name, field, regexp;
+        String name;
+        String field;
+        String regexp;
         for (int i = 0; i < number; ++i) {
             field = groups.get(3 * i);
             name = groups.get(3 * i + 1);

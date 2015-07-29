@@ -48,7 +48,8 @@ public class RTFChars implements LayoutFormatter {
 
         StringBuffer sb = new StringBuffer("");
         StringBuffer currentCommand = null;
-        boolean escaped = false, incommand = false;
+        boolean escaped = false;
+        boolean incommand = false;
         for (int i = 0; i < field.length(); i++) {
 
             System.out.println("incommand=" + incommand + ". escaped=" + escaped

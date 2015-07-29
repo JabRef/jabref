@@ -67,7 +67,9 @@ public class MedlinePlainImporter extends ImportFormat {
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line 
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("PMID.*-.*"), pat2 = Pattern.compile("PMC.*-.*"), pat3 = Pattern.compile("PMCR.*-.*");
+        Pattern pat1 = Pattern.compile("PMID.*-.*");
+        Pattern pat2 = Pattern.compile("PMC.*-.*");
+        Pattern pat3 = Pattern.compile("PMCR.*-.*");
 
         String str;
         while ((str = in.readLine()) != null) {
@@ -101,7 +103,10 @@ public class MedlinePlainImporter extends ImportFormat {
                 continue;
             }
 
-            String type = "", author = "", editor = "", comment = "";
+            String type = "";
+            String author = "";
+            String editor = "";
+            String comment = "";
             HashMap<String, String> hm = new HashMap<String, String>();
 
             String[] fields = entry1.split("\n");

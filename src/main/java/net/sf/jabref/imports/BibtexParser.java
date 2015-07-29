@@ -628,7 +628,8 @@ public class BibtexParser {
      */
     private boolean hasNegativeBraceCount(String s) {
         // System.out.println(s);
-        int i = 0, count = 0;
+        int i = 0;
+        int count = 0;
         while (i < s.length()) {
             if (s.charAt(i) == '{') {
                 count++;

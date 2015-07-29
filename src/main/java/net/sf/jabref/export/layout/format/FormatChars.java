@@ -242,7 +242,8 @@ public class FormatChars implements LayoutFormatter {
         StringBuffer currentCommand = null;
 
         char c;
-        boolean escaped = false, incommand = false;
+        boolean escaped = false;
+        boolean incommand = false;
 
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);

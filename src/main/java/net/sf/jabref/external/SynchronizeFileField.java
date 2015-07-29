@@ -52,7 +52,9 @@ public class SynchronizeFileField extends AbstractWorker {
             Globals.lang("Remove all broken links"),
             Globals.lang("Quit synchronization")};
 
-    private boolean goOn = true, autoSet = true, checkExisting = true;
+    private boolean goOn = true;
+    private boolean autoSet = true;
+    private boolean checkExisting = true;
 
 
     public SynchronizeFileField(BasePanel panel) {

@@ -875,7 +875,8 @@ public class Util {
 
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = dateFormatter.getCurrentDate();
-        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER), globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
+        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
+        boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp || markEntries)) {
@@ -1115,7 +1116,9 @@ public class Util {
      */
     public static String putBracesAroundCapitals(String s) {
 
-        boolean inString = false, isBracing = false, escaped = false;
+        boolean inString = false;
+        boolean isBracing = false;
+        boolean escaped = false;
         int inBrace = 0;
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
@@ -1240,7 +1243,8 @@ public class Util {
      */
     public static void showQuickErrorDialog(JFrame parent, String title, Exception e) {
         // create and configure a text area - fill it with exception text.
-        final JPanel pan = new JPanel(), details = new JPanel();
+        final JPanel pan = new JPanel();
+        final JPanel details = new JPanel();
         final CardLayout crd = new CardLayout();
         pan.setLayout(crd);
         final JTextArea textArea = new JTextArea();
@@ -1381,7 +1385,9 @@ public class Util {
      * @return
      */
     public static int intValueOf(String str) {
-        int ival = 0, idx = 0, end;
+        int ival = 0;
+        int idx = 0;
+        int end;
         boolean sign = false;
         char ch;
 
@@ -2050,7 +2056,8 @@ public class Util {
 
         int colon = fieldAndFormat.indexOf(':');
 
-        String beforeColon, afterColon;
+        String beforeColon;
+        String afterColon;
         if (colon == -1) {
             beforeColon = fieldAndFormat;
             afterColon = null;

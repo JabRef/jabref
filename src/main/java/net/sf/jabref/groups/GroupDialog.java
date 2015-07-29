@@ -402,7 +402,8 @@ class GroupDialog extends JDialog {
             m_ok.setEnabled(false);
             return;
         }
-        String s1, s2;
+        String s1;
+        String s2;
         if (m_keywordsRadioButton.isSelected()) {
             s1 = m_kgSearchField.getText().trim();
             okEnabled = okEnabled && s1.matches("\\w+");

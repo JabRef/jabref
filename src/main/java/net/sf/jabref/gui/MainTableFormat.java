@@ -355,7 +355,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     return new int[]{0, fileList.getRowCount()};
                 }
             }
-            int lastLinkPosition = -1, countLinks = 0;
+            int lastLinkPosition = -1;
+            int countLinks = 0;
             for (int i = 1; i < field.length; i++) {
                 // Count the number of links of correct type.
                 for (int j = 0; j < fileList.getRowCount(); j++) {

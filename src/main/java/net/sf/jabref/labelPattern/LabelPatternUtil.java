@@ -460,7 +460,8 @@ public class LabelPatternUtil {
         ArrayList<String> _al;
         String _label;
         StringBuilder _sb = new StringBuilder();
-        boolean forceUpper = false, forceLower = false;
+        boolean forceUpper = false;
+        boolean forceLower = false;
 
         try {
             // get the type of entry
@@ -531,7 +532,8 @@ public class LabelPatternUtil {
             occurences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER), firstLetterA = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
+        boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
+        boolean firstLetterA = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
 
         if (!alwaysAddLetter && occurences == 0) {
             // No dupes found, so we can just go ahead.
@@ -844,8 +846,10 @@ public class LabelPatternUtil {
 
     private static String getTitleWords(int number, BibtexEntry _entry) {
         String ss = new RemoveLatexCommands().format(_entry.getField("title"));
-        StringBuffer _sbvalue = new StringBuffer(), current;
-        int piv = 0, words = 0;
+        StringBuffer _sbvalue = new StringBuffer();
+        StringBuffer current;
+        int piv = 0;
+        int words = 0;
 
         // sorry for being English-centric. I guess these
         // words should really be an editable preference.

@@ -209,7 +209,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /* References to the toggle buttons in the toolbar */
     // the groups interface
     public JToggleButton groupToggle;
-    public JToggleButton searchToggle, previewToggle, highlightAny, highlightAll;
+    public JToggleButton searchToggle;
+    public JToggleButton previewToggle;
+    public JToggleButton highlightAny;
+    public JToggleButton highlightAll;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final AbstractAction
@@ -1330,9 +1333,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void fillMenu() {
         //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
-        JMenu file = JabRefFrame.subMenu("File"), sessions = JabRefFrame.subMenu("Sessions"), edit = JabRefFrame.subMenu("Edit"), search = JabRefFrame.subMenu("Search"), bibtex = JabRefFrame.subMenu("BibTeX"), view = JabRefFrame.subMenu("View"), tools = JabRefFrame.subMenu("Tools"),
-        //web = subMenu("Web search"),
-        options = JabRefFrame.subMenu("Options"), newSpec = JabRefFrame.subMenu("New entry..."), helpMenu = JabRefFrame.subMenu("Help");
+        JMenu file = JabRefFrame.subMenu("File");
+        JMenu sessions = JabRefFrame.subMenu("Sessions");
+        JMenu edit = JabRefFrame.subMenu("Edit");
+        JMenu search = JabRefFrame.subMenu("Search");
+        JMenu bibtex = JabRefFrame.subMenu("BibTeX");
+        JMenu view = JabRefFrame.subMenu("View");
+        JMenu tools = JabRefFrame.subMenu("Tools");
+        JMenu options = JabRefFrame.subMenu("Options");
+        JMenu newSpec = JabRefFrame.subMenu("New entry...");
+        JMenu helpMenu = JabRefFrame.subMenu("Help");
 
         setUpImportMenus();
 

@@ -9,7 +9,8 @@ import java.util.Vector;
  */
 public class SaveOrderConfig {
 
-    public boolean saveInOriginalOrder, saveInSpecifiedOrder;
+    public boolean saveInOriginalOrder;
+    public boolean saveInSpecifiedOrder;
 
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];

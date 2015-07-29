@@ -687,7 +687,8 @@ class ManageJournalsPanel extends JPanel {
 
     static class JournalEntry implements Comparable<JournalEntry> {
 
-        String name, abbreviation;
+        String name;
+        String abbreviation;
 
         public JournalEntry(String name, String abbreviation) {
             this.name = name;

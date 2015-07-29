@@ -73,9 +73,11 @@ class SearchManagerNoGUI {
     }
 
     private String fieldYear() {
-        String regPt1 = "", regPt2 = "";
+        String regPt1 = "";
+        String regPt2 = "";
         String completeReg = null;
-        boolean reg1Set = false, reg2Set = false; //if beginning of timeframe is BEFORE and end of timeframe is AFTER turn of the century
+        boolean reg1Set = false; //if beginning of timeframe is BEFORE and end of timeframe is AFTER turn of the century
+        boolean reg2Set = false;
         String[] searchTermsToPr = searchTerm.split("=");
         String field = searchTermsToPr[0];
         String[] years = searchTermsToPr[1].split("-");

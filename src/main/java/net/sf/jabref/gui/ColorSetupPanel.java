@@ -35,7 +35,8 @@ import net.sf.jabref.Globals;
  */
 public class ColorSetupPanel extends JPanel {
 
-    private static final int ICON_WIDTH = 30, ICON_HEIGHT = 20;
+    private static final int ICON_WIDTH = 30;
+    private static final int ICON_HEIGHT = 20;
     private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
 
 

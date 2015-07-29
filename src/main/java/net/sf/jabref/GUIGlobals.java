@@ -71,20 +71,20 @@ public class GUIGlobals {
 
     // Size of help window.
     public static final Dimension
-            helpSize = new Dimension(700, 600),
-            aboutSize = new Dimension(600, 265),
-            searchPaneSize = new Dimension(430, 70),
-            searchFieldSize = new Dimension(215, 25);
+            helpSize = new Dimension(700, 600);
+    public static final Dimension aboutSize = new Dimension(600, 265);
+    public static final Dimension searchPaneSize = new Dimension(430, 70);
+    public static final Dimension searchFieldSize = new Dimension(215, 25);
     public static Double zoomLevel = 1.0;
 
     // Divider size for BaseFrame split pane. 0 means non-resizable.
     public static final int
-            SPLIT_PANE_DIVIDER_SIZE = 4,
-            SPLIT_PANE_DIVIDER_LOCATION = 145 + 15, // + 15 for possible scrollbar.
-            TABLE_ROW_PADDING = 8,
-            KEYBIND_COL_0 = 200,
-            KEYBIND_COL_1 = 80, // Added to the font size when determining table
-            MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
+            SPLIT_PANE_DIVIDER_SIZE = 4;
+    public static final int SPLIT_PANE_DIVIDER_LOCATION = 145 + 15; // + 15 for possible scrollbar.
+            public static final int TABLE_ROW_PADDING = 8;
+    public static final int KEYBIND_COL_0 = 200;
+    public static final int KEYBIND_COL_1 = 80; // Added to the font size when determining table
+            public static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
 
     // File names.
     public static final String //configFile = "preferences.dat",
@@ -119,35 +119,35 @@ public class GUIGlobals {
 
     //Help files (in HTML format):
     public static final String
-            baseFrameHelp = "BaseFrameHelp.html",
-            entryEditorHelp = "EntryEditorHelp.html",
-            stringEditorHelp = "StringEditorHelp.html",
-            helpContents = "Contents.html",
-            searchHelp = "SearchHelp.html",
-            groupsHelp = "GroupsHelp.html",
-            customEntriesHelp = "CustomEntriesHelp.html",
-            contentSelectorHelp = "ContentSelectorHelp.html",
-            specialFieldsHelp = "SpecialFieldsHelp.html",
-            labelPatternHelp = "LabelPatterns.html",
-            ownerHelp = "OwnerHelp.html",
-            timeStampHelp = "TimeStampHelp.html",
-            pdfHelp = "ExternalFiles.html",
-            exportCustomizationHelp = "CustomExports.html",
-            importCustomizationHelp = "CustomImports.html",
-            medlineHelp = "MedlineHelp.html",
-            citeSeerHelp = "CiteSeerHelp.html",
-            generalFieldsHelp = "GeneralFields.html",
-            aboutPage = "About.html",
-            shortPlainImport = "ShortPlainImport.html",
-            importInspectionHelp = "ImportInspectionDialog.html",
-            shortIntegrityCheck = "ShortIntegrityCheck.html",
-            remoteHelp = "RemoteHelp.html",
-            journalAbbrHelp = "JournalAbbreviations.html",
-            regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch",
-            nameFormatterHelp = "CustomExports.html#NameFormatter",
-            previewHelp = "PreviewHelp.html",
-            pluginHelp = "Plugin.html",
-            autosaveHelp = "Autosave.html";
+            baseFrameHelp = "BaseFrameHelp.html";
+    public static final String entryEditorHelp = "EntryEditorHelp.html";
+    public static final String stringEditorHelp = "StringEditorHelp.html";
+    public static final String helpContents = "Contents.html";
+    public static final String searchHelp = "SearchHelp.html";
+    public static final String groupsHelp = "GroupsHelp.html";
+    public static final String customEntriesHelp = "CustomEntriesHelp.html";
+    public static final String contentSelectorHelp = "ContentSelectorHelp.html";
+    public static final String specialFieldsHelp = "SpecialFieldsHelp.html";
+    public static final String labelPatternHelp = "LabelPatterns.html";
+    public static final String ownerHelp = "OwnerHelp.html";
+    public static final String timeStampHelp = "TimeStampHelp.html";
+    public static final String pdfHelp = "ExternalFiles.html";
+    public static final String exportCustomizationHelp = "CustomExports.html";
+    public static final String importCustomizationHelp = "CustomImports.html";
+    public static final String medlineHelp = "MedlineHelp.html";
+    public static final String citeSeerHelp = "CiteSeerHelp.html";
+    public static final String generalFieldsHelp = "GeneralFields.html";
+    public static final String aboutPage = "About.html";
+    public static final String shortPlainImport = "ShortPlainImport.html";
+    public static final String importInspectionHelp = "ImportInspectionDialog.html";
+    public static final String shortIntegrityCheck = "ShortIntegrityCheck.html";
+    public static final String remoteHelp = "RemoteHelp.html";
+    public static final String journalAbbrHelp = "JournalAbbreviations.html";
+    public static final String regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch";
+    public static final String nameFormatterHelp = "CustomExports.html#NameFormatter";
+    public static final String previewHelp = "PreviewHelp.html";
+    public static final String pluginHelp = "Plugin.html";
+    public static final String autosaveHelp = "Autosave.html";
 
     //	Colors.
     public static Color
@@ -164,8 +164,10 @@ public class GUIGlobals {
             ;
 
     public static Color
-            editorTextColor = null, validFieldBackgroundColor = null,
-            activeBackground = null, invalidFieldBackgroundColor = null;
+            editorTextColor = null;
+    public static Color validFieldBackgroundColor = null;
+    public static Color activeBackground = null;
+    public static Color invalidFieldBackgroundColor = null;
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String META_FLAG_OLD = "bibkeeper-meta: ";
@@ -173,13 +175,13 @@ public class GUIGlobals {
 
     // some fieldname constants
     public static final double
-            DEFAULT_FIELD_WEIGHT = 1,
-            MAX_FIELD_WEIGHT = 2;
+            DEFAULT_FIELD_WEIGHT = 1;
+    public static final double MAX_FIELD_WEIGHT = 2;
 
     // constants for editor types:
     public static final int
-            STANDARD_EDITOR = 1,
-            FILE_LIST_EDITOR = 2;
+            STANDARD_EDITOR = 1;
+    public static final int FILE_LIST_EDITOR = 2;
 
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
@@ -188,9 +190,9 @@ public class GUIGlobals {
     private static final String FOLDER_FIELD = "folder";
 
     public static final double
-            SMALL_W = 0.30,
-            MEDIUM_W = 0.5,
-            LARGE_W = 1.5;
+            SMALL_W = 0.30;
+    public static final double MEDIUM_W = 0.5;
+    public static final double LARGE_W = 1.5;
 
     public static final double PE_HEIGHT = 2;
 
@@ -200,8 +202,8 @@ public class GUIGlobals {
 
     //	Constants controlling formatted bibtex output.
     public static final int
-            INDENT = 4,
-            LINE_LENGTH = 65; // Maximum
+            INDENT = 4;
+    public static final int LINE_LENGTH = 65; // Maximum
 
     public static final int DEFAULT_FIELD_LENGTH = 100;
     public static final int NUMBER_COL_LENGTH = 32;
@@ -210,16 +212,16 @@ public class GUIGlobals {
 
     // Column widths for export customization dialog table:
     public static final int
-            EXPORT_DIALOG_COL_0_WIDTH = 50,
-            EXPORT_DIALOG_COL_1_WIDTH = 200,
-            EXPORT_DIALOG_COL_2_WIDTH = 30;
+            EXPORT_DIALOG_COL_0_WIDTH = 50;
+    public static final int EXPORT_DIALOG_COL_1_WIDTH = 200;
+    public static final int EXPORT_DIALOG_COL_2_WIDTH = 30;
 
     // Column widths for import customization dialog table:
     public static final int
-            IMPORT_DIALOG_COL_0_WIDTH = 200,
-            IMPORT_DIALOG_COL_1_WIDTH = 80,
-            IMPORT_DIALOG_COL_2_WIDTH = 200,
-            IMPORT_DIALOG_COL_3_WIDTH = 200;
+            IMPORT_DIALOG_COL_0_WIDTH = 200;
+    public static final int IMPORT_DIALOG_COL_1_WIDTH = 80;
+    public static final int IMPORT_DIALOG_COL_2_WIDTH = 200;
+    public static final int IMPORT_DIALOG_COL_3_WIDTH = 200;
 
     public static final Map<String, String> LANGUAGES;
 
@@ -261,7 +263,8 @@ public class GUIGlobals {
      * fails, try to fall back on the default theme.
      */
     public static void setUpIconTheme() {
-        String defaultPrefix = "/images/crystal_16/", prefix = defaultPrefix;
+        String defaultPrefix = "/images/crystal_16/";
+        String prefix = defaultPrefix;
 
         URL defaultResource = GUIGlobals.class.getResource(prefix + "Icons.properties");
         URL resource = defaultResource;

@@ -197,7 +197,8 @@ public class GenFieldsCustomizer extends JDialog {
 
     void revert_actionPerformed(ActionEvent e) {
         StringBuffer sb = new StringBuffer();
-        String name, fields;
+        String name;
+        String fields;
         int i = 0;
         while ((name = (String) Globals.prefs.defaults.get
                 (JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i)) != null) {

@@ -90,7 +90,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     @Override
     public void getEntries(Map<String, Boolean> selection, ImportInspector inspector) {
-        int toDownload = 0, downloaded = 0;
+        int toDownload = 0;
+        int downloaded = 0;
         for (String link : selection.keySet()) {
             boolean isSelected = selection.get(link);
             if (isSelected) {

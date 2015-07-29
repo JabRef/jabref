@@ -55,7 +55,9 @@ class EntryChange extends Change {
         allFields.addAll(diskEntry.getAllFields());
 
         for (String field : allFields) {
-            String mem = memEntry.getField(field), tmp = tmpEntry.getField(field), disk = diskEntry.getField(field);
+            String mem = memEntry.getField(field);
+            String tmp = tmpEntry.getField(field);
+            String disk = diskEntry.getField(field);
 
             if (tmp != null && disk != null) {
                 if (!tmp.equals(disk)) {

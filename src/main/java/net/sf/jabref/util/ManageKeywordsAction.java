@@ -81,7 +81,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private DefaultListModel keywordListModel;
     private JList keywordList;
 
-    private JRadioButton intersectKeywords, mergeKeywords;
+    private JRadioButton intersectKeywords;
+    private JRadioButton mergeKeywords;
 
     private boolean cancelled;
 

@@ -209,7 +209,10 @@ public class LatexFieldFormatter implements FieldFormatter {
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
         sb.append(valueDelimitersZero);
-        boolean escape = false, inCommandName = false, inCommand = false, inCommandOption = false;
+        boolean escape = false;
+        boolean inCommandName = false;
+        boolean inCommand = false;
+        boolean inCommandOption = false;
         int nestedEnvironments = 0;
         StringBuilder commandName = new StringBuilder();
         char c;
@@ -290,7 +293,8 @@ if (c == '&' && !escape &&
 
     private void checkBraces(String text) throws IllegalArgumentException {
 
-        Vector<Integer> left = new Vector<Integer>(5, 3), right = new Vector<Integer>(5, 3);
+        Vector<Integer> left = new Vector<Integer>(5, 3);
+        Vector<Integer> right = new Vector<Integer>(5, 3);
         int current = -1;
 
         // First we collect all occurences:

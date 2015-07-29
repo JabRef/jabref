@@ -197,7 +197,8 @@ public class ChangeScanner implements Runnable {
         // Create pointers that are incremented as the entries of each base are used in
         // successive order from the beginning. Entries "further down" in the "disk" base
         // can also be matched.
-        int piv1, piv2 = 0;
+        int piv1;
+        int piv2 = 0;
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
@@ -361,7 +362,9 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanPreamble(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        String mem = inMem.getPreamble(), tmp = onTmp.getPreamble(), disk = onDisk.getPreamble();
+        String mem = inMem.getPreamble();
+        String tmp = onTmp.getPreamble();
+        String disk = onDisk.getPreamble();
         if (tmp != null) {
             if (disk == null || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(tmp, mem, disk));
@@ -373,7 +376,8 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        int nTmp = onTmp.getStringCount(), nDisk = onDisk.getStringCount();
+        int nTmp = onTmp.getStringCount();
+        int nDisk = onDisk.getStringCount();
         if (nTmp == 0 && nDisk == 0) {
             return;
         }

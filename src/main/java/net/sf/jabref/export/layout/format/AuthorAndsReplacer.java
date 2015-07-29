@@ -46,8 +46,8 @@ public class AuthorAndsReplacer implements LayoutFormatter {
             s = authors[0] + " & " + authors[1];
             break;
         default:
-            int i,
-            x = authors.length;
+            int i;
+            int x = authors.length;
             StringBuffer sb = new StringBuffer();
 
             for (i = 0; i < x - 2; i++) {
