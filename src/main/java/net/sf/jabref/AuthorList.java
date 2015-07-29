@@ -384,7 +384,7 @@ public class AuthorList {
                     break;
                 }
             }
-        }// end token_loop
+        }
 
         // Second step: split name into parts (here: calculate indices
         // of parts in 'tokens' Vector)
@@ -1320,7 +1320,7 @@ public class AuthorList {
             }
             return res.toString();
         }
-    }// end Author
+    }
 
 
     public static void main(String[] args) {
@@ -1337,4 +1337,4 @@ public class AuthorList {
 
         System.out.println((new CreateDocBookAuthors()).format(s));
     }
-}// end AuthorList
+}

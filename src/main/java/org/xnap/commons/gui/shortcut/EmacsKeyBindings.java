@@ -680,7 +680,7 @@ public class EmacsKeyBindings
          */
         void add(String text)
         {
-            if (text.length() == 0) {
+            if (text.isEmpty()) {
                 return;
             }
 

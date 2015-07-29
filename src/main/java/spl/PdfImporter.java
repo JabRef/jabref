@@ -159,7 +159,7 @@ public class PdfImporter {
                         }
                     }
 
-                    if ((localRes == null) || (localRes.size() == 0)) {
+                    if ((localRes == null) || (localRes.isEmpty())) {
                         // import failed -> generate default entry
                         LOGGER.info(Globals.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
@@ -214,7 +214,7 @@ public class PdfImporter {
                     }
 
                     // import failed -> generate default entry
-                    if ((localRes == null) || (localRes.size() == 0)) {
+                    if ((localRes == null) || (localRes.isEmpty())) {
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -461,7 +461,7 @@ public class PdfImporter {
     }
 
     private boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile) {
-        return !((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0));
+        return !((xmpEntriesInFile == null) || (xmpEntriesInFile.isEmpty()));
     }
 
     public MainTable getEntryTable() {

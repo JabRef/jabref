@@ -265,7 +265,7 @@ public class Globals {
             translation = key;
         }
 
-        if ((translation != null) && (translation.length() != 0)) {
+        if ((translation != null) && (!translation.isEmpty())) {
             translation = translation.replaceAll("_", " ");
             StringBuffer sb = new StringBuffer();
             boolean b = false;
@@ -319,7 +319,7 @@ public class Globals {
         } catch (MissingResourceException ex) {
             translation = key;
         }
-        if ((translation != null) && (translation.length() != 0)) {
+        if ((translation != null) && (!translation.isEmpty())) {
             return translation.replaceAll("_", " ");
         } else {
             return key;
@@ -339,7 +339,7 @@ public class Globals {
             // for \""
             // + key + "\"");
         }
-        if ((translation != null) && (translation.length() != 0)) {
+        if ((translation != null) && (!translation.isEmpty())) {
             return translation;
         } else {
             return key;

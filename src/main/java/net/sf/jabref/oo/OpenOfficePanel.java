@@ -313,7 +313,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
                             (databases, OpenOfficePanel.style);
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
                     //ooBase.sync(frame.basePanel().database(), style);
-                    if (unresolvedKeys.size() > 0) {
+                    if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                 unresolvedKeys.get(0)), Globals.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     }
@@ -773,7 +773,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (acd.cancelled()) {
                 return;
             }
-            if (acd.getPageInfo().length() > 0) {
+            if (!acd.getPageInfo().isEmpty()) {
                 pageInfo = acd.getPageInfo();
             }
             inParenthesis = acd.isInParenthesisCite();
@@ -959,7 +959,7 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
             if (acd.cancelled()) {
                 return;
             }
-            if (acd.getPageInfo().length() > 0) {
+            if (!acd.getPageInfo().isEmpty()) {
                 pageInfo = acd.getPageInfo();
             }
             inParenthesis = acd.isInParenthesisCite();

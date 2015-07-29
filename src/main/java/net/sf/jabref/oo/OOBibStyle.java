@@ -63,18 +63,18 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private boolean valid = false;
 
-    private final static int NONE = 0;
-    private final static int LAYOUT = 1;
-    private final static int PROPERTIES = 2;
-    private final static int CITATION = 3;
-    private final static int NAME = 4;
-    private final static int JOURNALS = 5;
-    private final static String LAYOUT_MRK = "LAYOUT";
-    private final static String PROPERTIES_MARK = "PROPERTIES";
-    private final static String CITATION_MARK = "CITATION";
-    private final static String NAME_MARK = "NAME";
-    private final static String JOURNALS_MARK = "JOURNALS";
-    private final static String DEFAULT_MARK = "default";
+    private static final int NONE = 0;
+    private static final int LAYOUT = 1;
+    private static final int PROPERTIES = 2;
+    private static final int CITATION = 3;
+    private static final int NAME = 4;
+    private static final int JOURNALS = 5;
+    private static final String LAYOUT_MRK = "LAYOUT";
+    private static final String PROPERTIES_MARK = "PROPERTIES";
+    private static final String CITATION_MARK = "CITATION";
+    private static final String NAME_MARK = "NAME";
+    private static final String JOURNALS_MARK = "JOURNALS";
+    private static final String DEFAULT_MARK = "default";
     private File styleFile = null;
     private static long styleFileModificationTime = Long.MIN_VALUE;
 
@@ -198,11 +198,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         for (String line1 : lines) {
             String line = line1;
-            if ((line.length() > 0) && (line.charAt(line.length() - 1) == '\r')) {
+            if ((!line.isEmpty()) && (line.charAt(line.length() - 1) == '\r')) {
                 line = line.substring(0, line.length() - 1);
             }
             // Check for empty line or comment:
-            if ((line.trim().length() == 0) || (line.charAt(0) == '#')) {
+            if ((line.trim().isEmpty()) || (line.charAt(0) == '#')) {
                 continue;
             }
             // Check if we should change mode:
@@ -225,7 +225,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
             switch (mode) {
             case NAME:
-                if (line.trim().length() > 0) {
+                if (!line.trim().isEmpty()) {
                     name = line.trim();
                 }
             case LAYOUT:
@@ -323,7 +323,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @throws IOException
      */
     private void handleJournalsLine(String line) {
-        if (line.trim().length() > 0) {
+        if (!line.trim().isEmpty()) {
             journals.add(line.trim());
         }
     }
@@ -458,7 +458,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         if (uniquefiers != null) {
             for (int i = 0; i < uniquefiers.length; i++) {
 
-                if ((uniquefiers[i] != null) && (uniquefiers[i].length() > 0)) {
+                if ((uniquefiers[i] != null) && (!uniquefiers[i].isEmpty())) {
                     String authorField = (String) citProperties.get("AuthorField");
                     int maxAuthors = (Integer) citProperties.get("MaxAuthors");
                     if (piv == -1) {
@@ -737,7 +737,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         String[] fields = field.split("/");
         for (String s : fields) {
             String content = BibtexDatabase.getResolvedField(s, entry, database);
-            if ((content != null) && (content.trim().length() > 0)) {
+            if ((content != null) && (!content.trim().isEmpty())) {
                 if (fieldFormatter != null) {
                     content = fieldFormatter.format(content);
                 }
@@ -759,7 +759,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         if (al.size() > number) {
             AuthorList.Author a = al.getAuthor(number);
-            if ((a.getVon() != null) && (a.getVon().length() > 0)) {
+            if ((a.getVon() != null) && (!a.getVon().isEmpty())) {
                 String von = a.getVon();
                 sb.append(von);
                 /*sb.append(von.substring(0, 1).toUpperCase());

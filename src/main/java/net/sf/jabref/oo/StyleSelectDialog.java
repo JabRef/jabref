@@ -382,7 +382,7 @@ class StyleSelectDialog {
 
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
-        if (styleDir.getText().length() > 0) {
+        if (!styleDir.getText().isEmpty()) {
             addStyles(styleDir.getText(), true);
         }
         styles.getReadWriteLock().writeLock().unlock();
@@ -485,7 +485,7 @@ class StyleSelectDialog {
      * @return the selected style, or null if no style is selected.
      */
     private OOBibStyle getSelectedStyle() {
-        if (selectionModel.getSelected().size() > 0) {
+        if (!selectionModel.getSelected().isEmpty()) {
             return selectionModel.getSelected().get(0);
         } else {
             return null;

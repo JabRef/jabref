@@ -251,7 +251,7 @@ class CitationManager {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (pageInfo.getText().trim().length() > 0) {
+                    if (!pageInfo.getText().trim().isEmpty()) {
                         _entry.pageInfo = pageInfo.getText().trim();
                     } else {
                         _entry.pageInfo = null;

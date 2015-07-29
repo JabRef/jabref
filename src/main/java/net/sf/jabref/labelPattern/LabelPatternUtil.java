@@ -513,7 +513,7 @@ public class LabelPatternUtil {
         // Patch by Toralf Senger:
         // Remove Regular Expressions while generating Keys
         String regex = Globals.prefs.get("KeyPatternRegex");
-        if ((regex != null) && (regex.trim().length() > 0)) {
+        if ((regex != null) && (!regex.trim().isEmpty())) {
             String replacement = Globals.prefs.get("KeyPatternReplacement");
             _label = _label.replaceAll(regex, replacement);
         }
@@ -607,7 +607,7 @@ public class LabelPatternUtil {
                     String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
                     for (String word1 : words) {
-                        if (word1.length() > 0) {
+                        if (!word1.isEmpty()) {
                             abbr.append(word1.charAt(0));
                         }
                     }
@@ -863,7 +863,7 @@ public class LabelPatternUtil {
             piv++;
             // Check if it is ok:
             String word = current.toString().trim();
-            if (word.length() == 0) {
+            if (word.isEmpty()) {
                 continue;
             }
             for (int _i = 0; _i < SKIP_WORDS.length; _i++) {

@@ -116,7 +116,7 @@ class OOUtil {
         Matcher m = OOUtil.htmlTag.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
-            if (ss.length() > 0) {
+            if (!ss.isEmpty()) {
                 OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
                         mono > 0, smallCaps > 0, sup > 0, sub > 0);
             }

@@ -82,7 +82,7 @@ class BstWrapper {
         ArrayList<Integer> endIndices = new ArrayList<Integer>();
         ArrayList<String> keys = new ArrayList<String>();
         while (m.find()) {
-            if (indices.size() > 0) {
+            if (!indices.isEmpty()) {
                 endIndices.add(m.start());
             }
             System.out.println(m.start() + "  " + m.end());

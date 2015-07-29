@@ -48,7 +48,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         for (BibtexEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
             // Only handle keys that are actually set:
-            if ((key != null) && (key.length() > 0)) {
+            if ((key != null) && (!key.isEmpty())) {
                 // See whether this entry's key is already known:
                 if (!foundKeys.containsKey(key)) {
                     // Not already known. Add key and entry to map:
@@ -99,7 +99,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         }
 
         // Do the actual generation:
-        if (toGenerateFor.size() > 0) {
+        if (!toGenerateFor.isEmpty()) {
             NamedCompound ce = new NamedCompound("resolve duplicate keys");
             for (BibtexEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKey();

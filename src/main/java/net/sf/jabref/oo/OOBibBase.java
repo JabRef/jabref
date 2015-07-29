@@ -51,17 +51,17 @@ import java.util.regex.Pattern;
  */
 class OOBibBase {
 
-    private final static String BIB_SECTION_NAME = "JR_bib";
-    private final static String BIB_SECTION_END_NAME = "JR_bib_end";
-    private final static String BIB_CITATION = "JR_cite";
+    private static final String BIB_SECTION_NAME = "JR_bib";
+    private static final String BIB_SECTION_END_NAME = "JR_bib_end";
+    private static final String BIB_CITATION = "JR_cite";
     private final Pattern citePattern = Pattern.compile(OOBibBase.BIB_CITATION + "\\d*_(\\d*)_(.*)");
 
-    private final static int
+    private static final int
             AUTHORYEAR_PAR = 1;
-    private final static int AUTHORYEAR_INTEXT = 2;
-    private final static int INVISIBLE_CIT = 3;
+    private static final int AUTHORYEAR_INTEXT = 2;
+    private static final int INVISIBLE_CIT = 3;
 
-    final static String DEFAULT_CONNECTION_STRING = "uno:socket,host=localhost,port=2002;urp;StarOffice.ServiceManager";
+    static final String DEFAULT_CONNECTION_STRING = "uno:socket,host=localhost,port=2002;urp;StarOffice.ServiceManager";
     final String[] BIB_TYPES = new String[] {"ARTICLE", "BOOK", "BOOKLET", "CONFERENCE",
             "INBOOK", "INCOLLECTION", "INPROCEEDINGS", "JOURNAL", "MANUAL", "MASTERTHESIS",
             "MISC", "PHDTHESIS", "PROCEEDINGS", "TECHREPORT", "UNPUBLISHED", "EMAIL", "WWW",

@@ -167,7 +167,7 @@ public class BibtexWidth {
             BibtexWidth.widths[126] = 500;
         }
 
-        if ((0 <= c) && (c < 128)) {
+        if ((c >= 0) && (c < 128)) {
             return BibtexWidth.widths[c];
         } else {
             return 0;

@@ -177,7 +177,7 @@ public class MetaData implements Iterable<String> {
             key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
-        if ((vec != null) && (vec.size() > 0)) {
+        if ((vec != null) && (!vec.isEmpty())) {
             String dir;
             dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
