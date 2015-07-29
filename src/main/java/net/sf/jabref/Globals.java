@@ -15,7 +15,6 @@
 */
 package net.sf.jabref;
 
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,7 +52,9 @@ public class Globals {
     /**
      * {@link Control} class allowing properties bundles to be in different encodings.
      * 
-     * @see <a href="http://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle">utf-8 and property files</a>
+     * @see <a
+     *      href="http://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle">utf-8
+     *      and property files</a>
      */
     private static class EncodingControl extends Control {
 
@@ -97,16 +98,17 @@ public class Globals {
             return bundle;
         }
     }
-    
+
+
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
     private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
             INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
     public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
-    
+
     public static final String JOURNALS_IEEE_INTERNAL_LIST = "/resource/IEEEJournalList.txt";
-    
+
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
     private static ResourceBundle intMessages;
@@ -128,14 +130,14 @@ public class Globals {
 
     public static final String[] ENCODINGS;
     private static final String[] ALL_ENCODINGS = // (String[])
-            // Charset.availableCharsets().keySet().toArray(new
-            // String[]{});
-            new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII", "Cp1250", "Cp1251", "Cp1252",
-                    "Cp1253", "Cp1254", "Cp1257", "SJIS",
-                    "KOI8_R", // Cyrillic
-                    "EUC_JP", // Added Japanese encodings.
-                    "Big5", "Big5_HKSCS", "GBK", "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5",
-                    "ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
+    // Charset.availableCharsets().keySet().toArray(new
+    // String[]{});
+    new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII", "Cp1250", "Cp1251", "Cp1252",
+            "Cp1253", "Cp1254", "Cp1257", "SJIS",
+            "KOI8_R", // Cyrillic
+            "EUC_JP", // Added Japanese encodings.
+            "Big5", "Big5_HKSCS", "GBK", "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5",
+            "ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
     public static final Map<String, String> ENCODING_NAMES_LOOKUP;
 
     static {
@@ -190,7 +192,8 @@ public class Globals {
 
     public static final String osName = System.getProperty("os.name", "def");
 
-    public static final boolean ON_MAC = (Globals.osName.equals(Globals.MAC)), ON_WIN = Globals.osName.startsWith("Windows"),
+    public static final boolean ON_MAC = (Globals.osName.equals(Globals.MAC)),
+            ON_WIN = Globals.osName.startsWith("Windows"),
             ON_LINUX = Globals.osName.startsWith("Linux");
 
     public static SidePaneManager sidePaneManager;
@@ -201,12 +204,11 @@ public class Globals {
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
-    
+
     public static JournalAbbreviationRepository journalAbbrev;
 
     /**
-     * 	"Fieldname" to indicate that a field should be treated as a bibtex 
-     * string. Used when writing database to file.
+     * "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
      */
     public static final String BIBTEX_STRING = "__string";
 
@@ -222,6 +224,7 @@ public class Globals {
 
     /**
      * Initialize and start the autosave manager.
+     * 
      * @param frame The main frame.
      */
     public static void startAutoSaveManager(JabRefFrame frame) {
@@ -1227,8 +1230,7 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
     }
 
     /**
-     * Returns a reg exp pattern in the form (w1)|(w2)| ...
-     * wi are escaped if no regex search is enabled
+     * Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
      */
     public static Pattern getPatternForWords(ArrayList<String> words) {
         if ((words == null) || (words.isEmpty()) || (words.get(0).isEmpty())) {
@@ -1252,6 +1254,5 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
 
         return pattern;
     }
-
 
 }
