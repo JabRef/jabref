@@ -45,22 +45,6 @@ Project: JGoodies Looks
 URL:     http://www.jgoodies.com/downloads/libraries/
 License: BSD
 
-Id:      com.sun.jersey:jersey-client
-Project: Jersey
-URL:     http://jersey.java.net/
-License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
-
-Id:      com.sun.jersey:jersey-core
-Project: Jersey
-URL:     http://jersey.java.net/
-License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
-
-Id:      com.sun.jersey.contribs:jersey-multipart
-Project: Jersey
-URL:     http://jersey.java.net/
-License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
-Note:    This should fetch org.jvnet.mimepull:mimepull; maybe that version is broken. Only 1.9.4 is reported to work correctly
-
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
@@ -150,16 +134,6 @@ Path:    lib/plugin/velocity-dep-1.5.jar
 Project: Apache Velocity
 URL:     http://velocity.apache.org/engine/releases/velocity-1.5/
 License: Apache 2.0
-
-Path:    lib/spl/sciplore/mrDlib-serialization-api.jar
-Project: Mr. DLib
-URL:     http://mr-dlib.org/
-License: Source not yet available
-
-Path:    lib/spl/sciplore/xstream-1.4.1.jar
-Project: XStream
-URL:     http://xstream.codehaus.org/
-License: BSD (http://xstream.codehaus.org/license.html)
 
 Path:    lib/spin.jar
 Project: Spin

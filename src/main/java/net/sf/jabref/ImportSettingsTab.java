@@ -44,10 +44,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     private final JRadioButton radioButtonXmp;
     private final JRadioButton radioButtonPDFcontent;
-    private final JRadioButton radioButtonMrDlib;
     private final JRadioButton radioButtonNoMeta;
     private final JRadioButton radioButtononlyAttachPDF;
-    private final JRadioButton radioButtonUpdateEmptyFields;
     private final JCheckBox useDefaultPDFImportStyle;
 
     private final JTextField fileNamePattern;
@@ -60,17 +58,12 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         radioButtonNoMeta = new JRadioButton(Globals.lang("Create_blank_entry_linking_the_PDF"));
         radioButtonXmp = new JRadioButton(Globals.lang("Create_entry_based_on_XMP_data"));
         radioButtonPDFcontent = new JRadioButton(Globals.lang("Create_entry_based_on_content"));
-        radioButtonMrDlib = new JRadioButton(Globals.lang("Create_entry_based_on_data_fetched_from") + " Mr.DLib");
         radioButtononlyAttachPDF = new JRadioButton(Globals.lang("Only_attach_PDF"));
-        radioButtonUpdateEmptyFields = new JRadioButton(Globals.lang("Update_empty_fields_with_data_fetched_from")
-                + " Mr.DLib");
         ButtonGroup bg = new ButtonGroup();
         bg.add(radioButtonNoMeta);
         bg.add(radioButtonXmp);
         bg.add(radioButtonPDFcontent);
-        bg.add(radioButtonMrDlib);
         bg.add(radioButtononlyAttachPDF);
-        bg.add(radioButtonUpdateEmptyFields);
 
         useDefaultPDFImportStyle = new JCheckBox(Globals.lang("Always use this PDF import style (and do not ask for each import)"));
 
@@ -99,13 +92,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         builder.append(radioButtonPDFcontent);
         builder.nextLine();
         builder.append(pan);
-        builder.append(radioButtonMrDlib);
-        builder.nextLine();
-        builder.append(pan);
         builder.append(radioButtononlyAttachPDF);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(radioButtonUpdateEmptyFields);
         builder.nextLine();
         builder.append(pan);
         builder.append(useDefaultPDFImportStyle);
@@ -140,14 +127,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         case ImportDialog.CONTENT:
             radioButtonPDFcontent.setSelected(true);
             break;
-        case ImportDialog.MRDLIB:
-            radioButtonMrDlib.setSelected(true);
-            break;
         case ImportDialog.ONLYATTACH:
             radioButtononlyAttachPDF.setSelected(true);
-            break;
-        case ImportDialog.UPDATEEMPTYFIELDS:
-            radioButtonUpdateEmptyFields.setSelected(true);
             break;
         default:
             // fallback
@@ -167,12 +148,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             style = ImportDialog.XMP;
         } else if (radioButtonPDFcontent.isSelected()) {
             style = ImportDialog.CONTENT;
-        } else if (radioButtonMrDlib.isSelected()) {
-            style = ImportDialog.MRDLIB;
         } else if (radioButtononlyAttachPDF.isSelected()) {
             style = ImportDialog.ONLYATTACH;
-        } else if (radioButtonUpdateEmptyFields.isSelected()) {
-            style = ImportDialog.UPDATEEMPTYFIELDS;
         }
         Globals.prefs.putInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
         Globals.prefs.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
