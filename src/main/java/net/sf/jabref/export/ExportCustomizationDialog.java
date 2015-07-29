@@ -29,7 +29,7 @@ import net.sf.jabref.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import net.sf.jabref.util.Util;
 
 /**
@@ -125,7 +125,7 @@ public class ExportCustomizationDialog extends JDialog {
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
                 "Help"));
 
-        EventTableModel<String[]> tableModel = new EventTableModel<String[]>(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
+        DefaultEventTableModel<String[]> tableModel = new DefaultEventTableModel<String[]>(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);

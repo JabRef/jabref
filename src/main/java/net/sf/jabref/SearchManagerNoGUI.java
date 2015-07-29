@@ -15,8 +15,6 @@
 */
 package net.sf.jabref;
 
-import java.lang.Integer;
-import java.lang.Math;
 import java.util.Collection;
 import java.util.Vector;
 

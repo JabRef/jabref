@@ -15,49 +15,6 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.table.TableColumnModel;
-
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.EntryComparator;
-import net.sf.jabref.FieldComparator;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.GeneralRenderer;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.TransferableBibtexEntry;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -65,14 +22,26 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
+import net.sf.jabref.*;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.util.Util;
+
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
  * possibility to preview and to locate each entry in the main window.
- *
+ * <p/>
  * TODO: should be possible to save or export the list.
  */
 public class SearchResultsDialog {
@@ -91,7 +60,7 @@ public class SearchResultsDialog {
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
-    private EventTableModel<BibtexEntry> model;
+    private DefaultEventTableModel<BibtexEntry> model;
     private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
     private SortedList<BibtexEntry> sortedEntries;
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
@@ -99,7 +68,6 @@ public class SearchResultsDialog {
     private JTable entryTable;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private PreviewPanel preview;
-
 
     public SearchResultsDialog(JabRefFrame frame, String title) {
 
@@ -116,7 +84,7 @@ public class SearchResultsDialog {
                 activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
-        model = new EventTableModel<BibtexEntry>(sortedEntries,
+        model = new DefaultEventTableModel<BibtexEntry>(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
@@ -129,7 +97,7 @@ public class SearchResultsDialog {
         setupComparatorChooser(tableSorter);
         JScrollPane sp = new JScrollPane(entryTable);
 
-        final EventSelectionModel<BibtexEntry> selectionModel = new EventSelectionModel<BibtexEntry>(sortedEntries);
+        final DefaultEventSelectionModel<BibtexEntry> selectionModel = new DefaultEventSelectionModel<BibtexEntry>(sortedEntries);
         entryTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         entryTable.addMouseListener(new TableClickListener());
@@ -158,7 +126,7 @@ public class SearchResultsDialog {
                     BibtexEntry[] bes = selectionModel.getSelected().toArray
                             (new BibtexEntry[selectionModel.getSelected().size()]);
                     TransferableBibtexEntry trbe
-                    = new TransferableBibtexEntry(bes);
+                            = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.basePanel());
@@ -192,6 +160,7 @@ public class SearchResultsDialog {
 
     /**
      * Control the visibility of the dialog.
+     *
      * @param visible true to show dialog, false to hide.
      */
     public void setVisible(boolean visible) {
@@ -217,6 +186,7 @@ public class SearchResultsDialog {
     /**
      * Set up the comparators for each column, so the user can modify sort order
      * by clicking the column labels.
+     *
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
     @SuppressWarnings("unchecked")
@@ -284,8 +254,9 @@ public class SearchResultsDialog {
 
     /**
      * Add a list of entries to the table.
+     *
      * @param newEntries The list of entries.
-     * @param panel A reference to the BasePanel where the entries belong.
+     * @param panel      A reference to the BasePanel where the entries belong.
      */
     public synchronized void addEntries(java.util.List<BibtexEntry> newEntries, BasePanel panel) {
         for (BibtexEntry entry : newEntries) {
@@ -296,6 +267,7 @@ public class SearchResultsDialog {
 
     /**
      * Add a single entry to the table.
+     *
      * @param entry The entry to add.
      * @param panel A reference to the BasePanel where the entry belongs.
      */
@@ -303,7 +275,6 @@ public class SearchResultsDialog {
         entries.add(entry);
         entryHome.put(entry, panel);
     }
-
 
     /**
      * Mouse listener for the entry table. Processes icon clicks to open external
@@ -386,6 +357,7 @@ public class SearchResultsDialog {
          * gets redirected to this method. Here we open a file link menu if the
          * user is pointing at a file link icon. Otherwise a general context
          * menu should be shown.
+         *
          * @param e The triggering mouse event.
          */
         public void processPopupTrigger(MouseEvent e) {
@@ -498,8 +470,7 @@ public class SearchResultsDialog {
                 default:
                     return null;
                 }
-            }
-            else {
+            } else {
                 String field = fields[column - PAD];
                 if (field.equals("author") || field.equals("editor")) {
                     // For name fields, tap into a MainTableFormat instance and use

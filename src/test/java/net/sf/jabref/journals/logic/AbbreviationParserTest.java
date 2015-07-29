@@ -1,7 +1,7 @@
 package net.sf.jabref.journals.logic;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.journals.logic.AbbreviationParser;
+
 import static org.junit.Assert.*;
 import org.junit.Test;
 

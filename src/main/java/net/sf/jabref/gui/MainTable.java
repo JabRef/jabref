@@ -41,8 +41,8 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 /**
@@ -66,7 +66,7 @@ public class MainTable extends JTable {
     private final boolean tableColorCodes;
     private boolean showingFloatSearch = false;
     private boolean showingFloatGrouping = false;
-    private final EventSelectionModel<BibtexEntry> selectionModel;
+    private final DefaultEventSelectionModel<BibtexEntry> selectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;
     private Comparator<BibtexEntry> searchComparator;
@@ -118,11 +118,11 @@ public class MainTable extends JTable {
         searchComparator = null;//new HitOrMissComparator(searchMatcher);
         groupComparator = null;//new HitOrMissComparator(groupMatcher);
 
-        EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
+        DefaultEventTableModel<BibtexEntry> tableModel = new DefaultEventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
+        selectionModel = new DefaultEventSelectionModel<BibtexEntry>(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());

@@ -1,6 +1,5 @@
 package net.sf.jabref.journals.logic;
 
-import net.sf.jabref.journals.logic.Abbreviation;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

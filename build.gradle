@@ -25,6 +25,7 @@ apply plugin: "eclipse"
 apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
+apply plugin: "maven"
 
 /* disabled, because plugin requires Java 1.8
 format {
@@ -47,6 +48,7 @@ test {
     }
 }
 
+group = "net.sf.jabref"
 version = "2.11dev"
 
 repositories {
@@ -74,7 +76,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.7.2'
     compile 'com.jgoodies:jgoodies-looks:2.5.3'
     
-    compile 'org.swinglabs:swingx:1.6.1'
+    compile 'org.swinglabs.swingx:swingx-core:1.6.5-1'
 
     compile 'org.apache.pdfbox:pdfbox:1.8.10'
     compile 'org.apache.pdfbox:fontbox:1.8.10'
@@ -115,7 +117,8 @@ dependencies {
 
     compile 'junit:junit:4.12'
 
-    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
+    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar'])
+    generateClasspath 'org.apache.velocity:velocity:1.7'
 }
 
 // use ant targets with prefix antTargets.XXXXX

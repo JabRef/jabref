@@ -18,7 +18,7 @@ package net.sf.jabref.oo;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -42,7 +42,7 @@ class CitationManager {
     private final JDialog diag;
     private final EventList<CitEntry> list;
     private JTable table;
-    private EventTableModel<CitEntry> tableModel;
+    private DefaultEventTableModel<CitEntry> tableModel;
     private final JButton ok = new JButton(Globals.lang("Ok"));
     private final JButton cancel = new JButton(Globals.lang("Cancel"));
 
@@ -60,7 +60,7 @@ class CitationManager {
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new EventTableModel<CitEntry>(list, new CitEntryFormat());
+        tableModel = new DefaultEventTableModel<CitEntry>(list, new CitEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 

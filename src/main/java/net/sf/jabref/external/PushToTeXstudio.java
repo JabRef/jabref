@@ -6,7 +6,6 @@ import java.io.InputStream;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.external.PushToApplication;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 

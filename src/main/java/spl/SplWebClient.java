@@ -76,7 +76,7 @@ public class SplWebClient {
 
             ClientResponse response = SplWebClient.WEBRESOURCE.path("documents").type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formDataMultiPart);
             //System.out.println(response.getEntity(String.class));
-            if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
+            if ((response.getStatusInfo().getStatusCode() == ClientResponse.Status.OK.getStatusCode()) && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 byte[] bytes = new byte[0];
                 try {
@@ -119,7 +119,7 @@ public class SplWebClient {
                     return WebServiceStatus.NO_METADATA;
                 }
             }
-            if (response.getClientResponseStatus() == ClientResponse.Status.SERVICE_UNAVAILABLE) {
+            if (response.getStatusInfo().getStatusCode() == ClientResponse.Status.SERVICE_UNAVAILABLE.getStatusCode()) {
                 return WebServiceStatus.UNAVAILABLE;
             }
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class SplWebClient {
     private static boolean isWebServiceOutDated() {
         try {
             ClientResponse response = SplWebClient.WEBRESOURCE.path("service/versioncheck/" + Tools.WEBSERVICE_APP_ID + "/current").get(ClientResponse.class);
-            if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
+            if ((response.getStatusInfo().getStatusCode() == ClientResponse.Status.OK.getStatusCode()) && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 byte[] bytes = entity.getBytes();
                 InputStream is = new ByteArrayInputStream(bytes);
@@ -154,7 +154,7 @@ public class SplWebClient {
     private static boolean isMetaDataServiceAvailable() {
         try {
             ClientResponse response = SplWebClient.WEBRESOURCE.path("service/metadata/available").get(ClientResponse.class);
-            if ((response.getClientResponseStatus() == ClientResponse.Status.OK) && response.hasEntity()) {
+            if ((response.getStatusInfo().getStatusCode() == ClientResponse.Status.OK.getStatusCode()) && response.hasEntity()) {
                 String entity = response.getEntity(String.class);
                 if ((entity != null) && entity.equalsIgnoreCase("false")) {
                     return false;
