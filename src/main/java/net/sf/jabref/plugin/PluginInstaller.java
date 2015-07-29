@@ -176,7 +176,7 @@ public class PluginInstaller {
         VersionNumber vn = new VersionNumber(nav[1]);
         Map<VersionNumber, File> versions = PluginInstaller.getInstalledVersions(nav[0]);
 
-        if (versions.size() == 0) {
+        if (versions.isEmpty()) {
             return PluginInstaller.NO_VERSIONS_INSTALLED;
         }
         VersionNumber thenum = versions.keySet().iterator().next();

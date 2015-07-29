@@ -303,7 +303,7 @@ public class ImportFormatReader {
     private static String expandAll(String s) {
         //System.out.println("'"+s+"'");
         // Avoid arrayindexoutof.... :
-        if (s.length() == 0) {
+        if (s.isEmpty()) {
             return s;
         }
         // If only one character (uppercase letter), add a dot and return immediately:
@@ -392,7 +392,7 @@ public class ImportFormatReader {
             BibtexEntry entry = i.next();
 
             // If there are no fields, remove the entry:
-            if (entry.getAllFields().size() == 0) {
+            if (entry.getAllFields().isEmpty()) {
                 i.remove();
             }
         }

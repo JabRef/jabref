@@ -243,7 +243,7 @@ public class ExternalFileTypeEditor extends JDialog {
                 fileTypes.remove(rows[i]);
             }
             tableModel.fireTableDataChanged();
-            if (fileTypes.size() > 0) {
+            if (!fileTypes.isEmpty()) {
                 int row = Math.min(rows[0], fileTypes.size() - 1);
                 table.setRowSelectionInterval(row, row);
             }

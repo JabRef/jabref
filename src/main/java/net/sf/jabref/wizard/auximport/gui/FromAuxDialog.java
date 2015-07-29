@@ -261,7 +261,7 @@ public class FromAuxDialog
         String auxName = auxFileField.getText();
 
         if (auxName != null) {
-            if ((refBase != null) && (auxName.length() > 0)) {
+            if ((refBase != null) && (!auxName.isEmpty())) {
                 auxParser.clear();
                 notFoundList.setListData(auxParser.generate(auxName, refBase));
 

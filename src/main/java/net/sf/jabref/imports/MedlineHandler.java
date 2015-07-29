@@ -166,7 +166,7 @@ class MedlineHandler extends DefaultHandler
         else if (localName.equals("PMID")) {
             // Set PMID only once, because there can be <CommentIn> tags later on that
             // contain IDs of different articles.
-            if (pubmedid.length() == 0) {
+            if (pubmedid.isEmpty()) {
                 inPubMedID = true;
                 pubmedid = "";
             }
@@ -411,10 +411,10 @@ class MedlineHandler extends DefaultHandler
                 author = lastname;
             }
 
-            if (suffix.length() > 0) {
+            if (!suffix.isEmpty()) {
                 author = author + ", " + suffix;
             }
-            if (forename.length() > 0) {
+            if (!forename.isEmpty()) {
                 author = author + ", " + forename;
             }
 

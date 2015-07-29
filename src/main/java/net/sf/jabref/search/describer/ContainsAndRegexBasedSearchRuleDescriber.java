@@ -22,7 +22,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
     @Override
     public String getDescription() {
         List<String> words = new SentenceAnalyzer(query).getWords();
-        String firstWord = words.size() > 0 ? words.get(0) : "";
+        String firstWord = !words.isEmpty() ? words.get(0) : "";
 
         System.out.println("words = " + words);
 

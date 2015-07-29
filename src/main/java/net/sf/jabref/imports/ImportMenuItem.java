@@ -320,7 +320,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 ParserResult pr = importResult.parserResult;
                 Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
 
-                anythingUseful = anythingUseful | (entries.size() > 0);
+                anythingUseful = anythingUseful | (!entries.isEmpty());
 
                 // set timestamp and owner
                 Util.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),

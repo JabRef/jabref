@@ -68,7 +68,7 @@ public class PushToLatexEditor implements PushToApplication {
 
         String led = Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH);
 
-        if ((led == null) || (led.trim().length() == 0)) {
+        if ((led == null) || (led.trim().isEmpty())) {
             notDefined = true;
             return;
         }

@@ -262,7 +262,7 @@ public class RepecNepImporter extends ImportFormat {
         String result = this.lastLine.trim();
         readLine();
         while ((this.lastLine != null) && !this.lastLine.trim().equals("") && !startsWithKeyword(RepecNepImporter.recognizedFields) && !isStartOfWorkingPaper()) {
-            result += this.lastLine.length() == 0 ? this.lastLine.trim() : " " + this.lastLine.trim();
+            result += this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim();
             readLine();
         }
         return result;

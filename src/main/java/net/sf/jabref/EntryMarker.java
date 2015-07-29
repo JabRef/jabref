@@ -159,7 +159,7 @@ public class EntryMarker {
             sb.append(']');
         }
         String newVal = sb.toString();
-        if (newVal.length() == 0) {
+        if (newVal.isEmpty()) {
             newVal = null;
         }
         ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be

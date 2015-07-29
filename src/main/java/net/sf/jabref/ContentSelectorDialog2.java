@@ -192,7 +192,7 @@ class ContentSelectorDialog2 extends JDialog {
                 }
                 wordListModel.remove(index);
                 wordEditField.setText("");
-                if (wordListModel.size() > 0) {
+                if (!wordListModel.isEmpty()) {
                     wordList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
                 }
             }
@@ -282,7 +282,7 @@ class ContentSelectorDialog2 extends JDialog {
                 fieldListModel.remove(index);
                 wordListModels.remove(fieldName);
                 fieldNameField.setText("");
-                if (fieldListModel.size() > 0) {
+                if (!fieldListModel.isEmpty()) {
                     fieldList.setSelectedIndex(Math.min(index, wordListModel.size() - 1));
                 }
             }
@@ -342,7 +342,7 @@ class ContentSelectorDialog2 extends JDialog {
     }
 
     private void newWordAction() {
-        if ((wordListModel.size() == 0) ||
+        if ((wordListModel.isEmpty()) ||
                 !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT)) {
             wordListModel.add(0, WORD_FIRSTLINE_TEXT);
         }
@@ -370,7 +370,7 @@ class ContentSelectorDialog2 extends JDialog {
             DefaultListModel lm = wordListModels.get(fieldName);
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
-            if (lm.size() > 0) {
+            if (!lm.isEmpty()) {
                 while ((start < lm.size()) && (lm.get(start)).equals(WORD_FIRSTLINE_TEXT)) {
                     start++;
                 }
@@ -419,7 +419,7 @@ class ContentSelectorDialog2 extends JDialog {
                 contents.add(s.substring(Globals.SELECTOR_META_PREFIX.length()));
             }
         }
-        if (contents.size() == 0) {
+        if (contents.isEmpty()) {
             // if nothing was added, put the default fields (as described in the help)
             fieldListModel.addElement("author");
             fieldListModel.addElement("journal");

@@ -521,7 +521,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             notBibFiles.add(fileName);
         }
 
-        if (notBibFiles.size() > 0) {
+        if (!notBibFiles.isEmpty()) {
             String[] toImport = new String[notBibFiles.size()];
             notBibFiles.toArray(toImport);
 

@@ -85,7 +85,7 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // See if there are plugins scheduled for deletion:
-        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && (prefs.get(JabRefPreferences.DELETE_PLUGINS).length() > 0)) {
+        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && (!prefs.get(JabRefPreferences.DELETE_PLUGINS).isEmpty())) {
             String[] toDelete = prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
             PluginInstaller.deletePluginsOnStartup(toDelete);
             prefs.put(JabRefPreferences.DELETE_PLUGINS, "");
@@ -378,7 +378,7 @@ public class JabRef {
         }
 
         if (cli.isExportMatches()) {
-            if (loaded.size() > 0) {
+            if (!loaded.isEmpty()) {
                 String[] data = cli.getExportMatches().split(",");
                 String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
                                                                  //? stands for a blank
@@ -434,13 +434,13 @@ public class JabRef {
         }
 
         if (cli.isFileExport()) {
-            if (loaded.size() > 0) {
+            if (!loaded.isEmpty()) {
                 String[] data = cli.getFileExport().split(",");
 
                 if (data.length == 1) {
                     // This signals that the latest import should be stored in BibTeX
                     // format to the given file.
-                    if (loaded.size() > 0) {
+                    if (!loaded.isEmpty()) {
                         ParserResult pr =
                                 loaded.elementAt(loaded.size() - 1);
                         if (!pr.isInvalid()) {
@@ -517,7 +517,7 @@ public class JabRef {
         if (!cli.isBlank() && cli.isAuxImport()) {
             boolean usageMsg = false;
 
-            if (loaded.size() > 0) // bibtex file loaded
+            if (!loaded.isEmpty()) // bibtex file loaded
             {
                 String[] data = cli.getAuxImport().split(",");
 
@@ -623,7 +623,7 @@ public class JabRef {
                 " " + Globals.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if ((result == null) || (result.size() == 0)) {
+        if ((result == null) || (result.isEmpty())) {
             System.out.println(Globals.lang(
                     "Query '%0' with fetcher '%1' did not return any results.", query, engine));
             return null;
@@ -771,7 +771,7 @@ public class JabRef {
         List<File> postponed = new ArrayList<File>();
         List<ParserResult> failed = new ArrayList<ParserResult>();
         List<ParserResult> toOpenTab = new ArrayList<ParserResult>();
-        if (loaded.size() > 0) {
+        if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();
                 if (pr.isInvalid()) {
@@ -881,12 +881,12 @@ public class JabRef {
 
         // If any database loading was postponed due to an autosave, schedule them
         // for handing now:
-        if (postponed.size() > 0) {
+        if (!postponed.isEmpty()) {
             AutosaveStartupPrompter asp = new AutosaveStartupPrompter(JabRef.jrf, postponed);
             SwingUtilities.invokeLater(asp);
         }
 
-        if (loaded.size() > 0) {
+        if (!loaded.isEmpty()) {
             JabRef.jrf.tabbedPane.setSelectedIndex(0);
             new FocusRequester(((BasePanel) JabRef.jrf.tabbedPane.getComponentAt(0)).mainTable);
         }

@@ -290,7 +290,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     }
 
                     return entry;
-                } else if (entries.size() == 0) {
+                } else if (entries.isEmpty()) {
                     System.out.println("No entry found! (" + link + ")");
                     return null;
                 } else {

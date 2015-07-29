@@ -685,7 +685,7 @@ public class CleanUpAction extends AbstractWorker {
             String newFieldName = alias.getValue();
             String oldValue = entry.getField(oldFieldName);
             String newValue = entry.getField(newFieldName);
-            if ((oldValue != null) && (oldValue.length() > 0)
+            if ((oldValue != null) && (!oldValue.isEmpty())
                     && (newValue == null))
             {
                 // There is content in the old field and no value in the new, so just copy
@@ -698,7 +698,7 @@ public class CleanUpAction extends AbstractWorker {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        if ((entry.getField("date") == null) || (entry.getField("date").length() == 0))
+        if ((entry.getField("date") == null) || (entry.getField("date").isEmpty()))
         {
             String newDate = entry.getFieldOrAlias("date");
             String oldYear = entry.getField("year");

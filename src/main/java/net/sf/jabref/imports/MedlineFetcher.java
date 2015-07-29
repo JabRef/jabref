@@ -177,7 +177,7 @@ public class MedlineFetcher implements EntryFetcher {
 
             List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frame);
 
-            if (bibs.size() == 0) {
+            if (bibs.isEmpty()) {
                 frame.showMessage(Globals.lang("No references found"));
             }
 
@@ -187,7 +187,7 @@ public class MedlineFetcher implements EntryFetcher {
             return true;
         }
 
-        if (query.length() > 0) {
+        if (!query.isEmpty()) {
             frame.setStatus(Globals.lang("Fetching Medline by term..."));
 
             String searchTerm = toSearchTerm(query);

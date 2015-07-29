@@ -73,7 +73,7 @@ public class DownloadExternalFile {
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().length() == 0)) {
+        if ((res == null) || (res.trim().isEmpty())) {
             return;
         }
 
@@ -287,7 +287,7 @@ public class DownloadExternalFile {
     private String getSuggestedFileName(String suffix) {
 
         String plannedName = bibtexKey;
-        if (suffix.length() > 0) {
+        if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
         }
 

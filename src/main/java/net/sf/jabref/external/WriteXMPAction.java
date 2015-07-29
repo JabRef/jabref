@@ -143,7 +143,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             optDiag.progressArea.append(entry.getCiteKey() + "\n");
 
-            if (files.size() == 0) {
+            if (files.isEmpty()) {
                 skipped++;
                 optDiag.progressArea.append("  " + Globals.lang("Skipped - No PDF linked") + ".\n");
             } else {

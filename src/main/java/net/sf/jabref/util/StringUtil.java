@@ -113,7 +113,7 @@ public class StringUtil {
             throw new IllegalArgumentException();
         }
 
-        if (string.length() == 0) {
+        if (string.isEmpty()) {
             return string;
         }
 

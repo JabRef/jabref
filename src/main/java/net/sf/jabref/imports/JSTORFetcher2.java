@@ -94,7 +94,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 return false;
             }
             //System.out.println("JSTORFetcher2 processQuery after false citations=" + citations);
-            if (citations.size() == 0) {
+            if (citations.isEmpty()) {
                 if (!noAccessFound) {
                     status.showMessage(Globals.lang("No entries found for the search string '%0'",
                             query),

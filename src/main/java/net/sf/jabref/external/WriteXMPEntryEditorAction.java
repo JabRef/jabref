@@ -110,7 +110,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         @Override
         public void run() {
-            if (files.size() == 0) {
+            if (files.isEmpty()) {
                 message = Globals.lang("No PDF linked") + ".\n";
             } else {
                 int written = 0, error = 0;

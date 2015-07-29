@@ -72,7 +72,7 @@ public class BiblioscapeImporter extends ImportFormat {
         HashMap<String, StringBuffer> lines = new HashMap<String, StringBuffer>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
-            if (line.length() == 0)
+            if (line.isEmpty())
              {
                 continue; // ignore empty lines, e.g. at file
             }
@@ -275,7 +275,7 @@ public class BiblioscapeImporter extends ImportFormat {
                             + (country != null ? ", " + country : ""));
                 }
 
-                if (comments.size() > 0) { // set comment if present
+                if (!comments.isEmpty()) { // set comment if present
                     StringBuilder s = new StringBuilder();
                     for (int i = 0; i < comments.size(); ++i) {
                         s.append(i > 0 ? "; " : "").append(comments.elementAt(i));

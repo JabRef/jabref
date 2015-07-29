@@ -85,14 +85,14 @@ public class PdfContentImporter extends ImportFormat {
      */
     private String removeNonLettersAtEnd(String input) {
         input = input.trim();
-        if (input.length() == 0) {
+        if (input.isEmpty()) {
             return input;
         }
         char lastC = input.charAt(input.length() - 1);
         while (!Character.isLetter(lastC) && (lastC != ')')) {
             // if there is an asterix, a dot or something else at the end: remove it
             input = input.substring(0, input.length() - 1);
-            if (input.length() > 0) {
+            if (!input.isEmpty()) {
                 lastC = input.charAt(input.length() - 1);
             } else {
                 break;
@@ -178,7 +178,7 @@ public class PdfContentImporter extends ImportFormat {
                         // last name found
                         res = res.concat(removeNonLettersAtEnd(splitNames[i]));
 
-                        if ((splitNames[i].length() > 0) && Character.isLowerCase(splitNames[i].charAt(0))) {
+                        if ((!splitNames[i].isEmpty()) && Character.isLowerCase(splitNames[i].charAt(0))) {
                             // it is probably be "van", "vom", ...
                             // we just rely on the fact that these things are written in lower case letters
                             // do NOT finish name
@@ -258,7 +258,7 @@ public class PdfContentImporter extends ImportFormat {
                     }
                 };
                 PdfContentImporter.doiToBibTeXFetcher.processQuery(doi, i, status);
-                if (res.size() != 0) {
+                if (!res.isEmpty()) {
                     // if something has been found, return the result
                     return res;
                 } else {
@@ -594,7 +594,7 @@ public class PdfContentImporter extends ImportFormat {
         while ((i < split.length) && (!split[i].equals(""))) {
             String curLine = split[i].trim();
             if (!curLine.equals("")) {
-                if (curString.length() > 0) {
+                if (!curString.isEmpty()) {
                     // insert separating space if necessary
                     curString = curString.concat(" ");
                 }

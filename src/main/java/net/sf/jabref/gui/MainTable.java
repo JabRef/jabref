@@ -742,7 +742,7 @@ public class MainTable extends JTable {
     @SuppressWarnings("unchecked")
     public Comparator<BibtexEntry> getComparatorForColumn(int index) {
         List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
-        return l.size() == 0 ? null : l.get(0);
+        return l.isEmpty() ? null : l.get(0);
     }
 
     /**

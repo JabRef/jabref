@@ -39,7 +39,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
                 i.remove();
             }
         }
-        return pr.getEntryTypes().size() > 0;
+        return !pr.getEntryTypes().isEmpty();
     }
 
     @Override
