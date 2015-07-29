@@ -105,7 +105,6 @@ public class Globals {
 
     private static int SHORTCUT_MASK = -1;
 
-    public static int STANDARD_EXPORT_COUNT = 5; // The number of standard export formats.
     public static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
     // used at highlighting in preview area. 
