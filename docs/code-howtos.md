@@ -16,7 +16,9 @@ net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFile
 
 # Get Absolute/Expanded Filename
 
+```java
 File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD)); 
+```
 
 # Setting a Database Directory for a .bib File
 
@@ -27,14 +29,14 @@ File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().get
 
 # How to work with Preferences
 
-Globals.prefs is a global variable storing a link to the preferences form. 
+`Globals.prefs` is a global variable storing a link to the preferences form. 
 
-Globals.prefs.getTYPE(key) returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”. 
+`Globals.prefs.getTYPE(key)` returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”. 
 
 To store the configuration keys in constants, one has two options 
 
   * as constant in the own class 
-  * as constant in net.sf.jabref.JaRefPreferences.java 
+  * as constant in `net.sf.jabref.JaRefPreferences.java`
 
 There are JabRef classes existing, where the strings are hard-coded and where constants are not used. That way of configuration should be avoided. 
 
@@ -51,7 +53,7 @@ If Globals.prefs are not initialized in a test case, try to add Globals.prefs = 
 
 # UI for Preferences
 
-  * JabRefFrame.preferences() shows the preferences 
+  * `JabRefFrame.preferences()` shows the preferences 
   * class: PrefsDialog3 
 
 # "Special Fields"
