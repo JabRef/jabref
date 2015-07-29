@@ -29,6 +29,8 @@ public class MetaData implements Iterable<String> {
 
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
+    
+    private static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
     private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private GroupTreeNode groupsRoot = null;
@@ -263,7 +265,7 @@ public class MetaData implements Iterable<String> {
                 sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
             sb.append("}");
-            wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
+            wrapStringBuffer(sb, METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
 
@@ -290,7 +292,7 @@ public class MetaData implements Iterable<String> {
             while (tok.hasMoreTokens()) {
                 StringBuffer s =
                         new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
-                wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
+                wrapStringBuffer(s, METADATA_LINE_LENGTH);
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
             }

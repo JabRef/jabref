@@ -41,8 +41,7 @@ import net.sf.jabref.util.TXMLReader;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class BibtexFields
-{
+public class BibtexFields {
 
     public static final String KEY_FIELD = "bibtexkey";
 
@@ -53,7 +52,12 @@ public class BibtexFields
     public static final String MARKED = "__markedentry";
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
-            private static final String ENTRYTYPE = "entrytype";
+    private static final String ENTRYTYPE = "entrytype";
+    
+    /*
+     * some extra field definitions
+     */
+    private static final String ADDITIONAL_FIELDS = "/resource/fields/fields.xml";
 
     public static final String// Using this when I have no database open or when I read
             // non bibtex file formats (used by the ImportFormatReader.java)
@@ -241,7 +245,7 @@ public class BibtexFields
         add(dummy);
 
         // read external field definitions
-        readXML(Globals.additionalFields);
+        readXML(ADDITIONAL_FIELDS);
 
         // collect all public fields for the PUBLIC_FIELDS array
         Vector<String> pFields = new Vector<String>(fieldSet.size());

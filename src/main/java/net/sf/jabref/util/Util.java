@@ -118,6 +118,12 @@ public class Util {
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
     
     private static final Log LOGGER = LogFactory.getLog(Util.class);
+    
+    private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
+    
+    private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
+    
+    private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
 
     /**
      * This method sets the location of a Dialog such that it is centered with
@@ -248,7 +254,7 @@ public class Util {
      * is the HashMap GLobals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : Globals.UNICODE_CHARS.entrySet()) {
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
         return s;
@@ -373,7 +379,7 @@ public class Util {
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
-                link = Globals.ARXIV_LOOKUP_PREFIX + link;
+                link = ARXIV_LOOKUP_PREFIX + link;
             }
         }
 
@@ -1595,7 +1601,7 @@ public class Util {
         // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
         // if nothing is found, " " is likely to be the separating char.
         // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, Globals.SEPARATING_CHARS_NOSPACE);
+        StringTokenizer tok = new StringTokenizer(keywords, SEPARATING_CHARS_NOSPACE);
         while (tok.hasMoreTokens()) {
             String word = tok.nextToken().trim();
             res.add(word);

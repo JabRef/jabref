@@ -16,13 +16,15 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.util.StringUtil;
 
 /**
  * This formatter escapes characters so they are suitable for HTML.
  */
 public class HTMLChars implements LayoutFormatter {
+    
+    private static final HtmlCharsMap HTML_CHARS = new HtmlCharsMap();
 
     @Override
     public String format(String field) {
@@ -45,7 +47,7 @@ public class HTMLChars implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = Globals.HTMLCHARS.get(command);
+                    Object result = HTML_CHARS.get(command);
                     if (result != null) {
                         sb.append((String) result);
                     } else {
@@ -86,7 +88,7 @@ public class HTMLChars implements LayoutFormatter {
                             combody = field.substring(i, i + 1);
                             // System.out.println("... "+combody);
                         }
-                        Object result = Globals.HTMLCHARS.get(command + combody);
+                        Object result = HTML_CHARS.get(command + combody);
 
                         if (result != null) {
                             sb.append((String) result);
@@ -98,7 +100,7 @@ public class HTMLChars implements LayoutFormatter {
                         //	Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
-                            Object result = Globals.HTMLCHARS.get(command);
+                            Object result = HTML_CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -142,7 +144,7 @@ public class HTMLChars implements LayoutFormatter {
                         argument = part;
                         if (argument != null) {
                             // handle common case of general latex command
-                            Object result = Globals.HTMLCHARS.get(command + argument);
+                            Object result = HTML_CHARS.get(command + argument);
                             // System.out.print("command: "+command+", arg: "+argument);
                             // System.out.print(", result: ");
                             // If found, then use translated version. If not, then keep
@@ -158,7 +160,7 @@ public class HTMLChars implements LayoutFormatter {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = Globals.HTMLCHARS.get(command);
+                        Object result = HTML_CHARS.get(command);
                         if (result != null) {
                             sb.append((String) result);
                         } else {
@@ -166,7 +168,7 @@ public class HTMLChars implements LayoutFormatter {
                             sb.append(command);
                         }
                     } else {
-                        Object result = Globals.HTMLCHARS.get(command);
+                        Object result = HTML_CHARS.get(command);
                         if (result != null) {
                             sb.append((String) result);
                         } else {

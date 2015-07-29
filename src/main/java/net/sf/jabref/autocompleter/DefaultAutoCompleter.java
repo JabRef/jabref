@@ -29,6 +29,8 @@ import java.util.StringTokenizer;
 class DefaultAutoCompleter extends AbstractAutoCompleter {
 
     private final String fieldName;
+    
+    private final String SEPARATING_CHARS = ";,\n ";
 
     /**
      * @see AutoCompleterFactory
@@ -50,7 +52,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
 
         String fieldValue = entry.getField(fieldName);
         if (fieldValue != null) {
-            StringTokenizer tok = new StringTokenizer(fieldValue, Globals.SEPARATING_CHARS);
+            StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
                 String word = tok.nextToken();
                 addWordToIndex(word);

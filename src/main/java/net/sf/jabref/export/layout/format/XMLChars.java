@@ -37,9 +37,9 @@
 
 package net.sf.jabref.export.layout.format;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
@@ -47,12 +47,22 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class XMLChars implements LayoutFormatter {
 
+    private final static XmlCharsMap XML_CHARS = new XmlCharsMap();
+    
+    private final static Map<String, String> ASCII_TO_XML_CHARS = new HashMap<String, String>();
+
+    static {
+        ASCII_TO_XML_CHARS.put("<", "&lt;");
+        ASCII_TO_XML_CHARS.put("\"", "&quot;");
+        ASCII_TO_XML_CHARS.put(">", "&gt;");
+    }
+
     @Override
     public String format(String fieldText) {
 
         fieldText = firstFormat(fieldText);
 
-        for (Map.Entry<String, String> entry : Globals.XML_CHARS.entrySet()) {
+        for (Map.Entry<String, String> entry : XML_CHARS.entrySet()) {
             String s = entry.getKey();
             String repl = entry.getValue();
             if (repl != null) {
@@ -113,7 +123,7 @@ public class XMLChars implements LayoutFormatter {
         fieldText = buffer.toString();
 
         // use common abbreviations for <, > instead of code
-        for (Map.Entry<String, String> entry : Globals.ASCII2XML_CHARS.entrySet()) {
+        for (Map.Entry<String, String> entry : ASCII_TO_XML_CHARS.entrySet()) {
             String s = entry.getKey();
             String repl = entry.getValue();
 

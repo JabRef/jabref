@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -346,6 +347,8 @@ public class JabRefPreferences {
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
+    
+    private int SHORTCUT_MASK = -1;
 
     private final Preferences prefs;
 
@@ -1147,8 +1150,20 @@ public class JabRefPreferences {
                 modifiers = modifiers | InputEvent.ALT_MASK;
             }
 
-            return KeyStroke.getKeyStroke(keyCode, Globals.getShortcutMask() + modifiers);
+            return KeyStroke.getKeyStroke(keyCode, getShortcutMask() + modifiers);
         }
+    }
+    
+    private int getShortcutMask() {
+        if (SHORTCUT_MASK == -1) {
+            try {
+                SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+            } catch (Throwable ignored) {
+
+            }
+        }
+
+        return SHORTCUT_MASK;
     }
 
     /**

@@ -39,6 +39,8 @@ public class RTFChars implements LayoutFormatter {
 
     // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
+    
+    private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
 
     @Override
@@ -96,7 +98,7 @@ public class RTFChars implements LayoutFormatter {
                             combody = field.substring(i, i + 1);
                         }
 
-                        String result = Globals.RTFCHARS.get(command + combody);
+                        String result = RTF_CHARS.get(command + combody);
 
                         if (result != null) {
                             sb.append(result);
@@ -125,7 +127,7 @@ public class RTFChars implements LayoutFormatter {
                     } else if ((c == '}') && (currentCommand.length() > 0)) {
                         // Seems to be the end of a command like \{aa}. Look it up:
                         String command = currentCommand.toString();
-                        String result = Globals.RTFCHARS.get(command);
+                        String result = RTF_CHARS.get(command);
                         if (result != null) {
                             sb.append(result);
                         }
