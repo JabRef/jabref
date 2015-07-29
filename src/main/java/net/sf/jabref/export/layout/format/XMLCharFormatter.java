@@ -37,6 +37,7 @@
 
 package net.sf.jabref.export.layout.format;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.jabref.Globals;
@@ -48,7 +49,14 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class XMLCharFormatter implements LayoutFormatter {
 
     private static XmlCharsMap xmlChars = new XmlCharsMap();
+    
+    private static Map<String, String> asciiToXmlChars = new HashMap<String, String>();
 
+    static {
+        asciiToXmlChars.put("<", "&lt;");
+        asciiToXmlChars.put("\"", "&quot;");
+        asciiToXmlChars.put(">", "&gt;");
+    }
 
     @Override
     public String format(String fieldText) {
@@ -116,7 +124,7 @@ public class XMLCharFormatter implements LayoutFormatter {
         fieldText = buffer.toString();
 
         // use common abbreviations for <, > instead of code
-        for (Map.Entry<String, String> entry : Globals.ASCII2XML_CHARS.entrySet()) {
+        for (Map.Entry<String, String> entry : asciiToXmlChars.entrySet()) {
             String s = entry.getKey();
             String repl = entry.getValue();
 

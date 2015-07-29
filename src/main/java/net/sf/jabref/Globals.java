@@ -367,15 +367,10 @@ public class Globals {
 
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
-    public static final HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> RTFCHARS = new HashMap<String, String>();
 
     static {
-        Globals.ASCII2XML_CHARS.put("<", "&lt;");
-        Globals.ASCII2XML_CHARS.put("\"", "&quot;");
-        Globals.ASCII2XML_CHARS.put(">", "&gt;");
-
         Globals.UNICODE_CHARS.put("\u00C0", "A");
         Globals.UNICODE_CHARS.put("\u00C1", "A");
         Globals.UNICODE_CHARS.put("\u00C2", "A");
