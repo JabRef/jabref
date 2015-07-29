@@ -35,7 +35,7 @@ import java.util.*;
  */
 public class RegExpFileSearch {
 
-    private final static String EXT_MARKER = "__EXTENSION__";
+    private static final String EXT_MARKER = "__EXTENSION__";
 
     /**
      * Search for file links for a set of entries using regexp. Lists of extensions and directories

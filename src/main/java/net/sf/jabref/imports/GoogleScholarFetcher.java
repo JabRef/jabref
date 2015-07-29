@@ -32,17 +32,17 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private boolean hasRunConfig = false;
     private static final int MAX_ENTRIES_TO_LOAD = 50;
-    private final static String QUERY_MARKER = "___QUERY___";
-    private final static String URL_START = "http://scholar.google.com";
-    private final static String URL_SETTING = "http://scholar.google.com/scholar_settings";
-    private final static String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
-    private final static String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
+    private static final String QUERY_MARKER = "___QUERY___";
+    private static final String URL_START = "http://scholar.google.com";
+    private static final String URL_SETTING = "http://scholar.google.com/scholar_settings";
+    private static final String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
+    private static final String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
             + "&amp;hl=en&amp;btnG=Search";
 
-    private final static Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
-    private final static Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
-    private final static Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
-    private final static Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
+    private static final Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
+    private static final Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
+    private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
+    private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
     private final HashMap<String, String> entryLinks = new HashMap<String, String>();
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(

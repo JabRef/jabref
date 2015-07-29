@@ -47,22 +47,22 @@ import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {
 
-    private final static String
+    private static final String
             AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
-    private final static String CLEANUP_DOI = "CleanUpDOI";
-    private final static String CLEANUP_MONTH = "CleanUpMonth";
-    private final static String CLEANUP_PAGENUMBERS = "CleanUpPageNumbers";
-    private final static String CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative";
-    private final static String CLEANUP_RENAMEPDF = "CleanUpRenamePDF";
-    private final static String CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
-    private final static String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
-    private final static String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
-    private final static String CLEANUP_HTML = "CleanUpHTML";
-    private final static String CLEANUP_CASE = "CleanUpCase";
-    private final static String CLEANUP_LATEX = "CleanUpLaTeX";
-    private final static String CLEANUP_UNITS = "CleanUpUnits";
-    private final static String CLEANUP_UNICODE = "CleanUpUnicode";
-    private final static String CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
+    private static final String CLEANUP_DOI = "CleanUpDOI";
+    private static final String CLEANUP_MONTH = "CleanUpMonth";
+    private static final String CLEANUP_PAGENUMBERS = "CleanUpPageNumbers";
+    private static final String CLEANUP_MAKEPATHSRELATIVE = "CleanUpMakePathsRelative";
+    private static final String CLEANUP_RENAMEPDF = "CleanUpRenamePDF";
+    private static final String CLEANUP_RENAMEPDF_ONLYRELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
+    private static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
+    private static final String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
+    private static final String CLEANUP_HTML = "CleanUpHTML";
+    private static final String CLEANUP_CASE = "CleanUpCase";
+    private static final String CLEANUP_LATEX = "CleanUpLaTeX";
+    private static final String CLEANUP_UNITS = "CleanUpUnits";
+    private static final String CLEANUP_UNICODE = "CleanUpUnicode";
+    private static final String CLEANUP_CONVERTTOBIBLATEX = "CleanUpConvertToBiblatex";
 
 
     public static void putDefaults(HashMap<String, Object> defaults) {
