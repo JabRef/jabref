@@ -24,16 +24,14 @@ import net.sf.jabref.BibtexEntry;
 /**
  * Main class for formatting DOCUMENT ME!
  */
-public class Layout
-{
+public class Layout {
 
     private final LayoutEntry[] layoutEntries;
 
     private final ArrayList<String> missingFormatters = new ArrayList<String>();
 
 
-    public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception
-    {
+    public Layout(Vector<StringInt> parsedEntries, String classPrefix) throws Exception {
         StringInt si;
         Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>(parsedEntries.size());
 
@@ -57,8 +55,7 @@ public class Layout
                         blockEntries = null;
                     } else {
                         System.out.println(blockStart + '\n' + si.s);
-                        System.out.println(
-                                "Nested field entries are not implemented !!!");
+                        System.out.println("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }
@@ -69,13 +66,11 @@ public class Layout
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(si.s)) {
                         blockEntries.add(si);
-                        le = new LayoutEntry(blockEntries, classPrefix,
-                                LayoutHelper.IS_GROUP_START);
+                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        System.out
-                                .println("Nested field entries are not implemented !!!");
+                        System.out.println("Nested field entries are not implemented !!!");
                         Thread.dumpStack();
                     }
                 }

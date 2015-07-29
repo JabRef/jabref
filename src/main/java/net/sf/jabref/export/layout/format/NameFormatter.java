@@ -83,7 +83,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * For more examples see the test-cases.
  *
  */
-public class NameFormat implements LayoutFormatter {
+public class NameFormatter implements LayoutFormatter {
 
     public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
 
@@ -166,7 +166,7 @@ public class NameFormat implements LayoutFormatter {
     }
 
 
-    private String parameter = NameFormat.DEFAULT_FORMAT;
+    private String parameter = NameFormatter.DEFAULT_FORMAT;
 
 
     public void setParameter(String parameter) {

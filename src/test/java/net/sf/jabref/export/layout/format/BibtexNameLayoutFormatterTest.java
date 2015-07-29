@@ -10,7 +10,7 @@ public class BibtexNameLayoutFormatterTest {
     @Test
     public void testFormatStringStringBibtexEntry() {
 
-        NameFormat l = new NameFormat();
+        NameFormatter l = new NameFormatter();
 
         Assert.assertEquals("Doe", l.format("Joe Doe", "1@*@{ll}", null));
 
@@ -34,7 +34,7 @@ public class BibtexNameLayoutFormatterTest {
     @Test
     public void testFormat() {
 
-        NameFormat a = new NameFormat();
+        NameFormatter a = new NameFormatter();
 
         // Empty case
         Assert.assertEquals("", a.format(""));

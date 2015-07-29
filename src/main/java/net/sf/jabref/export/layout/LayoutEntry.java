@@ -22,7 +22,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.layout.format.NameFormat;
+import net.sf.jabref.export.layout.format.NameFormatter;
 import net.sf.jabref.export.layout.format.NotFoundFormatter;
 import net.sf.jabref.util.Util;
 
@@ -391,8 +391,7 @@ class LayoutEntry {
      * string (in order of appearance).
      * 
      */
-    private static LayoutFormatter[] getOptionalLayout(String formatterName,
-                                                       String classPrefix) {
+    private static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix) {
 
         ArrayList<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
@@ -408,7 +407,7 @@ class LayoutEntry {
             if (Globals.prefs.customExportNameFormatters != null) {
                 String contents = Globals.prefs.customExportNameFormatters.get(className);
                 if (contents != null) {
-                    NameFormat nf = new NameFormat();
+                    NameFormatter nf = new NameFormatter();
                     nf.setParameter(contents);
                     results.add(nf);
                     continue;
@@ -434,7 +433,7 @@ class LayoutEntry {
             String formatterParameter = userNameFormatter.get(className);
 
             if (formatterParameter != null) {
-                NameFormat nf = new NameFormat();
+                NameFormatter nf = new NameFormatter();
                 nf.setParameter(formatterParameter);
                 results.add(nf);
                 continue;

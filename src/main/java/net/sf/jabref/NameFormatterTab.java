@@ -27,7 +27,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.export.layout.format.NameFormat;
+import net.sf.jabref.export.layout.format.NameFormatter;
 import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.help.HelpDialog;
 
@@ -59,7 +59,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             if (i < formats.length) {
                 result.put(names[i], formats[i]);
             } else {
-                result.put(names[i], NameFormat.DEFAULT_FORMAT);
+                result.put(names[i], NameFormatter.DEFAULT_FORMAT);
             }
         }
 
@@ -88,7 +88,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         }
 
         public TableRow(String name) {
-            this(name, NameFormat.DEFAULT_FORMAT);
+            this(name, NameFormatter.DEFAULT_FORMAT);
         }
 
         public TableRow(String name, String format) {
