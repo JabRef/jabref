@@ -100,8 +100,6 @@ public class Globals {
     
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
-    private static int SHORTCUT_MASK = -1;
-
     private static final String RESOURCE_PREFIX = "resource/JabRef", MENU_RESOURCE_PREFIX = "resource/Menu",
             INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
@@ -371,20 +369,6 @@ public class Globals {
     public static final HashMap<String, String> ASCII2XML_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> UNICODE_CHARS = new HashMap<String, String>();
     public static final HashMap<String, String> RTFCHARS = new HashMap<String, String>();
-
-
-    public static int getShortcutMask() {
-        if (Globals.SHORTCUT_MASK == -1) {
-            try {
-                Globals.SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-            } catch (Throwable ignored) {
-
-            }
-        }
-
-        return Globals.SHORTCUT_MASK;
-    }
-
 
     static {
         // Following character definitions contributed by Ervin Kolenovic:
