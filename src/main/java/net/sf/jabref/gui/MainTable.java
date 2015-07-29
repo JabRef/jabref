@@ -72,7 +72,8 @@ public class MainTable extends JTable {
     private Comparator<BibtexEntry> searchComparator;
     private Comparator<BibtexEntry> groupComparator;
     private final Comparator<BibtexEntry> markingComparator = new IsMarkedComparator();
-    private Matcher<BibtexEntry> searchMatcher, groupMatcher;
+    private Matcher<BibtexEntry> searchMatcher;
+    private Matcher<BibtexEntry> groupMatcher;
 
     // needed to activate/deactivate the listener
     private final PersistenceTableColumnListener tableColumnListener;
@@ -620,16 +621,19 @@ public class MainTable extends JTable {
     }
 
 
-    private static GeneralRenderer defRenderer, reqRenderer, optRenderer, grayedOutRenderer,
-            veryGrayedOutRenderer;
+    private static GeneralRenderer defRenderer;
+    private static GeneralRenderer reqRenderer;
+    private static GeneralRenderer optRenderer;
+    private static GeneralRenderer grayedOutRenderer;
+    private static GeneralRenderer veryGrayedOutRenderer;
 
     private static GeneralRenderer[] markedRenderers;
 
     private static IncompleteRenderer incRenderer;
     private static CompleteRenderer
-            compRenderer,
-            grayedOutNumberRenderer,
-            veryGrayedOutNumberRenderer;
+            compRenderer;
+    private static CompleteRenderer grayedOutNumberRenderer;
+    private static CompleteRenderer veryGrayedOutNumberRenderer;
 
     private static CompleteRenderer[] markedNumberRenderers;
 

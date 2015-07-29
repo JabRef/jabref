@@ -236,7 +236,19 @@ public class CleanUpAction extends AbstractWorker {
             return;
         }
         storeSettings();
-        boolean choiceCleanUpSuperscripts = cleanUpSuperscrips.isSelected(), choiceCleanUpDOI = cleanUpDOI.isSelected(), choiceCleanUpMonth = cleanUpMonth.isSelected(), choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected(), choiceCleanUpUpgradeExternalLinks = cleanUpUpgradeExternalLinks.isSelected(), choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected(), choiceRenamePDF = cleanUpRenamePDF.isSelected(), choiceConvertHTML = cleanUpHTML.isSelected(), choiceConvertCase = cleanUpCase.isSelected(), choiceConvertLaTeX = cleanUpLaTeX.isSelected(), choiceConvertUnits = cleanUpUnits.isSelected(), choiceConvertUnicode = cleanUpUnicode.isSelected(), choiceConvertToBiblatex = cleanUpBiblatex.isSelected();
+        boolean choiceCleanUpSuperscripts = cleanUpSuperscrips.isSelected();
+        boolean choiceCleanUpDOI = cleanUpDOI.isSelected();
+        boolean choiceCleanUpMonth = cleanUpMonth.isSelected();
+        boolean choiceCleanUpPageNumbers = cleanUpPageNumbers.isSelected();
+        boolean choiceCleanUpUpgradeExternalLinks = cleanUpUpgradeExternalLinks.isSelected();
+        boolean choiceMakePathsRelative = cleanUpMakePathsRelative.isSelected();
+        boolean choiceRenamePDF = cleanUpRenamePDF.isSelected();
+        boolean choiceConvertHTML = cleanUpHTML.isSelected();
+        boolean choiceConvertCase = cleanUpCase.isSelected();
+        boolean choiceConvertLaTeX = cleanUpLaTeX.isSelected();
+        boolean choiceConvertUnits = cleanUpUnits.isSelected();
+        boolean choiceConvertUnicode = cleanUpUnicode.isSelected();
+        boolean choiceConvertToBiblatex = cleanUpBiblatex.isSelected();
 
         if (choiceRenamePDF && Globals.prefs.getBoolean(CleanUpAction.AKS_AUTO_NAMING_PDFS_AGAIN)) {
             CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
