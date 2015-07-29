@@ -61,8 +61,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private boolean oldBiblMode = false;
     private int oldPort = -1;
 
-    public final static String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation";
-    public final static String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
+    public static final String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation";
+    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
 
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;

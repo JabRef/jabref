@@ -105,7 +105,7 @@ public class IsiImporter extends ImportFormat {
     private static final Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
 
-    static public void processSubSup(HashMap<String, String> map) {
+    public static void processSubSup(HashMap<String, String> map) {
 
         String[] subsup = {"title", "abstract", "review", "notes"};
 
