@@ -370,7 +370,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         //Arrays.copyOf(number, number.length);
         Arrays.sort(lNum);
         StringBuilder sb = new StringBuilder(bracketBefore);
-        int combineFrom = -1, written = 0;
+        int combineFrom = -1;
+        int written = 0;
         for (int i = 0; i < lNum.length; i++) {
             int i1 = lNum[i];
             if (combineFrom < 0) {

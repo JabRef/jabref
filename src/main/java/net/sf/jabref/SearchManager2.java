@@ -73,7 +73,9 @@ public class SearchManager2 extends SidePaneComponent
     private final JRadioButton showResultsInDialog;
     private final JRadioButton searchAllBases;
     private final JCheckBoxMenuItem select;
-    private boolean incSearch = false, startedFloatSearch = false, startedFilterSearch = false;
+    private boolean incSearch = false;
+    private boolean startedFloatSearch = false;
+    private boolean startedFilterSearch = false;
 
     private int incSearchPos = -1; // To keep track of where we are in
 

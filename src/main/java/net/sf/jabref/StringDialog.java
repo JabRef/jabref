@@ -337,7 +337,8 @@ class StringDialog extends JDialog {
 
     void assureNotEditing() {
         if (table.isEditing()) {
-            int col = table.getEditingColumn(), row = table.getEditingRow();
+            int col = table.getEditingColumn();
+            int row = table.getEditingRow();
             table.getCellEditor(row, col).stopCellEditing();
         }
     }

@@ -59,7 +59,8 @@ public class EntryComparator implements Comparator<BibtexEntry> {
         }
 
         //Util.pr("EntryComparator: "+e1+" : "+e2);
-        Object f1 = e1.getField(sortField), f2 = e2.getField(sortField);
+        Object f1 = e1.getField(sortField);
+        Object f2 = e2.getField(sortField);
 
         if (binary) {
             // We just separate on set and unset fields:
@@ -126,7 +127,8 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             Integer f2AsInteger = new Integer(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
-            String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
+            String ours = ((String) f1).toLowerCase();
+            String theirs = ((String) f2).toLowerCase();
             int comp = ours.compareTo(theirs);
             result = -comp;
         }

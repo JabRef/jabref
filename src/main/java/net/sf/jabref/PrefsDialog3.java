@@ -139,7 +139,8 @@ class PrefsDialog3 extends JDialog {
             }
         });
 
-        JPanel one = new JPanel(), two = new JPanel();
+        JPanel one = new JPanel();
+        JPanel two = new JPanel();
         one.setLayout(new BorderLayout());
         two.setLayout(new BorderLayout());
         one.add(chooser, BorderLayout.CENTER);
@@ -150,7 +151,8 @@ class PrefsDialog3 extends JDialog {
         upper.add(two, BorderLayout.WEST);
         upper.add(main, BorderLayout.CENTER);
 
-        JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton cancel = new JButton(Globals.lang("Cancel"));
         ok.addActionListener(new OkAction());
         CancelAction cancelAction = new CancelAction();
         cancel.addActionListener(cancelAction);

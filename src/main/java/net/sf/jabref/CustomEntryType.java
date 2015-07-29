@@ -172,7 +172,8 @@ public class CustomEntryType extends BibtexEntryType {
             return false;
         }
         for (String[] reqSet : reqSets) {
-            boolean takesPart = false, oneSet = false;
+            boolean takesPart = false;
+            boolean oneSet = false;
             for (String aReqSet : reqSet) {
                 // If this is the field we're looking for, note that the field is part of the set:
                 if (aReqSet.equalsIgnoreCase(field)) {

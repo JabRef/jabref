@@ -27,7 +27,11 @@ public class DuplicateCheck {
      * Integer values for indicating result of duplicate check (for entries):
      *
      */
-    static final int NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2, EMPTY_IN_TWO = 3, EMPTY_IN_BOTH = 4;
+    static final int NOT_EQUAL = 0;
+    static final int EQUAL = 1;
+    static final int EMPTY_IN_ONE = 2;
+    static final int EMPTY_IN_TWO = 3;
+    static final int EMPTY_IN_BOTH = 4;
 
     public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
     // Non-required fields are investigated only if the required fields give a value within
@@ -115,7 +119,8 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibtexEntry one, BibtexEntry two) {
-        String s1 = one.getField(field), s2 = two.getField(field);
+        String s1 = one.getField(field);
+        String s2 = two.getField(field);
         if (s1 == null) {
             if (s2 == null) {
                 return EMPTY_IN_BOTH;
@@ -130,7 +135,8 @@ public class DuplicateCheck {
         if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase(), auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
+            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replaceAll(" and ", " ").toLowerCase();
+            String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replaceAll(" and ", " ").toLowerCase();
             //System.out.println(auth1);
             //System.out.println(auth2);
             //System.out.println(correlateByWords(auth1, auth2));
@@ -190,7 +196,8 @@ public class DuplicateCheck {
 
         int score = 0;
         for (String field : allFields) {
-            Object en = one.getField(field), to = two.getField(field);
+            Object en = one.getField(field);
+            Object to = two.getField(field);
             if (en != null && to != null && en.equals(to) || en == null && to == null) {
                 score++;
             }
@@ -233,7 +240,8 @@ public class DuplicateCheck {
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
     private static double correlateByWords(String s1, String s2, boolean truncate) {
-        String[] w1 = s1.split("\\s"), w2 = s2.split("\\s");
+        String[] w1 = s1.split("\\s");
+        String[] w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);
         int misses = 0;
         for (int i = 0; i < n; i++) {
@@ -268,7 +276,8 @@ public class DuplicateCheck {
                 s2 = s2.substring(0, minLength);
             }
         }
-        double[] n1 = DuplicateCheck.numberizeString(s1), n2 = DuplicateCheck.numberizeString(s2);
+        double[] n1 = DuplicateCheck.numberizeString(s1);
+        double[] n2 = DuplicateCheck.numberizeString(s2);
         // If truncation is disabled, harmonize length by interpolation:
         if (!truncate) {
             if (n1.length < n2.length) {
@@ -282,14 +291,16 @@ public class DuplicateCheck {
 
     private static double corrCoef(double[] n1, double[] n2) {
         // Calculate mean values:
-        double mean1 = 0, mean2 = 0;
+        double mean1 = 0;
+        double mean2 = 0;
         for (int i = 0; i < n1.length; i++) {
             mean1 += n1[i];
             mean2 += n2[i];
         }
         mean1 /= n1.length;
         mean2 /= n2.length;
-        double sigma1 = 0, sigma2 = 0;
+        double sigma1 = 0;
+        double sigma2 = 0;
         // Calculate correlation coefficient:
         double corr = 0;
         for (int i = 0; i < n1.length; i++) {

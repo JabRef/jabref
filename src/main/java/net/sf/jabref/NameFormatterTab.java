@@ -309,7 +309,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     public void storeSettings() {
 
         if (table.isEditing()) {
-            int col = table.getEditingColumn(), row = table.getEditingRow();
+            int col = table.getEditingColumn();
+            int row = table.getEditingRow();
             table.getCellEditor(row, col).stopCellEditing();
         }
 
@@ -326,7 +327,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 }
             }
             // Then we make arrays
-            String[] names = new String[tableRows.size()], formats = new String[tableRows.size()];
+            String[] names = new String[tableRows.size()];
+            String[] formats = new String[tableRows.size()];
 
             for (i = 0; i < tableRows.size(); i++) {
                 TableRow tr = tableRows.elementAt(i);

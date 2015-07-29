@@ -471,7 +471,8 @@ public class BibtexDatabase {
         //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
-            int piv = 0, next;
+            int piv = 0;
+            int next;
             while ((next = res.indexOf("#", piv)) >= 0) {
 
                 // We found the next string ref. Append the text

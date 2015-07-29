@@ -44,7 +44,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JabRefPreferences _prefs;
     private boolean tableChanged = false;
     private final JTable colSetup;
-    private int rowCount = -1, ncWidth = -1;
+    private int rowCount = -1;
+    private int ncWidth = -1;
     private final Vector<TableRow> tableRows = new Vector<TableRow>(10);
     private final JabRefFrame frame;
 
@@ -70,10 +71,18 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JCheckBox relevanceColumn;
     private JCheckBox printedColumn;
     private JCheckBox readStatusColumn;
-    private JRadioButton syncKeywords, writeSpecialFields;
-    private boolean oldSpecialFieldsEnabled, oldRankingColumn, oldCompcatRankingColumn, oldQualityColumn,
-            oldPriorityColumn, oldRelevanceColumn, oldPrintedColumn, oldReadStatusColumn, oldSyncKeyWords,
-            oldWriteSpecialFields;
+    private JRadioButton syncKeywords;
+    private JRadioButton writeSpecialFields;
+    private boolean oldSpecialFieldsEnabled;
+    private boolean oldRankingColumn;
+    private boolean oldCompcatRankingColumn;
+    private boolean oldQualityColumn;
+    private boolean oldPriorityColumn;
+    private boolean oldRelevanceColumn;
+    private boolean oldPrintedColumn;
+    private boolean oldReadStatusColumn;
+    private boolean oldSyncKeyWords;
+    private boolean oldWriteSpecialFields;
 
 
     /*** end: special fields ***/
@@ -450,7 +459,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
         tableRows.clear();
-        String[] names = _prefs.getStringArray(JabRefPreferences.COLUMN_NAMES), lengths = _prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
+        String[] names = _prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
+        String[] lengths = _prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.length; i++) {
             if (i < lengths.length) {
                 tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
@@ -727,7 +737,16 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special fields ***/
 
-        boolean newSpecialFieldsEnabled = specialFieldsEnabled.isSelected(), newRankingColumn = rankingColumn.isSelected(), newCompactRankingColumn = compactRankingColumn.isSelected(), newQualityColumn = qualityColumn.isSelected(), newPriorityColumn = priorityColumn.isSelected(), newRelevanceColumn = relevanceColumn.isSelected(), newPrintedColumn = printedColumn.isSelected(), newReadStatusColumn = readStatusColumn.isSelected(), newSyncKeyWords = syncKeywords.isSelected(), newWriteSpecialFields = writeSpecialFields.isSelected();
+        boolean newSpecialFieldsEnabled = specialFieldsEnabled.isSelected();
+        boolean newRankingColumn = rankingColumn.isSelected();
+        boolean newCompactRankingColumn = compactRankingColumn.isSelected();
+        boolean newQualityColumn = qualityColumn.isSelected();
+        boolean newPriorityColumn = priorityColumn.isSelected();
+        boolean newRelevanceColumn = relevanceColumn.isSelected();
+        boolean newPrintedColumn = printedColumn.isSelected();
+        boolean newReadStatusColumn = readStatusColumn.isSelected();
+        boolean newSyncKeyWords = syncKeywords.isSelected();
+        boolean newWriteSpecialFields = writeSpecialFields.isSelected();
 
         boolean restartRequired;
         restartRequired = oldSpecialFieldsEnabled != newSpecialFieldsEnabled ||
@@ -767,7 +786,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** end: special fields ***/
 
         if (colSetup.isEditing()) {
-            int col = colSetup.getEditingColumn(), row = colSetup.getEditingRow();
+            int col = colSetup.getEditingColumn();
+            int row = colSetup.getEditingRow();
             colSetup.getCellEditor(row, col).stopCellEditing();
         }
 
@@ -791,7 +811,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 }
             }
             // Then we make arrays
-            String[] names = new String[tableRows.size()], widths = new String[tableRows.size()];
+            String[] names = new String[tableRows.size()];
+            String[] widths = new String[tableRows.size()];
             int[] nWidths = new int[tableRows.size()];
 
             _prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);

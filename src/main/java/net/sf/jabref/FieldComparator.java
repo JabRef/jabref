@@ -81,7 +81,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 
     @Override
     public int compare(BibtexEntry e1, BibtexEntry e2) {
-        Object f1, f2;
+        Object f1;
+        Object f2;
 
         if (isTypeHeader) {
             // Sort by type.
@@ -137,7 +138,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         }
 
         if (isNumeric) {
-            Integer i1 = null, i2 = null;
+            Integer i1 = null;
+            Integer i2 = null;
             try {
                 i1 = Util.intValueOf((String) f1);
             } catch (NumberFormatException ex) {
@@ -178,7 +180,8 @@ public class FieldComparator implements Comparator<BibtexEntry> {
             Integer f2AsInteger = new Integer(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
-            String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
+            String ours = ((String) f1).toLowerCase();
+            String theirs = ((String) f2).toLowerCase();
             result = FieldComparator.collator.compare(ours, theirs);//ours.compareTo(theirs);
         }
 
