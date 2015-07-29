@@ -73,12 +73,8 @@ Please also see our [Windows FAQ](http://jabref.sourceforge.net/faq.php#windows)
 ## Installing and running, general:
 
 JabRef can be downloaded as an executable .jar file.
-Try to doubleclick the `jar` file or execute the follwing command:
+Try to doubleclick the `jar` file or execute the following command:
      `java -jar <path to jar>`
-
-If you run JabRef under Java 1.5, you can add the option `-Dswing.aatext=true` before the
-`-jar` option, to activate antialiased text throughout the application.
-
 
 ## Documentation
 

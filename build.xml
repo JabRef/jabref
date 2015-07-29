@@ -69,7 +69,7 @@
 	<property name="extensions.dir" value="${resources.dir}/extensions" />
 	<property name="layout.dir" value="${resources.dir}/resource/layout" />
 	<property name="lib.dir" value="lib" />
-	<property name="buildlib.dir" value="buildlib" />
+	<property name="buildres.dir" value="buildres" />
 
 	<property name="osxbin.dir" value="osx" />
 
@@ -336,7 +336,7 @@ version=${jabref.version}</echo>
 		<taskdef
 			name="bundleapp"
 			classname="com.oracle.appbundler.AppBundlerTask"
-			classpath="${buildlib.dir}/appbundler-1.0.jar" />
+			classpath="${buildres.dir}/appbundler-1.0.jar" />
 		<bundleapp
 			name="JabRef"
 			mainclassname="net.sf.jabref.JabRef"
@@ -424,9 +424,9 @@ version=${jabref.version}</echo>
 			}
 			project.setProperty("txtFileVersion", txtFileVersion);
 		]]></script>
-		<delete file="jabref-launch4j.tmp" />
-		<copy file="jabref-launch4j.xml" tofile="jabref-launch4j.tmp" />
-		<replace file="jabref-launch4j.tmp">
+		<delete file="build/tmp/jabref-launch4j.tmp" />
+		<copy file="buildres/jabref-launch4j.xml" tofile="build/tmp/jabref-launch4j.tmp" />
+		<replace file="build/tmp/jabref-launch4j.tmp">
 			<replacefilter token="1.1.1" value="${jabref.version}" />
 			<replacefilter token="3.3.3" value="${txtFileVersion}" />
 			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
@@ -440,7 +440,7 @@ version=${jabref.version}</echo>
 		<exec
 			executable="${launch4j.dir}/launch4j"
 			dir="${launch4j.dir}">
-			<arg value="${basedir}/jabref-launch4j.tmp"/>
+			<arg value="${basedir}/build/tmp/jabref-launch4j.tmp"/>
 		</exec>
 
 		<!-- Finally create Windows-Installer -->
@@ -454,7 +454,7 @@ version=${jabref.version}</echo>
 		<exec
 			executable="${launch4j.dir}/launch4jc.exe"
 			dir="${launch4j.dir}">
-			<arg value="${basedir}/jabref-launch4j.tmp"/>
+			<arg value="${basedir}/build/tmp/jabref-launch4j.tmp"/>
 		</exec>
 
 		<exec dir="." executable="${nsis.executable}" failonerror="true">

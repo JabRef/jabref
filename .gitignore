@@ -10,7 +10,6 @@ classes/
 user.properties
 src/main/resources/resource/build.properties
 src/main/resources/windows/nsis/dist/
-jabref-launch4j.tmp
 
 # Gradle
 build/
