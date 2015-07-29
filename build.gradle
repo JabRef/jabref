@@ -25,6 +25,7 @@ apply plugin: "eclipse"
 apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
+apply plugin: "maven"
 
 /* disabled, because plugin requires Java 1.8
 format {
@@ -47,6 +48,7 @@ test {
     }
 }
 
+group = "net.sf.jabref"
 version = "2.11dev"
 
 repositories {
