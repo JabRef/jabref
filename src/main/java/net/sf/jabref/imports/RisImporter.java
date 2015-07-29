@@ -89,7 +89,7 @@ public class RisImporter extends ImportFormat {
 
         for (String entry1 : entries) {
 
-            if (entry1.trim().length() == 0) {
+            if (entry1.trim().isEmpty()) {
                 continue;
             }
 
@@ -202,7 +202,7 @@ public class RisImporter extends ImportFormat {
                     } else if ((lab.equals("Y1") || lab.equals("PY")) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
                         hm.put("year", parts[0]);
-                        if ((parts.length > 1) && (parts[1].length() > 0)) {
+                        if ((parts.length > 1) && (!parts[1].isEmpty())) {
                             try {
 
                                 int monthNumber = Integer.parseInt(parts[1]);
@@ -222,7 +222,7 @@ public class RisImporter extends ImportFormat {
                             hm.put("keywords", kw + ", " + val);
                         }
                     } else if (lab.equals("U1") || lab.equals("U2") || lab.equals("N1")) {
-                        if (comment.length() > 0) {
+                        if (!comment.isEmpty()) {
                             comment = comment + "\n";
                         }
                         comment = comment + val;
@@ -239,15 +239,15 @@ public class RisImporter extends ImportFormat {
                     }
                 }
                 // fix authors
-                if (author.length() > 0) {
+                if (!author.isEmpty()) {
                     author = AuthorList.fixAuthor_lastNameFirst(author);
                     hm.put("author", author);
                 }
-                if (editor.length() > 0) {
+                if (!editor.isEmpty()) {
                     editor = AuthorList.fixAuthor_lastNameFirst(editor);
                     hm.put("editor", editor);
                 }
-                if (comment.length() > 0) {
+                if (!comment.isEmpty()) {
                     hm.put("comment", comment);
                 }
 
@@ -260,7 +260,7 @@ public class RisImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().length() == 0)) {
+                if ((content == null) || (content.trim().isEmpty())) {
                     toRemove.add(key);
                 }
             }

@@ -73,7 +73,7 @@ public class DownloadExternalFile {
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().length() == 0)) {
+        if ((res == null) || (res.trim().isEmpty())) {
             return;
         }
 
@@ -137,7 +137,7 @@ public class DownloadExternalFile {
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                                     + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while downloading " + "'" + urlF.toString() + "'", e2);
+                    LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
                     return;
                 }
 
@@ -287,7 +287,7 @@ public class DownloadExternalFile {
     private String getSuggestedFileName(String suffix) {
 
         String plannedName = bibtexKey;
-        if (suffix.length() > 0) {
+        if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
         }
 

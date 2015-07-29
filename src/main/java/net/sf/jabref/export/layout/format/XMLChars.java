@@ -47,9 +47,9 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class XMLChars implements LayoutFormatter {
 
-    private final static XmlCharsMap XML_CHARS = new XmlCharsMap();
+    private static final XmlCharsMap XML_CHARS = new XmlCharsMap();
     
-    private final static Map<String, String> ASCII_TO_XML_CHARS = new HashMap<String, String>();
+    private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<String, String>();
 
     static {
         ASCII_TO_XML_CHARS.put("<", "&lt;");

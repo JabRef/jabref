@@ -39,7 +39,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
                 i.remove();
             }
         }
-        return pr.getEntryTypes().size() > 0;
+        return !pr.getEntryTypes().isEmpty();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         Object[] types = pr.getEntryTypes().keySet().toArray();
         Arrays.sort(types);
         for (Object type : types) {
-            sb.append(type.toString()).append(", ");
+            sb.append(type).append(", ");
         }
         String s = sb.toString();
         int answer = JOptionPane.showConfirmDialog(panel.frame(),

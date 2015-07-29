@@ -286,7 +286,7 @@ public class DroppedFileHandler {
             return false;
         }
 
-        if ((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0)) {
+        if ((xmpEntriesInFile == null) || (xmpEntriesInFile.isEmpty())) {
             return false;
         }
 

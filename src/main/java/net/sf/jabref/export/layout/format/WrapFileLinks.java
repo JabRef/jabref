@@ -132,7 +132,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         sb.append(entry.getString());
                         break;
                     case ITERATION_COUNT:
-                        sb.append(String.valueOf(piv));
+                        sb.append(piv);
                         break;
                     case FILE_PATH:
                         if (flEntry.getLink() == null) {

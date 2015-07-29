@@ -57,7 +57,7 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
 
                 try {
                     URL pdfUrl = new URL(SpringerLinkPdfDownload.BASE_URL + leading.substring(index + marker.length() + 1, endIndex));
-                    System.out.println(pdfUrl.toString());
+                    System.out.println(pdfUrl);
                     return pdfUrl;
                 } catch (MalformedURLException e) {
                     return null;

@@ -1211,7 +1211,7 @@ public class XMPUtil {
         case 0:
             XMPUtil.usage();
             break;
-        case 1: {
+        case 1:
 
             if (args[0].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
@@ -1222,7 +1222,7 @@ public class XMPUtil {
                 for (BibtexEntry entry : l) {
                     StringWriter sw = new StringWriter();
                     bibtexEntryWriter.write(entry, sw);
-                    System.out.println(sw.getBuffer().toString());
+                    System.out.println(sw.getBuffer());
                 }
 
             } else if (args[0].endsWith(".bib")) {
@@ -1245,64 +1245,61 @@ public class XMPUtil {
                 XMPUtil.usage();
             }
             break;
-        }
-        case 2: {
-            if (args[0].equals("-x") && args[1].endsWith(".pdf")) {
-                // Read from pdf and write as BibTex
-                XMPMetadata meta = XMPUtil.readRawXMP(new File(args[1]));
+            case 2:
+                if (args[0].equals("-x") && args[1].endsWith(".pdf")) {
+                    // Read from pdf and write as BibTex
+                    XMPMetadata meta = XMPUtil.readRawXMP(new File(args[1]));
 
-                if (meta == null) {
-                    System.err
-                            .println("The given pdf does not contain any XMP-metadata.");
-                } else {
-                    XMLUtil.save(meta.getXMPDocument(), System.out, "UTF-8");
+                    if (meta == null) {
+                        System.err
+                                .println("The given pdf does not contain any XMP-metadata.");
+                    } else {
+                        XMLUtil.save(meta.getXMPDocument(), System.out, "UTF-8");
+                    }
+                    break;
                 }
+
+                if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
+                    ParserResult result = BibtexParser
+                            .parse(new FileReader(args[0]));
+
+                    Collection<BibtexEntry> entries = result.getDatabase()
+                            .getEntries();
+
+                    if (entries.isEmpty()) {
+                        System.err.println("Could not find BibtexEntry in "
+                                + args[0]);
+                    } else {
+                        XMPUtil.writeXMP(new File(args[1]), entries, result
+                                .getDatabase(), false);
+                        System.out.println("XMP written.");
+                    }
+                    break;
+                }
+
+                XMPUtil.usage();
                 break;
-            }
+            case 3:
+                if (!args[1].endsWith(".bib") && !args[2].endsWith(".pdf")) {
+                    XMPUtil.usage();
+                    break;
+                }
 
-            if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
-                ParserResult result = BibtexParser
-                        .parse(new FileReader(args[0]));
+                ParserResult result = BibtexParser.parse(new FileReader(args[1]));
 
-                Collection<BibtexEntry> entries = result.getDatabase()
-                        .getEntries();
+                BibtexEntry e = result.getDatabase().getEntryByKey(args[0]);
 
-                if (entries.isEmpty()) {
-                    System.err.println("Could not find BibtexEntry in "
-                            + args[0]);
+                if (e == null) {
+                    System.err.println("Could not find BibtexEntry " + args[0]
+                            + " in " + args[0]);
                 } else {
-                    XMPUtil.writeXMP(new File(args[1]), entries, result
-                            .getDatabase(), false);
+                    XMPUtil.writeXMP(new File(args[2]), e, result.getDatabase());
+
                     System.out.println("XMP written.");
                 }
                 break;
-            }
 
-            XMPUtil.usage();
-            break;
-        }
-        case 3: {
-            if (!args[1].endsWith(".bib") && !args[2].endsWith(".pdf")) {
-                XMPUtil.usage();
-                break;
-            }
-
-            ParserResult result = BibtexParser.parse(new FileReader(args[1]));
-
-            BibtexEntry e = result.getDatabase().getEntryByKey(args[0]);
-
-            if (e == null) {
-                System.err.println("Could not find BibtexEntry " + args[0]
-                        + " in " + args[0]);
-            } else {
-                XMPUtil.writeXMP(new File(args[2]), e, result.getDatabase());
-
-                System.out.println("XMP written.");
-            }
-            break;
-        }
-
-        default:
+            default:
             XMPUtil.usage();
         }
     }

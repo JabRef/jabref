@@ -91,35 +91,34 @@ public class CopacImporter extends ImportFormat {
 
         List<String> entries = new LinkedList<String>();
 
-        { // Preprocess entries
-            String str;
-            StringBuffer sb = new StringBuffer();
+        // Preprocess entries
+        String str;
+        StringBuffer sb = new StringBuffer();
 
-            while ((str = in.readLine()) != null) {
+        while ((str = in.readLine()) != null) {
 
-                if (str.length() < 4) {
-                    continue;
-                }
+            if (str.length() < 4) {
+                continue;
+            }
 
-                String code = str.substring(0, 4);
+            String code = str.substring(0, 4);
 
-                if (code.equals("    ")) {
-                    sb.append(" ").append(str.trim());
-                } else {
+            if (code.equals("    ")) {
+                sb.append(" ").append(str.trim());
+            } else {
 
-                    // begining of a new item
-                    if (str.substring(0, 4).equals("TI- ")) {
-                        if (sb.length() > 0) {
-                            entries.add(sb.toString());
-                        }
-                        sb = new StringBuffer();
+                // begining of a new item
+                if (str.substring(0, 4).equals("TI- ")) {
+                    if (sb.length() > 0) {
+                        entries.add(sb.toString());
                     }
-                    sb.append('\n').append(str);
+                    sb = new StringBuffer();
                 }
+                sb.append('\n').append(str);
             }
-            if (sb.length() > 0) {
-                entries.add(sb.toString());
-            }
+        }
+        if (sb.length() > 0) {
+            entries.add(sb.toString());
         }
 
         List<BibtexEntry> results = new LinkedList<BibtexEntry>();

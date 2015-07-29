@@ -91,7 +91,7 @@ public class VersionHandling {
             GroupTreeNode newNode;
             int i;
             String g;
-            while (s.length() > 0) {
+            while (!s.isEmpty()) {
                 if (s.startsWith("(")) {
                     String subtree = Version0_1.getSubtree(s);
                     newNode = Version0_1.fromString(subtree, db, version);
@@ -193,7 +193,7 @@ public class VersionHandling {
 
                 // This allows to read databases that have been modified by, e.g., BibDesk
                 s = s.trim();
-                if (s.length() == 0) {
+                if (s.isEmpty()) {
                     continue;
                 }
 

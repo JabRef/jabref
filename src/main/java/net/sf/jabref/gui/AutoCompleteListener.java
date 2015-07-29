@@ -458,9 +458,9 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
 
-    private final static int ANY_NAME = 0;
-    private final static int FIRST_NAME = 1;
-    final static int LAST_NAME = 2;
+    private static final int ANY_NAME = 0;
+    private static final int FIRST_NAME = 1;
+    static final int LAST_NAME = 2;
 
 
     protected int findNamePositionStatus(JTextComponent comp) {

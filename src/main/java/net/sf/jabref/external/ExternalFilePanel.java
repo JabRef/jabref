@@ -362,7 +362,7 @@ public class ExternalFilePanel extends JPanel {
                         JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL") + ": "
                                         + e2.getMessage(), Globals.lang("Download file"),
                                 JOptionPane.ERROR_MESSAGE);
-                        LOGGER.info("Error while downloading " + url.toString(), e2);
+                        LOGGER.info("Error while downloading " + url, e2);
                         return;
                     }
                     output(Globals.lang("Download completed"));

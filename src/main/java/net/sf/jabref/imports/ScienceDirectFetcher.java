@@ -83,7 +83,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
             if (citations == null) {
                 return false;
             }
-            if (citations.size() == 0) {
+            if (citations.isEmpty()) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         query),
                         Globals.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);

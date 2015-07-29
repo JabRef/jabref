@@ -117,7 +117,7 @@ public class JSTORFetcher implements EntryFetcher {
             // Last retrieve the Bibtex-entries of the citations found
             Collection<BibtexEntry> entries = getBibtexEntries(ticket, citations);
 
-            if (entries.size() == 0) {
+            if (entries.isEmpty()) {
                 status.showMessage(Globals.lang("No entries found for the search string '%0'",
                         query),
                         Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);

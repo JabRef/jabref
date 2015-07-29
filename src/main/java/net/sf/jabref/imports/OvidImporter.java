@@ -103,7 +103,7 @@ public class OvidImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
         while ((line = in.readLine()) != null) {
-            if ((line.length() > 0) && (line.charAt(0) != ' ')) {
+            if ((!line.isEmpty()) && (line.charAt(0) != ' ')) {
                 sb.append("__NEWFIELD__");
             }
             sb.append(line);

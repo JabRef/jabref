@@ -72,7 +72,7 @@ public class BiblioscapeImporter extends ImportFormat {
         HashMap<String, StringBuffer> lines = new HashMap<String, StringBuffer>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
-            if (line.length() == 0)
+            if (line.isEmpty())
              {
                 continue; // ignore empty lines, e.g. at file
             }
@@ -120,10 +120,10 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .toString();
                     } else if (entry.getKey().equals("SB")) {
                         comments.add("Subject: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("SA")) {
                         comments
-                                .add("Secondary Authors: " + entry.getValue().toString());
+                                .add("Secondary Authors: " + entry.getValue());
                     } else if (entry.getKey().equals("NT")) {
                         hm.put("note", entry
                                 .getValue().toString());
@@ -132,10 +132,10 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .getValue().toString());
                     } else if (entry.getKey().equals("TA")) {
                         comments
-                                .add("Tertiary Authors: " + entry.getValue().toString());
+                                .add("Tertiary Authors: " + entry.getValue());
                     } else if (entry.getKey().equals("TT")) {
                         comments
-                                .add("Tertiary Title: " + entry.getValue().toString());
+                                .add("Tertiary Title: " + entry.getValue());
                     } else if (entry.getKey().equals("ED")) {
                         hm.put("edition", entry
                                 .getValue().toString());
@@ -144,10 +144,10 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .toString();
                     } else if (entry.getKey().equals("QA")) {
                         comments
-                                .add("Quaternary Authors: " + entry.getValue().toString());
+                                .add("Quaternary Authors: " + entry.getValue());
                     } else if (entry.getKey().equals("QT")) {
                         comments
-                                .add("Quaternary Title: " + entry.getValue().toString());
+                                .add("Quaternary Title: " + entry.getValue());
                     } else if (entry.getKey().equals("IS")) {
                         hm.put("isbn", entry
                                 .getValue().toString());
@@ -169,31 +169,31 @@ public class BiblioscapeImporter extends ImportFormat {
                                 : "pdf", entry.getValue().toString());
                     } else if (entry.getKey().equals("C1")) {
                         comments.add("Custom1: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("C2")) {
                         comments.add("Custom2: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("C3")) {
                         comments.add("Custom3: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("C4")) {
                         comments.add("Custom4: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("C5")) {
                         comments.add("Custom5: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("C6")) {
                         comments.add("Custom6: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("DE")) {
                         hm.put("annote", entry
                                 .getValue().toString());
                     } else if (entry.getKey().equals("CA")) {
                         comments.add("Categories: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("TH")) {
                         comments.add("Short Title: "
-                                + entry.getValue().toString());
+                                + entry.getValue());
                     } else if (entry.getKey().equals("SE"))
                      {
                         hm.put("chapter", entry
@@ -275,7 +275,7 @@ public class BiblioscapeImporter extends ImportFormat {
                             + (country != null ? ", " + country : ""));
                 }
 
-                if (comments.size() > 0) { // set comment if present
+                if (!comments.isEmpty()) { // set comment if present
                     StringBuilder s = new StringBuilder();
                     for (int i = 0; i < comments.size(); ++i) {
                         s.append(i > 0 ? "; " : "").append(comments.elementAt(i));

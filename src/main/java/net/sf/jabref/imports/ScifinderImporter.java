@@ -120,7 +120,7 @@ public class ScifinderImporter extends ImportFormat {
                         } else if (tmp[0].equals("Supplementary Terms")) {
                             hm.put("keywords",
                                     tmp[1]);
-                        } else if (tmp[0].equals("Inventor Name") && (tmp[1].trim().length() > 0)) {
+                        } else if (tmp[0].equals("Inventor Name") && (!tmp[1].trim().isEmpty())) {
                             hm.put("author", AuthorList.fixAuthor_lastNameFirst(tmp[1].replaceAll(";", " and ")));
                         } else if (tmp[0].equals("Patent Assignee")) {
                             hm.put("institution", tmp[1]);

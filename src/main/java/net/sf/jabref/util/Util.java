@@ -141,7 +141,7 @@ public class Util {
      * references are enclosed in a pair of '#' characters.
      */
     public static String parseField(String content) {
-        if (content.length() == 0) {
+        if (content.isEmpty()) {
             return content;
         }
 
@@ -149,7 +149,7 @@ public class Util {
         StringBuilder result = new StringBuilder();
         for (String string : strings) {
             String s = string.trim();
-            if (s.length() > 0) {
+            if (!s.isEmpty()) {
                 char c = s.charAt(0);
                 // String reference or not?
                 if ((c == '{') || (c == '"')) {
@@ -318,12 +318,12 @@ public class Util {
             BibtexEntry be = db.getEntryById(s);
             for (String field : fields) {
                 String val = be.getField(field);
-                if ((val != null) && (val.length() > 0)) {
+                if ((val != null) && (!val.isEmpty())) {
                     AuthorList al = AuthorList.getAuthorList(val);
                     for (int i = 0; i < al.size(); i++) {
                         AuthorList.Author a = al.getAuthor(i);
                         String lastName = a.getLast();
-                        if ((lastName != null) && (lastName.length() > 0)) {
+                        if ((lastName != null) && (!lastName.isEmpty())) {
                             res.add(lastName);
                         }
                     }
@@ -569,12 +569,12 @@ public class Util {
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
         if (Globals.ON_MAC) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-            String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
+            String[] cmd = ((fileType.getOpenWith() != null) && (!fileType.getOpenWith().isEmpty())) ?
                     new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
                     new String[] {"/usr/bin/open", filePath};
             Runtime.getRuntime().exec(cmd);
         } else if (Globals.ON_WIN) {
-            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+            if ((fileType.getOpenWith() != null) && (!fileType.getOpenWith().isEmpty())) {
                 // Application is specified. Use it:
                 Util.openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
             } else {
@@ -583,7 +583,7 @@ public class Util {
         } else {
             // Use the given app if specified, and the universal "xdg-open" otherwise:
             String[] openWith;
-            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+            if ((fileType.getOpenWith() != null) && (!fileType.getOpenWith().isEmpty())) {
                 openWith = fileType.getOpenWith().split(" ");
             } else {
                 openWith = new String[] {"xdg-open"};
@@ -677,7 +677,7 @@ public class Util {
             }
             if (flEntry == null) {
                 // This shouldn't happen, so I'm not sure what to put in here:
-                throw new RuntimeException("Could not find the file list entry " + link + " in " + entry.toString());
+                throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
             }
 
             FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
@@ -1001,7 +1001,7 @@ public class Util {
             for (String field : fields) {
                 String o = entry.getField(field);
                 if (o != null) {
-                    if (o.trim().length() > 0) {
+                    if (!o.trim().isEmpty()) {
                         File f = new File(o);
                         FileListEntry flEntry = new FileListEntry(f.getName(), o,
                                 Globals.prefs.getExternalFileTypeByExt(field));
@@ -1057,7 +1057,7 @@ public class Util {
                 }
             }
         }
-        if (affectedFields.size() == 0)
+        if (affectedFields.isEmpty())
          {
             return true; // no side effects
         }
@@ -1306,7 +1306,7 @@ public class Util {
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && ((oldVal).length() > 0)) {
+            if (!overwriteValues && (oldVal != null) && (!(oldVal).isEmpty())) {
                 continue;
             }
             if (text != null) {
@@ -1335,13 +1335,13 @@ public class Util {
         for (BibtexEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
-            if ((valToMove == null) || (valToMove.length() == 0)) {
+            if ((valToMove == null) || (valToMove.isEmpty())) {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
             // nonempy value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && (valInNewField.length() > 0)) {
+            if (!overwriteValues && (valInNewField != null) && (!valInNewField.isEmpty())) {
                 continue;
             }
 
@@ -1473,7 +1473,7 @@ public class Util {
         if (sb.length() > 0) {
             thisEntry.add(sb.toString());
         }
-        if (thisEntry.size() > 0) {
+        if (!thisEntry.isEmpty()) {
             newList.add(thisEntry);
         }
 
@@ -1617,7 +1617,7 @@ public class Util {
         // Set Keyword Field
         String oldValue = entry.getField("keywords");
         String newValue;
-        if (keywords.size() > 0) {
+        if (!keywords.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (String keyword : keywords) {
                 sb.append(keyword);
@@ -1847,7 +1847,7 @@ public class Util {
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
                             String newVal = tableModel.getStringRepresentation();
-                            if (newVal.length() == 0) {
+                            if (newVal.isEmpty()) {
                                 newVal = null;
                             }
                             if (ce != null) {
@@ -2006,7 +2006,7 @@ public class Util {
             // First, look for exact matches:
             for (BibtexEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && (citeKey.length() > 0)) {
+                if ((citeKey != null) && (!citeKey.isEmpty())) {
                     if (dot > 0) {
                         if (name.substring(0, dot).equals(citeKey)) {
                             result.get(entry).add(file);
@@ -2020,7 +2020,7 @@ public class Util {
             if (!exactOnly) {
                 for (BibtexEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && (citeKey.length() > 0)) {
+                    if ((citeKey != null) && (!citeKey.isEmpty())) {
                         if (name.startsWith(citeKey)) {
                             result.get(entry).add(file);
                             continue nextFile;
@@ -2060,7 +2060,7 @@ public class Util {
         }
         beforeColon = beforeColon.trim();
 
-        if (beforeColon.length() == 0) {
+        if (beforeColon.isEmpty()) {
             return null;
         }
 
@@ -2075,7 +2075,7 @@ public class Util {
             return null;
         }
 
-        if ((afterColon == null) || (afterColon.length() == 0)) {
+        if ((afterColon == null) || (afterColon.isEmpty())) {
             return fieldValue;
         }
 

@@ -138,7 +138,7 @@ public class BibtexParser {
      */
     public static BibtexEntry singleFromString(String bibtexString) {
         Collection<BibtexEntry> c = BibtexParser.fromString(bibtexString);
-        if ((c == null) || (c.size() == 0)) {
+        if ((c == null) || (c.isEmpty())) {
             return null;
         }
         return c.iterator().next();
@@ -396,7 +396,7 @@ public class BibtexParser {
             return parserResult;
         } catch (KeyCollisionException kce) {
             // kce.printStackTrace();
-            throw new IOException("Duplicate ID in bibtex file: " + kce.toString());
+            throw new IOException("Duplicate ID in bibtex file: " + kce);
         }
     }
 
@@ -499,7 +499,7 @@ public class BibtexParser {
         if (Globals.prefs.putBracesAroundCapitals(key)) {
             content = Util.removeBracesAroundCapitals(content);
         }
-        if (content.length() > 0) {
+        if (!content.isEmpty()) {
             if (entry.getField(key) == null) {
                 entry.setField(key, content);
             } else {
@@ -574,7 +574,7 @@ public class BibtexParser {
                 consume('#');
             } else {
                 String textToken = parseTextToken();
-                if (textToken.length() == 0) {
+                if (textToken.isEmpty()) {
                     throw new IOException("Error in line " + line + " or above: "
                             + "Empty text token.\nThis could be caused "
                             + "by a missing comma between two fields.");
@@ -818,7 +818,7 @@ public class BibtexParser {
                     // the key. Possibly the comma is missing, so we try to
                     // return what we
                     // have found, as the key and try to restore the rest in fixKey().
-                    return token.toString() + fixKey();
+                    return token + fixKey();
                 } else if (c == ',') {
                     unread(c);
                     return token.toString();

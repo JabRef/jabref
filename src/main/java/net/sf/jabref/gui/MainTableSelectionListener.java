@@ -346,70 +346,68 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                         return; // There is an icon, but the field is not set.
                     }
 
-                    {
-                        // See if this is a simple file link field, or if it is a file-list
-                        // field that can specify a list of links:
-                        if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
+                    // See if this is a simple file link field, or if it is a file-list
+                    // field that can specify a list of links:
+                    if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
 
-                            // We use a FileListTableModel to parse the field content:
-                            FileListTableModel fileList = new FileListTableModel();
-                            fileList.setContent((String) link);
+                        // We use a FileListTableModel to parse the field content:
+                        FileListTableModel fileList = new FileListTableModel();
+                        fileList.setContent((String) link);
 
-                            FileListEntry flEntry = null;
-                            // If there are one or more links of the correct type,
-                            // open the first one:
-                            if (!listOfFileTypes.isEmpty()) {
-                                for (int i = 0; i < fileList.getRowCount(); i++) {
-                                    flEntry = fileList.getEntry(i);
-                                    boolean correctType = false;
-                                    for (String listOfFileType : listOfFileTypes) {
-                                        if (flEntry.getType().toString().equals(listOfFileType)) {
-                                            correctType = true;
-                                        }
+                        FileListEntry flEntry = null;
+                        // If there are one or more links of the correct type,
+                        // open the first one:
+                        if (!listOfFileTypes.isEmpty()) {
+                            for (int i = 0; i < fileList.getRowCount(); i++) {
+                                flEntry = fileList.getEntry(i);
+                                boolean correctType = false;
+                                for (String listOfFileType : listOfFileTypes) {
+                                    if (flEntry.getType().toString().equals(listOfFileType)) {
+                                        correctType = true;
                                     }
-                                    if (correctType) {
-                                        break;
-                                    }
-                                    flEntry = null;
                                 }
-                            }
-                            //If there are no file types specified, consider all files.
-                            else if (fileList.getRowCount() > 0) {
-                                flEntry = fileList.getEntry(0);
-                            }
-                            if (flEntry != null) {
-                                //                            if (fileList.getRowCount() > 0) {
-                                //                                FileListEntry flEntry = fileList.getEntry(0);
-
-                                ExternalFileMenuItem item = new ExternalFileMenuItem
-                                        (panel.frame(), entry, "",
-                                                flEntry.getLink(), flEntry.getType().getIcon(),
-                                                panel.metaData(), flEntry.getType());
-                                boolean success = item.openLink();
-                                if (!success) {
-                                    panel.output(Globals.lang("Unable to open link."));
+                                if (correctType) {
+                                    break;
                                 }
+                                flEntry = null;
                             }
-                        } else {
-                            try {
-                                Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
-                            } catch (IOException ex) {
-                                panel.output(Globals.lang("Unable to open link."));
-                            }
+                        }
+                        //If there are no file types specified, consider all files.
+                        else if (fileList.getRowCount() > 0) {
+                            flEntry = fileList.getEntry(0);
+                        }
+                        if (flEntry != null) {
+                            //                            if (fileList.getRowCount() > 0) {
+                            //                                FileListEntry flEntry = fileList.getEntry(0);
 
-                            /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
                             ExternalFileMenuItem item = new ExternalFileMenuItem
                                     (panel.frame(), entry, "",
-                                    (String)link, type.getIcon(),
-                                    panel.metaData(), type);
+                                            flEntry.getLink(), flEntry.getType().getIcon(),
+                                            panel.metaData(), flEntry.getType());
                             boolean success = item.openLink();
                             if (!success) {
                                 panel.output(Globals.lang("Unable to open link."));
-                            } */
-                            //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                            }
+                        }
+                    } else {
+                        try {
+                            Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
+                        } catch (IOException ex) {
+                            panel.output(Globals.lang("Unable to open link."));
                         }
 
+                        /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
+                        ExternalFileMenuItem item = new ExternalFileMenuItem
+                                (panel.frame(), entry, "",
+                                (String)link, type.getIcon(),
+                                panel.metaData(), type);
+                        boolean success = item.openLink();
+                        if (!success) {
+                            panel.output(Globals.lang("Unable to open link."));
+                        } */
+                        //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                     }
+
                     //catch (IOException ex) {
                     //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
                     //}

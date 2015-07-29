@@ -666,8 +666,8 @@ public class OpenOfficePanel extends AbstractWorker implements SidePanePlugin, P
         } catch (Throwable t) {
             t.printStackTrace();
             throw new IOException("Error, could not add URL to system classloader");
-        }//end try catch
-    }//end method
+        }
+    }
 
     private void updateConnectionParams(String ooPath, String ooExec, String ooJars, boolean oo3) {
         Globals.prefs.put("ooPath", ooPath);

@@ -43,15 +43,13 @@ public class CompositeFormatTest {
             Assert.assertEquals("BAff", f.format("f"));
         }
 
-        {
-            LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(),
-                    new NoSpaceBetweenAbbreviations());
-            LayoutFormatter first = new AuthorOrgSci();
-            LayoutFormatter second = new NoSpaceBetweenAbbreviations();
+        LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(),
+                new NoSpaceBetweenAbbreviations());
+        LayoutFormatter first = new AuthorOrgSci();
+        LayoutFormatter second = new NoSpaceBetweenAbbreviations();
 
-            Assert.assertEquals(second.format(first.format("John Flynn and Sabine Gartska")), f.format("John Flynn and Sabine Gartska"));
-            Assert.assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")), f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
-        }
+        Assert.assertEquals(second.format(first.format("John Flynn and Sabine Gartska")), f.format("John Flynn and Sabine Gartska"));
+        Assert.assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")), f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
     }
 
 }

@@ -516,7 +516,7 @@ class GroupDialog extends JDialog {
                 "The regular expression <b>%0</b> is invalid%c",
                 StringUtil.quoteForHTML(regExp))
                 + "<p><tt>"
-                + sb.toString()
+                + sb
                 + "</tt>";
         if (!(e instanceof PatternSyntaxException)) {
             return s;

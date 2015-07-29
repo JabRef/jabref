@@ -220,7 +220,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (tf.getText().trim().length() == 0) {
+        if (tf.getText().trim().isEmpty()) {
             frame.output(Globals.lang("Please enter a search string"));
             return;
         }

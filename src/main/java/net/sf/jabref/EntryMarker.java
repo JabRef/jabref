@@ -155,11 +155,11 @@ public class EntryMarker {
         StringBuilder sb = new StringBuilder();
         for (Object owner : owners) {
             sb.append('[');
-            sb.append(owner.toString());
+            sb.append(owner);
             sb.append(']');
         }
         String newVal = sb.toString();
-        if (newVal.length() == 0) {
+        if (newVal.isEmpty()) {
             newVal = null;
         }
         ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be

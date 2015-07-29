@@ -251,7 +251,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     if (!tableModel.getStringRepresentation().equals(old)) {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();
-                        if (toSet.length() == 0) {
+                        if (toSet.isEmpty()) {
                             toSet = null;
                         }
                         ce.addEdit(new UndoableFieldChange(aSel, fieldName, old,

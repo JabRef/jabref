@@ -39,7 +39,7 @@ public class URLDownload {
 
             @Override
             protected InputStream monitorInputStream(InputStream in) {
-                return new ProgressMonitorInputStream(component, "Downloading " + this.getSource().toString(), in);
+                return new ProgressMonitorInputStream(component, "Downloading " + this.getSource(), in);
             }
         };
     }

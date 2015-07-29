@@ -243,7 +243,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     private String makeUrl(int startIndex) {
-        return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + String.valueOf(startIndex);
+        return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + startIndex;
     }
 
     private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
@@ -327,7 +327,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 sb.append(buffer[i]);
             }
         }
-        System.out.println(sb.toString());
+        System.out.println(sb);
 
         ParserResult results = new BibtexParser(bufr).parse();
         bufr.close();
@@ -399,7 +399,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }*/
         // clean up month
         String month = entry.getField("month");
-        if ((month != null) && (month.length() > 0)) {
+        if ((month != null) && (!month.isEmpty())) {
             month = month.replaceAll("\\.", "");
             month = month.toLowerCase();
 
@@ -407,17 +407,17 @@ public class IEEEXploreFetcher implements EntryFetcher {
             Matcher mm = monthPattern.matcher(month);
             String date = month;
             if (mm.find()) {
-                if (mm.group(3).length() == 0) {
-                    if (mm.group(2).length() > 0) {
+                if (mm.group(3).isEmpty()) {
+                    if (!mm.group(2).isEmpty()) {
                         date = "#" + mm.group(2).substring(0, 3) + "#";
-                        if (mm.group(1).length() > 0) {
+                        if (!mm.group(1).isEmpty()) {
                             date += " " + mm.group(1) + ",";
                         }
                     } else {
                         date = mm.group(1) + ",";
                     }
-                } else if (mm.group(2).length() == 0) {
-                    if (mm.group(4).length() > 0) {
+                } else if (mm.group(2).isEmpty()) {
+                    if (!mm.group(4).isEmpty()) {
                         date = "#" + mm.group(4).substring(0, 3) + "# " + mm.group(1) + "--" + mm.group(3) + ",";
                     } else {
                         date += ",";

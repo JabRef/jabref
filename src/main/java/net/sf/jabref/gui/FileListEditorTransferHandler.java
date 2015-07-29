@@ -147,16 +147,16 @@ class FileListEditorTransferHandler extends TransferHandler {
             }
 
         } catch (IOException ioe) {
-            System.err.println("failed to read dropped data: " + ioe.toString());
+            System.err.println("failed to read dropped data: " + ioe);
         } catch (UnsupportedFlavorException ufe) {
-            System.err.println("drop type error: " + ufe.toString());
+            System.err.println("drop type error: " + ufe);
         }
 
         // all supported flavors failed
         System.err.println("can't transfer input: ");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            System.out.println("  " + inflav.toString());
+            System.out.println("  " + inflav);
         }
 
         return false;

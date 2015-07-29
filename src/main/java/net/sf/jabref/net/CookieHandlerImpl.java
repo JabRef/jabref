@@ -103,7 +103,7 @@ class CookieHandlerImpl extends CookieHandler {
                 if (cookies.length() > 0) {
                     cookies.append(", ");
                 }
-                cookies.append(cookie.toString());
+                cookies.append(cookie);
             }
         }
 

@@ -103,7 +103,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             // application link. If that link is referred by the error message, we can assume
             // that the problem is in the open-with-application setting:
             if ((fileType != null) && (fileType.getOpenWith() != null)
-                    && (fileType.getOpenWith().length() > 0) &&
+                    && (!fileType.getOpenWith().isEmpty()) &&
                     (e1.getMessage().contains(fileType.getOpenWith()))) {
 
                 JOptionPane.showMessageDialog(frame, Globals.lang("Unable to open link. "

@@ -89,7 +89,7 @@ public class AppendDatabaseAction implements BaseAction {
 
     private void openIt(boolean importEntries, boolean importStrings,
                         boolean importGroups, boolean importSelectorWords) {
-        if (filesToOpen.size() == 0) {
+        if (filesToOpen.isEmpty()) {
             return;
         }
         for (File file : filesToOpen) {

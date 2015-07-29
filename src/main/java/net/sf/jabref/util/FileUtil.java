@@ -162,7 +162,7 @@ public class FileUtil {
     public static File expandFilename(String name, String dir) {
 
         File file;
-        if ((name == null) || (name.length() == 0)) {
+        if ((name == null) || (name.isEmpty())) {
             return null;
         } else {
             file = new File(name);

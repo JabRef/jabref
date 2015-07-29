@@ -130,7 +130,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
-        if (filesToOpen.size() > 0) {
+        if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
             JabRefExecutorService.INSTANCE.execute(new Runnable() {
 

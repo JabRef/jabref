@@ -164,7 +164,7 @@ public class ParserResult {
     }
 
     public boolean hasWarnings() {
-        return (warnings.size() > 0);
+        return (!warnings.isEmpty());
     }
 
     public String[] warnings() {
@@ -190,7 +190,7 @@ public class ParserResult {
      * @return true if there is at least one duplicate key.
      */
     public boolean hasDuplicateKeys() {
-        return duplicateKeys.size() > 0;
+        return !duplicateKeys.isEmpty();
     }
 
     /**

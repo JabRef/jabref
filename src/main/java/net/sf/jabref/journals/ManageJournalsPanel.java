@@ -263,7 +263,7 @@ class ManageJournalsPanel extends JPanel {
 
     public void setValues() {
         personalFile.setText(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST));
-        if (personalFile.getText().length() == 0) {
+        if (personalFile.getText().isEmpty()) {
             newFile.setSelected(true);
             oldFile.setEnabled(false);
         } else {
@@ -341,7 +341,7 @@ class ManageJournalsPanel extends JPanel {
     private boolean readyToClose() {
         File f;
         if (newFile.isSelected()) {
-            if (newNameTf.getText().length() > 0) {
+            if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
                 return (!f.exists() || (JOptionPane.showConfirmDialog
                         (this, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
@@ -364,7 +364,7 @@ class ManageJournalsPanel extends JPanel {
     private void storeSettings() throws FileNotFoundException {
         File f = null;
         if (newFile.isSelected()) {
-            if (newNameTf.getText().length() > 0) {
+            if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
             }// else {
              //    return; // Nothing to do.
@@ -414,7 +414,7 @@ class ManageJournalsPanel extends JPanel {
                 extFiles.add(efe.getValue());
             }
         }
-        if (extFiles.size() == 0) {
+        if (extFiles.isEmpty()) {
             Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
         } else {
             String[] list = extFiles.toArray(new String[extFiles.size()]);

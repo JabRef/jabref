@@ -241,7 +241,7 @@ public class CsaImporter extends ImportFormat {
         line = 1;
         str = readLine(in);
         while (true) {
-            if ((str == null) || (str.length() == 0)) { // end of record
+            if ((str == null) || (str.isEmpty())) { // end of record
                 if (!hm.isEmpty()) { // have a record
                     if (Type == null) {
                         addNote(hm, "Publication Type: [NOT SPECIFIED]");
@@ -297,7 +297,7 @@ public class CsaImporter extends ImportFormat {
                     sb.append(str.substring(4)); // skip spaces
                 }
                 String fstr = sb.toString();
-                if (fstr.length() == 0) {
+                if (fstr.isEmpty()) {
                     int line1 = line - 1;
                     throw new IOException("illegal empty field at line " +
                             line1);

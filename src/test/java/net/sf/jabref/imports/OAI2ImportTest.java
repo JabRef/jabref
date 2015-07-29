@@ -167,14 +167,12 @@ public class OAI2ImportTest {
             Thread.sleep(20000);
         }
 
-        {
-            OAI2Fetcher fetcher = new OAI2Fetcher();
-            be = fetcher.importOai2Entry("0709.3040");
-            Assert.assertNotNull(be);
+        OAI2Fetcher fetcher = new OAI2Fetcher();
+        be = fetcher.importOai2Entry("0709.3040");
+        Assert.assertNotNull(be);
 
-            Assert.assertEquals("2007", be.getField("year"));
-            Assert.assertEquals("#sep#", be.getField("month"));
-        }
+        Assert.assertEquals("2007", be.getField("year"));
+        Assert.assertEquals("#sep#", be.getField("month"));
 
     }
 }

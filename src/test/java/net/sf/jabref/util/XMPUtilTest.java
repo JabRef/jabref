@@ -351,28 +351,27 @@ public class XMPUtilTest {
 
             Assert.assertEquals(expectedFields, x.getAllFields());
         }
-        { // First set:
-            prefs.putBoolean("useXmpPrivacyFilter", true);
-            prefs
-                    .putStringArray(
-                            JabRefPreferences.XMP_PRIVACY_FILTERS,
-                            new String[] {"author;title;note;booktitle;year;owner;timestamp"});
+        // First set:
+        prefs.putBoolean("useXmpPrivacyFilter", true);
+        prefs
+                .putStringArray(
+                        JabRefPreferences.XMP_PRIVACY_FILTERS,
+                        new String[] {"author;title;note;booktitle;year;owner;timestamp"});
 
-            BibtexEntry e = t1BibtexEntry();
+        BibtexEntry e = t1BibtexEntry();
 
-            XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null);
 
-            List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
-            Assert.assertEquals(1, l.size());
-            BibtexEntry x = l.get(0);
-            Set<String> ts = x.getAllFields();
-            Assert.assertEquals(8, ts.size());
+        List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
+        Assert.assertEquals(1, l.size());
+        BibtexEntry x = l.get(0);
+        Set<String> ts = x.getAllFields();
+        Assert.assertEquals(8, ts.size());
 
-            ts.contains("bibtextype");
-            ts.contains("bibtexkey");
-            ts.contains("year");
-            ts.contains("url");
-        }
+        ts.contains("bibtextype");
+        ts.contains("bibtexkey");
+        ts.contains("year");
+        ts.contains("url");
 
     }
 
@@ -538,25 +537,23 @@ public class XMPUtilTest {
     @Test
     public void testNewlineHandling() throws Exception {
 
-        {
-            String bibtex = "<bibtex:title>\nHallo\nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n</bibtex:title>\n"
-                    + "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n"
-                    + "<bibtex:abstract>\n\nAbstract preserve\n\t Whitespace\n\n</bibtex:abstract>";
+        String bibtex = "<bibtex:title>\nHallo\nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n</bibtex:title>\n"
+                + "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n"
+                + "<bibtex:abstract>\n\nAbstract preserve\n\t Whitespace\n\n</bibtex:abstract>";
 
-            writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
+        writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
 
-            List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
-            Assert.assertEquals(1, l.size());
-            BibtexEntry e = l.get(0);
+        List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
+        Assert.assertEquals(1, l.size());
+        BibtexEntry e = l.get(0);
 
-            Assert.assertNotNull(e);
-            Assert.assertEquals("Hallo World this is not an exercise .", e
-                    .getField("title"));
-            Assert.assertEquals("Hallo World this is not an exercise .", e
-                    .getField("tabs"));
-            Assert.assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e
-                    .getField("abstract"));
-        }
+        Assert.assertNotNull(e);
+        Assert.assertEquals("Hallo World this is not an exercise .", e
+                .getField("title"));
+        Assert.assertEquals("Hallo World this is not an exercise .", e
+                .getField("tabs"));
+        Assert.assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e
+                .getField("abstract"));
     }
 
     /**
@@ -735,92 +732,91 @@ public class XMPUtilTest {
             }
         }
 
-        { // Now alter the Bibtex entry, write it and do all the checks again
-            BibtexEntry toSet = t1BibtexEntry();
-            toSet.setField("author", "Pokemon!");
+        // Now alter the Bibtex entry, write it and do all the checks again
+        BibtexEntry toSet = t1BibtexEntry();
+        toSet.setField("author", "Pokemon!");
 
-            XMPUtil.writeXMP(pdfFile, toSet, null);
+        XMPUtil.writeXMP(pdfFile, toSet, null);
 
-            List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
-            Assert.assertEquals(1, l.size());
-            BibtexEntry e = l.get(0);
+        List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
+        Assert.assertEquals(1, l.size());
+        BibtexEntry e = l.get(0);
 
-            assertEqualsBibtexEntry(toSet, e);
+        assertEqualsBibtexEntry(toSet, e);
 
-            // This is what we really want to test: Is the rest of the
-            // descriptions still there?
+        // This is what we really want to test: Is the rest of the
+        // descriptions still there?
 
-            PDDocument document = null;
-            try {
-                document = PDDocument.load(pdfFile.getAbsoluteFile());
-                if (document.isEncrypted()) {
-                    throw new IOException(
-                            "Error: Cannot read metadata from encrypted document.");
-                }
-                PDDocumentCatalog catalog = document.getDocumentCatalog();
-                PDMetadata metaRaw = catalog.getMetadata();
+        PDDocument document = null;
+        try {
+            document = PDDocument.load(pdfFile.getAbsoluteFile());
+            if (document.isEncrypted()) {
+                throw new IOException(
+                        "Error: Cannot read metadata from encrypted document.");
+            }
+            PDDocumentCatalog catalog = document.getDocumentCatalog();
+            PDMetadata metaRaw = catalog.getMetadata();
 
-                XMPMetadata meta;
-                if (metaRaw != null) {
-                    meta = new XMPMetadata(XMLUtil.parse(metaRaw
-                            .createInputStream()));
-                } else {
-                    meta = new XMPMetadata();
-                }
-                meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE,
-                        XMPSchemaBibtex.class);
+            XMPMetadata meta;
+            if (metaRaw != null) {
+                meta = new XMPMetadata(XMLUtil.parse(metaRaw
+                        .createInputStream()));
+            } else {
+                meta = new XMPMetadata();
+            }
+            meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE,
+                    XMPSchemaBibtex.class);
 
-                List<XMPSchema> schemas = meta.getSchemas();
+            List<XMPSchema> schemas = meta.getSchemas();
 
-                Assert.assertEquals(4, schemas.size());
+            Assert.assertEquals(4, schemas.size());
 
-                schemas = meta
-                        .getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
+            schemas = meta
+                    .getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
+            Assert.assertEquals(1, schemas.size());
 
-                schemas = meta
-                        .getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
-                XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schemas.get(0);
-                Assert.assertEquals("application/pdf", dc.getFormat());
+            schemas = meta
+                    .getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
+            Assert.assertEquals(1, schemas.size());
+            XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schemas.get(0);
+            Assert.assertEquals("application/pdf", dc.getFormat());
 
-                schemas = meta
-                        .getSchemasByNamespaceURI(XMPSchemaBasic.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
-                XMPSchemaBasic bs = (XMPSchemaBasic) schemas.get(0);
-                Assert.assertEquals("Acrobat PDFMaker 7.0.7", bs.getCreatorTool());
+            schemas = meta
+                    .getSchemasByNamespaceURI(XMPSchemaBasic.NAMESPACE);
+            Assert.assertEquals(1, schemas.size());
+            XMPSchemaBasic bs = (XMPSchemaBasic) schemas.get(0);
+            Assert.assertEquals("Acrobat PDFMaker 7.0.7", bs.getCreatorTool());
 
-                Calendar c = Calendar.getInstance();
-                c.clear();
-                c.set(Calendar.YEAR, 2006);
-                c.set(Calendar.MONTH, 7);
-                c.set(Calendar.DATE, 7);
-                c.set(Calendar.HOUR, 14);
-                c.set(Calendar.MINUTE, 44);
-                c.set(Calendar.SECOND, 24);
-                c.setTimeZone(TimeZone.getTimeZone("GMT+2"));
+            Calendar c = Calendar.getInstance();
+            c.clear();
+            c.set(Calendar.YEAR, 2006);
+            c.set(Calendar.MONTH, 7);
+            c.set(Calendar.DATE, 7);
+            c.set(Calendar.HOUR, 14);
+            c.set(Calendar.MINUTE, 44);
+            c.set(Calendar.SECOND, 24);
+            c.setTimeZone(TimeZone.getTimeZone("GMT+2"));
 
-                Calendar other = bs.getCreateDate();
+            Calendar other = bs.getCreateDate();
 
-                Assert.assertEquals(c.get(Calendar.YEAR), other.get(Calendar.YEAR));
-                Assert.assertEquals(c.get(Calendar.MONTH), other.get(Calendar.MONTH));
-                Assert.assertEquals(c.get(Calendar.DATE), other.get(Calendar.DATE));
-                Assert.assertEquals(c.get(Calendar.HOUR), other.get(Calendar.HOUR));
-                Assert.assertEquals(c.get(Calendar.MINUTE), other.get(Calendar.MINUTE));
-                Assert.assertEquals(c.get(Calendar.SECOND), other.get(Calendar.SECOND));
-                Assert.assertTrue(c.getTimeZone().hasSameRules(other.getTimeZone()));
+            Assert.assertEquals(c.get(Calendar.YEAR), other.get(Calendar.YEAR));
+            Assert.assertEquals(c.get(Calendar.MONTH), other.get(Calendar.MONTH));
+            Assert.assertEquals(c.get(Calendar.DATE), other.get(Calendar.DATE));
+            Assert.assertEquals(c.get(Calendar.HOUR), other.get(Calendar.HOUR));
+            Assert.assertEquals(c.get(Calendar.MINUTE), other.get(Calendar.MINUTE));
+            Assert.assertEquals(c.get(Calendar.SECOND), other.get(Calendar.SECOND));
+            Assert.assertTrue(c.getTimeZone().hasSameRules(other.getTimeZone()));
 
-                schemas = meta
-                        .getSchemasByNamespaceURI(XMPSchemaMediaManagement.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
-                XMPSchemaMediaManagement mm = (XMPSchemaMediaManagement) schemas
-                        .get(0);
-                Assert.assertEquals("17", mm.getSequenceList("xapMM:VersionID").get(0));
+            schemas = meta
+                    .getSchemasByNamespaceURI(XMPSchemaMediaManagement.NAMESPACE);
+            Assert.assertEquals(1, schemas.size());
+            XMPSchemaMediaManagement mm = (XMPSchemaMediaManagement) schemas
+                    .get(0);
+            Assert.assertEquals("17", mm.getSequenceList("xapMM:VersionID").get(0));
 
-            } finally {
-                if (document != null) {
-                    document.close();
-                }
+        } finally {
+            if (document != null) {
+                document.close();
             }
         }
     }
@@ -909,19 +905,18 @@ public class XMPUtilTest {
         /* Test minimal syntaxical completeness */
         Assert.assertTrue(0 < xmp.indexOf("xpacket"));
         Assert.assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
-        Assert.assertTrue((0 < xmp
-                .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>"))
+        Assert.assertTrue((0 < xmp.indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>"))
                 || (0 < xmp.indexOf("bibtex:bibtexkey=")));
-        Assert.assertTrue(0 < xmp.indexOf("<rdf:li>Norton Bar</rdf:li>"));
-        Assert.assertTrue((0 < xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>"))
-                || (0 < xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>")));
-        Assert.assertTrue((0 < xmp
-                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'"))
-                || (0 < xmp
-                        .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"")));
-        Assert.assertTrue(0 < xmp.indexOf("<rdf:Description"));
-        Assert.assertTrue((0 < xmp.indexOf("<?xpacket end='w'?>"))
-                || (0 < xmp.indexOf("<?xpacket end=\"w\"?>")));
+        Assert.assertTrue(xmp.indexOf("<rdf:li>Norton Bar</rdf:li>") > 0);
+        Assert.assertTrue((xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0)
+                || (xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0));
+        Assert.assertTrue((xmp
+                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0)
+                || (xmp
+                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0));
+        Assert.assertTrue(xmp.indexOf("<rdf:Description") > 0);
+        Assert.assertTrue((xmp.indexOf("<?xpacket end='w'?>") > 0)
+                || (xmp.indexOf("<?xpacket end=\"w\"?>") > 0));
 
         /* Test contents of string */
         writeManually(pdfFile, xmp);
@@ -1289,44 +1284,42 @@ public class XMPUtilTest {
 
             assertEqualsBibtexEntry(e, x);
         }
-        {
-            // Write XMP to file
-            BibtexEntry e = t1BibtexEntry();
+        // Write XMP to file
+        BibtexEntry e = t1BibtexEntry();
 
-            XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null);
 
-            ByteArrayOutputStream s = new ByteArrayOutputStream();
-            PrintStream oldOut = System.out;
-            System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[] {"-x", pdfFile.getAbsolutePath()});
-            System.setOut(oldOut);
-            s.close();
-            String xmp = s.toString();
+        ByteArrayOutputStream s = new ByteArrayOutputStream();
+        PrintStream oldOut = System.out;
+        System.setOut(new PrintStream(s));
+        XMPUtil.main(new String[] {"-x", pdfFile.getAbsolutePath()});
+        System.setOut(oldOut);
+        s.close();
+        String xmp = s.toString();
 
             /* Test minimal syntaxical completeness */
-            Assert.assertTrue(0 < xmp.indexOf("xpacket"));
-            Assert.assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
-            Assert.assertTrue((0 < xmp
-                    .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>"))
-                    || (0 < xmp.indexOf("bibtex:bibtexkey=")));
-            Assert.assertTrue(0 < xmp.indexOf("<rdf:li>K. Crowston</rdf:li>"));
-            Assert.assertTrue((0 < xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>"))
-                    || (0 < xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>")));
-            Assert.assertTrue((0 < xmp
-                    .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'"))
-                    || (0 < xmp
-                            .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"")));
-            Assert.assertTrue(0 < xmp.indexOf("<rdf:Description"));
-            Assert.assertTrue((0 < xmp.indexOf("<?xpacket end='w'?>"))
-                    || (0 < xmp.indexOf("<?xpacket end=\"w\"?>")));
+        Assert.assertTrue(xmp.indexOf("xpacket") > 0);
+        Assert.assertTrue(xmp.indexOf("adobe:ns:meta") > 0);
+        Assert.assertTrue((xmp
+                .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>") > 0)
+                || (xmp.indexOf("bibtex:bibtexkey=") > 0));
+        Assert.assertTrue(xmp.indexOf("<rdf:li>K. Crowston</rdf:li>") > 0);
+        Assert.assertTrue((xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0)
+                || (xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0));
+        Assert.assertTrue((xmp
+                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0)
+                || (xmp
+                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0));
+        Assert.assertTrue(xmp.indexOf("<rdf:Description") > 0);
+        Assert.assertTrue((xmp.indexOf("<?xpacket end='w'?>") > 0)
+                || (xmp.indexOf("<?xpacket end=\"w\"?>") > 0));
 
             /* Test contents of string */
-            writeManually(pdfFile, xmp);
-            List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
-            Assert.assertEquals(1, l.size());
+        writeManually(pdfFile, xmp);
+        List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
+        Assert.assertEquals(1, l.size());
 
-            assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
-        }
+        assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
     }
 
     /**
@@ -1364,23 +1357,22 @@ public class XMPUtilTest {
                 Assert.assertEquals(1, l.size());
                 assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
             }
-            { // Now try OezbekC06
-                ByteArrayOutputStream s = new ByteArrayOutputStream();
-                PrintStream oldOut = System.out;
-                System.setOut(new PrintStream(s));
-                try {
-                    XMPUtil.main(new String[] {"OezbekC06",
-                            tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                    s.close();
-                }
-
-                // PDF should be annotated:
-                List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
-                Assert.assertEquals(1, l.size());
-                assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
+            // Now try OezbekC06
+            ByteArrayOutputStream s = new ByteArrayOutputStream();
+            PrintStream oldOut = System.out;
+            System.setOut(new PrintStream(s));
+            try {
+                XMPUtil.main(new String[] {"OezbekC06",
+                        tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+            } finally {
+                System.setOut(oldOut);
+                s.close();
             }
+
+            // PDF should be annotated:
+            List<BibtexEntry> l = XMPUtil.readXMP(pdfFile);
+            Assert.assertEquals(1, l.size());
+            assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
         } finally {
             if (fileWriter != null) {
                 fileWriter.close();

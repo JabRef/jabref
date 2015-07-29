@@ -158,7 +158,7 @@ public class ExternalFileTypeEntryEditor {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
                 private void handle(DocumentEvent e) {
-                    if (application.getText().length() == 0) {
+                    if (application.getText().isEmpty()) {
                         useDefault.setSelected(true);
                     } else {
                         other.setSelected(true);
@@ -223,7 +223,7 @@ public class ExternalFileTypeEntryEditor {
         mimeType.setText(entry.getMimeType());
         application.setText(entry.getOpenWith());
         icon.setIcon(entry.getIcon());
-        if ((application.getText().length() == 0)) {
+        if ((application.getText().isEmpty())) {
             useDefault.setSelected(true);
         } else {
             other.setSelected(true);
@@ -236,7 +236,7 @@ public class ExternalFileTypeEntryEditor {
         entry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:
         String ext = extension.getText().trim();
-        if ((ext.length() > 0) && (ext.charAt(0) == '.')) {
+        if ((!ext.isEmpty()) && (ext.charAt(0) == '.')) {
             entry.setExtension(ext.substring(1));
         } else {
             entry.setExtension(ext);
@@ -250,7 +250,7 @@ public class ExternalFileTypeEntryEditor {
         } else {
             // On Windows, store application as empty if the "Default" option is selected,
             // or if the application name is empty:
-            if (useDefault.isSelected() || (application.getText().trim().length() == 0)) {
+            if (useDefault.isSelected() || (application.getText().trim().isEmpty())) {
                 entry.setOpenWith("");
             } else {
                 entry.setOpenWith(application.getText().trim());
@@ -275,7 +275,7 @@ public class ExternalFileTypeEntryEditor {
         @Override
         public void actionPerformed(ActionEvent e) {
             File initial = new File(comp.getText().trim());
-            if (comp.getText().trim().length() == 0) {
+            if (comp.getText().trim().isEmpty()) {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }

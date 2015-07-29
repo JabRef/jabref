@@ -273,7 +273,7 @@ public class IsiImporter extends ImportFormat {
                     int detpos = value.indexOf(' ');
 
                     // tweak for IEEE Explore
-                    if ((detpos != -1) && (value.substring(0, detpos).trim().length() > 0)) {
+                    if ((detpos != -1) && (!value.substring(0, detpos).trim().isEmpty())) {
                         value = value.substring(0, detpos);
                     }
 
@@ -326,7 +326,7 @@ public class IsiImporter extends ImportFormat {
             }
 
             // Skip empty entries
-            if (hm.size() == 0) {
+            if (hm.isEmpty()) {
                 continue;
             }
 
@@ -338,7 +338,7 @@ public class IsiImporter extends ImportFormat {
             ArrayList<Object> toRemove = new ArrayList<Object>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if ((content == null) || (content.trim().length() == 0)) {
+                if ((content == null) || (content.trim().isEmpty())) {
                     toRemove.add(key);
                 }
             }
