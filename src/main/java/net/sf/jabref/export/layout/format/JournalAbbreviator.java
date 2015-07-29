@@ -49,6 +49,6 @@ public class JournalAbbreviator implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return Globals.journalAbbrev.getIsoAbbreviation(fieldText).or(fieldText);
+        return Globals.journalAbbrev.getIsoAbbreviation(fieldText).orElse(fieldText);
     }
 }

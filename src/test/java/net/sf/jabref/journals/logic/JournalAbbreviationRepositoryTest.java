@@ -21,16 +21,16 @@ public class JournalAbbreviationRepositoryTest {
         assertEquals(1, repository.size());
         assertFalse(repository.getAbbreviations().isEmpty());
 
-        assertEquals("L. N.", repository.getIsoAbbreviation("Long Name").or("WRONG"));
-        assertEquals("UNKNOWN", repository.getIsoAbbreviation("?").or("UNKNOWN"));
+        assertEquals("L. N.", repository.getIsoAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getIsoAbbreviation("?").orElse("UNKNOWN"));
 
-        assertEquals("L N", repository.getMedlineAbbreviation("Long Name").or("WRONG"));
-        assertEquals("UNKNOWN", repository.getMedlineAbbreviation("?").or("UNKNOWN"));
+        assertEquals("L N", repository.getMedlineAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getMedlineAbbreviation("?").orElse("UNKNOWN"));
 
-        assertEquals("L. N.", repository.getNextAbbreviation("Long Name").or("WRONG"));
-        assertEquals("L N", repository.getNextAbbreviation("L. N.").or("WRONG"));
-        assertEquals("Long Name", repository.getNextAbbreviation("L N").or("WRONG"));
-        assertEquals("UNKNOWN", repository.getNextAbbreviation("?").or("UNKNOWN"));
+        assertEquals("L. N.", repository.getNextAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("L N", repository.getNextAbbreviation("L. N.").orElse("WRONG"));
+        assertEquals("Long Name", repository.getNextAbbreviation("L N").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getNextAbbreviation("?").orElse("UNKNOWN"));
 
         assertTrue(repository.isKnownName("Long Name"));
         assertTrue(repository.isKnownName("L. N."));
@@ -62,11 +62,11 @@ public class JournalAbbreviationRepositoryTest {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
         repository.addEntry(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.size());
-        assertEquals("L. N.", repository.getIsoAbbreviation("Long Name").or("WRONG"));
+        assertEquals("L. N.", repository.getIsoAbbreviation("Long Name").orElse("WRONG"));
 
         repository.addEntry(new Abbreviation("Long Name", "LA. N."));
         assertEquals(1, repository.size());
-        assertEquals("LA. N.", repository.getIsoAbbreviation("Long Name").or("WRONG"));
+        assertEquals("LA. N.", repository.getIsoAbbreviation("Long Name").orElse("WRONG"));
 
         assertEquals("Long Name = LA. N.", repository.getAbbreviations().first().toPropertiesLine());
     }

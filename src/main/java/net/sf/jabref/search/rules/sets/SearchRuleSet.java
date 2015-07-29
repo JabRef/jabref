@@ -26,9 +26,9 @@
  */
 package net.sf.jabref.search.rules.sets;
 
-import com.google.common.base.Preconditions;
 import net.sf.jabref.search.SearchRule;
 
+import java.util.Objects;
 import java.util.Vector;
 
 public abstract class SearchRuleSet implements SearchRule {
@@ -36,7 +36,7 @@ public abstract class SearchRuleSet implements SearchRule {
     protected final Vector<SearchRule> ruleSet = new Vector<SearchRule>();
 
     public void addRule(SearchRule newRule) {
-        ruleSet.add(Preconditions.checkNotNull(newRule));
+        ruleSet.add(Objects.requireNonNull(newRule));
     }
 
     @Override
