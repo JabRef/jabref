@@ -6,20 +6,16 @@ buildscript {
 
     dependencies {
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
     }
 }
 
 plugins {
-    //The format plugin requires Java 1.8. As JabRef currently supports Java 1.6, the formatter plugin is disabled.
+    //The format plugin is currently not used
     //id "com.github.youribonnaffe.gradle.format" version "1.2"
 
-    // Version 0.3 requires Java 1.7, therefore we use version 0.2
-    // This version, however, is not available as plugin directly from gradle
-    // id "eu.appsatori.fatjar" version "0.3"
+    id "eu.appsatori.fatjar" version "0.3"
 }
 
-apply plugin: "fatjar"
 apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "application"
@@ -27,7 +23,7 @@ apply plugin: "project-report"
 apply plugin: "sonar-runner"
 apply plugin: "maven"
 
-/* disabled, because plugin requires Java 1.8
+/* disabled, because currently unused
 format {
     configurationFile = file('formatter_settings.xml')
     // default: reformat main and test
@@ -131,7 +127,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
     ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
 }
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {

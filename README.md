@@ -7,6 +7,15 @@
 
 This version is a development version. Features may not work as expected.
 
+The branch of this README file is `master`.
+
+### Breaking changes in comparison to v2.11
+
+* Transition to Java8
+* No plugin support
+
+### Background
+
 JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
 You can customize the entry information shown in the main window, and sort by any of the standard Bibtex fields.
@@ -46,8 +55,7 @@ For details see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Requirements
 
-JabRef runs on any system equipped with the Java Virtual Machine (1.6 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
-If you do not plan to compile JabRef, the Java Runtime Environment may be a better choice than the Java Development Kit.
+JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 
 ## Installing and running, Mac OS X:
@@ -87,7 +95,7 @@ appear in your chosen languages.
 
 If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
-To compile JabRef from source, you need a Java compiler supporting Java 1.6 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java compiler supporting Java 1.8 and `JAVA_HOME` pointing to this JDK.
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`

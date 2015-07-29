@@ -13,7 +13,7 @@
                help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
 
    Precondition: 1. Ant should be installed.
-                 2. JAVA_HOME environment variable contains the path to JDK1.6 or higher
+                 2. JAVA_HOME environment variable contains the path to JDK 1.8 or higher
                  3. ANT_HOME environment variable contains the path to ant's home directory
 
    Language: XML
@@ -123,7 +123,7 @@
 	<!-- Compiles project -->
 	<target name="compile">
 		<mkdir dir="${build.classes}" />
-		<javac destdir="${build.classes}" encoding="UTF8" source="1.6" target="1.6">
+		<javac destdir="${build.classes}" encoding="UTF8" source="1.8" target="1.8">
 			<src path="${java.dir}" />
             <src path="${gen.dir}" />
 			<classpath refid="classpath" />
@@ -133,7 +133,7 @@
 	<!-- Builds the OSXAdapter -->
 	<target name="osx" depends="compile">
 		<mkdir dir="${build.classes}" />
-		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.6">
+		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.8">
 			<!-- Hack to force visibility of com.apple.eawt in rt.jar in JDK7 & 8
 				 https://bugs.openjdk.java.net/browse/JDK-8008714 -->
 			<compilerarg value="-XDignore.symbol.file"/>			
@@ -332,13 +332,7 @@ version=${jabref.version}</echo>
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
 
-	<target name="java16test">
-		<condition property="java16">
-			<equals arg1="${ant.java.version}" arg2="1.6"/>
-		</condition>
-	</target>
-
-	<target name="macbundle" depends="java16test, jars" unless="java16" description="creates a bundle made for the Oracle Apple JVM (1.7+)">
+	<target name="macbundle" depends="jars" description="creates a bundle made for the Oracle Apple JVM (1.8+)">
 		<taskdef
 			name="bundleapp"
 			classname="com.oracle.appbundler.AppBundlerTask"
@@ -388,35 +382,6 @@ version=${jabref.version}</echo>
 		</zip>
 	</target>
 	
-	<target name="macbundle_java16" depends="jars" description="creates a bundle made for the Legacy Apple JVM (1.6)">
-		<jarbundler dir="${build.lib}"
-                    name="JabRef_Java6"
-                    mainclass="net.sf.jabref.JabRef"
-                    jar="${build.lib}/${build.jar}"
-                    icon="${images.dir}/JabRef-Logo.icns"
-                    version="${jabref.version}"
-                    jvmversion="1.6+"
-		    vmoptions="-Xms128m -Xmx512m"
-                    stubfile="${osxbin.dir}/JavaApplicationStub"
-                    signature="JABr">
-            <documenttype name="BibTeX file" extensions="bib" role="Editor"
-                          iconFile="${images.dir}/JabRef-Logo.icns"/>
-        </jarbundler>
-        <!-- After running jarbundler we need to hack the Info.plist file: -->
-        <replace file="${build.lib}/JabRef_Java6.app/Contents/Info.plist" token="&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"
-            value="&lt;key&gt;NSPrincipalClass&lt;/key&gt;${line.separator}
-   &lt;string&gt;NSApplication&lt;/string&gt;${line.separator}
-   &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;"/>
-		<zip basedir="${build.lib}"
-			destfile="${build.lib}/JabRef-${jabref.version}-OSX-Java6.zip"
-			excludes="JabRef_Java6.app/Contents/MacOS/JavaApplicationStub"
-			includes="JabRef_Java6.app/"
-			level="9">
-			<zipfileset dir="${build.lib}" includes="JabRef_Java6.app/Contents/MacOS/JavaApplicationStub" filemode="755" />
-		</zip>
-	</target>
-
-
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 	<!-- Build Windows Installer                                                    -->
 	<!--                                                                            -->
@@ -514,8 +479,6 @@ version=${jabref.version}</echo>
 	   Auxiliary targets
 	  +++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
-
 	<macrodef name="compresssrc">
         <attribute name="git-core-autocrlf" />
         <attribute name="temp-dir" />
@@ -564,8 +527,8 @@ version=${jabref.version}</echo>
 		<delete dir="${temp.dir}" failonerror="no"/>
 	</target>
 
-	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle_java16, macbundle" description="creates development snapshot binaries" />
+	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, non_osx, win.installer, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
-	<target name="release.linux" depends="clean, non_osx, win.installer.linux, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
+	<target name="release" depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
+	<target name="release.linux" depends="clean, non_osx, win.installer.linux, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>
