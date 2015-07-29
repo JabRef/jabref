@@ -1,6 +1,6 @@
 package net.sf.jabref.export.layout;
 
-import net.sf.jabref.export.layout.format.RTFChars;
+import net.sf.jabref.export.layout.format.RTFCharFormatter;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -13,7 +13,7 @@ public class RTFCharsTest {
     @Test
     public void testBasicFormat() {
 
-        LayoutFormatter layout = new RTFChars();
+        LayoutFormatter layout = new RTFCharFormatter();
 
         Assert.assertEquals("", layout.format(""));
 
@@ -29,7 +29,7 @@ public class RTFCharsTest {
     @Test
     public void testLaTeXHighlighting() {
 
-        LayoutFormatter layout = new RTFChars();
+        LayoutFormatter layout = new RTFCharFormatter();
 
         Assert.assertEquals("{\\i hallo}", layout.format("\\emph{hallo}"));
         Assert.assertEquals("{\\i hallo}", layout.format("{\\emph hallo}"));
@@ -44,7 +44,7 @@ public class RTFCharsTest {
     @Test
     @Ignore
     public void testComplicated() {
-        LayoutFormatter layout = new RTFChars();
+        LayoutFormatter layout = new RTFCharFormatter();
 
         Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e \\u230ae should be \\u230ae", layout.format("Réflexions sur le timing de la quantité \\ae should be æ"));
 
@@ -55,7 +55,7 @@ public class RTFCharsTest {
     @Ignore
     public void testSpecialCharacters() {
 
-        LayoutFormatter layout = new RTFChars();
+        LayoutFormatter layout = new RTFCharFormatter();
 
         Assert.assertEquals("\\u243o", layout.format("\\'{o}")); // ó
         Assert.assertEquals("\\'f2", layout.format("\\`{o}")); // ò
