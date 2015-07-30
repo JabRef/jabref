@@ -75,7 +75,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.imports.ImportInspector;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;

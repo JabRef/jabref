@@ -1,7 +1,8 @@
-package net.sf.jabref.labelPattern;
+package net.sf.jabref.gui.labelPattern;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.imports.BibtexParser;
 import org.junit.Assert;

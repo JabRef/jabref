@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.labelPattern;
+package net.sf.jabref.gui.labelPattern;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -36,6 +36,7 @@ import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.labelPattern.LabelPattern;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;

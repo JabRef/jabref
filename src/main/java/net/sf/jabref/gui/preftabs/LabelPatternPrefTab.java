@@ -29,9 +29,9 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.labelPattern.LabelPatternPanel;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

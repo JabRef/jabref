@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.logic.labelPattern.LabelPattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,7 +49,6 @@ import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
-import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.StringUtil;
@@ -1240,7 +1240,7 @@ public class JabRefPreferences {
      */
     public LabelPattern getKeyPattern() {
         JabRefPreferences.keyPattern = new LabelPattern();
-        Preferences pre = Preferences.userNodeForPackage(net.sf.jabref.labelPattern.LabelPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(LabelPattern.class);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
@@ -1263,7 +1263,7 @@ public class JabRefPreferences {
         JabRefPreferences.keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(net.sf.jabref.labelPattern.LabelPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(LabelPattern.class);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1275,7 +1275,7 @@ public class JabRefPreferences {
             if (value != null) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see net.sf.jabref.labelPattern.LabelPatternUtil.split(String)
+                // see net.sf.jabref.logic.labelPattern.LabelPatternUtil.split(String)
                 pre.put(stringArrayListEntry.getKey(), value.get(0));
             }
         }

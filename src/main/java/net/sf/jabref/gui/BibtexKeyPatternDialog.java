@@ -34,8 +34,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.labelPattern.LabelPatternPanel;
+import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 

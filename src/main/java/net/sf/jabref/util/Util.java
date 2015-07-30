@@ -104,7 +104,7 @@ import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;

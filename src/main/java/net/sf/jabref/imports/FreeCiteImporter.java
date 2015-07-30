@@ -36,7 +36,7 @@ import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 
 /**
  * This importer parses text format citations using the online API of FreeCite -

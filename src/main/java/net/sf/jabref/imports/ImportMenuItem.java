@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
