@@ -25,7 +25,7 @@ Name "JabRef ${VERSION}"
 !define PRODUCT_EXE "JabRef.exe"
 !define PRODUCT_NAME "JabRef"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-!define PRODUCT_LICENSE_FILE "dist\LICENSE"
+!define PRODUCT_LICENSE_FILE "../../LICENSE"
 !define AppUserModelId "JabRef.${VERSION}"
 
 # Variables
@@ -133,7 +133,7 @@ Var InstDestination
 
 
 # Installer attributes
-OutFile JabRefSetup.exe
+OutFile ..\..\build\nsis\JabRefSetup.exe
 InstallDir "$PROGRAMFILES\JabRef"
 BrandingText "$(^Name) installer" ; appear at the bottom of the installer windows
 XPStyle on ; use XP style for installer windows
@@ -145,7 +145,7 @@ VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
 VIAddVersionKey FileDescription "JabRef installation program"
-VIAddVersionKey LegalCopyright "under the GPL version 3"
+VIAddVersionKey LegalCopyright "under the GPL version 2"
 VIAddVersionKey FileVersion ""
 
 
@@ -173,7 +173,7 @@ Section "-Installation actions" SecInstallation
   ; copy files
   SetOutPath "$INSTDIR"
   SetOverwrite on
-  File /r dist\*.*
+  File /r ..\..\build\nsis\*.*
   WriteRegStr SHCTX "${REGKEY}\Components" Main 1
   ; register JabRef
   WriteRegStr SHCTX "${REGKEY}" Path $INSTDIR

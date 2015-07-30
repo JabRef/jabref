@@ -9,6 +9,11 @@ License:
  * GPLv2  means, we haven't checked whether later options are allowed
  * similar for LGPL and other version of GPL
 
+Id:      com.apple:AppleJavaExtensions
+Project: AppleJavaExtensions
+URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
+License: Apple License
+
 Id:      org.antlr:antlr
 Project: ANTLR 3
 URL:     http://www.antlr.org/

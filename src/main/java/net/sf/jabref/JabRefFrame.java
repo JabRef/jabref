@@ -125,6 +125,7 @@ import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
+import osx.macadapter.MacAdapter;
 
 /**
  * The main window of the application.
@@ -635,11 +636,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //opened (double-clicked) documents are not displayed.
         if (Globals.ON_MAC) {
             try {
-                Class<?> macreg = Class.forName("osx.macadapter.MacAdapter");
-                Method method = macreg.getMethod("registerMacEvents", JabRefFrame.class);
-                method.invoke(macreg.newInstance(), this);
+                new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                System.err.println("Exception (" + e.getClass() + "): " + e.getMessage());
+                LOGGER.fatal("could not interface with Mac OS X methods", e);
             }
         }
     }

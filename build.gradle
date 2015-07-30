@@ -1,19 +1,8 @@
-// must appear before any plugins blocks - see http://gradle.org/docs/2.4/userguide/plugins.html#sec:plugins_block
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-    }
-}
-
 plugins {
-    //The format plugin is currently not used
-    //id "com.github.youribonnaffe.gradle.format" version "1.2"
-
     id "eu.appsatori.fatjar" version "0.3"
+    id "edu.sc.seis.launch4j" version "1.1.4"
+    id "com.github.kt3k.coveralls" version "2.4.0"
+    id "edu.sc.seis.macAppBundle" version "2.1.1"
 }
 
 apply plugin: "java"
@@ -22,14 +11,6 @@ apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
 apply plugin: "maven"
-
-/* disabled, because currently unused
-format {
-    configurationFile = file('formatter_settings.xml')
-    // default: reformat main and test
-    //files = sourceSets.main.java
-}
-*/
 
 fatJar {
     classifier 'fat'
@@ -45,7 +26,8 @@ test {
 }
 
 group = "net.sf.jabref"
-version = "2.11dev"
+version = "2.80dev"
+project.ext.threeDotVersion = "2.80.0.0"
 
 repositories {
     jcenter()
@@ -70,7 +52,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.7.0'
     compile 'com.jgoodies:jgoodies-forms:1.7.2'
     compile 'com.jgoodies:jgoodies-looks:2.5.3'
-    
+
     compile 'org.swinglabs.swingx:swingx-core:1.6.5-1'
 
     compile 'org.apache.pdfbox:pdfbox:1.8.10'
@@ -94,7 +76,7 @@ dependencies {
     compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
-    compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
+    compile fileTree(dir: 'lib', includes: ['*.jar'])
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
@@ -102,20 +84,11 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-   compile 'junit:junit:4.12'
-}
-
-// use ant targets with prefix antTargets.XXXXX
-ant.importBuild "build-wrapper.xml"
-// add jars from this classpath to the classpath for the ant build
-if (org.gradle.internal.os.OperatingSystem.current().windows) {
-    // according to the discussion at https://github.com/JabRef/jabref/pull/58, the separators are different on Windows and Linux
-    ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
-} else {
-    ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
+    compile 'junit:junit:4.12'
 }
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
@@ -127,6 +100,7 @@ compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
 }
+compileJava.dependsOn "generateSource"
 
 compileTestJava {
     // files are all encoded using UTF-8
@@ -143,8 +117,6 @@ javadoc {
 }
 
 // jabref specific tasks
-compileJava.dependsOn "generateSource"
-
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
@@ -200,3 +172,141 @@ jacocoTestReport {
         html.enabled = true
     }
 }
+
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.internal.os.OperatingSystem
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "version": project.version,
+            "year"   : "2015",
+    ]
+}
+
+// release tasks
+task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "zipSource", "tarSource"]) {
+    group = 'JabRef - Release'
+    description 'Creates a release for all target platforms.'
+}
+
+project.ext.nsisExec = "C:/Program Files/NSIS/makensis.exe"
+
+/*
+ * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
+ */
+if (hasProperty('dev')) {
+    String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
+    String result = ""
+    if (OperatingSystem.current().isWindows()) {
+        result = "cmd /c $command".execute().in.text
+    } else {
+        result = command.execute().in.text
+    }
+
+    // remove enclosing ' of result
+    project.version += "--snapshot--" + result.substring(1, result.length() - 1)
+}
+
+launch4j {
+    mainClassName = project.mainClassName
+    version = project.ext.threeDotVersion
+    textVersion = project.version
+    jar = "../libs/JabRef-${project.version}-fat.jar"
+    icon = "${projectDir}/src/main/resources/images/JabRef.ico"
+    copyright = "JabRef developers"
+    initialHeapSize = 32
+    maxHeapSize = 512
+}
+createExe.dependsOn "fatJar"
+
+task releaseJar(dependsOn: "fatJar") {
+    group = 'JabRef - Release'
+    description "Creates a Jar release."
+
+    doLast {
+        copy {
+            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
+            into("$buildDir/releases")
+
+            rename { String fileName ->
+                fileName.replace('-fat', '')
+            }
+        }
+    }
+}
+
+task releaseWindows(dependsOn: "launch4j") {
+    group = 'JabRef - Release'
+    description "Creates a Windows release."
+
+    doLast {
+        copy {
+            from("$projectDir/LICENSE")
+            from("$projectDir/README.md")
+            from("$buildDir/launch4j/JabRef.exe")
+            into("$buildDir/nsis")
+        }
+        exec {
+            commandLine project.ext.nsisExec, "/DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+        }
+        copy {
+            from("$buildDir/nsis/JabRefSetup.exe")
+            from("$buildDir/nsis/JabRef.exe")
+            into("$buildDir/releases")
+        }
+    }
+}
+
+task releaseMac(dependsOn: "createAppZip") {
+    group = 'JabRef - Release'
+    description "Creates a OSX release."
+
+    doLast {
+        copy {
+            from "$buildDir/distributions/JabRef-${project.version}.zip"
+            into "$buildDir/releases"
+            rename { String fileName ->
+                fileName.replace('.zip', '-OSX.zip')
+            }
+        }
+    }
+}
+
+macAppBundle {
+    mainClassName = project.mainClassName
+    icon = "src/main/resources/images/icons/JabRef-Logo.icns"
+    highResolutionCapable = true
+
+    def map = [
+            "CFBundleTypeName"      : "BibTeX file",
+            "CFBundleTypeRole"      : "Editor",
+            "CFBundleTypeIconFile"  : "JabRef-Logo.icns",
+            "CFBundleTypeExtensions": ["bib"]
+    ]
+    bundleExtras.put("CFBundleDocumentTypes", [map])
+}
+
+// TODO: can be removed when SourceForge releases are discontinued
+task zipSource(type: Exec) {
+    group = 'JabRef - Release'
+    description "Creates a zip archive of the source code."
+
+    if (OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
+    } else {
+        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
+    }
+}
+
+// TODO: can be removed when SourceForge releases are discontinued
+task tarSource(type: Exec) {
+    group = 'JabRef - Release'
+    description "Creates a tar archive of the source code."
+
+    if (OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
+    } else {
+        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
+    }
+}
+
