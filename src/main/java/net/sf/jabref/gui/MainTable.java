@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
-import net.sf.jabref.search.HitOrMissComparator;
+import net.sf.jabref.logic.search.HitOrMissComparator;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;

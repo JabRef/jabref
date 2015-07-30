@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.Vector;
 
 import net.sf.jabref.imports.*;
-import net.sf.jabref.search.SearchRules;
-import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.logic.search.SearchRules;
+import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * @author Silberer, Zirn

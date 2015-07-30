@@ -31,9 +31,9 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.rules.sets.SearchRuleSets;
-import net.sf.jabref.search.rules.sets.SearchRuleSet;
+import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
+import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.

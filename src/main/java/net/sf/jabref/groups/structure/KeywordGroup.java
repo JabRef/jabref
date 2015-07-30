@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.QuotedStringTokenizer;

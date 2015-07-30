@@ -20,7 +20,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * This group contains all entries. Always. At any time!
