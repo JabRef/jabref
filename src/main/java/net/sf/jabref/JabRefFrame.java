@@ -76,6 +76,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.gui.preftabs.PrefsDialog3;
 import net.sf.jabref.imports.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

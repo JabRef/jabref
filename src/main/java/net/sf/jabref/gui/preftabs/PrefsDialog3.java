@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -37,9 +37,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.*;
 import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.gui.preftabs.GroupsPrefsTab;
-import net.sf.jabref.gui.preftabs.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
