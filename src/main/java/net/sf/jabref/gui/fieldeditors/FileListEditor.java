@@ -482,27 +482,12 @@ public class FileListEditor extends JTable implements FieldEditor,
         }
     }
 
-
-    @Override
-    public boolean hasUndoInformation() {
-        return false;
-    }
-
     @Override
     public void undo() {
     }
 
     @Override
-    public boolean hasRedoInformation() {
-        return false;
-    }
-
-    @Override
     public void redo() {
-    }
-
-    @Override
-    public void addUndoableEditListener(UndoableEditListener listener) {
     }
 
     @Override

@@ -89,15 +89,9 @@ public interface FieldEditor {
      */
     String getSelectedText();
 
-    boolean hasUndoInformation();
-
     void undo();
 
-    boolean hasRedoInformation();
-
     void redo();
-
-    void addUndoableEditListener(UndoableEditListener listener);
 
     void setAutoCompleteListener(AutoCompleteListener listener);
 

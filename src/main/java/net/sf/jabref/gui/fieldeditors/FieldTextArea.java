@@ -164,11 +164,6 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
     }
 
     @Override
-    public boolean hasUndoInformation() {
-        return false;// undo.canUndo();
-    }
-
-    @Override
     public void undo() {
         /*
          * try { if (undo.canUndo()) { undo.undo(); } } catch
@@ -178,22 +173,12 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
     }
 
     @Override
-    public boolean hasRedoInformation() {
-        return false;// undo.canRedo();
-    }
-
-    @Override
     public void redo() {
         /*
          * try { if (undo.canRedo()) { undo.redo(); } } catch
          * (CannotUndoException e) { }
          */
 
-    }
-
-    @Override
-    public void addUndoableEditListener(UndoableEditListener listener) {
-        getDocument().addUndoableEditListener(listener);
     }
 
     @Override

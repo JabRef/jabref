@@ -214,11 +214,6 @@ public class FieldTextField extends JTextField implements FieldEditor {
     }
 
     @Override
-    public boolean hasUndoInformation() {
-        return false;//undo.canUndo();
-    }
-
-    @Override
     public void undo() {
         /*try {
             if (undo.canUndo()) {
@@ -226,11 +221,6 @@ public class FieldTextField extends JTextField implements FieldEditor {
             }
         } catch (CannotUndoException e) {
         }*/
-    }
-
-    @Override
-    public boolean hasRedoInformation() {
-        return false;//undo.canRedo();
     }
 
     @Override
@@ -242,11 +232,6 @@ public class FieldTextField extends JTextField implements FieldEditor {
         } catch (CannotUndoException e) {
         }*/
 
-    }
-
-    @Override
-    public void addUndoableEditListener(UndoableEditListener listener) {
-        getDocument().addUndoableEditListener(listener);
     }
 
     @Override
