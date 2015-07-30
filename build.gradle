@@ -211,6 +211,11 @@ task releaseLinux(dependsOn: ["clean", "copyOSXAdapter"]) {
     description "Creates a Linux release. Creates all distribution files in ${buildDir}"
 }
 
+task releaseMac(dependsOn: ["clean", "copyOSXAdapter"]) {
+    group = 'JabRef'
+    description "Creates a OSX release. Creates all distribution files in ${buildDir}"
+}
+
 // release helper
 task copyOSXAdapter(type: Copy) {
     description "Copies a compiled version of MacAdapter for non-OSX platforms"
@@ -221,18 +226,27 @@ task copyOSXAdapter(type: Copy) {
 
 import org.gradle.internal.os.OperatingSystem;
 
+// TODO: can be removed when SourceForge releases are discontinued
 task zipSource(type:Exec) {
+    group = 'JabRef'
+    description "Creates a zip archive of the source code inside ${buildDir}"
+
     if(OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
     } else {
-        commandLine "./git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
+        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
     }
 }
 
+// TODO: can be removed when SourceForge releases are discontinued
 task tarSource(type:Exec) {
+    group = 'JabRef'
+    description "Creates a tar archive of the source code inside ${buildDir}"
+
     if(OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
     } else {
-        commandLine "./git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
+        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
     }
 }
+

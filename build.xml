@@ -6,7 +6,6 @@
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.11dev" />
 	<property name="jabref.version.full" value="2.11.4.0" /> <!-- a version number with 4 places. Required by launch4j -->
 	<property name="jabref.year" value="2015" />
 	<property name="jabref.placeholder.version" value="@version@" />
@@ -54,16 +53,6 @@
 		<pathelement path="${build.dir}" />
 		<filelist refid="jars" />
 	</path>
-
-	<!-- Builds the OSXAdapter -->
-	<target name="osx" depends="compile">
-		<mkdir dir="${build.classes}" />
-		<javac srcdir="${osx.dir}" destdir="${build.classes}" target="1.8">
-			<!-- Hack to force visibility of com.apple.eawt in rt.jar in JDK7 & 8
-				 https://bugs.openjdk.java.net/browse/JDK-8008714 -->
-			<compilerarg value="-XDignore.symbol.file"/>			
-		</javac>
-	</target>
 
 	<target name="jars" depends="build, unjarlib" description="Jars up project">
 		<mkdir dir="${build.lib}" />
