@@ -69,6 +69,7 @@ public class ExportFormats {
         ExportFormat ef = new ExportFormat(Globals.lang("RIS"), "ris", "ris", "ris", ".ris");
         ef.encoding = "UTF-8";
         ExportFormats.putFormat(ef);
+        ExportFormats.putFormat(new ExportFormat(Globals.lang("MIS Quarterly"), "misq", "misq", "misq",".rtf"));
 
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
