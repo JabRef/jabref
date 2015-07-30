@@ -41,10 +41,9 @@ import net.sf.jabref.JabRefPreferences;
 /**
  * Preference tab for file sorting options.
  */
-@SuppressWarnings("serial")
 public class FileSortTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
     private final JRadioButton saveInOriginalOrder;
     private final JRadioButton saveInTableOrder;
     private final JRadioButton saveInSpecifiedOrder;
@@ -72,8 +71,8 @@ public class FileSortTab extends JPanel implements PrefsTab {
     private JComboBox exportTerSort;
 
 
-    public FileSortTab(JabRefFrame frame, JabRefPreferences prefs) {
-        this._prefs = prefs;
+    public FileSortTab(JabRefPreferences prefs) {
+        this.prefs = prefs;
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.leadingColumnOffset(1);
@@ -84,10 +83,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
             saveInTableOrder = new JRadioButton(Globals.lang("Save in current table sort order"));
             saveInSpecifiedOrder = new JRadioButton(Globals.lang("Save entries ordered as specified"));
 
-            ButtonGroup bg = new ButtonGroup();
-            bg.add(saveInOriginalOrder);
-            bg.add(saveInTableOrder);
-            bg.add(saveInSpecifiedOrder);
+            ButtonGroup buttonGroup = new ButtonGroup();
+            buttonGroup.add(saveInOriginalOrder);
+            buttonGroup.add(saveInTableOrder);
+            buttonGroup.add(saveInSpecifiedOrder);
 
             ActionListener listener = new ActionListener() {
 
@@ -109,10 +108,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
             saveInTableOrder.addActionListener(listener);
             saveInSpecifiedOrder.addActionListener(listener);
 
-            ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
-            v.add(BibtexFields.KEY_FIELD);
-            Collections.sort(v);
-            String[] allPlusKey = v.toArray(new String[v.size()]);
+            ArrayList<String> fieldNames = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+            fieldNames.add(BibtexFields.KEY_FIELD);
+            Collections.sort(fieldNames);
+            String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
             savePriSort = new JComboBox(allPlusKey);
             saveSecSort = new JComboBox(allPlusKey);
             saveTerSort = new JComboBox(allPlusKey);
@@ -204,10 +203,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
         exportInTableOrder = new JRadioButton(Globals.lang("Export in current table sort order"));
         exportInSpecifiedOrder = new JRadioButton(Globals.lang("Export entries ordered as specified"));
 
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(exportInOriginalOrder);
-        bg.add(exportInTableOrder);
-        bg.add(exportInSpecifiedOrder);
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(exportInOriginalOrder);
+        buttonGroup.add(exportInTableOrder);
+        buttonGroup.add(exportInSpecifiedOrder);
 
         ActionListener listener = new ActionListener() {
 
@@ -229,10 +228,10 @@ public class FileSortTab extends JPanel implements PrefsTab {
         exportInTableOrder.addActionListener(listener);
         exportInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
-        v.add(BibtexFields.KEY_FIELD);
-        Collections.sort(v);
-        String[] allPlusKey = v.toArray(new String[v.size()]);
+        ArrayList<String> fieldNames = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        fieldNames.add(BibtexFields.KEY_FIELD);
+        Collections.sort(fieldNames);
+        String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
         exportPriSort = new JComboBox(allPlusKey);
         exportSecSort = new JComboBox(allPlusKey);
         exportTerSort = new JComboBox(allPlusKey);
@@ -325,16 +324,16 @@ public class FileSortTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        if (_prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER)) {
+        if (prefs.getBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER)) {
             saveInOriginalOrder.setSelected(true);
-        } else if (_prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
+        } else if (prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER)) {
             saveInSpecifiedOrder.setSelected(true);
         } else {
             saveInTableOrder.setSelected(true);
         }
 
         {
-            boolean selected = _prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER);
+            boolean selected = prefs.getBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER);
             savePriSort.setEnabled(selected);
             savePriField.setEnabled(selected);
             savePriDesc.setEnabled(selected);
@@ -346,27 +345,27 @@ public class FileSortTab extends JPanel implements PrefsTab {
             saveTerDesc.setEnabled(selected);
         }
 
-        savePriField.setText(_prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD));
-        saveSecField.setText(_prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD));
-        saveTerField.setText(_prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD));
+        savePriField.setText(prefs.get(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD));
+        saveSecField.setText(prefs.get(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD));
+        saveTerField.setText(prefs.get(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD));
 
         savePriSort.setSelectedIndex(0);
         saveSecSort.setSelectedIndex(0);
         saveTerSort.setSelectedIndex(0);
 
-        savePriDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING));
-        saveSecDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING));
-        saveTerDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING));
+        savePriDesc.setSelected(prefs.getBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING));
+        saveSecDesc.setSelected(prefs.getBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING));
+        saveTerDesc.setSelected(prefs.getBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING));
 
-        if (_prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER)) {
+        if (prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER)) {
             exportInOriginalOrder.setSelected(true);
-        } else if (_prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+        } else if (prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
             exportInSpecifiedOrder.setSelected(true);
         } else {
             exportInTableOrder.setSelected(true);
         }
 
-        boolean selected = _prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER);
+        boolean selected = prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER);
         exportPriSort.setEnabled(selected);
         exportPriField.setEnabled(selected);
         exportPriDesc.setEnabled(selected);
@@ -377,42 +376,42 @@ public class FileSortTab extends JPanel implements PrefsTab {
         exportTerField.setEnabled(selected);
         exportTerDesc.setEnabled(selected);
 
-        exportPriField.setText(_prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD));
-        exportSecField.setText(_prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD));
-        exportTerField.setText(_prefs.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD));
+        exportPriField.setText(prefs.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD));
+        exportSecField.setText(prefs.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD));
+        exportTerField.setText(prefs.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD));
 
         exportPriSort.setSelectedIndex(0);
         exportSecSort.setSelectedIndex(0);
         exportTerSort.setSelectedIndex(0);
 
-        exportPriDesc.setSelected(_prefs.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING));
-        exportSecDesc.setSelected(_prefs.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING));
-        exportTerDesc.setSelected(_prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING));
+        exportPriDesc.setSelected(prefs.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING));
+        exportSecDesc.setSelected(prefs.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING));
+        exportTerDesc.setSelected(prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING));
     }
 
     @Override
     public void storeSettings() {
-        _prefs.putBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, saveInOriginalOrder.isSelected());
-        _prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, saveInSpecifiedOrder.isSelected());
+        prefs.putBoolean(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, saveInOriginalOrder.isSelected());
+        prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, saveInSpecifiedOrder.isSelected());
 
-        _prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, savePriDesc.isSelected());
-        _prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, saveSecDesc.isSelected());
-        _prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, saveTerDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, savePriDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, saveSecDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, saveTerDesc.isSelected());
 
-        _prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, savePriField.getText().toLowerCase().trim());
-        _prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, saveSecField.getText().toLowerCase().trim());
-        _prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, saveTerField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, savePriField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, saveSecField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, saveTerField.getText().toLowerCase().trim());
 
-        _prefs.putBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, exportInOriginalOrder.isSelected());
-        _prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, exportInSpecifiedOrder.isSelected());
+        prefs.putBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, exportInOriginalOrder.isSelected());
+        prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, exportInSpecifiedOrder.isSelected());
 
-        _prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, exportPriDesc.isSelected());
-        _prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, exportSecDesc.isSelected());
-        _prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, exportTerDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, exportPriDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, exportSecDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, exportTerDesc.isSelected());
 
-        _prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, exportPriField.getText().toLowerCase().trim());
-        _prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, exportSecField.getText().toLowerCase().trim());
-        _prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, exportTerField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, exportPriField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, exportSecField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, exportTerField.getText().toLowerCase().trim());
 
     }
 
