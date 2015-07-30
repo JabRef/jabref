@@ -13,6 +13,7 @@ import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.imports.PdfContentImporter;
 import net.sf.jabref.imports.PdfXmpImporter;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
