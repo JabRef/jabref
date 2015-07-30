@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -36,9 +36,12 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.preftabs.PrefsTab;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 
-class TablePrefsTab extends JPanel implements PrefsTab {
+public class TablePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences _prefs;
 
