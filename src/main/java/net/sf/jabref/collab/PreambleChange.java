@@ -21,8 +21,8 @@ import javax.swing.JScrollPane;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoablePreambleChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoablePreambleChange;
 
 class PreambleChange extends Change {
 

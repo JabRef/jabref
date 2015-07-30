@@ -59,7 +59,7 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.wizard.integrity.IntegrityCheck;
 import net.sf.jabref.wizard.integrity.IntegrityMessage;
 import net.sf.jabref.wizard.text.gui.HintListModel;

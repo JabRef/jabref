@@ -29,7 +29,7 @@ import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 

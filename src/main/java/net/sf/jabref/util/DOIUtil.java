@@ -1,8 +1,8 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

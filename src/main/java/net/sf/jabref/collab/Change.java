@@ -21,7 +21,7 @@ import net.sf.jabref.BibtexDatabase;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 abstract class Change extends DefaultMutableTreeNode {
 

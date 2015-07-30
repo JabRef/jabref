@@ -23,8 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 class EntryChange extends Change {
 

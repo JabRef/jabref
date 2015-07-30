@@ -22,7 +22,7 @@ import net.sf.jabref.util.Util;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 public class SpecialFieldsUtils {
 

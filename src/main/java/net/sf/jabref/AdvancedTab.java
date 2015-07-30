@@ -33,13 +33,13 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.remote.RemotePreferences;
-import net.sf.jabref.remote.RemoteUtil;
-import net.sf.jabref.remote.JabRefMessageHandler;
+import net.sf.jabref.logic.remote.RemotePreferences;
+import net.sf.jabref.logic.remote.RemoteUtil;
+import net.sf.jabref.gui.remote.JabRefMessageHandler;
 
 public class AdvancedTab extends JPanel implements PrefsTab {
 

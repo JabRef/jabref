@@ -17,6 +17,7 @@ package net.sf.jabref.net;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.cookies.CookieHandlerImpl;
 
 import javax.swing.*;
 

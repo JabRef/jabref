@@ -19,7 +19,7 @@ import net.sf.jabref.BaseAction;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 public class SpecialFieldAction implements BaseAction {
 

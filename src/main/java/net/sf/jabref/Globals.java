@@ -38,11 +38,11 @@ import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
-import net.sf.jabref.journals.logic.JournalAbbreviationRepository;
-import net.sf.jabref.remote.server.RemoteListenerServerLifecycle;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.util.BuildInfo;
-import net.sf.jabref.util.error.StreamEavesdropper;
-import net.sf.jabref.util.logging.CacheableHandler;
+import net.sf.jabref.logic.error.StreamEavesdropper;
+import net.sf.jabref.logic.logging.CacheableHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

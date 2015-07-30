@@ -26,8 +26,8 @@ import java.util.Vector;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import spin.Spin;
 
 public class DuplicateSearch implements Runnable {

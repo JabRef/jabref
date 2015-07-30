@@ -20,7 +20,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import net.sf.jabref.undo.UndoablePreambleChange;
+import net.sf.jabref.gui.undo.UndoablePreambleChange;
 
 class PreambleEditor extends JDialog {
 

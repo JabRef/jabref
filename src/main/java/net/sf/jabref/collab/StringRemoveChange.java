@@ -25,8 +25,8 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableRemoveString;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableRemoveString;
 
 class StringRemoveChange extends Change {
 

@@ -12,7 +12,7 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators. 

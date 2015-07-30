@@ -16,7 +16,7 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 

@@ -48,9 +48,9 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.undo.UndoableInsertString;
-import net.sf.jabref.undo.UndoableRemoveString;
-import net.sf.jabref.undo.UndoableStringChange;
+import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.gui.undo.UndoableRemoveString;
+import net.sf.jabref.gui.undo.UndoableStringChange;
 
 class StringDialog extends JDialog {
 

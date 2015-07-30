@@ -18,7 +18,7 @@ package net.sf.jabref.gui;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
 
-import net.sf.jabref.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -22,7 +22,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.autocompleter.AutoCompleterFactory;
+import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;

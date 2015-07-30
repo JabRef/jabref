@@ -44,14 +44,14 @@ import net.sf.jabref.export.IExportFormat;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.imports.*;
-import net.sf.jabref.remote.RemotePreferences;
-import net.sf.jabref.remote.client.RemoteListenerClient;
-import net.sf.jabref.remote.JabRefMessageHandler;
+import net.sf.jabref.logic.remote.RemotePreferences;
+import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.gui.splash.SplashScreenLifecycle;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.util.logging.CacheableHandler;
+import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.sun.jna.Native;

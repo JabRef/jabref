@@ -19,8 +19,8 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 
 class EntryDeleteChange extends Change {
 

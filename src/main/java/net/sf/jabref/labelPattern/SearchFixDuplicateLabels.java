@@ -16,8 +16,8 @@
 package net.sf.jabref.labelPattern;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableKeyChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
 
 import javax.swing.*;
 import java.util.ArrayList;

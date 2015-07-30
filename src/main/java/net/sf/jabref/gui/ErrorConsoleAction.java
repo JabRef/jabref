@@ -1,8 +1,8 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.util.error.StreamEavesdropper;
-import net.sf.jabref.util.logging.CacheableHandler;
+import net.sf.jabref.logic.error.StreamEavesdropper;
+import net.sf.jabref.logic.logging.CacheableHandler;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;

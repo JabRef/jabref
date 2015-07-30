@@ -16,7 +16,7 @@ import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.PdfContentImporter;
 import net.sf.jabref.imports.PdfXmpImporter;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;

@@ -34,8 +34,8 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.imports.HTMLConverter;
 import net.sf.jabref.imports.CaseKeeper;
 import net.sf.jabref.imports.UnitFormatter;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
