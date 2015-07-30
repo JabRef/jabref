@@ -3,6 +3,9 @@ src/main/gen/
 
 hs_err*.log
 
+# backup files from JabRef itself
+*.bak
+
 # Ant
 buildant/
 build.number
