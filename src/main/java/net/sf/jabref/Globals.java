@@ -106,9 +106,9 @@ public class Globals {
     private static final String MENU_RESOURCE_PREFIX = "resource/Menu";
     private static final String INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
 
-    public static final String JOURNALS_FILE_BUILTIN = "/resource/journalList.txt";
+    public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
 
-    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/resource/IEEEJournalList.txt";
+    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/journals/IEEEJournalList.txt";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
