@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -23,12 +23,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import net.sf.jabref.*;
 import net.sf.jabref.gui.ColorSetupPanel;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-class AppearancePrefsTab extends JPanel implements PrefsTab {
+public class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences _prefs;
     private final JCheckBox colorCodes;

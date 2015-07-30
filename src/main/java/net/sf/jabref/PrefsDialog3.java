@@ -40,6 +40,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.AdvancedTab;
+import net.sf.jabref.gui.AppearancePrefsTab;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
