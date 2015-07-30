@@ -39,14 +39,11 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.groups.GroupsPrefsTab;
-import net.sf.jabref.gui.preftabs.AdvancedTab;
-import net.sf.jabref.gui.preftabs.AppearancePrefsTab;
+import net.sf.jabref.gui.preftabs.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.gui.preftabs.GeneralTab;
-import net.sf.jabref.gui.preftabs.PrefsTab;
 import net.sf.jabref.util.Util;
 
 /**

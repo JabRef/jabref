@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -27,7 +27,9 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.preftabs.PrefsTab;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
