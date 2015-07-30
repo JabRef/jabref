@@ -29,7 +29,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.ColorSetupPanel;
 
-public class AppearancePrefsTab extends JPanel implements PrefsTab {
+class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private final JCheckBox colorCodes;

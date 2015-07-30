@@ -33,7 +33,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class ExternalTab extends JPanel implements PrefsTab {
+class ExternalTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 

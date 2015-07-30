@@ -20,7 +20,7 @@ package net.sf.jabref.gui.preftabs;
  * 
  * It needs to extend from Component.
  */
-public interface PrefsTab {
+interface PrefsTab {
 
     /**
      * This method is called when the dialog is opened, or if it is made

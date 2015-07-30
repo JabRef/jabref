@@ -40,7 +40,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class TableColumnsTab extends JPanel implements PrefsTab {
+class TableColumnsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged = false;

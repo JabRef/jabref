@@ -41,7 +41,7 @@ import net.sf.jabref.JabRefPreferences;
 /**
  * Preference tab for file sorting options.
  */
-public class FileSortTab extends JPanel implements PrefsTab {
+class FileSortTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private final JRadioButton saveInOriginalOrder;

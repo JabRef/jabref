@@ -33,7 +33,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
+class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     private final JCheckBox autoOpenForm;
     private final JCheckBox showSource;

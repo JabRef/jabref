@@ -40,7 +40,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class GeneralTab extends JPanel implements PrefsTab {
+class GeneralTab extends JPanel implements PrefsTab {
 
     private final JCheckBox defSort;
     private final JCheckBox ctrlClick;

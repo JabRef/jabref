@@ -39,7 +39,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * The Preferences panel for key generation.
  */
-public class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
+class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 

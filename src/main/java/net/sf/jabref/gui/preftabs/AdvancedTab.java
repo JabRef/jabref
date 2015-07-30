@@ -42,7 +42,7 @@ import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 
-public class AdvancedTab extends JPanel implements PrefsTab {
+class AdvancedTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences preferences;
     private final JCheckBox useDefault;

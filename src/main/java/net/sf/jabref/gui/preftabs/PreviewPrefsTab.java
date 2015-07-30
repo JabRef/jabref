@@ -28,7 +28,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.help.HelpAction;
 
-public class PreviewPrefsTab extends JPanel implements PrefsTab {
+class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 

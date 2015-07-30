@@ -37,7 +37,7 @@ import net.sf.jabref.JabRefPreferences;
  * 
  * Allows the user to enable and configure the XMP privacy filter.
  */
-public class XmpPrefsTab extends JPanel implements PrefsTab {
+class XmpPrefsTab extends JPanel implements PrefsTab {
 
     private boolean tableChanged = false;
 

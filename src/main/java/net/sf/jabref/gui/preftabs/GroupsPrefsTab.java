@@ -27,7 +27,7 @@ import net.sf.jabref.JabRefPreferences;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class GroupsPrefsTab extends JPanel implements PrefsTab {
+class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     private final JCheckBox showIcons = new JCheckBox(Globals.lang("Show icons for groups"));
     private final JCheckBox showDynamic = new JCheckBox(

@@ -48,7 +48,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * Preferences tab for file options. These options were moved out from GeneralTab to
  * resolve the space issue.
  */
-public class FileTab extends JPanel implements PrefsTab {
+class FileTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private final JabRefFrame frame;

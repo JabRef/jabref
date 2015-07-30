@@ -40,7 +40,7 @@ import net.sf.jabref.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
-public class TablePrefsTab extends JPanel implements PrefsTab {
+class TablePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
