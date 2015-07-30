@@ -65,12 +65,6 @@
 	  </and>
 	</condition>
 
-    <!-- Done by MrDlib -->
-	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
-	        <exclude name="services/**/*" />
-	</fileset>
-    <!-- Done by MrDlib -->
-
 	<!-- Build classpath -->
 	<filelist id="jars" />
 	<path id="classpath">
@@ -297,11 +291,6 @@ version=${jabref.version}</echo>
 		<unjar dest="${build.tmp}">
 			<filelist refid="jars" />
 		</unjar>
-		<!-- done by MrDlib -->
-		<delete includeEmptyDirs="true">
-			<fileset refid="deletableMeta-InfFiles" />
-		</delete>
-		<!-- done by MrDlib -->
 		<!-- rename the microba license file -->
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
