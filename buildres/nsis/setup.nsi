@@ -25,7 +25,7 @@ Name "JabRef ${VERSION}"
 !define PRODUCT_EXE "JabRef.exe"
 !define PRODUCT_NAME "JabRef"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
-!define PRODUCT_LICENSE_FILE "dist\LICENSE"
+!define PRODUCT_LICENSE_FILE "../../LICENSE"
 !define AppUserModelId "JabRef.${VERSION}"
 
 # Variables
@@ -145,7 +145,7 @@ VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
 VIAddVersionKey FileDescription "JabRef installation program"
-VIAddVersionKey LegalCopyright "under the GPL version 3"
+VIAddVersionKey LegalCopyright "under the GPL version 2"
 VIAddVersionKey FileVersion ""
 
 

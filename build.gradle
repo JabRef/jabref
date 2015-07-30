@@ -194,6 +194,8 @@ jacocoTestReport {
 }
 
 // release tasks
+import org.gradle.internal.os.OperatingSystem;
+
 task release(dependsOn: ["releaseWindows", "releaseMac"]) {
     group = 'JabRef'
     description 'Creates a release for all target platforms.'
@@ -221,9 +223,13 @@ task releaseWindows(dependsOn: ["clean", "copyOSXAdapter", "launch4j"]) {
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
 
     if(OperatingSystem.current().isWindows()) {
-        //commandLine 'cmd', '/c', "${project.ext.nsisExec} '/DVERSION=${version}' ${buildDir}/setup.nsi"
+        exec {
+            commandLine 'cmd', '/c', "${project.ext.nsisExec} /DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+        }
     } else {
-        //commandLine "${project.ext.nsisExec} '/DVERSION=${version}' ${buildDir}/setup.nsi"
+        exec {
+            commandLine "${project.ext.nsisExec} /DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+        }
     }
 }
 
@@ -240,8 +246,6 @@ task copyOSXAdapter(type: Copy) {
     into("${buildDir}/classes/osx")
     include '*.class'
 }
-
-import org.gradle.internal.os.OperatingSystem;
 
 // TODO: can be removed when SourceForge releases are discontinued
 task zipSource(type:Exec) {
