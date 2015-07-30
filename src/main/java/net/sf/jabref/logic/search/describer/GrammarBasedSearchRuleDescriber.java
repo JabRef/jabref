@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.search.describer;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.search.SearchBaseVisitor;
-import net.sf.jabref.logic.search.SearchParser;
+import net.sf.jabref.search.SearchBaseVisitor;
+import net.sf.jabref.search.SearchParser;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.logic.util.StringUtil;
 import org.antlr.v4.runtime.tree.ParseTree;

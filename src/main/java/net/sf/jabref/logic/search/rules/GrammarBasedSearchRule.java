@@ -16,10 +16,10 @@
 package net.sf.jabref.logic.search.rules;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.logic.search.SearchBaseVisitor;
+import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.SearchLexer;
-import net.sf.jabref.logic.search.SearchParser;
+import net.sf.jabref.search.SearchLexer;
+import net.sf.jabref.search.SearchParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
