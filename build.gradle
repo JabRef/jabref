@@ -72,7 +72,7 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.7.0'
     compile 'com.jgoodies:jgoodies-forms:1.7.2'
     compile 'com.jgoodies:jgoodies-looks:2.5.3'
-    
+
     compile 'org.swinglabs.swingx:swingx-core:1.6.5-1'
 
     compile 'org.apache.pdfbox:pdfbox:1.8.10'
@@ -206,6 +206,26 @@ task release(dependsOn: ["releaseWindows", "releaseMac"]) {
 project.ext.nsisExec = "C:/Program files/NSIS/makensis.exe"
 project.ext.launch4jDir = "/opt/launch4j"
 
+task devBuild() {
+    group = 'JabRef'
+    description "Sets the version to 'version-DATE-GIT_HASH', e.g., '2.11dev-2015-01-04-ab34ef8'"
+
+    doLast {
+        String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
+        String result = ""
+        if (OperatingSystem.current().isWindows()) {
+            result = "cmd /c $command".execute().in.text
+        } else {
+            result = command.execute().in.text
+        }
+
+        // remove enclosing ' of result
+        project.version += "--snapshot--" + result.substring(1, result.length() - 1)
+        println project.version
+    }
+}
+
+
 launch4j {
     mainClassName = "net.sf.jabref.JabRefMain"
     version = project.version
@@ -222,13 +242,15 @@ task releaseWindows(dependsOn: ["clean", "copyOSXAdapter", "launch4j"]) {
     group = 'JabRef'
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
 
-    if(OperatingSystem.current().isWindows()) {
-        exec {
-            commandLine 'cmd', '/c', "${project.ext.nsisExec} /DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
-        }
-    } else {
-        exec {
-            commandLine "${project.ext.nsisExec} /DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+    doLast {
+        if (OperatingSystem.current().isWindows()) {
+            exec {
+                commandLine 'cmd', '/c', "${project.ext.nsisExec}", "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+            }
+        } else {
+            exec {
+                commandLine "${project.ext.nsisExec}", "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+            }
         }
     }
 }
@@ -248,11 +270,11 @@ task copyOSXAdapter(type: Copy) {
 }
 
 // TODO: can be removed when SourceForge releases are discontinued
-task zipSource(type:Exec) {
+task zipSource(type: Exec) {
     group = 'JabRef'
     description "Creates a zip archive of the source code inside ${buildDir}"
 
-    if(OperatingSystem.current().isWindows()) {
+    if (OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
     } else {
         commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
@@ -260,11 +282,11 @@ task zipSource(type:Exec) {
 }
 
 // TODO: can be removed when SourceForge releases are discontinued
-task tarSource(type:Exec) {
+task tarSource(type: Exec) {
     group = 'JabRef'
     description "Creates a tar archive of the source code inside ${buildDir}"
 
-    if(OperatingSystem.current().isWindows()) {
+    if (OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
     } else {
         commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
