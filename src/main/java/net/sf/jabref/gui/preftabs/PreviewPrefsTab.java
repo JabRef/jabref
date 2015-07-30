@@ -30,9 +30,7 @@ import net.sf.jabref.gui.help.HelpAction;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
-
-    JabRefFrame _frame;
+    private final JabRefPreferences prefs;
 
     JPanel pan = new JPanel();
 
@@ -47,128 +45,127 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
 
     public PreviewPrefsTab(JabRefPreferences prefs) {
-        _prefs = prefs;
+        this.prefs = prefs;
 
-        JPanel p1 = new JPanel();
-        GridBagLayout gbl = new GridBagLayout();
-        p1.setLayout(gbl);
-        JPanel p2 = new JPanel();
-        p2.setLayout(gbl);
+        JPanel firstPanel = new JPanel();
+        GridBagLayout layout = new GridBagLayout();
+        firstPanel.setLayout(layout);
+        JPanel secondPanel = new JPanel();
+        secondPanel.setLayout(layout);
 
-        setLayout(gbl);
+        setLayout(layout);
         JLabel lab;
         lab = new JLabel(Globals.lang("Preview") + " 1");
-        GridBagConstraints con = new GridBagConstraints();
-        con.anchor = GridBagConstraints.WEST;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        con.fill = GridBagConstraints.BOTH;
-        con.weightx = 1;
-        con.weighty = 0;
-        con.insets = new Insets(2, 2, 2, 2);
-        gbl.setConstraints(lab, con);
-        // p1.add(lab);
-        con.weighty = 1;
-        JScrollPane sp1 = new JScrollPane(layout1);
-        gbl.setConstraints(sp1, con);
-        p1.add(sp1);
-        con.weighty = 0;
-        con.gridwidth = 1;
-        con.weightx = 0;
-        con.fill = GridBagConstraints.NONE;
-        con.anchor = GridBagConstraints.WEST;
-        JButton test1 = new JButton(Globals.lang("Test"));
-        gbl.setConstraints(test1, con);
-        p1.add(test1);
-        JButton def1 = new JButton(Globals.lang("Default"));
-        gbl.setConstraints(def1, con);
-        p1.add(def1);
-        con.gridwidth = GridBagConstraints.REMAINDER;
+        GridBagConstraints layoutConstraints = new GridBagConstraints();
+        layoutConstraints.anchor = GridBagConstraints.WEST;
+        layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        layoutConstraints.fill = GridBagConstraints.BOTH;
+        layoutConstraints.weightx = 1;
+        layoutConstraints.weighty = 0;
+        layoutConstraints.insets = new Insets(2, 2, 2, 2);
+        layout.setConstraints(lab, layoutConstraints);
+        layoutConstraints.weighty = 1;
+        JScrollPane firstScrollPane = new JScrollPane(layout1);
+        layout.setConstraints(firstScrollPane, layoutConstraints);
+        firstPanel.add(firstScrollPane);
+        layoutConstraints.weighty = 0;
+        layoutConstraints.gridwidth = 1;
+        layoutConstraints.weightx = 0;
+        layoutConstraints.fill = GridBagConstraints.NONE;
+        layoutConstraints.anchor = GridBagConstraints.WEST;
+        JButton testButton = new JButton(Globals.lang("Test"));
+        layout.setConstraints(testButton, layoutConstraints);
+        firstPanel.add(testButton);
+        JButton defaultButton = new JButton(Globals.lang("Default"));
+        layout.setConstraints(defaultButton, layoutConstraints);
+        firstPanel.add(defaultButton);
+        layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
         JPanel pan = new JPanel();
-        con.weightx = 1;
-        gbl.setConstraints(pan, con);
-        p1.add(pan);
+        layoutConstraints.weightx = 1;
+        layout.setConstraints(pan, layoutConstraints);
+        firstPanel.add(pan);
         lab = new JLabel(Globals.lang("Preview") + " 2");
-        gbl.setConstraints(lab, con);
+        layout.setConstraints(lab, layoutConstraints);
         // p2.add(lab);
-        con.weighty = 1;
-        con.fill = GridBagConstraints.BOTH;
-        JScrollPane sp2 = new JScrollPane(layout2);
-        gbl.setConstraints(sp2, con);
-        p2.add(sp2);
-        con.weighty = 0;
-        con.weightx = 0;
-        con.fill = GridBagConstraints.NONE;
-        con.gridwidth = 1;
-        JButton test2 = new JButton(Globals.lang("Test"));
-        gbl.setConstraints(test2, con);
-        p2.add(test2);
-        JButton def2 = new JButton(Globals.lang("Default"));
-        gbl.setConstraints(def2, con);
-        p2.add(def2);
-        con.gridwidth = 1;
+        layoutConstraints.weighty = 1;
+        layoutConstraints.fill = GridBagConstraints.BOTH;
+        JScrollPane secondScrollPane = new JScrollPane(layout2);
+        layout.setConstraints(secondScrollPane, layoutConstraints);
+        secondPanel.add(secondScrollPane);
+        layoutConstraints.weighty = 0;
+        layoutConstraints.weightx = 0;
+        layoutConstraints.fill = GridBagConstraints.NONE;
+        layoutConstraints.gridwidth = 1;
+        JButton testButton2 = new JButton(Globals.lang("Test"));
+        layout.setConstraints(testButton2, layoutConstraints);
+        secondPanel.add(testButton2);
+        JButton defaultButton2 = new JButton(Globals.lang("Default"));
+        layout.setConstraints(defaultButton2, layoutConstraints);
+        secondPanel.add(defaultButton2);
+        layoutConstraints.gridwidth = 1;
         pan = new JPanel();
-        con.weightx = 1;
-        gbl.setConstraints(pan, con);
-        p2.add(pan);
+        layoutConstraints.weightx = 1;
+        layout.setConstraints(pan, layoutConstraints);
+        secondPanel.add(pan);
 
-        con.weightx = 1;
-        con.weighty = 0;
-        con.fill = GridBagConstraints.BOTH;
-        con.gridwidth = GridBagConstraints.REMAINDER;
+        layoutConstraints.weightx = 1;
+        layoutConstraints.weighty = 0;
+        layoutConstraints.fill = GridBagConstraints.BOTH;
+        layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
         lab = new JLabel(Globals.lang("Preview") + " 1");
-        gbl.setConstraints(lab, con);
+        layout.setConstraints(lab, layoutConstraints);
         add(lab);
-        con.weighty = 1;
-        gbl.setConstraints(p1, con);
-        add(p1);
+        layoutConstraints.weighty = 1;
+        layout.setConstraints(firstPanel, layoutConstraints);
+        add(firstPanel);
         lab = new JLabel(Globals.lang("Preview") + " 2");
-        con.weighty = 0;
+        layoutConstraints.weighty = 0;
         JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-        gbl.setConstraints(sep, con);
+        layout.setConstraints(sep, layoutConstraints);
         add(sep);
-        gbl.setConstraints(lab, con);
+        layout.setConstraints(lab, layoutConstraints);
         add(lab);
-        con.weighty = 1;
-        gbl.setConstraints(p2, con);
-        add(p2);
+        layoutConstraints.weighty = 1;
+        layout.setConstraints(secondPanel, layoutConstraints);
+        add(secondPanel);
 
         // PDF Preview button
-        JPanel p3 = new JPanel(new BorderLayout());
-        p3.add(pdfPreview, BorderLayout.WEST);
+        JPanel pdfPreviewPanel = new JPanel(new BorderLayout());
+        pdfPreviewPanel.add(pdfPreview, BorderLayout.WEST);
 
         { // Help Button
             HelpAction helpAction = new HelpAction(Globals.helpDiag, GUIGlobals.previewHelp,
                     Globals.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
             JButton help = helpAction.getIconButton();
-            p3.add(help, BorderLayout.EAST);
+            pdfPreviewPanel.add(help, BorderLayout.EAST);
         }
 
-        con.weighty = 0;
-        gbl.setConstraints(p3, con);
-        add(p3);
+        layoutConstraints.weighty = 0;
+        layout.setConstraints(pdfPreviewPanel, layoutConstraints);
+        add(pdfPreviewPanel);
 
-        def1.addActionListener(new ActionListener() {
+        defaultButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
-                _prefs.remove(JabRefPreferences.PREVIEW_0);
-                layout1.setText(_prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
-                _prefs.put(JabRefPreferences.PREVIEW_0, tmp);
+                PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
+                layout1.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
+                PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
             }
         });
-        def2.addActionListener(new ActionListener() {
+        defaultButton2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
-                _prefs.remove(JabRefPreferences.PREVIEW_1);
-                layout2.setText(_prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
-                _prefs.put(JabRefPreferences.PREVIEW_1, tmp);
+                PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
+                layout2.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
+                PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
             }
         });
 
-        test1.addActionListener(new ActionListener() {
+        testButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -185,7 +182,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             }
         });
 
-        test2.addActionListener(new ActionListener() {
+        testButton2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -255,16 +252,16 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        layout1.setText(_prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
-        layout2.setText(_prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
-        pdfPreview.setSelected(_prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
+        layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
+        layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
+        pdfPreview.setSelected(prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
     }
 
     @Override
     public void storeSettings() {
-        _prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replaceAll("\n", "__NEWLINE__"));
-        _prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replaceAll("\n", "__NEWLINE__"));
-        _prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
+        prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replaceAll("\n", "__NEWLINE__"));
+        prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replaceAll("\n", "__NEWLINE__"));
+        prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
     }
 
     @Override
