@@ -105,16 +105,6 @@ dependencies {
    compile 'junit:junit:4.12'
 }
 
-// use ant targets with prefix antTargets.XXXXX
-ant.importBuild "build-wrapper.xml"
-// add jars from this classpath to the classpath for the ant build
-if (org.gradle.internal.os.OperatingSystem.current().windows) {
-    // according to the discussion at https://github.com/JabRef/jabref/pull/58, the separators are different on Windows and Linux
-    ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
-} else {
-    ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
-}
-
 sourceCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
 
@@ -199,4 +189,22 @@ jacocoTestReport {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
     }
+}
+
+// release tasks
+task release(dependsOn: ["releaseWindows", "releaseLinux"]) {
+    group = 'JabRef'
+    description 'Creates a release for all target platforms.'
+}
+
+//win: depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc"
+task releaseWindows(dependsOn: []) {
+    group = 'JabRef'
+    description "Creates a Windows release. Creates all distribution files in ${buildDir}"
+}
+
+//linux: depends="clean, non_osx, win.installer.linux, macbundle, bzip2src, zipsrc"
+task releaseLinux(dependsOn: []) {
+    group = 'JabRef'
+    description "Creates a Linux release. Creates all distribution files in ${buildDir}"
 }

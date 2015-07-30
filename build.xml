@@ -1,30 +1,4 @@
 <?xml version="1.0"?>
-<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   Filename: build.xml
-   Purpose:  Ant build file for Jabref.
-
-             Ant-Download: http://jakarta.apache.org/ant
-             Ant-Manual:   http://jakarta.apache.org/ant/manual/index.html
-
-             Jabref homepage:       http://jabref.sourceforge.net
-             Jabref@OpenHub:        https://www.openhub.net/p/jabref
-
-             Further questions:
-               help mailing list:   https://lists.sourceforge.net/lists/listinfo/jabref-users
-
-   Precondition: 1. Ant should be installed.
-                 2. JAVA_HOME environment variable contains the path to JDK 1.8 or higher
-                 3. ANT_HOME environment variable contains the path to ant's home directory
-
-   Language: XML
-   Compiler: Ant
-   Authors:  Joerg K. Wegner, wegnerj@informatik.uni-tuebingen.de
-             Morten O. Alver
-
-   modified: see at git checkout and "gitk build.xml"
-
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-
 <project name="JabRef" default="jars" basedir=".">
 
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -529,6 +503,4 @@ version=${jabref.version}</echo>
 
 	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
-	<target name="release.linux" depends="clean, non_osx, win.installer.linux, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>
