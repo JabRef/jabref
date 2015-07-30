@@ -43,7 +43,6 @@ import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.preftabs.PrefsTab;
 
 /**
  * Preferences tab for file options. These options were moved out from GeneralTab to
@@ -51,8 +50,8 @@ import net.sf.jabref.gui.preftabs.PrefsTab;
  */
 public class FileTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
-    private final JabRefFrame _frame;
+    private final JabRefPreferences prefs;
+    private final JabRefFrame frame;
 
     private final JCheckBox backup;
     private final JCheckBox openLast;
@@ -64,8 +63,7 @@ public class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox sameColumn;
     private final JComboBox valueDelimiter;
     private final JComboBox newlineSeparator;
-    private final JRadioButton
-            resolveStringsStandard;
+    private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
     private final JTextField bracesAroundCapitalsFields;
     private final JTextField nonWrappableFields;
@@ -73,18 +71,15 @@ public class FileTab extends JPanel implements PrefsTab {
     private final JSpinner autoSaveInterval;
     private boolean origAutoSaveSetting = false;
 
-    //for LWang_AdjustableFieldOrder 
-    //    private JRadioButton sortFieldInAlphabetaOrder,unSortFieldStyle,orderAsUserDefined;
     private final ButtonGroup bgFieldOrderStyle;
-    //    int fieldOrderStyle;
     private JTextField userDefinedFieldOrder;
 
     private final JCheckBox wrapFieldLine;
 
 
     public FileTab(JabRefFrame frame, JabRefPreferences prefs) {
-        _prefs = prefs;
-        _frame = frame;
+        this.prefs = prefs;
+        this.frame = frame;
 
         HelpAction autosaveHelp = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
@@ -105,16 +100,7 @@ public class FileTab extends JPanel implements PrefsTab {
         bg.add(resolveStringsAll);
         bg.add(resolveStringsStandard);
 
-        //for LWang_AdjustableFieldOrder
-        //        ButtonGroup bgFieldOrderStyle=new ButtonGroup();
-        //        sortFieldInAlphabetaOrder = new JRadioButton(Globals.lang("Sort fields in alphabeta order (as ver >= 2.10)"));
-        //        unSortFieldStyle = new JRadioButton(Globals.lang("Do not sort fields (as ver<=2.9.2)"));
-        //        orderAsUserDefined= new JRadioButton(Globals.lang("Save fields as user defined order"));
-        //        bgFieldOrderStyle.add(sortFieldInAlphabetaOrder);
-        //        bgFieldOrderStyle.add(unSortFieldStyle);
-        //        bgFieldOrderStyle.add(orderAsUserDefined);
-
-        userDefinedFieldOrder = new JTextField(_prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
+        userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
 
         // This is sort of a quick hack
         newlineSeparator = new JComboBox(new String[] {"CR", "CR/LF", "LF"});
@@ -122,10 +108,7 @@ public class FileTab extends JPanel implements PrefsTab {
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
-        autoDoubleBraces = new JCheckBox(
-                //+ Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
-                //+ "Double braces signal that BibTeX should preserve character case.") + "</HTML>");
-                Globals.lang("Remove double braces around BibTeX fields when loading."));
+        autoDoubleBraces = new JCheckBox(Globals.lang("Remove double braces around BibTeX fields when loading."));
 
         autoSave.addChangeListener(new ChangeListener() {
 
@@ -169,12 +152,12 @@ public class FileTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Globals.lang("Autosave"));
         builder.append(autoSave, 1);
-        JButton hlp = new JButton(autosaveHelp);
-        hlp.setText(null);
-        hlp.setPreferredSize(new Dimension(24, 24));
+        JButton help = new JButton(autosaveHelp);
+        help.setText(null);
+        help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());
-        hPan.add(hlp, BorderLayout.EAST);
+        hPan.add(help, BorderLayout.EAST);
         builder.append(hPan);
         builder.nextLine();
         builder.append(Globals.lang("Autosave interval (minutes)") + ":");
@@ -187,13 +170,6 @@ public class FileTab extends JPanel implements PrefsTab {
         builder.append(camelCase);
         builder.nextLine();
         builder.append(sameColumn);
-        /*FormLayout layout2 = new FormLayout(
-                "left:pref, 8dlu, fill:pref", "");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        builder2.append(new JLabel(Globals.lang("Field value delimiter. E.g., \"author={x}\" or \"author='x'\"") + ":"));
-        builder2.append(valueDelimiter);
-        builder.nextLine();
-        builder.append(builder2.getPanel());*/
         builder.append(new JPanel());
         builder.nextLine();
         builder.append(includeEmptyFields);
@@ -210,15 +186,8 @@ public class FileTab extends JPanel implements PrefsTab {
             _rbs.add(Globals.lang(_rb));
         }
         bgFieldOrderStyle = createRadioBg(_rbs);
-        userDefinedFieldOrder = new JTextField(_prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
+        userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
         createAdFieldOrderBg(builder, bgFieldOrderStyle, userDefinedFieldOrder);
-        //        builder.append(sortFieldInAlphabetaOrder);
-        //        builder.nextLine();
-        //        builder.append(unSortFieldStyle);
-        //        builder.nextLine();
-        //        builder.append(orderAsUserDefined);
-        //        builder.append(userDefinedFieldOrder);
-        //        builder.nextLine();
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -227,40 +196,40 @@ public class FileTab extends JPanel implements PrefsTab {
     }
 
     private ButtonGroup createRadioBg(Iterable<String> radioButtonLabels) {
-        ButtonGroup _bg = new ButtonGroup();
+        ButtonGroup buttonGroup = new ButtonGroup();
         for (String _s : radioButtonLabels) {
             JRadioButton _rb = new JRadioButton(_s);
-            _bg.add(_rb);
+            buttonGroup.add(_rb);
 
         }
-        return _bg;
+        return buttonGroup;
     }
 
-    private int getBgValue(ButtonGroup bg) {
-        int _i = 0;
-        for (Enumeration<AbstractButton> _it = bg.getElements(); _it.hasMoreElements();) {
-            if (_it.nextElement().isSelected()) {
-                return _i;
+    private int getBgValue(ButtonGroup buttonGroup) {
+        int index = 0;
+        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
+            if (buttons.nextElement().isSelected()) {
+                return index;
             }
-            _i++;
+            index++;
 
         }
         return 0;
 
     }
 
-    private void setBgSelected(ButtonGroup bg, int x) {
-        int _i = 0;
+    private void setBgSelected(ButtonGroup buttonGroup, int buttonIndex) {
+        int currentIndex = 0;
 
-        for (Enumeration<AbstractButton> _it = bg.getElements(); _it.hasMoreElements();) {
-            if (_i == x) {
-                _it.nextElement().setSelected(true);
+        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
+            if (currentIndex == buttonIndex) {
+                buttons.nextElement().setSelected(true);
 
             } else {
-                _it.nextElement().setSelected(false);
+                buttons.nextElement().setSelected(false);
 
             }
-            _i++;
+            currentIndex++;
 
         }
 
@@ -270,23 +239,23 @@ public class FileTab extends JPanel implements PrefsTab {
     //        fieldOrderStyle=getBgValue(bgFieldOrderStyle);
     //    }
 
-    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup bg, JTextField jtf) {
+    private void createAdFieldOrderBg(DefaultFormBuilder builder, ButtonGroup buttonGroup, JTextField textField) {
         //for LWang_AdjustableFieldOrder
 
-        for (Enumeration<AbstractButton> _it = bg.getElements(); _it.hasMoreElements();) {
-            builder.append(_it.nextElement());
+        for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
+            builder.append(buttons.nextElement());
             builder.nextLine();
         }
-        builder.append(jtf);
+        builder.append(textField);
         builder.nextLine();
     }
 
     @Override
     public void setValues() {
-        openLast.setSelected(_prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
-        backup.setSelected(_prefs.getBoolean(JabRefPreferences.BACKUP));
+        openLast.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
+        backup.setSelected(prefs.getBoolean(JabRefPreferences.BACKUP));
 
-        String newline = _prefs.get(net.sf.jabref.JabRefPreferences.NEWLINE);
+        String newline = prefs.get(net.sf.jabref.JabRefPreferences.NEWLINE);
         if ("\r".equals(newline)) {
             newlineSeparator.setSelectedIndex(0);
         } else if ("\n".equals(newline)) {
@@ -296,27 +265,26 @@ public class FileTab extends JPanel implements PrefsTab {
             newlineSeparator.setSelectedIndex(1);
         }
 
-        //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
-        wrapFieldLine.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD));
-        autoDoubleBraces.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES));
-        resolveStringsAll.setSelected(_prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
+        wrapFieldLine.setSelected(prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD));
+        autoDoubleBraces.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES));
+        resolveStringsAll.setSelected(prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
-        doNotResolveStringsFor.setText(_prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        bracesAroundCapitalsFields.setText(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
-        nonWrappableFields.setText(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
+        doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        bracesAroundCapitalsFields.setText(prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
+        nonWrappableFields.setText(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
-        autoSave.setSelected(_prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
-        promptBeforeUsingAutoSave.setSelected(_prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE));
-        autoSaveInterval.setValue(_prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL));
+        autoSave.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
+        promptBeforeUsingAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE));
+        autoSaveInterval.setValue(prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL));
         origAutoSaveSetting = autoSave.isSelected();
-        valueDelimiter.setSelectedIndex(_prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
-        includeEmptyFields.setSelected(_prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS));
-        camelCase.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
-        sameColumn.setSelected(_prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
+        valueDelimiter.setSelectedIndex(prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
+        includeEmptyFields.setSelected(prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS));
+        camelCase.setSelected(prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME));
+        sameColumn.setSelected(prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES));
 
         //for LWang_AdjustableFieldOrder
-        setBgSelected(bgFieldOrderStyle, _prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE));
-        userDefinedFieldOrder.setText(_prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER));
+        setBgSelected(bgFieldOrderStyle, prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE));
+        userDefinedFieldOrder.setText(prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER));
 
     }
 
@@ -333,47 +301,47 @@ public class FileTab extends JPanel implements PrefsTab {
         default:
             newline = "\r\n";
         }
-        _prefs.put(net.sf.jabref.JabRefPreferences.NEWLINE, newline);
+        prefs.put(net.sf.jabref.JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant
         Globals.NEWLINE = newline;
         Globals.NEWLINE_LENGTH = newline.length();
 
-        _prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
-        _prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
-        _prefs.putBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES, autoDoubleBraces.isSelected());
-        _prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());
-        _prefs.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, doNotResolveStringsFor.getText().trim());
-        _prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
-        _prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
-        _prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
-        _prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
-        _prefs.putBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS, includeEmptyFields.isSelected());
-        _prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
-        _prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
-        doNotResolveStringsFor.setText(_prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
+        prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
+        prefs.putBoolean(JabRefPreferences.AUTO_DOUBLE_BRACES, autoDoubleBraces.isSelected());
+        prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());
+        prefs.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, doNotResolveStringsFor.getText().trim());
+        prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
+        prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
+        prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
+        prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
+        prefs.putBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS, includeEmptyFields.isSelected());
+        prefs.putBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME, camelCase.isSelected());
+        prefs.putBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES, sameColumn.isSelected());
+        doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
         //for LWang_AdjustableFieldOrder
-        _prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, getBgValue(bgFieldOrderStyle));
-        _prefs.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER, userDefinedFieldOrder.getText().trim());
-        _prefs.putBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD, wrapFieldLine.isSelected());
+        prefs.putInt(JabRefPreferences.WRITEFIELD_SORTSTYLE, getBgValue(bgFieldOrderStyle));
+        prefs.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER, userDefinedFieldOrder.getText().trim());
+        prefs.putBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD, wrapFieldLine.isSelected());
 
         boolean updateSpecialFields = false;
-        if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
-            _prefs.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, bracesAroundCapitalsFields.getText());
+        if (!bracesAroundCapitalsFields.getText().trim().equals(prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
+            prefs.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, bracesAroundCapitalsFields.getText());
             updateSpecialFields = true;
         }
-        if (!nonWrappableFields.getText().trim().equals(_prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
-            _prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
+        if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
+            prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
             updateSpecialFields = true;
         }
         // If either of the two last entries were changed, run the update for special field handling:
         if (updateSpecialFields) {
-            _prefs.updateSpecialFieldHandling();
+            prefs.updateSpecialFieldHandling();
         }
 
         // See if we should start or stop the auto save manager:
         if (!origAutoSaveSetting && autoSave.isSelected()) {
-            Globals.startAutoSaveManager(_frame);
+            Globals.startAutoSaveManager(frame);
         }
         else if (origAutoSaveSetting && !autoSave.isSelected()) {
             Globals.stopAutoSaveManager();
