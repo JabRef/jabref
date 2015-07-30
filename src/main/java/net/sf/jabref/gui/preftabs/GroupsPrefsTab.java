@@ -23,12 +23,10 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.preftabs.PrefsTab;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-// JZTODO lyrics
 public class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     private final JCheckBox showIcons = new JCheckBox(Globals.lang("Show icons for groups"));
