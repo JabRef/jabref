@@ -220,7 +220,7 @@ task releaseMac(dependsOn: ["clean", "copyOSXAdapter"]) {
 task copyOSXAdapter(type: Copy) {
     description "Copies a compiled version of MacAdapter"
 
-    from("${projectDir}/osx")
+    from("${projectDir}/buildres/osx")
     into("${buildDir}/classes/osx")
     include '*.class'
 }
