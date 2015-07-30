@@ -84,34 +84,6 @@
 
 	</target>
 
-	<!-- updates version information with git information.
-	     should be used in development builds only
-
-	     Use "ant addgitinfo jars" to generate a jar with version information in the filename
-	-->
-	<target name="addgitinfo" description="Adds git version information in ${jabref.version} and ${build.jar}">
-		<exec executable="git" searchpath="true" outputproperty="git.version" failifexecutionfails="true" errorproperty="">
-			<arg value="log" />
-			<arg value="-1" />
-			<arg value="--pretty=format:%cd - %H" />
-			<arg value="--date=iso" />
-		</exec>
-		<script language="javascript"><![CDATA[
-			var gitVersion = project.getProperty("git.version");
-			if ((gitVersion != undefined) && (gitVersion.length() > 0)) {
-				// convert "2012-12-16 15:44:07 +0100 - a249a226" to "2012-12-16 15.44.07 - a249a226"
-				gitVersion = gitVersion.substr(0,13) + "." + gitVersion.substr(14,2) + "." + gitVersion.substr(17, 2) + gitVersion.substr(25);
-
-				// we have to update the properties using JavaScript as properties are normally immutable
-				// Properties can be updated using JavaScript and not with the <property>-Task
-				var jabrefVersion = project.getProperty("jabref.version");
-				jabrefVersion = jabrefVersion + " - " + gitVersion;
-				project.setProperty("jabref.version", jabrefVersion);
-				project.setProperty("build.jar", "JabRef-" + jabrefVersion + ".jar");
-			}
-		]]></script>
-	</target>
-
 	<!-- copy all necessary files and insert version informations -->
 	<target name="build" depends="compile, buildinfos" description="Build project">
 
@@ -271,8 +243,5 @@ version=${jabref.version}</echo>
 		<move file="${win.installer.dir}/JabRefSetup.exe" tofile="${build.lib}/JabRef-${jabref.version}-setup.exe" />
 		<delete dir="${win.installer.dir}/dist" />
 	</target>
-
-
-	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle" description="creates development snapshot binaries" />
 
 </project>

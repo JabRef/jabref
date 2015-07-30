@@ -96,15 +96,17 @@ To compile JabRef from source, you need a Java compiler supporting Java 1.8 and 
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
-and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` project files.
+and then generate the Eclipse `gradlew eclipse`.
+For IntelliJ IDEA, just import the project via a Gradle Import by poiting at the `build.gradle`.
 
 
 ## Release Process
 
 Requires
  * [launch4j](http://launch4j.sourceforge.net/)
+   * that launch4j is available through the PATH
  * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
- * Eventually a `user.properties` with correct setting of `launch4j.dir` and `nsis.executable`. See [build.xml](build.xml) for defaults.
+ * Eventually and `nsis.executable`
 
 Replace `ANY_ANT_TARGET` with the Ant Target of your choice (e.g., `macbundle`), and the system will build your binaries.
 To get a list of all targets, use `gradlew tasks`.
@@ -127,10 +129,17 @@ All binaries (including OSX) and the installer are generated in the directory `b
 
 ### Releasing on Windows
 
-Run `gradlew antTargets.release`
+Run `gradlew releaseWindows`
 
 All binaries (including OSX) and the installer are generated in the directory `buildant/lib`.
 
+### Releasing Developer Releases
+
+Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
+The only difference is that the version contains the keyword *snapshot*, the *date*, and the *shortend git hash*.
+
+Normal: `JabRef--2.80.0.0.jar`
+With `-Pdev=true`: `JabRef--2.80.0.0--snapshot--2015-07-30--48a23d1.jar`
 
 ## License
 
