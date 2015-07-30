@@ -40,9 +40,7 @@ import java.util.Properties;
 
 public class BuildInfo {
 
-    private final String date;
     private final String version;
-    private final String number;
 
     public BuildInfo() {
         this("/resource/build.properties");
@@ -52,24 +50,13 @@ public class BuildInfo {
         Properties properties = new Properties();
         try {
             properties.load(getClass().getResourceAsStream(path));
-        } catch (IOException ignored) {
-        } catch (NullPointerException ignored) {
+        } catch (IOException | NullPointerException ignored) {
         }
-        date = properties.getProperty("builddate", "");
-        number = properties.getProperty("build", "1");
         version = properties.getProperty("version", "dev");
-    }
-
-    public String getDate() {
-        return date;
     }
 
     public String getVersion() {
         return version;
-    }
-
-    public String getNumber() {
-        return number;
     }
 
 }

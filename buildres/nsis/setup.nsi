@@ -133,7 +133,7 @@ Var InstDestination
 
 
 # Installer attributes
-OutFile JabRefSetup.exe
+OutFile ..\..\build\nsis\JabRefSetup.exe
 InstallDir "$PROGRAMFILES\JabRef"
 BrandingText "$(^Name) installer" ; appear at the bottom of the installer windows
 XPStyle on ; use XP style for installer windows
@@ -173,7 +173,7 @@ Section "-Installation actions" SecInstallation
   ; copy files
   SetOutPath "$INSTDIR"
   SetOverwrite on
-  File /r dist\*.*
+  File /r ..\..\build\nsis\*.*
   WriteRegStr SHCTX "${REGKEY}\Components" Main 1
   ; register JabRef
   WriteRegStr SHCTX "${REGKEY}" Path $INSTDIR

@@ -172,20 +172,29 @@ jacocoTestReport {
     }
 }
 
+import org.apache.tools.ant.filters.*
+processResources {
+    filter ReplaceTokens, tokens: [
+            "version": project.version,
+            "year": "2015",
+    ]
+}
+
+
 // release tasks
 import org.gradle.internal.os.OperatingSystem;
 
-task release(dependsOn: ["releaseWindows", "releaseMac"]) {
-    group = 'JabRef'
+task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "zipSource", "tarSource"]) {
+    group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }
 
-project.ext.nsisExec = "C:/Program files/NSIS/makensis.exe"
+project.ext.nsisExec = "C:/Program Files/NSIS/makensis.exe"
 
 /*
  * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
  */
-if(hasProperty('dev')) {
+if (hasProperty('dev')) {
     String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
     String result = ""
     if (OperatingSystem.current().isWindows()) {
@@ -209,28 +218,45 @@ launch4j {
     maxHeapSize = 512
 }
 createExe.dependsOn "fatJar"
-farJar.dependsOn "copyOSXAdapter"
+fatJar.dependsOn "copyOSXAdapter"
 
-task releaseWindows(dependsOn: ["launch4j"]) {
-    group = 'JabRef'
-    description "Creates a Windows release. Creates all distribution files in ${buildDir}"
+
+task releaseJar(dependsOn: "fatJar") {
+    group = 'JabRef - Release'
+    description "Creates a Jar release."
 
     doLast {
-        if (OperatingSystem.current().isWindows()) {
-            exec {
-                commandLine 'cmd', '/c', project.ext.nsisExec, "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
-            }
-        } else {
-            exec {
-                commandLine project.ext.nsisExec, "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
-            }
+        copy {
+            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
+            into("$buildDir/releases")
         }
     }
 }
 
-task releaseMac(dependsOn: []) {
-    group = 'JabRef'
-    description "Creates a OSX release. Creates all distribution files in ${buildDir}"
+task releaseWindows(dependsOn: "launch4j") {
+    group = 'JabRef - Release'
+    description "Creates a Windows release."
+
+    doLast {
+        copy {
+            from("$projectDir/LICENSE")
+            from("$projectDir/README.md")
+            from("$buildDir/launch4j/JabRef.exe")
+            into("$buildDir/nsis")
+        }
+        exec {
+            commandLine project.ext.nsisExec, "/DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+        }
+        copy {
+            from("$buildDir/nsis/JabRefSetup.exe")
+            into("$buildDir/releases")
+        }
+    }
+}
+
+task releaseMac() {
+    group = 'JabRef - Release'
+    description "Creates a OSX release."
 }
 
 // release helper
@@ -244,25 +270,25 @@ task copyOSXAdapter(type: Copy) {
 
 // TODO: can be removed when SourceForge releases are discontinued
 task zipSource(type: Exec) {
-    group = 'JabRef'
-    description "Creates a zip archive of the source code inside ${buildDir}"
+    group = 'JabRef - Release'
+    description "Creates a zip archive of the source code."
 
     if (OperatingSystem.current().isWindows()) {
-        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
     } else {
-        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
+        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
     }
 }
 
 // TODO: can be removed when SourceForge releases are discontinued
 task tarSource(type: Exec) {
-    group = 'JabRef'
-    description "Creates a tar archive of the source code inside ${buildDir}"
+    group = 'JabRef - Release'
+    description "Creates a tar archive of the source code."
 
     if (OperatingSystem.current().isWindows()) {
-        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
     } else {
-        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
+        commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
     }
 }
 
