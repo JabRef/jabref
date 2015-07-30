@@ -201,28 +201,29 @@ task release(dependsOn: ["releaseWindows", "releaseMac"]) {
 
 //win: depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc"
 
-//nsis.executable = "C:/Program files/NSIS/makensis.exe"
-//launch4j.dir = "/opt/launch4j"
+project.ext.nsisExec = "C:/Program files/NSIS/makensis.exe"
+project.ext.launch4jDir = "/opt/launch4j"
 
 launch4j {
-    mainClassName = project.mainClassName
+    mainClassName = "net.sf.jabref.JabRefMain"
     version = project.version
     textVersion = project.ext.txtVersion
-    jar = "lib/JabRef-${project.version}.jar"
+    jar = "../libs/JabRef-${project.version}-fat.jar"
+    icon = "${projectDir}/src/main/resources/images/JabRef.ico"
     copyright = "JabRef developers"
-    dontWrapJar = true
     initialHeapSize = 32
     maxHeapSize = 512
 }
+createExe.dependsOn "fatJar"
 
-task releaseWindows(dependsOn: ["clean", "copyOSXAdapter"]) {
+task releaseWindows(dependsOn: ["clean", "copyOSXAdapter", "launch4j"]) {
     group = 'JabRef'
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
 
     if(OperatingSystem.current().isWindows()) {
-
+        //commandLine 'cmd', '/c', "${project.ext.nsisExec} '/DVERSION=${version}' ${buildDir}/setup.nsi"
     } else {
-
+        //commandLine "${project.ext.nsisExec} '/DVERSION=${version}' ${buildDir}/setup.nsi"
     }
 }
 

@@ -242,29 +242,11 @@ version=${jabref.version}</echo>
 	<property name="nsis.executable.linux" value="makensis"/>
 	<property name="launch4j.dir" location="/opt/launch4j" />
 
-	<target name="win.installer" description="Copy files in place to be used by the installer" depends="win.installer.win.pre, jars, win.installer.step1, win.installer.step2.win, win.installer.step3">
+	<target name="win.installer" description="Copy files in place to be used by the installer" depends="win.installer.step1, win.installer.step2.win, win.installer.step3">
 	</target>
 
-	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars, win.installer.step1, win.installer.step2.linux, win.installer.step3">
+	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="win.installer.step1, win.installer.step2.linux, win.installer.step3">
 		<delete dir="${win.installer.dir}/dist" />
-	</target>
-
-	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
-		<delete failonerror="false" dir="${win.installer.dir}/dist" />
-		<delete file="${win.installer.dir}/JabRefSetup.exe" />
-	</target>
-
-
-	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
-	<condition property="is.windows">
-		<and>
-			<isset property="nsis.executable" />
-			<os family="windows" />
-		</and>
-	</condition>
-
-	<target name="win.installer.win.pre" description="Precondition for win.installer on Windows">
-		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists" />
 	</target>
 
 	<target name="win.installer.step1" description="Gather everything that will go into the installer in dist">
@@ -283,45 +265,6 @@ version=${jabref.version}</echo>
 			</fileset>
 		</copy>
 
-		<!-- "Create Exe-Wrapper" -->
-
-		<delete file="build/tmp/jabref-launch4j.tmp" />
-		<copy file="buildres/jabref-launch4j.xml" tofile="build/tmp/jabref-launch4j.tmp" />
-		<replace file="build/tmp/jabref-launch4j.tmp">
-			<replacefilter token="1.1.1" value="${jabref.version}" />
-			<replacefilter token="3.3.3" value="${txtFileVersion}" />
-			<replacefilter token="2.2.2.2" value="${jabref.version.full}" />
-			<replacefilter token="./" value="${basedir}/" />
-		</replace>
-
-	</target>
-
-	<target name="win.installer.step2.linux" description="Create Windows launcher and Windows installer on Linux">
-		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
-		<exec
-			executable="${launch4j.dir}/launch4j"
-			dir="${launch4j.dir}">
-			<arg value="${basedir}/build/tmp/jabref-launch4j.tmp"/>
-		</exec>
-
-
-		<!-- Finally create Windows-Installer -->
-		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
-			<arg line="'-DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
-		</exec>
-	</target>
-
-	<target name="win.installer.step2.win" description="Create Windows launcher and Windows installer on Windows">
-		<!-- launch4j ant task does not work as ld.exe gets the wrong path passed - see https://sourceforge.net/tracker/?func=detail&aid=3598164&group_id=95944&atid=613100 -->
-		<exec
-			executable="${launch4j.dir}/launch4jc.exe"
-			dir="${launch4j.dir}">
-			<arg value="${basedir}/build/tmp/jabref-launch4j.tmp"/>
-		</exec>
-
-		<exec dir="." executable="${nsis.executable}" failonerror="true">
-			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
-		</exec>
 	</target>
 
 	<target name="win.installer.step3">
