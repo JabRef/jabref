@@ -45,7 +45,7 @@ import net.sf.jabref.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.config.SaveOrderConfig;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;

@@ -1,4 +1,4 @@
-package net.sf.jabref.config;
+package net.sf.jabref.logic.config;
 
 import java.util.Vector;
 

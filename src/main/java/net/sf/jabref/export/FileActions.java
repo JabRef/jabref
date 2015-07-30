@@ -28,7 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
-import net.sf.jabref.config.SaveOrderConfig;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 
 public class FileActions {
 
