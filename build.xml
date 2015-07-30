@@ -47,24 +47,6 @@
 
 	<property name="osxbin.dir" value="osx" />
 
-	<!-- Load user dependent properties. Has to happen before setting the properties here -->
-	<!-- For instance to redefine the NSIS-compiler write
-		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
-	  -->
-	<property file="user.properties" />
-
-	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
-	<property name="nsis.executable.linux" value="makensis"/>
-	<property name="launch4j.dir" location="/opt/launch4j" />
-
-	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
-	<condition property="is.windows">
-	  <and>
-	    <isset property="nsis.executable" />
-	    <os family="windows" />
-	  </and>
-	</condition>
-
 	<!-- Build classpath -->
 	<filelist id="jars" />
 	<path id="classpath">
@@ -81,15 +63,6 @@
 				 https://bugs.openjdk.java.net/browse/JDK-8008714 -->
 			<compilerarg value="-XDignore.symbol.file"/>			
 		</javac>
-	</target>
-	
-	<!-- Copies in the OSXAdapter class, which is compilable only on Mac
-		 Development on other platforms should also be possible by using the 
-       	 distributed stub of com.apple.eawt as described in 
-         http://stackoverflow.com/questions/2151174/how-can-i-develop-apple-java-extensions-on-windows -->
-	<target name="non_osx">
-		<mkdir dir="${build.classes.osx}" />
-		<copy file="${osxbin.dir}/MacAdapter.class" todir="${build.classes.osx}" />
 	</target>
 
 	<target name="jars" depends="build, unjarlib" description="Jars up project">
@@ -263,17 +236,43 @@ version=${jabref.version}</echo>
 			<zipfileset dir="${build.lib}" includes="JabRef.app/Contents/MacOS/JavaAppLauncher" filemode="755" />
 		</zip>
 	</target>
-	
+
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 	<!-- Build Windows Installer                                                    -->
 	<!--                                                                            -->
 	<!-- Don't forget to set nsis.executable and launch4j.dir properties            -->
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
+	<!-- Load user dependent properties. Has to happen before setting the properties here -->
+	<!-- For instance to redefine the NSIS-compiler write
+		nsis.executable="d:\\prog\\dev\\NSIS\\makensis.exe"
+	  -->
+	<property file="user.properties" />
+
+	<property name="nsis.executable" value="C:\Program files\NSIS\makensis.exe"/>
+	<property name="nsis.executable.linux" value="makensis"/>
+	<property name="launch4j.dir" location="/opt/launch4j" />
+
+	<target name="win.installer" description="Copy files in place to be used by the installer" depends="win.installer.win.pre, jars, win.installer.step1, win.installer.step2.win, win.installer.step3">
+	</target>
+
+	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars, win.installer.step1, win.installer.step2.linux, win.installer.step3">
+		<delete dir="${win.installer.dir}/dist" />
+	</target>
+
 	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
 		<delete failonerror="false" dir="${win.installer.dir}/dist" />
 		<delete file="${win.installer.dir}/JabRefSetup.exe" />
 	</target>
+
+
+	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
+	<condition property="is.windows">
+		<and>
+			<isset property="nsis.executable" />
+			<os family="windows" />
+		</and>
+	</condition>
 
 	<target name="win.installer.win.pre" description="Precondition for win.installer on Windows">
 		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists" />
@@ -349,65 +348,6 @@ version=${jabref.version}</echo>
 		<delete dir="${win.installer.dir}/dist" />
 	</target>
 
-	<target name="win.installer" description="Copy files in place to be used by the installer" depends="win.installer.win.pre, jars, win.installer.step1, win.installer.step2.win, win.installer.step3">
-	</target>
-
-	<target name="win.installer.linux" description="Copy files in place to be used by the installer" depends="jars, win.installer.step1, win.installer.step2.linux, win.installer.step3">
-		<delete dir="${win.installer.dir}/dist" />
-
-	</target>
-
-	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
-	   Auxiliary targets
-	  +++++++++++++++++++++++++++++++++++++++++++++++++-->
-
-	<macrodef name="compresssrc">
-        <attribute name="git-core-autocrlf" />
-        <attribute name="temp-dir" />
-        <attribute name="base-dir" />
-
-        <sequential>
-            <!-- clone current repo into tmp dir. Reason: we want to have a clean src.zip, but do not want to execute "git clean -xdf" to allow developers having some temporary files (and user.properties) -->
-            <mkdir dir="@{temp-dir}"/>
-            <echo message="@{temp-dir}" />
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull">
-                <arg value="clone" />
-                <arg value="@{base-dir}" />
-                <arg value="@{temp-dir}" />
-            </exec>
-
-            <!-- ensure correct line endings -->
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="@{temp-dir}">
-                <arg value="config" />
-                <arg value="core.autocrlf" />
-                <arg value="@{git-core-autocrlf}" />
-            </exec>
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="@{temp-dir}">
-                <arg value="rm" />
-                <arg value="--cached" />
-                <arg value="-r" />
-                <arg value="." />
-            </exec>
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="@{temp-dir}">
-                <arg value="reset" />
-                <arg value="--hard" />
-            </exec>
-        </sequential>
-	</macrodef>
-
-	<target name="zipsrc">
-		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc" />
-		<compresssrc git-core-autocrlf="true" temp-dir="${temp.dir}/jabref-${jabref.version}" base-dir="${basedir}" />
-		<zip destfile="${build.lib}/JabRef-${jabref.version}-src.zip" basedir="${temp.dir}" level="9" />
-		<delete dir="${temp.dir}" failonerror="no"/>
-	</target>
-
-	<target name="bzip2src">
-		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc" />
-        <compresssrc git-core-autocrlf="false" temp-dir="${temp.dir}/jabref-${jabref.version}" base-dir="${basedir}" />
-		<tar destfile="${build.lib}/JabRef-${jabref.version}-src.tar.bz2" basedir="${temp.dir}" excludes=".git/" compression="bzip2" />
-		<delete dir="${temp.dir}" failonerror="no"/>
-	</target>
 
 	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle" description="creates development snapshot binaries" />
 

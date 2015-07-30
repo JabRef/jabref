@@ -102,7 +102,7 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-   compile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
 }
 
 sourceCompatibility = 1.8
@@ -197,13 +197,42 @@ task release(dependsOn: ["releaseWindows", "releaseLinux"]) {
 }
 
 //win: depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc"
-task releaseWindows(dependsOn: ["clean"]) {
+task releaseWindows(dependsOn: ["clean", "copyOSXAdapter"]) {
     group = 'JabRef'
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
+
+    // if ()) {
+    // throw new GradleException("rpmbuild does not exist") }
 }
 
 //linux: depends="clean, non_osx, win.installer.linux, macbundle, bzip2src, zipsrc"
-task releaseLinux(dependsOn: ["clean"]) {
+task releaseLinux(dependsOn: ["clean", "copyOSXAdapter"]) {
     group = 'JabRef'
     description "Creates a Linux release. Creates all distribution files in ${buildDir}"
+}
+
+// release helper
+task copyOSXAdapter(type: Copy) {
+    description "Copies a compiled version of MacAdapter for non-OSX platforms"
+
+    from("${projectDir}/osx")
+    into("${buildDir}/classes/osx")
+}
+
+import org.gradle.internal.os.OperatingSystem;
+
+task zipSource(type:Exec) {
+    if(OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
+    } else {
+        commandLine "./git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/JabRef-${version}-src.zip"
+    }
+}
+
+task tarSource(type:Exec) {
+    if(OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
+    } else {
+        commandLine "./git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/JabRef-${version}-src.tar.gz"
+    }
 }
