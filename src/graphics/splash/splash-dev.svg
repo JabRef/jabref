@@ -14,7 +14,7 @@
    inkscape:export-xdpi="90.000000"
    inkscape:export-filename="splash.png"
    sodipodi:docname="splash-dev.svg"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:version="0.32"
    id="svg2138"
    height="432"
@@ -24,14 +24,14 @@
   <defs
      id="defs2140" />
   <sodipodi:namedview
-     inkscape:window-y="0"
+     inkscape:window-y="27"
      inkscape:window-x="35"
      inkscape:window-height="873"
-     inkscape:window-width="752"
+     inkscape:window-width="1660"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="305.8697"
-     inkscape:cx="342.10531"
+     inkscape:cy="225.8697"
+     inkscape:cx="165.10531"
      inkscape:zoom="1"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -62,12 +62,13 @@
      id="layer2"
      inkscape:label="Release splash">
     <image
+       sodipodi:absref="/home/koppor/jabref/src/graphics/splash/splash-release.svg"
        xlink:href="splash-release.svg"
-       y="0"
-       x="1"
-       id="image3381"
+       width="576"
        height="432"
-       width="576" />
+       id="image3381"
+       x="1"
+       y="0" />
   </g>
   <g
      id="layer1"
@@ -76,9 +77,9 @@
      transform="translate(-77.5,-170.36218)">
     <text
        xml:space="preserve"
-       style="font-size:41.23898697px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:#ff6600;stroke-width:2.8878212;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Nimbus Sans L"
-       x="210.24789"
-       y="610.62048"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:41.23898697px;line-height:100%;font-family:'Nimbus Sans L';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:#ff6600;stroke-width:2.8878212;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       x="210.5853"
+       y="653.81372"
        id="text2911-4"
        sodipodi:linespacing="100%"
        transform="matrix(0.80568825,-0.44174063,0.52619691,0.95267301,0,0)"
@@ -87,9 +88,9 @@
        inkscape:export-ydpi="75"><tspan
          sodipodi:role="line"
          id="tspan2913-0"
-         x="210.24789"
-         y="610.62048"
-         style="font-size:85.91455841px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:#ff6600;stroke-width:2.8878212;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Bitstream Vera Sans">dev</tspan></text>
+         x="210.5853"
+         y="653.81372"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:85.91455841px;line-height:100%;font-family:'Bitstream Vera Sans';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:#ff6600;stroke-width:2.8878212;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1">dev</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:20.00000002px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold;font-stretch:normal;font-variant:normal"
