@@ -38,7 +38,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.groups.GroupsPrefsTab;
+import net.sf.jabref.gui.preftabs.GroupsPrefsTab;
 import net.sf.jabref.gui.preftabs.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
