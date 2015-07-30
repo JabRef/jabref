@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -25,8 +25,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import net.sf.jabref.*;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.preftabs.PrefsTab;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
