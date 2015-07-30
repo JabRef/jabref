@@ -24,23 +24,22 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.ColorSetupPanel;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class AppearancePrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
     private final JCheckBox colorCodes;
     private final JCheckBox overrideFonts;
-    private final JCheckBox showGrid;//, useCustomIconTheme;
+    private final JCheckBox showGrid;
     private final ColorSetupPanel colorPanel = new ColorSetupPanel();
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
-    private final JTextField rowPadding;//, customIconThemeFile;
+    private final JTextField rowPadding;
 
 
     /**
@@ -49,7 +48,7 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
      * @param prefs a <code>JabRefPreferences</code> value
      */
     public AppearancePrefsTab(JabRefPreferences prefs) {
-        _prefs = prefs;
+        this.prefs = prefs;
         setLayout(new BorderLayout());
 
         // Font sizes:
@@ -60,14 +59,11 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         colorCodes = new JCheckBox(
                 Globals.lang("Color codes for required and optional fields"));
-        /*antialias = new JCheckBox(Globals.lang
-                  ("Use antialiasing font"));*/
+
         overrideFonts = new JCheckBox(Globals.lang("Override default font settings"));
 
         showGrid = new JCheckBox(Globals.lang("Show gridlines"));
 
-        //useCustomIconTheme = new JCheckBox(Globals.lang("Use custom icon theme"));
-        //customIconThemeFile = new JTextField();
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
                         "");
@@ -84,8 +80,6 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.append(overrideFonts);
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Table appearance"));
-        //builder.append(antialias);
-        //builder.nextLine();
         JPanel p2 = new JPanel();
         p2.add(new JLabel(Globals.lang("Table row height padding") + ":"));
         p2.add(rowPadding);
@@ -100,18 +94,6 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Table and entry editor colors"));
         builder.append(colorPanel);
-        //builder.appendSeparator(Globals.lang("Custom icon theme"));
-        //builder.append(useCustomIconTheme);
-        //builder.nextLine();
-        //JPanel p2 = new JPanel();
-        //lab = new JLabel(Globals.lang("Custom icon theme file")+":");
-        //p2.add(lab);
-        //p2.add(customIconThemeFile);
-        //BrowseAction browse = new BrowseAction(null, customIconThemeFile, false);
-        //JButton browseBut = new JButton(Globals.lang("Browse"));
-        //browseBut.addActionListener(browse);
-        //p2.add(browseBut);
-        //builder.append(p2);
 
         JPanel upper = new JPanel();
         JPanel sort = new JPanel();
@@ -142,16 +124,6 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
                 }
             }
         });
-        /*menuFontButton.addActionListener(new ActionListener() {
-             public void actionPerformed(ActionEvent e) {
-                 Font f=new FontSelectorDialog
-                     (null, menuFont).getSelectedFont();
-                 if(f==null)
-                     return;
-                 else
-                     menuFont = f;
-             }
-             });*/
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -160,17 +132,14 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        colorCodes.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
-        //antialias.setSelected(_prefs.getBoolean("antialias"));
-        fontSize.setText("" + _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE));
-        rowPadding.setText("" + _prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING));
-        oldMenuFontSize = _prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
-        overrideFonts.setSelected(_prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS));
+        colorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
+        fontSize.setText("" + prefs.getInt(JabRefPreferences.MENU_FONT_SIZE));
+        rowPadding.setText("" + prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING));
+        oldMenuFontSize = prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
+        overrideFonts.setSelected(prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS));
         oldOverrideFontSize = overrideFonts.isSelected();
         fontSize.setEnabled(overrideFonts.isSelected());
-        //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));
-        //customIconThemeFile.setText(_prefs.get("customIconThemeFile"));
-        showGrid.setSelected(_prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID));
+        showGrid.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID));
         colorPanel.setValues();
     }
 
@@ -182,20 +151,19 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
 
-        _prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
-        //_prefs.putBoolean("antialias", antialias.isSelected());
-        _prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
-        _prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
-        _prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
-        _prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
+        prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
+        prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
+        prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
+        prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
+        prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
         GUIGlobals.CURRENTFONT = font;
         colorPanel.storeSettings();
-        _prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
+        prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
             if (overrideFonts.isSelected() != oldOverrideFontSize ||
                     size != oldMenuFontSize) {
-                _prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
+                prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
                         Globals.lang("You have changed the menu and label font size.")
                                 .concat(" ")
@@ -208,7 +176,7 @@ public class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
         try {
             int padding = Integer.parseInt(rowPadding.getText());
-            _prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
+            prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
