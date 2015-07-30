@@ -56,7 +56,7 @@ public class PushToApplicationButton implements ActionListener {
     private JPopupMenu popup = null;
     private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
     private final Dimension buttonDim = new Dimension(23, 23);
-    private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
+    private static final URL ARROW_ICON = GUIGlobals.getIconUrl("secondary_sorted_reverse");
     private final MenuAction mAction = new MenuAction();
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Globals.lang("Settings"));

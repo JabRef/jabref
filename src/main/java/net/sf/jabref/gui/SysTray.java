@@ -54,7 +54,7 @@ public class SysTray {
         showWindow.addActionListener(showJabref);
         PopupMenu popup = new PopupMenu();
         popup.add(showWindow);
-        ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/JabRef-icon-48.png"));
+        ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/icons/JabRef-icon-48.png"));
         icon = new TrayIcon(imic.getImage(), "JabRef", popup);
         icon.setImageAutoSize(true);
         icon.addMouseListener(new MouseAdapter() {

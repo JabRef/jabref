@@ -343,7 +343,7 @@ version=${jabref.version}</echo>
 			outputdirectory="${build.lib}"
 			displayname="JabRef"
 			identifier="jabref.JabRef"
-			icon="${images.dir}/JabRef-Logo.icns"
+			icon="src/main/resources/images/icons/JabRef-Logo.icns"
 			shortversion="${jabref.version}">
 			<classpath file="${build.lib}/JabRef-${jabref.version}.jar" />	
 			<!-- Memory options apparently break the bundle 

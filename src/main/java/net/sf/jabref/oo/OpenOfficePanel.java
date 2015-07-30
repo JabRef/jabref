@@ -110,7 +110,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private OpenOfficePanel() {
-        ImageIcon connectImage = new ImageIcon(OpenOfficePanel.class.getResource("/images/connect_no.png"));
+        ImageIcon connectImage = GUIGlobals.getImage("connect_no");
 
         OpenOfficePanel.connect = new JButton(connectImage);
         OpenOfficePanel.manualConnect = new JButton(connectImage);

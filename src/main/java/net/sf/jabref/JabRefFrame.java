@@ -504,7 +504,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // glassPane.setVisible(true);
 
         setTitle(GUIGlobals.frameTitle);
-        //setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
         setIconImage(GUIGlobals.getImage("jabrefIcon48").getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
