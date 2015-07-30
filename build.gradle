@@ -14,6 +14,7 @@ plugins {
     //id "com.github.youribonnaffe.gradle.format" version "1.2"
 
     id "eu.appsatori.fatjar" version "0.3"
+    id "edu.sc.seis.launch4j" version "1.1.3"
 }
 
 apply plugin: "java"
@@ -45,7 +46,8 @@ test {
 }
 
 group = "net.sf.jabref"
-version = "2.11dev"
+version = "2.11.0.0"
+project.ext.txtVersion = "2.11dev"
 
 repositories {
     jcenter()
@@ -106,6 +108,7 @@ dependencies {
 }
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
@@ -191,24 +194,36 @@ jacocoTestReport {
 }
 
 // release tasks
-task release(dependsOn: ["releaseWindows", "releaseLinux"]) {
+task release(dependsOn: ["releaseWindows", "releaseMac"]) {
     group = 'JabRef'
     description 'Creates a release for all target platforms.'
 }
 
 //win: depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc"
+
+//nsis.executable = "C:/Program files/NSIS/makensis.exe"
+//launch4j.dir = "/opt/launch4j"
+
+launch4j {
+    mainClassName = project.mainClassName
+    version = project.version
+    textVersion = project.ext.txtVersion
+    jar = "lib/JabRef-${project.version}.jar"
+    copyright = "JabRef developers"
+    dontWrapJar = true
+    initialHeapSize = 32
+    maxHeapSize = 512
+}
+
 task releaseWindows(dependsOn: ["clean", "copyOSXAdapter"]) {
     group = 'JabRef'
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
 
-    // if ()) {
-    // throw new GradleException("rpmbuild does not exist") }
-}
+    if(OperatingSystem.current().isWindows()) {
 
-//linux: depends="clean, non_osx, win.installer.linux, macbundle, bzip2src, zipsrc"
-task releaseLinux(dependsOn: ["clean", "copyOSXAdapter"]) {
-    group = 'JabRef'
-    description "Creates a Linux release. Creates all distribution files in ${buildDir}"
+    } else {
+
+    }
 }
 
 task releaseMac(dependsOn: ["clean", "copyOSXAdapter"]) {

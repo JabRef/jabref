@@ -285,15 +285,6 @@ version=${jabref.version}</echo>
 
 		<!-- "Create Exe-Wrapper" -->
 
-		<!-- first of all, update version information -->
-		<script language="javascript"><![CDATA[
-			// create new property with a maximum length of 50 characters
-			var txtFileVersion = project.getProperty("jabref.version");
-			if (txtFileVersion.length()>50) {
-				txtFileVersion = txtFileVersion.substring(0,50);
-			}
-			project.setProperty("txtFileVersion", txtFileVersion);
-		]]></script>
 		<delete file="build/tmp/jabref-launch4j.tmp" />
 		<copy file="buildres/jabref-launch4j.xml" tofile="build/tmp/jabref-launch4j.tmp" />
 		<replace file="build/tmp/jabref-launch4j.tmp">
@@ -312,6 +303,7 @@ version=${jabref.version}</echo>
 			dir="${launch4j.dir}">
 			<arg value="${basedir}/build/tmp/jabref-launch4j.tmp"/>
 		</exec>
+
 
 		<!-- Finally create Windows-Installer -->
 		<exec dir="." executable="${nsis.executable.linux}" failonerror="true">
