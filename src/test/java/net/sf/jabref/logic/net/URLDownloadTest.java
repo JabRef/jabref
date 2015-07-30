@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.net;
+package net.sf.jabref.logic.net;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
