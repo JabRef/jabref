@@ -1,5 +1,4 @@
 import org.gradle.internal.os.OperatingSystem
-import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id "eu.appsatori.fatjar" version "0.3"
@@ -86,10 +85,18 @@ sourceSets {
 }
 
 processResources {
-    filter ReplaceTokens, tokens: [
-            "version": project.version,
-            "year"   : String.valueOf(Calendar.getInstance().get(Calendar.YEAR))
-    ]
+    filesMatching("help/**/About.html") {
+        expand ("version": project.version,
+                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)))
+    }
+
+    filesMatching("resource/build.properties") {
+        expand version: project.version
+    }
+
+    filesMatching("resource/**/meta.xml") {
+        expand version: project.version
+    }
 }
 
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
