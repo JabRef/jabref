@@ -49,7 +49,7 @@ class FileListEditorTransferHandler extends TransferHandler {
     private final JabRefFrame frame;
     private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
-    private DroppedFileHandler dfh = null;
+    private DroppedFileHandler droppedFileHandler = null;
     
     private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
 
@@ -99,15 +99,12 @@ class FileListEditorTransferHandler extends TransferHandler {
             List<File> files = null;
             // This flavor is used for dragged file links in Windows:
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                // JOptionPane.showMessageDialog(null, "Received
-                // javaFileListFlavor");
                 files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
             }
 
             if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
                 System.out.println("URL: " + dropLink);
-                //return handleDropTransfer(dropLink, dropRow);
             }
 
             // This is used when one or more files are pasted from the file manager
@@ -123,10 +120,9 @@ class FileListEditorTransferHandler extends TransferHandler {
 
                     @Override
                     public void run() {
-                        //addAll(files);
-                        for (File f : theFiles) {
+                        for (File file : theFiles) {
                             // Find the file's extension, if any:
-                            String name = f.getAbsolutePath();
+                            String name = file.getAbsolutePath();
                             String extension;
                             ExternalFileType fileType = null;
                             int index = name.lastIndexOf('.');
@@ -135,10 +131,10 @@ class FileListEditorTransferHandler extends TransferHandler {
                                 fileType = Globals.prefs.getExternalFileTypeByExt(extension);
                             }
                             if (fileType != null) {
-                                if (dfh == null) {
-                                    dfh = new DroppedFileHandler(frame, frame.basePanel());
+                                if (droppedFileHandler == null) {
+                                    droppedFileHandler = new DroppedFileHandler(frame, frame.basePanel());
                                 }
-                                dfh.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
+                                droppedFileHandler.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
                             }
                         }
                     }
@@ -147,17 +143,18 @@ class FileListEditorTransferHandler extends TransferHandler {
             }
 
         } catch (IOException ioe) {
-            System.err.println("failed to read dropped data: " + ioe);
+            LOGGER.warn("failed to read dropped data: " + ioe);
         } catch (UnsupportedFlavorException ufe) {
-            System.err.println("drop type error: " + ufe);
+            LOGGER.warn("drop type error: " + ufe);
         }
 
         // all supported flavors failed
-        System.err.println("can't transfer input: ");
+        StringBuilder logMessage = new StringBuilder("can't transfer input: ");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            System.out.println("  " + inflav);
+            logMessage.append("  " + inflav);
         }
+        LOGGER.warn(logMessage.toString());
 
         return false;
     }

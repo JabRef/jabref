@@ -23,10 +23,8 @@ import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.logic.util.StringUtil;
 
 import java.awt.*;
-import java.util.regex.Pattern;
 
 import javax.swing.*;
-import javax.swing.event.UndoableEditListener;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea. Used for
@@ -34,32 +32,18 @@ import javax.swing.event.UndoableEditListener;
  */
 public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
-    Dimension PREFERRED_SIZE;
-
-    private final JScrollPane sp;
+    private final JScrollPane scrollPane;
 
     private final FieldNameLabel label;
 
     private String fieldName;
 
-    static final Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
-
-    static final Pattern indent = Pattern.compile("\\s+.*");
-
     private AutoCompleteListener autoCompleteListener = null;
 
 
-    // protected UndoManager undo = new UndoManager();
-
-    public FieldTextArea(String fieldName_, String content) {
+    public FieldTextArea(String fieldName, String content) {
         super(content);
 
-        // Listen for undo and redo events
-        /*
-         * getDocument().addUndoableEditListener(new UndoableEditListener() {
-         * public void undoableEditHappened(UndoableEditEvent evt) {
-         * undo.addEdit(evt.getEdit()); } });
-         */
 
         updateFont();
 
@@ -67,19 +51,18 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
         // was focused when an action was called.
         addFocusListener(Globals.focusListener);
         addFocusListener(new FieldEditorFocusListener());
-        sp = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        sp.setMinimumSize(new Dimension(200, 1));
+        scrollPane.setMinimumSize(new Dimension(200, 1));
 
         setLineWrap(true);
         setWrapStyleWord(true);
-        fieldName = fieldName_;
+        this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + StringUtil.nCase(fieldName) + ' ');
+        label = new FieldNameLabel(' ' + StringUtil.nCase(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
-        // setFont(new Font("Times", Font.PLAIN, 10));
 
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
@@ -91,12 +74,6 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
-
-    /*
-     * public void paint(Graphics g) { Graphics2D g2 = (Graphics2D) g; if
-     * (antialias) g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-     * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
-     */
 
     @Override
     public String getFieldName() {
@@ -113,13 +90,13 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
     }
 
     @Override
-    public void setLabelColor(Color c) {
-        label.setForeground(c);
+    public void setLabelColor(Color color) {
+        label.setForeground(color);
     }
 
     @Override
     public JComponent getPane() {
-        return sp;
+        return scrollPane;
     }
 
     @Override
@@ -165,20 +142,10 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     @Override
     public void undo() {
-        /*
-         * try { if (undo.canUndo()) { undo.undo(); } } catch
-         * (CannotUndoException e) { }
-         */
-
     }
 
     @Override
     public void redo() {
-        /*
-         * try { if (undo.canRedo()) { undo.redo(); } } catch
-         * (CannotUndoException e) { }
-         */
-
     }
 
     @Override

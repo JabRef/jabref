@@ -50,9 +50,9 @@ public interface FieldEditor {
 
     void setInvalidBackgroundColor();
 
-    void setLabelColor(Color c);
+    void setLabelColor(Color color);
 
-    void setBackground(Color c);
+    void setBackground(Color color);
 
     void updateFontColor();
 

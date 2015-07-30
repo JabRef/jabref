@@ -41,17 +41,9 @@ public class FieldTextField extends JTextField implements FieldEditor {
     private AutoCompleteListener autoCompleteListener = null;
 
 
-    //protected UndoManager undo = new UndoManager();
-
-    public FieldTextField(String fieldName_, String content, boolean changeColorOnFocus) {
+    public FieldTextField(String fieldName, String content, boolean changeColorOnFocus) {
         super(content);
 
-        // Listen for undo and redo events
-        /*getDocument().addUndoableEditListener(new UndoableEditListener() {
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });*/
         setupUndoRedo();
 
         updateFont();
@@ -63,18 +55,11 @@ public class FieldTextField extends JTextField implements FieldEditor {
         if (changeColorOnFocus) {
             addFocusListener(new FieldEditorFocusListener());
         }
-        fieldName = fieldName_;
-        label = new FieldNameLabel(' ' + StringUtil.nCase(fieldName) + ' ');
-        // label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
-        // label.setBorder(BorderFactory.createEtchedBorder());
+        this.fieldName = fieldName;
+        label = new FieldNameLabel(' ' + StringUtil.nCase(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
-        // label.setOpaque(true);
-        // if ((content != null) && (content.length() > 0))
-        // label.setForeground(GUIGlobals.entryEditorLabelColor);
-        // At construction time, the field can never have an invalid value.
-        // else label.setForeground(GUIGlobals.nullFieldColor);
 
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
@@ -155,8 +140,8 @@ public class FieldTextField extends JTextField implements FieldEditor {
     }
 
     @Override
-    public void setLabelColor(Color c) {
-        label.setForeground(c);
+    public void setLabelColor(Color color) {
+        label.setForeground(color);
         throw new NullPointerException("ok");
     }
 
@@ -196,12 +181,6 @@ public class FieldTextField extends JTextField implements FieldEditor {
         setFont(GUIGlobals.CURRENTFONT);
     }
 
-    /*public void paint(Graphics g) {
-    	Graphics2D g2 = (Graphics2D) g;
-    	if (antialias)
-    		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    	super.paint(g2);
-    }*/
 
     @Override
     public void paste(String textToInsert) {
@@ -215,22 +194,11 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
     @Override
     public void undo() {
-        /*try {
-            if (undo.canUndo()) {
-                undo.undo();
-            }
-        } catch (CannotUndoException e) {
-        }*/
+
     }
 
     @Override
     public void redo() {
-        /*try {
-            if (undo.canRedo()) {
-                undo.redo();
-            }
-        } catch (CannotUndoException e) {
-        }*/
 
     }
 
