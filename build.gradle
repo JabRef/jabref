@@ -117,6 +117,7 @@ compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
 }
+compileJava.dependsOn "generateSource"
 
 compileTestJava {
     // files are all encoded using UTF-8
@@ -133,8 +134,6 @@ javadoc {
 }
 
 // jabref specific tasks
-compileJava.dependsOn "generateSource"
-
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
@@ -198,13 +197,13 @@ task release(dependsOn: ["releaseWindows", "releaseLinux"]) {
 }
 
 //win: depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc"
-task releaseWindows(dependsOn: []) {
+task releaseWindows(dependsOn: ["clean"]) {
     group = 'JabRef'
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
 }
 
 //linux: depends="clean, non_osx, win.installer.linux, macbundle, bzip2src, zipsrc"
-task releaseLinux(dependsOn: []) {
+task releaseLinux(dependsOn: ["clean"]) {
     group = 'JabRef'
     description "Creates a Linux release. Creates all distribution files in ${buildDir}"
 }

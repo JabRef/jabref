@@ -73,31 +73,6 @@
 		<filelist refid="jars" />
 	</path>
 
-	<target name="run" depends="build">
-		<java classname="net.sf.jabref.JabRefMain" fork="true">
-			<classpath refid="classpath" />
-		</java>
-	</target>
-
-	<!-- Runs project -->
-	<target name="runFromJar">
-		<java dir="${build.lib}" classname="net.sf.jabref.JabRefMain" fork="true">
-			<classpath>
-				<pathelement location="${build.lib}/${build.jar}" />
-			</classpath>
-		</java>
-	</target>
-
-	<!-- Compiles project -->
-	<target name="compile">
-		<mkdir dir="${build.classes}" />
-		<javac destdir="${build.classes}" encoding="UTF8" source="1.8" target="1.8">
-			<src path="${java.dir}" />
-            <src path="${gen.dir}" />
-			<classpath refid="classpath" />
-		</javac>
-	</target>
-
 	<!-- Builds the OSXAdapter -->
 	<target name="osx" depends="compile">
 		<mkdir dir="${build.classes}" />
@@ -228,62 +203,6 @@
 		<echo file="${resource.dir}/build.properties">builddate=${TODAY}
 build=${build.number}
 version=${jabref.version}</echo>
-	</target>
-
-	<target name="extension-javadocs" depends="build" description="Generates the javadocs for the extensions archive">
-		<mkdir dir="${build.extension-javadocs}" />
-		<copy todir="${build.extension-javadocs}">
-			<fileset dir="${help.dir}" defaultexcludes="yes">
-				<include name="CustomExports.html" />
-				<include name="CustomImports.html" />
-			</fileset>
-		</copy>
-
-		<javadoc sourcepath="${java.dir}" destdir="${build.extension-javadocs}" author="true" version="true" windowtitle="JabRef-Extensions API" link="http://docs.oracle.com/javase/6/docs/api/" Overview="${extensions.dir}/API/overview.html" access="protected">
-			<!--
-                 create javadoc only selectively for classes that
-                 users extending JabRef are likely to use
-              -->
-			<fileset dir="${java.dir}" defaultexcludes="yes">
-				<include name="net/sf/jabref/imports/ImportFormat.java" />
-				<include name="net/sf/jabref/imports/ImportFormatReader.java" />
-				<include name="net/sf/jabref/BibtexEntry.java" />
-				<include name="net/sf/jabref/BibtexEntryType.java" />
-				<include name="net/sf/jabref/AuthorList.java" />
-				<include name="net/sf/jabref/AuthorList.java" />
-				<include name="net/sf/jabref/export/layout/LayoutFormatter.java" />
-			</fileset>
-
-			<classpath refid="classpath" />
-		</javadoc>
-	</target>
-
-	<target name="extensions" depends="extension-javadocs" description="Generates the extensions archive">
-		<copy todir="${build.extensions}" description="copy examples">
-			<fileset dir="${java.dir}">
-				<include name="net/sf/jabref/export/layout/format/CurrentDate.java" />
-				<include name="net/sf/jabref/export/layout/format/ToLowerCase.java" />
-				<include name="net/sf/jabref/export/layout/format/HTMLChars.java" />
-				<include name="net/sf/jabref/imports/*Importer.java" />
-			</fileset>
-		</copy>
-		<mkdir dir="${build.extension-layout}" />
-		<copy todir="${build.extension-layout}">
-			<fileset dir="${layout.dir}" />
-		</copy>
-		<copy todir="${build.extensions}">
-			<fileset dir="${extensions.dir}" />
-			<filterset>
-				<filter token="version" value="${jabref.version}" />
-			</filterset>
-		</copy>
-		<zip destfile="${build.dir}/jabref-extensions.zip" description="create extensions-zip file">
-			<zipfileset dir="${build.extensions}" prefix="jabref-extensions" />
-		</zip>
-	</target>
-
-	<target name="clean" depends="win.installer.clean" description="Clean project">
-		<delete dir="${build.dir}" />
 	</target>
 
 	<target name="unjarlib" description="Unpacks jars from lib directory into temp directory">
