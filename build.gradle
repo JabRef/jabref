@@ -76,7 +76,7 @@ dependencies {
     compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
-    compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
+    compile fileTree(dir: 'lib', includes: ['*.jar'])
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
@@ -227,6 +227,10 @@ task releaseJar(dependsOn: "fatJar") {
         copy {
             from("$buildDir/libs/JabRef-${project.version}-fat.jar")
             into("$buildDir/releases")
+
+            rename { String fileName ->
+                fileName.replace('-fat', '')
+            }
         }
     }
 }
@@ -247,6 +251,7 @@ task releaseWindows(dependsOn: "launch4j") {
         }
         copy {
             from("$buildDir/nsis/JabRefSetup.exe")
+            from("$buildDir/nsis/JabRef.exe")
             into("$buildDir/releases")
         }
     }
@@ -255,15 +260,16 @@ task releaseWindows(dependsOn: "launch4j") {
 task releaseMac(dependsOn: "createAppZip") {
     group = 'JabRef - Release'
     description "Creates a OSX release."
-}
 
-classes.dependsOn "copyOSXAdapter"
-task copyOSXAdapter(type: Copy) {
-    description "Copies a compiled version of MacAdapter"
-
-    from("${projectDir}/buildres/osx")
-    into("${buildDir}/classes/osx")
-    include '*.class'
+    doLast {
+        copy {
+            from "$buildDir/distributions/JabRef-${project.version}.zip"
+            into "$buildDir/releases"
+            rename { String fileName ->
+                fileName.replace('.zip', '-OSX.zip')
+            }
+        }
+    }
 }
 
 macAppBundle {
