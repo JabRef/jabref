@@ -54,17 +54,14 @@ import net.sf.jabref.util.Util;
  * With this design, it should be very easy to add new tabs later.
  * 
  */
-public class PrefsDialog3 extends JDialog {
+public class PreferencesDialog extends JDialog {
 
     private final JPanel main;
 
     private final JabRefFrame frame;
-    private final JabRef jabRef;
 
-
-    public PrefsDialog3(JabRefFrame parent, JabRef jabRef) {
+    public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
         super(parent, Globals.lang("JabRef preferences"), false);
-        this.jabRef = jabRef;
         final JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
@@ -105,14 +102,14 @@ public class PrefsDialog3 extends JDialog {
         tabs.add(new XmpPrefsTab());
         tabs.add(new AdvancedTab(prefs, parent.helpDiag, jabRef));
 
-        Iterator<PrefsTab> it = tabs.iterator();
+        Iterator<PrefsTab> prefTabs = tabs.iterator();
         String[] names = new String[tabs.size()];
-        int i = 0;
-        //ArrayList<Component> comps = new ArrayList<Component>();
-        while (it.hasNext()) {
-            PrefsTab tab = it.next();
-            names[i] = tab.getTabName();
-            i++;
+        int index = 0;
+
+        while (prefTabs.hasNext()) {
+            PrefsTab tab = prefTabs.next();
+            names[index] = tab.getTabName();
+            index++;
             main.add((Component) tab, tab.getTabName());
         }
 
@@ -157,15 +154,11 @@ public class PrefsDialog3 extends JDialog {
         CancelAction cancelAction = new CancelAction();
         cancel.addActionListener(cancelAction);
         lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        ButtonBarBuilder bb = new ButtonBarBuilder(lower);
-        bb.addGlue();
-        bb.addButton(ok);
-        bb.addButton(cancel);
-        //bb.addButton(ok);
-        //bb.addButton(cancel);
-        bb.addGlue();
-        // lower.add(ok);
-        // lower.add(cancel);
+        ButtonBarBuilder buttonBarBuilder = new ButtonBarBuilder(lower);
+        buttonBarBuilder.addGlue();
+        buttonBarBuilder.addButton(ok);
+        buttonBarBuilder.addButton(cancel);
+        buttonBarBuilder.addGlue();
 
         // Key bindings:
         Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
@@ -184,18 +177,17 @@ public class PrefsDialog3 extends JDialog {
                 }
                 File file = new File(filename);
                 if (!file.exists()
-                        || JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
+                        || JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
                                 + "' " + Globals.lang("exists. Overwrite file?"),
                                 Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
                     try {
                         prefs.exportPreferences(filename);
                     } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(PrefsDialog3.this,
+                        JOptionPane.showMessageDialog(PreferencesDialog.this,
                                 Globals.lang("Could not export preferences")
                                         + ": " + ex.getMessage(), Globals.lang("Export preferences"),
                                 JOptionPane.ERROR_MESSAGE);
-                        // ex.printStackTrace();
                     }
                 }
 
@@ -220,11 +212,10 @@ public class PrefsDialog3 extends JDialog {
                     frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(PrefsDialog3.this,
+                    JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Globals.lang("Could not import preferences")
                                     + ": " + ex.getMessage(), Globals.lang("Import preferences"),
                             JOptionPane.ERROR_MESSAGE);
-                    // ex.printStackTrace();
                 }
             }
 
@@ -232,13 +223,8 @@ public class PrefsDialog3 extends JDialog {
 
         setValues();
 
-        pack(); // setSize(440, 500);
+        pack();
 
-        /** Look through component sizes to find which tab is to blame
-         *  when the dialog grows too large:
-        for (Component co : comps) {
-            System.out.println(co.getPreferredSize());
-        }*/
     }
 
 

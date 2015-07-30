@@ -56,7 +56,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
     private final JRadioButton matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
 
 
-    public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs,
+    public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs,
             HelpDialog helpDialog) {
         this.prefs = prefs;
         this.frame = frame;
