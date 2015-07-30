@@ -31,7 +31,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.preftabs.PrefsTab;
 
 /**
  * Preference Tab for XMP.
@@ -58,7 +57,7 @@ public class XmpPrefsTab extends JPanel implements PrefsTab {
     public XmpPrefsTab() {
         setLayout(new BorderLayout());
 
-        TableModel tm = new AbstractTableModel() {
+        TableModel tableModel = new AbstractTableModel() {
 
             @Override
             public int getRowCount() {
@@ -110,9 +109,9 @@ public class XmpPrefsTab extends JPanel implements PrefsTab {
 
         };
 
-        table = new JTable(tm);
-        TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(140);
+        table = new JTable(tableModel);
+        TableColumnModel columnModel = table.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(140);
 
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
