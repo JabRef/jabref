@@ -1,11 +1,14 @@
 # JabRef development version
 
-[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
-[![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
-[![Coverage Status](https://coveralls.io/repos/JabRef/jabref/badge.svg)](https://coveralls.io/r/JabRef/jabref)
+[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=dev_2.11)](https://travis-ci.org/JabRef/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This version is a development version. Features may not work as expected.
+
+The branch of this README file is `dev_2.11`.
+This branch is intended for maintenance releases in the 2.11 line with Java 6 compatibility and plugin support.
+The main goal is to include important fixes only.
+Main development (bug fixes and new features) will be incorporated in the [master branch](https://github.com/JabRef/jabref/tree/master).
 
 JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
