@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -28,6 +28,9 @@ import javax.swing.table.TableModel;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.PrefsTab;
 
 /**
@@ -35,7 +38,7 @@ import net.sf.jabref.gui.preftabs.PrefsTab;
  * 
  * Allows the user to enable and configure the XMP privacy filter.
  */
-class XmpPrefsTab extends JPanel implements PrefsTab {
+public class XmpPrefsTab extends JPanel implements PrefsTab {
 
     private boolean tableChanged = false;
 
