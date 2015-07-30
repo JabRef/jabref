@@ -55,7 +55,7 @@ import net.sf.jabref.util.Util;
  * With this design, it should be very easy to add new tabs later.
  * 
  */
-class PrefsDialog3 extends JDialog {
+public class PrefsDialog3 extends JDialog {
 
     private final JPanel main;
 
