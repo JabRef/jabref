@@ -20,6 +20,12 @@ import java.util.List;
 
 import net.sf.jabref.JabRefFrame;
 
+import com.apple.eawt.*;
+import com.apple.eawt.AppEvent.AboutEvent;
+import com.apple.eawt.AppEvent.OpenFilesEvent;
+import com.apple.eawt.AppEvent.PreferencesEvent;
+import com.apple.eawt.AppEvent.QuitEvent;
+
 public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler, OpenFilesHandler {
 
 	private JabRefFrame parentFrame = null;

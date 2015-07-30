@@ -1,7 +1,11 @@
 # no generated files in version control
 src/main/gen/
 
+# JVM errors
 hs_err*.log
+
+# backup files from JabRef itself
+*.bak
 
 # Ant
 buildant/
