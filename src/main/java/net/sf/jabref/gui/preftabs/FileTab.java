@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -35,6 +35,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
