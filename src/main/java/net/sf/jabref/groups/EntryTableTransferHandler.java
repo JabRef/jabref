@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
+import net.sf.jabref.gui.net.MonitoredURLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,7 +49,6 @@ import net.sf.jabref.gui.MainTableFormat;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.net.URLDownload;
 import spl.PdfImporter;
 import spl.PdfImporter.ImportPdfFilesResult;
 
@@ -539,7 +539,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // System.out.println("Import url: " + dropLink.toString());
         // System.out.println("Temp file: "+tmpfile.getAbsolutePath());
 
-        URLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
+        MonitoredURLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
 
         // Import into new if entryTable==null, otherwise into current database:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);

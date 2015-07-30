@@ -18,7 +18,7 @@ package net.sf.jabref.export;
 import net.sf.jabref.Globals;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.mods.MODSDatabase;
+import net.sf.jabref.logic.mods.MODSDatabase;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;

@@ -28,7 +28,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.msbib.MSBibDatabase;
+import net.sf.jabref.logic.msbib.MSBibDatabase;
 
 /**
  * ExportFormat for exporting in MSBIB XML format.

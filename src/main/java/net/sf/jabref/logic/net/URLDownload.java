@@ -13,15 +13,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.net;
+package net.sf.jabref.logic.net;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.cookies.CookieHandlerImpl;
 
-import javax.swing.*;
-
-import java.awt.*;
 import java.io.*;
 import java.net.CookieHandler;
 import java.net.URL;
@@ -35,23 +31,11 @@ import java.net.URLConnection;
  */
 public class URLDownload {
 
-    public static URLDownload buildMonitoredDownload(final Component component, URL source) {
-        return new URLDownload(source) {
-
-            @Override
-            protected InputStream monitorInputStream(InputStream in) {
-                return new ProgressMonitorInputStream(component, "Downloading " + this.getSource(), in);
-            }
-        };
-    }
-
-
     private final URL source;
-
 
     /**
      * URL download to a string.
-     * <p/>
+     * <p>
      * Example
      * URLDownload dl = new URLDownload(URL);
      * String content = dl.downloadToString(ENCODING);
@@ -66,7 +50,7 @@ public class URLDownload {
         URLDownload.setCookieHandler();
     }
 
-    URL getSource() {
+    public URL getSource() {
         return source;
     }
 

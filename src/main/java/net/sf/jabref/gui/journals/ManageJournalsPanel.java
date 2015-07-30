@@ -36,7 +36,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -460,7 +460,7 @@ class ManageJournalsPanel extends JPanel {
                 } else {
                     toFile = new File(toName);
                 }
-                URLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
+                MonitoredURLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, Globals.lang("Error downloading file '%0'", chosen),

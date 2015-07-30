@@ -18,7 +18,7 @@ package net.sf.jabref.imports;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
 import java.io.IOException;

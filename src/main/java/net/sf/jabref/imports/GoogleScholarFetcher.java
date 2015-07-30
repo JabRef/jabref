@@ -17,7 +17,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
 import java.io.*;

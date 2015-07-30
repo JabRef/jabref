@@ -30,7 +30,7 @@ import java.util.List;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.util.DOIUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.logic.net.URLDownload;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.

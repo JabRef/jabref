@@ -16,7 +16,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.util.NameListNormalizer;
 
 import javax.swing.*;

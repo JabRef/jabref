@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.msbib;
+package net.sf.jabref.logic.msbib;
 
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -35,8 +35,8 @@ import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.XMLChars;
-import net.sf.jabref.mods.PageNumbers;
-import net.sf.jabref.mods.PersonName;
+import net.sf.jabref.logic.mods.PageNumbers;
+import net.sf.jabref.logic.mods.PersonName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

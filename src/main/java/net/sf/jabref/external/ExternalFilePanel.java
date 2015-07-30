@@ -36,12 +36,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.gui.net.MonitoredURLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.UtilFindFiles;
 import net.sf.jabref.util.XMPUtil;
@@ -358,7 +358,7 @@ public class ExternalFilePanel extends JPanel {
                     URL url = new URL(res);
 
                     try {
-                        URLDownload.buildMonitoredDownload(parent, url).downloadToFile(file);
+                        MonitoredURLDownload.buildMonitoredDownload(parent, url).downloadToFile(file);
                     } catch (IOException e2) {
                         JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL") + ": "
                                         + e2.getMessage(), Globals.lang("Download file"),

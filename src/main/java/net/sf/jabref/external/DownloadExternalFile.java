@@ -18,7 +18,8 @@ package net.sf.jabref.external;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.util.FileUtil;
 
 import javax.swing.*;
@@ -105,7 +106,7 @@ public class DownloadExternalFile {
         final File tmp = File.createTempFile("jabref_download", "tmp");
         tmp.deleteOnExit();
 
-        URLDownload udl = URLDownload.buildMonitoredDownload(frame, url);
+        URLDownload udl = MonitoredURLDownload.buildMonitoredDownload(frame, url);
 
         //long time = System.currentTimeMillis();
         try {

@@ -41,7 +41,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -172,7 +172,7 @@ public class UrlDragDrop implements DropTargetListener {
                             .getField(BibtexFields.KEY_FIELD)
                             + ".pdf");
                     frame.output(Globals.lang("Downloading..."));
-                    URLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
+                    MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
                     frame.output(Globals.lang("Download completed"));
                     feditor.setText(file.toURI().toURL().toString());
                     editor.updateField(feditor);
