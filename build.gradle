@@ -218,10 +218,11 @@ task releaseMac(dependsOn: ["clean", "copyOSXAdapter"]) {
 
 // release helper
 task copyOSXAdapter(type: Copy) {
-    description "Copies a compiled version of MacAdapter for non-OSX platforms"
+    description "Copies a compiled version of MacAdapter"
 
     from("${projectDir}/osx")
     into("${buildDir}/classes/osx")
+    include '*.class'
 }
 
 import org.gradle.internal.os.OperatingSystem;
