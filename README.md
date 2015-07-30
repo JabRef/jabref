@@ -39,16 +39,16 @@ JabRef can be run as a command line application to convert from any import forma
 
 ### Bug reports, suggestions, other feedback
 
-We are thankful for any bug reports or other feedback. If there are
-features you want included in JabRef, tell us!
+We are thankful for any bug reports or other feedback.
+If there are features you want included in JabRef, tell us!
 
-The "old" trackers at sourceforge still remain intact:
+You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) so send in bug reports and suggestions.
+We also keep an eye on our old trackers at sourceforge:
 
-* Bugs: https://sourceforge.net/p/jabref/bugs/
-* Feature Requests: https://sourceforge.net/p/jabref/feature-requests/
+    * Bugs: https://sourceforge.net/p/jabref/bugs/
+    * Feature Requests: https://sourceforge.net/p/jabref/feature-requests/
 
-Do *not* file patches using https://sourceforge.net/p/jabref/patches/.
-Just fork JabRef and create a pull request.
+To get your code added to JabRef, just fork JabRef and create a pull request.
 For details see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Next Steps
