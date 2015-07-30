@@ -34,7 +34,6 @@ import javax.swing.table.TableModel;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.preftabs.PrefsTab;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -43,7 +42,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class TableColumnsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
     private boolean tableChanged = false;
     private final JTable colSetup;
     private int rowCount = -1;
@@ -118,7 +117,7 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
      * @param prefs a <code>JabRefPreferences</code> value
      */
     public TableColumnsTab(JabRefPreferences prefs, JabRefFrame frame) {
-        _prefs = prefs;
+        this.prefs = prefs;
         this.frame = frame;
         setLayout(new BorderLayout());
 
@@ -214,8 +213,7 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         cm.getColumn(1).setPreferredWidth(80);
 
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:pref",//, 4dlu, fill:60dlu, 4dlu, fill:pref",
-                "");
+                ("1dlu, 8dlu, left:pref, 4dlu, fill:pref","");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
         JPanel tabPanel = new JPanel();
@@ -226,23 +224,19 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         colSetup.setPreferredScrollableViewportSize(new Dimension(250, 200));
         sp.setMinimumSize(new Dimension(250, 300));
         tabPanel.add(sp, BorderLayout.CENTER);
-        JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
-        tlb.setFloatable(false);
-        //tlb.setRollover(true);
-        //tlb.setLayout(gbl);
-        AddRowAction ara = new AddRowAction();
-        DeleteRowAction dra = new DeleteRowAction();
+        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+        toolBar.setFloatable(false);
+        AddRowAction addRow = new AddRowAction();
+        DeleteRowAction deleteRow = new DeleteRowAction();
         MoveRowUpAction moveUp = new MoveRowUpAction();
         MoveRowDownAction moveDown = new MoveRowDownAction();
-        tlb.setBorder(null);
-        tlb.add(ara);
-        tlb.add(dra);
-        tlb.addSeparator();
-        tlb.add(moveUp);
-        tlb.add(moveDown);
-        //tlb.addSeparator();
-        //tlb.add(new UpdateWidthsAction());
-        tabPanel.add(tlb, BorderLayout.EAST);
+        toolBar.setBorder(null);
+        toolBar.add(addRow);
+        toolBar.add(deleteRow);
+        toolBar.addSeparator();
+        toolBar.add(moveUp);
+        toolBar.add(moveDown);
+        tabPanel.add(toolBar, BorderLayout.EAST);
 
         showOneLetterHeadingForIconColumns = new JCheckBox(Globals.lang("Show one letter heading for icon columns"));
 
@@ -285,12 +279,11 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         /*** begin: special table columns and special fields ***/
 
         HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
-        JButton hlb = new JButton(GUIGlobals.getImage("helpSmall"));
-        hlb.setToolTipText(Globals.lang("Help on special fields"));
-        hlb.addActionListener(help);
+        JButton helpButton = new JButton(GUIGlobals.getImage("helpSmall"));
+        helpButton.setToolTipText(Globals.lang("Help on special fields"));
+        helpButton.addActionListener(help);
 
         specialFieldsEnabled = new JCheckBox(Globals.lang("Enable special fields"));
-        //		.concat(". ").concat(Globals.lang("You must restart JabRef for this to come into effect.")));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {
 
             @Override
@@ -350,7 +343,7 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 10, 2));
         specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 11, 2));
         specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 12, 4));
-        specialTableColumnsBuilder.add(hlb, cc.xyw(1, 13, 2));
+        specialTableColumnsBuilder.add(helpButton, cc.xyw(1, 13, 2));
 
         specialTableColumnsBuilder.add(fileColumn, cc.xyw(5, 1, 2));
         specialTableColumnsBuilder.add(pdfColumn, cc.xyw(5, 2, 2));
@@ -372,9 +365,6 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         builder.append(pan);
         builder.append(tabPanel);
         builder.nextLine();
-        //	lab = new JLabel("<HTML>("+Globals.lang("this button will update the column width settings<BR>"
-        //						+"to match the current widths in your table")+")</HTML>");
-        //        lab = new JLabel("<HTML>("+Globals.lang("this_button_will_update") +")</HTML>") ;
         builder.append(pan);
         JButton buttonWidth = new JButton(new UpdateWidthsAction());
         JButton buttonOrder = new JButton(new UpdateOrderAction());
@@ -384,7 +374,6 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         builder.append(buttonOrder);
         builder.nextLine();
         builder.append(pan);
-        //builder.append(lab);
         builder.nextLine();
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -393,17 +382,17 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileColumn.setSelected(_prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
-        pdfColumn.setSelected(_prefs.getBoolean(JabRefPreferences.PDF_COLUMN));
-        urlColumn.setSelected(_prefs.getBoolean(JabRefPreferences.URL_COLUMN));
-        preferUrl.setSelected(!_prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI));
-        preferDoi.setSelected(_prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI));
-        fileColumn.setSelected(_prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
-        arxivColumn.setSelected(_prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN));
+        fileColumn.setSelected(prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
+        pdfColumn.setSelected(prefs.getBoolean(JabRefPreferences.PDF_COLUMN));
+        urlColumn.setSelected(prefs.getBoolean(JabRefPreferences.URL_COLUMN));
+        preferUrl.setSelected(!prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI));
+        preferDoi.setSelected(prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI));
+        fileColumn.setSelected(prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
+        arxivColumn.setSelected(prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN));
 
-        extraFileColumns.setSelected(_prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS));
+        extraFileColumns.setSelected(prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS));
         if (extraFileColumns.isSelected()) {
-            String[] desiredColumns = _prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
+            String[] desiredColumns = prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             int listSize = listOfFileColumns.getModel().getSize();
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
@@ -423,46 +412,46 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special fields ***/
 
-        oldRankingColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING);
+        oldRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING);
         rankingColumn.setSelected(oldRankingColumn);
 
-        oldCompcatRankingColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT);
+        oldCompcatRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT);
         compactRankingColumn.setSelected(oldCompcatRankingColumn);
 
-        oldQualityColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY);
+        oldQualityColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY);
         qualityColumn.setSelected(oldQualityColumn);
 
-        oldPriorityColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY);
+        oldPriorityColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY);
         priorityColumn.setSelected(oldPriorityColumn);
 
-        oldRelevanceColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE);
+        oldRelevanceColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE);
         relevanceColumn.setSelected(oldRelevanceColumn);
 
-        oldPrintedColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED);
+        oldPrintedColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED);
         printedColumn.setSelected(oldPrintedColumn);
 
-        oldReadStatusColumn = _prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ);
+        oldReadStatusColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ);
         readStatusColumn.setSelected(oldReadStatusColumn);
 
-        oldSyncKeyWords = _prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+        oldSyncKeyWords = prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
         syncKeywords.setSelected(oldSyncKeyWords);
 
-        oldWriteSpecialFields = _prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS);
+        oldWriteSpecialFields = prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS);
         writeSpecialFields.setSelected(oldWriteSpecialFields);
 
         // has to be called as last to correctly enable/disable the other settings
-        oldSpecialFieldsEnabled = _prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED);
+        oldSpecialFieldsEnabled = prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED);
         specialFieldsEnabled.setSelected(!oldSpecialFieldsEnabled);
         specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled); // Call twice to make sure the ChangeListener is triggered
 
         /*** end: special fields ***/
 
-        boolean oldShowOneLetterHeadingForIconColumns = _prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS);
+        boolean oldShowOneLetterHeadingForIconColumns = prefs.getBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS);
         showOneLetterHeadingForIconColumns.setSelected(oldShowOneLetterHeadingForIconColumns);
 
         tableRows.clear();
-        String[] names = _prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
-        String[] lengths = _prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
+        String[] names = prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
+        String[] lengths = prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.length; i++) {
             if (i < lengths.length) {
                 tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
@@ -471,7 +460,7 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
             }
         }
         rowCount = tableRows.size() + 5;
-        ncWidth = _prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
+        ncWidth = prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
 
     }
 
@@ -668,9 +657,7 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
     class UpdateWidthsAction extends AbstractAction {
 
         public UpdateWidthsAction() {
-            //super(Globals.lang("Update to current column widths"));
             super(Globals.lang("Update to current column widths"));
-            //putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
         }
 
         @Override
@@ -685,8 +672,6 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
                 try {
                     String name = panel.mainTable.getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
-                    //Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
-                    //Util.pr("-"+name);
                     if (i <= tableRows.size() && ((String) colSetup.getValueAt(i, 0)).toLowerCase().equals(name)) {
                         colSetup.setValueAt("" + width, i, 1);
                     } else { // Doesn't match; search for a matching col in our table
@@ -716,26 +701,26 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
      */
     @Override
     public void storeSettings() {
-        _prefs.putBoolean(JabRefPreferences.FILE_COLUMN, fileColumn.isSelected());
-        _prefs.putBoolean(JabRefPreferences.PDF_COLUMN, pdfColumn.isSelected());
-        _prefs.putBoolean(JabRefPreferences.URL_COLUMN, urlColumn.isSelected());
-        _prefs.putBoolean(JabRefPreferences.PREFER_URL_DOI, preferDoi.isSelected());
-        _prefs.putBoolean(JabRefPreferences.ARXIV_COLUMN, arxivColumn.isSelected());
+        prefs.putBoolean(JabRefPreferences.FILE_COLUMN, fileColumn.isSelected());
+        prefs.putBoolean(JabRefPreferences.PDF_COLUMN, pdfColumn.isSelected());
+        prefs.putBoolean(JabRefPreferences.URL_COLUMN, urlColumn.isSelected());
+        prefs.putBoolean(JabRefPreferences.PREFER_URL_DOI, preferDoi.isSelected());
+        prefs.putBoolean(JabRefPreferences.ARXIV_COLUMN, arxivColumn.isSelected());
 
-        _prefs.putBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS, extraFileColumns.isSelected());
+        prefs.putBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS, extraFileColumns.isSelected());
         if (extraFileColumns.isSelected() && !listOfFileColumns.isSelectionEmpty()) {
             String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
             for (int i = 0; i < selections.length; i++) {
                 selections[i] = (String) listOfFileColumns.getModel().getElementAt(
                         listOfFileColumns.getSelectedIndices()[i]);
             }
-            _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
+            prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
         }
         else {
-            _prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[] {});
+            prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[]{});
         }
 
-        _prefs.putBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, showOneLetterHeadingForIconColumns.isSelected());
+        prefs.putBoolean(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, showOneLetterHeadingForIconColumns.isSelected());
 
         /*** begin: special fields ***/
 
@@ -773,16 +758,16 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
         // restart required implies that the settings have been changed
         // the seetings need to be stored
         if (restartRequired) {
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT, newCompactRankingColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, newPrintedColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, newReadStatusColumn);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
-            _prefs.putBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT, newCompactRankingColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, newPrintedColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, newReadStatusColumn);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
+            prefs.putBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
         }
 
         /*** end: special fields ***/
@@ -792,13 +777,6 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
             int row = colSetup.getEditingRow();
             colSetup.getCellEditor(row, col).stopCellEditing();
         }
-
-        //_prefs.putStringArray("columnNames", getChoices());
-        /*String[] cols = tableFields.getText().replaceAll("\\s+","")
-            .replaceAll("\\n+","").toLowerCase().split(";");
-        if (cols.length > 0) for (int i=0; i<cols.length; i++)
-            cols[i] = cols[i].trim();
-            else cols = null;*/
 
         // Now we need to make sense of the contents the user has made to the
         // table setup table.
@@ -817,18 +795,17 @@ public class TableColumnsTab extends JPanel implements PrefsTab {
             String[] widths = new String[tableRows.size()];
             int[] nWidths = new int[tableRows.size()];
 
-            _prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
+            prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
             for (i = 0; i < tableRows.size(); i++) {
                 TableRow tr = tableRows.elementAt(i);
                 names[i] = tr.name.toLowerCase();
                 nWidths[i] = tr.length;
                 widths[i] = "" + tr.length;
-                //Util.pr(names[i]+"   "+widths[i]);
             }
 
             // Finally, we store the new preferences.
-            _prefs.putStringArray(JabRefPreferences.COLUMN_NAMES, names);
-            _prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS, widths);
+            prefs.putStringArray(JabRefPreferences.COLUMN_NAMES, names);
+            prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }
