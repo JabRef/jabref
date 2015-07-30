@@ -28,7 +28,6 @@ import javax.swing.event.ChangeListener;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 
 public class NetworkTab extends JPanel implements PrefsTab {
@@ -36,13 +35,10 @@ public class NetworkTab extends JPanel implements PrefsTab {
     private final JCheckBox useProxy;
     private final JTextField defProxyHostname;
     private final JTextField defProxyPort;
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
 
-
-    //    private HelpAction ownerHelp, timeStampHelp;
-
-    public NetworkTab(JabRefFrame frame, JabRefPreferences prefs) {
-        _prefs = prefs;
+    public NetworkTab(JabRefPreferences prefs) {
+        this.prefs = prefs;
 
         setLayout(new BorderLayout());
 
@@ -63,7 +59,6 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
             @Override
             public void stateChanged(ChangeEvent event) {
-                //useProxy.setEnabled(useProxy.isSelected());
                 defProxyHostname.setEnabled(useProxy.isSelected());
                 defProxyPort.setEnabled(useProxy.isSelected());
             }
@@ -71,8 +66,6 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
-        //("right:pref, 10dlu, 50dlu, 5dlu, fill:60dlu", "");
-        //("10dlu, left:50dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         builder.appendSeparator(Globals.lang("Network"));
@@ -87,7 +80,6 @@ public class NetworkTab extends JPanel implements PrefsTab {
         builder.append(new JPanel());
         JLabel lap2 = new JLabel(Globals.lang("Port") + ':');
         builder.append(lap2);
-        //builder.append(new JPanel());
         builder.append(defProxyPort);
 
         JPanel pan = builder.getPanel();
@@ -99,19 +91,17 @@ public class NetworkTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
 
-        useProxy.setSelected(_prefs.getBoolean(JabRefPreferences.USE_PROXY));
-        //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
-        defProxyHostname.setText(_prefs.get(JabRefPreferences.PROXY_HOSTNAME));
-        defProxyPort.setText(_prefs.get(JabRefPreferences.PROXY_PORT));
+        useProxy.setSelected(prefs.getBoolean(JabRefPreferences.USE_PROXY));
+        defProxyHostname.setText(prefs.get(JabRefPreferences.PROXY_HOSTNAME));
+        defProxyPort.setText(prefs.get(JabRefPreferences.PROXY_PORT));
 
     }
 
     @Override
     public void storeSettings() {
-        _prefs.putBoolean(JabRefPreferences.USE_PROXY, useProxy.isSelected());
-        //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
-        _prefs.put(JabRefPreferences.PROXY_HOSTNAME, defProxyHostname.getText().trim());
-        _prefs.put(JabRefPreferences.PROXY_PORT, defProxyPort.getText().trim());
+        prefs.putBoolean(JabRefPreferences.USE_PROXY, useProxy.isSelected());
+        prefs.put(JabRefPreferences.PROXY_HOSTNAME, defProxyHostname.getText().trim());
+        prefs.put(JabRefPreferences.PROXY_PORT, defProxyPort.getText().trim());
     }
 
     @Override
