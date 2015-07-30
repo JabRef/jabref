@@ -2,6 +2,7 @@ plugins {
     id "eu.appsatori.fatjar" version "0.3"
     id "edu.sc.seis.launch4j" version "1.1.4"
     id "com.github.kt3k.coveralls" version "2.4.0"
+    id "edu.sc.seis.macAppBundle" version "2.1.1"
 }
 
 apply plugin: "java"
@@ -172,18 +173,17 @@ jacocoTestReport {
     }
 }
 
-import org.apache.tools.ant.filters.*
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.internal.os.OperatingSystem
+
 processResources {
     filter ReplaceTokens, tokens: [
             "version": project.version,
-            "year": "2015",
+            "year"   : "2015",
     ]
 }
 
-
 // release tasks
-import org.gradle.internal.os.OperatingSystem;
-
 task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "zipSource", "tarSource"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
@@ -218,8 +218,6 @@ launch4j {
     maxHeapSize = 512
 }
 createExe.dependsOn "fatJar"
-fatJar.dependsOn "copyOSXAdapter"
-
 
 task releaseJar(dependsOn: "fatJar") {
     group = 'JabRef - Release'
@@ -254,18 +252,32 @@ task releaseWindows(dependsOn: "launch4j") {
     }
 }
 
-task releaseMac() {
+task releaseMac(dependsOn: "createAppZip") {
     group = 'JabRef - Release'
     description "Creates a OSX release."
 }
 
-// release helper
+classes.dependsOn "copyOSXAdapter"
 task copyOSXAdapter(type: Copy) {
     description "Copies a compiled version of MacAdapter"
 
     from("${projectDir}/buildres/osx")
     into("${buildDir}/classes/osx")
     include '*.class'
+}
+
+macAppBundle {
+    mainClassName = project.mainClassName
+    icon = "src/main/resources/images/icons/JabRef-Logo.icns"
+    highResolutionCapable = true
+
+    def map = [
+            "CFBundleTypeName"      : "BibTeX file",
+            "CFBundleTypeRole"      : "Editor",
+            "CFBundleTypeIconFile"  : "JabRef-Logo.icns",
+            "CFBundleTypeExtensions": ["bib"]
+    ]
+    bundleExtras.put("CFBundleDocumentTypes", [map])
 }
 
 // TODO: can be removed when SourceForge releases are discontinued
