@@ -45,9 +45,6 @@ import net.sf.jabref.gui.remote.JabRefMessageHandler;
 public class AdvancedTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences preferences;
-    HelpDialog helpDiag;
-    JPanel pan = new JPanel();
-    JLabel lab;
     private final JCheckBox useDefault;
     private final JCheckBox useRemoteServer;
     private final JCheckBox useNativeFileDialogOnMac;
@@ -56,14 +53,10 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox biblatexMode;
     private final JComboBox className;
     private final JTextField remoteServerPort;
-    JPanel p1 = new JPanel();
     private String oldLnf = "";
     private boolean oldUseDef;
     private boolean oldBiblMode = false;
     private int oldPort = -1;
-
-    public static final String PREF_IMPORT_CONVERT_TO_EQUATION = "importFileConvertToEquation";
-    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
 
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
