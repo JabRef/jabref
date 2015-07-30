@@ -5,7 +5,7 @@
 * in the command line (terminal in linux, cmd in windows) run "javac -version"
 * if javac is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
 
-### Install gradle in your machine (*** THIS STEP IS OPTIONAL)
+### Install gradle in your machine (optional)
 * for debian based linux distros:
 
 1. "sudo apt-get install gradle"
