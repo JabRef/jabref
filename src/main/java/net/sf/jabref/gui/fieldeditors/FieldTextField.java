@@ -13,8 +13,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.fieldeditors;
 
+import net.sf.jabref.FieldNameLabel;
+import net.sf.jabref.FieldTextMenu;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.logic.util.StringUtil;
 

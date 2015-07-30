@@ -28,9 +28,12 @@ import java.util.Map;
 
 import javax.swing.*;
 
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.FieldTextArea;
+import net.sf.jabref.gui.fieldeditors.FieldTextField;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.FileListEditor;
+import net.sf.jabref.gui.fieldeditors.FileListEditor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

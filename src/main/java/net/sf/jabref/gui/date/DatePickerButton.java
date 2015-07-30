@@ -27,7 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import net.sf.jabref.EasyDateFormat;
-import net.sf.jabref.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.FocusRequester;
 
 import com.michaelbaranov.microba.calendar.DatePicker;

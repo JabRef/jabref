@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import javax.swing.*;
 
+import net.sf.jabref.gui.fieldeditors.FieldTextField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

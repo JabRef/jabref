@@ -13,7 +13,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.fieldeditors;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 
 import javax.swing.*;
 import java.awt.event.FocusEvent;
@@ -27,7 +30,7 @@ import java.awt.event.FocusListener;
  * Time: 18:20:14
  * To change this template use File | Settings | File Templates.
  */
-class FieldEditorFocusListener implements FocusListener {
+public class FieldEditorFocusListener implements FocusListener {
 
     public FieldEditorFocusListener() {
     }

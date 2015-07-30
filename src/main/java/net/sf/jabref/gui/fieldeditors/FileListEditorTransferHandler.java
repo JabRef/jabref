@@ -14,7 +14,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;

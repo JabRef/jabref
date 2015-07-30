@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -43,6 +43,10 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;

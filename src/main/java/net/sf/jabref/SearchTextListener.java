@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * @author Ben
  * 
  */
-interface SearchTextListener {
+public interface SearchTextListener {
 
     /**
      * Array of words that were searched for
