@@ -28,6 +28,7 @@ import javax.swing.table.TableModel;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 
 /**
  * Preference Tab for XMP.

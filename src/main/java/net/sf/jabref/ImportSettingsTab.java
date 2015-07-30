@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import net.sf.jabref.gui.preftabs.PrefsTab;
 import spl.gui.ImportDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;

@@ -33,6 +33,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
 

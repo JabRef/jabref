@@ -33,6 +33,7 @@ import javax.swing.table.TableModel;
 
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;

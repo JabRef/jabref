@@ -22,6 +22,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.gui.preftabs.PrefsTab;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 

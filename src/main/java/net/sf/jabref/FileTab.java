@@ -39,6 +39,7 @@ import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 
 /**
  * Preferences tab for file options. These options were moved out from GeneralTab to

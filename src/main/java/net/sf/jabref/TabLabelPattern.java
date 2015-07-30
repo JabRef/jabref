@@ -27,6 +27,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternPanel;
 import net.sf.jabref.labelPattern.LabelPatternUtil;

@@ -36,6 +36,7 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 

@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.preftabs.PrefsTab;
 
 /**
  * Preference tab for file sorting options.
