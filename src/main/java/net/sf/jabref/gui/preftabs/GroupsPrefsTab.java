@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.groups;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.event.FocusEvent;
@@ -23,13 +23,11 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.PrefsTab;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-// JZTODO lyrics
-public class GroupsPrefsTab extends JPanel implements PrefsTab {
+class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     private final JCheckBox showIcons = new JCheckBox(Globals.lang("Show icons for groups"));
     private final JCheckBox showDynamic = new JCheckBox(

@@ -3,7 +3,7 @@ package net.sf.jabref.util;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.NameFormatterTab;
+import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 

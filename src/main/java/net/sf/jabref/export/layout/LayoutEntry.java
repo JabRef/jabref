@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.NameFormatter;
 import net.sf.jabref.export.layout.format.NotFoundFormatter;
+import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.util.Util;
 
 class LayoutEntry {

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -37,8 +37,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.*;
 import net.sf.jabref.export.ExportFormats;
-import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
@@ -54,17 +54,14 @@ import net.sf.jabref.util.Util;
  * With this design, it should be very easy to add new tabs later.
  * 
  */
-class PrefsDialog3 extends JDialog {
+public class PreferencesDialog extends JDialog {
 
     private final JPanel main;
 
     private final JabRefFrame frame;
-    private final JabRef jabRef;
 
-
-    public PrefsDialog3(JabRefFrame parent, JabRef jabRef) {
+    public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
         super(parent, Globals.lang("JabRef preferences"), false);
-        this.jabRef = jabRef;
         final JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
@@ -89,30 +86,30 @@ class PrefsDialog3 extends JDialog {
         // ----------------------------------------------------------------
         ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
         tabs.add(new GeneralTab(frame, prefs));
-        tabs.add(new NetworkTab(frame, prefs));
+        tabs.add(new NetworkTab(prefs));
         tabs.add(new FileTab(frame, prefs));
-        tabs.add(new FileSortTab(frame, prefs));
+        tabs.add(new FileSortTab(prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new AppearancePrefsTab(prefs));
         tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
-        tabs.add(new TablePrefsTab(prefs, parent));
+        tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new TabLabelPattern(prefs, parent.helpDiag));
+        tabs.add(new LabelPatternPrefTab(prefs, parent.helpDiag));
         tabs.add(new PreviewPrefsTab(prefs));
         tabs.add(new NameFormatterTab(parent.helpDiag));
         tabs.add(new ImportSettingsTab());
         tabs.add(new XmpPrefsTab());
         tabs.add(new AdvancedTab(prefs, parent.helpDiag, jabRef));
 
-        Iterator<PrefsTab> it = tabs.iterator();
+        Iterator<PrefsTab> prefTabs = tabs.iterator();
         String[] names = new String[tabs.size()];
-        int i = 0;
-        //ArrayList<Component> comps = new ArrayList<Component>();
-        while (it.hasNext()) {
-            PrefsTab tab = it.next();
-            names[i] = tab.getTabName();
-            i++;
+        int index = 0;
+
+        while (prefTabs.hasNext()) {
+            PrefsTab tab = prefTabs.next();
+            names[index] = tab.getTabName();
+            index++;
             main.add((Component) tab, tab.getTabName());
         }
 
@@ -157,15 +154,11 @@ class PrefsDialog3 extends JDialog {
         CancelAction cancelAction = new CancelAction();
         cancel.addActionListener(cancelAction);
         lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        ButtonBarBuilder bb = new ButtonBarBuilder(lower);
-        bb.addGlue();
-        bb.addButton(ok);
-        bb.addButton(cancel);
-        //bb.addButton(ok);
-        //bb.addButton(cancel);
-        bb.addGlue();
-        // lower.add(ok);
-        // lower.add(cancel);
+        ButtonBarBuilder buttonBarBuilder = new ButtonBarBuilder(lower);
+        buttonBarBuilder.addGlue();
+        buttonBarBuilder.addButton(ok);
+        buttonBarBuilder.addButton(cancel);
+        buttonBarBuilder.addGlue();
 
         // Key bindings:
         Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
@@ -184,18 +177,17 @@ class PrefsDialog3 extends JDialog {
                 }
                 File file = new File(filename);
                 if (!file.exists()
-                        || JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
+                        || JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
                                 + "' " + Globals.lang("exists. Overwrite file?"),
                                 Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
                     try {
                         prefs.exportPreferences(filename);
                     } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(PrefsDialog3.this,
+                        JOptionPane.showMessageDialog(PreferencesDialog.this,
                                 Globals.lang("Could not export preferences")
                                         + ": " + ex.getMessage(), Globals.lang("Export preferences"),
                                 JOptionPane.ERROR_MESSAGE);
-                        // ex.printStackTrace();
                     }
                 }
 
@@ -220,11 +212,10 @@ class PrefsDialog3 extends JDialog {
                     frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(PrefsDialog3.this,
+                    JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Globals.lang("Could not import preferences")
                                     + ": " + ex.getMessage(), Globals.lang("Import preferences"),
                             JOptionPane.ERROR_MESSAGE);
-                    // ex.printStackTrace();
                 }
             }
 
@@ -232,13 +223,8 @@ class PrefsDialog3 extends JDialog {
 
         setValues();
 
-        pack(); // setSize(440, 500);
+        pack();
 
-        /** Look through component sizes to find which tab is to blame
-         *  when the dialog grows too large:
-        for (Component co : comps) {
-            System.out.println(co.getPreferredSize());
-        }*/
     }
 
 

@@ -5,7 +5,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.ImportSettingsTab;
+import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import spl.localization.LocalizationSupport;
 
 import javax.swing.*;

@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

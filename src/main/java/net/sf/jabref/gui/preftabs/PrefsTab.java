@@ -13,14 +13,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 /**
  * A prefsTab is a component displayed in the PreferenceDialog.
  * 
  * It needs to extend from Component.
  */
-public interface PrefsTab {
+interface PrefsTab {
 
     /**
      * This method is called when the dialog is opened, or if it is made

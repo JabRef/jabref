@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -27,6 +27,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.format.NameFormatter;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
@@ -105,7 +107,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     public NameFormatterTab(HelpDialog helpDialog) {
         setLayout(new BorderLayout());
 
-        TableModel tm = new AbstractTableModel() {
+        TableModel tableModel = new AbstractTableModel() {
 
             @Override
             public int getRowCount() {
@@ -169,10 +171,10 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
         };
 
-        table = new JTable(tm);
-        TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(140);
-        cm.getColumn(1).setPreferredWidth(400);
+        table = new JTable(tableModel);
+        TableColumnModel columnModel = table.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(140);
+        columnModel.getColumn(1).setPreferredWidth(400);
 
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
 
@@ -182,22 +184,22 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        JScrollPane scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         table.setPreferredScrollableViewportSize(new Dimension(250, 200));
-        sp.setMinimumSize(new Dimension(250, 300));
-        sp.setPreferredSize(new Dimension(600, 300));
-        tabPanel.add(sp, BorderLayout.CENTER);
+        scrollPane.setMinimumSize(new Dimension(250, 300));
+        scrollPane.setPreferredSize(new Dimension(600, 300));
+        tabPanel.add(scrollPane, BorderLayout.CENTER);
 
-        JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
-        tlb.setFloatable(false);
-        tlb.setBorder(null);
-        tlb.add(new AddRowAction());
-        tlb.add(new DeleteRowAction());
-        tlb.add(new HelpAction(helpDialog, GUIGlobals.nameFormatterHelp,
+        JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+        toolBar.setFloatable(false);
+        toolBar.setBorder(null);
+        toolBar.add(new AddRowAction());
+        toolBar.add(new DeleteRowAction());
+        toolBar.add(new HelpAction(helpDialog, GUIGlobals.nameFormatterHelp,
                 "Help on Name Formatting", GUIGlobals.getIconUrl("helpSmall")));
 
-        tabPanel.add(tlb, BorderLayout.EAST);
+        tabPanel.add(toolBar, BorderLayout.EAST);
 
         builder.appendSeparator(Globals.lang("Special Name Formatters"));
         builder.nextLine();

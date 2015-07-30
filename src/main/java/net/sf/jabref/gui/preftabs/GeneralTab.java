@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -31,15 +31,18 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class GeneralTab extends JPanel implements PrefsTab {
+class GeneralTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox
-            defSort;
+    private final JCheckBox defSort;
     private final JCheckBox ctrlClick;
     private final JCheckBox useOwner;
     private final JCheckBox overwriteOwner;
@@ -61,13 +64,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField defOwnerField;
     private final JTextField timeStampFormat;
     private final JTextField timeStampField;
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
     private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[GUIGlobals.LANGUAGES.keySet().size()]));
     private final JComboBox encodings = new JComboBox(Globals.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
-        _prefs = prefs;
+        this.prefs = prefs;
         setLayout(new BorderLayout());
 
         allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"));
@@ -157,10 +160,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton hlp = new JButton(ownerHelp);
-        hlp.setText(null);
-        hlp.setPreferredSize(new Dimension(24, 24));
-        builder.append(hlp);
+        JButton help = new JButton(ownerHelp);
+        help.setText(null);
+        help.setPreferredSize(new Dimension(24, 24));
+        builder.append(help);
         builder.nextLine();
 
         builder.append(useTimeStamp, 3);
@@ -169,10 +172,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Globals.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        hlp = new JButton(timeStampHelp);
-        hlp.setText(null);
-        hlp.setPreferredSize(new Dimension(24, 24));
-        builder.append(hlp);
+        help = new JButton(timeStampHelp);
+        help.setText(null);
+        help.setPreferredSize(new Dimension(24, 24));
+        builder.append(help);
         builder.nextLine();
 
         builder.append(new JPanel());
@@ -200,39 +203,39 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        allowEditing.setSelected(_prefs.getBoolean(JabRefPreferences.ALLOW_TABLE_EDITING));
-        defSort.setSelected(_prefs.getBoolean(JabRefPreferences.DEFAULT_AUTO_SORT));
-        ctrlClick.setSelected(_prefs.getBoolean(JabRefPreferences.CTRL_CLICK));
-        useOwner.setSelected(_prefs.getBoolean(JabRefPreferences.USE_OWNER));
-        overwriteOwner.setSelected(_prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
-        useTimeStamp.setSelected(_prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
-        overwriteTimeStamp.setSelected(_prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
-        updateTimeStamp.setSelected(_prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        allowEditing.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_TABLE_EDITING));
+        defSort.setSelected(prefs.getBoolean(JabRefPreferences.DEFAULT_AUTO_SORT));
+        ctrlClick.setSelected(prefs.getBoolean(JabRefPreferences.CTRL_CLICK));
+        useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
+        overwriteOwner.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
+        useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
+        overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+        updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setEnabled(useTimeStamp.isSelected());
-        keyDuplicateWarningDialog.setSelected(_prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY));
-        keyEmptyWarningDialog.setSelected(_prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY));
-        enforceLegalKeys.setSelected(_prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-        memoryStick.setSelected(_prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
-        confirmDelete.setSelected(_prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE));
-        defOwnerField.setText(_prefs.get(JabRefPreferences.DEFAULT_OWNER));
-        timeStampFormat.setText(_prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
-        timeStampField.setText(_prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
-        useImportInspector.setSelected(_prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG));
-        useImportInspectorForSingle.setSelected(_prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE));
-        inspectionWarnDupli.setSelected(_prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
+        keyDuplicateWarningDialog.setSelected(prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY));
+        keyEmptyWarningDialog.setSelected(prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY));
+        enforceLegalKeys.setSelected(prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+        memoryStick.setSelected(prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
+        confirmDelete.setSelected(prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE));
+        defOwnerField.setText(prefs.get(JabRefPreferences.DEFAULT_OWNER));
+        timeStampFormat.setText(prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
+        timeStampField.setText(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
+        useImportInspector.setSelected(prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG));
+        useImportInspectorForSingle.setSelected(prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE));
+        inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
         useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
         inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
-        markImportedEntries.setSelected(_prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
-        unmarkAllEntriesBeforeImporting.setSelected(_prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
+        markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
+        unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
-        String enc = _prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+        String enc = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         for (int i = 0; i < Globals.ENCODINGS.length; i++) {
             if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
                 encodings.setSelectedIndex(i);
                 break;
             }
         }
-        String oldLan = _prefs.get(JabRefPreferences.LANGUAGE);
+        String oldLan = prefs.get(JabRefPreferences.LANGUAGE);
 
         // Language choice
         int ilk = 0;
@@ -247,40 +250,38 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        _prefs.putBoolean(JabRefPreferences.USE_OWNER, useOwner.isSelected());
-        _prefs.putBoolean(JabRefPreferences.OVERWRITE_OWNER, overwriteOwner.isSelected());
-        _prefs.putBoolean(JabRefPreferences.USE_TIME_STAMP, useTimeStamp.isSelected());
-        _prefs.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, overwriteTimeStamp.isSelected());
-        _prefs.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStamp.isSelected());
-        _prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY, keyDuplicateWarningDialog.isSelected());
-        _prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, keyEmptyWarningDialog.isSelected());
-        _prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
-        if (_prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
+        prefs.putBoolean(JabRefPreferences.USE_OWNER, useOwner.isSelected());
+        prefs.putBoolean(JabRefPreferences.OVERWRITE_OWNER, overwriteOwner.isSelected());
+        prefs.putBoolean(JabRefPreferences.USE_TIME_STAMP, useTimeStamp.isSelected());
+        prefs.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, overwriteTimeStamp.isSelected());
+        prefs.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStamp.isSelected());
+        prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY, keyDuplicateWarningDialog.isSelected());
+        prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, keyEmptyWarningDialog.isSelected());
+        prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
+        if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
             JOptionPane.showMessageDialog(null, Globals.lang("To disable the memory stick mode"
                     + " rename or remove the jabref.xml file in the same folder as JabRef."),
                     Globals.lang("Memory Stick Mode"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
-        _prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
-        _prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
-        _prefs.putBoolean(JabRefPreferences.ALLOW_TABLE_EDITING, allowEditing.isSelected());
-        _prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
-        //_prefs.putBoolean("preserveFieldFormatting", preserveFormatting.isSelected());
-        _prefs.putBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG, useImportInspector.isSelected());
-        _prefs.putBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, useImportInspectorForSingle.isSelected());
-        _prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
-        //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
+        prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
+        prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
+        prefs.putBoolean(JabRefPreferences.ALLOW_TABLE_EDITING, allowEditing.isSelected());
+        prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
+        prefs.putBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG, useImportInspector.isSelected());
+        prefs.putBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, useImportInspectorForSingle.isSelected());
+        prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
-        _prefs.put(JabRefPreferences.DEFAULT_OWNER, owner);
-        _prefs.WRAPPED_USERNAME = '[' + owner + ']';
-        _prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
-        _prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
-        _prefs.put(JabRefPreferences.DEFAULT_ENCODING, (String) encodings.getSelectedItem());
-        _prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
-        _prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
+        prefs.put(JabRefPreferences.DEFAULT_OWNER, owner);
+        prefs.WRAPPED_USERNAME = '[' + owner + ']';
+        prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
+        prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
+        prefs.put(JabRefPreferences.DEFAULT_ENCODING, (String) encodings.getSelectedItem());
+        prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
+        prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 
-        if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get(JabRefPreferences.LANGUAGE))) {
-            _prefs.put(JabRefPreferences.LANGUAGE, GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
+        if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
+            prefs.put(JabRefPreferences.LANGUAGE, GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
             Globals.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()), "");
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();

@@ -76,6 +76,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.imports.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -135,7 +136,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final JSplitPane contentPane = new JSplitPane();
 
     final JabRefPreferences prefs = Globals.prefs;
-    private PrefsDialog3 prefsDialog = null;
+    private PreferencesDialog prefsDialog = null;
 
     private int lastTabbedPanelSelectionIndex = -1;
 
@@ -755,7 +756,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             public void run() {
                 output(Globals.lang("Opening preferences..."));
                 if (prefsDialog == null) {
-                    prefsDialog = new PrefsDialog3(JabRefFrame.this, jabRef);
+                    prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
                     Util.placeDialog(prefsDialog, JabRefFrame.this);
                 } else {
                     prefsDialog.setValues();

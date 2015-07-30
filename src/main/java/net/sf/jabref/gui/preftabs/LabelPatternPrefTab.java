@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.GridBagConstraints;
 
@@ -26,6 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternPanel;
@@ -37,9 +39,9 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * The Preferences panel for key generation.
  */
-public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
+class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
 
     private final JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys"));
     private final JCheckBox warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys"));
@@ -54,9 +56,9 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
     private final JTextField KeyPatternReplacement = new JTextField(20);
 
 
-    public TabLabelPattern(JabRefPreferences prefs, HelpDialog helpDiag) {
+    public LabelPatternPrefTab(JabRefPreferences prefs, HelpDialog helpDiag) {
         super(helpDiag);
-        _prefs = prefs;
+        this.prefs = prefs;
         appendKeyGeneratorSettings();
     }
 
@@ -73,8 +75,6 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
-        //Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
-        //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
         Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
         Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerateOnImport.isSelected());
@@ -94,13 +94,13 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
         LabelPatternUtil.updateDefaultPattern();
 
         // fetch the old parent from the currently stored patterns
-        LabelPattern defKeyPattern = _prefs.getKeyPattern().getParent();
+        LabelPattern defKeyPattern = prefs.getKeyPattern().getParent();
         // fetch entries from GUI
         LabelPattern keypatterns = getLabelPattern();
         // restore old parent
         keypatterns.setParent(defKeyPattern);
         // store new patterns globally
-        _prefs.putKeyPattern(keypatterns);
+        prefs.putKeyPattern(keypatterns);
     }
 
     private void appendKeyGeneratorSettings() {
@@ -111,7 +111,7 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
 
         // Build a panel for checkbox settings:
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");//, 8dlu, 20dlu, 8dlu, fill:pref", "");
+                ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");
         JPanel pan = new JPanel();
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.appendSeparator(Globals.lang("Key generator settings"));
@@ -167,7 +167,7 @@ public class TabLabelPattern extends LabelPatternPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        super.setValues(_prefs.getKeyPattern());
+        super.setValues(prefs.getKeyPattern());
         defaultPat.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
         dontOverwrite.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY));
         generateOnSave.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));

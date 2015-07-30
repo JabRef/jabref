@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -36,10 +36,13 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences _prefs;
+    private final JabRefPreferences prefs;
 
     private final JCheckBox autoResizeMode;
     private final JCheckBox priDesc;
@@ -70,8 +73,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      * @param prefs
      *            a <code>JabRefPreferences</code> value
      */
-    public TablePrefsTab(JabRefPreferences prefs, JabRefFrame frame) {
-        _prefs = prefs;
+    public TablePrefsTab(JabRefPreferences prefs) {
+        this.prefs = prefs;
         setLayout(new BorderLayout());
 
         /**
@@ -81,10 +84,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
          * 
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        Vector<String> v = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
-        v.add(BibtexFields.KEY_FIELD);
-        Collections.sort(v);
-        String[] allPlusKey = v.toArray(new String[v.size()]);
+        Vector<String> fieldNames = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        fieldNames.add(BibtexFields.KEY_FIELD);
+        Collections.sort(fieldNames);
+        String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
         priSort = new JComboBox(allPlusKey);
         secSort = new JComboBox(allPlusKey);
         terSort = new JComboBox(allPlusKey);
@@ -142,15 +145,15 @@ class TablePrefsTab extends JPanel implements PrefsTab {
             }
         });
 
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(namesAsIs);
-        bg.add(namesNatbib);
-        bg.add(namesFf);
-        bg.add(namesFl);
-        ButtonGroup bg2 = new ButtonGroup();
-        bg2.add(lastNamesOnly);
-        bg2.add(abbrNames);
-        bg2.add(noAbbrNames);
+        ButtonGroup nameStyle = new ButtonGroup();
+        nameStyle.add(namesAsIs);
+        nameStyle.add(namesNatbib);
+        nameStyle.add(namesFf);
+        nameStyle.add(namesFl);
+        ButtonGroup nameAbbrev = new ButtonGroup();
+        nameAbbrev.add(lastNamesOnly);
+        nameAbbrev.add(abbrNames);
+        nameAbbrev.add(noAbbrNames);
         priDesc = new JCheckBox(Globals.lang("Descending"));
         secDesc = new JCheckBox(Globals.lang("Descending"));
         terDesc = new JCheckBox(Globals.lang("Descending"));
@@ -178,10 +181,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         builder.append(pan);
         builder.append(nameBuilder.getPanel());
         builder.nextLine();
-        // builder.append(pan); builder.append(noAbbrNames); builder.nextLine();
-        // builder.append(pan); builder.append(abbrNames); builder.nextLine();
-        // builder.append(pan); builder.append(lastNamesOnly);
-        // builder.nextLine();
 
         builder.appendSeparator(Globals.lang("Default sort criteria"));
         // Create a new panel with its own FormLayout for these items:
@@ -241,42 +240,42 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         autoResizeMode
-                .setSelected(_prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
+                .setSelected(prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        priField.setText(_prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD));
-        secField.setText(_prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD));
-        terField.setText(_prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD));
+        priField.setText(prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD));
+        secField.setText(prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD));
+        terField.setText(prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD));
         priSort.setSelectedIndex(0);
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
 
-        if (_prefs.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
+        if (prefs.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
             namesAsIs.setSelected(true);
-        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
+        } else if (prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
             namesFf.setSelected(true);
-        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_NATBIB)) {
+        } else if (prefs.getBoolean(JabRefPreferences.NAMES_NATBIB)) {
             namesNatbib.setSelected(true);
         } else {
             namesFl.setSelected(true);
         }
-        if (_prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
+        if (prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
             abbrNames.setSelected(true);
-        } else if (_prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
+        } else if (prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
             lastNamesOnly.setSelected(true);
         } else {
             noAbbrNames.setSelected(true);
         }
-        priDesc.setSelected(_prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING));
-        secDesc.setSelected(_prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
-        terDesc.setSelected(_prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
+        priDesc.setSelected(prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING));
+        secDesc.setSelected(prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING));
+        terDesc.setSelected(prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING));
 
-        floatMarked.setSelected(_prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
+        floatMarked.setSelected(prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         abbrNames.setEnabled(!namesNatbib.isSelected());
         lastNamesOnly.setEnabled(!namesNatbib.isSelected());
         noAbbrNames.setEnabled(!namesNatbib.isSelected());
 
-        String numF = _prefs.get(JabRefPreferences.NUMERIC_FIELDS);
+        String numF = prefs.get(JabRefPreferences.NUMERIC_FIELDS);
         if (numF == null) {
             numericFields.setText("");
         } else {
@@ -293,29 +292,25 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
 
-        _prefs.putBoolean(JabRefPreferences.NAMES_AS_IS, namesAsIs.isSelected());
-        _prefs.putBoolean(JabRefPreferences.NAMES_FIRST_LAST, namesFf.isSelected());
-        _prefs.putBoolean(JabRefPreferences.NAMES_NATBIB, namesNatbib.isSelected());
-        _prefs.putBoolean(JabRefPreferences.NAMES_LAST_ONLY, lastNamesOnly.isSelected());
-        _prefs.putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, abbrNames.isSelected());
+        prefs.putBoolean(JabRefPreferences.NAMES_AS_IS, namesAsIs.isSelected());
+        prefs.putBoolean(JabRefPreferences.NAMES_FIRST_LAST, namesFf.isSelected());
+        prefs.putBoolean(JabRefPreferences.NAMES_NATBIB, namesNatbib.isSelected());
+        prefs.putBoolean(JabRefPreferences.NAMES_LAST_ONLY, lastNamesOnly.isSelected());
+        prefs.putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, abbrNames.isSelected());
 
-        _prefs.putInt(JabRefPreferences.AUTO_RESIZE_MODE,
+        prefs.putInt(JabRefPreferences.AUTO_RESIZE_MODE,
                 autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
-        _prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, priDesc.isSelected());
-        _prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, secDesc.isSelected());
-        _prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, terDesc.isSelected());
-        // _prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD,
-        // GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
-        // _prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD,
-        // GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
-        _prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, priField.getText().toLowerCase().trim());
-        _prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
-        _prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
+        prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, priDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, secDesc.isSelected());
+        prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, terDesc.isSelected());
+        prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, priField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, secField.getText().toLowerCase().trim());
+        prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, terField.getText().toLowerCase().trim());
 
-        _prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
+        prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
         // updatefont
 
-        String oldVal = _prefs.get(JabRefPreferences.NUMERIC_FIELDS);
+        String oldVal = prefs.get(JabRefPreferences.NUMERIC_FIELDS);
         String newVal = numericFields.getText().trim();
         if (newVal.isEmpty()) {
             newVal = null;
@@ -323,7 +318,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (newVal != null && oldVal == null
                 || newVal == null && oldVal != null
                 || newVal != null && !newVal.equals(oldVal)) {
-            _prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
+            prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             BibtexFields.setNumericFieldsFromPrefs();
         }
 
