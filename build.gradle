@@ -1,20 +1,7 @@
-// must appear before any plugins blocks - see http://gradle.org/docs/2.4/userguide/plugins.html#sec:plugins_block
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-    }
-}
-
 plugins {
-    //The format plugin is currently not used
-    //id "com.github.youribonnaffe.gradle.format" version "1.2"
-
     id "eu.appsatori.fatjar" version "0.3"
-    id "edu.sc.seis.launch4j" version "1.1.3"
+    id "edu.sc.seis.launch4j" version "1.1.4"
+    id "com.github.kt3k.coveralls" version "2.4.0"
 }
 
 apply plugin: "java"
@@ -23,14 +10,6 @@ apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
 apply plugin: "maven"
-
-/* disabled, because currently unused
-format {
-    configurationFile = file('formatter_settings.xml')
-    // default: reformat main and test
-    //files = sourceSets.main.java
-}
-*/
 
 fatJar {
     classifier 'fat'
@@ -46,8 +25,8 @@ test {
 }
 
 group = "net.sf.jabref"
-version = "2.11.0.0"
-project.ext.txtVersion = "2.11dev"
+version = "2.80dev"
+project.ext.threeDotVersion = "2.80.0.0"
 
 repositories {
     jcenter()
@@ -201,35 +180,28 @@ task release(dependsOn: ["releaseWindows", "releaseMac"]) {
     description 'Creates a release for all target platforms.'
 }
 
-//win: depends="clean, non_osx, win.installer, macbundle, bzip2src, zipsrc"
-
 project.ext.nsisExec = "C:/Program files/NSIS/makensis.exe"
-project.ext.launch4jDir = "/opt/launch4j"
 
-task devBuild() {
-    group = 'JabRef'
-    description "Sets the version to 'version-DATE-GIT_HASH', e.g., '2.11dev-2015-01-04-ab34ef8'"
-
-    doLast {
-        String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
-        String result = ""
-        if (OperatingSystem.current().isWindows()) {
-            result = "cmd /c $command".execute().in.text
-        } else {
-            result = command.execute().in.text
-        }
-
-        // remove enclosing ' of result
-        project.version += "--snapshot--" + result.substring(1, result.length() - 1)
-        println project.version
+/*
+ * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
+ */
+if(hasProperty('dev')) {
+    String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
+    String result = ""
+    if (OperatingSystem.current().isWindows()) {
+        result = "cmd /c $command".execute().in.text
+    } else {
+        result = command.execute().in.text
     }
+
+    // remove enclosing ' of result
+    project.version += "--snapshot--" + result.substring(1, result.length() - 1)
 }
 
-
 launch4j {
-    mainClassName = "net.sf.jabref.JabRefMain"
-    version = project.version
-    textVersion = project.ext.txtVersion
+    mainClassName = project.mainClassName
+    version = project.ext.threeDotVersion
+    textVersion = project.version
     jar = "../libs/JabRef-${project.version}-fat.jar"
     icon = "${projectDir}/src/main/resources/images/JabRef.ico"
     copyright = "JabRef developers"
@@ -237,25 +209,26 @@ launch4j {
     maxHeapSize = 512
 }
 createExe.dependsOn "fatJar"
+farJar.dependsOn "copyOSXAdapter"
 
-task releaseWindows(dependsOn: ["clean", "copyOSXAdapter", "launch4j"]) {
+task releaseWindows(dependsOn: ["launch4j"]) {
     group = 'JabRef'
     description "Creates a Windows release. Creates all distribution files in ${buildDir}"
 
     doLast {
         if (OperatingSystem.current().isWindows()) {
             exec {
-                commandLine 'cmd', '/c', "${project.ext.nsisExec}", "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+                commandLine 'cmd', '/c', project.ext.nsisExec, "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
             }
         } else {
             exec {
-                commandLine "${project.ext.nsisExec}", "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
+                commandLine project.ext.nsisExec, "/DVERSION=${version} ${projectDir}/buildres/nsis/setup.nsi"
             }
         }
     }
 }
 
-task releaseMac(dependsOn: ["clean", "copyOSXAdapter"]) {
+task releaseMac(dependsOn: []) {
     group = 'JabRef'
     description "Creates a OSX release. Creates all distribution files in ${buildDir}"
 }
