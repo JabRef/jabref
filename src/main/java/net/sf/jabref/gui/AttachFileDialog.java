@@ -29,6 +29,8 @@ import net.sf.jabref.external.ExternalFilePanel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.FieldTextField;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 

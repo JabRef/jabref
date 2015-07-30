@@ -14,7 +14,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -30,8 +30,12 @@ import javax.swing.text.BadLocationException;
 import net.sf.jabref.EntryContainer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
+
+    private static final Log LOGGER = LogFactory.getLog(PreviewPanelTransferHandler.class);
 
     public PreviewPanelTransferHandler(JabRefFrame frame, EntryContainer entryContainer, TransferHandler textTransferHandler) {
         super(frame, entryContainer, textTransferHandler);
@@ -41,13 +45,13 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
      * LINK is unsupported as dropping into into Microsoft Word then leads to a link instead to a copy
      */
     @Override
-    public int getSourceActions(JComponent c) {
+    public int getSourceActions(JComponent component) {
         return DnDConstants.ACTION_COPY;
     }
 
     @Override
-    protected Transferable createTransferable(JComponent c) {
-        if (c instanceof JEditorPane) {
+    protected Transferable createTransferable(JComponent component) {
+        if (component instanceof JEditorPane) {
             // this method should be called from the preview panel only
 
             // the default TransferHandler implementation is aware of HTML
@@ -56,18 +60,18 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             // I don't know any other method, I do the HTML conversion by hand
 
             // First, get the HTML of the selected text
-            JEditorPane e = (JEditorPane) c;
-            StringWriter sw = new StringWriter();
+            JEditorPane editorPane = (JEditorPane) component;
+            StringWriter stringWriter = new StringWriter();
             try {
-                e.getEditorKit().write(sw, e.getDocument(), e.getSelectionStart(), e.getSelectionEnd());
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (BadLocationException e1) {
-                e1.printStackTrace();
+                editorPane.getEditorKit().write(stringWriter, editorPane.getDocument(), editorPane.getSelectionStart(), editorPane.getSelectionEnd());
+            } catch (IOException e) {
+                LOGGER.warn("Cannot write preview", e);
+            } catch (BadLocationException e) {
+                LOGGER.warn("Cannot write preview", e);
             }
 
             // Second, return the HTML (and text as fallback)
-            return new HtmlTransferable(sw.toString(), e.getSelectedText());
+            return new HtmlTransferable(stringWriter.toString(), editorPane.getSelectedText());
         } else {
             // if not called from the preview panel, return an error string
             return new StringSelection(Globals.lang("Operation not supported"));

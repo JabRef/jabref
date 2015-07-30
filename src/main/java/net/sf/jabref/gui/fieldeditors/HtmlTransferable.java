@@ -14,7 +14,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

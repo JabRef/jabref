@@ -41,6 +41,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

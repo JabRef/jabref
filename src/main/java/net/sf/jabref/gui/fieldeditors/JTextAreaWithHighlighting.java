@@ -13,7 +13,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.fieldeditors;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.SearchTextListener;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -47,27 +51,6 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
     JTextAreaWithHighlighting(String text) {
         super(text);
-        setupUndoRedo();
-    }
-
-    public JTextAreaWithHighlighting(Document doc) {
-        super(doc);
-        setupUndoRedo();
-    }
-
-    public JTextAreaWithHighlighting(int rows, int columns) {
-        super(rows, columns);
-        setupUndoRedo();
-    }
-
-    public JTextAreaWithHighlighting(String text, int rows, int columns) {
-        super(text, rows, columns);
-        setupUndoRedo();
-    }
-
-    public JTextAreaWithHighlighting(Document doc, String text, int rows,
-            int columns) {
-        super(doc, text, rows, columns);
         setupUndoRedo();
     }
 
@@ -125,8 +108,8 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             // If yes, do not bind
             // Typically, we have: CTRL+y is "yank" in emacs and REDO in 'normal' settings
             // The Emacs key bindings are stored in the keymap, not in the input map.
-            Keymap keymap2 = getKeymap();
-            KeyStroke[] keys = keymap2.getBoundKeyStrokes();
+            Keymap keymap = getKeymap();
+            KeyStroke[] keys = keymap.getBoundKeyStrokes();
             int i = 0;
             while (i < keys.length && !keys[i].equals(redoKey)) {
                 i++;
@@ -148,9 +131,8 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
      */
     private void highLight(ArrayList<String> words) {
         // highlight all characters that appear in charsToHighlight
-        Highlighter h = getHighlighter();
-        // myTa.set
-        h.removeAllHighlights();
+        Highlighter highlighter = getHighlighter();
+        highlighter.removeAllHighlights();
 
         if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
             return;
@@ -164,7 +146,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
         while (matcher.find()) {
             try {
-                h.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
+                highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
             } catch (BadLocationException ble) {
                 // should not occur if matcher works right
                 System.out.println(ble);
@@ -174,8 +156,8 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     }
 
     @Override
-    public void setText(String t) {
-        super.setText(t);
+    public void setText(String text) {
+        super.setText(text);
         if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
             highLight(wordsToHighlight);
         }

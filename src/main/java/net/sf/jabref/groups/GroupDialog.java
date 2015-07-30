@@ -21,6 +21,7 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.gui.fieldeditors.FieldTextField;
 import net.sf.jabref.search.SearchRules;
 import net.sf.jabref.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.StringUtil;

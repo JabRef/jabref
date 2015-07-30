@@ -38,6 +38,7 @@ import java.net.URL;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.EntryEditor.StoreFieldAction;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

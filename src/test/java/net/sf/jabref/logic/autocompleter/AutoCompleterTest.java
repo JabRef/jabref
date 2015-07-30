@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.autocompleter;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.FieldTextArea;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.testutils.TestUtils;
 

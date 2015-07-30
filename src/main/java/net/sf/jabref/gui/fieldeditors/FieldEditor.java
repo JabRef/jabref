@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.gui.AutoCompleteListener;
 
@@ -50,9 +50,9 @@ public interface FieldEditor {
 
     void setInvalidBackgroundColor();
 
-    void setLabelColor(Color c);
+    void setLabelColor(Color color);
 
-    void setBackground(Color c);
+    void setBackground(Color color);
 
     void updateFontColor();
 
@@ -89,15 +89,9 @@ public interface FieldEditor {
      */
     String getSelectedText();
 
-    boolean hasUndoInformation();
-
     void undo();
 
-    boolean hasRedoInformation();
-
     void redo();
-
-    void addUndoableEditListener(UndoableEditListener listener);
 
     void setAutoCompleteListener(AutoCompleteListener listener);
 

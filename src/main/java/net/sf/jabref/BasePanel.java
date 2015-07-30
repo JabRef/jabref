@@ -57,6 +57,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.DatabaseChangeEvent.ChangeType;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
