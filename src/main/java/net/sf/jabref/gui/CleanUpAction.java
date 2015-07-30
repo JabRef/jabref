@@ -42,7 +42,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.util.DOIUtil;
 import net.sf.jabref.util.FileUtil;
-import net.sf.jabref.util.MonthUtil;
+import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {

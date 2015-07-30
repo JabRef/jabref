@@ -37,7 +37,7 @@ import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 
 public class AuxCommandLine
 {

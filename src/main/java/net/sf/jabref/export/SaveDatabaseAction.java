@@ -20,7 +20,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
-import net.sf.jabref.util.FileBasedLock;
+import net.sf.jabref.logic.util.FileBasedLock;
 
 import javax.swing.*;
 import java.io.File;

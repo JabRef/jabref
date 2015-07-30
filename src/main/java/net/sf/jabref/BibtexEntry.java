@@ -44,7 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.export.FieldFormatter;
-import net.sf.jabref.util.MonthUtil;
+import net.sf.jabref.logic.util.MonthUtil;
 
 public class BibtexEntry
 {

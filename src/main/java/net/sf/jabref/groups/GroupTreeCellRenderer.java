@@ -29,7 +29,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its

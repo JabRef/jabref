@@ -22,8 +22,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.search.SearchRule;
 import net.sf.jabref.search.SearchRules;
 import net.sf.jabref.search.describer.SearchDescribers;
-import net.sf.jabref.util.QuotedStringTokenizer;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.QuotedStringTokenizer;
+import net.sf.jabref.logic.util.StringUtil;
 
 import javax.swing.undo.AbstractUndoableEdit;
 

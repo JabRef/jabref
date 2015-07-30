@@ -33,7 +33,7 @@
 // modified:
 //
 
-package net.sf.jabref.util;
+package net.sf.jabref.logic.util;
 
 import java.io.IOException;
 import java.util.Properties;

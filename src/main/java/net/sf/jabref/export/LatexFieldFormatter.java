@@ -16,7 +16,7 @@
 package net.sf.jabref.export;
 
 import net.sf.jabref.*;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 
 import java.util.Vector;

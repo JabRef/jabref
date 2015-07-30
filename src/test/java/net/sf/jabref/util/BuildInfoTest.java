@@ -1,6 +1,8 @@
 package net.sf.jabref.util;
 
 import static org.junit.Assert.*;
+
+import net.sf.jabref.logic.util.BuildInfo;
 import org.junit.Test;
 
 public class BuildInfoTest {

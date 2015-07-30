@@ -70,6 +70,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.logic.util.FileNameCleaner;
+import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.YearUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

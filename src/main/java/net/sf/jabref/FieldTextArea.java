@@ -16,7 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 
 import java.awt.*;
 import java.util.regex.Pattern;

@@ -1,4 +1,6 @@
-package net.sf.jabref.util;
+package net.sf.jabref.logic.util;
+
+import net.sf.jabref.util.Util;
 
 import java.util.Arrays;
 import java.util.List;

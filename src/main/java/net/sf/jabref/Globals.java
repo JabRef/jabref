@@ -40,7 +40,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
-import net.sf.jabref.util.BuildInfo;
+import net.sf.jabref.logic.util.BuildInfo;
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.logging.CacheableHandler;
 

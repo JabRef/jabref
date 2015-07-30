@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.sf.jabref.*;
-import net.sf.jabref.util.MonthUtil;
+import net.sf.jabref.logic.util.MonthUtil;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on

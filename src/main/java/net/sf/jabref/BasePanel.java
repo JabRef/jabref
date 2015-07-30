@@ -122,7 +122,7 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.util.FileBasedLock;
+import net.sf.jabref.logic.util.FileBasedLock;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import ca.odell.glazedlists.FilterList;

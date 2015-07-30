@@ -35,6 +35,7 @@ package net.sf.jabref.util;
  */
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.CaseChangers;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;

@@ -26,7 +26,7 @@ import javax.swing.*;
 
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 
 /**

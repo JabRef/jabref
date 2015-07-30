@@ -6,6 +6,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OpenFileFilter;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.logic.util.StringUtil;
 
 import java.io.File;
 import java.io.FilenameFilter;

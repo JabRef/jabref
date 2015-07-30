@@ -47,7 +47,7 @@ import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.util.CaseChangeMenu;
-import net.sf.jabref.util.NameListNormalizer;
+import net.sf.jabref.logic.util.NameListNormalizer;
 import net.sf.jabref.util.GoogleUrlCleaner;
 
 public class FieldTextMenu implements MouseListener

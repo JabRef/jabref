@@ -1,7 +1,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.export.FieldFormatter;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 
 import java.io.IOException;
 import java.io.Writer;

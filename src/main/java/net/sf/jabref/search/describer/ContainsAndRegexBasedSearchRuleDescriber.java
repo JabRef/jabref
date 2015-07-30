@@ -2,7 +2,7 @@ package net.sf.jabref.search.describer;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.search.rules.util.SentenceAnalyzer;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.StringUtil;
 
 import java.util.LinkedList;
 import java.util.List;

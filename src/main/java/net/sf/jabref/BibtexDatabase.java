@@ -35,8 +35,7 @@ Modified for use in JabRef
 
 package net.sf.jabref;
 
-import net.sf.jabref.util.MonthUtil;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.util.MonthUtil;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;

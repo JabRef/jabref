@@ -7,6 +7,7 @@ import net.sf.jabref.NameFormatterTab;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
+import net.sf.jabref.logic.util.StringUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
