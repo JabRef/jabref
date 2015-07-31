@@ -112,7 +112,8 @@ releaseWindows - Creates a Windows executable and installer.
 
 To set the path to your local NSIS executable pass it via a Gradle property:
 
-`gradlew -PnsisExec=PATH ANY_RELEASE_TASK `
+`gradlew -PnsisExec=PATH ANY_RELEASE_TASK`
+Typically, this is `"C:\Program Files (x86)\NSIS\makensis.exe"` resulting in the command line `gradlew -PnsisExec="C:\Program Files (x86)\NSIS\makensis.exe" release`.
 
 All binaries are created inside the directory `build/releases`.
 
@@ -121,8 +122,8 @@ All binaries are created inside the directory `build/releases`.
 Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
 The only difference is that the version contains the keyword *snapshot*, the *date*, and the *shortend git hash*.
 
-Normal: `JabRef--2.80.0.0.jar`
-With `-Pdev=true`: `JabRef--2.80.0.0--snapshot--2015-07-30--48a23d1.jar`
+Normal: `JabRef--2.80dev.jar`
+With `-Pdev=true`: `JabRef--2.80dev--snapshot--2015-07-30--48a23d1.jar`
 
 ## License
 
