@@ -20,7 +20,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 group = "net.sf.jabref"
 version = "2.80dev"
 project.ext.threeDotVersion = "2.80.0.0"
-project.ext.nsisExec = "C:/Program Files/NSIS/makensis.exe"
+project.ext.nsisExec = hasProperty("nsisExec") ? getProperty("nsisExec") : "C:/Program Files/NSIS/makensis.exe"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
