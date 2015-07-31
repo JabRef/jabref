@@ -1,3 +1,6 @@
+import org.gradle.internal.os.OperatingSystem
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id "eu.appsatori.fatjar" version "0.3"
     id "edu.sc.seis.launch4j" version "1.1.4"
@@ -11,34 +14,23 @@ apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
 apply plugin: "maven"
-
-fatJar {
-    classifier 'fat'
-    manifest {
-        attributes 'Main-Class': "net.sf.jabref.JabRefMain"
-    }
-}
-
-test {
-    testLogging {
-        exceptionFormat "full" // default is "short"
-    }
-}
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
 
 group = "net.sf.jabref"
 version = "2.80dev"
 project.ext.threeDotVersion = "2.80.0.0"
+project.ext.nsisExec = "C:/Program Files/NSIS/makensis.exe"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+mainClassName = "net.sf.jabref.JabRefMain"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.5'
+}
 
 repositories {
     jcenter()
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs = ["src/main/java", "src/main/gen"]
-        }
-    }
 }
 
 configurations {
@@ -47,7 +39,6 @@ configurations {
 }
 
 dependencies {
-
     // jgoodies
     compile 'com.jgoodies:jgoodies-common:1.7.0'
     compile 'com.jgoodies:jgoodies-forms:1.7.2'
@@ -87,36 +78,22 @@ dependencies {
     compile 'junit:junit:4.12'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-mainClassName = "net.sf.jabref.JabRefMain"
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.5'
-}
-
-compileJava {
-    // files are all encoded using UTF-8
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:none"
-}
-compileJava.dependsOn "generateSource"
-
-compileTestJava {
-    // files are all encoded using UTF-8
-    options.encoding = 'UTF-8'
-}
-
-javadoc {
-    options {
-        // files are all encoded using UTF-8
-        encoding = 'UTF-8'
-        version = true
-        author = true
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", "src/main/gen"]
+        }
     }
 }
 
-// jabref specific tasks
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "version": project.version,
+            "year"   : String.valueOf(Calendar.getInstance().get(Calendar.YEAR))
+    ]
+}
+
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
@@ -163,8 +140,39 @@ task generateSearchGrammarSource(type: JavaExec) {
     args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
 }
 
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
+compileJava {
+    // files are all encoded using UTF-8
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:none"
+}
+compileJava.dependsOn "generateSource"
+
+compileTestJava {
+    // files are all encoded using UTF-8
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options {
+        // files are all encoded using UTF-8
+        encoding = 'UTF-8'
+        version = true
+        author = true
+    }
+}
+
+fatJar {
+    classifier 'fat'
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+test {
+    testLogging {
+        exceptionFormat "full" // default is "short"
+    }
+}
 
 jacocoTestReport {
     reports {
@@ -172,24 +180,6 @@ jacocoTestReport {
         html.enabled = true
     }
 }
-
-import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.internal.os.OperatingSystem
-
-processResources {
-    filter ReplaceTokens, tokens: [
-            "version": project.version,
-            "year"   : "2015",
-    ]
-}
-
-// release tasks
-task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "zipSource", "tarSource"]) {
-    group = 'JabRef - Release'
-    description 'Creates a release for all target platforms.'
-}
-
-project.ext.nsisExec = "C:/Program Files/NSIS/makensis.exe"
 
 /*
  * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
@@ -205,6 +195,12 @@ if (hasProperty('dev')) {
 
     // remove enclosing ' of result
     project.version += "--snapshot--" + result.substring(1, result.length() - 1)
+}
+
+// release tasks
+task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "releaseSourceZip", "releaseSourceTar"]) {
+    group = 'JabRef - Release'
+    description 'Creates a release for all target platforms.'
 }
 
 launch4j {
@@ -290,8 +286,7 @@ macAppBundle {
     bundleExtras.put("CFBundleDocumentTypes", [map])
 }
 
-// TODO: can be removed when SourceForge releases are discontinued
-task zipSource(type: Exec) {
+task releaseSourceZip(type: Exec) {
     group = 'JabRef - Release'
     description "Creates a zip archive of the source code."
 
@@ -302,8 +297,7 @@ task zipSource(type: Exec) {
     }
 }
 
-// TODO: can be removed when SourceForge releases are discontinued
-task tarSource(type: Exec) {
+task releaseSourceTar(type: Exec) {
     group = 'JabRef - Release'
     description "Creates a tar archive of the source code."
 
@@ -312,5 +306,10 @@ task tarSource(type: Exec) {
     } else {
         commandLine "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
     }
+}
+
+task makeReleasesAvailableOnCircleCI(type: Copy) {
+    from "$buildDir/releases"
+    into System.getenv('CIRCLE_ARTIFACTS')
 }
 
