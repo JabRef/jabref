@@ -272,6 +272,10 @@ task releaseMac(dependsOn: "createAppZip") {
     }
 }
 
+if(!OperatingSystem.current().isMacOsX()) {
+    createDmg.enabled = false // disable this task as it requires a command line tool only available on Mac OS X
+}
+
 macAppBundle {
     mainClassName = project.mainClassName
     icon = "src/main/resources/images/icons/JabRef-Logo.icns"
