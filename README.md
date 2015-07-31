@@ -10,7 +10,7 @@ This version is a development version. Features may not work as expected.
 
 The branch of this README file is `master`.
 The intention of this branch is to move JabRef forward to modern technologies such as Java8 and JavaFX.
-The development version will be called `v2.80` and is meant is preparation to the `v3.0` release.
+The development version will be called `v2.80` and is meant as preparation to the `v3.0` release.
 
 The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
@@ -43,20 +43,9 @@ We are thankful for any bug reports or other feedback.
 If there are features you want included in JabRef, tell us!
 
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) so send in bug reports and suggestions.
-We also keep an eye on our old trackers at sourceforge:
-
-    * Bugs: https://sourceforge.net/p/jabref/bugs/
-    * Feature Requests: https://sourceforge.net/p/jabref/feature-requests/
 
 To get your code added to JabRef, just fork JabRef and create a pull request.
-For details see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-### Next Steps
-
-* Completely change build system from `ant` to `gradle` to get rid of the binaries in the repository.
-* Migrate the sourceforge wiki to github
-* Fix bugs listed at https://sourceforge.net/p/jabref/bugs/.
-
+For details see [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Requirements
 
@@ -83,7 +72,7 @@ Try to doubleclick the `jar` file or execute the following command:
 
 ## Documentation
 
-JabRef comes with an online help function, accessed by pressing F1 or
+JabRef comes with an online help function, accessed by pressing `F1` or
 clicking on a question mark icon. The help files are probably not
 exhaustive enough to satisfy everyone yet, but they should help sort
 out the most important issues about using the program. The help files
@@ -107,35 +96,24 @@ For IntelliJ IDEA, just import the project via a Gradle Import by poiting at the
 ## Release Process
 
 Requires
- * [launch4j](http://launch4j.sourceforge.net/)
-   * that launch4j is available through the PATH
+ * [launch4j](http://launch4j.sourceforge.net/) available in PATH
  * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
  * Eventually and `nsis.executable`
 
-Replace `ANY_ANT_TARGET` with the Ant Target of your choice (e.g., `macbundle`), and the system will build your binaries.
 To get a list of all targets, use `gradlew tasks`.
+```
+release - Creates a release for all target platforms.
+releaseJar - Creates a Jar release.
+releaseMac - Creates a OSX release.
+releaseSourceTar - Creates a tar archive of the source code.
+releaseSourceZip - Creates a zip archive of the source code.
+releaseWindows - Creates a Windows executable and installer.
+```
 
-`gradlew generateSource antTargets.ANY_ANT_TARGET`
+To set the path to your local NSIS executable pass it via a Gradle property, e.g.:
+`gradlew -PnsisExec=PATH release`
 
-To compile, use the command `gradlew generateSource antTargets.jars`.
-After the build is finished, you can find the executable jar file
-named `JabRef-$VERSION.jar` (where $VERSION is the current version of the
-source tree) in the `buildant\lib` directory. Enjoy!
-The setup files are created by invoking the command `gradlew generateSource antTargets.release`.
-
-
-### Releasing on Linux
-
-Run `gradlew antTargets.release.linux`
-
-All binaries (including OSX) and the installer are generated in the directory `buildant/lib`.
-
-
-### Releasing on Windows
-
-Run `gradlew releaseWindows`
-
-All binaries (including OSX) and the installer are generated in the directory `buildant/lib`.
+All binaries are created inside the directory `build/releases`.
 
 ### Releasing Developer Releases
 
