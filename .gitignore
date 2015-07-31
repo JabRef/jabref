@@ -19,3 +19,4 @@ classes/
 .classpath
 .project
 jabref.xml
+src/main/gen/
