@@ -39,7 +39,6 @@ configurations {
 }
 
 dependencies {
-    // jgoodies
     compile 'com.jgoodies:jgoodies-common:1.7.0'
     compile 'com.jgoodies:jgoodies-forms:1.7.2'
     compile 'com.jgoodies:jgoodies-looks:2.5.3'
@@ -85,7 +84,6 @@ sourceSets {
         }
     }
 }
-
 
 processResources {
     filter ReplaceTokens, tokens: [
@@ -141,30 +139,20 @@ task generateSearchGrammarSource(type: JavaExec) {
 }
 
 compileJava {
-    // files are all encoded using UTF-8
     options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
 }
 compileJava.dependsOn "generateSource"
 
 compileTestJava {
-    // files are all encoded using UTF-8
     options.encoding = 'UTF-8'
 }
 
 javadoc {
     options {
-        // files are all encoded using UTF-8
         encoding = 'UTF-8'
         version = true
         author = true
-    }
-}
-
-fatJar {
-    classifier 'fat'
-    manifest {
-        attributes 'Main-Class': project.mainClassName
     }
 }
 
@@ -180,6 +168,15 @@ jacocoTestReport {
         html.enabled = true
     }
 }
+
+fatJar {
+    classifier 'fat'
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+
 
 /*
  * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
@@ -197,7 +194,6 @@ if (hasProperty('dev')) {
     project.version += "--snapshot--" + result.substring(1, result.length() - 1)
 }
 
-// release tasks
 task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "releaseSourceZip", "releaseSourceTar"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
@@ -253,6 +249,11 @@ task releaseWindows(dependsOn: "launch4j") {
     }
 }
 
+if(!OperatingSystem.current().isMacOsX()) {
+    // disable this task as it requires a command line tool only available on Mac OS X
+    createDmg.enabled = false
+}
+
 task releaseMac(dependsOn: "createAppZip") {
     group = 'JabRef - Release'
     description "Creates a OSX release."
@@ -266,10 +267,6 @@ task releaseMac(dependsOn: "createAppZip") {
             }
         }
     }
-}
-
-if(!OperatingSystem.current().isMacOsX()) {
-    createDmg.enabled = false // disable this task as it requires a command line tool only available on Mac OS X
 }
 
 macAppBundle {
