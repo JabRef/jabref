@@ -211,7 +211,7 @@ launch4j {
     version = project.ext.threeDotVersion
     textVersion = project.version
     jar = "../libs/JabRef-${project.version}-fat.jar"
-    icon = "${projectDir}/src/main/resources/images/JabRef.ico"
+    icon = "${projectDir}/src/main/resources/images/icons/JabRef.ico"
     copyright = "JabRef developers"
     initialHeapSize = 32
     maxHeapSize = 512
