@@ -43,7 +43,7 @@ our %translation_back_to_contents = (
 );
 
 
-#build.xml for getting string replacements @version@ and @year@
+#build.xml for getting string replacements ${version} and ${year}
 use constant BUILDXML       => "../build.xml";
 
 use warnings;
@@ -271,8 +271,8 @@ HTML
 #extracts info out of build.xml
 #	<property name="jabref.version" value="2.8b" />
 #	<property name="jabref.year" value="2012" />
-#	<property name="jabref.placeholder.version" value="@version@" />
-#	<property name="jabref.placeholder.year" value="@year@" />
+#	<property name="jabref.placeholder.version" value="${version}" />
+#	<property name="jabref.placeholder.year" value="${year}" />
 sub loadPreferences {
   open(my $buildXML, "<", BUILDXML) or die "cannot open < " . BUILDXML . ": $!";
   my @buildxml = <$buildXML>;
