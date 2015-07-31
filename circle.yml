@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get update; sudo apt-get install nsis
+    - sudo apt-get update; sudo apt-get install nsis git
     - wget http://www.mirrorservice.org/sites/downloads.sourceforge.net/l/la/launch4j/launch4j-3/3.8/launch4j-3.8-linux.tgz
     - tar xzf launch4j-3.8-linux.tgz
     - cd launch4j
