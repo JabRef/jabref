@@ -110,6 +110,7 @@ releaseWindows - Creates a Windows executable and installer.
 ```
 
 To set the path to your local NSIS executable pass it via a Gradle property:
+
 `gradlew -PnsisExec=PATH ANY_RELEASE_TASK `
 
 All binaries are created inside the directory `build/releases`.
