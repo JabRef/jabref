@@ -98,7 +98,6 @@ For IntelliJ IDEA, just import the project via a Gradle Import by poiting at the
 Requires
  * [launch4j](http://launch4j.sourceforge.net/) available in PATH
  * [NSIS](http://nsis.sourceforge.net) with the [WinShell plug-in](http://nsis.sourceforge.net/WinShell_plug-in).
- * Eventually and `nsis.executable`
 
 To get a list of all targets, use `gradlew tasks`.
 ```
@@ -110,8 +109,8 @@ releaseSourceZip - Creates a zip archive of the source code.
 releaseWindows - Creates a Windows executable and installer.
 ```
 
-To set the path to your local NSIS executable pass it via a Gradle property, e.g.:
-`gradlew -PnsisExec=PATH release`
+To set the path to your local NSIS executable pass it via a Gradle property:
+`gradlew -PnsisExec=PATH ANY_RELEASE_TASK `
 
 All binaries are created inside the directory `build/releases`.
 
