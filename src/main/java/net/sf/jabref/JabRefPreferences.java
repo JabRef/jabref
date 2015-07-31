@@ -35,6 +35,9 @@ import java.net.UnknownHostException;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.export.CustomExportList;
 import net.sf.jabref.export.ExportComparator;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -50,6 +53,8 @@ import net.sf.jabref.util.StringUtil;
 import net.sf.jabref.util.Util;
 
 public class JabRefPreferences {
+    
+    private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**
      * HashMap that contains all preferences which are set by default
@@ -450,7 +455,7 @@ public class JabRefPreferences {
                 importPreferences("jabref.xml");
             }
         } catch (IOException e) {
-            Globals.logger("Could not import preferences from jabref.xml:" + e.getLocalizedMessage());
+            LOGGER.info("Could not import preferences from jabref.xml:" + e.getLocalizedMessage(), e);
         }
 
         // load user preferences 
@@ -857,7 +862,7 @@ public class JabRefPreferences {
             defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
             defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
-            Globals.logger("Hostname not found.");
+            LOGGER.info("Hostname not found.", ex);
             defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
             defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
         }
@@ -1105,7 +1110,7 @@ public class JabRefPreferences {
             if (s == null) {
                 // there isn't even a default value
                 // Output error
-                Globals.logger("Could not get key binding for \"" + bindName + '"');
+                LOGGER.info("Could not get key binding for \"" + bindName + '"');
                 // fall back to a default value
                 s = "Not associated";
             }
@@ -1181,7 +1186,7 @@ public class JabRefPreferences {
             try {
                 exportPreferences("jabref.xml");
             } catch (IOException e) {
-                Globals.logger("Could not save preferences for memory stick mode: " + e.getLocalizedMessage());
+                LOGGER.info("Could not save preferences for memory stick mode: " + e.getLocalizedMessage(), e);
             }
         }
         try {
@@ -1227,7 +1232,7 @@ public class JabRefPreferences {
                 }
             }
         } catch (BackingStoreException ex) {
-            Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
+            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
         return JabRefPreferences.keyPattern;
     }
@@ -1245,7 +1250,7 @@ public class JabRefPreferences {
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
-            Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
+            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
         for (Map.Entry<String, ArrayList<String>> stringArrayListEntry : pattern.entrySet()) {

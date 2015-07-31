@@ -22,6 +22,10 @@ import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.FileUtil;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -47,6 +51,8 @@ public class DownloadExternalFile {
     private FileListEntryEditor editor;
     private boolean downloadFinished = false;
     private boolean dontShowDialog = false;
+    
+    private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
 
     public DownloadExternalFile(JabRefFrame frame, MetaData metaData, String bibtexKey) {
@@ -110,7 +116,7 @@ public class DownloadExternalFile {
             JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                     + ex.getMessage(), Globals.lang("Download file"),
                     JOptionPane.ERROR_MESSAGE);
-            Globals.logger("Error while downloading " + "'" + res + "'");
+            LOGGER.info("Error while downloading " + "'" + res + "'", ex);
             return;
         }
         final URL urlF = url;
@@ -131,7 +137,7 @@ public class DownloadExternalFile {
                     JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
                                     + e2.getMessage(), Globals.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
-                    Globals.logger("Error while downloading " + "'" + urlF.toString() + "'");
+                    LOGGER.info("Error while downloading " + "'" + urlF.toString() + "'", e2);
                     return;
                 }
 

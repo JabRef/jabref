@@ -25,13 +25,13 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.util.DOIUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
@@ -47,9 +47,9 @@ import org.apache.pdfbox.util.PDFTextStripper;
  */
 public class PdfContentImporter extends ImportFormat {
 
-    private static final Logger logger = Logger.getLogger(PdfContentImporter.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(PdfContentImporter.class);
 
-    // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
+            // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
     private static final DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
 
     /* global variables holding the state of the current parse run
@@ -217,14 +217,13 @@ public class PdfContentImporter extends ImportFormat {
         try {
             document = PDDocument.load(in);
         } catch (IOException e) {
-            PdfContentImporter.logger.log(Level.SEVERE, "Could not load document", e);
+            LOGGER.error("Could not load document", e);
             return res;
         }
 
         try {
             if (document.isEncrypted()) {
-                PdfContentImporter.logger.log(Level.INFO,
-                        Globals.lang("Encrypted documents are not supported"));
+                LOGGER.error(Globals.lang("Encrypted documents are not supported"));
                 //return res;
             }
 
@@ -543,7 +542,7 @@ public class PdfContentImporter extends ImportFormat {
             if (e.getMessage().equals("org/bouncycastle/jce/provider/BouncyCastleProvider")) {
                 status.showMessage(Globals.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
             } else {
-                PdfContentImporter.logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+                LOGGER.error("Could not find class", e);
             }
         } finally {
             document.close();

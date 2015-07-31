@@ -17,9 +17,11 @@ package net.sf.jabref.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.util.Util;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -28,10 +30,14 @@ import net.sf.jabref.util.Util;
  */
 public class UndoableFieldChange extends AbstractUndoableEdit {
 
+    private static final long serialVersionUID = 1L;
+    
     private final BibtexEntry entry;
     private final String field;
     private final String oldValue;
     private final String newValue;
+    
+    private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
 
     public UndoableFieldChange(BibtexEntry entry, String field,
@@ -69,8 +75,9 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
                 entry.clearField(field);
             }
 
-        } catch (Throwable ex) {
-            Util.pr(ex.getMessage());
+            // this is the only exception explicitly thrown here
+        } catch (IllegalArgumentException ex) {
+            LOGGER.info("Cannot perform undo", ex);
         }
     }
 
@@ -86,8 +93,8 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
                 entry.clearField(field);
             }
 
-        } catch (Throwable ex) {
-            Util.pr(ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            LOGGER.info("Cannot perform redo", ex);
         }
     }
 

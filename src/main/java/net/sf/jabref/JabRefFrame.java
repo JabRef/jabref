@@ -77,6 +77,9 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.export.ExportCustomizationDialog;
 import net.sf.jabref.export.ExportFormats;
@@ -139,6 +142,8 @@ import com.jgoodies.looks.Options;
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
 
+    private static final long serialVersionUID = 1L;
+
     final JSplitPane contentPane = new JSplitPane();
 
     final JabRefPreferences prefs = Globals.prefs;
@@ -153,9 +158,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
+    
+    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
 
     class ToolBar extends JToolBar {
+
+        private static final long serialVersionUID = 1L;
 
         void addAction(Action a) {
             JButton b = new JButton(a);
@@ -1207,7 +1216,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     // code copied from BasePanel.java, action "toggleToolbar"
                     tlb.setVisible(!tlb.isVisible());
                 } else {
-                    Util.pr("Action '" + command + "' must be disabled when no database is open.");
+                    LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
                 }
             }
         }
@@ -1286,7 +1295,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         .newEntry(BibtexEntryType.getType(thisType));
             }
             else {
-                Util.pr("Action 'New entry' must be disabled when no "
+                LOGGER.info("Action 'New entry' must be disabled when no "
                         + "database is open.");
             }
         }

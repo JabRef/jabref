@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -78,6 +77,8 @@ import net.sf.jabref.help.HelpAction;
 import net.sf.jabref.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.search.rules.sets.SearchRuleSet;
 import net.sf.jabref.undo.NamedCompound;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The whole UI component holding the groups tree and the buttons
@@ -85,7 +86,7 @@ import net.sf.jabref.undo.NamedCompound;
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener {
 
-    private static final Logger logger = Logger.getLogger(GroupSelector.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(GroupSelector.class);
 
     private final JButton newButton = new JButton(GUIGlobals.getImage("new"));
     private final JButton refresh = new JButton(
@@ -276,9 +277,7 @@ public class GroupSelector extends SidePaneComponent implements
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
                 Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
-                GroupSelector.logger.fine(Double.toString(GroupSelector.this.getHeight()));
-                GroupSelector.logger.fine(Double.toString(GroupSelector.this.getPreferredSize().getHeight()));
-
+                LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: " + GroupSelector.this.getPreferredSize().getHeight());
             }
         });
         JButton reduce = new JButton(GUIGlobals.getImage("up"));
@@ -678,10 +677,10 @@ public class GroupSelector extends SidePaneComponent implements
         for (BibtexEntry entry : entries) {
             // Sort according to current state of the entries
             if (group.contains(entry)) {
-                GroupSelector.logger.fine("remove " + entry.toString());
+                LOGGER.info("Removing entry " + entry.toString());
                 toRemove.add(entry);
             } else {
-                GroupSelector.logger.fine("add " + entry.toString());
+                LOGGER.info("Adding entry " + entry.toString());
                 toAdd.add(entry);
             }
         }
@@ -723,8 +722,7 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void annotationEvent(GroupTreeNode node) {
-        GroupSelector.logger.fine("annotationEvent");
-        GroupSelector.logger.fine(node.toString());
+        LOGGER.info("Performing annotation " + node.toString());
         if (editModeIndicator) {
             updateGroupContent(node);
             panel.markBaseChanged();
