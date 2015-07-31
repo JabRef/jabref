@@ -313,8 +313,3 @@ task releaseSourceTar(type: Exec) {
     }
 }
 
-task makeReleasesAvailableOnCircleCI(type: Copy) {
-    from "$buildDir/releases"
-    into System.getenv('CIRCLE_ARTIFACTS')
-}
-
