@@ -290,7 +290,7 @@ task releaseSourceZip(type: Exec) {
     if (OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
     } else {
-        commandLine "git", "-c core.autocrlf=false", "-c core.eol=lf", "archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
+        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
     }
 }
 
@@ -301,7 +301,7 @@ task releaseSourceTar(type: Exec) {
     if (OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
     } else {
-        commandLine "git", "-c core.autocrlf=false", "-c core.eol=lf", "archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
+        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
     }
 }
 
