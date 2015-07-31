@@ -245,8 +245,14 @@ task releaseWindows(dependsOn: "launch4j") {
             from("$buildDir/launch4j/JabRef.exe")
             into("$buildDir/nsis")
         }
-        exec {
-            commandLine project.ext.nsisExec, "/DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+        if (OperatingSystem.current().isWindows()) {
+            exec {
+               commandLine project.ext.nsisExec, "/DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+            }
+        } else {
+            exec {
+                commandLine project.ext.nsisExec, "-DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+            }
         }
         copy {
             from("$buildDir/nsis/JabRefSetup.exe")
