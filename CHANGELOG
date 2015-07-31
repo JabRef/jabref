@@ -1,6 +1,7 @@
 [master]
     - Remove Mr.DLib support as MR.DLib will be shut down in 2015
     - Streamline logging API: Replace usages of java.util.logging with commons.logging
+    - BREAKING: Remove plugin functionality.
 [dev_2.11]
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)
     - Update dependencies: jersey, commons.logging, pdfbox, jgoodies, lazedlists, JDBC connectors
@@ -17,8 +18,8 @@
     - Changed html description of search expressions, expressing the conditional logic more explicitly with brackets.
     - Fixed INSPIRE searches compatibility problem (by Stefano Gariazzo).
     - BREAKING: Search groups now use same search logic as UI --> avoids confusion when converting a UI search into a search group. Behaviour before: contains/regex check of whole search string; behaviour after: contains/regex check of every word of the search string. The new search is more powerful and con simulate the old behaviour: enclose everything in double quotes, e.g., process language --> "process language".
-    - Change default of use IEEE abbreviations from TRUE to FALSE
-    - BREAKING: Remove plugin functionality.
+    - Streamline logging API: Replace usages of java.util.logging with commons.logging
+    - Change default of "use IEEE abbreviations" from TRUE to FALSE
 2.11 beta 3
     - New MacOSX integration
     - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
