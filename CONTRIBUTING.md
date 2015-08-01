@@ -59,6 +59,11 @@ gets
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
 
+
+### Create a pull request
+Create a pull request on GitHub.
+For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
+
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
 [good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [help documentation]: https://help.github.com/articles/using-pull-requests/
