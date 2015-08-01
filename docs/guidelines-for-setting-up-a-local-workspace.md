@@ -6,7 +6,7 @@
 * If javac is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
 
 ### GitHub account
-If you do not have GitHub account, create it at https://github.com/
+If you do not have GitHub account, create it at https://github.com/.
 
 ### Get an IDE in place
 I suggest Eclipse. Other developers like and use IntelliJ.
@@ -24,8 +24,8 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 
 
 ## Get the code
-### Fork jabref into your github account
-1. Log into your github account
+### Fork JabRef into your GitHub account
+1. Log into your GitHub account
 2. Go to https://github.com/JabRef/jabref 
 3. Create a fork by clicking at fork button on the right top corner
 4. A fork repository will be created under your account (https://github.com/YOUR_USERNAME/jabref)
@@ -33,7 +33,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 ### Clone your forked repo into your local machine.
 
 * In command line go to a folder you want to place the source code locally (parent folder of `jabref/`)
-* Run `git clone https://github.com/YOUR_USERNAME/jabref.git`
+* Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 
 ### Generating additional source codes and getting dependencies using Gradle:
 * Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
