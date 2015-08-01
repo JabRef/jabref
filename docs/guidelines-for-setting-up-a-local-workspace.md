@@ -1,12 +1,12 @@
 ## Prerequisites:
-* Java Development Kit ([Download Java DevKit from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp))
+* Java Development Kit ([Download JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp))
 
 ### Ensure you have a Java SDK installed
 * In the command line (terminal in Linux, cmd in Windows) run `javac -version`
 * If `javac` is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
 
 ### GitHub account
-If you do not have a GitHub account, create it at https://github.com/.
+If you do not have a GitHub account, create it at https://github.com.
 
 ### Get an IDE in place
 I suggest [Eclipse](https://eclipse.org/). Other developers like and use [IntelliJ](https://www.jetbrains.com/idea/).
@@ -45,7 +45,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * To Import your jabref project go to menu File --> Import
 
 1. Choose General --> Existing projects in the workspace and "next"
-2. For "select root directory", browse until the root folder of your jabref just cloned from your repo (e.g., /home/user/<YOU>/jabref)
+2. For "select root directory", browse until the root folder of your jabref just cloned from your repo (e.g., `/home/user/<YOU>/jabref`)
 3. Click on "Finish" and voilá!
 4. In Eclipse, right click on the project and choose Run as --> Java application (Forget about the existing errors)
 5. Choose JabRefMain as the main class to be executed
