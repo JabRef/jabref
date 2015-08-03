@@ -865,6 +865,10 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     public String[] getPrimaryOptionalFields() {
         return new String[0];
     }
+    
+    public String[] getSecondaryOptionalFields() {
+        return new String[0];
+    }
 
     public abstract String describeRequiredFields();
 
@@ -1054,7 +1058,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 
     /**
      * Get an array of the required fields in a form appropriate for the entry customization
-     * dialog - that is, thie either-or fields together and separated by slashes.
+     * dialog - that is, the either-or fields together and separated by slashes.
      *
      * @return Array of the required fields in a form appropriate for the entry customization dialog.
      */

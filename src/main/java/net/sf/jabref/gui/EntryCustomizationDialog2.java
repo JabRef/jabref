@@ -30,7 +30,6 @@ import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.util.Util;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 
@@ -111,7 +110,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             right.add(new JPanel());
             right.add(optComp2);
         }
-
+        
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
         ok = new JButton("Ok");
@@ -216,7 +215,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 optComp.setFields(opt);
                 optComp.setEnabled(true);
             } else {
-                // New entry, veintle
+                // New entry, veintle // FIXME what does veintle mean?
                 reqComp.setFields(new ArrayList<String>());
                 reqComp.setEnabled(true);
                 optComp.setFields(new ArrayList<String>());
@@ -283,10 +282,10 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 String[] oldReq = oldType.getRequiredFields();
                 String[] oldOpt = oldType.getOptionalFields();
                 if (biblatexMode) {
-                    String[] priOpt = oldType.getPrimaryOptionalFields();
-                    String[] secOpt = Util.getRemainder(oldOpt, priOpt);
-                    if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr) &&
-                            equalArrays(secOpt, opt2Str)) {
+                    String[] oldPriOpt = oldType.getPrimaryOptionalFields();
+                    String[] oldSecOpt = oldType.getSecondaryOptionalFields(); 
+                    if (equalArrays(oldReq, reqStr) && equalArrays(oldPriOpt, optStr) &&
+                            equalArrays(oldSecOpt, opt2Str)) {
                         changesMade = false;
                     }
                 } else if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr)) {
@@ -454,7 +453,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                     if (of != null)
                     {
                         String[] priOptArray = type.getPrimaryOptionalFields();
-                        String[] secOptArray = Util.getRemainder(of, priOptArray);
+                        String[] secOptArray = type.getSecondaryOptionalFields();
                         if (priOptArray != null) {
                             opt1 = java.util.Arrays.asList(priOptArray);
                         }
