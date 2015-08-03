@@ -23,7 +23,7 @@ public interface AutoCompleter {
 
     String getPrefix();
 
-    String[] complete(String str);
+    String[] complete(String toComplete);
 
     boolean indexContainsWord(String word);
 

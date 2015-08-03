@@ -35,8 +35,8 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     @Override
-    public int compareTo(Abbreviation o) {
-        return name.compareTo(o.name);
+    public int compareTo(Abbreviation toCompare) {
+        return name.compareTo(toCompare.name);
     }
 
     public String getNext(String current) {
