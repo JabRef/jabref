@@ -65,7 +65,7 @@
             <entry key="useImportInspectionDialog" value="true"/>
             <entry key="useImportInspectionDialogForSingle" value="true"/>
             <entry key="warnAboutDuplicatesInInspection" value="true"/>
-            <entry key="defaultOwner" value="joerg"/>
+            <entry key="defaultOwner" value="jabref"/>
             <entry key="timeStampFormat" value="yyyy.MM.dd"/>
             <entry key="timeStampField" value="timestamp"/>
             <entry key="defaultEncoding" value="UTF8"/>
