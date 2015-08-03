@@ -20,6 +20,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -107,6 +109,11 @@ public class CustomEntryType extends BibtexEntryType {
     @Override
     public String[] getPrimaryOptionalFields() {
         return priOpt;
+    }
+    
+    @Override
+    public String[] getSecondaryOptionalFields() {
+    	return Util.getRemainder(opt, priOpt);
     }
 
     @Override
