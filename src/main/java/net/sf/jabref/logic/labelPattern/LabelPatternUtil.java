@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -47,13 +47,13 @@ public class LabelPatternUtil {
     
     private static final String[] SKIP_WORDS = {"a", "an", "the", "for", "on", "of"};
 
-
     public static ArrayList<String> DEFAULT_LABELPATTERN;
+
     static {
         LabelPatternUtil.updateDefaultPattern();
     }
 
-    private static BibtexDatabase _db;
+    private static BibtexDatabase database;
 
     public static void updateDefaultPattern() {
         LabelPatternUtil.DEFAULT_LABELPATTERN = LabelPatternUtil.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
@@ -65,11 +65,11 @@ public class LabelPatternUtil {
      * @param db the DB to use as global database
      */
     public static void setDataBase(BibtexDatabase db) {
-        LabelPatternUtil._db = db;
+        LabelPatternUtil.database = db;
     }
 
     private static String normalize(String content) {
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         int b = 0;
         String and = "";
         String token = "";
@@ -397,52 +397,17 @@ public class LabelPatternUtil {
      */
     public static ArrayList<String> split(String labelPattern) {
         // A holder for fields of the entry to be used for the key
-        ArrayList<String> _alist = new ArrayList<String>();
+        ArrayList<String> fieldList = new ArrayList<String>();
 
         // Before we do anything, we add the parameter to the ArrayLIst
-        _alist.add(labelPattern);
+        fieldList.add(labelPattern);
 
         //String[] ss = labelPattern.split("\\[|\\]");
         StringTokenizer tok = new StringTokenizer(labelPattern, "[]", true);
         while (tok.hasMoreTokens()) {
-            _alist.add(tok.nextToken());
+            fieldList.add(tok.nextToken());
         }
-        return _alist;
-
-        /*
-        // Regular expresion for identifying the fields
-        Pattern pi = Pattern.compile("\\[\\w*\\]");
-        // Regular expresion for identifying the spacer
-        Pattern ps = Pattern.compile("\\].()*\\[");
-
-        // The matcher for the field
-        Matcher mi = pi.matcher(labelPattern);
-        // The matcher for the spacer char
-        Matcher ms = ps.matcher(labelPattern);
-
-        // Before we do anything, we add the parameter to the ArrayLIst
-        _alist.add(labelPattern);
-
-        // If we can find the spacer character
-        if(ms.find()){
-        String t_spacer = ms.group();
-        // Remove the `]' and `[' at the ends
-        // We cant imagine a spacer of omre than one character.
-        t_spacer = t_spacer.substring(1,2);
-        _alist.add(t_spacer);
-        }
-
-        while(mi.find()){
-        // Get the matched string
-        String t_str = mi.group();
-        int _sindex = 1;
-        int _eindex = t_str.length() -1;
-        // Remove the `[' and `]' at the ends
-        t_str = t_str.substring(_sindex, _eindex);
-        _alist.add(t_str);
-        }
-
-        return _alist;*/
+        return fieldList;
     }
 
     /**
@@ -452,97 +417,89 @@ public class LabelPatternUtil {
      * The given database is used to avoid duplicate keys.
      *
      * @param database a <code>BibtexDatabase</code>
-     * @param _entry a <code>BibtexEntry</code>
+     * @param entry a <code>BibtexEntry</code>
      * @return modified Bibtexentry
      */
-    public static BibtexEntry makeLabel(MetaData metaData, BibtexDatabase database, BibtexEntry _entry) {
-        LabelPatternUtil._db = database;
-        ArrayList<String> _al;
-        String _label;
-        StringBuilder _sb = new StringBuilder();
+    public static BibtexEntry makeLabel(MetaData metaData, BibtexDatabase database, BibtexEntry entry) {
+        LabelPatternUtil.database = database;
+        ArrayList<String> typeList;
+        String key;
+        StringBuilder stringBuilder = new StringBuilder();
         boolean forceUpper = false;
         boolean forceLower = false;
 
         try {
             // get the type of entry
-            String _type = _entry.getType().getName().toLowerCase();
+            String entryType = entry.getType().getName().toLowerCase();
             // Get the arrayList corresponding to the type
-            _al = metaData.getLabelPattern().getValue(_type);
-            int _alSize = _al.size();
+            typeList = metaData.getLabelPattern().getValue(entryType);
+            int typeListSize = typeList.size();
             boolean field = false;
-            for (int i = 1; i < _alSize; i++) {
-                String val = _al.get(i);
-                if (val.equals("[")) {
+            for (int i = 1; i < typeListSize; i++) {
+                String typeListEntry = typeList.get(i);
+                if (typeListEntry.equals("[")) {
                     field = true;
-                } else if (val.equals("]")) {
+                } else if (typeListEntry.equals("]")) {
                     field = false;
                 } else if (field) {
-                    /*
-                     * Edited by Seb Wills <saw27@mrao.cam.ac.uk> on 13-Apr-2004
-                     * Added new pseudo-fields "shortyear" and "veryshorttitle",
-                     * and and ":lower" modifier for all fields (in a way easily
-                     * extended to other modifiers). Helpfile
-                     * help/LabelPatterns.html updated accordingly.
-                     */
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     // String modifier = null;
-                    String[] parts = LabelPatternUtil.parseFieldMarker(val);//val.split(":");
+                    String[] parts = LabelPatternUtil.parseFieldMarker(typeListEntry);//val.split(":");
 
-                    String label = LabelPatternUtil.makeLabel(_entry, parts[0]);
+                    String label = LabelPatternUtil.makeLabel(entry, parts[0]);
 
                     // apply modifier if present
                     if (parts.length > 1) {
                         label = LabelPatternUtil.applyModifiers(label, parts, 1);
                     }
 
-                    _sb.append(label);
+                    stringBuilder.append(label);
 
                 } else {
-                    _sb.append(val);
+                    stringBuilder.append(typeListEntry);
                 }
             }
         } catch (Exception e) {
-            System.err.println(e);
+            LOGGER.warn("Cannot make label", e);
         }
 
         // Remove all illegal characters from the key.
-        _label = Util.checkLegalKey(_sb.toString());
+        key = Util.checkLegalKey(stringBuilder.toString());
 
-        // Patch by Toralf Senger:
         // Remove Regular Expressions while generating Keys
         String regex = Globals.prefs.get("KeyPatternRegex");
         if (regex != null && !regex.trim().isEmpty()) {
             String replacement = Globals.prefs.get("KeyPatternReplacement");
-            _label = _label.replaceAll(regex, replacement);
+            key = key.replaceAll(regex, replacement);
         }
 
         if (forceUpper) {
-            _label = _label.toUpperCase();
+            key = key.toUpperCase();
         }
         if (forceLower) {
-            _label = _label.toLowerCase();
+            key = key.toLowerCase();
         }
 
-        String oldKey = _entry.getCiteKey();
-        int occurences = LabelPatternUtil._db.getNumberOfKeyOccurences(_label);
+        String oldKey = entry.getCiteKey();
+        int occurrences = LabelPatternUtil.database.getNumberOfKeyOccurences(key);
 
-        if (oldKey != null && oldKey.equals(_label))
+        if (oldKey != null && oldKey.equals(key))
          {
-            occurences--; // No change, so we can accept one dupe.
+            occurrences--; // No change, so we can accept one dupe.
         }
 
         boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
         boolean firstLetterA = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
 
-        if (!alwaysAddLetter && occurences == 0) {
+        if (!alwaysAddLetter && occurrences == 0) {
             // No dupes found, so we can just go ahead.
-            if (!_label.equals(oldKey)) {
-                if (LabelPatternUtil._db.getEntryById(_entry.getId()) == null) {
+            if (!key.equals(oldKey)) {
+                if (LabelPatternUtil.database.getEntryById(entry.getId()) == null) {
                     // entry does not (yet) exist in the database, just update the entry
-                    _entry.setField(BibtexFields.KEY_FIELD, _label);
+                    entry.setField(BibtexFields.KEY_FIELD, key);
                 } else {
-                    LabelPatternUtil._db.setCiteKeyForEntry(_entry.getId(), _label);
+                    LabelPatternUtil.database.setCiteKeyForEntry(entry.getId(), key);
                 }
             }
 
@@ -553,35 +510,34 @@ public class LabelPatternUtil {
                 number = 1;
             }
 
-            String moddedKey = _label + LabelPatternUtil.getAddition(number);
-            occurences = LabelPatternUtil._db.getNumberOfKeyOccurences(moddedKey);
+            String moddedKey = key + LabelPatternUtil.getAddition(number);
+            occurrences = LabelPatternUtil.database.getNumberOfKeyOccurences(moddedKey);
 
             if (oldKey != null && oldKey.equals(moddedKey)) {
-                occurences--;
+                occurrences--;
             }
 
-            while (occurences > 0) {
+            while (occurrences > 0) {
                 number++;
-                moddedKey = _label + LabelPatternUtil.getAddition(number);
+                moddedKey = key + LabelPatternUtil.getAddition(number);
 
-                occurences = LabelPatternUtil._db.getNumberOfKeyOccurences(moddedKey);
+                occurrences = LabelPatternUtil.database.getNumberOfKeyOccurences(moddedKey);
                 if (oldKey != null && oldKey.equals(moddedKey)) {
-                    occurences--;
+                    occurrences--;
                 }
             }
 
             if (!moddedKey.equals(oldKey)) {
-                if (LabelPatternUtil._db.getEntryById(_entry.getId()) == null) {
+                if (LabelPatternUtil.database.getEntryById(entry.getId()) == null) {
                     // entry does not (yet) exist in the database, just update the entry
-                    _entry.setField(BibtexFields.KEY_FIELD, moddedKey);
+                    entry.setField(BibtexFields.KEY_FIELD, moddedKey);
                 } else {
-                    LabelPatternUtil._db.setCiteKeyForEntry(_entry.getId(), moddedKey);
+                    LabelPatternUtil.database.setCiteKeyForEntry(entry.getId(), moddedKey);
                 }
             }
         }
 
-        return _entry;
-        /** End of edit, Morten Alver 2004.02.04.  */
+        return entry;
     }
 
     /**
@@ -602,7 +558,6 @@ public class LabelPatternUtil {
                     label = label.toUpperCase();
                 } else if (modifier.equals("abbr")) {
                     // Abbreviate - that is,
-                    // System.out.println(_sbvalue.toString());
                     StringBuilder abbr = new StringBuilder();
                     String[] words = label.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
@@ -629,7 +584,7 @@ public class LabelPatternUtil {
         return label;
     }
 
-    public static String makeLabel(BibtexEntry _entry, String val) {
+    public static String makeLabel(BibtexEntry entry, String val) {
 
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -644,9 +599,9 @@ public class LabelPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = _entry.getField("author");
+                String authString = entry.getField("author");
                 if (authString != null) {
-                    authString = LabelPatternUtil.normalize(LabelPatternUtil._db.resolveForStrings(authString));
+                    authString = LabelPatternUtil.normalize(LabelPatternUtil.database.resolveForStrings(authString));
                 }
 
                 if (val.startsWith("pure")) {
@@ -655,10 +610,10 @@ public class LabelPatternUtil {
                     val = val.substring(4);
                 } else {
                     if (authString == null || authString.equals("")) {
-                        authString = _entry.getField("editor");
+                        authString = entry.getField("editor");
                         if (authString != null) {
                             authString = LabelPatternUtil.normalize(
-                                    LabelPatternUtil._db.resolveForStrings(authString));
+                                    LabelPatternUtil.database.resolveForStrings(authString));
                         }
                     }
                 }
@@ -723,47 +678,47 @@ public class LabelPatternUtil {
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return LabelPatternUtil.getField(_entry, val);
+                    return LabelPatternUtil.getField(entry, val);
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if (val.equals("edtr")) {
-                    return LabelPatternUtil.firstAuthor(_entry.getField("editor"));
+                    return LabelPatternUtil.firstAuthor(entry.getField("editor"));
                 } else if (val.equals("edtrForeIni")) {
-                    return LabelPatternUtil.firstAuthorForenameInitials(_entry.getField("editor"));
+                    return LabelPatternUtil.firstAuthorForenameInitials(entry.getField("editor"));
                 } else if (val.equals("editors")) {
-                    return LabelPatternUtil.allAuthors(_entry.getField("editor"));
+                    return LabelPatternUtil.allAuthors(entry.getField("editor"));
                     // Last author's last name
                 } else if (val.equals("editorLast")) {
-                    return LabelPatternUtil.lastAuthor(_entry.getField("editor"));
+                    return LabelPatternUtil.lastAuthor(entry.getField("editor"));
                 } else if (val.equals("editorLastForeIni")) {
-                    return LabelPatternUtil.lastAuthorForenameInitials(_entry.getField("editor"));
+                    return LabelPatternUtil.lastAuthorForenameInitials(entry.getField("editor"));
                 } else if (val.equals("editorIni")) {
-                    String s = LabelPatternUtil.oneAuthorPlusIni(_entry.getField("editor"));
+                    String s = LabelPatternUtil.oneAuthorPlusIni(entry.getField("editor"));
                     return s == null ? "" : s;
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = LabelPatternUtil.authIniN(_entry.getField("editor"), num);
+                    String s = LabelPatternUtil.authIniN(entry.getField("editor"), num);
                     return s == null ? "" : s;
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = LabelPatternUtil.authN_M(_entry.getField("editor"),
+                    String s = LabelPatternUtil.authN_M(entry.getField("editor"),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                     return s == null ? "" : s;
                 } else if (val.equals("edtr.edtr.ea")) {
-                    String s = LabelPatternUtil.authAuthEa(_entry.getField("editor"));
+                    String s = LabelPatternUtil.authAuthEa(entry.getField("editor"));
                     return s == null ? "" : s;
                 } else if (val.equals("edtrshort")) {
-                    String s = LabelPatternUtil.authshort(_entry.getField("editor"));
+                    String s = LabelPatternUtil.authshort(entry.getField("editor"));
                     return s == null ? "" : s;
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
                     int num = Integer.parseInt(val.substring(4));
-                    String fa = LabelPatternUtil.firstAuthor(_entry.getField("editor"));
+                    String fa = LabelPatternUtil.firstAuthor(entry.getField("editor"));
                     if (fa == null) {
                         return "";
                     }
@@ -774,16 +729,16 @@ public class LabelPatternUtil {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return LabelPatternUtil.getField(_entry, val);
+                    return LabelPatternUtil.getField(entry, val);
                 }
             } else if (val.equals("firstpage")) {
-                return LabelPatternUtil.firstPage(_entry.getField("pages"));
+                return LabelPatternUtil.firstPage(entry.getField("pages"));
             } else if (val.equals("lastpage")) {
-                return LabelPatternUtil.lastPage(_entry.getField("pages"));
+                return LabelPatternUtil.lastPage(entry.getField("pages"));
             } else if (val.equals("shorttitle")) {
-                return LabelPatternUtil.getTitleWords(3, _entry);
+                return LabelPatternUtil.getTitleWords(3, entry);
             } else if (val.equals("shortyear")) {
-                String ss = _entry.getFieldOrAlias("year");
+                String ss = entry.getFieldOrAlias("year");
                 if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";
                 } else if (ss.length() > 2) {
@@ -792,11 +747,11 @@ public class LabelPatternUtil {
                     return ss;
                 }
             } else if (val.equals("veryshorttitle")) {
-                return LabelPatternUtil.getTitleWords(1, _entry);
+                return LabelPatternUtil.getTitleWords(1, entry);
             } else if (val.matches("keyword\\d+")) {
                 StringBuilder sb = new StringBuilder();
                 int num = Integer.parseInt(val.substring(7));
-                String kw = LabelPatternUtil.getField(_entry, "keywords");
+                String kw = LabelPatternUtil.getField(entry, "keywords");
                 if (kw != null) {
                     // TODO: merge this functionality with Util.getSeparatedKeywords
                     String[] keywords = kw.split("[,;]\\s*");
@@ -807,7 +762,7 @@ public class LabelPatternUtil {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return LabelPatternUtil.getField(_entry, val);
+                return LabelPatternUtil.getField(entry, val);
             }
         } catch (NullPointerException ex) {
             return "";
@@ -844,17 +799,17 @@ public class LabelPatternUtil {
         }
     }
 
-    private static String getTitleWords(int number, BibtexEntry _entry) {
-        String ss = new RemoveLatexCommands().format(_entry.getField("title"));
-        StringBuffer _sbvalue = new StringBuffer();
-        StringBuffer current;
+    private static String getTitleWords(int number, BibtexEntry entry) {
+        String ss = new RemoveLatexCommands().format(entry.getField("title"));
+        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder current;
         int piv = 0;
         int words = 0;
 
         // sorry for being English-centric. I guess these
         // words should really be an editable preference.
         mainl: while (piv < ss.length() && words < number) {
-            current = new StringBuffer();
+            current = new StringBuilder();
             // Get the next word:
             while (piv < ss.length() && !Character.isWhitespace(ss.charAt(piv))
                     && ss.charAt(piv) != '-') {
@@ -875,59 +830,26 @@ public class LabelPatternUtil {
             }
 
             // If we get here, the word was accepted.
-            if (_sbvalue.length() > 0) {
-                _sbvalue.append(" ");
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(" ");
             }
-            _sbvalue.append(word);
+            stringBuilder.append(word);
             words++;
         }
 
-        return LabelPatternUtil.keepLettersAndDigitsOnly(_sbvalue.toString());
+        return LabelPatternUtil.keepLettersAndDigitsOnly(stringBuilder.toString());
     }
 
     private static String keepLettersAndDigitsOnly(String in) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < in.length(); i++) {
             if (Character.isLetterOrDigit(in.charAt(i))) {
-                sb.append(in.charAt(i));
+                stringBuilder.append(in.charAt(i));
             }
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
-    /**
-     * Tests whether a given label is unique.
-     * 
-     * This method is private as it is currently used nowhere.
-     * The issue with this method is that it uses the global variable "_db", which might be undefined when calling the method.
-     *
-     * @param label a <code>String</code>
-     * @return <code>true</code> if and only if the <code>label</code> is unique
-     */
-    private static boolean isLabelUnique(String label) {
-        boolean _isUnique = true;
-        BibtexEntry _entry;
-        int _dbSize = LabelPatternUtil._db.getEntryCount();
-        // run through the whole DB and check the key field
-        // if this could be made recursive I would be very happy
-        // it kinda sux that we have to run through the whole db.
-        // The idea here is that if we meet NO match, the _duplicate
-        // field will be true
-
-        for (int i = 0; i < _dbSize; i++) {
-            _entry = LabelPatternUtil._db.getEntryById(String.valueOf(i));
-
-            // oh my! there is a match! we better set the uniqueness to false
-            // and leave this for-loop all together
-            if (_entry.getField(BibtexFields.KEY_FIELD).equals(label)) {
-                _isUnique = false;
-                break;
-            }
-        }
-
-        return _isUnique;
-
-    }
 
     /**
      * Gets the last name of the first author/editor
@@ -941,11 +863,11 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     public static String firstAuthor(String authorField) {
-        AuthorList al = AuthorList.getAuthorList(authorField);
-        if (al.size() == 0) {
+        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        if (authorList.size() == 0) {
             return "";
         }
-        String s = al.getAuthor(0).getLast();
+        String s = authorList.getAuthor(0).getLast();
         return s != null ? s : "";
 
     }
@@ -962,11 +884,11 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     private static String firstAuthorForenameInitials(String authorField) {
-        AuthorList al = AuthorList.getAuthorList(authorField);
-        if (al.size() == 0) {
+        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        if (authorList.size() == 0) {
             return "";
         }
-        String s = al.getAuthor(0).getFirstAbbr();
+        String s = authorList.getAuthor(0).getFirstAbbr();
         return s != null ? s.substring(0, 1) : "";
     }
 
@@ -982,21 +904,21 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     public static String firstAuthorVonAndLast(String authorField) {
-        AuthorList al = AuthorList.getAuthorList(authorField);
-        if (al.size() == 0) {
+        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        if (authorList.size() == 0) {
             return "";
         }
-        String s = al.getAuthor(0).getVon();
-        StringBuilder sb = new StringBuilder();
-        if (s != null) {
-            sb.append(s);
-            sb.append(' ');
+        String vonAuthor = authorList.getAuthor(0).getVon();
+        StringBuilder stringBuilder = new StringBuilder();
+        if (vonAuthor != null) {
+            stringBuilder.append(vonAuthor);
+            stringBuilder.append(' ');
         }
-        s = al.getAuthor(0).getLast();
-        if (s != null) {
-            sb.append(s);
+        vonAuthor = authorList.getAuthor(0).getLast();
+        if (vonAuthor != null) {
+            stringBuilder.append(vonAuthor);
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     /**
@@ -1027,11 +949,11 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     private static String lastAuthorForenameInitials(String authorField) {
-        AuthorList al = AuthorList.getAuthorList(authorField);
-        if (al.size() == 0) {
+        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        if (authorList.size() == 0) {
             return "";
         }
-        String s = al.getAuthor(al.size() - 1).getFirstAbbr();
+        String s = authorList.getAuthor(authorList.size() - 1).getFirstAbbr();
         return s != null ? s.substring(0, 1) : "";
     }
 
