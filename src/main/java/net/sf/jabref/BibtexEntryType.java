@@ -865,6 +865,10 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     public String[] getPrimaryOptionalFields() {
         return new String[0];
     }
+    
+    public String[] getSecondaryOptionalFields() {
+        return new String[0];
+    }
 
     public abstract String describeRequiredFields();
 
