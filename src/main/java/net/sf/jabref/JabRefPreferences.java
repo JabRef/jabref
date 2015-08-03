@@ -1359,7 +1359,9 @@ public class JabRefPreferences {
     public CustomEntryType getCustomEntryType(int number) {
         String nr = "" + number;
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
-        String[] req = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr), opt = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr), priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
+        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
         }
