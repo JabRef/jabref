@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,6 +24,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,10 +38,11 @@ public class MODSDatabase {
 
     private Set<MODSEntry> entries;
 
+    private static final Log LOGGER = LogFactory.getLog(MODSDatabase.class);
 
     public MODSDatabase() {
         // maybe make this sorted later...
-        entries = new HashSet<MODSEntry>();
+        entries = new HashSet<>();
     }
 
     public MODSDatabase(BibtexDatabase bibtex) {
@@ -54,7 +57,7 @@ public class MODSDatabase {
     }
 
     private void addEntries(BibtexDatabase database, Set<String> keySet) {
-        entries = new HashSet<MODSEntry>();
+        entries = new HashSet<>();
         for (String aKeySet : keySet) {
             BibtexEntry entry = database.getEntryById(aKeySet);
             MODSEntry newMods = new MODSEntry(entry);
@@ -80,10 +83,8 @@ public class MODSDatabase {
             }
 
             result.appendChild(modsCollection);
-        } catch (Exception e)
-        {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+        } catch (Exception e)         {
+           LOGGER.info("Could not get DOM representation", e);
         }
         return result;
     }

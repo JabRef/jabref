@@ -38,40 +38,40 @@ public class PageNumbers {
         parsePageNums(s);
     }
 
-    private void parsePageNums(String s) {
-        Pattern p = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
-        Matcher m = p.matcher(s);
-        if (m.matches()) {
-            start = Integer.parseInt(m.group(1));
-            end = Integer.parseInt(m.group(2));
+    private void parsePageNums(String numberString) {
+        Pattern pattern = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
+        Matcher matcher = pattern.matcher(numberString);
+        if (matcher.matches()) {
+            start = Integer.parseInt(matcher.group(1));
+            end = Integer.parseInt(matcher.group(2));
         } else {
-            freeform = s;
+            freeform = numberString;
         }
     }
 
-    public Element getDOMrepresentation(Document d) {
-        Element result = d.createElement("extent");
+    public Element getDOMrepresentation(Document document) {
+        Element result = document.createElement("extent");
         result.setAttribute("unit", "page");
         if (freeform != null) {
-            Node t = d.createTextNode(freeform);
-            result.appendChild(t);
+            Node textNode = document.createTextNode(freeform);
+            result.appendChild(textNode);
         }
         else {
-            Element start = d.createElement("start");
-            Element end = d.createElement("end");
-            start.appendChild(d.createTextNode("" + this.start));
-            end.appendChild(d.createTextNode("" + this.end));
+            Element start = document.createElement("start");
+            Element end = document.createElement("end");
+            start.appendChild(document.createTextNode("" + this.start));
+            end.appendChild(document.createTextNode("" + this.end));
             result.appendChild(start);
             result.appendChild(end);
         }
         return result;
     }
 
-    public String toString(String seperator) {
+    public String toString(String separator) {
         if (freeform != null) {
             return freeform;
         }
-        return start + seperator + end;
+        return start + separator + end;
     }
 
     @Override
