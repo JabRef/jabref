@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.labelPattern;
+package net.sf.jabref.logic.labelPattern;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
