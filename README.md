@@ -1,4 +1,4 @@
-# JabRef development version
+# JabRef Development Version
 
 [![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
@@ -15,7 +15,7 @@ The development version will be called `v2.80` and is meant as preparation to th
 
 The last version with Java6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-### Breaking changes in comparison to v2.11
+### Breaking Changes in Comparison to v2.11
 
 * No plugin support
 * Transition to Java8
@@ -32,13 +32,13 @@ JabRef can import from and export to several formats, and you can customize expo
 JabRef can be run as a command line application to convert from any import format to any export format.
 
 * Homepage: http://jabref.sourceforge.net/
-* Development mailinglist: https://lists.sourceforge.net/lists/listinfo/jabref-devel
+* Development mailing list: https://lists.sourceforge.net/lists/listinfo/jabref-devel
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
-* CI Server: https://travis-ci.org/JabRef/jabref
+* CI Servers: https://travis-ci.org/JabRef/jabref and https://circleci.com/gh/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
-### Bug reports, suggestions, other feedback
+### Bug Reports, Suggestions, Other Feedback
 
 We are thankful for any bug reports or other feedback.
 If there are features you want included in JabRef, tell us!
@@ -48,28 +48,29 @@ You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) 
 To get your code added to JabRef, just fork JabRef and create a pull request.
 For details see [CONTRIBUTING](CONTRIBUTING.md).
 
-## Requirements
+
+## Installing and Running
+
+### Requirements
 
 JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
-
-## Installing and running, Mac OS X:
+### Installing and Running, Mac OS X:
 
 Please see our [Mac OS X FAQ](http://jabref.sourceforge.net/faq.php#osx).
 
-
-## Installing and running, Windows:
+### Installing and Running, Windows:
 
 JabRef offers an installer, which also adds a shortcut to JabRef to your start menu.
 
 Please also see our [Windows FAQ](http://jabref.sourceforge.net/faq.php#windows)
 
-
-## Installing and running, general:
+### Installing and Running, General:
 
 JabRef can be downloaded as an executable .jar file.
-Try to doubleclick the `jar` file or execute the following command:
+Try to double click the `jar` file or execute the following command:
      `java -jar <path to jar>`
+
 
 ## Documentation
 
@@ -82,7 +83,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 
-## Building JabRef from source:
+## Building JabRef From Source
 
 If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
@@ -91,7 +92,7 @@ To compile JabRef from source, you need a Java compiler supporting Java 1.8 and 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse`.
-For IntelliJ IDEA, just import the project via a Gradle Import by poiting at the `build.gradle`.
+For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
 
 ## Release Process
