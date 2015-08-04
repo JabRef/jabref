@@ -1,42 +1,61 @@
 # This file lists all individuals having contributed content to the repository.
 # For how it is generated, see `scripts/generate-authors.sh`.
-
+Aaron Chen <>
 Adam Rehn <adam.rehn@my.jcu.edu.au>
 Adrian Daerr <adrian.daerr@univ-paris-diderot.fr>
 Alessio Pollero <alessiopollero@users.sf.net>
+Alex Montgomery <>
+Alexis Gallagher <>
 Alexsandro Lauber <alexlauber@outlook.com>
 ambro2 <ambro2@users.noreply.github.com>
+Ambrogio Oliva <>
 Andreas Amann <a.amann@ucc.ie>
 Andreas Rudert <arudert@users.sourceforge.net>
+Bernd Kalbfuss <>
 Brian Quistorff <bquistorff@gmail.com>
 Brian Van Essen <vanessen@users.sourceforge.net>
 captain123 <captain123@users.sourceforge.net>
 Carlos Silla <silla@users.sourceforge.net>
+Christian Kopf <>
 Christopher Oezbek <coezbek@users.sourceforge.net>
 Christopher S. Lester <clester@ieee.org>
+Cyrille d'Haese <>
 Dale Visser <dwvisser@users.sourceforge.net>
 Daniel Svärd <>
+David Gleich <>
+David Weitzman <>
 Dominik Waßenhoven <domwass@users.sourceforge.net>
 Douglas Nassif Roma Junior <nassifrroma@gmail.com>
 Eduardo Greco <eduardogreco93@gmail.com>
 Egon Willighagen <egon.willighagen@gmail.com>
+Ellen Reitmayr <>
 Erik Putrycz <eputrycz@users.sourceforge.net>
+Ervin Kolenovic <>
+Fabian Bieker <>
+Fabrice Dessaint <>
+Fedor Bezrukov <>
 Felix Berger <blat1@users.sf.net>
+Felix Langner <>
 Florian Straßer <strassfn@studi.informatik.uni-stuttgart.de>
+François Charette <>
 Fred <breakfastfish@users.sf.net>
 Frédéric Darboux <Frederic.Darboux@orleans.inra.fr>
 Gert Renckens <gert_@users.sourceforge.net>
 Gregor Herrmann <gregoa@debian.org>
 Guillaume Gardey <glinmac@users.sourceforge.net>
 Hakan Duran <ehakanduran@gmail.com>
+Hannes Restel <>
 Igor Chernyavsky <chigle@gmail.com>
 Igor Steinmacher <igorsteinmacher@gmail.com>
 Ingvar Jackal <rz703a@gmail.com>
 Jan Kubovy <jan@kubovy.eu>
 Janosch Kutscherauer <noshky@users.sf.net>
 Jason Pickering <jason.p.pickering@gmail.com>
+Jeffrey Kuhn <>
 Joerg Lenhard <joerg.lenhard@uni-bamberg.de>
 John David <ebo@sandien.com>
+John Relph <>
+John Zedlewski <>
 Jonathan Powell <jpowell@jpowell.co.uk>
 Jorge Tornero <jtorlistas@gmail.com>
 Jörg Wegner <wegner@users.sourceforge.net>
@@ -46,29 +65,39 @@ Koji Yokota <yokota33@gmail.com>
 Koji Yokota <yokota6@gmail.com>
 Kolja Brix <kbx@users.sourceforge.net>
 Krunoslav Zubrinic <kruno.zubrinic@gmail.com>
+Krzysztof A. Kościuszkiewicz <>
 Laura Hernández Gómez <litahdz@users.sf.net>
 Leonardo Haddad <leeohaddad@usp.br>
 Ling Wang <LingWangNeuralEng@gmail.com>
 Lorenzo Genta <lorenzo.genta@fastwebnet.it>
 lpatton <lpatton@users.sourceforge.net>
 Luciana de Melo e Abud <lucianaabud@uol.com.br>
+Manuel Siebeneicher <>
 Mariana Prudencio <mari.mvargas@gmail.com>
 Marius Kleiner <kleinems@studi.informatik.uni-stuttgart.de>
 Mark Schenk <Mark-Schenk@users.sourceforge.net>
+Martin Kähmer <>
+Martin Stolle <>
 Mattias Ulbrich <mattze@gmx.de>
 mcmoody <mcmoody@users.sf.net>
 Meltem Demirköprü <demirkmm@studi.uni-stuttgart.de>
+Michael Beckmann <>
 Michael Falkenthal <michael.falkenthal@googlemail.com>
 Michael Spiegel <mspiegel@users.sourceforge.net>
 Michael Wrighton <mwrighton@users.sourceforge.net>
+Michel Baylac <>
+Mike Smoot <>
 mlep <mlep@github.com>
+Moritz Ringler <>
 Morten Alver <mortenalver@gmail.com>
+Nathan Dunn <>
 Nathan Sheffield <sheffien@users.noreply.github.com>
 Nicolas Pavillon <pavillon.nicolas@gmail.com>
 nikmilpv <nikmil@gmail.com>
 Nizar N. Batada <nbatada@users.sourceforge.net>
 noravanq <zangakatun@gmail.com>
 Olaf Lenz <olenz@icp.uni-stuttgart.de>
+Oliver Beckmann <>
 Oliver Kopp <kopp.dev@gmail.com>
 Oscar Gustafsson <ogib@users.sourceforge.net>
 payload <payload@lavabit.com>
@@ -77,24 +106,34 @@ Philip Johnson <plfjohnson@emory.edu>
 Raik Nagel <kiar@users.sourceforge.net>
 Renato Massao <renato.massao@live.com>
 Robert Jäschke <rjoberon@users.sf.net>
+Rudolf Seemann <>
 Ruy Minoru Ito Takata <ruy.takata@gmail.com>
 Ryo Igarashi <rigarash@gmail.com>
 S M Mahbub Murshed <udvranto@users.sourceforge.net>
 Saivert <saivert@gmail.com>
+Samin Muhammad Ridwanul Karim <>
 Sascha Hunold <hunoldinho@users.sf.net>
+Saverio Mori <>
 Seb Wills <sebwills@users.sourceforge.net>
 Simon Harrer <simon.harrer@gmail.com>
 Simon Rutishauser <simon.rutishauser@web.de>
 speed9 <speed9@users.sf.net>
 Stefan Kolb <stefan-kolb@web.de>
+Stefan Robert <>
 Stefano <steog88@gmail.com>
+Stefano Gariazzo <>
+Stephan Lau <>
+Stephan Rave <>
 The Gitter Badger <badger@gitter.im>
 Thiago Toledo <thimakgt@gmail.com>
 Thomas Arildsen <tha@es.aau.dk>
 Thorsten Dahlheimer <tdahlheim@gmx.net>
 Tobias Diez <tobiasdiez@gmx.de>
+Toralf Senger <>
 uid112001 <uid112001@users.sourceforge.net>
+Ulrich Stärk <>
 Ulrik Stervbo <ulriks@users.sourceforge.net>
+Uwe Kuehn <>
 Waluyo Adi Siswanto <was.uthm@gmail.com>
 Ward Poelmans <wpoely86@gmail.com>
 wuw <wuw@front.ru>
