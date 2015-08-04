@@ -54,6 +54,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	Stefan Robert <>
 	EOF
 
-	echo -e "$authors\n$(git log --format='%aN <%aE>')" | LC_ALL=C.UTF-8 sort -uf
+	# %aN = author name, %aE = author email
+	echo -e "$authors\n$(git log --format='%aN <%aE>')" | LC_ALL=C.UTF-8 sort --unique --ignore-case
 } > AUTHORS
 
