@@ -6,7 +6,7 @@
 #
 # For explanation on this file format: man git-shortlog
 Ruy Minoru Ito Takata <ruy.takata@gmail.com>
-<ruy.takata@gmail.com> <21537850814@serpro-1557637.(none)>
+Ruy Minoru Ito Takata <ruy.takata@gmail.com> <21537850814@serpro-1557637.(none)>
 Stefan Kolb <stefan-kolb@web.de>
 <stefan-kolb@web.de> <stefan-kolb@users.noreply.github.com>
 Nicolas Pavillon <pavillon.nicolas@gmail.com>
@@ -33,6 +33,7 @@ Michael Falkenthal <michael.falkenthal@googlemail.com> <michael.falkenthal@iaas.
 <ambro2@users.noreply.github.com> <ambro2@users.sourceforge.net>
 Eduardo Greco <eduardogreco93@gmail.com>
 Egon Willighagen <egon.willighagen@gmail.com> <egonw@users.sourceforge.net>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr>
 Frédéric Darboux <Frederic.Darboux@orleans.inra.fr> <fdar@users.sourceforge.net>
 Florian Straßer <strassfn@studi.informatik.uni-stuttgart.de>
 Gregor Herrmann <gregoa@debian.org>
@@ -73,3 +74,4 @@ Kolja Brix <kbx@users.sourceforge.net>
 Raik Nagel <kiar@users.sourceforge.net>
 Carlos Silla <silla@users.sourceforge.net>
 S M Mahbub Murshed <udvranto@users.sourceforge.net>
+Robert Jäschke <rjoberon@users.sf.net>
