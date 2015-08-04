@@ -19,12 +19,10 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	Oliver Beckmann <>
 	Fedor Bezrukov <>
 	Fabian Bieker <>
-	François Charette <>
 	Aaron Chen <>
 	Fabrice Dessaint <>
 	Nathan Dunn <>
 	Alexis Gallagher <>
-	Stefano Gariazzo <>
 	David Gleich <>
 	Bernd Kalbfuss <>
 	Martin Kähmer <>
