@@ -5,9 +5,8 @@
 #   git log --format='%aE - %aN' | sort -uf
 #
 # For explanation on this file format: man git-shortlog
-Oliver Kopp <kopp.dev@gmail.com>
 Ruy Minoru Ito Takata <ruy.takata@gmail.com>
-<ruy.takata@gmail.com> <21537850814@serpro-1557637.(none)>
+Ruy Minoru Ito Takata <ruy.takata@gmail.com> <21537850814@serpro-1557637.(none)>
 Stefan Kolb <stefan-kolb@web.de>
 <stefan-kolb@web.de> <stefan-kolb@users.noreply.github.com>
 Nicolas Pavillon <pavillon.nicolas@gmail.com>
@@ -28,13 +27,14 @@ Tobias Diez <tobiasdiez@gmx.de>
 <igorsteinmacher@gmail.com> <ifsteinm@yahoo.com.br>
 <igorsteinmacher@gmail.com> <igorfs@utfpr.edu.br>
 <adrian.daerr@univ-paris-diderot.fr> <adaerr@users.sf.net>
-<was.uthm@gmail.com> <was123@users.sourceforge.net>
+Waluyo Adi Siswanto <was.uthm@gmail.com> <was123@users.sourceforge.net>
 Michael Falkenthal <michael.falkenthal@googlemail.com> <schwarmi@users.sf.net>
 Michael Falkenthal <michael.falkenthal@googlemail.com> <michael.falkenthal@iaas.uni-stuttgart.de>
 <ambro2@users.noreply.github.com> <ambro2@users.sourceforge.net>
 Eduardo Greco <eduardogreco93@gmail.com>
 Egon Willighagen <egon.willighagen@gmail.com> <egonw@users.sourceforge.net>
-Frederic Darboux <Frederic.Darboux@orleans.inra.fr> <fdar@users.sourceforge.net>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr>
+Frédéric Darboux <Frederic.Darboux@orleans.inra.fr> <fdar@users.sourceforge.net>
 Florian Straßer <strassfn@studi.informatik.uni-stuttgart.de>
 Gregor Herrmann <gregoa@debian.org>
 Hakan Duran <ehakanduran@gmail.com> hakova <ehakanduran@gmail.com>
@@ -49,7 +49,31 @@ Lorenzo Genta <lorenzo.genta@fastwebnet.it>
 Morten Alver <mortenalver@gmail.com> <mortenalver@users.sourceforge.net>
 Morten Alver <mortenalver@gmail.com> <alver@alver-1001PX.(none)>
 Morten Alver <mortenalver@gmail.com> <mortenalver@gmail.com>
+Oliver Kopp <kopp.dev@gmail.com>
 Oliver Kopp <kopp.dev@gmail.com> <olly98@users.sf.net>
 Oliver Kopp <kopp.dev@gmail.com> <olly98@users.sourceforge.net>
 Oliver Kopp <kopp.dev@gmail.com> <kopp.dev+format@gmail.com>
 Oliver Kopp <kopp.dev@gmail.com> <kopp.dev+cleanup@github.com>
+Oliver Kopp <kopp.dev@gmail.com> Apple Inc <no@mail>
+Nizar N. Batada <nbatada@users.sourceforge.net>
+Christopher Oezbek <coezbek@users.sourceforge.net>
+Andreas Rudert <arudert@users.sourceforge.net>
+Michael Spiegel <mspiegel@users.sourceforge.net>
+Jörg Wegner <wegner@users.sourceforge.net>
+Michael Wrighton <mwrighton@users.sourceforge.net>
+Jörg Zieren <jzieren@users.sourceforge.net>
+Brian Van Essen <vanessen@users.sourceforge.net>
+Luciana de Melo e Abud <lucianaabud@uol.com.br>
+Seb Wills <sebwills@users.sourceforge.net>
+Waluyo Adi Siswanto <was.uthm@gmail.com>
+Dale Visser <dwvisser@users.sourceforge.net>
+Erik Putrycz <eputrycz@users.sourceforge.net>
+Gert Renckens <gert_@users.sourceforge.net>
+Guillaume Gardey <glinmac@users.sourceforge.net>
+Kolja Brix <kbx@users.sourceforge.net>
+Raik Nagel <kiar@users.sourceforge.net>
+Carlos Silla <silla@users.sourceforge.net>
+S M Mahbub Murshed <udvranto@users.sourceforge.net>
+Robert Jäschke <rjoberon@users.sf.net>
+Koji Yokota <yokota6@gmail.com>
+Ulrik Stervbo <ulriks@users.sourceforge.net>
