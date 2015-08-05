@@ -94,7 +94,7 @@ public class RISImporterTest {
                 "Harrison, Warren",
                 entry.getField("author"));
 
-        Assert.assertEquals(BibtexEntryType.ARTICLE, entry.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
         Assert.assertEquals("Empirical Software Engineering", entry.getField("journal"));
         Assert.assertEquals("2001", entry.getField("year"));
         Assert.assertEquals("6", entry.getField("volume"));

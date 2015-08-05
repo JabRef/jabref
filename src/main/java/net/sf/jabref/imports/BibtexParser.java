@@ -1015,7 +1015,7 @@ public class BibtexParser {
                                     + be.getType().getName() + ":" + be.getField(BibtexFields.KEY_FIELD)
                                     + " . " + Globals.lang("Type set to 'other'")
                                     + ".");
-                    be.setType(BibtexEntryType.OTHER);
+                    be.setType(BibtexEntryTypes.OTHER);
                 }
             }
         }

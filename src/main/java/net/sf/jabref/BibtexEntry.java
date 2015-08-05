@@ -94,7 +94,7 @@ public class BibtexEntry
 
     public BibtexEntry(String id)
     {
-        this(id, BibtexEntryType.OTHER);
+        this(id, BibtexEntryTypes.OTHER);
     }
 
     public BibtexEntry(String id, BibtexEntryType type)
@@ -198,7 +198,7 @@ public class BibtexEntry
      * current types.
      * @return true if the entry could find a type, false if not (in
      * this case the type will have been set to
-     * BibtexEntryType.TYPELESS).
+     * BibtexEntryTypes.TYPELESS).
      */
     public boolean updateType() {
         BibtexEntryType newType = BibtexEntryType.getType(_type.getName());
@@ -206,7 +206,7 @@ public class BibtexEntry
             _type = newType;
             return true;
         }
-        _type = BibtexEntryType.TYPELESS;
+        _type = BibtexEntryTypes.TYPELESS;
         return false;
     }
 

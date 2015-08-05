@@ -253,12 +253,12 @@ public class PdfImporter {
                             if (fieldExists(document.getType())) {
                                 type = BibtexEntryType.getStandardType(document.getType());
                                 if (type == null) {
-                                    type = BibtexEntryType.ARTICLE;
+                                    type = BibtexEntryTypes.ARTICLE;
                                 }
                                 entry.setType(type);
                             }
                             else {
-                                entry.setType(BibtexEntryType.ARTICLE);
+                                entry.setType(BibtexEntryTypes.ARTICLE);
                             }
                             ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
                             list.add(entry);

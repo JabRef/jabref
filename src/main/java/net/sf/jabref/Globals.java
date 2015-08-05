@@ -397,13 +397,13 @@ public class Globals {
         if (o != null) {
             return (BibtexEntryType) o;
         } else {
-            return BibtexEntryType.OTHER;
+            return BibtexEntryTypes.OTHER;
         }
         /*
-         * if(type.equals("article")) return BibtexEntryType.ARTICLE; else
-         * if(type.equals("book")) return BibtexEntryType.BOOK; else
+         * if(type.equals("article")) return BibtexEntryTypes.ARTICLE; else
+         * if(type.equals("book")) return BibtexEntryTypes.BOOK; else
          * if(type.equals("inproceedings")) return
-         * BibtexEntryType.INPROCEEDINGS;
+         * BibtexEntryTypes.INPROCEEDINGS;
          */
     }
 
