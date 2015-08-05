@@ -31,10 +31,15 @@ Add a line with your changes and your name.
 Nicknames are OK.
 
 
-### Add yourself to src/main/resources/help/About.html
-We try to keep an updated list of contributors in `About.html`.
-Open `About.html` and add yourself below `Contributions from:`.
+### Author credits
+You will be given credit in the `AUTHORS` file in the root of the repository and the 'About' pages inside the main application.
+We will periodically update the contributors list inside `AUTHORS`.
+This is done by an automatic shell script `scripts/generate-authors.sh`.
 
+If you want to add yourself directly with your pull request please run this script.
+Please make sure there are no duplicates or alternate spellings of your name listed.
+If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
+More information on this can be found `man git-shortlog`.
 
 ### Add yourself to the header
 
