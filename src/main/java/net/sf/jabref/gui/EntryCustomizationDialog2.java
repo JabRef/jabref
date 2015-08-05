@@ -79,9 +79,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         java.util.List<String> entryTypes = new ArrayList<String>();
-        for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
-            entryTypes.add(s);
-        }
+		for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+			entryTypes.add(s);
+		}
 
         typeComp = new EntryTypeList(entryTypes);
         typeComp.addListSelectionListener(this);
@@ -173,18 +173,20 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         }
         List<String> rl = reqLists.get(s);
         if (rl == null) {
-            BibtexEntryType type = BibtexEntryType.getType(s);
+        	BibtexEntryType type = BibtexEntryType.getType(s);
             if (type != null) {
                 String[] rf = type.getRequiredFieldsForCustomization();
-                String[] of = type.getOptionalFields();
-                List<String> req, opt;
+
+                List<String> req;
                 if (rf != null) {
                     req = java.util.Arrays.asList(rf);
                 } else {
                     req = new ArrayList<String>();
                 }
 
+                List<String> opt;
                 if (!biblatexMode) {
+                    String[] of = type.getOptionalFields();
                     if (of != null) {
                         opt = java.util.Arrays.asList(of);
                     } else {
@@ -197,24 +199,22 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                     } else {
                         opt = new ArrayList<String>();
                     }
-                    List<String> opt2 = new ArrayList<String>();
-                    if (of != null) {
-                        for (String anOf : of) {
-                            if (!opt.contains(anOf)) {
-                                opt2.add(anOf);
-                            }
-                        }
+                    String[] secOpt = type.getSecondaryOptionalFields();
+                    List<String> opt2;
+                    if (secOpt != null) {
+                    	opt2 = java.util.Arrays.asList(secOpt);
+                    } else {
+                    	opt2 = new ArrayList<String>();
                     }
                     optComp2.setFields(opt2);
                     optComp2.setEnabled(true);
                 }
-
                 reqComp.setFields(req);
                 reqComp.setEnabled(true);
                 optComp.setFields(opt);
                 optComp.setEnabled(true);
             } else {
-                // New entry, veintle // FIXME what does veintle mean?
+                // New entry
                 reqComp.setFields(new ArrayList<String>());
                 reqComp.setEnabled(true);
                 optComp.setFields(new ArrayList<String>());
