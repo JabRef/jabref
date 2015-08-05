@@ -39,7 +39,7 @@ This is done by an automatic shell script `scripts/generate-authors.sh`.
 If you want to add yourself directly with your pull request please run this script.
 Please make sure there are no duplicates or alternate spellings of your name listed.
 If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
-More information on this can be found `man git-shortlog`.
+More information on this can be found via `man git-shortlog`.
 
 ### Add yourself to the header
 
