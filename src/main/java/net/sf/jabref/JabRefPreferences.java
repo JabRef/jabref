@@ -1368,13 +1368,8 @@ public class JabRefPreferences {
         if (priOpt == null) {
             return new CustomEntryType(StringUtil.nCase(name), req, opt);
         }
-        ArrayList<String> secOpt = new ArrayList<String>();
-        Collections.addAll(secOpt, opt);
-        for (String aPriOpt : priOpt) {
-            secOpt.remove(aPriOpt);
-        }
-        return new CustomEntryType(StringUtil.nCase(name), req, priOpt,
-                secOpt.toArray(new String[secOpt.size()]));
+        String[] secOpt = Util.getRemainder(opt, priOpt);
+        return new CustomEntryType(StringUtil.nCase(name), req, priOpt, secOpt);
 
     }
 
