@@ -113,7 +113,7 @@ public class BibtexEntry
      */
     public String[] getOptionalFields()
     {
-        return _type.getOptionalFields();
+        return _type.getOptionalFields().clone();
     }
 
     /**
@@ -121,7 +121,7 @@ public class BibtexEntry
      */
     public String[] getRequiredFields()
     {
-        return _type.getRequiredFields();
+        return _type.getRequiredFields().clone();
     }
 
     public String[] getUserDefinedFields()
