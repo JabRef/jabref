@@ -5,6 +5,7 @@ plugins {
     id "edu.sc.seis.launch4j" version "1.1.4"
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
+    id "com.github.youribonnaffe.gradle.format" version "1.2"
 }
 
 apply plugin: "java"
@@ -174,6 +175,13 @@ jacocoTestReport {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
     }
+}
+
+// enables `gradlew format`. Currently `LabelPatternUtil.java` is destroyed. Use with care!
+format {
+    configurationFile = file('ide-settings/formatter_settings.xml')
+    // default: reformat main and test
+    //files = sourceSets.main.java
 }
 
 fatJar {
