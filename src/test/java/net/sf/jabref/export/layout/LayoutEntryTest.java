@@ -12,9 +12,6 @@ import org.junit.Test;
 import java.io.StringReader;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry.
  * Indirectly the net.sf.jabref.export.layout.Layout is testet too.

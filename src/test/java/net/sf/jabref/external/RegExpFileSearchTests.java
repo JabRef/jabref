@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.Globals;

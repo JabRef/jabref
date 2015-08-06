@@ -11,9 +11,6 @@ import org.junit.Test;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author kahlert, cordes
  */
