@@ -79,7 +79,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         java.util.List<String> entryTypes = new ArrayList<String>();
-		for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+		for (String s : BibtexEntryType.getAllTypes()) {
 			entryTypes.add(s);
 		}
 
@@ -297,13 +297,13 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                         new CustomEntryType(StringUtil.nCase(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
                         new CustomEntryType(StringUtil.nCase(stringListEntry.getKey()), reqStr, optStr);
 
-                BibtexEntryType.ALL_TYPES.put(stringListEntry.getKey().toLowerCase(), typ);
+                BibtexEntryType.addOrModifyCustomEntryType(typ);
                 updateTypesForEntries(typ.getName());
             }
         }
 
         Set<Object> toRemove = new HashSet<Object>();
-        for (String o : BibtexEntryType.ALL_TYPES.keySet()) {
+        for (String o : BibtexEntryType.getAllTypes()) {
             if (!types.contains(o)) {
                 toRemove.add(o);
             }

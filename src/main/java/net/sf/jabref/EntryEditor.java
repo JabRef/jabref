@@ -1068,7 +1068,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JPopupMenu typeMenu = new JPopupMenu();
-						for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+						for (String s : BibtexEntryType.getAllTypes()) {
                         typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
 					}
 
@@ -1109,7 +1109,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 private void handleTypeChange() {
                     JPopupMenu typeMenu = new JPopupMenu();
-						for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+						for (String s : BibtexEntryType.getAllTypes()) {
                         typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
 					}
 					typeMenu.show(ths, 0, 0);

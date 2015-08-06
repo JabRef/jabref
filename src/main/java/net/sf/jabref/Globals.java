@@ -389,11 +389,11 @@ public class Globals {
     }
 
     // ============================================================
-    // Using the hashmap of entry types found in BibtexEntryType
+    // Get an entry type defined in BibtexEntryType
     // ============================================================
     public static BibtexEntryType getEntryType(String type) {
         // decide which entryType object to return
-        Object o = BibtexEntryType.ALL_TYPES.get(type);
+        Object o = BibtexEntryType.getType(type);
         if (o != null) {
             return (BibtexEntryType) o;
         } else {

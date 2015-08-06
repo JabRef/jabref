@@ -29,8 +29,10 @@ Modified for use in JabRef.
 */
 package net.sf.jabref;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TreeMap;
 
 import net.sf.jabref.util.Util;
@@ -99,7 +101,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return true;
     }
 
-    public static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
+    private static final TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
     private static final TreeMap<String, BibtexEntryType> STANDARD_TYPES;
 
     static {
@@ -159,8 +161,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 			}
 		// We need a record of the standard types, in case the user wants
 		// to remove a customized version. Therefore we clone the map.
-		STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(ALL_TYPES);
-		
+		STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(ALL_TYPES);	
     }
 
     /**
@@ -190,6 +191,18 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
             return (BibtexEntryType) o;
         }
     }
+    
+    public static void addOrModifyCustomEntryType(CustomEntryType type) {
+    	ALL_TYPES.put(type.getName().toLowerCase(Locale.US), type);
+    }
+    
+    public static Set<String> getAllTypes() {
+    	return ALL_TYPES.keySet();
+    }
+    
+    public static Collection<BibtexEntryType> getAllValues() {
+    	return ALL_TYPES.values();
+    }
 
     /**
      * Removes a customized entry type from the type map. If this type
@@ -206,7 +219,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 		if (STANDARD_TYPES.get(nm) != null) {
 			// In this case the user has removed a customized version
 			// of a standard type. We reinstate the standard type.
-			ALL_TYPES.put(nm, STANDARD_TYPES.get(nm));
+			addOrModifyCustomEntryType((CustomEntryType) STANDARD_TYPES.get(nm));
 		}
 	}
 
@@ -218,7 +231,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         int number = 0;
         CustomEntryType type;
         while ((type = prefs.getCustomEntryType(number)) != null) {
-            ALL_TYPES.put(type.getName().toLowerCase(Locale.US), type);
+            addOrModifyCustomEntryType(type);
             number++;
         }
     }
