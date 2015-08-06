@@ -580,7 +580,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             @Override
             public void run() {
                 List<String> errors = new LinkedList<String>();
-                int count = creatorManager.addEntrysFromFiles(fileList, database, frame.basePanel(),
+                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.basePanel(),
                         entryType,
                         checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
