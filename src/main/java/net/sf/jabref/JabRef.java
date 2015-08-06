@@ -75,12 +75,6 @@ public class JabRef {
     public void start(String[] args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
-        // See if there are plugins scheduled for deletion:
-        if (prefs.hasKey(JabRefPreferences.DELETE_PLUGINS) && !prefs.get(JabRefPreferences.DELETE_PLUGINS).isEmpty()) {
-            String[] toDelete = prefs.getStringArray(JabRefPreferences.DELETE_PLUGINS);
-            prefs.put(JabRefPreferences.DELETE_PLUGINS, "");
-        }
-
         if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
             // NetworkTab.java ensures that proxyHostname and proxyPort are not null
             System.setProperty("http.proxyHost", prefs.get(JabRefPreferences.PROXY_HOSTNAME));

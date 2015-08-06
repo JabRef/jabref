@@ -302,7 +302,6 @@ public class JabRefPreferences {
     public static final String VALUE_DELIMITERS2 = "valueDelimiters";
     public static final String BIBLATEX_MODE = "biblatexMode";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
-    public static final String DELETE_PLUGINS = "deletePlugins";
     public static final String PROMPT_BEFORE_USING_AUTOSAVE = "promptBeforeUsingAutosave";
     public static final String AUTO_SAVE_INTERVAL = "autoSaveInterval";
     public static final String AUTO_SAVE = "autoSave";
@@ -804,7 +803,6 @@ public class JabRefPreferences {
         defaults.put(AUTO_SAVE, Boolean.TRUE);
         defaults.put(AUTO_SAVE_INTERVAL, 5);
         defaults.put(PROMPT_BEFORE_USING_AUTOSAVE, Boolean.TRUE);
-        defaults.put(DELETE_PLUGINS, "");
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         defaults.put(BIBLATEX_MODE, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
