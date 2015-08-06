@@ -1866,7 +1866,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             title = file.getName();
         }
-        tabbedPane.add("<html><div style='padding:2px 5px;'>" + title + "</div></html>", bp);
+        // idea: "<html><div style='padding:2px 5px;'>" + title + "</div></html>" instead of "title" to get some space around.
+        // However, this causes https://sourceforge.net/p/jabref/bugs/1293/
+        // Therefore, plain "title" is used
+        tabbedPane.add(title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
