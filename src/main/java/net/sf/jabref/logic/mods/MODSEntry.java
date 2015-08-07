@@ -27,7 +27,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.XMLChars;
 
@@ -117,9 +117,7 @@ class MODSEntry {
         if (bibtex.getField("author") != null) {
             authors = getAuthors(bibtex.getField("author"));
         }
-        if (bibtex.getType() == BibtexEntryType.ARTICLE ||
-                bibtex.getType() == BibtexEntryType.INPROCEEDINGS)
-        {
+        if ((bibtex.getType() == BibtexEntryTypes.ARTICLE) || (bibtex.getType() == BibtexEntryTypes.INPROCEEDINGS)) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
             host.title = bibtex.getField("booktitle");

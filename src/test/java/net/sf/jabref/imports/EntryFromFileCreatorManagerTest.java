@@ -12,8 +12,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 /**
  * @version 11.11.2008 | 21:51:54
  */

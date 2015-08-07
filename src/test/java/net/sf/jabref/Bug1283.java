@@ -6,8 +6,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
-
 public class Bug1283 {
 
     @Test

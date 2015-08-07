@@ -154,7 +154,7 @@ public class XMPUtilTest {
 
     public BibtexEntry t2BibtexEntry() {
         BibtexEntry e = new BibtexEntry(IdGenerator.next(),
-                BibtexEntryType.INCOLLECTION);
+                BibtexEntryTypes.INCOLLECTION);
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
         e.setField("year", "2003");
@@ -168,7 +168,7 @@ public class XMPUtilTest {
 
     public BibtexEntry t3BibtexEntry() {
         BibtexEntry e = new BibtexEntry();
-        e.setType(BibtexEntryType.INPROCEEDINGS);
+        e.setType(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("title", "Hypersonic ultra-sound");
         e.setField("bibtexkey", "Clarkson06");
         e.setField("author", "Kelly Clarkson and Ozzy Osbourne");
@@ -295,7 +295,7 @@ public class XMPUtilTest {
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation", e
                 .getField("title"));
-        Assert.assertEquals(BibtexEntryType.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
 
     }
 
@@ -322,7 +322,7 @@ public class XMPUtilTest {
         Assert.assertEquals("OezbekC06", e.getCiteKey());
         Assert.assertEquals("2003", e.getField("year"));
         Assert.assertEquals("�pt�mz�t��n", e.getField("title"));
-        Assert.assertEquals(BibtexEntryType.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
     }
 
     /**
@@ -404,7 +404,7 @@ public class XMPUtilTest {
         Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getField("author"));
         Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e
                 .getField("editor"));
-        Assert.assertEquals(BibtexEntryType.OTHER, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.OTHER, e.getType());
     }
 
     /**
@@ -424,7 +424,7 @@ public class XMPUtilTest {
         BibtexEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals(BibtexEntryType.ARTICLE, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
     }
 
     public static String readManually(File tempFile) throws IOException {
@@ -937,11 +937,11 @@ public class XMPUtilTest {
         Assert.assertEquals("canh05", a.getCiteKey());
         Assert.assertEquals("K. Crowston and H. Annabi", a.getField("author"));
         Assert.assertEquals("Title A", a.getField("title"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, a.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
 
         Assert.assertEquals("foo", b.getCiteKey());
         Assert.assertEquals("Norton Bar", b.getField("author"));
-        Assert.assertEquals(BibtexEntryType.INPROCEEDINGS, b.getType());
+        Assert.assertEquals(BibtexEntryTypes.INPROCEEDINGS, b.getType());
     }
 
     /**

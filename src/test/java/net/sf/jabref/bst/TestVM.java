@@ -16,8 +16,6 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.Vector;
 
-import static org.junit.Assert.*;
-
 public class TestVM {
 
     @Test

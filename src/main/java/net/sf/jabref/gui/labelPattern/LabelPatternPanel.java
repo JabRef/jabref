@@ -116,7 +116,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+        for (String s : BibtexEntryType.getAllTypes()) {
             textFields.put(s, addEntryType(pan, s, y));
             y++;
         }
