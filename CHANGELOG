@@ -1,4 +1,5 @@
 [master]
+    - List of authors is now auto generated `scripts/generate-authors.sh` and inserted into L10N About.html
     - Remove Mr.DLib support as MR.DLib will be shut down in 2015
     - Streamline logging API: Replace usages of java.util.logging with commons.logging
     - BREAKING: Remove plugin functionality.
