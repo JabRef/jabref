@@ -5,8 +5,6 @@ import net.sf.jabref.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Test case for ContainBasedSearchRule.
  */
@@ -46,7 +44,7 @@ public class ContainBasedSearchRuleTest {
     }
 
     public BibtexEntry makeBibtexEntry() {
-        BibtexEntry e = new BibtexEntry(IdGenerator.next(), BibtexEntryType.INCOLLECTION);
+        BibtexEntry e = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION);
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
         e.setField("year", "2001");

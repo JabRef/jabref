@@ -389,21 +389,21 @@ public class Globals {
     }
 
     // ============================================================
-    // Using the hashmap of entry types found in BibtexEntryType
+    // Get an entry type defined in BibtexEntryType
     // ============================================================
     public static BibtexEntryType getEntryType(String type) {
         // decide which entryType object to return
-        Object o = BibtexEntryType.ALL_TYPES.get(type);
+        Object o = BibtexEntryType.getType(type);
         if (o != null) {
             return (BibtexEntryType) o;
         } else {
-            return BibtexEntryType.OTHER;
+            return BibtexEntryTypes.OTHER;
         }
         /*
-         * if(type.equals("article")) return BibtexEntryType.ARTICLE; else
-         * if(type.equals("book")) return BibtexEntryType.BOOK; else
+         * if(type.equals("article")) return BibtexEntryTypes.ARTICLE; else
+         * if(type.equals("book")) return BibtexEntryTypes.BOOK; else
          * if(type.equals("inproceedings")) return
-         * BibtexEntryType.INPROCEEDINGS;
+         * BibtexEntryTypes.INPROCEEDINGS;
          */
     }
 

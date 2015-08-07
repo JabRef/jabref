@@ -226,7 +226,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 existentTypes.add(rs.getString(1));
             }
         }
-        for (BibtexEntryType val : BibtexEntryType.ALL_TYPES.values()) {
+        for (BibtexEntryType val : BibtexEntryType.getAllValues()) {
             fieldRequirement.clear();
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 fieldRequirement.add(i, "gen");

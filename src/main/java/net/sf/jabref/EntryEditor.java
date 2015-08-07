@@ -252,9 +252,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 Set<String> deprecatedFields = new HashSet<String>(BibtexEntry.FieldAliasesOldToNew.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
-                String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(entry.getOptionalFields(),
-                        entry.getType().getPrimaryOptionalFields());
-                optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(optionalFieldsNotPrimaryOrDeprecated,
+                String[] secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
+                String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(secondaryOptionalFields,
                         deprecatedFields.toArray(new String[deprecatedFields.size()]));
 
                 // Get list of all optional fields of this entry and their aliases
@@ -272,27 +271,28 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
                 // Add tabs
-                optPan = new EntryEditorTab(frame, panel,
+                 EntryEditorTab optPan2 = new EntryEditorTab(frame, panel,
                         java.util.Arrays.asList(optionalFieldsNotPrimaryOrDeprecated), this,
                         false, true, Globals.lang("Optional fields 2"));
-                if (optPan.fileListEditor != null) {
-                    fileListEditor = optPan.fileListEditor;
+                if (optPan2.fileListEditor != null) {
+                    fileListEditor = optPan2.fileListEditor;
                 }
-                tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan
+                tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan2
                         .getPane(), Globals.lang("Show optional fields"));
-                tabs.add(optPan);
+                tabs.add(optPan2);
 
                 if (!usedOptionalFieldsDeprecated.isEmpty())
                 {
-                    optPan = new EntryEditorTab(frame, panel,
+                	EntryEditorTab optPan3;
+                	optPan3 = new EntryEditorTab(frame, panel,
                             java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[usedOptionalFieldsDeprecated.size()])), this,
                             false, true, Globals.lang("Deprecated fields"));
-                    if (optPan.fileListEditor != null) {
-                        fileListEditor = optPan.fileListEditor;
+                    if (optPan3.fileListEditor != null) {
+                        fileListEditor = optPan3.fileListEditor;
                     }
-                    tabbed.addTab(Globals.lang("Deprecated fields"), GUIGlobals.getImage("optional"), optPan
+                    tabbed.addTab(Globals.lang("Deprecated fields"), GUIGlobals.getImage("optional"), optPan3
                             .getPane(), Globals.lang("Show deprecated bibtex fields"));
-                    tabs.add(optPan);
+                    tabs.add(optPan3);
                 }
             }
         }
@@ -1068,11 +1068,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+						for (String s : BibtexEntryType.getAllTypes()) {
                         typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
-                    }
+					}
 
-                    typeMenu.show(ths, 0, 0);
+					typeMenu.show(ths, 0, 0);
                 }
             });
         }
@@ -1109,10 +1109,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 private void handleTypeChange() {
                     JPopupMenu typeMenu = new JPopupMenu();
-                    for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+						for (String s : BibtexEntryType.getAllTypes()) {
                         typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
-                    }
-                    typeMenu.show(ths, 0, 0);
+					}
+					typeMenu.show(ths, 0, 0);
                 }
             });
         }

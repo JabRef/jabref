@@ -1,3 +1,5 @@
+package extensions;
+
 import java.io.*;
 import java.util.*;
 import net.sf.jabref.*;

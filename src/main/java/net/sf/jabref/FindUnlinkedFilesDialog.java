@@ -28,7 +28,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -581,7 +580,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             @Override
             public void run() {
                 List<String> errors = new LinkedList<String>();
-                int count = creatorManager.addEntrysFromFiles(fileList, database, frame.basePanel(),
+                int count = creatorManager.addEntriesFromFiles(fileList, database, frame.basePanel(),
                         entryType,
                         checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
@@ -1089,8 +1088,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void createEntryTypesCombobox() {
 
-        TreeMap<String, BibtexEntryType> entryTypes = BibtexEntryType.ALL_TYPES;
-        Iterator<BibtexEntryType> iterator = entryTypes.values().iterator();
+        Iterator<BibtexEntryType> iterator = BibtexEntryType.getAllValues().iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<BibtexEntryTypeWrapper>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {

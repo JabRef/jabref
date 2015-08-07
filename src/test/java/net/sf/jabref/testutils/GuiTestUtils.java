@@ -1,14 +1,13 @@
-package net.sf.jabref;
+package net.sf.jabref.testutils;
 
 import java.awt.*;
 
 /**
- * Provides helper methods for unit testing such as methods for making testing
- * of GUIs easier.
+ * Provides helper methods for making testing of GUIs easier.
  *
  * @author Dennis Hartrampf, Ines Moosdorf
  */
-public class TestUtils {
+public class GuiTestUtils {
 
     /**
      * Get a Component by name.
@@ -27,7 +26,7 @@ public class TestUtils {
             Component[] children = ((Container) parent).getComponents();
 
             for (Component aChildren : children) {
-                Component child = TestUtils.getChildNamed(aChildren, name);
+                Component child = GuiTestUtils.getChildNamed(aChildren, name);
                 if (child != null) {
                     return child;
                 }

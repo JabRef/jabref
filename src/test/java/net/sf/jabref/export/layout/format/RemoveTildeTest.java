@@ -5,8 +5,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class RemoveTildeTest {
 
     @Test

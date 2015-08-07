@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.OutputPrinter;
 
@@ -129,7 +130,7 @@ public class CopacImporter extends ImportFormat {
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
             BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
-                    BibtexEntryType.BOOK);
+                    BibtexEntryTypes.BOOK);
 
             String[] lines = entry.split("\n");
 

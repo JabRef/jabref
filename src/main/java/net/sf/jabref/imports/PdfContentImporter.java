@@ -280,7 +280,7 @@ public class PdfContentImporter extends ImportFormat {
             String pages = null;
             // year is a class variable as the method extractYear() uses it;
             String publisher = null;
-            BibtexEntryType type = BibtexEntryType.INPROCEEDINGS;
+            BibtexEntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
             final String lineBreak = System.getProperty("line.separator");
 
@@ -383,7 +383,7 @@ public class PdfContentImporter extends ImportFormat {
 
                     int pos = lower.indexOf("technical");
                     if (pos >= 0) {
-                        type = BibtexEntryType.TECHREPORT;
+                        type = BibtexEntryTypes.TECHREPORT;
                         pos = curString.trim().lastIndexOf(' ');
                         if (pos >= 0) {
                             // assumption: last character of curString is NOT ' '

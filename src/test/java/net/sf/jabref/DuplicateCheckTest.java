@@ -5,9 +5,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 /**
  * Created by IntelliJ IDEA.
  * User: alver
@@ -25,9 +22,9 @@ public class DuplicateCheckTest {
     @Test
     @Ignore
     public void testDuplicateDetection() {
-        BibtexEntry one = new BibtexEntry(IdGenerator.next(), BibtexEntryType.ARTICLE);
+        BibtexEntry one = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
 
-        BibtexEntry two = new BibtexEntry(IdGenerator.next(), BibtexEntryType.ARTICLE);
+        BibtexEntry two = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE);
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");
@@ -38,10 +35,10 @@ public class DuplicateCheckTest {
         Assert.assertFalse(DuplicateCheck.isDuplicate(one, two));
 
         two.setField("author", "Billy Bob");
-        two.setType(BibtexEntryType.BOOK);
+        two.setType(BibtexEntryTypes.BOOK);
         Assert.assertFalse(DuplicateCheck.isDuplicate(one, two));
 
-        two.setType(BibtexEntryType.ARTICLE);
+        two.setType(BibtexEntryTypes.ARTICLE);
         one.setField("year", "2005");
         two.setField("year", "2005");
         one.setField("title", "A title");

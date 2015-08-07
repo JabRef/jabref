@@ -32,6 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.XMLChars;
@@ -1042,21 +1043,21 @@ class MSBibEntry {
 
     private BibtexEntryType mapMSBibToBibtexType(String msbib)
     {
-        BibtexEntryType bibtex = BibtexEntryType.OTHER;
+        BibtexEntryType bibtex = BibtexEntryTypes.OTHER;
         if (msbib.equals("Book")) {
-            bibtex = BibtexEntryType.BOOK;
+            bibtex = BibtexEntryTypes.BOOK;
         } else if (msbib.equals("BookSection")) {
-            bibtex = BibtexEntryType.INBOOK;
+            bibtex = BibtexEntryTypes.INBOOK;
         } else if (msbib.equals("JournalArticle") || msbib.equals("ArticleInAPeriodical")) {
-            bibtex = BibtexEntryType.ARTICLE;
+            bibtex = BibtexEntryTypes.ARTICLE;
         } else if (msbib.equals("ConferenceProceedings")) {
-            bibtex = BibtexEntryType.CONFERENCE;
+            bibtex = BibtexEntryTypes.CONFERENCE;
         } else if (msbib.equals("Report")) {
-            bibtex = BibtexEntryType.TECHREPORT;
+            bibtex = BibtexEntryTypes.TECHREPORT;
         } else if (msbib.equals("InternetSite") || msbib.equals("DocumentFromInternetSite") || msbib.equals("ElectronicSource") || msbib.equals("Art") || msbib.equals("SoundRecording") || msbib.equals("Performance") || msbib.equals("Film") || msbib.equals("Interview") || msbib.equals("Patent") || msbib.equals("Case")) {
-            bibtex = BibtexEntryType.OTHER;
+            bibtex = BibtexEntryTypes.OTHER;
         } else {
-            bibtex = BibtexEntryType.MISC;
+            bibtex = BibtexEntryTypes.MISC;
         }
 
         return bibtex;
@@ -1082,43 +1083,43 @@ class MSBibEntry {
         // Todo: add check for BibTexEntry types
         //		BibtexEntry entry = new BibtexEntry();
         //		if(sourceType.equals("Book"))
-        //			entry.setType(BibtexEntryType.BOOK);
+        //			entry.setType(BibtexEntryTypes.BOOK);
         //		else if(sourceType.equals("BookSection"))
-        //			entry.setType(BibtexEntryType.INBOOK);
+        //			entry.setType(BibtexEntryTypes.INBOOK);
         //		else if(sourceType.equals("JournalArticle"))
-        //			entry.setType(BibtexEntryType.ARTICLE);
+        //			entry.setType(BibtexEntryTypes.ARTICLE);
         //		else if(sourceType.equals("ArticleInAPeriodical"))
-        //			entry.setType(BibtexEntryType.ARTICLE);
+        //			entry.setType(BibtexEntryTypes.ARTICLE);
         //		else if(sourceType.equals("ConferenceProceedings"))
-        //			entry.setType(BibtexEntryType.CONFERENCE);
+        //			entry.setType(BibtexEntryTypes.CONFERENCE);
         //		else if(sourceType.equals("Report"))
-        //			entry.setType(BibtexEntryType.TECHREPORT);
+        //			entry.setType(BibtexEntryTypes.TECHREPORT);
         //		else if(sourceType.equals("InternetSite"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("DocumentFromInternetSite"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("DocumentFromInternetSite"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("ElectronicSource"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Art"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("SoundRecording"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Performance"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Film"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Interview"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Patent"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Case"))
-        //			entry.setType(BibtexEntryType.OTHER);
+        //			entry.setType(BibtexEntryTypes.OTHER);
         //		else if(sourceType.equals("Misc"))
-        //			entry.setType(BibtexEntryType.MISC);
+        //			entry.setType(BibtexEntryTypes.MISC);
         //		else
-        //			entry.setType(BibtexEntryType.MISC);
+        //			entry.setType(BibtexEntryTypes.MISC);
 
         HashMap<String, String> hm = new HashMap<String, String>();
 

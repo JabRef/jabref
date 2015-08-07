@@ -4,13 +4,10 @@ import net.sf.jabref.*;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class CopacImporterTest {
 
@@ -62,7 +59,7 @@ public class CopacImporterTest {
         Assert.assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
         Assert.assertEquals("1992", entry.getField("year"));
         Assert.assertEquals("Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik", entry.getField("publisher"));
-        Assert.assertEquals(BibtexEntryType.BOOK, entry.getType());
+        Assert.assertEquals(BibtexEntryTypes.BOOK, entry.getType());
     }
 
     @Test
