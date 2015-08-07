@@ -18,7 +18,6 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 
 
 ### Ensure consistent formatting
-
 Ensure your code is formatted according the JabRef formatting guidelines.
 These are provided as Eclipse formatting configuration in [formatter_settings.xml](ide-settings/formatter_settings.xml).
 Ensure that JabRef's code cleanup settings are activated.
@@ -41,8 +40,8 @@ Please make sure there are no duplicates or alternate spellings of your name lis
 If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
 More information on this can be found via `man git-shortlog`.
 
-### Add yourself to the header
 
+### Add yourself to the header
 The headers of each `.java` file state the authors.
 These entries should match the modifications done.
 If you do not want to add your real name, add yourself as `JabRef contributors`.
@@ -65,9 +64,16 @@ gets
 See [good commit message] or [commit guidelines section of Pro Git].
 
 
+### Test your code
+We know that writing test cases causes a lot of time.
+Nevertheless, we rely on our test cases to ensure that a bug fix or a feature implementation doesn't break anything.
+In case you do not have time to add a test case, we nevertheless ask you to run `gradlew check` to ensure that your change doesn't break anything else.
+
+
 ### Create a pull request
 Create a pull request on GitHub.
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
+
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
 [good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
