@@ -8,7 +8,8 @@ This version is a development version. Features may not work as expected.
 The branch of this README file is `dev_2.11`.
 This branch is intended for maintenance releases in the 2.11 line with Java 6 compatibility and plugin support.
 The main goal is to include important fixes only.
-Main development (bug fixes and new features) will be incorporated in the [master branch](https://github.com/JabRef/jabref/tree/master).
+Main development (bug fixes and new features) is happening in the [master branch](https://github.com/JabRef/jabref/tree/master).
+Please check it for latest development information.
 
 JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
@@ -18,39 +19,6 @@ JabRef also lets you easily link to PDF or web sources for your reference entrie
 
 JabRef can import from and export to several formats, and you can customize export filters.
 JabRef can be run as a command line application to convert from any import format to any export format.
-
-* Homepage: http://jabref.sourceforge.net/
-* Development mailinglist: https://lists.sourceforge.net/lists/listinfo/jabref-devel
-* Development page: https://github.com/JabRef
-* Main git repository: https://github.com/JabRef/jabref
-* CI Server: https://travis-ci.org/JabRef/jabref
-* Open HUB page: https://www.openhub.net/p/jabref
-
-The main git repository has been generated out of the old git repository at sourceforge.
-The folder `jabref` of the old repository is now the main repository.
-Although that changed **all** git commit ids, the advantage is to have a clean separation between plugins, the homepage and the code of JabRef.
-
-
-### Bug reports, suggestions, other feedback
-
-We are thankful for any bug reports or other feedback. If there are
-features you want included in JabRef, tell us!
-
-The "old" trackers at sourceforge still remain intact:
-
-* Bugs: https://sourceforge.net/p/jabref/bugs/
-* Feature Requests: https://sourceforge.net/p/jabref/feature-requests/
-
-Do *not* file patches using https://sourceforge.net/p/jabref/patches/.
-Just fork JabRef and create a pull request.
-For details see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-### Next Steps
-
-* Completely change build system from `ant` to `gradle` to get rid of the binaries in the repository.
-* Migrate the sourceforge wiki to github
-* Fix bugs listed at https://sourceforge.net/p/jabref/bugs/.
-
 
 ## Requirements
 
@@ -91,18 +59,16 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 
-## Building JabRef from source:
-
-If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
+## Building JabRef v2.11 from source:
 
 To compile JabRef from source, you need a Java compiler supporting Java 1.6 and `JAVA_HOME` pointing to this JDK.
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
-and then generate the Eclipse `gradlew eclipse` or IntelliJ IDEA `gradlew idea` project files.
+and then generate the Eclipse `gradlew eclipse` project files.
 
 
-## Release Process
+## Release process
 
 Requires
  * [launch4j](http://launch4j.sourceforge.net/)
