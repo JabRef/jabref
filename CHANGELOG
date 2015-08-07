@@ -1,4 +1,5 @@
 [dev_2.11]
+    - Fix for bugs #1221 and #1261 (also partly #1243): order of fields in customized entry types no longer gets destroyed by the entry editor 
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)
     - BREAKING: Search groups now use same search logic as UI --> avoids confusion when converting a UI search into a search group. Behaviour before: contains/regex check of whole search string; behaviour after: contains/regex check of every word of the search string. The new search is more powerful and con simulate the old behaviour: enclose everything in double quotes, e.g., process language --> "process language".
     - Fix for bug #1276: OO styles do not consider editor fields anymore for sorting
