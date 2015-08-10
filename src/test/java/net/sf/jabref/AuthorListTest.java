@@ -3,8 +3,6 @@ package net.sf.jabref;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Christopher Oezbek <oezi@oezi.de>
  * @version 0.1 - Still fails for stuff in AuthorList that is ambiguous
@@ -12,7 +10,8 @@ import static org.junit.Assert.*;
  */
 public class AuthorListTest {
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void testFixAuthor_Natbib() {
         Assert.assertEquals("", AuthorList.fixAuthor_Natbib(""));
         Assert.assertEquals("Smith", AuthorList.fixAuthor_Natbib("John Smith"));
@@ -36,7 +35,8 @@ public class AuthorListTest {
         Assert.assertFalse(al == AuthorList.getAuthorList("Smith"));
     }
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void testFixAuthor_firstNameFirstCommas() {
 
         // No Commas
@@ -104,7 +104,8 @@ public class AuthorListTest {
 
     }
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void testFixAuthor_firstNameFirst() {
         Assert.assertEquals("John Smith", AuthorList.fixAuthor_firstNameFirst("John Smith"));
 
@@ -125,7 +126,8 @@ public class AuthorListTest {
 
     }
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void testFixAuthor_lastNameFirstCommas() {
 
         { // No commas before and
@@ -195,7 +197,8 @@ public class AuthorListTest {
                 "John Peter von Neumann", true, true));
     }
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void testFixAuthor_lastNameFirst() {
 
         // Test helper method
@@ -254,7 +257,8 @@ public class AuthorListTest {
 
     }
 
-    @Test
+    @SuppressWarnings("unused")
+	@Test
     public void testFixAuthor_lastNameOnlyCommas() {
 
         // No comma before and

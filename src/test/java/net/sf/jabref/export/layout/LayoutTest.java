@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-
 public class LayoutTest {
 
     /**

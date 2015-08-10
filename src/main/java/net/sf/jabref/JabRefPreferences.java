@@ -1365,10 +1365,9 @@ public class JabRefPreferences {
     public void storeCustomEntryType(CustomEntryType tp, int number) {
         String nr = "" + number;
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
-        put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());//tp.getRequiredFields());
+        put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
         putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, tp.getOptionalFields());
         putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, tp.getPrimaryOptionalFields());
-
     }
 
     /**
@@ -1377,8 +1376,8 @@ public class JabRefPreferences {
     public CustomEntryType getCustomEntryType(int number) {
         String nr = "" + number;
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
-        String[] req = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
         String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
@@ -1386,13 +1385,8 @@ public class JabRefPreferences {
         if (priOpt == null) {
             return new CustomEntryType(StringUtil.nCase(name), req, opt);
         }
-        ArrayList<String> secOpt = new ArrayList<String>();
-        Collections.addAll(secOpt, opt);
-        for (String aPriOpt : priOpt) {
-            secOpt.remove(aPriOpt);
-        }
-        return new CustomEntryType(StringUtil.nCase(name), req, priOpt,
-                secOpt.toArray(new String[secOpt.size()]));
+        String[] secOpt = Util.getRemainder(opt, priOpt);
+        return new CustomEntryType(StringUtil.nCase(name), req, priOpt, secOpt);
 
     }
 

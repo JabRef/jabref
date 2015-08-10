@@ -43,7 +43,7 @@ JabRef can be run as a command line application to convert from any import forma
 We are thankful for any bug reports or other feedback.
 If there are features you want included in JabRef, tell us!
 
-You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) so send in bug reports and suggestions.
+You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to send in bug reports and suggestions.
 
 To get your code added to JabRef, just fork JabRef and create a pull request.
 For details see [CONTRIBUTING](CONTRIBUTING.md).

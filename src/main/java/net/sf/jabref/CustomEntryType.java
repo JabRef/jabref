@@ -20,6 +20,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,14 +41,11 @@ public class CustomEntryType extends BibtexEntryType {
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
 
-    public CustomEntryType(String name_, String[] req_, String[] opt_, String[] opt2_) {
-        name = name_;
+    public CustomEntryType(String name_, String[] req_, String[] priOpt_, String[] secOpt_) {
+        name = StringUtil.nCase(name_);
         parseRequiredFields(req_);
-        ArrayList<String> allOpt = new ArrayList<String>();
-        Collections.addAll(allOpt, opt_);
-        Collections.addAll(allOpt, opt2_);
-        opt = allOpt.toArray(new String[allOpt.size()]);
-        priOpt = opt_;
+        priOpt = priOpt_;
+        opt = Util.arrayConcat(priOpt_, secOpt_);
     }
 
     public CustomEntryType(String name_, String[] req_, String[] opt_) {
@@ -53,7 +53,7 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     private CustomEntryType(String name_, String reqStr, String optStr) {
-        name = name_;
+        name = StringUtil.nCase(name_);
         if (reqStr.isEmpty()) {
             req = new String[0];
         } else {
@@ -107,6 +107,11 @@ public class CustomEntryType extends BibtexEntryType {
     @Override
     public String[] getPrimaryOptionalFields() {
         return priOpt;
+    }
+    
+    @Override
+    public String[] getSecondaryOptionalFields() {
+    	return Util.getRemainder(opt, priOpt);
     }
 
     @Override

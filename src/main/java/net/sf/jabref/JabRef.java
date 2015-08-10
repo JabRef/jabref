@@ -47,7 +47,6 @@ import net.sf.jabref.imports.*;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.gui.splash.SplashScreenLifecycle;
 import net.sf.jabref.logic.util.FileBasedLock;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
@@ -71,9 +70,7 @@ public class JabRef {
     
     private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
-    private boolean graphicFailure = false;
     private JabRefCLI cli;
-    private SplashScreenLifecycle splashScreen = new SplashScreenLifecycle();
 
     public void start(String[] args) {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
@@ -175,7 +172,7 @@ public class JabRef {
 
         Vector<ParserResult> loaded = processArguments(args, true);
 
-        if (loaded == null || graphicFailure || cli.isDisableGui() || cli.isShowVersion()) {
+        if (loaded == null || cli.isDisableGui() || cli.isShowVersion()) {
             JabRefExecutorService.INSTANCE.shutdownEverything();
             return;
         }
@@ -253,20 +250,6 @@ public class JabRef {
         }
 
         boolean commandMode = cli.isDisableGui() || cli.isFetcherEngine();
-
-        // First we quickly scan the command line parameters for any that signal
-        // that the GUI
-        // should not be opened. This is used to decide whether we should show the
-        // splash screen or not.
-        if (initialStartup && !commandMode && !cli.isDisableSplash()) {
-            try {
-                splashScreen.show();
-            } catch (Throwable ex) {
-                graphicFailure = true;
-                System.err.println(Globals.lang("Unable to create graphical interface")
-                        + ".");
-            }
-        }
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
@@ -796,8 +779,6 @@ public class JabRef {
             JabRef.jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(
                     JabRef.jrf, 0, ""));
         }
-
-        splashScreen.hide();
 
         /*JOptionPane.showMessageDialog(null, Globals.lang("Please note that this "
             +"is an early beta version. Do not use it without backing up your files!"),

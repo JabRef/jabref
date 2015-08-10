@@ -640,11 +640,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     type = BibtexEntryType.getType("standard");
                     sourceField = "number";
                 } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
-                    type = BibtexEntryType.getType("Electronic");
+                    type = BibtexEntryType.getType("electronic");
                     sourceField = "note";
                 } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
                         typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
-                    type = BibtexEntryType.getType("inCollection");
+                    type = BibtexEntryType.getType("incollection");
                     sourceField = "booktitle";
                 }
             }

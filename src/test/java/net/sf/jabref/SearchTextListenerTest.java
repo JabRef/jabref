@@ -10,8 +10,6 @@ import javax.swing.text.Highlighter.Highlight;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-
 public class SearchTextListenerTest {
 
     @Before
@@ -108,7 +106,6 @@ public class SearchTextListenerTest {
     public void testHighlightingInvalidParameter() {
 
         String content = "Test Word Content";
-        String contentToHighlight1 = "Word";
 
         FieldTextArea ta = new FieldTextArea("", content);
 

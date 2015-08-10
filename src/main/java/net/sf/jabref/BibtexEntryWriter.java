@@ -35,7 +35,7 @@ public class BibtexEntryWriter {
         // XXX JK: Look for all used field names not only defined once, since
         //         there may be some unofficial field name used.
         int max = 0;
-        for (BibtexEntryType t : BibtexEntryType.ALL_TYPES.values()) {
+        for (BibtexEntryType t : BibtexEntryType.getAllValues()) {
             if (t.getRequiredFields() != null) {
                 for (String field : t.getRequiredFields()) {
                     max = Math.max(max, field.length());
@@ -55,7 +55,7 @@ public class BibtexEntryWriter {
     private final boolean writeFieldCameCaseName = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME);
     private final boolean writeFieldAddSpaces = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES);
     private final boolean includeEmptyFields = Globals.prefs.getBoolean(JabRefPreferences.INCLUDE_EMPTY_FIELDS);
-    private final int writeFieldSortStype = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
+    private final int writeFieldSortStyle = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
 
 
     public BibtexEntryWriter(FieldFormatter fieldFormatter, boolean write) {
@@ -64,12 +64,12 @@ public class BibtexEntryWriter {
     }
 
     public void write(BibtexEntry entry, Writer out) throws IOException {
-        switch (writeFieldSortStype) {
+        switch (writeFieldSortStyle) {
         case 0:
-            writeSorted(entry, out);
+            writeNewStyle(entry, out);
             break;
         case 1:
-            writeUnsorted(entry, out);
+            writeOldStyle(entry, out);
             break;
         case 2:
             writeUserDefinedOrder(entry, out);
@@ -84,7 +84,7 @@ public class BibtexEntryWriter {
      * @param out
      * @throws IOException
      */
-    private void writeSorted(BibtexEntry entry, Writer out) throws IOException {
+    private void writeNewStyle(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
@@ -149,7 +149,7 @@ public class BibtexEntryWriter {
      * @param out
      * @throws IOException
      */
-    private void writeUnsorted(BibtexEntry entry, Writer out) throws IOException {
+    private void writeOldStyle(BibtexEntry entry, Writer out) throws IOException {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 

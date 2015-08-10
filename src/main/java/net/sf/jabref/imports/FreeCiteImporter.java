@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;
@@ -113,7 +114,7 @@ public class FreeCiteImporter extends ImportFormat {
 
                     BibtexEntry e = new BibtexEntry();
                     // fallback type
-                    BibtexEntryType type = BibtexEntryType.INPROCEEDINGS;
+                    BibtexEntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
                     while (!(parser.getEventType() == XMLStreamConstants.END_ELEMENT
                     && parser.getLocalName().equals("citation"))) {
@@ -149,10 +150,10 @@ public class FreeCiteImporter extends ImportFormat {
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
                                 // the drawback is that ctx:context-objects is NOT nested in citation, but a separate element
                                 // we would have to change the whole parser to parse that format.
-                                type = BibtexEntryType.ARTICLE;
+                                type = BibtexEntryTypes.ARTICLE;
                                 e.setField(ln, parser.getElementText());
                             } else if (ln.equals("tech")) {
-                                type = BibtexEntryType.TECHREPORT;
+                                type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
                             } else if (ln.equals("doi")

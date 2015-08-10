@@ -10,8 +10,6 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
-
 /**
  * @version 11.11.2008 | 22:16
  */

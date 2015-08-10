@@ -20,8 +20,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Nosh&Dan
  * @version 09.11.2008 | 21:06:17

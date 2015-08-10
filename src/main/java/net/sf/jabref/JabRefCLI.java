@@ -17,10 +17,6 @@ public class JabRefCLI {
         return cl.hasOption("version");
     }
 
-    public boolean isDisableSplash() {
-        return cl.hasOption("nosplash");
-    }
-
     public boolean isBlank() {
         return cl.hasOption("blank");
     }
@@ -126,7 +122,6 @@ public class JabRefCLI {
         // boolean options
         options.addOption("v", "version", false, Globals.lang("Display version"));
         options.addOption("n", "nogui", false, Globals.lang("No GUI. Only process command line options."));
-        options.addOption("s", "nosplash", false, Globals.lang("Do not show splash window at startup"));
         options.addOption("h", "help", false, Globals.lang("Display help on command line options"));
         options.addOption("l", "loads", false, Globals.lang("Load session"));
         options.addOption("b", "blank", false, Globals.lang("Do not open any files at startup"));

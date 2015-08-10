@@ -20,28 +20,26 @@ import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.XMLChars;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
  * @author Michael Wrighton
+ *
  */
 class MODSEntry {
-
-    private static final Log LOGGER = LogFactory.getLog(MODSEntry.class);
 
     private String entryType = "mods"; // could also be relatedItem
     private String id;
@@ -70,8 +68,8 @@ class MODSEntry {
 
 
     private MODSEntry() {
-        extensionFields = new HashMap<>();
-        handledExtensions = new HashSet<>();
+        extensionFields = new HashMap<String, String>();
+        handledExtensions = new HashSet<String>();
 
     }
 
@@ -119,8 +117,7 @@ class MODSEntry {
         if (bibtex.getField("author") != null) {
             authors = getAuthors(bibtex.getField("author"));
         }
-        if (bibtex.getType() == BibtexEntryType.ARTICLE ||
-                bibtex.getType() == BibtexEntryType.INPROCEEDINGS) {
+        if ((bibtex.getType() == BibtexEntryTypes.ARTICLE) || (bibtex.getType() == BibtexEntryTypes.INPROCEEDINGS)) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
             host.title = bibtex.getField("booktitle");
@@ -149,7 +146,7 @@ class MODSEntry {
     }
 
     private List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new LinkedList<>();
+        List<PersonName> result = new LinkedList<PersonName>();
         LayoutFormatter chars = new XMLChars();
 
         if (!authors.contains(" and ")) {
@@ -158,7 +155,9 @@ class MODSEntry {
             } else {
                 result.add(new PersonName(authors));
             }
-        } else {
+        }
+        else
+        {
             String[] names = authors.split(" and ");
             for (String name : names) {
                 if (CHARFORMAT) {
@@ -199,110 +198,117 @@ class MODSEntry {
             DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
             result = getDOMrepresentation(d.newDocument());
-        } catch (ParserConfigurationException e) {
-            LOGGER.warn("Cannot get DOM representation", e);
+        } catch (Exception e)
+        {
+            throw new Error(e);
         }
         return result;
     }
 
-    public Element getDOMrepresentation(Document document) {
-
-        Element mods = document.createElement(entryType);
-        mods.setAttribute("version", "3.0");
-        // mods.setAttribute("xmlns:xlink:", "http://www.w3.org/1999/xlink");
-        // title
-        if (title != null) {
-            Element titleInfo = document.createElement("titleInfo");
-            Element mainTitle = document.createElement("title");
-            mainTitle.appendChild(document.createTextNode(stripNonValidXMLCharacters(title)));
-            titleInfo.appendChild(mainTitle);
-            mods.appendChild(titleInfo);
-        }
-        if (authors != null) {
-            for (PersonName name : authors) {
-                Element modsName = document.createElement("name");
-                modsName.setAttribute("type", "personal");
-                if (name.getSurname() != null) {
-                    Element namePart = document.createElement("namePart");
-                    namePart.setAttribute("type", "family");
-                    namePart.appendChild(document.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
-                    modsName.appendChild(namePart);
-                }
-                if (name.getGivenNames() != null) {
-                    Element namePart = document.createElement("namePart");
-                    namePart.setAttribute("type", "given");
-                    namePart.appendChild(document.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
-                    modsName.appendChild(namePart);
-                }
-                Element role = document.createElement("role");
-                Element roleTerm = document.createElement("roleTerm");
-                roleTerm.setAttribute("type", "text");
-                roleTerm.appendChild(document.createTextNode("author"));
-                role.appendChild(roleTerm);
-                modsName.appendChild(role);
-                mods.appendChild(modsName);
+    public Element getDOMrepresentation(Document d) {
+        try {
+            Element mods = d.createElement(entryType);
+            mods.setAttribute("version", "3.0");
+            // mods.setAttribute("xmlns:xlink:", "http://www.w3.org/1999/xlink");
+            // title
+            if (title != null) {
+                Element titleInfo = d.createElement("titleInfo");
+                Element mainTitle = d.createElement("title");
+                mainTitle.appendChild(d.createTextNode(stripNonValidXMLCharacters(title)));
+                titleInfo.appendChild(mainTitle);
+                mods.appendChild(titleInfo);
             }
-        }
-        //publisher
-        Element originInfo = document.createElement("originInfo");
-        mods.appendChild(originInfo);
-        if (this.publisher != null) {
-            Element publisher = document.createElement("publisher");
-            publisher.appendChild(document.createTextNode(stripNonValidXMLCharacters(this.publisher)));
-            originInfo.appendChild(publisher);
-        }
-        if (date != null) {
-            Element dateIssued = document.createElement("dateIssued");
-            dateIssued.appendChild(document.createTextNode(stripNonValidXMLCharacters(date)));
-            originInfo.appendChild(dateIssued);
-        }
-        Element issuance = document.createElement("issuance");
-        issuance.appendChild(document.createTextNode(stripNonValidXMLCharacters(this.issuance)));
-        originInfo.appendChild(issuance);
+            if (authors != null) {
+                for (PersonName name : authors) {
+                    Element modsName = d.createElement("name");
+                    modsName.setAttribute("type", "personal");
+                    if (name.getSurname() != null) {
+                        Element namePart = d.createElement("namePart");
+                        namePart.setAttribute("type", "family");
+                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
+                        modsName.appendChild(namePart);
+                    }
+                    if (name.getGivenNames() != null) {
+                        Element namePart = d.createElement("namePart");
+                        namePart.setAttribute("type", "given");
+                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
+                        modsName.appendChild(namePart);
+                    }
+                    Element role = d.createElement("role");
+                    Element roleTerm = d.createElement("roleTerm");
+                    roleTerm.setAttribute("type", "text");
+                    roleTerm.appendChild(d.createTextNode("author"));
+                    role.appendChild(roleTerm);
+                    modsName.appendChild(role);
+                    mods.appendChild(modsName);
+                }
+            }
+            //publisher
+            Element originInfo = d.createElement("originInfo");
+            mods.appendChild(originInfo);
+            if (this.publisher != null) {
+                Element publisher = d.createElement("publisher");
+                publisher.appendChild(d.createTextNode(stripNonValidXMLCharacters(this.publisher)));
+                originInfo.appendChild(publisher);
+            }
+            if (date != null) {
+                Element dateIssued = d.createElement("dateIssued");
+                dateIssued.appendChild(d.createTextNode(stripNonValidXMLCharacters(date)));
+                originInfo.appendChild(dateIssued);
+            }
+            Element issuance = d.createElement("issuance");
+            issuance.appendChild(d.createTextNode(stripNonValidXMLCharacters(this.issuance)));
+            originInfo.appendChild(issuance);
 
-        if (id != null) {
-            Element idref = document.createElement("identifier");
-            idref.appendChild(document.createTextNode(stripNonValidXMLCharacters(id)));
-            mods.appendChild(idref);
-            mods.setAttribute("ID", id);
+            if (id != null) {
+                Element idref = d.createElement("identifier");
+                idref.appendChild(d.createTextNode(stripNonValidXMLCharacters(id)));
+                mods.appendChild(idref);
+                mods.setAttribute("ID", id);
 
-        }
-        Element typeOfResource = document.createElement("typeOfResource");
-        String type = "text";
-        typeOfResource.appendChild(document.createTextNode(stripNonValidXMLCharacters(type)));
-        mods.appendChild(typeOfResource);
+            }
+            Element typeOfResource = d.createElement("typeOfResource");
+            String type = "text";
+            typeOfResource.appendChild(d.createTextNode(stripNonValidXMLCharacters(type)));
+            mods.appendChild(typeOfResource);
 
-        if (genre != null) {
-            Element genreElement = document.createElement("genre");
-            genreElement.setAttribute("authority", "marc");
-            genreElement.appendChild(document.createTextNode(stripNonValidXMLCharacters(genre)));
-            mods.appendChild(genreElement);
-        }
+            if (genre != null) {
+                Element genreElement = d.createElement("genre");
+                genreElement.setAttribute("authority", "marc");
+                genreElement.appendChild(d.createTextNode(stripNonValidXMLCharacters(genre)));
+                mods.appendChild(genreElement);
+            }
 
-        if (host != null) {
-            Element relatedItem = host.getDOMrepresentation(document);
-            relatedItem.setAttribute("type", "host");
-            mods.appendChild(relatedItem);
-        }
-        if (pages != null) {
-            mods.appendChild(pages.getDOMrepresentation(document));
-        }
+            if (host != null) {
+                Element relatedItem = host.getDOMrepresentation(d);
+                relatedItem.setAttribute("type", "host");
+                mods.appendChild(relatedItem);
+            }
+            if (pages != null) {
+                mods.appendChild(pages.getDOMrepresentation(d));
+            }
 
             /* now generate extension fields for unhandled data */
-        for (Map.Entry<String, String> theEntry : extensionFields.entrySet()) {
-            Element extension = document.createElement("extension");
-            String field = theEntry.getKey();
-            String value = theEntry.getValue();
-            if (handledExtensions.contains(field)) {
-                continue;
+            for (Map.Entry<String, String> theEntry : extensionFields.entrySet()) {
+                Element extension = d.createElement("extension");
+                String field = theEntry.getKey();
+                String value = theEntry.getValue();
+                if (handledExtensions.contains(field)) {
+                    continue;
+                }
+                Element theData = d.createElement(field);
+                theData.appendChild(d.createTextNode(stripNonValidXMLCharacters(value)));
+                extension.appendChild(theData);
+                mods.appendChild(extension);
             }
-            Element theData = document.createElement(field);
-            theData.appendChild(document.createTextNode(stripNonValidXMLCharacters(value)));
-            extension.appendChild(theData);
-            mods.appendChild(extension);
+            return mods;
+        } catch (Exception e)
+        {
+            System.out.println("Exception caught..." + e);
+            e.printStackTrace();
+            throw new Error(e);
         }
-        return mods;
-
+        // return result;
     }
 
     /**
@@ -312,7 +318,7 @@ class MODSEntry {
      * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
      * standard</a>. This method will return an empty
      * String if the input is null or empty.
-     * <p>
+     * 
      * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
      *
      * @param in The String whose non-valid characters we want to remove.
@@ -322,7 +328,8 @@ class MODSEntry {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if (in == null || in != null && in.isEmpty()) {
+        if (in == null || in != null && in.isEmpty())
+         {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
@@ -352,8 +359,8 @@ class MODSEntry {
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
-        } catch (TransformerException e) {
-            LOGGER.warn("Could not transform DOM", e);
+        } catch (Exception e) {
+            throw new Error(e);
         }
         return sresult.toString();
     }

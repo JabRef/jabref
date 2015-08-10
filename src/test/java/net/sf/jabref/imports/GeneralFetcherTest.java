@@ -4,7 +4,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.SidePaneManager;
-import net.sf.jabref.TestUtils;
+import net.sf.jabref.testutils.GuiTestUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -15,9 +15,6 @@ import org.junit.Test;
 import javax.swing.*;
 
 import java.util.ArrayList;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests GeneralFetcher
@@ -41,12 +38,12 @@ public class GeneralFetcherTest {
     @Test @Ignore
     public void testResetButton() throws Exception {
         String testString = "test string";
-        JTextField tf = (JTextField) TestUtils.getChildNamed(GeneralFetcherTest.gf, "tf");
+        JTextField tf = (JTextField) GuiTestUtils.getChildNamed(GeneralFetcherTest.gf, "tf");
         Assert.assertNotNull(tf); // tf found?
         tf.setText(testString);
         tf.postActionEvent(); // send message
         Assert.assertEquals(testString, tf.getText());
-        JButton reset = (JButton) TestUtils.getChildNamed(GeneralFetcherTest.gf, "reset");
+        JButton reset = (JButton) GuiTestUtils.getChildNamed(GeneralFetcherTest.gf, "reset");
         Assert.assertNotNull(reset); // reset found?
         reset.doClick(); // "click" reset
         Assert.assertEquals("", tf.getText());

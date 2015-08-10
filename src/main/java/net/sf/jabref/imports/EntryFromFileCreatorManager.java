@@ -89,7 +89,7 @@ public final class EntryFromFileCreatorManager {
             BibtexDatabase database, BibtexEntryType entryType,
             boolean generateKeywordsFromPathToFile) {
         List<String> importGUIMessages = new LinkedList<String>();
-        addEntrysFromFiles(files, database, null, entryType,
+        addEntriesFromFiles(files, database, null, entryType,
                 generateKeywordsFromPathToFile, null, importGUIMessages);
         return importGUIMessages;
     }
@@ -107,7 +107,7 @@ public final class EntryFromFileCreatorManager {
      *         failures
      * @return Returns The number of entries added
      */
-    public int addEntrysFromFiles(List<File> files,
+    public int addEntriesFromFiles(List<File> files,
             BibtexDatabase database, BasePanel panel, BibtexEntryType entryType,
             boolean generateKeywordsFromPathToFile,
             ChangeListener changeListener, List<String> importGUIMessages) {

@@ -180,7 +180,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(wrapFieldLine);
         builder.nextLine();
         //for LWang_AdjustableFieldOrder
-        String[] _rbs0 = {"Sort fields in alphabeta order (as ver 2.10)", "Sort fields in old fasion (as ver 2.9.2)", "Save fields as user defined order"};
+        String[] _rbs0 = {"Save fields sorted in alphabetic order (as in versions 2.10+)", "Save fields in unsorted order (as until version 2.9.2)", "Save fields in user-defined order"};
         ArrayList<String> _rbs = new ArrayList<String>();
         for (String _rb : _rbs0) {
             _rbs.add(Globals.lang(_rb));
@@ -350,7 +350,7 @@ class FileTab extends JPanel implements PrefsTab {
     }
 
     @Override
-    public boolean readyToClose() {
+    public boolean validateSettings() {
         return true;
     }
 

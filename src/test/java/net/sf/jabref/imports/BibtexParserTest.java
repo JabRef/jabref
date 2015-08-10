@@ -1,7 +1,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexEntryTypes;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -12,8 +12,6 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-
-import static org.junit.Assert.*;
 
 /**
  * Test the BibtexParser
@@ -153,11 +151,11 @@ public class BibtexParserTest {
         Assert.assertEquals("canh05", a.getCiteKey());
         Assert.assertEquals("Crowston, K. and Annabi, H.", a.getField("author"));
         Assert.assertEquals("Title A", a.getField("title"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, a.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
 
         Assert.assertEquals("foo", b.getCiteKey());
         Assert.assertEquals("Norton Bar", b.getField("author"));
-        Assert.assertEquals(BibtexEntryType.INPROCEEDINGS, b.getType());
+        Assert.assertEquals(BibtexEntryTypes.INPROCEEDINGS, b.getType());
     }
 
     @Test
@@ -168,7 +166,7 @@ public class BibtexParserTest {
         Assert.assertEquals("canh05", a.getCiteKey());
         Assert.assertEquals("Crowston, K. and Annabi, H.", a.getField("author"));
         Assert.assertEquals("Title A", a.getField("title"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, a.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
 
         BibtexEntry b = BibtexParser.singleFromString("@article{canh05,"
                 + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
@@ -207,7 +205,7 @@ public class BibtexParserTest {
                 "@article{test,author={Ed von Test}}"));
         ParserResult result = parser.parse();
 
-        BibtexEntry e = new BibtexEntry("", BibtexEntryType.ARTICLE);
+        BibtexEntry e = new BibtexEntry("", BibtexEntryTypes.ARTICLE);
         e.setField("author", "Ed von Test");
         e.setField("bibtexkey", "test");
 
@@ -262,7 +260,7 @@ public class BibtexParserTest {
         BibtexEntry e = c.iterator().next();
 
         Assert.assertEquals("bourdieu-2002-questions-sociologie", e.getCiteKey());
-        Assert.assertEquals(BibtexEntryType.BOOK, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.BOOK, e.getType());
         Assert.assertEquals("2707318256", e.getField("isbn"));
         Assert.assertEquals("Paris", e.getField("address"));
         Assert.assertEquals("Minuit", e.getField("publisher"));
@@ -286,7 +284,7 @@ public class BibtexParserTest {
                 + "}");
 
         Assert.assertEquals("canh05", e.getCiteKey());
-        Assert.assertEquals(BibtexEntryType.ARTICLE, e.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, e.getType());
 
         Assert.assertEquals("a b", e.getField("a"));
         Assert.assertEquals("a\nb", e.getField("b"));

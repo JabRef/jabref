@@ -1562,6 +1562,13 @@ public class Util {
      * @return The remainder that is not part of the subset.
      */
     public static String[] getRemainder(String[] all, String[] subset) {
+    	if (subset.length == 0) {
+    		return all;
+    	}
+    	if (all.equals(subset)) {
+    		return new String[0];
+    	}
+    	
         ArrayList<String> al = new ArrayList<String>();
         for (String anAll : all) {
             boolean found = false;
@@ -1577,6 +1584,24 @@ public class Util {
         }
         return al.toArray(new String[al.size()]);
     }
+    
+	/**
+	 * Concatenate two String arrays
+	 * 
+	 * @param array1
+	 *            the first string array
+	 * @param array2
+	 *            the second string array
+	 * @return The concatenation of array1 and array2
+	 */
+	public static String[] arrayConcat(String[] array1, String[] array2) {
+		int len1 = array1.length;
+		int len2 = array2.length;
+		String[] union = new String[len1 + len2];
+		System.arraycopy(array1, 0, union, 0, len1);
+		System.arraycopy(array2, 0, union, len1, len2);
+		return union;
+	}
 
     /**
      * Determines filename provided by an entry in a database

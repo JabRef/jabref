@@ -98,7 +98,7 @@ public class IsiImporterTest {
                 "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
                 entry.getField("author"));
 
-        Assert.assertEquals(BibtexEntryType.ARTICLE, entry.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
         Assert.assertEquals("Optical Materials", entry.getField("journal"));
         Assert.assertEquals("2006", entry.getField("year"));
         Assert.assertEquals("28", entry.getField("volume"));
@@ -130,7 +130,7 @@ public class IsiImporterTest {
         Assert.assertEquals(
                 "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides",
                 a.getField("title"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, a.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
 
         Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.", a
                 .getField("author"));
@@ -191,7 +191,7 @@ public class IsiImporterTest {
         Assert.assertEquals(
                 "Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
                 b.getField("title"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, b.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, b.getType());
     }
 
     @Test
@@ -276,7 +276,7 @@ public class IsiImporterTest {
         Assert.assertEquals(1, entries.size());
         BibtexEntry a = entries.get(0);
 
-        Assert.assertEquals(a.getType().getName(), BibtexEntryType.ARTICLE, a.getType());
+        Assert.assertEquals(a.getType().getName(), BibtexEntryTypes.ARTICLE, a.getType());
         Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
         Assert.assertEquals(
                 "Improving Urban Road Extraction in High-Resolution " +
@@ -347,7 +347,7 @@ public class IsiImporterTest {
         Assert.assertEquals("12", a.getField("volume"));
         Assert.assertEquals("20", a.getField("number"));
         Assert.assertEquals("2457--71", a.getField("pages"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, a.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
 
         // Check B
         Assert.assertEquals(
@@ -361,6 +361,6 @@ public class IsiImporterTest {
         Assert.assertEquals("13", b.getField("volume"));
         Assert.assertEquals("3", b.getField("number"));
         Assert.assertEquals("411--22", b.getField("pages"));
-        Assert.assertEquals(BibtexEntryType.ARTICLE, b.getType());
+        Assert.assertEquals(BibtexEntryTypes.ARTICLE, b.getType());
     }
 }

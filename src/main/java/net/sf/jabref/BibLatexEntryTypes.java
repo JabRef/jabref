@@ -27,7 +27,7 @@ class BibLatexEntryTypes {
             "issuetitle", "issuesubtitle", "origlanguage", "version", "addendum"
 
      */
-
+	
     public static final BibtexEntryType ARTICLE = new BibtexEntryType() {
 
         @Override
@@ -114,7 +114,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Inbook";
+            return "InBook";
         }
 
         @Override
@@ -156,7 +156,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Bookinbook";
+            return "BookInBook";
         }
 
         // Same fields as "INBOOK" according to Biblatex 1.0: 
@@ -190,7 +190,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Suppbook";
+            return "SuppBook";
         }
 
         // Same fields as "INBOOK" according to Biblatex 1.0: 
@@ -301,7 +301,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Incollection";
+            return "InCollection";
         }
 
         @Override
@@ -342,7 +342,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Suppcollection";
+            return "SuppCollection";
         }
 
         // Treated as alias of "INCOLLECTION" according to Biblatex 1.0: 
@@ -557,7 +557,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Suppperiodical";
+            return "SuppPeriodical";
         }
 
         // Treated as alias of "ARTICLE" according to Biblatex 1.0: 
@@ -630,7 +630,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Inproceedings";
+            return "InProceedings";
         }
 
         @Override
@@ -704,7 +704,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Inreference";
+            return "InReference";
         }
 
         // Treated as alias of "INCOLLECTION" according to Biblatex 1.0: 
@@ -977,7 +977,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Mastersthesis";
+            return "MastersThesis";
         }
 
         // Treated as alias of "THESIS", except "type" field is optional
@@ -1014,7 +1014,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Phdthesis";
+            return "PhdThesis";
         }
 
         // Treated as alias of "THESIS", except "type" field is optional
@@ -1051,7 +1051,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Techreport";
+            return "TechReport";
         }
 
         // Treated as alias of "REPORT", except "type" field is optional
@@ -1088,7 +1088,7 @@ class BibLatexEntryTypes {
 
         @Override
         public String getName() {
-            return "Www";
+            return "WWW";
         }
 
         // Treated as alias of "ONLINE" according to Biblatex 1.0: 
@@ -1159,27 +1159,4 @@ class BibLatexEntryTypes {
             return true;
         }
     };
-
-    // Unsupported types and custom types left out
-
-    /*public static final BibtexEntryType ARTICLE = new BibtexEntryType() {
-        public String getName() {
-            return "Article";
-        }
-        public String[] getRequiredFields() {
-            return new String[] {};
-        }
-        public String[] getOptionalFields() {
-            return new String[] {};
-        }
-        public String[] getPrimaryOptionalFields() {
-            return new String[] {};
-        }
-        public String describeRequiredFields() {
-            return "";
-        }
-        public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
-            return entry.allFieldsPresent(getRequiredFields(), database);
-        }
-    };*/
 }

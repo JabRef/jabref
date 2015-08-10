@@ -5,9 +5,6 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Nosh&Dan
  * @version 09.11.2008 | 19:41:40

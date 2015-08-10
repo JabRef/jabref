@@ -303,7 +303,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         if (type != null) {
             t = BibtexEntryType.getStandardType(type);
         } else {
-            t = BibtexEntryType.OTHER;
+            t = BibtexEntryTypes.OTHER;
         }
 
         BibtexEntry e = new BibtexEntry(IdGenerator.next(), t);

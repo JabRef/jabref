@@ -1,8 +1,8 @@
 # no generated files in version control
 src/main/gen/
 
-# JVM errors
-hs_err*.log
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err*
 
 # backup files from JabRef itself
 *.bak
