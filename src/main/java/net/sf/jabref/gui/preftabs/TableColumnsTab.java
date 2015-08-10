@@ -811,7 +811,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     }
 
     @Override
-    public boolean readyToClose() {
+    public boolean validateSettings() {
         return true;
     }
 

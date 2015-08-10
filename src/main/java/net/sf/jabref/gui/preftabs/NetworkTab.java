@@ -105,7 +105,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
     }
 
     @Override
-    public boolean readyToClose() {
+    public boolean validateSettings() {
         boolean validSetting;
         if (useProxy.isSelected()) {
             String host = defProxyHostname.getText();

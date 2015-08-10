@@ -47,7 +47,7 @@ interface PrefsTab {
      * If the tab is *not* ready, it should display a message to the user 
      * informing about the illegal setting.
      */
-    boolean readyToClose();
+    boolean validateSettings();
 
     /**
      * Should return the localized identifier to use for the tab.

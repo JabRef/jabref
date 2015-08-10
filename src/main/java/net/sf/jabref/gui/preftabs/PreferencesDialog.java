@@ -248,7 +248,7 @@ public class PreferencesDialog extends JDialog {
                     int count = main.getComponentCount();
                     Component[] comps = main.getComponents();
                     for (int i = 0; i < count; i++) {
-                        if (!((PrefsTab) comps[i]).readyToClose()) {
+                        if (!((PrefsTab) comps[i]).validateSettings()) {
                             ready = false;
                             return; // If not, break off.
                         }

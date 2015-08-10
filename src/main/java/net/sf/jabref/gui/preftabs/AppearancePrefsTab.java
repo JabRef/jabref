@@ -199,7 +199,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     }
 
     @Override
-    public boolean readyToClose() {
+    public boolean validateSettings() {
         // Test if font size is a number:
         if (!validateIntegerField("Menu and label font size", fontSize.getText(), "Changed font settings")) {
             return false;

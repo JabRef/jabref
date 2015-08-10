@@ -296,7 +296,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     }
 
     @Override
-    public boolean readyToClose() {
+    public boolean validateSettings() {
         try {
             // Test if date format is legal:
             new SimpleDateFormat(timeStampFormat.getText());

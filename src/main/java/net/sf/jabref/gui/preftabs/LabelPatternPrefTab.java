@@ -161,7 +161,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
     }
 
     @Override
-    public boolean readyToClose() {
+    public boolean validateSettings() {
         return true;
     }
 
