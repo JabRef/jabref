@@ -51,6 +51,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.logic.l10n.Localization;
 
 class StringDialog extends JDialog {
 
@@ -155,9 +156,9 @@ class StringDialog extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
 
         if (panel.getFile() != null) {
-            setTitle(Globals.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
+            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
         } else {
-            setTitle(Globals.lang(GUIGlobals.stringsTitle) + ": " + Globals.lang(GUIGlobals.untitledTitle));
+            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + Localization.lang(GUIGlobals.untitledTitle));
         }
 
     }
@@ -241,29 +242,29 @@ class StringDialog extends JDialog {
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
                     if (base.hasStringLabel((String) value)) {
                         JOptionPane.showMessageDialog(parent,
-                                Globals.lang("A string with that label "
+                                Localization.lang("A string with that label "
                                         + "already exists"),
-                                Globals.lang("Label"),
+                                Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                     } else if (((String) value).contains(" ")) {
                         JOptionPane.showMessageDialog
                                 (parent,
-                                        Globals.lang("The label of the string can not contain spaces."),
-                                        Globals.lang("Label"),
+                                        Localization.lang("The label of the string can not contain spaces."),
+                                        Localization.lang("Label"),
                                         JOptionPane.ERROR_MESSAGE);
                     }
                     else if (((String) value).contains("#")) {
                         JOptionPane.showMessageDialog
                                 (parent,
-                                        Globals.lang("The label of the string can not contain the '#' character."),
-                                        Globals.lang("Label"),
+                                        Localization.lang("The label of the string can not contain the '#' character."),
+                                        Localization.lang("Label"),
                                         JOptionPane.ERROR_MESSAGE);
                     }
                     else if (isNumber((String) value)) {
                         JOptionPane.showMessageDialog
                                 (parent,
-                                        Globals.lang("The label of the string can not be a number."),
-                                        Globals.lang("Label"),
+                                        Localization.lang("The label of the string can not be a number."),
+                                        Localization.lang("Label"),
                                         JOptionPane.ERROR_MESSAGE);
                     }
                     else {
@@ -313,7 +314,7 @@ class StringDialog extends JDialog {
         @Override
         public String getColumnName(int col) {
             return col == 0 ?
-                    Globals.lang("Name") : Globals.lang("Content");
+                    Localization.lang("Name") : Localization.lang("Content");
         }
 
         @Override
@@ -356,7 +357,7 @@ class StringDialog extends JDialog {
         public CloseAction(StringDialog parent) {
             super("Close window");
             //, new ImageIcon(GUIGlobals.closeIconFile));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close dialog"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close dialog"));
             this.parent = parent;
         }
 
@@ -382,7 +383,7 @@ class StringDialog extends JDialog {
         public NewStringAction(StringDialog parent) {
             super("New string",
                     GUIGlobals.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("New string"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("New string"));
             this.parent = parent;
         }
 
@@ -390,31 +391,31 @@ class StringDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             String name =
                     JOptionPane.showInputDialog(parent,
-                            Globals.lang("Please enter the string's label"));
+                            Localization.lang("Please enter the string's label"));
             if (name == null) {
                 return;
             }
             if (isNumber(name)) {
                 JOptionPane.showMessageDialog
                         (parent,
-                                Globals.lang("The label of the string can not be a number."),
-                                Globals.lang("Label"),
+                                Localization.lang("The label of the string can not be a number."),
+                                Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (name.contains("#")) {
                 JOptionPane.showMessageDialog
                         (parent,
-                                Globals.lang("The label of the string can not contain the '#' character."),
-                                Globals.lang("Label"),
+                                Localization.lang("The label of the string can not contain the '#' character."),
+                                Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (name.contains(" ")) {
                 JOptionPane.showMessageDialog
                         (parent,
-                                Globals.lang("The label of the string can not contain spaces."),
-                                Globals.lang("Label"),
+                                Localization.lang("The label of the string can not contain spaces."),
+                                Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -433,9 +434,9 @@ class StringDialog extends JDialog {
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
                 JOptionPane.showMessageDialog(parent,
-                        Globals.lang("A string with that label "
+                        Localization.lang("A string with that label "
                                 + "already exists"),
-                        Globals.lang("Label"),
+                        Localization.lang("Label"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -453,7 +454,7 @@ class StringDialog extends JDialog {
         public StoreContentAction(StringDialog parent) {
             super("Store string",
                     GUIGlobals.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Store string"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Store string"));
             this.parent = parent;
         }
 
@@ -471,7 +472,7 @@ class StringDialog extends JDialog {
         public RemoveStringAction(StringDialog parent) {
             super("Remove selected strings",
                     GUIGlobals.getImage("remove"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Remove selected strings"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Remove selected strings"));
             this.parent = parent;
         }
 
@@ -484,10 +485,10 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                String msg = Globals.lang("Really delete the selected") + ' ' +
-                        (sel.length > 1 ? sel.length + " " + Globals.lang("entries")
-                                : Globals.lang("entry")) + '?';
-                int answer = JOptionPane.showConfirmDialog(parent, msg, Globals.lang("Delete strings"),
+                String msg = Localization.lang("Really delete the selected") + ' ' +
+                        (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
+                                : Localization.lang("entry")) + '?';
+                int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.YES_OPTION) {
@@ -592,7 +593,7 @@ class StringDialog extends JDialog {
 
         public UndoAction() {
             super("Undo", GUIGlobals.getImage("undo"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Undo"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Undo"));
         }
 
         @Override
@@ -609,7 +610,7 @@ class StringDialog extends JDialog {
 
         public RedoAction() {
             super("Undo", GUIGlobals.getImage("redo"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Redo"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Redo"));
         }
 
         @Override

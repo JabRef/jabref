@@ -29,6 +29,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
@@ -115,9 +116,9 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         } catch (FileNotFoundException e) {
 
             if (status != null) {
-                status.showMessage(Globals.lang("Unknown DOI: '%0'.",
-                        doi),
-                        Globals.lang("Get BibTeX entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("Unknown DOI: '%0'.",
+                                doi),
+                        Localization.lang("Get BibTeX entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
             }
             return null;
         } catch (IOException e) {

@@ -16,6 +16,7 @@
 package net.sf.jabref.specialfields;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public abstract class Rank extends SpecialField {
 
@@ -38,12 +39,12 @@ public abstract class Rank extends SpecialField {
 
     @Override
     public String getToolTip() {
-        return Globals.lang("Rank");
+        return Localization.lang("Rank");
     }
 
     @Override
     public String getMenuString() {
-        return Globals.lang("Rank");
+        return Localization.lang("Rank");
     }
 
 }

@@ -19,7 +19,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -44,12 +44,12 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + Globals.lang("change preamble");
+        return Localization.lang("Undo") + ": " + Localization.lang("change preamble");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + Globals.lang("change preamble");
+        return Localization.lang("Redo") + ": " + Localization.lang("change preamble");
     }
 
     @Override

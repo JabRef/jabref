@@ -18,8 +18,8 @@ package net.sf.jabref.collab;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.util.Vector;
@@ -43,11 +43,11 @@ class MetaDataChange extends Change {
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {
-        super(Globals.lang("Metadata change"));
+        super(Localization.lang("Metadata change"));
         this.md = md;
         this.mdSecondary = mdSecondary;
 
-        tp.setText("<html>" + Globals.lang("Metadata change") + "</html>");
+        tp.setText("<html>" + Localization.lang("Metadata change") + "</html>");
     }
 
     public int getChangeCount() {
@@ -68,7 +68,7 @@ class MetaDataChange extends Change {
 
     @Override
     JComponent description() {
-        StringBuilder sb = new StringBuilder("<html>" + Globals.lang("Changes have been made to the following metadata elements") + ":<p>");
+        StringBuilder sb = new StringBuilder("<html>" + Localization.lang("Changes have been made to the following metadata elements") + ":<p>");
         for (MetaDataChangeUnit unit : changes) {
             sb.append("<br>&nbsp;&nbsp;");
             sb.append(unit.key);

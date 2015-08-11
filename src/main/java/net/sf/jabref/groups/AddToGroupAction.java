@@ -24,8 +24,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
 
@@ -48,8 +48,8 @@ public class AddToGroupAction extends AbstractAction {
     }
 
     public AddToGroupAction(boolean move) {
-        super(move ? Globals.lang("Assign entry selection exclusively to this group")
-                : Globals.lang("Add entry selection to this group"));
+        super(move ? Localization.lang("Assign entry selection exclusively to this group")
+                : Localization.lang("Add entry selection to this group"));
         m_move = move;
     }
 
@@ -107,7 +107,7 @@ public class AddToGroupAction extends AbstractAction {
         // edit has to be stored:
         m_panel.storeCurrentEdit();
 
-        NamedCompound undoAll = new NamedCompound(Globals.lang("change assignment of entries"));
+        NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
 
         if (m_move) {
             // first remove

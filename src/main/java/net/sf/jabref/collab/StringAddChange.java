@@ -18,6 +18,7 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,10 +39,10 @@ class StringAddChange extends Change {
 
 
     public StringAddChange(BibtexString string) {
-        name = Globals.lang("Added string") + ": '" + string.getName() + '\'';
+        name = Localization.lang("Added string") + ": '" + string.getName() + '\'';
         this.string = string;
 
-        tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+        tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" + Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
     }
 

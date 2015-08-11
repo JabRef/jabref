@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +55,7 @@ public class SendAsEMailAction extends AbstractWorker {
     @Override
     public void run() {
         if (!Desktop.isDesktopSupported()) {
-            message = Globals.lang("Error creating email");
+            message = Localization.lang("Error creating email");
             return;
         }
 
@@ -63,7 +64,7 @@ public class SendAsEMailAction extends AbstractWorker {
             return;
         }
         if (panel.getSelectedEntries().length == 0) {
-            message = Globals.lang("No entries selected.");
+            message = Localization.lang("No entries selected.");
             return;
         }
 
@@ -112,7 +113,7 @@ public class SendAsEMailAction extends AbstractWorker {
             uriMailTo = new URI("mailto", mailTo, null);
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
-            message = Globals.lang("Error creating email");
+            message = Localization.lang("Error creating email");
             return;
         }
 
@@ -121,12 +122,12 @@ public class SendAsEMailAction extends AbstractWorker {
             desktop.mail(uriMailTo);
         } catch (IOException e) {
             e.printStackTrace();
-            message = Globals.lang("Error creating email");
+            message = Localization.lang("Error creating email");
             return;
         }
 
         message = String.format("%s: %d",
-                Globals.lang("Entries added to an email"), bes.length);
+                Localization.lang("Entries added to an email"), bes.length);
     }
 
     @Override

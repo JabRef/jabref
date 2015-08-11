@@ -50,6 +50,7 @@ import net.sf.jabref.logic.config.SaveOrderConfig;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -92,15 +93,15 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
-    private final JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
+    private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
     private boolean oldProtectVal = false;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
-        super(parent, Globals.lang("Database properties"), true);
-        encoding = new JComboBox(Globals.ENCODINGS);
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
+        super(parent, Localization.lang("Database properties"), true);
+        encoding = new JComboBox(Localization.ENCODINGS);
+        ok = new JButton(Localization.lang("Ok"));
+        cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
     }
 
@@ -111,10 +112,10 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void init(JFrame parent) {
 
-        JButton browseFile = new JButton(Globals.lang("Browse"));
-        JButton browseFileIndv = new JButton(Globals.lang("Browse"));
-        JButton browsePdf = new JButton(Globals.lang("Browse"));
-        JButton browsePs = new JButton(Globals.lang("Browse"));
+        JButton browseFile = new JButton(Localization.lang("Browse"));
+        JButton browseFileIndv = new JButton(Localization.lang("Browse"));
+        JButton browsePdf = new JButton(Localization.lang("Browse"));
+        JButton browsePs = new JButton(Localization.lang("Browse"));
         browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
         browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
         browsePdf.addActionListener(BrowseAction.buildForDir(parent, pdfDir));
@@ -125,30 +126,30 @@ public class DatabasePropertiesDialog extends JDialog {
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref", ""));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        builder.append(Globals.lang("Database encoding"));
+        builder.append(Localization.lang("Database encoding"));
         builder.append(encoding);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Override default file directories"));
+        builder.appendSeparator(Localization.lang("Override default file directories"));
         builder.nextLine();
-        builder.append(Globals.lang("General file directory"));
+        builder.append(Localization.lang("General file directory"));
         builder.append(fileDir);
         builder.append(browseFile);
         builder.nextLine();
-        builder.append(Globals.lang("User-specific file directory"));
+        builder.append(Localization.lang("User-specific file directory"));
         builder.append(fileDirIndv);
         builder.append(browseFileIndv);
         builder.nextLine();
-        builder.append(Globals.lang("PDF directory"));
+        builder.append(Localization.lang("PDF directory"));
         builder.append(pdfDir);
         builder.append(browsePdf);
         builder.nextLine();
-        builder.append(Globals.lang("PS directory"));
+        builder.append(Localization.lang("PS directory"));
         builder.append(psDir);
         builder.append(browsePs);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Save sort order"));
+        builder.appendSeparator(Localization.lang("Save sort order"));
         builder.append(saveAsConfiguredGlobally, 1);
         builder.nextLine();
         builder.append(saveInOriginalOrder, 1);
@@ -159,19 +160,19 @@ public class DatabasePropertiesDialog extends JDialog {
         // Create a new panel with its own FormLayout for these items:
         FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        JLabel lab = new JLabel(Globals.lang("Primary sort criterion"));
+        JLabel lab = new JLabel(Localization.lang("Primary sort criterion"));
         builder2.append(lab);
         builder2.append(savePriSort);
         builder2.append(savePriField);
         builder2.append(savePriDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Secondary sort criterion"));
+        lab = new JLabel(Localization.lang("Secondary sort criterion"));
         builder2.append(lab);
         builder2.append(saveSecSort);
         builder2.append(saveSecField);
         builder2.append(saveSecDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
         builder2.append(lab);
         builder2.append(saveTerSort);
         builder2.append(saveTerField);
@@ -181,7 +182,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.append(saveSpecPanel);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Database protection"));
+        builder.appendSeparator(Localization.lang("Database protection"));
         builder.nextLine();
         builder.append(protect, 3);
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -226,9 +227,9 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setupSortOrderConfiguration() {
-        saveAsConfiguredGlobally = new JRadioButton(Globals.lang("Save entries as configured globally"));
-        saveInOriginalOrder = new JRadioButton(Globals.lang("Save entries in their original order"));
-        saveInSpecifiedOrder = new JRadioButton(Globals.lang("Save entries ordered as specified"));
+        saveAsConfiguredGlobally = new JRadioButton(Localization.lang("Save entries as configured globally"));
+        saveInOriginalOrder = new JRadioButton(Localization.lang("Save entries in their original order"));
+        saveInSpecifiedOrder = new JRadioButton(Localization.lang("Save entries ordered as specified"));
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveAsConfiguredGlobally);
@@ -263,9 +264,9 @@ public class DatabasePropertiesDialog extends JDialog {
         saveSecSort = new JComboBox(allPlusKey);
         saveTerSort = new JComboBox(allPlusKey);
 
-        savePriSort.insertItemAt(Globals.lang("<select>"), 0);
-        saveSecSort.insertItemAt(Globals.lang("<select>"), 0);
-        saveTerSort.insertItemAt(Globals.lang("<select>"), 0);
+        savePriSort.insertItemAt(Localization.lang("<select>"), 0);
+        saveSecSort.insertItemAt(Localization.lang("<select>"), 0);
+        saveTerSort.insertItemAt(Localization.lang("<select>"), 0);
 
         savePriField = new JTextField(10);
         saveSecField = new JTextField(10);
@@ -302,9 +303,9 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         });
 
-        savePriDesc = new JCheckBox(Globals.lang("Descending"));
-        saveSecDesc = new JCheckBox(Globals.lang("Descending"));
-        saveTerDesc = new JCheckBox(Globals.lang("Descending"));
+        savePriDesc = new JCheckBox(Localization.lang("Descending"));
+        saveSecDesc = new JCheckBox(Localization.lang("Descending"));
+        saveTerDesc = new JCheckBox(Localization.lang("Descending"));
 
     }
 

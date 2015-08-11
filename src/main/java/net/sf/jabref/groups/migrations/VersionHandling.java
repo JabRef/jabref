@@ -18,12 +18,12 @@ package net.sf.jabref.groups.migrations;
 import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 
 /**
@@ -71,7 +71,7 @@ public class VersionHandling {
         case 3:
             return Version2_3.fromString(orderedData, db, version);
         default:
-            throw new IllegalArgumentException(Globals.lang("Failed to read groups data (unsupported version: %0)", Integer.toString(version)));
+            throw new IllegalArgumentException(Localization.lang("Failed to read groups data (unsupported version: %0)", Integer.toString(version)));
         }
     }
 

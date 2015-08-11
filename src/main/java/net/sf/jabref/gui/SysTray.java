@@ -16,8 +16,8 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +50,7 @@ public class SysTray {
 
             }
         };
-        MenuItem showWindow = new MenuItem(Globals.lang("Show"));
+        MenuItem showWindow = new MenuItem(Localization.lang("Show"));
         showWindow.addActionListener(showJabref);
         PopupMenu popup = new PopupMenu();
         popup.add(showWindow);

@@ -19,7 +19,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class UndoableStringChange extends AbstractUndoableEdit {
 
@@ -42,14 +42,14 @@ public class UndoableStringChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": "
-                + Globals.lang(nameChange ? "change string name" : "change string content");
+        return Localization.lang("Undo") + ": "
+                + Localization.lang(nameChange ? "change string name" : "change string content");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": "
-                + Globals.lang(nameChange ? "change string name" : "change string content");
+        return Localization.lang("Redo") + ": "
+                + Localization.lang(nameChange ? "change string name" : "change string content");
     }
 
     @Override

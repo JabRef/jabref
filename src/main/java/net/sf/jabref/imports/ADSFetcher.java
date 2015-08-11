@@ -37,11 +37,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  *
@@ -73,7 +73,7 @@ public class ADSFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Globals.menuTitle(getKeyName());
+        return Localization.menuTitle(getKeyName());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ADSFetcher implements EntryFetcher {
             /* Allow fetching only 1 key */
             String key = query;
             /* Query ADS and load the results into the BibtexDatabase */
-            status.setStatus(Globals.lang("Processing ") + key);
+            status.setStatus(Localization.lang("Processing ") + key);
             BibtexDatabase bd = importADSEntries(key, status);
             /* Add the entry to the inspection dialog */
             status.setStatus("Adding fetched entries");
@@ -95,7 +95,7 @@ public class ADSFetcher implements EntryFetcher {
                 }
             }
         } catch (Exception e) {
-            status.setStatus(Globals.lang("Error while fetching from ADS") + ": " + e.getMessage());
+            status.setStatus(Localization.lang("Error while fetching from ADS") + ": " + e.getMessage());
             e.printStackTrace();
         }
         return true;
@@ -116,13 +116,13 @@ public class ADSFetcher implements EntryFetcher {
             ParserResult pr = BibtexParser.parse(reader);
             return pr.getDatabase();
         } catch (IOException e) {
-            status.showMessage(Globals.lang(
+            status.showMessage(Localization.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Globals.lang(
-                    "An Error occurred while fetching from ADS (%0):", new String[] {url})
-                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(
+                    "An Error occurred while fetching from ADS (%0):", new String[]{url})
+                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -160,17 +160,17 @@ public class ADSFetcher implements EntryFetcher {
             abstractText = abstractText.replace("\n", " ");
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {
-            status.showMessage(Globals.lang(
-                    "An Error occurred while parsing abstract"),
-                    Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(
+                            "An Error occurred while parsing abstract"),
+                    Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Globals.lang(
+            status.showMessage(Localization.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Globals.lang(
-                    "An Error occurred while fetching from ADS (%0):", new String[] {url})
-                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(
+                    "An Error occurred while fetching from ADS (%0):", new String[]{url})
+                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
     }
 }

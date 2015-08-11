@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -121,8 +122,8 @@ class SimpleUrlDragDrop implements DropTargetListener {
         } catch (UnsupportedFlavorException nfe) {
             // if not an URL
             JOptionPane.showMessageDialog((Component) editor,
-                    Globals.lang("Operation not supported"),
-                    Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Operation not supported"),
+                    Localization.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Could not perform drage and drop", nfe);
         } catch (IOException ioex) {
             LOGGER.warn("Could not perform drage and drop", ioex);

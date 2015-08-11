@@ -35,6 +35,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
 
@@ -139,7 +140,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String");
+                return col == 0 ? Localization.lang("Formatter Name") : Localization.lang("Format String");
             }
 
             @Override
@@ -201,7 +202,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         tabPanel.add(toolBar, BorderLayout.EAST);
 
-        builder.appendSeparator(Globals.lang("Special Name Formatters"));
+        builder.appendSeparator(Localization.lang("Special Name Formatters"));
         builder.nextLine();
         builder.append(pan);
         builder.append(tabPanel);
@@ -240,7 +241,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         public DeleteRowAction() {
             super("Delete row", GUIGlobals.getImage("remove"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
         @Override
@@ -273,7 +274,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         public AddRowAction() {
             super("Add row", GUIGlobals.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
         @Override
@@ -351,6 +352,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Name formatter");
+        return Localization.lang("Name formatter");
     }
 }

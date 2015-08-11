@@ -18,6 +18,7 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,7 +43,7 @@ class StringNameChange extends Change {
     public StringNameChange(BibtexString string, BibtexString tmpString,
             String mem, String tmp, String disk, String content) {
         this.tmpString = tmpString;
-        name = Globals.lang("Renamed string") + ": '" + tmp + '\'';
+        name = Localization.lang("Renamed string") + ": '" + tmp + '\'';
         this.string = string;
         this.content = content;
         this.mem = mem;

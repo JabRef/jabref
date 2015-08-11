@@ -19,6 +19,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,17 +53,17 @@ class ResolveDuplicateLabelDialog {
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key,
             List<BibtexEntry> entries) {
-        diag = new JDialog(panel.frame(), Globals.lang("Duplicate BibTeX key"), true);
+        diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 4dlu, fill:pref", ""));
-        b.append(new JLabel(Globals.lang("Duplicate key") + ": " + key), 3);
+        b.append(new JLabel(Localization.lang("Duplicate key") + ": " + key), 3);
         b.nextLine();
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         boolean first = true;
         for (BibtexEntry entry : entries) {
-            JCheckBox cb = new JCheckBox(Globals.lang("Generate key"), !first);
+            JCheckBox cb = new JCheckBox(Localization.lang("Generate key"), !first);
             //JPanel pan = new JPanel();
             //pan.setLayout(new BorderLayout());
             //pan.add(cb, BorderLayout.NORTH);
@@ -79,9 +80,9 @@ class ResolveDuplicateLabelDialog {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("Ok"));
         bb.addButton(ok);
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

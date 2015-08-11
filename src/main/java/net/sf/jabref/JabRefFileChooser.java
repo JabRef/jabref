@@ -67,7 +67,7 @@ public class JabRefFileChooser extends JFileChooser
 
     @Override
     protected void setUI(ComponentUI newUI) {
-        if (Globals.osName.equals(Globals.MAC)) {
+        if (Globals.ON_MAC) {
             super.setUI(newUI);
         } else {
             super.setUI(new JabRefUI(this));

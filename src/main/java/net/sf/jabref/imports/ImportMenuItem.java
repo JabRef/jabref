@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -54,7 +55,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew, ImportFormat importer) {
         super(importer != null ? importer.getFormatName()
-                : Globals.lang("Autodetect format"));
+                : Localization.lang("Autodetect format"));
         this.importer = importer;
         this.frame = frame;
         this.openInNew = openInNew;
@@ -100,7 +101,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
             if (filenames != null && filenames.length > 0) {
                 frame.block();
-                frame.output(Globals.lang("Starting import"));
+                frame.output(Localization.lang("Starting import"));
                 fileOk = true;
 
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames[0]);
@@ -127,7 +128,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 .getFormatName(), pr));
                     } else {
                         // Unknown format:
-                        frame.output(Globals.lang("Importing in unknown format") + "...");
+                        frame.output(Localization.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
                         imports.add(Globals.importFormatReader
                                 .importUnknownFormat(filename));
@@ -164,7 +165,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 wrn.deleteCharAt(wrn.length() - 1);
                             }
                             JOptionPane.showMessageDialog(frame, wrn.toString(),
-                                    Globals.lang("Warnings"),
+                                    Localization.lang("Warnings"),
                                     JOptionPane.WARNING_MESSAGE);
                         }
                     }
@@ -194,7 +195,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             || bibtexResult.getDatabase().getEntryCount() > 1)) {
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
-                                Globals.lang("Import"), openInNew);
+                                Localization.lang("Import"), openInNew);
                         diag.addEntries(bibtexResult.getDatabase().getEntries());
                         diag.entryListComplete();
                         Util.placeDialog(diag, frame);
@@ -202,7 +203,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         diag.toFront();
                     } else {
                         boolean generateKeys = Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION);
-                        NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
+                        NamedCompound ce = new NamedCompound(Localization.lang("Import entries"));
 
                         // Check if we should unmark entries before adding the new ones:
                         if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
@@ -256,21 +257,21 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 else {
                     frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
                             bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
-                    frame.output(Globals.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
+                    frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
 
             } else {
                 if (importer == null) {
-                    frame.output(Globals.lang("Could not find a suitable import format."));
+                    frame.output(Localization.lang("Could not find a suitable import format."));
                 } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError != null) {
-                        JOptionPane.showMessageDialog(frame, importError.getMessage(), Globals.lang("Import failed"),
+                        JOptionPane.showMessageDialog(frame, importError.getMessage(), Localization.lang("Import failed"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     else {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("No entries found. Please make sure you are "
-                                + "using the correct import filter."), Globals.lang("Import failed"),
+                        JOptionPane.showMessageDialog(frame, Localization.lang("No entries found. Please make sure you are "
+                                        + "using the correct import filter."), Localization.lang("Import failed"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }

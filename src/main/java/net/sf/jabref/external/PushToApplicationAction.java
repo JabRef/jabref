@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
@@ -58,7 +59,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // Check if any entries are selected:
         entries = panel.getSelectedEntries();
         if (entries.length == 0) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires one or more entries to be selected."),
+            JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires one or more entries to be selected."),
                     (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -67,7 +68,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         if (operation.requiresBibtexKeys()) {
             for (BibtexEntry entry : entries) {
                 if (entry.getCiteKey() == null || entry.getCiteKey().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires all selected entries to have BibTex keys defined."),
+                    JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."),
                             (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }

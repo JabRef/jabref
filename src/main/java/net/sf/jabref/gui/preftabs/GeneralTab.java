@@ -39,6 +39,7 @@ import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 class GeneralTab extends JPanel implements PrefsTab {
 
@@ -66,21 +67,21 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[GUIGlobals.LANGUAGES.keySet().size()]));
-    private final JComboBox encodings = new JComboBox(Globals.ENCODINGS);
+    private final JComboBox encodings = new JComboBox(Localization.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
-        allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"));
+        allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
-        memoryStick = new JCheckBox(Globals.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
-        defSort = new JCheckBox(Globals.lang("Sort Automatically"));
-        ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
-        useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ':');
-        useTimeStamp = new JCheckBox(Globals.lang("Mark new entries with addition date") + ". "
-                + Globals.lang("Date format") + ':');
+        memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
+        defSort = new JCheckBox(Localization.lang("Sort Automatically"));
+        ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
+        useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
+        useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "
+                + Localization.lang("Date format") + ':');
         useTimeStamp.addChangeListener(new ChangeListener() {
 
             @Override
@@ -88,22 +89,22 @@ class GeneralTab extends JPanel implements PrefsTab {
                 updateTimeStamp.setEnabled(useTimeStamp.isSelected());
             }
         });
-        updateTimeStamp = new JCheckBox(Globals.lang("Update timestamp on modification"));
-        overwriteOwner = new JCheckBox(Globals.lang("Overwrite"));
-        overwriteTimeStamp = new JCheckBox(Globals.lang("Overwrite"));
-        overwriteOwner.setToolTipText(Globals.lang("If a pasted or imported entry already has "
+        updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
+        overwriteOwner = new JCheckBox(Localization.lang("Overwrite"));
+        overwriteTimeStamp = new JCheckBox(Localization.lang("Overwrite"));
+        overwriteOwner.setToolTipText(Localization.lang("If a pasted or imported entry already has "
                 + "the field set, overwrite."));
-        overwriteTimeStamp.setToolTipText(Globals.lang("If a pasted or imported entry already has "
+        overwriteTimeStamp.setToolTipText(Localization.lang("If a pasted or imported entry already has "
                 + "the field set, overwrite."));
-        keyDuplicateWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
-        keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
-        enforceLegalKeys = new JCheckBox(Globals.lang("Enforce legal characters in BibTeX keys"));
-        confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
+        keyDuplicateWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when a duplicate BibTeX key is entered"));
+        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
+        enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
+        confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
-        useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
-        useImportInspectorForSingle = new JCheckBox(Globals.lang("Use inspection window also when a single entry is imported."));
-        markImportedEntries = new JCheckBox(Globals.lang("Mark entries imported into an existing database"));
-        unmarkAllEntriesBeforeImporting = new JCheckBox(Globals.lang("Unmark all entries before importing new entries into an existing database"));
+        useImportInspector = new JCheckBox(Localization.lang("Display imported entries in an inspection window before they are added."));
+        useImportInspectorForSingle = new JCheckBox(Localization.lang("Use inspection window also when a single entry is imported."));
+        markImportedEntries = new JCheckBox(Localization.lang("Mark entries imported into an existing database"));
+        unmarkAllEntriesBeforeImporting = new JCheckBox(Localization.lang("Unmark all entries before importing new entries into an existing database"));
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
@@ -111,7 +112,7 @@ class GeneralTab extends JPanel implements PrefsTab {
                 "Help", GUIGlobals.getIconUrl("helpSmall"));
         HelpAction timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
-        inspectionWarnDupli = new JCheckBox(Globals.lang("Warn about unresolved duplicates when closing inspection window"));
+        inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
         Insets marg = new Insets(0, 12, 3, 0);
         useImportInspectorForSingle.setMargin(marg);
@@ -132,7 +133,7 @@ class GeneralTab extends JPanel implements PrefsTab {
                 ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.appendSeparator(Globals.lang("General"));
+        builder.appendSeparator(Localization.lang("General"));
         builder.nextLine();
         builder.append(useImportInspector, 13);
         builder.nextLine();
@@ -169,7 +170,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(useTimeStamp, 3);
         builder.append(timeStampFormat);
         builder.append(overwriteTimeStamp);
-        builder.append(Globals.lang("Field name") + ':');
+        builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
         help = new JButton(timeStampHelp);
@@ -187,11 +188,11 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(unmarkAllEntriesBeforeImporting, 13);
         builder.nextLine();
         JLabel lab;
-        lab = new JLabel(Globals.lang("Language") + ':');
+        lab = new JLabel(Localization.lang("Language") + ':');
         builder.append(lab, 3);
         builder.append(language);
         builder.nextLine();
-        lab = new JLabel(Globals.lang("Default encoding") + ':');
+        lab = new JLabel(Localization.lang("Default encoding") + ':');
         builder.append(lab, 3);
         builder.append(encodings);
 
@@ -229,8 +230,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
         String enc = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
-        for (int i = 0; i < Globals.ENCODINGS.length; i++) {
-            if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
+        for (int i = 0; i < Localization.ENCODINGS.length; i++) {
+            if (Localization.ENCODINGS[i].equalsIgnoreCase(enc)) {
                 encodings.setSelectedIndex(i);
                 break;
             }
@@ -259,9 +260,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, keyEmptyWarningDialog.isSelected());
         prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
-            JOptionPane.showMessageDialog(null, Globals.lang("To disable the memory stick mode"
-                    + " rename or remove the jabref.xml file in the same folder as JabRef."),
-                    Globals.lang("Memory Stick Mode"),
+            JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
+                            + " rename or remove the jabref.xml file in the same folder as JabRef."),
+                    Localization.lang("Memory Stick Mode"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
@@ -282,15 +283,15 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
             prefs.put(JabRefPreferences.LANGUAGE, GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
-            Globals.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()), "");
+            Localization.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()), "");
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:
             JOptionPane.showMessageDialog(null,
-                    Globals.lang("You have changed the language setting.")
+                    Localization.lang("You have changed the language setting.")
                             .concat(" ")
-                            .concat(Globals.lang("You must restart JabRef for this to come into effect.")),
-                    Globals.lang("Changed language settings"),
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    Localization.lang("Changed language settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -303,8 +304,8 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         } catch (IllegalArgumentException ex2) {
             JOptionPane.showMessageDialog
-                    (null, Globals.lang("The chosen date format for new entries is not valid"),
-                            Globals.lang("Invalid date format"),
+                    (null, Localization.lang("The chosen date format for new entries is not valid"),
+                            Localization.lang("Invalid date format"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -313,6 +314,6 @@ class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("General");
+        return Localization.lang("General");
     }
 }

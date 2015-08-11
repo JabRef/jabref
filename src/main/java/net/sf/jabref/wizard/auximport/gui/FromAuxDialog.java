@@ -59,11 +59,11 @@ import javax.swing.JTextField;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -115,7 +115,7 @@ public class FromAuxDialog
         JPanel panel1 = new JPanel();
 
         panel1.setLayout(new BorderLayout());
-        selectInDBButton.setText(Globals.lang("Select"));
+        selectInDBButton.setText(Localization.lang("Select"));
         selectInDBButton.setEnabled(false);
         selectInDBButton.addActionListener(new ActionListener() {
 
@@ -124,12 +124,12 @@ public class FromAuxDialog
                 FromAuxDialog.this.select_actionPerformed();
             }
         });
-        generateButton.setText(Globals.lang("Generate"));
+        generateButton.setText(Localization.lang("Generate"));
         generateButton.setEnabled(false);
         generateButton.addActionListener(new FromAuxDialog_generate_actionAdapter(this));
-        cancelButton.setText(Globals.lang("Cancel"));
+        cancelButton.setText(Localization.lang("Cancel"));
         cancelButton.addActionListener(new FromAuxDialog_Cancel_actionAdapter(this));
-        parseButton.setText(Globals.lang("Parse"));
+        parseButton.setText(Localization.lang("Parse"));
         parseButton.addActionListener(new FromAuxDialog_parse_actionAdapter(this));
 
         initPanels(parent);
@@ -148,12 +148,12 @@ public class FromAuxDialog
         bb.addGlue();
         this.setModal(true);
         this.setResizable(true);
-        this.setTitle(Globals.lang("AUX file import"));
-        JLabel desc = new JLabel("<html><h3>" + Globals.lang("AUX file import") + "</h3><p>"
-                + Globals.lang("This feature generates a new database based on which entries "
-                        + "are needed in an existing LaTeX document.") + "</p>"
-                + "<p>" + Globals.lang("You need to select one of your open databases from which to choose "
-                        + "entries, as well as the AUX file produced by LaTeX when compiling your document.") + "</p></html>");
+        this.setTitle(Localization.lang("AUX file import"));
+        JLabel desc = new JLabel("<html><h3>" + Localization.lang("AUX file import") + "</h3><p>"
+                + Localization.lang("This feature generates a new database based on which entries "
+                + "are needed in an existing LaTeX document.") + "</p>"
+                + "<p>" + Localization.lang("You need to select one of your open databases from which to choose "
+                + "entries, as well as the AUX file produced by LaTeX when compiling your document.") + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel1.add(desc, BorderLayout.NORTH);
 
@@ -194,7 +194,7 @@ public class FromAuxDialog
         }
 
         auxFileField = new JTextField("", 25);
-        JButton browseAuxFileButton = new JButton(Globals.lang("Browse"));
+        JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
         notFoundList = new JList();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
@@ -207,20 +207,20 @@ public class FromAuxDialog
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
-        b.appendSeparator(Globals.lang("Options"));
-        b.append(Globals.lang("Reference database") + ":");
+        b.appendSeparator(Localization.lang("Options"));
+        b.append(Localization.lang("Reference database") + ":");
         b.append(dbChooser, 3);
         b.nextLine();
-        b.append(Globals.lang("LaTeX AUX file") + ":");
+        b.append(Localization.lang("LaTeX AUX file") + ":");
         b.append(auxFileField);
         b.append(browseAuxFileButton);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         b = new DefaultFormBuilder(new FormLayout(
                 "fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"), statusPanel);
-        b.appendSeparator(Globals.lang("Result"));
-        b.append(Globals.lang("Unknown bibtex entries") + ":");
-        b.append(Globals.lang("Messages") + ":");
+        b.appendSeparator(Localization.lang("Result"));
+        b.append(Localization.lang("Unknown bibtex entries") + ":");
+        b.append(Localization.lang("Messages") + ":");
         b.nextLine();
         b.append(listScrollPane);
         b.append(statusScrollPane);
@@ -265,20 +265,20 @@ public class FromAuxDialog
                 auxParser.clear();
                 notFoundList.setListData(auxParser.generate(auxName, refBase));
 
-                statusInfos.append(Globals.lang("keys in database") + " " +
+                statusInfos.append(Localization.lang("keys in database") + " " +
                         refBase.getEntryCount());
-                statusInfos.append("\n" + Globals.lang("found in aux file") + " " +
+                statusInfos.append("\n" + Localization.lang("found in aux file") + " " +
                         auxParser.getFoundKeysInAux());
-                statusInfos.append("\n" + Globals.lang("resolved") + " " +
+                statusInfos.append("\n" + Localization.lang("resolved") + " " +
                         auxParser.getResolvedKeysCount());
-                statusInfos.append("\n" + Globals.lang("not found") + " " +
+                statusInfos.append("\n" + Localization.lang("not found") + " " +
                         auxParser.getNotResolvedKeysCount());
-                statusInfos.append("\n" + Globals.lang("crossreferenced entries included") + " " +
+                statusInfos.append("\n" + Localization.lang("crossreferenced entries included") + " " +
                         auxParser.getCrossreferencedEntriesCount());
 
                 int nested = auxParser.getNestedAuxCounter();
                 if (nested > 0) {
-                    statusInfos.append("\n" + Globals.lang("nested_aux_files") + " " +
+                    statusInfos.append("\n" + Localization.lang("nested_aux_files") + " " +
                             nested);
                 }
 
@@ -289,7 +289,7 @@ public class FromAuxDialog
 
         // the generated database contains no entries -> no active generate-button
         if (auxParser.getGeneratedDatabase().getEntryCount() < 1) {
-            statusInfos.append("\n" + Globals.lang("empty database"));
+            statusInfos.append("\n" + Localization.lang("empty database"));
             generateButton.setEnabled(false);
         }
 
@@ -318,7 +318,7 @@ public class FromAuxDialog
 
 
         public BrowseAction(JTextField tc, JabRefFrame frame) {
-            super(Globals.lang("Browse"));
+            super(Localization.lang("Browse"));
             _frame = frame;
             comp = tc;
         }

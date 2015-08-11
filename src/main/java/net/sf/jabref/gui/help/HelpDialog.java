@@ -23,9 +23,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -46,7 +46,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 
     // Initializes, but does not show the help dialog.
     public HelpDialog(JabRefFrame bf) {
-        super(bf, Globals.lang("JabRef help"), false);
+        super(bf, Localization.lang("JabRef help"), false);
         frame = bf;
         content = new HelpContent(bf.prefs());
         content.addHyperlinkListener(this);
@@ -115,9 +115,9 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class CloseAction extends AbstractAction {
 
         public CloseAction() {
-            super(Globals.lang("Close"));
+            super(Localization.lang("Close"));
             // , new ImageIcon(GUIGlobals.closeIconFile));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close the help window"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the help window"));
         }
 
         @Override

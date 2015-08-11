@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -465,7 +466,7 @@ public class JabRefPreferences {
         prefs = Preferences.userNodeForPackage(JabRef.class);
         upgradeOldPreferences();
 
-        if (Globals.osName.equals(Globals.MAC)) {
+        if (Globals.ON_MAC) {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
             //defaults.put("htmlviewer", "/Applications/Safari.app");
@@ -474,7 +475,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put(FONT_FAMILY, "SansSerif");
 
-        } else if (Globals.osName.toLowerCase().startsWith("windows")) {
+        } else if (Globals.ON_WIN) {
             //defaults.put("pdfviewer", "cmd.exe /c start /b");
             //defaults.put("psviewer", "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
@@ -811,7 +812,7 @@ public class JabRefPreferences {
         defaults.put(INCLUDE_EMPTY_FIELDS, Boolean.FALSE);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        defaults.put(EMAIL_SUBJECT, Globals.lang("References"));
+        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
@@ -873,17 +874,17 @@ public class JabRefPreferences {
     public void setLanguageDependentDefaultValues() {
 
         // Entry editor tab 0:
-        defaults.put(CUSTOM_TAB_NAME + "_def0", Globals.lang("General"));
+        defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
                 + "comment;owner;timestamp");
 
         // Entry editor tab 1:
         defaults.put(CUSTOM_TAB_FIELDS + "_def1", "abstract");
-        defaults.put(CUSTOM_TAB_NAME + "_def1", Globals.lang("Abstract"));
+        defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
         // Entry editor tab 2: Review Field - used for research comments, etc.
         defaults.put(CUSTOM_TAB_FIELDS + "_def2", "review");
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Globals.lang("Review"));
+        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
 
     }
 

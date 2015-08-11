@@ -19,6 +19,7 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
@@ -225,17 +226,17 @@ public class SearchGroup extends AbstractGroup {
             sb.append(StringUtil.quoteForHTML(getName()));
         }
         sb.append("</b> - ");
-        sb.append(Globals.lang("dynamic group"));
+        sb.append(Localization.lang("dynamic group"));
         sb.append(" (");
-        sb.append(Globals.lang("search expression"));
+        sb.append(Localization.lang("search expression"));
         sb.append(" <b>").
                 append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
         switch (getHierarchicalContext()) {
         case INCLUDING:
-            sb.append(", ").append(Globals.lang("includes subgroups"));
+            sb.append(", ").append(Localization.lang("includes subgroups"));
             break;
         case REFINING:
-            sb.append(", ").append(Globals.lang("refines supergroup"));
+            sb.append(", ").append(Localization.lang("refines supergroup"));
             break;
         default:
             break;

@@ -23,6 +23,7 @@ import javax.swing.*;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldTextArea;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
+import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleEditor extends JDialog {
 
@@ -76,7 +77,7 @@ class PreambleEditor extends JDialog {
 
         String content = base.getPreamble();
 
-        ed = new FieldTextArea(Globals.lang("Preamble"), content != null ? content : "");
+        ed = new FieldTextArea(Localization.lang("Preamble"), content != null ? content : "");
         //ed.addUndoableEditListener(panel.undoListener);
         setupJTextComponent((FieldTextArea) ed);
 
@@ -92,7 +93,7 @@ class PreambleEditor extends JDialog {
         //conPane.add(tlb, BorderLayout.NORTH);
         Container conPane = getContentPane();
         conPane.add(pan, BorderLayout.CENTER);
-        setTitle(Globals.lang("Edit preamble"));
+        setTitle(Localization.lang("Edit preamble"));
     }
 
     private void setupJTextComponent(javax.swing.text.JTextComponent ta) {
@@ -227,7 +228,7 @@ class PreambleEditor extends JDialog {
     class CloseAction extends AbstractAction {
 
         public CloseAction() {
-            super(Globals.lang("Close window"));
+            super(Localization.lang("Close window"));
             //, new ImageIcon(GUIGlobals.closeIconFile));
             //putValue(SHORT_DESCRIPTION, "Close window (Ctrl-Q)");
         }

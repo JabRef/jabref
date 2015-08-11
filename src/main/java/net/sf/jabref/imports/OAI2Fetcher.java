@@ -31,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -221,17 +222,17 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return be;
         } catch (IOException e) {
-            status.showMessage(Globals.lang(
+            status.showMessage(Localization.lang(
                     "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+                    + "\n\n" + e, Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
-            status.showMessage(Globals.lang(
-                    "An SAXException ocurred while parsing '%0':", new String[] {url})
-                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(
+                    "An SAXException ocurred while parsing '%0':", new String[]{url})
+                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            status.showMessage(Globals.lang(
-                    "An Error occurred while fetching from OAI2 source (%0):", new String[] {url})
-                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(
+                    "An Error occurred while fetching from OAI2 source (%0):", new String[]{url})
+                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -255,7 +256,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Globals.menuTitle(getKeyName());
+        return Localization.menuTitle(getKeyName());
     }
 
     @Override
@@ -281,13 +282,13 @@ public class OAI2Fetcher implements EntryFetcher {
                     long elapsed = new Date().getTime() - lastCall.getTime();
 
                     while (elapsed < waitTime) {
-                        status.setStatus(Globals.lang("Waiting for ArXiv...") + (waitTime - elapsed) / 1000 + " s");
+                        status.setStatus(Localization.lang("Waiting for ArXiv...") + (waitTime - elapsed) / 1000 + " s");
                         Thread.sleep(1000);
                         elapsed = new Date().getTime() - lastCall.getTime();
                     }
                 }
 
-                status.setStatus(Globals.lang("Processing ") + key);
+                status.setStatus(Localization.lang("Processing ") + key);
 
                 /* the cancel button has been hit */
                 if (!shouldContinue) {
@@ -312,7 +313,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return true;
         } catch (Exception e) {
-            status.setStatus(Globals.lang("Error while fetching from OAI2") + ": " + e.getMessage());
+            status.setStatus(Localization.lang("Error while fetching from OAI2") + ": " + e.getMessage());
             e.printStackTrace();
         }
         return false;

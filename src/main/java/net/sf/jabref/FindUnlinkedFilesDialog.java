@@ -61,6 +61,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -88,10 +89,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Keys to be used for referencing this Action.
      */
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
-    public static final String ACTION_TITLE = Globals.lang("Find unlinked files") + "..."; // this entry is NOT in Menu_en.properties as the same string also appears in JabRef_en.properties
+    public static final String ACTION_TITLE = Localization.lang("Find unlinked files") + "..."; // this entry is NOT in Menu_en.properties as the same string also appears in JabRef_en.properties
     public static final String ACTION_ICON = "toggleSearch";
     public static final String ACTION_KEYBINDING_ACTION = "Find unlinked files";
-    public static final String ACTION_SHORT_DESCRIPTION = Globals.lang("Searches for unlinked PDF files on the file system");
+    public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
 
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
@@ -166,7 +167,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     }
 
     public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
-        super(owner, Globals.lang("Find unlinked files"), true);
+        super(owner, Localization.lang("Find unlinked files"), true);
         this.frame = frame;
 
         restoreSizeOfDialog();
@@ -256,7 +257,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void initializeActions() {
 
-        actionSelectAll = new AbstractAction(Globals.lang("Select all")) {
+        actionSelectAll = new AbstractAction(Localization.lang("Select all")) {
 
             private static final long serialVersionUID = 9153126361571985383L;
 
@@ -270,7 +271,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             }
         };
 
-        actionUnselectAll = new AbstractAction(Globals.lang("Unselect all")) {
+        actionUnselectAll = new AbstractAction(Localization.lang("Unselect all")) {
 
             private static final long serialVersionUID = -9012913268030356450L;
 
@@ -284,7 +285,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             }
         };
 
-        actionExpandTree = new AbstractAction(Globals.lang("Expand all")) {
+        actionExpandTree = new AbstractAction(Localization.lang("Expand all")) {
 
             private static final long serialVersionUID = -4794088095435302433L;
 
@@ -296,7 +297,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             }
         };
 
-        actionCollapseTree = new AbstractAction(Globals.lang("Collapse all")) {
+        actionCollapseTree = new AbstractAction(Localization.lang("Collapse all")) {
 
             private static final long serialVersionUID = 6007246730370326456L;
 
@@ -386,9 +387,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
         if (fileChooser == null) {
             fileChooser = new JFileChooser();
             fileChooser.setAutoscrolls(true);
-            fileChooser.setDialogTitle(Globals.lang("Select Directory"));
-            fileChooser.setApproveButtonText(Globals.lang("Choose Directory"));
-            fileChooser.setApproveButtonToolTipText(Globals.lang("Use the selected directory to start with the search."));
+            fileChooser.setDialogTitle(Localization.lang("Select Directory"));
+            fileChooser.setApproveButtonText(Localization.lang("Choose Directory"));
+            fileChooser.setApproveButtonToolTipText(Localization.lang("Use the selected directory to start with the search."));
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
 
@@ -608,7 +609,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         if (errors != null && !errors.isEmpty()) {
 
             JOptionPane.showMessageDialog(this, "The import finished with warnings:\n" + "There " + (errors.size() > 1 ? "were " : "was ") + errors.size() + (errors.size() > 1 ? " files" : " file") + (errors.size() > 1 ? " which" : " that") + " could not be imported.",
-                    Globals.lang("Warning"),
+                    Localization.lang("Warning"),
                     JOptionPane.WARNING_MESSAGE);
         }
 
@@ -771,17 +772,17 @@ public class FindUnlinkedFilesDialog extends JDialog {
         panelButtons = new JPanel();
         panelImportArea = new JPanel();
 
-        buttonBrowse = new JButton(Globals.lang("Browse..."));
+        buttonBrowse = new JButton(Localization.lang("Browse..."));
         buttonBrowse.setMnemonic('B');
-        buttonBrowse.setToolTipText(Globals.lang("Opens the file browser."));
-        buttonScan = new JButton(Globals.lang("Scan directory"));
+        buttonBrowse.setToolTipText(Localization.lang("Opens the file browser."));
+        buttonScan = new JButton(Localization.lang("Scan directory"));
         buttonScan.setMnemonic('S');
-        buttonScan.setToolTipText(Globals.lang("Searches the selected directory for unlinked files."));
-        buttonApply = new JButton(Globals.lang("Apply"));
+        buttonScan.setToolTipText(Localization.lang("Searches the selected directory for unlinked files."));
+        buttonApply = new JButton(Localization.lang("Apply"));
         buttonApply.setMnemonic('I');
-        buttonApply.setToolTipText(Globals.lang("Starts the import of bibtex entries."));
-        buttonClose = new JButton(Globals.lang("Close"));
-        buttonClose.setToolTipText(Globals.lang("Leave this dialog."));
+        buttonApply.setToolTipText(Localization.lang("Starts the import of bibtex entries."));
+        buttonClose = new JButton(Localization.lang("Close"));
+        buttonClose.setToolTipText(Localization.lang("Leave this dialog."));
         buttonClose.setMnemonic('C');
 
         /* Options for the TreeView */
@@ -798,8 +799,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonOptionCollapseAll.setMnemonic('L');
         buttonOptionCollapseAll.setAction(actionCollapseTree);
 
-        checkboxCreateKeywords = new JCheckBox(Globals.lang("Create directory based keywords"));
-        checkboxCreateKeywords.setToolTipText(Globals.lang("Creates keywords in created entrys with directory pathnames"));
+        checkboxCreateKeywords = new JCheckBox(Localization.lang("Create directory based keywords"));
+        checkboxCreateKeywords.setToolTipText(Localization.lang("Creates keywords in created entrys with directory pathnames"));
         checkboxCreateKeywords.setSelected(checkBoxWhyIsThereNoGetSelectedStupidSwing);
         checkboxCreateKeywords.addItemListener(new ItemListener() {
 
@@ -812,14 +813,14 @@ public class FindUnlinkedFilesDialog extends JDialog {
         textfieldDirectoryPath = new JTextField();
         textfieldDirectoryPath.setText(lastSelectedDirectory == null ? "" : lastSelectedDirectory.getAbsolutePath());
 
-        labelDirectoryDescription = new JLabel(Globals.lang("Select a directory where the search shall start."));
-        labelFileTypesDescription = new JLabel(Globals.lang("Select file type:"));
-        labelFilesDescription = new JLabel(Globals.lang("These files are not linked in the active database."));
-        labelEntryTypeDescription = new JLabel(Globals.lang("Entry type to be created:"));
-        labelSearchingDirectoryInfo = new JLabel(Globals.lang("Searching file system..."));
+        labelDirectoryDescription = new JLabel(Localization.lang("Select a directory where the search shall start."));
+        labelFileTypesDescription = new JLabel(Localization.lang("Select file type:"));
+        labelFilesDescription = new JLabel(Localization.lang("These files are not linked in the active database."));
+        labelEntryTypeDescription = new JLabel(Localization.lang("Entry type to be created:"));
+        labelSearchingDirectoryInfo = new JLabel(Localization.lang("Searching file system..."));
         labelSearchingDirectoryInfo.setHorizontalAlignment(JTextField.CENTER);
         labelSearchingDirectoryInfo.setVisible(false);
-        labelImportingInfo = new JLabel(Globals.lang("Importing into Database..."));
+        labelImportingInfo = new JLabel(Localization.lang("Importing into Database..."));
         labelImportingInfo.setHorizontalAlignment(JTextField.CENTER);
         labelImportingInfo.setVisible(false);
 
@@ -847,9 +848,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         GridBagLayout gbl = new GridBagLayout();
 
-        panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Select directory")));
-        panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Select files")));
-        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Bibtex entry creation")));
+        panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select directory")));
+        panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select files")));
+        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Bibtex entry creation")));
 
         Insets basicInsets = new Insets(6, 6, 6, 6);
         Insets smallInsets = new Insets(3, 2, 3, 1);
@@ -1120,7 +1121,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         @Override
         public String toString() {
             if (entryType == null) {
-                return Globals.lang("<No selection>");
+                return Localization.lang("<No selection>");
             }
             return entryType.getName();
         }

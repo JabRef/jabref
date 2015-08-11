@@ -29,6 +29,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
@@ -43,14 +44,14 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
-    private final JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys"));
-    private final JCheckBox warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys"));
-    private final JCheckBox generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)"));
-    private final JCheckBox autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
+    private final JCheckBox dontOverwrite = new JCheckBox(Localization.lang("Do not overwrite existing keys"));
+    private final JCheckBox warnBeforeOverwriting = new JCheckBox(Localization.lang("Warn before overwriting existing keys"));
+    private final JCheckBox generateOnSave = new JCheckBox(Localization.lang("Generate keys before saving (for entries without a key)"));
+    private final JCheckBox autoGenerateOnImport = new JCheckBox(Localization.lang("Generate keys for imported entries"));
 
-    private final JRadioButton letterStartA = new JRadioButton(Globals.lang("Ensure unique keys using letters (a, b, ...)"));
-    private final JRadioButton letterStartB = new JRadioButton(Globals.lang("Ensure unique keys using letters (b, c, ...)"));
-    private final JRadioButton alwaysAddLetter = new JRadioButton(Globals.lang("Always add letter (a, b, ...) to generated keys"));
+    private final JRadioButton letterStartA = new JRadioButton(Localization.lang("Ensure unique keys using letters (a, b, ...)"));
+    private final JRadioButton letterStartB = new JRadioButton(Localization.lang("Ensure unique keys using letters (b, c, ...)"));
+    private final JRadioButton alwaysAddLetter = new JRadioButton(Localization.lang("Always add letter (a, b, ...) to generated keys"));
 
     private final JTextField KeyPatternRegex = new JTextField(20);
     private final JTextField KeyPatternReplacement = new JTextField(20);
@@ -114,7 +115,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
                 ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");
         JPanel pan = new JPanel();
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.appendSeparator(Globals.lang("Key generator settings"));
+        builder.appendSeparator(Localization.lang("Key generator settings"));
 
         builder.nextLine();
         builder.append(pan);
@@ -133,8 +134,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         builder.append(generateOnSave);
         builder.nextLine();
         builder.append(pan);
-        builder.append(Globals.lang("Replace (regular expression)") + ':');
-        builder.append(Globals.lang("by") + ':');
+        builder.append(Localization.lang("Replace (regular expression)") + ':');
+        builder.append(Localization.lang("by") + ':');
 
         builder.nextLine();
         builder.append(pan);
@@ -196,6 +197,6 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("BibTeX key generator");
+        return Localization.lang("BibTeX key generator");
     }
 }

@@ -28,7 +28,6 @@ import javax.swing.ListSelectionModel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.Layout;
 
 import com.sun.star.beans.Property;
@@ -40,6 +39,7 @@ import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Utility methods for processing OO Writer documents.
@@ -279,7 +279,7 @@ class OOUtil {
         JList sel = new JList(values);
         sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sel.setSelectedIndex(0);
-        int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Globals.lang("Select document"),
+        int ans = JOptionPane.showConfirmDialog(parent, new JScrollPane(sel), Localization.lang("Select document"),
                 JOptionPane.OK_CANCEL_OPTION);
         if (ans == JOptionPane.OK_OPTION) {
             return list.get(sel.getSelectedIndex());

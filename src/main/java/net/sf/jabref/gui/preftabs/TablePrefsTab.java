@@ -37,8 +37,8 @@ import javax.swing.event.ChangeListener;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
@@ -92,17 +92,17 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort = new JComboBox(allPlusKey);
         terSort = new JComboBox(allPlusKey);
 
-        autoResizeMode = new JCheckBox(Globals.lang("Fit table horizontally on screen"));
+        autoResizeMode = new JCheckBox(Localization.lang("Fit table horizontally on screen"));
 
-        namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
-        namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
-        namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
-        namesNatbib = new JRadioButton(Globals.lang("Natbib style"));
-        noAbbrNames = new JRadioButton(Globals.lang("Do not abbreviate names"));
-        abbrNames = new JRadioButton(Globals.lang("Abbreviate names"));
-        lastNamesOnly = new JRadioButton(Globals.lang("Show last names only"));
+        namesAsIs = new JRadioButton(Localization.lang("Show names unchanged"));
+        namesFf = new JRadioButton(Localization.lang("Show 'Firstname Lastname'"));
+        namesFl = new JRadioButton(Localization.lang("Show 'Lastname, Firstname'"));
+        namesNatbib = new JRadioButton(Localization.lang("Natbib style"));
+        noAbbrNames = new JRadioButton(Localization.lang("Do not abbreviate names"));
+        abbrNames = new JRadioButton(Localization.lang("Abbreviate names"));
+        lastNamesOnly = new JRadioButton(Localization.lang("Show last names only"));
 
-        floatMarked = new JCheckBox(Globals.lang("Float marked entries"));
+        floatMarked = new JCheckBox(Localization.lang("Float marked entries"));
 
         priField = new JTextField(10);
         secField = new JTextField(10);
@@ -110,9 +110,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         numericFields = new JTextField(30);
 
-        priSort.insertItemAt(Globals.lang("<select>"), 0);
-        secSort.insertItemAt(Globals.lang("<select>"), 0);
-        terSort.insertItemAt(Globals.lang("<select>"), 0);
+        priSort.insertItemAt(Localization.lang("<select>"), 0);
+        secSort.insertItemAt(Localization.lang("<select>"), 0);
+        terSort.insertItemAt(Localization.lang("<select>"), 0);
 
         priSort.addActionListener(new ActionListener() {
 
@@ -154,9 +154,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         nameAbbrev.add(lastNamesOnly);
         nameAbbrev.add(abbrNames);
         nameAbbrev.add(noAbbrNames);
-        priDesc = new JCheckBox(Globals.lang("Descending"));
-        secDesc = new JCheckBox(Globals.lang("Descending"));
-        terDesc = new JCheckBox(Globals.lang("Descending"));
+        priDesc = new JCheckBox(Localization.lang("Descending"));
+        secDesc = new JCheckBox(Localization.lang("Descending"));
+        terDesc = new JCheckBox(Localization.lang("Descending"));
 
         FormLayout layout = new FormLayout(
                 "1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
@@ -164,7 +164,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         JLabel lab;
         JPanel pan = new JPanel();
 
-        builder.appendSeparator(Globals.lang("Format of author and editor names"));
+        builder.appendSeparator(Localization.lang("Format of author and editor names"));
         DefaultFormBuilder nameBuilder = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 8dlu, left:pref", ""));
 
@@ -182,24 +182,24 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         builder.append(nameBuilder.getPanel());
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Default sort criteria"));
+        builder.appendSeparator(Localization.lang("Default sort criteria"));
         // Create a new panel with its own FormLayout for these items:
         FormLayout layout2 = new FormLayout(
                 "left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        lab = new JLabel(Globals.lang("Primary sort criterion"));
+        lab = new JLabel(Localization.lang("Primary sort criterion"));
         builder2.append(lab);
         builder2.append(priSort);
         builder2.append(priField);
         builder2.append(priDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Secondary sort criterion"));
+        lab = new JLabel(Localization.lang("Secondary sort criterion"));
         builder2.append(lab);
         builder2.append(secSort);
         builder2.append(secField);
         builder2.append(secDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
         builder2.append(lab);
         builder2.append(terSort);
         builder2.append(terField);
@@ -213,11 +213,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(pan);
         builder2 = new DefaultFormBuilder(new FormLayout("left:pref, 8dlu, fill:pref", ""));
-        builder2.append(Globals.lang("Sort the following fields as numeric fields") + ':');
+        builder2.append(Localization.lang("Sort the following fields as numeric fields") + ':');
         builder2.append(numericFields);
         builder.append(builder2.getPanel(), 5);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("General"));
+        builder.appendSeparator(Localization.lang("General"));
         builder.append(pan);
         builder.append(autoResizeMode);
         builder.nextLine();
@@ -331,6 +331,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Entry table");
+        return Localization.lang("Entry table");
     }
 }

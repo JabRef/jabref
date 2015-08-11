@@ -33,6 +33,7 @@ import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 public class ChangeScanner implements Runnable {
@@ -56,7 +57,7 @@ public class ChangeScanner implements Runnable {
      * can be reproduced in memory by calling redo() on them. REDO, not UNDO!
      */
     //ArrayList changes = new ArrayList();
-    private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
+    private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Localization.lang("External changes"));
 
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
@@ -135,8 +136,8 @@ public class ChangeScanner implements Runnable {
             });
 
         } else {
-            JOptionPane.showMessageDialog(frame, Globals.lang("No actual changes found."),
-                    Globals.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("No actual changes found."),
+                    Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
             fup.scanResultsResolved(true);
         }
     }

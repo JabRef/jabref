@@ -47,6 +47,7 @@ import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.CaseChangeMenu;
 import net.sf.jabref.logic.util.NameListNormalizer;
 import net.sf.jabref.util.GoogleUrlCleaner;
@@ -133,25 +134,25 @@ public class FieldTextMenu implements MouseListener
 
         public BasicAction(String text, String description, URL icon)
         {
-            super(Globals.lang(text), new ImageIcon(icon));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
+            super(Localization.lang(text), new ImageIcon(icon));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
         public BasicAction(String text, String description, URL icon, KeyStroke key)
         {
-            super(Globals.lang(text), new ImageIcon(icon));
+            super(Localization.lang(text), new ImageIcon(icon));
             putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
         public BasicAction(String text)
         {
-            super(Globals.lang(text));
+            super(Localization.lang(text));
         }
 
         public BasicAction(String text, KeyStroke key)
         {
-            super(Globals.lang(text));
+            super(Localization.lang(text));
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
@@ -234,7 +235,7 @@ public class FieldTextMenu implements MouseListener
 
         public ReplaceAction() {
             super("Normalize to BibTeX name format");
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
         }
 
         @Override
@@ -253,7 +254,7 @@ public class FieldTextMenu implements MouseListener
 
         public UrlAction() {
             super("Clean Google URL");
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("If possible, clean URL that Google search returned"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, clean URL that Google search returned"));
         }
 
         @Override

@@ -21,16 +21,16 @@ import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 @SuppressWarnings("serial")
 public class ForkMeOnGitHubAction extends AbstractAction {
 
     public ForkMeOnGitHubAction() {
-        super(Globals.menuTitle("Fork me on GitHub"));
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Opens JabRef's GitHub page"));
+        super(Localization.menuTitle("Fork me on GitHub"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Opens JabRef's GitHub page"));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ForkMeOnGitHubAction extends AbstractAction {
             Util.openBrowser("https://github.com/JabRef/jabref");
         } catch (IOException ex) {
             ex.printStackTrace();
-            JabRef.jrf.basePanel().output(Globals.lang("Could not open browser.") + " " + Globals.lang("Please open http://github.com/JabRef/jabref manually."));
+            JabRef.jrf.basePanel().output(Localization.lang("Could not open browser.") + " " + Localization.lang("Please open http://github.com/JabRef/jabref manually."));
         }
     }
 }

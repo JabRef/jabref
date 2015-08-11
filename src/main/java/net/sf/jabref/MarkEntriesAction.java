@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 
@@ -69,7 +70,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         besLength = bes.length;
 
         if (bes.length != 0) {
-            NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
+            NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
             for (BibtexEntry be : bes) {
                 EntryMarker.markEntry(be, level + 1, false, ce);
             }
@@ -83,15 +84,15 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         String outputStr;
         switch (besLength) {
         case 0:
-            outputStr = Globals.lang("No entries selected.");
+            outputStr = Localization.lang("No entries selected.");
             break;
         case 1:
             frame.basePanel().markBaseChanged();
-            outputStr = Globals.lang("Marked selected entry");
+            outputStr = Localization.lang("Marked selected entry");
             break;
         default:
             frame.basePanel().markBaseChanged();
-            outputStr = Globals.lang("Marked all %0 selected entries", Integer.toString(besLength));
+            outputStr = Localization.lang("Marked all %0 selected entries", Integer.toString(besLength));
             break;
         }
         frame.output(outputStr);

@@ -25,6 +25,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.NameFormatter;
 import net.sf.jabref.export.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 class LayoutEntry {
@@ -351,7 +352,7 @@ class LayoutEntry {
             return field;
         } else if (type == LayoutHelper.IS_ENCODING_NAME) {
             // Try to translate from Java encoding name to common name:
-            String commonName = Globals.ENCODING_NAMES_LOOKUP.get(encoding);
+            String commonName = Localization.ENCODING_NAMES_LOOKUP.get(encoding);
             return commonName != null ? commonName : encoding;
         }
         else if (type == LayoutHelper.IS_FILENAME) {
@@ -379,7 +380,7 @@ class LayoutEntry {
                     return (LayoutFormatter) Class.forName(className).newInstance();
                 }
             } catch (ClassNotFoundException ex) {
-                throw new Exception(Globals.lang("Formatter not found") + ": " + className);
+                throw new Exception(Localization.lang("Formatter not found") + ": " + className);
             } catch (InstantiationException ex) {
                 throw new Exception(className + " can not be instantiated.");
             } catch (IllegalAccessException ex) {

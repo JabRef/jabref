@@ -27,8 +27,8 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
@@ -42,7 +42,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         setLayout(new BorderLayout());
 
-        useProxy = new JCheckBox(Globals.lang("Use custom proxy configuration"));
+        useProxy = new JCheckBox(Localization.lang("Use custom proxy configuration"));
 
         defProxyHostname = new JTextField();
         defProxyHostname.setEnabled(false);
@@ -68,17 +68,17 @@ public class NetworkTab extends JPanel implements PrefsTab {
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.appendSeparator(Globals.lang("Network"));
+        builder.appendSeparator(Localization.lang("Network"));
         builder.nextLine();
         builder.append(useProxy, 5);
         builder.nextLine();
         builder.append(new JPanel());
-        JLabel lap = new JLabel(Globals.lang("Host") + ':');
+        JLabel lap = new JLabel(Localization.lang("Host") + ':');
         builder.append(lap);
         builder.append(defProxyHostname);
         builder.nextLine();
         builder.append(new JPanel());
-        JLabel lap2 = new JLabel(Globals.lang("Port") + ':');
+        JLabel lap2 = new JLabel(Localization.lang("Port") + ':');
         builder.append(lap2);
         builder.append(defProxyPort);
 
@@ -127,8 +127,8 @@ public class NetworkTab extends JPanel implements PrefsTab {
         }
         if (!validSetting) {
             JOptionPane.showMessageDialog
-                    (null, Globals.lang("Please specify both hostname and port"),
-                            Globals.lang("Invalid setting"),
+                    (null, Localization.lang("Please specify both hostname and port"),
+                            Localization.lang("Invalid setting"),
                             JOptionPane.ERROR_MESSAGE);
         }
         return validSetting;
@@ -136,6 +136,6 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Network");
+        return Localization.lang("Network");
     }
 }

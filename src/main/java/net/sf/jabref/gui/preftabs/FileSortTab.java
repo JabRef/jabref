@@ -34,9 +34,8 @@ import javax.swing.JTextField;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BibtexFields;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Preference tab for file sorting options.
@@ -79,9 +78,9 @@ class FileSortTab extends JPanel implements PrefsTab {
 
         { // SAVE SORT ORDER
           // create Components
-            saveInOriginalOrder = new JRadioButton(Globals.lang("Save entries in their original order"));
-            saveInTableOrder = new JRadioButton(Globals.lang("Save in current table sort order"));
-            saveInSpecifiedOrder = new JRadioButton(Globals.lang("Save entries ordered as specified"));
+            saveInOriginalOrder = new JRadioButton(Localization.lang("Save entries in their original order"));
+            saveInTableOrder = new JRadioButton(Localization.lang("Save in current table sort order"));
+            saveInSpecifiedOrder = new JRadioButton(Localization.lang("Save entries ordered as specified"));
 
             ButtonGroup buttonGroup = new ButtonGroup();
             buttonGroup.add(saveInOriginalOrder);
@@ -120,9 +119,9 @@ class FileSortTab extends JPanel implements PrefsTab {
             saveSecField = new JTextField(10);
             saveTerField = new JTextField(10);
 
-            savePriSort.insertItemAt(Globals.lang("<select>"), 0);
-            saveSecSort.insertItemAt(Globals.lang("<select>"), 0);
-            saveTerSort.insertItemAt(Globals.lang("<select>"), 0);
+            savePriSort.insertItemAt(Localization.lang("<select>"), 0);
+            saveSecSort.insertItemAt(Localization.lang("<select>"), 0);
+            saveTerSort.insertItemAt(Localization.lang("<select>"), 0);
 
             savePriSort.addActionListener(new ActionListener() {
 
@@ -155,14 +154,14 @@ class FileSortTab extends JPanel implements PrefsTab {
                 }
             });
 
-            savePriDesc = new JCheckBox(Globals.lang("Descending"));
-            saveSecDesc = new JCheckBox(Globals.lang("Descending"));
-            saveTerDesc = new JCheckBox(Globals.lang("Descending"));
+            savePriDesc = new JCheckBox(Localization.lang("Descending"));
+            saveSecDesc = new JCheckBox(Localization.lang("Descending"));
+            saveTerDesc = new JCheckBox(Localization.lang("Descending"));
 
             // create GUI
             JLabel lab;
 
-            builder.appendSeparator(Globals.lang("Save sort order"));
+            builder.appendSeparator(Localization.lang("Save sort order"));
             builder.append(saveInOriginalOrder, 1);
             builder.nextLine();
             builder.append(saveInTableOrder, 1);
@@ -174,19 +173,19 @@ class FileSortTab extends JPanel implements PrefsTab {
             FormLayout layout2 = new FormLayout(
                     "right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
             DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-            lab = new JLabel(Globals.lang("Primary sort criterion"));
+            lab = new JLabel(Localization.lang("Primary sort criterion"));
             builder2.append(lab);
             builder2.append(savePriSort);
             builder2.append(savePriField);
             builder2.append(savePriDesc);
             builder2.nextLine();
-            lab = new JLabel(Globals.lang("Secondary sort criterion"));
+            lab = new JLabel(Localization.lang("Secondary sort criterion"));
             builder2.append(lab);
             builder2.append(saveSecSort);
             builder2.append(saveSecField);
             builder2.append(saveSecDesc);
             builder2.nextLine();
-            lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+            lab = new JLabel(Localization.lang("Tertiary sort criterion"));
             builder2.append(lab);
             builder2.append(saveTerSort);
             builder2.append(saveTerField);
@@ -199,9 +198,9 @@ class FileSortTab extends JPanel implements PrefsTab {
 
         // EXPORT SORT ORDER
         // create Components
-        exportInOriginalOrder = new JRadioButton(Globals.lang("Export entries in their original order"));
-        exportInTableOrder = new JRadioButton(Globals.lang("Export in current table sort order"));
-        exportInSpecifiedOrder = new JRadioButton(Globals.lang("Export entries ordered as specified"));
+        exportInOriginalOrder = new JRadioButton(Localization.lang("Export entries in their original order"));
+        exportInTableOrder = new JRadioButton(Localization.lang("Export in current table sort order"));
+        exportInSpecifiedOrder = new JRadioButton(Localization.lang("Export entries ordered as specified"));
 
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(exportInOriginalOrder);
@@ -240,9 +239,9 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportSecField = new JTextField(10);
         exportTerField = new JTextField(10);
 
-        exportPriSort.insertItemAt(Globals.lang("<select>"), 0);
-        exportSecSort.insertItemAt(Globals.lang("<select>"), 0);
-        exportTerSort.insertItemAt(Globals.lang("<select>"), 0);
+        exportPriSort.insertItemAt(Localization.lang("<select>"), 0);
+        exportSecSort.insertItemAt(Localization.lang("<select>"), 0);
+        exportTerSort.insertItemAt(Localization.lang("<select>"), 0);
 
         exportPriSort.addActionListener(new ActionListener() {
 
@@ -275,14 +274,14 @@ class FileSortTab extends JPanel implements PrefsTab {
             }
         });
 
-        exportPriDesc = new JCheckBox(Globals.lang("Descending"));
-        exportSecDesc = new JCheckBox(Globals.lang("Descending"));
-        exportTerDesc = new JCheckBox(Globals.lang("Descending"));
+        exportPriDesc = new JCheckBox(Localization.lang("Descending"));
+        exportSecDesc = new JCheckBox(Localization.lang("Descending"));
+        exportTerDesc = new JCheckBox(Localization.lang("Descending"));
 
         // create GUI
         JLabel lab;
 
-        builder.appendSeparator(Globals.lang("Export sort order"));
+        builder.appendSeparator(Localization.lang("Export sort order"));
         builder.append(exportInOriginalOrder, 1);
         builder.nextLine();
         builder.append(exportInTableOrder, 1);
@@ -294,19 +293,19 @@ class FileSortTab extends JPanel implements PrefsTab {
         FormLayout layout2 = new FormLayout(
                 "right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        lab = new JLabel(Globals.lang("Primary sort criterion"));
+        lab = new JLabel(Localization.lang("Primary sort criterion"));
         builder2.append(lab);
         builder2.append(exportPriSort);
         builder2.append(exportPriField);
         builder2.append(exportPriDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Secondary sort criterion"));
+        lab = new JLabel(Localization.lang("Secondary sort criterion"));
         builder2.append(lab);
         builder2.append(exportSecSort);
         builder2.append(exportSecField);
         builder2.append(exportSecDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
         builder2.append(lab);
         builder2.append(exportTerSort);
         builder2.append(exportTerField);
@@ -422,6 +421,6 @@ class FileSortTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("File Sorting");
+        return Localization.lang("File Sorting");
     }
 }

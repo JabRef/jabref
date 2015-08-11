@@ -17,11 +17,11 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -50,17 +50,17 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getPresentationName() {
-        return Globals.lang("change field");
+        return Localization.lang("change field");
     }
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + Globals.lang("change field");
+        return Localization.lang("Undo") + ": " + Localization.lang("change field");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + Globals.lang("change field");
+        return Localization.lang("Redo") + ": " + Localization.lang("change field");
     }
 
     @Override

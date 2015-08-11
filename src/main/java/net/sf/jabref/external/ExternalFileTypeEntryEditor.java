@@ -33,6 +33,7 @@ import net.sf.jabref.gui.FileDialogs;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class produces a dialog box for editing an external file type.
@@ -48,11 +49,11 @@ public class ExternalFileTypeEntryEditor {
     private final JTextField application = new JTextField();
     private String selectedIcon = null;
     private final JButton icon = new JButton(GUIGlobals.getImage("picture"));
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JRadioButton useDefault = new JRadioButton(Globals.lang("Default"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
     private final JRadioButton other = new JRadioButton("");
-    final String emptyMessage = "<" + Globals.lang("Use default viewer") + ">";
+    final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
     boolean applicationFieldEmpty = false;
 
     private ExternalFileType entry;
@@ -79,21 +80,21 @@ public class ExternalFileTypeEntryEditor {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
-        builder.append(Globals.lang("Icon"));
+        builder.append(Localization.lang("Icon"));
         builder.append(icon);
         builder.nextLine();
-        builder.append(Globals.lang("Name"));
+        builder.append(Localization.lang("Name"));
         builder.append(name);
         builder.nextLine();
-        builder.append(Globals.lang("Extension"));
+        builder.append(Localization.lang("Extension"));
         builder.append(extension);
         builder.nextLine();
-        builder.append(Globals.lang("MIME type"));
+        builder.append(Localization.lang("MIME type"));
         builder.append(mimeType);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.nextLine();
-        builder.append(Globals.lang("Application"));
-        JButton browseBut = new JButton(Globals.lang("Browse"));
+        builder.append(Localization.lang("Application"));
+        JButton browseBut = new JButton(Localization.lang("Browse"));
         if (Globals.ON_WIN) {
             builder.append(useDefault);
             builder.nextLine();
@@ -183,9 +184,9 @@ public class ExternalFileTypeEntryEditor {
         }
 
         if (dParent != null) {
-            diag = new JDialog(dParent, Globals.lang("Edit file type"), true);
+            diag = new JDialog(dParent, Localization.lang("Edit file type"), true);
         } else {
-            diag = new JDialog(fParent, Globals.lang("Edit file type"), true);
+            diag = new JDialog(fParent, Localization.lang("Edit file type"), true);
         }
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);

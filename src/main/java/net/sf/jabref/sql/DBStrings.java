@@ -17,6 +17,7 @@ package net.sf.jabref.sql;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  *
@@ -50,7 +51,7 @@ public class DBStrings {
      * Initializes the variables needed with defaults
      */
     public void initialize() {
-        String[] servers = {Globals.lang("MySQL"), Globals.lang("PostgreSQL")};
+        String[] servers = {Localization.lang("MySQL"), Localization.lang("PostgreSQL")};
         setServerTypes(servers);
         setServerType(Globals.prefs.get(JabRefPreferences.DB_CONNECT_SERVER_TYPE));
         setServerHostname(Globals.prefs.get(JabRefPreferences.DB_CONNECT_HOSTNAME));

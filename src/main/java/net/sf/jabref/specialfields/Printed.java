@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class Printed extends SpecialField {
 
@@ -30,7 +30,7 @@ public class Printed extends SpecialField {
     private Printed() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         // DO NOT TRANSLATE "printed" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Globals.lang("Toogle print status"), GUIGlobals.getImage("printed"), Globals.lang("Toogle print status")));
+        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toogle print status"), GUIGlobals.getImage("printed"), Localization.lang("Toogle print status")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
     }
@@ -59,7 +59,7 @@ public class Printed extends SpecialField {
 
     @Override
     public String getMenuString() {
-        return Globals.lang("Printed");
+        return Localization.lang("Printed");
     }
 
     @Override

@@ -15,364 +15,36 @@
 */
 package net.sf.jabref;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
-import java.util.regex.Pattern;
-
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.export.AutoSaveManager;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
-import net.sf.jabref.logic.error.StreamEavesdropper;
-import net.sf.jabref.logic.logging.CacheableHandler;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 public class Globals {
+    private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
-    /**
-     * {@link Control} class allowing properties bundles to be in different encodings.
-     * 
-     * @see <a
-     *      href="http://stackoverflow.com/questions/4659929/how-to-use-utf-8-in-resource-properties-with-resourcebundle">utf-8
-     *      and property files</a>
-     */
-    private static class EncodingControl extends Control {
-
-        private final String encoding;
-
-
-        public EncodingControl(String encoding) {
-            this.encoding = encoding;
-        }
-
-        @Override
-        public ResourceBundle newBundle(String baseName, Locale locale,
-                String format, ClassLoader loader, boolean reload)
-                throws IllegalAccessException, InstantiationException,
-                IOException {
-            // The below is a copy of the default implementation.
-            String bundleName = toBundleName(baseName, locale);
-            String resourceName = toResourceName(bundleName, "properties");
-            ResourceBundle bundle = null;
-            InputStream stream = null;
-            if (reload) {
-                URL url = loader.getResource(resourceName);
-                if (url != null) {
-                    URLConnection connection = url.openConnection();
-                    if (connection != null) {
-                        connection.setUseCaches(false);
-                        stream = connection.getInputStream();
-                    }
-                }
-            } else {
-                stream = loader.getResourceAsStream(resourceName);
-            }
-            if (stream != null) {
-                try {
-                    // Only this line is changed to make it to read properties files as UTF-8.
-                    bundle = new PropertyResourceBundle(new InputStreamReader(stream, encoding));
-                } finally {
-                    stream.close();
-                }
-            }
-            return bundle;
-        }
-    }
-
-
+    // Remote listener
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
-    private static final String RESOURCE_PREFIX = "l10n/JabRef";
-    private static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
-    private static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
-
+    // journal initialization
     public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-
     public static final String JOURNALS_IEEE_INTERNAL_LIST = "/journals/IEEEJournalList.txt";
-
-    private static ResourceBundle messages;
-    private static ResourceBundle menuTitles;
-    private static ResourceBundle intMessages;
-
-    public static FileUpdateMonitor fileUpdateMonitor;
-
-    public static final ImportFormatReader importFormatReader = new ImportFormatReader();
-
-    public static StreamEavesdropper streamEavesdropper;
-    public static CacheableHandler handler;
-
-    public static final BuildInfo BUILD_INFO = new BuildInfo();
-
-    public static final String FILETYPE_PREFS_EXT = "_dir";
-    public static final String SELECTOR_META_PREFIX = "selector_";
-    public static final String PROTECTED_FLAG_META = "protectedFlag";
-    public static final String MAC = "Mac OS X";
-    public static final String DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
-    public static final String NONE = "_non__";
-    public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
-
-    public static final String[] ENCODINGS;
-    private static final String[] ALL_ENCODINGS = // (String[])
-    // Charset.availableCharsets().keySet().toArray(new
-    // String[]{});
-    new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII", "Cp1250", "Cp1251", "Cp1252",
-            "Cp1253", "Cp1254", "Cp1257", "SJIS",
-            "KOI8_R", // Cyrillic
-            "EUC_JP", // Added Japanese encodings.
-            "Big5", "Big5_HKSCS", "GBK", "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5",
-            "ISO8859_6", "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
-    public static final Map<String, String> ENCODING_NAMES_LOOKUP;
-
-    static {
-        // Build list of encodings, by filtering out all that are not supported
-        // on this system:
-        List<String> encodings = new ArrayList<String>();
-        for (String ALL_ENCODING : Globals.ALL_ENCODINGS) {
-            if (Charset.isSupported(ALL_ENCODING)) {
-                encodings.add(ALL_ENCODING);
-            }
-        }
-        ENCODINGS = encodings.toArray(new String[encodings.size()]);
-        // Build a map for translating Java encoding names into common encoding names:
-        ENCODING_NAMES_LOOKUP = new HashMap<String, String>();
-        Globals.ENCODING_NAMES_LOOKUP.put("Cp1250", "windows-1250");
-        Globals.ENCODING_NAMES_LOOKUP.put("Cp1251", "windows-1251");
-        Globals.ENCODING_NAMES_LOOKUP.put("Cp1252", "windows-1252");
-        Globals.ENCODING_NAMES_LOOKUP.put("Cp1253", "windows-1253");
-        Globals.ENCODING_NAMES_LOOKUP.put("Cp1254", "windows-1254");
-        Globals.ENCODING_NAMES_LOOKUP.put("Cp1257", "windows-1257");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_1", "ISO-8859-1");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_2", "ISO-8859-2");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_3", "ISO-8859-3");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_4", "ISO-8859-4");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_5", "ISO-8859-5");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_6", "ISO-8859-6");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_7", "ISO-8859-7");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_8", "ISO-8859-8");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_9", "ISO-8859-9");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_13", "ISO-8859-13");
-        Globals.ENCODING_NAMES_LOOKUP.put("ISO8859_15", "ISO-8859-15");
-        Globals.ENCODING_NAMES_LOOKUP.put("KOI8_R", "KOI8-R");
-        Globals.ENCODING_NAMES_LOOKUP.put("UTF8", "UTF-8");
-        Globals.ENCODING_NAMES_LOOKUP.put("UTF-16", "UTF-16");
-        Globals.ENCODING_NAMES_LOOKUP.put("SJIS", "Shift_JIS");
-        Globals.ENCODING_NAMES_LOOKUP.put("GBK", "GBK");
-        Globals.ENCODING_NAMES_LOOKUP.put("Big5_HKSCS", "Big5-HKSCS");
-        Globals.ENCODING_NAMES_LOOKUP.put("Big5", "Big5");
-        Globals.ENCODING_NAMES_LOOKUP.put("EUC_JP", "EUC-JP");
-        Globals.ENCODING_NAMES_LOOKUP.put("ASCII", "US-ASCII");
-    }
-
-    public static GlobalFocusListener focusListener;
-
-    public static AutoSaveManager autoSaveManager = null;
-
-    // In the main program, this field is initialized in JabRef.java
-    // Each test case initializes this field if required
-    public static JabRefPreferences prefs = null;
-
-    public static HelpDialog helpDiag = null;
-
-    public static final String osName = System.getProperty("os.name", "def");
-
-    public static final boolean ON_MAC = Globals.osName.equals(Globals.MAC);
-    public static final boolean ON_WIN = Globals.osName.startsWith("Windows");
-    public static final boolean ON_LINUX = Globals.osName.startsWith("Linux");
-
-    public static SidePaneManager sidePaneManager;
-
-    // will be overridden in initialization due to feature #857
-    public static String NEWLINE = System.getProperty("line.separator");
-    public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
-
-    // Instantiate logger:
-    private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
     public static JournalAbbreviationRepository journalAbbrev;
 
-    /**
-     * "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
-     */
-    public static final String BIBTEX_STRING = "__string";
-
-
-    public static void startBackgroundTasks() {
-        Globals.focusListener = new GlobalFocusListener();
-
-        Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
-
-        Globals.fileUpdateMonitor = new FileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
-    }
-
-    /**
-     * Initialize and start the autosave manager.
-     * 
-     * @param frame The main frame.
-     */
-    public static void startAutoSaveManager(JabRefFrame frame) {
-        Globals.autoSaveManager = new AutoSaveManager(frame);
-        Globals.autoSaveManager.startAutoSaveTimer();
-    }
-
-    /**
-     * Stop the autosave manager if it has been started.
-     */
-    public static void stopAutoSaveManager() {
-        if (Globals.autoSaveManager != null) {
-            Globals.autoSaveManager.stopAutoSaveTimer();
-            Globals.autoSaveManager.clearAutoSaves();
-            Globals.autoSaveManager = null;
-        }
-    }
-
-    public static void setLanguage(String language, String country) {
-        Locale locale = new Locale(language, country);
-        Globals.messages = ResourceBundle.getBundle(Globals.RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        Globals.menuTitles = ResourceBundle.getBundle(Globals.MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        Globals.intMessages = ResourceBundle.getBundle(Globals.INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        Locale.setDefault(locale);
-        javax.swing.JComponent.setDefaultLocale(locale);
-    }
-
-    public static String lang(String key, String... params) {
-        String translation = null;
-        try {
-            if (Globals.messages != null) {
-                translation = Globals.messages.getString(key.replaceAll(" ", "_"));
-            }
-        } catch (MissingResourceException ex) {
-            //logger("Warning: could not get translation for \"" + key + "\"");
-        }
-        if (translation == null) {
-            translation = key;
-        }
-
-        if (translation != null && !translation.isEmpty()) {
-            translation = translation.replaceAll("_", " ");
-            StringBuffer sb = new StringBuffer();
-            boolean b = false;
-            char c;
-            for (int i = 0; i < translation.length(); ++i) {
-                c = translation.charAt(i);
-                if (c == '%') {
-                    b = true;
-                } else {
-                    if (!b) {
-                        sb.append(c);
-                    } else {
-                        b = false;
-                        try {
-                            int index = Integer.parseInt(String.valueOf(c));
-                            if (params != null && index >= 0 && index <= params.length) {
-                                sb.append(params[index]);
-                            }
-                        } catch (NumberFormatException e) {
-                            // append literally (for quoting) or insert special
-                            // symbol
-                            switch (c) {
-                            case 'c': // colon
-                                sb.append(':');
-                                break;
-                            case 'e': // equal
-                                sb.append('=');
-                                break;
-                            default: // anything else, e.g. %
-                                sb.append(c);
-                            }
-                        }
-                    }
-                }
-            }
-            return sb.toString();
-        }
-        return key;
-    }
-
-    public static String lang(String key) {
-        return Globals.lang(key, (String[]) null);
-    }
-
-    public static String menuTitle(String key) {
-        String translation = null;
-        try {
-            if (Globals.messages != null) {
-                translation = Globals.menuTitles.getString(key.replaceAll(" ", "_"));
-            }
-        } catch (MissingResourceException ex) {
-            translation = key;
-        }
-        if (translation != null && !translation.isEmpty()) {
-            return translation.replaceAll("_", " ");
-        } else {
-            return key;
-        }
-    }
-
-    public static String getIntegrityMessage(String key) {
-        String translation = null;
-        try {
-            if (Globals.intMessages != null) {
-                translation = Globals.intMessages.getString(key);
-            }
-        } catch (MissingResourceException ex) {
-            translation = key;
-
-            // System.err.println("Warning: could not get menu item translation
-            // for \""
-            // + key + "\"");
-        }
-        if (translation != null && !translation.isEmpty()) {
-            return translation;
-        } else {
-            return key;
-        }
-    }
-
-    // ============================================================
-    // Get an entry type defined in BibtexEntryType
-    // ============================================================
-    public static BibtexEntryType getEntryType(String type) {
-        // decide which entryType object to return
-        Object o = BibtexEntryType.getType(type);
-        if (o != null) {
-            return (BibtexEntryType) o;
-        } else {
-            return BibtexEntryTypes.OTHER;
-        }
-        /*
-         * if(type.equals("article")) return BibtexEntryTypes.ARTICLE; else
-         * if(type.equals("book")) return BibtexEntryTypes.BOOK; else
-         * if(type.equals("inproceedings")) return
-         * BibtexEntryTypes.INPROCEEDINGS;
-         */
-    }
-
-
-    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
-
     public static void initializeJournalNames() {
-
         // Read internal lists:
         Globals.journalAbbrev = new JournalAbbreviationRepository();
         Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
@@ -406,9 +78,89 @@ public class Globals {
 
     }
 
-    /**
-     * Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
-     */
+    // operating system (OS) detection
+    // TODO: what OS do we support?
+    // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
+    public static final String osName = System.getProperty("os.name", "unknown").toLowerCase();
+
+    public static final boolean ON_MAC = Globals.osName.startsWith("mac");
+    public static final boolean ON_WIN = Globals.osName.startsWith("win");
+    public static final boolean ON_LINUX = Globals.osName.startsWith("linux");
+
+    // TODO: other stuff
+    public static FileUpdateMonitor fileUpdateMonitor;
+
+    public static final ImportFormatReader importFormatReader = new ImportFormatReader();
+
+    public static StreamEavesdropper streamEavesdropper;
+    public static CacheableHandler handler;
+
+    public static final BuildInfo BUILD_INFO = new BuildInfo();
+
+    public static final String FILETYPE_PREFS_EXT = "_dir";
+    public static final String SELECTOR_META_PREFIX = "selector_";
+    public static final String PROTECTED_FLAG_META = "protectedFlag";
+    public static final String DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
+    public static final String NONE = "_non__";
+    public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
+
+    public static GlobalFocusListener focusListener;
+
+    public static AutoSaveManager autoSaveManager;
+
+    // In the main program, this field is initialized in JabRef.java
+    // Each test case initializes this field if required
+    public static JabRefPreferences prefs;
+
+    public static HelpDialog helpDiag;
+
+    public static SidePaneManager sidePaneManager;
+
+    // will be overridden in initialization due to feature #857 @ JabRef.java
+    public static String NEWLINE = System.getProperty("line.separator");
+    public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
+
+    // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
+    public static final String BIBTEX_STRING = "__string";
+
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
+
+    public static void startBackgroundTasks() {
+        Globals.focusListener = new GlobalFocusListener();
+
+        Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
+
+        Globals.fileUpdateMonitor = new FileUpdateMonitor();
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
+    }
+
+    // Initialize and start the autosave manager.
+    public static void startAutoSaveManager(JabRefFrame frame) {
+        Globals.autoSaveManager = new AutoSaveManager(frame);
+        Globals.autoSaveManager.startAutoSaveTimer();
+    }
+
+    // Stop the autosave manager if it has been started
+    public static void stopAutoSaveManager() {
+        if (Globals.autoSaveManager != null) {
+            Globals.autoSaveManager.stopAutoSaveTimer();
+            Globals.autoSaveManager.clearAutoSaves();
+            Globals.autoSaveManager = null;
+        }
+    }
+
+    // Get an entry type defined in BibtexEntryType
+    public static BibtexEntryType getEntryType(String type) {
+        // decide which entryType object to return
+        Object o = BibtexEntryType.getType(type);
+        if (o != null) {
+            return (BibtexEntryType) o;
+        } else {
+            return BibtexEntryTypes.OTHER;
+        }
+    }
+
+    // Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
     public static Pattern getPatternForWords(ArrayList<String> words) {
         if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
             return Pattern.compile("");
@@ -431,5 +183,4 @@ public class Globals {
 
         return pattern;
     }
-
 }

@@ -26,6 +26,7 @@ import javax.swing.*;
 
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 
@@ -40,10 +41,10 @@ class ReplaceStringDialog extends JDialog {
     private final JTextField from = new JTextField("", 30);
     private final JTextField to = new JTextField("", 30);
 
-    private final JCheckBox selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
+    private final JCheckBox selOnly = new JCheckBox(Localization.lang("Limit to selected entries"), false);
     private final JRadioButton
-            allFi = new JRadioButton(Globals.lang("All fields"), true);
-    private final JRadioButton field = new JRadioButton(Globals.lang("Limit to fields") + ":", false);
+            allFi = new JRadioButton(Localization.lang("All fields"), true);
+    private final JRadioButton field = new JRadioButton(Localization.lang("Limit to fields") + ":", false);
     private boolean ok_pressed = false;
     private String[] flds = null;
     private String s1;
@@ -51,7 +52,7 @@ class ReplaceStringDialog extends JDialog {
 
 
     public ReplaceStringDialog(JabRefFrame parent_) {
-        super(parent_, Globals.lang("Replace string"), true);
+        super(parent_, Localization.lang("Replace string"), true);
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
@@ -70,7 +71,7 @@ class ReplaceStringDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("Ok"));
         ok.addActionListener(okListener);
         to.addActionListener(okListener);
         fields.addActionListener(okListener);
@@ -81,7 +82,7 @@ class ReplaceStringDialog extends JDialog {
                 dispose();
             }
         };
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(cancelAction);
 
         // Key bindings:
@@ -101,10 +102,10 @@ class ReplaceStringDialog extends JDialog {
 
         settings.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Replace string")));
+                        Localization.lang("Replace string")));
         main.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Strings")));
+                        Localization.lang("Strings")));
 
         // Settings panel:
         /*
@@ -147,11 +148,11 @@ class ReplaceStringDialog extends JDialog {
         con.weightx = 0;
         con.gridx = 0;
         con.gridy = 0;
-        JLabel fl = new JLabel(Globals.lang("Search for") + ":");
+        JLabel fl = new JLabel(Localization.lang("Search for") + ":");
         gbl.setConstraints(fl, con);
         main.add(fl);
         con.gridy = 1;
-        JLabel tl = new JLabel(Globals.lang("Replace with") + ":");
+        JLabel tl = new JLabel(Localization.lang("Replace with") + ":");
         gbl.setConstraints(tl, con);
         main.add(tl);
         con.weightx = 1;

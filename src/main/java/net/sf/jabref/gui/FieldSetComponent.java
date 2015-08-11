@@ -43,7 +43,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -88,8 +88,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
     private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
                               boolean arrows, boolean forceLowerCase) {
         this.forceLowerCase = forceLowerCase;
-        add = new JButton(Globals.lang(addText));
-        remove = new JButton(Globals.lang(removeText));
+        add = new JButton(Localization.lang(addText));
+        remove = new JButton(Localization.lang(removeText));
         listModel = new DefaultListModel();
         JLabel title1 = null;
         if (title != null) {
@@ -127,8 +127,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
             down = new JButton(GUIGlobals.getImage("down"));
             up.addActionListener(this);
             down.addActionListener(this);
-            up.setToolTipText(Globals.lang("Move up"));
-            down.setToolTipText(Globals.lang("Move down"));
+            up.setToolTipText(Localization.lang("Move up"));
+            down.setToolTipText(Localization.lang("Move down"));
             gbl.setConstraints(up, con);
             add(up);
             gbl.setConstraints(down, con);
@@ -243,9 +243,9 @@ class FieldSetComponent extends JPanel implements ActionListener {
         String testString = Util.checkLegalKey(s);
         if (!testString.equals(s) || s.indexOf('&') >= 0) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
-                    + "characters") + ": # { } ~ , ^ &",
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
+                            + "characters") + ": # { } ~ , ^ &",
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
             return;
         }

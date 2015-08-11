@@ -27,6 +27,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
@@ -61,7 +62,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     public EntryTypeDialog(JabRefFrame baseFrame_) {
         super(baseFrame_, true); // Set modal on.
 
-        setTitle(Globals.lang("Select entry type"));
+        setTitle(Localization.lang("Select entry type"));
 
         addWindowListener(new WindowAdapter() {
 
@@ -76,7 +77,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         getContentPane().add(pan, BorderLayout.CENTER);
         JPanel buttons = new JPanel();
         JButton // ok = new JButton("Ok"),
-        cancel = new JButton(Globals.lang("Cancel"));
+        cancel = new JButton(Localization.lang("Cancel"));
         //ok.addActionListener(this);
         cancel.addActionListener(this);
 
@@ -119,7 +120,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         }
         pan.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Entry types")));
+                        Localization.lang("Entry types")));
         //pan.setBackground(Color.white);
         //buttons.setBackground(Color.white);
         pack();

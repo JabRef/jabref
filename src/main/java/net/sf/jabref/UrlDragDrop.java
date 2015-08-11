@@ -43,6 +43,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -150,14 +151,14 @@ public class UrlDragDrop implements DropTargetListener {
             URL url = (URL) tsf.getTransferData(dtURL);
             JOptionChoice res = (JOptionChoice) JOptionPane
                     .showInputDialog(editor, "",
-                            Globals.lang("Select action"),
+                            Localization.lang("Select action"),
                             JOptionPane.QUESTION_MESSAGE, null,
                             new JOptionChoice[] {
                                     new JOptionChoice(
-                                            Globals.lang("Insert URL"), 0),
+                                            Localization.lang("Insert URL"), 0),
                                     new JOptionChoice(
-                                            Globals.lang("Download file"), 1)},
-                            new JOptionChoice(Globals.lang("Insert URL"), 0));
+                                            Localization.lang("Download file"), 1)},
+                            new JOptionChoice(Localization.lang("Insert URL"), 0));
             switch (res.getId()) {
             //insert URL
             case 0:
@@ -172,17 +173,17 @@ public class UrlDragDrop implements DropTargetListener {
                             .get("pdfDirectory")), editor.getEntry()
                             .getField(BibtexFields.KEY_FIELD)
                             + ".pdf");
-                    frame.output(Globals.lang("Downloading..."));
+                    frame.output(Localization.lang("Downloading..."));
                     MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
-                    frame.output(Globals.lang("Download completed"));
+                    frame.output(Localization.lang("Download completed"));
                     feditor.setText(file.toURI().toURL().toString());
                     editor.updateField(feditor);
 
                 } catch (IOException ioex) {
                     LOGGER.error("Error while downloading file", ioex);
                     JOptionPane.showMessageDialog(editor,
-                            Globals.lang("File download"),
-                            Globals.lang("Error while downloading file:"
+                            Localization.lang("File download"),
+                            Localization.lang("Error while downloading file:"
                                     + ioex.getMessage()),
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -204,8 +205,8 @@ public class UrlDragDrop implements DropTargetListener {
             if (filelist.size() > 1) {
                 JOptionPane
                         .showMessageDialog(editor,
-                                Globals.lang("Only one item is supported"),
-                                Globals.lang("Drag and Drop Error"),
+                                Localization.lang("Only one item is supported"),
+                                Localization.lang("Drag and Drop Error"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -215,8 +216,8 @@ public class UrlDragDrop implements DropTargetListener {
 
         } catch (UnsupportedFlavorException nfe) {
             JOptionPane.showMessageDialog(editor,
-                    Globals.lang("Operation not supported"),
-                    Globals.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Operation not supported"),
+                    Localization.lang("Drag and Drop Error"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Could not perform drage and drop", nfe);
         } catch (IOException ioex) {
             LOGGER.warn("Could not perform drage and drop", ioex);

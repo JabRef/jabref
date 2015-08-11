@@ -18,7 +18,6 @@ package net.sf.jabref.collab;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.BorderLayout;
-import net.sf.jabref.Globals;
 import java.awt.Insets;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -30,14 +29,15 @@ import java.util.Enumeration;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
     private BibtexDatabase secondary;
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
-    private final JCheckBox cb = new JCheckBox(Globals.lang("Accept change"));
-    private final JLabel rootInfo = new JLabel(Globals.lang("Select the tree nodes to view and accept or reject changes") + '.');
+    private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
+    private final JLabel rootInfo = new JLabel(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
     private Change selected = null;
     private JComponent infoShown = null;
     private boolean okPressed = false;
@@ -45,7 +45,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
             BibtexDatabase secondary, final DefaultMutableTreeNode root) {
-        super(owner, Globals.lang("External changes"), true);
+        super(owner, Localization.lang("External changes"), true);
         this.secondary = secondary;
 
         // Just to be sure, put in an empty secondary base if none is given:
@@ -68,10 +68,10 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         setInfo(rootInfo);
         infoPanel.add(cb, BorderLayout.SOUTH);
 
-        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("Ok"));
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(ok);
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         buttonPanel.add(cancel);
 
         getContentPane().add(pane, BorderLayout.CENTER);
@@ -100,7 +100,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
                 // Perform all accepted changes:
                 // Store all edits in an Undoable object:
-                NamedCompound ce = new NamedCompound(Globals.lang("Merged external changes"));
+                NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 @SuppressWarnings("unchecked")
                 Enumeration<Change> enumer = root.children();
                 boolean anyDisabled = false;

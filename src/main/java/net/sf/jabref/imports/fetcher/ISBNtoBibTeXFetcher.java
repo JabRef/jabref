@@ -33,6 +33,7 @@ import net.sf.jabref.imports.CaseKeeper;
 import net.sf.jabref.imports.EntryFetcher;
 import net.sf.jabref.imports.ImportInspector;
 import net.sf.jabref.imports.UnitFormatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class uses ebook.de's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
@@ -57,7 +58,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             q = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             // this should never happen
-            status.setStatus(Globals.lang("Error"));
+            status.setStatus(Localization.lang("Error"));
             e.printStackTrace();
             return false;
         }
@@ -78,12 +79,12 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             source = url.openStream();
         } catch (FileNotFoundException e) {
             // invalid ISBN --> 404--> FileNotFoundException
-            status.showMessage(Globals.lang("Invalid ISBN"));
+            status.showMessage(Localization.lang("Invalid ISBN"));
             return false;
         } catch (java.net.UnknownHostException e) {
             // It is very unlikely that ebook.de is an unknown host
             // It is more likely that we don't have an internet connection
-            status.showMessage(Globals.lang("No_Internet_Connection."));
+            status.showMessage(Localization.lang("No_Internet_Connection."));
             return false;
         } catch (Exception e) {
             status.showMessage(e.toString());

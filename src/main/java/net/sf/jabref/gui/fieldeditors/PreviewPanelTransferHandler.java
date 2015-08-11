@@ -28,8 +28,8 @@ import javax.swing.TransferHandler;
 import javax.swing.text.BadLocationException;
 
 import net.sf.jabref.EntryContainer;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,7 +74,7 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             return new HtmlTransferable(stringWriter.toString(), editorPane.getSelectedText());
         } else {
             // if not called from the preview panel, return an error string
-            return new StringSelection(Globals.lang("Operation not supported"));
+            return new StringSelection(Localization.lang("Operation not supported"));
         }
     }
 }

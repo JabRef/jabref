@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.external.ExternalFileType;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
@@ -285,14 +286,14 @@ public class GUIGlobals {
         try {
             GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(resource, prefix);
         } catch (IOException e) {
-            System.err.println(Globals.lang("Unable to read icon theme file") + " '" +
+            System.err.println(Localization.lang("Unable to read icon theme file") + " '" +
                     resource.toString() + '\'');
             // If we were trying to load a custom theme, try the default one as a fallback:
             if (resource != defaultResource) {
                 try {
                     GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(defaultResource, defaultPrefix);
                 } catch (IOException e2) {
-                    System.err.println(Globals.lang("Unable to read default icon theme."));
+                    System.err.println(Localization.lang("Unable to read default icon theme."));
                 }
             }
 
@@ -318,7 +319,7 @@ public class GUIGlobals {
                 }
             }
             if (url == null) {
-                System.err.println(Globals.lang("Could not find image file") + " '" + path + '\'');
+                System.err.println(Localization.lang("Could not find image file") + " '" + path + '\'');
             }
             return url;
         } else {
@@ -410,33 +411,33 @@ public class GUIGlobals {
         GUIGlobals.fieldNameFont = new Font("arial", Font.ITALIC + Font.BOLD, 14);
         JLabel lab;
         lab = new JLabel(GUIGlobals.getImage("pdfSmall"));
-        lab.setToolTipText(Globals.lang("Open") + " PDF");
+        lab.setToolTipText(Localization.lang("Open") + " PDF");
         GUIGlobals.tableIcons.put("pdf", lab);
         lab = new JLabel(GUIGlobals.getImage("wwwSmall"));
-        lab.setToolTipText(Globals.lang("Open") + " URL");
+        lab.setToolTipText(Localization.lang("Open") + " URL");
         GUIGlobals.tableIcons.put("url", lab);
         lab = new JLabel(GUIGlobals.getImage("citeseer"));
-        lab.setToolTipText(Globals.lang("Open") + " CiteSeer URL");
+        lab.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
         GUIGlobals.tableIcons.put("citeseerurl", lab);
         lab = new JLabel(GUIGlobals.getImage("arxiv"));
-        lab.setToolTipText(Globals.lang("Open") + " ArXiv URL");
+        lab.setToolTipText(Localization.lang("Open") + " ArXiv URL");
         GUIGlobals.tableIcons.put("eprint", lab);
         lab = new JLabel(GUIGlobals.getImage("doiSmall"));
-        lab.setToolTipText(Globals.lang("Open") + " DOI " + Globals.lang("web link"));
+        lab.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.tableIcons.put("doi", lab);
         lab = new JLabel(GUIGlobals.getImage("psSmall"));
-        lab.setToolTipText(Globals.lang("Open") + " PS");
+        lab.setToolTipText(Localization.lang("Open") + " PS");
         GUIGlobals.tableIcons.put("ps", lab);
         lab = new JLabel(GUIGlobals.getImage("psSmall"));
-        lab.setToolTipText(Globals.lang("Open folder"));
+        lab.setToolTipText(Localization.lang("Open folder"));
         GUIGlobals.tableIcons.put(GUIGlobals.FOLDER_FIELD, lab);
         lab = new JLabel(GUIGlobals.getImage("psSmall"));
-        lab.setToolTipText(Globals.lang("Open file"));
+        lab.setToolTipText(Localization.lang("Open file"));
         GUIGlobals.tableIcons.put(GUIGlobals.FILE_FIELD, lab);
 
         for (ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
             lab = new JLabel(fileType.getIcon());
-            lab.setToolTipText(Globals.lang("Open " + fileType.getName() + " file"));
+            lab.setToolTipText(Localization.lang("Open " + fileType.getName() + " file"));
             GUIGlobals.tableIcons.put(fileType.getName(), lab);
         }
 

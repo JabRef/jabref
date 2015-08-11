@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import spl.gui.ImportDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -56,20 +57,20 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     public ImportSettingsTab() {
         setLayout(new BorderLayout());
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
-        radioButtonNoMeta = new JRadioButton(Globals.lang("Create_blank_entry_linking_the_PDF"));
-        radioButtonXmp = new JRadioButton(Globals.lang("Create_entry_based_on_XMP_data"));
-        radioButtonPDFcontent = new JRadioButton(Globals.lang("Create_entry_based_on_content"));
-        radioButtononlyAttachPDF = new JRadioButton(Globals.lang("Only_attach_PDF"));
+        radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
+        radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
+        radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(radioButtonNoMeta);
         bg.add(radioButtonXmp);
         bg.add(radioButtonPDFcontent);
         bg.add(radioButtononlyAttachPDF);
 
-        useDefaultPDFImportStyle = new JCheckBox(Globals.lang("Always use this PDF import style (and do not ask for each import)"));
+        useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));
 
         fileNamePattern = new JTextField(50);
-        selectFileNamePattern = new JButton(Globals.lang("Choose pattern"));
+        selectFileNamePattern = new JButton(Localization.lang("Choose pattern"));
         selectFileNamePattern.addActionListener(new ActionListener() {
 
             @Override
@@ -81,7 +82,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
-        builder.appendSeparator(Globals.lang("Default import style for drag&drop of PDFs"));
+        builder.appendSeparator(Localization.lang("Default import style for drag&drop of PDFs"));
         builder.nextLine();
         builder.append(pan);
         builder.append(radioButtonNoMeta);
@@ -99,11 +100,11 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         builder.append(useDefaultPDFImportStyle);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Default PDF file link action"));
+        builder.appendSeparator(Localization.lang("Default PDF file link action"));
         builder.nextLine();
         builder.append(pan);
         JPanel pan2 = new JPanel();
-        JLabel lab = new JLabel(Globals.lang("File name format pattern").concat(":"));
+        JLabel lab = new JLabel(Localization.lang("File name format pattern").concat(":"));
         pan2.add(lab);
         pan2.add(fileNamePattern);
         pan2.add(selectFileNamePattern);
@@ -163,7 +164,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Import");
+        return Localization.lang("Import");
     }
 
     private void openFilePatternMenu() {

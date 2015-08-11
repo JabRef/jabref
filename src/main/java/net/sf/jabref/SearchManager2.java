@@ -18,6 +18,7 @@ package net.sf.jabref;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
@@ -52,8 +53,8 @@ public class SearchManager2 extends SidePaneComponent
     //private JabRefFrame frame;
     private final JTextField searchField = new JTextField("", 12);
     private final JPopupMenu settings = new JPopupMenu();
-    private final JButton openset = new JButton(Globals.lang("Settings"));
-    private final JButton escape = new JButton(Globals.lang("Clear"));
+    private final JButton openset = new JButton(Localization.lang("Settings"));
+    private final JButton escape = new JButton(Localization.lang("Clear"));
     /**
      * This button's text will be set later.
      */
@@ -83,7 +84,7 @@ public class SearchManager2 extends SidePaneComponent
     // that the search is inactive.
 
     public SearchManager2(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, GUIGlobals.getIconUrl("search"), Globals.lang("Search"));
+        super(manager, GUIGlobals.getIconUrl("search"), Localization.lang("Search"));
 
         this.frame = frame;
         incSearcher = new IncrementalSearcher(Globals.prefs);
@@ -91,26 +92,26 @@ public class SearchManager2 extends SidePaneComponent
         //setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.magenta));
 
         searchReq = new JCheckBoxMenuItem
-                (Globals.lang("Search required fields"),
+                (Localization.lang("Search required fields"),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REQ));
         searchOpt = new JCheckBoxMenuItem
-                (Globals.lang("Search optional fields"),
+                (Localization.lang("Search optional fields"),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_OPT));
         searchGen = new JCheckBoxMenuItem
-                (Globals.lang("Search general fields"),
+                (Localization.lang("Search general fields"),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_GEN));
         searchAll = new JCheckBoxMenuItem
-                (Globals.lang("Search all fields"),
+                (Localization.lang("Search all fields"),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL));
         regExpSearch = new JCheckBoxMenuItem
-                (Globals.lang("Use regular expressions"),
+                (Localization.lang("Use regular expressions"),
                         Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
-        increment = new JRadioButton(Globals.lang("Incremental"), false);
-        floatSearch = new JRadioButton(Globals.lang("Float"), true);
-        hideSearch = new JRadioButton(Globals.lang("Filter"), true);
-        showResultsInDialog = new JRadioButton(Globals.lang("Show results in dialog"), true);
-        searchAllBases = new JRadioButton(Globals.lang("Global search"),
+        increment = new JRadioButton(Localization.lang("Incremental"), false);
+        floatSearch = new JRadioButton(Localization.lang("Float"), true);
+        hideSearch = new JRadioButton(Localization.lang("Filter"), true);
+        showResultsInDialog = new JRadioButton(Localization.lang("Show results in dialog"), true);
+        searchAllBases = new JRadioButton(Localization.lang("Global search"),
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_ALL_BASES));
         ButtonGroup types = new ButtonGroup();
         types.add(increment);
@@ -119,11 +120,11 @@ public class SearchManager2 extends SidePaneComponent
         types.add(showResultsInDialog);
         types.add(searchAllBases);
 
-        select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
-        increment.setToolTipText(Globals.lang("Incremental search"));
-        floatSearch.setToolTipText(Globals.lang("Gray out non-matching entries"));
-        hideSearch.setToolTipText(Globals.lang("Hide non-matching entries"));
-        showResultsInDialog.setToolTipText(Globals.lang("Show search results in a window"));
+        select = new JCheckBoxMenuItem(Localization.lang("Select matches"), false);
+        increment.setToolTipText(Localization.lang("Incremental search"));
+        floatSearch.setToolTipText(Localization.lang("Gray out non-matching entries"));
+        hideSearch.setToolTipText(Localization.lang("Hide non-matching entries"));
+        showResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
 
         // Add an item listener that makes sure we only listen for key events
         // when incremental search is turned on.
@@ -151,13 +152,13 @@ public class SearchManager2 extends SidePaneComponent
             }
         });
 
-        caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
+        caseSensitive = new JCheckBoxMenuItem(Localization.lang("Case sensitive"),
                 Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH));
 
-        highLightWords = new JCheckBoxMenuItem(Globals.lang("Highlight Words"),
+        highLightWords = new JCheckBoxMenuItem(Localization.lang("Highlight Words"),
                 Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS));
 
-        searchAutoComplete = new JCheckBoxMenuItem(Globals.lang("Autocomplete names"),
+        searchAutoComplete = new JCheckBoxMenuItem(Localization.lang("Autocomplete names"),
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
         settings.add(select);
 
@@ -415,9 +416,9 @@ public class SearchManager2 extends SidePaneComponent
      * the longer of the two texts
      */
     private void setSearchButtonSizes() {
-        search.setText(Globals.lang("Search specified field(s)"));
+        search.setText(Localization.lang("Search specified field(s)"));
         Dimension size1 = search.getPreferredSize();
-        search.setText(Globals.lang("Search all fields"));
+        search.setText(Localization.lang("Search all fields"));
         Dimension size2 = search.getPreferredSize();
         size2.width = Math.max(size1.width, size2.width);
         search.setMinimumSize(size2);
@@ -429,7 +430,7 @@ public class SearchManager2 extends SidePaneComponent
      */
     private void instantiateSearchDialog() {
         if (searchDialog == null) {
-            searchDialog = new SearchResultsDialog(frame, Globals.lang("Search results"));
+            searchDialog = new SearchResultsDialog(frame, Localization.lang("Search results"));
         }
     }
 
@@ -530,7 +531,7 @@ public class SearchManager2 extends SidePaneComponent
                     Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
             if (!searchRule.validateSearchStrings(searchField.getText())) {
-                panel.output(Globals.lang("Search failed: illegal search expression"));
+                panel.output(Localization.lang("Search failed: illegal search expression"));
                 panel.stopShowingSearchResults();
                 return;
             }
@@ -584,7 +585,7 @@ public class SearchManager2 extends SidePaneComponent
 
         @Override
         public void update() {
-            panel.output(Globals.lang("Searched database. Number of hits")
+            panel.output(Localization.lang("Searched database. Number of hits")
                     + ": " + hits);
 
             // Show the result in the chosen way:
@@ -734,7 +735,7 @@ public class SearchManager2 extends SidePaneComponent
 
                 if (incSearchPos >= panel.getDatabase().getEntryCount()) {
                     panel.output('\'' + text + "' : " +
-                            Globals.lang("Incremental search failed. Repeat to search from top.") + '.');
+                            Localization.lang("Incremental search failed. Repeat to search from top.") + '.');
                     incSearchPos = -1;
                     return;
                 }
@@ -752,7 +753,7 @@ public class SearchManager2 extends SidePaneComponent
                         be = panel.mainTable.getEntryAt(incSearchPos);
                     } else {
                         panel.output('\'' + text + "' : " +
-                                Globals.lang("Incremental search failed. Repeat to search from top."));
+                                Localization.lang("Incremental search failed. Repeat to search from top."));
                         incSearchPos = -1;
                         return;
                     }
@@ -761,7 +762,7 @@ public class SearchManager2 extends SidePaneComponent
 
                     panel.selectSingleEntry(incSearchPos);
                     panel.output('\'' + text + "' " +
-                            Globals.lang("found") + '.');
+                            Localization.lang("found") + '.');
 
                 }
             }
@@ -798,7 +799,7 @@ public class SearchManager2 extends SidePaneComponent
      * the type of search that will happen on click.
      */
     private void updateSearchButtonText() {
-        search.setText(isSpecificSearch() ? Globals.lang("Search specified field(s)") : Globals.lang("Search all fields"));
+        search.setText(isSpecificSearch() ? Localization.lang("Search specified field(s)") : Localization.lang("Search all fields"));
     }
 
     private boolean isSpecificSearch() {

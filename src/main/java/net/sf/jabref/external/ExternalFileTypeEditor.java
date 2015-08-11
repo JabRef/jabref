@@ -35,6 +35,7 @@ import net.sf.jabref.MnemonicAwareAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Editor for external file types.
@@ -47,23 +48,23 @@ public class ExternalFileTypeEditor extends JDialog {
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor = null;
     private FileTypeTableModel tableModel;
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton add = new JButton(GUIGlobals.getImage("add"));
     private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
     private final JButton edit = new JButton(GUIGlobals.getImage("edit"));
-    private final JButton toDefaults = new JButton(Globals.lang("Default"));
+    private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
 
     private ExternalFileTypeEditor(JFrame frame) {
-        super(frame, Globals.lang("Manage external file types"), true);
+        super(frame, Localization.lang("Manage external file types"), true);
         this.frame = frame;
         init();
     }
 
     private ExternalFileTypeEditor(JDialog dialog) {
-        super(dialog, Globals.lang("Manage external file types"), true);
+        super(dialog, Localization.lang("Manage external file types"), true);
         this.dialog = dialog;
         init();
     }
@@ -296,13 +297,13 @@ public class ExternalFileTypeEditor extends JDialog {
             case 0:
                 return " ";
             case 1:
-                return Globals.lang("Name");
+                return Localization.lang("Name");
             case 2:
-                return Globals.lang("Extension");
+                return Localization.lang("Extension");
             case 3:
-                return Globals.lang("MIME type");
+                return Localization.lang("MIME type");
             case 4:
-                return Globals.lang("Application");
+                return Localization.lang("Application");
             default:
                 return null;
             }

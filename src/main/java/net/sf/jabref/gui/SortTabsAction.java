@@ -23,9 +23,9 @@ import javax.swing.Action;
 import javax.swing.JTabbedPane;
 
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This action rearranges all tabs in the main tabbed pane of the given JabRefFrame
@@ -38,7 +38,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
 
     public SortTabsAction(JabRefFrame frame) {
         putValue(Action.NAME, "Sort tabs");
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Rearrange tabs alphabetically by title"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Rearrange tabs alphabetically by title"));
         this.frame = frame;
     }
 

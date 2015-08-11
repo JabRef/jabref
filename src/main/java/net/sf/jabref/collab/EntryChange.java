@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 
 class EntryChange extends Change {
 
@@ -127,19 +128,19 @@ class EntryChange extends Change {
 
             StringBuilder text = new StringBuilder();
             text.append("<FONT SIZE=10>");
-            text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
+            text.append("<H2>").append(Localization.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
             if (onDisk != null && !onDisk.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
+                text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
             } else {
-                text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+                text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
             }
 
             if (inMem != null && !inMem.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + ' ').append(inMem);
+                text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + ' ').append(inMem);
             }
             if (onTmp != null && !onTmp.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
+                text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
             } else {
                 // No value in memory.
                 /*if ((onTmp != null) && !onTmp.equals(inMem))

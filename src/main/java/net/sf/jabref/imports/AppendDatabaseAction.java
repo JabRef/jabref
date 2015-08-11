@@ -31,6 +31,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -56,7 +57,7 @@ public class AppendDatabaseAction implements BaseAction {
     public void action() {
 
         filesToOpen.clear();
-        final MergeDialog md = new MergeDialog(frame, Globals.lang("Append database"), true);
+        final MergeDialog md = new MergeDialog(frame, Localization.lang("Append database"), true);
         Util.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
@@ -100,7 +101,7 @@ public class AppendDatabaseAction implements BaseAction {
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
-                panel.output(Globals.lang("Imported from database") + " '" + file.getPath() + "'");
+                panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog
@@ -120,7 +121,7 @@ public class AppendDatabaseAction implements BaseAction {
         ArrayList<BibtexEntry> originalEntries = new ArrayList<BibtexEntry>();
         BibtexDatabase database = panel.database();
         BibtexEntry originalEntry;
-        NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Append database"));
         MetaData meta = pr.getMetaData();
 
         if (importEntries) { // Add entries

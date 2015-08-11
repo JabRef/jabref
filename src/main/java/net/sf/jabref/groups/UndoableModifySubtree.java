@@ -20,7 +20,7 @@ import java.util.Vector;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class UndoableModifySubtree extends AbstractUndoableEdit {
 
@@ -53,13 +53,13 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + m_name;
+        return Localization.lang("Undo") + ": " + m_name;
         // JZTODO lyrics
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + m_name;
+        return Localization.lang("Redo") + ": " + m_name;
     }
 
     @Override

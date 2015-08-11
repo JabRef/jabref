@@ -31,6 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Preference Tab for XMP.
@@ -46,7 +47,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     private final JTable table;
 
     private final JCheckBox privacyFilterCheckBox = new JCheckBox(
-            Globals.lang("Do not write the following fields to XMP Metadata:"));
+            Localization.lang("Do not write the following fields to XMP Metadata:"));
 
     private final Vector<Object> tableRows = new Vector<Object>(10);
 
@@ -83,7 +84,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return Globals.lang("Field to filter");
+                return Localization.lang("Field to filter");
             }
 
             @Override
@@ -134,7 +135,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         tablePanel.add(toolbar, BorderLayout.EAST);
 
         // Build Prefs Tabs
-        builder.appendSeparator(Globals.lang("XMP Export Privacy Settings"));
+        builder.appendSeparator(Localization.lang("XMP Export Privacy Settings"));
         builder.nextLine();
 
         builder.append(pan);
@@ -155,7 +156,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         public DeleteRowAction() {
             super("Delete row", GUIGlobals.getImage("remove"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
         @Override
@@ -184,7 +185,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
         public AddRowAction() {
             super("Add row", GUIGlobals.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
         @Override
@@ -269,6 +270,6 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("XMP metadata");
+        return Localization.lang("XMP metadata");
     }
 }

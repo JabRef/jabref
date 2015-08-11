@@ -16,7 +16,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Formatter used to signal that a formatter hasn't been found. This can be
@@ -38,6 +38,6 @@ public class NotFoundFormatter implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return '[' + Globals.lang("Formatter not found: %0", notFound) + "] " + fieldText;
+        return '[' + Localization.lang("Formatter not found: %0", notFound) + "] " + fieldText;
     }
 }

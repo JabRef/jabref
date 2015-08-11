@@ -60,6 +60,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -219,35 +220,35 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (fields != null) {
             fieldList = java.util.Arrays.asList(fields);
         }
-        EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Globals.lang("Required fields"));
+        EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Localization.lang("Required fields"));
         if (reqPan.fileListEditor != null) {
             fileListEditor = reqPan.fileListEditor;
         }
-        tabbed.addTab(Globals.lang("Required fields"), GUIGlobals.getImage("required"), reqPan
-                .getPane(), Globals.lang("Show required fields"));
+        tabbed.addTab(Localization.lang("Required fields"), GUIGlobals.getImage("required"), reqPan
+                .getPane(), Localization.lang("Show required fields"));
         tabs.add(reqPan);
 
         if (entry.getOptionalFields() != null && entry.getOptionalFields().length >= 1) {
             EntryEditorTab optPan;
             if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
                 optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
-                        false, false, Globals.lang("Optional fields"));
+                        false, false, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
                 }
-                tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
-                        .getPane(), Globals.lang("Show optional fields"));
+                tabbed.addTab(Localization.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
+                        .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             }
             else {
                 optPan = new EntryEditorTab(frame, panel,
                         java.util.Arrays.asList(entry.getType().getPrimaryOptionalFields()), this,
-                        false, true, Globals.lang("Optional fields"));
+                        false, true, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
                 }
-                tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
-                        .getPane(), Globals.lang("Show optional fields"));
+                tabbed.addTab(Localization.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
+                        .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
 
                 Set<String> deprecatedFields = new HashSet<String>(BibtexEntry.FieldAliasesOldToNew.keySet());
@@ -274,12 +275,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // Add tabs
                  EntryEditorTab optPan2 = new EntryEditorTab(frame, panel,
                         java.util.Arrays.asList(optionalFieldsNotPrimaryOrDeprecated), this,
-                        false, true, Globals.lang("Optional fields 2"));
+                        false, true, Localization.lang("Optional fields 2"));
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
                 }
-                tabbed.addTab(Globals.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan2
-                        .getPane(), Globals.lang("Show optional fields"));
+                tabbed.addTab(Localization.lang("Optional fields 2"), GUIGlobals.getImage("optional"), optPan2
+                        .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
 
                 if (!usedOptionalFieldsDeprecated.isEmpty())
@@ -287,12 +288,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 	EntryEditorTab optPan3;
                 	optPan3 = new EntryEditorTab(frame, panel,
                             java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[usedOptionalFieldsDeprecated.size()])), this,
-                            false, true, Globals.lang("Deprecated fields"));
+                            false, true, Localization.lang("Deprecated fields"));
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
                     }
-                    tabbed.addTab(Globals.lang("Deprecated fields"), GUIGlobals.getImage("optional"), optPan3
-                            .getPane(), Globals.lang("Show deprecated bibtex fields"));
+                    tabbed.addTab(Localization.lang("Deprecated fields"), GUIGlobals.getImage("optional"), optPan3
+                            .getPane(), Localization.lang("Show deprecated bibtex fields"));
                     tabs.add(optPan3);
                 }
             }
@@ -309,10 +310,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             tabs.add(newTab);
         }
 
-        srcPanel.setName(Globals.lang("BibTeX source"));
+        srcPanel.setName(Localization.lang("BibTeX source"));
         if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SOURCE)) {
-            tabbed.addTab(Globals.lang("BibTeX source"), GUIGlobals.getImage("source"), srcPanel,
-                    Globals.lang("Show/edit BibTeX source"));
+            tabbed.addTab(Localization.lang("BibTeX source"), GUIGlobals.getImage("source"), srcPanel,
+                    Localization.lang("Show/edit BibTeX source"));
             tabs.add(srcPanel);
         }
         sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
@@ -494,7 +495,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             return ws;
         } else if (s != null && s.equals("browse")) {
-            JButton but = new JButton(Globals.lang("Browse"));
+            JButton but = new JButton(Localization.lang("Browse"));
             ((JComponent) ed).addMouseListener(new ExternalViewerListener());
 
             // but.setBackground(GUIGlobals.lightGray);
@@ -547,7 +548,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
 
         else if (s != null && s.equals("setOwner")) {
-            JButton button = new JButton(Globals.lang("Auto"));
+            JButton button = new JButton(Localization.lang("Auto"));
             button.addActionListener(new ActionListener() {
 
                 @Override
@@ -637,7 +638,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             } catch (IOException ex) {
                 source.setText(ex.getMessage() + "\n\n" +
-                        Globals.lang("Correct the entry, and "
+                        Localization.lang("Correct the entry, and "
                                 + "reopen editor to display/edit source."));
                 source.setEditable(false);
             }
@@ -869,7 +870,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
             }
 
-            NamedCompound compound = new NamedCompound(Globals.lang("source edit"));
+            NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibtexEntry nu = db.getEntryById(db.getKeySet().iterator().next());
             String id = entry.getId();
             String
@@ -937,7 +938,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             } else if (emptyWarning && showError) {
                 warnEmptyBibtexkey();
             } else {
-                panel.output(Globals.lang("Stored entry") + '.');
+                panel.output(Localization.lang("Stored entry") + '.');
             }
 
             lastSourceStringAccepted = source.getText();
@@ -980,11 +981,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             tabbed.setSelectedComponent(srcPanel);
 
             if (showError) {
-                Object[] options = {Globals.lang("Edit"),
-                        Globals.lang("Revert to original source")};
+                Object[] options = {Localization.lang("Edit"),
+                        Localization.lang("Revert to original source")};
 
-                int answer = JOptionPane.showOptionDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(),
-                        Globals.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
+                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
                 if (answer != 0) {
@@ -1063,7 +1064,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         public TypeButton(String type) {
             super(GUIGlobals.getImage("edit"));
-            setToolTipText(Globals.lang("Change entry type"));
+            setToolTipText(Localization.lang("Change entry type"));
             addActionListener(new ActionListener() {
 
                 @Override
@@ -1188,8 +1189,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public DeleteAction() {
-            super(Globals.lang("Delete"), GUIGlobals.getImage("delete"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete entry"));
+            super(Localization.lang("Delete"), GUIGlobals.getImage("delete"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
 
         @Override
@@ -1205,7 +1206,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             panel.database.removeEntry(entry.getId());
             panel.markBaseChanged();
             panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
-            panel.output(Globals.lang("Deleted") + ' ' + Globals.lang("entry"));
+            panel.output(Localization.lang("Deleted") + ' ' + Localization.lang("entry"));
         }
     }
 
@@ -1214,8 +1215,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public CloseAction() {
-            super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close window"));
+            super(Localization.lang("Close window"), GUIGlobals.getImage("close"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
 
         @Override
@@ -1285,8 +1286,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // Make sure the key is legal:
                 String cleaned = Util.checkLegalKey(newValue);
                 if (cleaned != null && !cleaned.equals(newValue)) {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid BibTeX key"),
-                            Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
+                            Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                     fe.setInvalidBackgroundColor();
                     return;
                 } else {
@@ -1299,7 +1300,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
                     } else {
-                        panel.output(Globals.lang("BibTeX key is unique."));
+                        panel.output(Localization.lang("BibTeX key is unique."));
                     }
                 } else { // key is null/empty
                     warnEmptyBibtexkey();
@@ -1380,8 +1381,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         updateSource();
                         panel.markBaseChanged();
                     } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Error") + ": " + ex.getMessage(),
-                                Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                         fe.setInvalidBackgroundColor();
                     }
                 } else {
@@ -1462,9 +1463,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public NextEntryAction() {
-            super(Globals.lang("Next entry"), GUIGlobals.getImage("down"));
+            super(Localization.lang("Next entry"), GUIGlobals.getImage("down"));
 
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Next entry"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Next entry"));
         }
 
         @Override
@@ -1494,9 +1495,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public PrevEntryAction() {
-            super(Globals.lang("Previous entry"), GUIGlobals.getImage("up"));
+            super(Localization.lang("Previous entry"), GUIGlobals.getImage("up"));
 
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Previous entry"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Previous entry"));
         }
 
         @Override
@@ -1532,11 +1533,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
         public GenerateKeyAction(JabRefFrame parentFrame) {
-            super(Globals.lang("Generate BibTeX key"), GUIGlobals.getImage("makeKey"));
+            super(Localization.lang("Generate BibTeX key"), GUIGlobals.getImage("makeKey"));
             parent = parentFrame;
 
             // selectedEntry = newEntry ;
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Generate BibTeX key"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Generate BibTeX key"));
 
             // putValue(MNEMONIC_KEY, GUIGlobals.showGenKeyCode);
         }
@@ -1556,13 +1557,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 if (oldValue != null) {
                     if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                        panel.output(Globals.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
+                        panel.output(Localization.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
                         return;
                     }
                     else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-                        CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("The current BibTeX key will be overwritten. Continue?"),
-                                Globals.lang("Disable this confirmation dialog"), false);
-                        int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite key"),
+                        CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("The current BibTeX key will be overwritten. Continue?"),
+                                Localization.lang("Disable this confirmation dialog"), false);
+                        int answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Overwrite key"),
                                 JOptionPane.YES_NO_OPTION);
                         if (cbm.isSelected()) {
                             Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
@@ -1707,7 +1708,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     private void warnDuplicateBibtexkey() {
-        panel.output(Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
+        panel.output(Localization.lang("Duplicate BibTeX key. Grouping may not work for this entry."));
 
         /*if (prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY)) {
             // JZTODO lyrics
@@ -1724,7 +1725,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void warnEmptyBibtexkey() {
         // JZTODO lyrics
-        panel.output(Globals.lang("Empty BibTeX key. Grouping may not work for this entry."));
+        panel.output(Localization.lang("Empty BibTeX key. Grouping may not work for this entry."));
 
         /*if (prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY)) {
             // JZTODO lyrics
@@ -1746,7 +1747,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         public AutoLinkAction() {
             putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Automatically set file links for this entry") + " (Alt-F)");
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Automatically set file links for this entry") + " (Alt-F)");
         }
 
         @Override

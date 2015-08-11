@@ -26,7 +26,7 @@ import javax.swing.event.PopupMenuListener;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -46,13 +46,13 @@ public class RightClickMenu extends JPopupMenu
 
     private final BasePanel panel;
     private final MetaData metaData;
-    private final JMenu groupAddMenu = new JMenu(Globals.lang("Add to group"));
-    private final JMenu groupRemoveMenu = new JMenu(Globals.lang("Remove from group"));
-    private final JMenu groupMoveMenu = new JMenu(Globals.lang("Assign exclusively to group")); // JZTODO lyrics
-    private final JMenu typeMenu = new JMenu(Globals.lang("Change entry type"));
+    private final JMenu groupAddMenu = new JMenu(Localization.lang("Add to group"));
+    private final JMenu groupRemoveMenu = new JMenu(Localization.lang("Remove from group"));
+    private final JMenu groupMoveMenu = new JMenu(Localization.lang("Assign exclusively to group")); // JZTODO lyrics
+    private final JMenu typeMenu = new JMenu(Localization.lang("Change entry type"));
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
-    private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
+    private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Localization.lang("Float marked entries"),
             Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
 
@@ -71,7 +71,7 @@ public class RightClickMenu extends JPopupMenu
 
         addPopupMenuListener(this);
 
-        add(new AbstractAction(Globals.lang("Copy"), GUIGlobals.getImage("copy")) {
+        add(new AbstractAction(Localization.lang("Copy"), GUIGlobals.getImage("copy")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -82,7 +82,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             }
         });
-        add(new AbstractAction(Globals.lang("Paste"), GUIGlobals.getImage("paste")) {
+        add(new AbstractAction(Localization.lang("Paste"), GUIGlobals.getImage("paste")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -93,7 +93,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             }
         });
-        add(new AbstractAction(Globals.lang("Cut"), GUIGlobals.getImage("cut")) {
+        add(new AbstractAction(Localization.lang("Cut"), GUIGlobals.getImage("cut")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -105,7 +105,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Delete"), GUIGlobals.getImage("delete")) {
+        add(new AbstractAction(Localization.lang("Delete"), GUIGlobals.getImage("delete")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -122,7 +122,7 @@ public class RightClickMenu extends JPopupMenu
         });
         addSeparator();
 
-        add(new AbstractAction(Globals.lang("Export to clipboard")) {
+        add(new AbstractAction(Localization.lang("Export to clipboard")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,7 +133,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             }
         });
-        add(new AbstractAction(Globals.lang("Send as email")) {
+        add(new AbstractAction(Localization.lang("Send as email")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -153,7 +153,7 @@ public class RightClickMenu extends JPopupMenu
         }
 
         if (multiple) {
-            add(new AbstractAction(Globals.lang("Mark entries"), GUIGlobals.getImage("markEntries")) {
+            add(new AbstractAction(Localization.lang("Mark entries"), GUIGlobals.getImage("markEntries")) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -167,7 +167,7 @@ public class RightClickMenu extends JPopupMenu
 
             add(markSpecific);
 
-            add(new AbstractAction(Globals.lang("Unmark entries"), GUIGlobals.getImage("unmarkEntries")) {
+            add(new AbstractAction(Localization.lang("Unmark entries"), GUIGlobals.getImage("unmarkEntries")) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -183,7 +183,7 @@ public class RightClickMenu extends JPopupMenu
             String marked = be.getField(BibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
             if (marked == null || marked.isEmpty()) {
-                add(new AbstractAction(Globals.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
+                add(new AbstractAction(Localization.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -198,7 +198,7 @@ public class RightClickMenu extends JPopupMenu
                 add(markSpecific);
             } else {
                 add(markSpecific);
-                add(new AbstractAction(Globals.lang("Unmark entry"), GUIGlobals.getImage("unmarkEntries")) {
+                add(new AbstractAction(Localization.lang("Unmark entry"), GUIGlobals.getImage("unmarkEntries")) {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -248,7 +248,7 @@ public class RightClickMenu extends JPopupMenu
             addSeparator();
         }
 
-        add(new AbstractAction(Globals.lang("Open folder"), GUIGlobals.getImage("openFolder")) {
+        add(new AbstractAction(Localization.lang("Open folder"), GUIGlobals.getImage("openFolder")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -260,7 +260,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
+        add(new AbstractAction(Localization.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -272,7 +272,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Attach file"), GUIGlobals.getImage("open")) {
+        add(new AbstractAction(Localization.lang("Attach file"), GUIGlobals.getImage("open")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -291,7 +291,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });*/
 
-        add(new AbstractAction(Globals.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
+        add(new AbstractAction(Localization.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -303,7 +303,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
+        add(new AbstractAction(Localization.lang("Copy BibTeX key")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -315,7 +315,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
 
-        add(new AbstractAction(Globals.lang("Copy") + " \\cite{" + Globals.lang("BibTeX key") + '}') {
+        add(new AbstractAction(Localization.lang("Copy") + " \\cite{" + Localization.lang("BibTeX key") + '}') {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -331,7 +331,7 @@ public class RightClickMenu extends JPopupMenu
         populateTypeMenu();
 
         add(typeMenu);
-        add(new AbstractAction(Globals.lang("Plain text import"))
+        add(new AbstractAction(Localization.lang("Plain text import"))
         {
 
             @Override
@@ -349,7 +349,7 @@ public class RightClickMenu extends JPopupMenu
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
-        groupAdd = new JMenuItem(new AbstractAction(Globals.lang("Add to group"))
+        groupAdd = new JMenuItem(new AbstractAction(Localization.lang("Add to group"))
         {
 
             @Override
@@ -366,7 +366,7 @@ public class RightClickMenu extends JPopupMenu
             }
         });
         add(groupAdd);
-        groupRemove = new JMenuItem(new AbstractAction(Globals.lang("Remove from group"))
+        groupRemove = new JMenuItem(new AbstractAction(Localization.lang("Remove from group"))
         {
 
             @Override
@@ -380,7 +380,7 @@ public class RightClickMenu extends JPopupMenu
         });
         add(groupRemove);
 
-        JMenuItem groupMoveTo = add(new AbstractAction(Globals.lang("Move to group")) {
+        JMenuItem groupMoveTo = add(new AbstractAction(Localization.lang("Move to group")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {

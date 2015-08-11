@@ -18,6 +18,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 
@@ -35,12 +36,12 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + Globals.lang("remove string ");
+        return Localization.lang("Undo") + ": " + Localization.lang("remove string ");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + Globals.lang("remove string ");
+        return Localization.lang("Redo") + ": " + Localization.lang("remove string ");
     }
 
     @Override

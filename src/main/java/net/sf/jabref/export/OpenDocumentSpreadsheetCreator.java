@@ -16,8 +16,8 @@
 package net.sf.jabref.export;
 
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -40,7 +40,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(Globals.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
+        super(Localization.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
     }
 
     @Override

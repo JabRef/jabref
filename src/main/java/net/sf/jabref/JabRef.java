@@ -33,6 +33,7 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -131,7 +132,7 @@ public class JabRef {
                      * through the socket to another JabRef instance. So we
                      * assume it's all taken care of, and quit.
                      */
-                    System.out.println(Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     JabRefExecutorService.INSTANCE.shutdownEverything();
                     return;
                 }
@@ -147,7 +148,7 @@ public class JabRef {
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
             } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, Globals.lang("Journal file not found") + ": " + e.getMessage(), Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Localization.lang("Journal file not found") + ": " + e.getMessage(), Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                 Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
             }
         }
@@ -193,7 +194,7 @@ public class JabRef {
             country = parts[1];
         }
 
-        Globals.setLanguage(language, country);
+        Localization.setLanguage(language, country);
     }
 
     // Do not use this code in release version, it contains some memory leaks
@@ -250,20 +251,20 @@ public class JabRef {
             String value = cli.getPreferencesReset();
             if (value.trim().equals("all")) {
                 try {
-                    System.out.println(Globals.lang("Setting all preferences to default values."));
+                    System.out.println(Localization.lang("Setting all preferences to default values."));
                     Globals.prefs.clear();
                 } catch (BackingStoreException e) {
-                    System.err.println(Globals.lang("Unable to clear preferences."));
+                    System.err.println(Localization.lang("Unable to clear preferences."));
                     e.printStackTrace();
                 }
             } else {
                 String[] keys = value.split(",");
                 for (String key : keys) {
                     if (Globals.prefs.hasKey(key.trim())) {
-                        System.out.println(Globals.lang("Resetting preference key '%0'", key.trim()));
+                        System.out.println(Localization.lang("Resetting preference key '%0'", key.trim()));
                         Globals.prefs.clear(key.trim());
                     } else {
-                        System.out.println(Globals.lang("Unknown preference key '%0'", key.trim()));
+                        System.out.println(Localization.lang("Unknown preference key '%0'", key.trim()));
                     }
                 }
             }
@@ -374,7 +375,7 @@ public class JabRef {
                             formatName = "tablerefsabsbib";
                             break;
                         default:
-                            System.err.println(Globals.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                            System.err.println(Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ") + JabRefCLI.getExportMatchesSyntax());
                             return null; // TODO replace with optional one day
                     } //end switch
 
@@ -383,21 +384,21 @@ public class JabRef {
                     if (format != null) {
                         // We have an ExportFormat instance:
                         try {
-                            System.out.println(Globals.lang("Exporting") + ": " + data[1]);
+                            System.out.println(Localization.lang("Exporting") + ": " + data[1]);
                             format.performExport(newBase, pr.getMetaData(), data[1], pr.getEncoding(), null);
                         } catch (Exception ex) {
-                            System.err.println(Globals.lang("Could not export file")
+                            System.err.println(Localization.lang("Could not export file")
                                     + " '" + data[1] + "': " + ex.getMessage());
                         }
                     } else {
-                        System.err.println(Globals.lang("Unknown export format")
+                        System.err.println(Localization.lang("Unknown export format")
                                 + ": " + formatName);
                     }
                 } /*end if newBase != null*/else {
-                    System.err.println(Globals.lang("No search matches."));
+                    System.err.println(Localization.lang("No search matches."));
                 }
             } else {
-                System.err.println(Globals.lang("The output option depends on a valid input option."));
+                System.err.println(Localization.lang("The output option depends on a valid input option."));
             } //end if(loaded.size > 0)
         }
 
@@ -413,24 +414,24 @@ public class JabRef {
                                 loaded.elementAt(loaded.size() - 1);
                         if (!pr.isInvalid()) {
                             try {
-                                System.out.println(Globals.lang("Saving") + ": " + data[0]);
+                                System.out.println(Localization.lang("Saving") + ": " + data[0]);
                                 SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
                                         pr.getMetaData(), new File(data[0]), Globals.prefs,
                                         false, false, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
-                                    System.err.println(Globals.lang("Warning") + ": " +
-                                            Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                                    System.err.println(Localization.lang("Warning") + ": " +
+                                            Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
                                                     session.getEncoding()) + session.getWriter().getProblemCharacters());
                                 }
                                 session.commit();
                             } catch (SaveException ex) {
-                                System.err.println(Globals.lang("Could not save file") + " '"
+                                System.err.println(Localization.lang("Could not save file") + " '"
                                         + data[0] + "': " + ex.getMessage());
                             }
                         }
                     } else {
-                        System.err.println(Globals.lang(
+                        System.err.println(Localization.lang(
                                 "The output option depends on a valid import option."));
                     }
                 } else if (data.length == 2) {
@@ -449,7 +450,7 @@ public class JabRef {
                     metaData.setFile(theFile);
                     Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                     Globals.prefs.databaseFile = metaData.getFile();
-                    System.out.println(Globals.lang("Exporting") + ": " + data[0]);
+                    System.out.println(Localization.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format != null) {
                         // We have an ExportFormat instance:
@@ -457,17 +458,17 @@ public class JabRef {
                             format.performExport(pr.getDatabase(),
                                     pr.getMetaData(), data[0], pr.getEncoding(), null);
                         } catch (Exception ex) {
-                            System.err.println(Globals.lang("Could not export file")
+                            System.err.println(Localization.lang("Could not export file")
                                     + " '" + data[0] + "': " + ex.getMessage());
                         }
                     } else {
-                        System.err.println(Globals.lang("Unknown export format")
+                        System.err.println(Localization.lang("Unknown export format")
                                 + ": " + data[1]);
                     }
 
                 }
             } else {
-                System.err.println(Globals.lang(
+                System.err.println(Localization.lang(
                         "The output option depends on a valid import option."));
             }
         }
@@ -502,20 +503,20 @@ public class JabRef {
                             String subName = StringUtil.getCorrectFileName(data[1], "bib");
 
                             try {
-                                System.out.println(Globals.lang("Saving") + ": "
+                                System.out.println(Localization.lang("Saving") + ": "
                                         + subName);
                                 SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                         new File(subName), Globals.prefs, false, false,
                                         Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), false);
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
-                                    System.err.println(Globals.lang("Warning") + ": " +
-                                            Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                                    System.err.println(Localization.lang("Warning") + ": " +
+                                            Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
                                                     session.getEncoding()) + session.getWriter().getProblemCharacters());
                                 }
                                 session.commit();
                             } catch (SaveException ex) {
-                                System.err.println(Globals.lang("Could not save file")
+                                System.err.println(Localization.lang("Could not save file")
                                         + " '" + subName + "': " + ex.getMessage());
                             }
 
@@ -524,7 +525,7 @@ public class JabRef {
                     }
 
                     if (!notSavedMsg) {
-                        System.out.println(Globals.lang("no database generated"));
+                        System.out.println(Localization.lang("no database generated"));
                     }
                 } else {
                     usageMsg = true;
@@ -534,8 +535,8 @@ public class JabRef {
             }
 
             if (usageMsg) {
-                System.out.println(Globals.lang("no base-bibtex-file specified"));
-                System.out.println(Globals.lang("usage") + " :");
+                System.out.println(Localization.lang("no base-bibtex-file specified"));
+                System.out.println(Localization.lang("usage") + " :");
                 System.out.println(
                         "jabref --aux infile[.aux],outfile[.bib] base-bibtex-file");
             }
@@ -561,8 +562,8 @@ public class JabRef {
 
         if (fetchCommand == null || !fetchCommand.contains(":") ||
                 fetchCommand.split(":").length != 2) {
-            System.out.println(Globals.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
-            System.out.println(Globals.lang("The following fetchers are available:"));
+            System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
+            System.out.println(Localization.lang("The following fetchers are available:"));
             return null;
         }
 
@@ -578,8 +579,8 @@ public class JabRef {
         }
 
         if (fetcher == null) {
-            System.out.println(Globals.lang("Could not find fetcher '%0'", engine));
-            System.out.println(Globals.lang("The following fetchers are available:"));
+            System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
+            System.out.println(Localization.lang("The following fetchers are available:"));
 
             for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
                 System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
@@ -587,12 +588,12 @@ public class JabRef {
             return null;
         }
 
-        System.out.println(Globals.lang("Running Query '%0' with fetcher '%1'.", query, engine) +
-                " " + Globals.lang("Please wait..."));
+        System.out.println(Localization.lang("Running Query '%0' with fetcher '%1'.", query, engine) +
+                " " + Localization.lang("Please wait..."));
         Collection<BibtexEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
         if (result == null || result.isEmpty()) {
-            System.out.println(Globals.lang(
+            System.out.println(Localization.lang(
                     "Query '%0' with fetcher '%1' did not return any results.", query, engine));
             return null;
         }
@@ -628,8 +629,8 @@ public class JabRef {
                     // also set system l&f as default
                     Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLnF);
                     // notify the user
-                    JOptionPane.showMessageDialog(JabRef.jrf, Globals.lang("Unable to find the requested Look & Feel and thus the default one is used."),
-                            Globals.lang("Warning"),
+                    JOptionPane.showMessageDialog(JabRef.jrf, Localization.lang("Unable to find the requested Look & Feel and thus the default one is used."),
+                            Localization.lang("Warning"),
                             JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -715,7 +716,7 @@ public class JabRef {
                     if (pr != null) {
 
                         if (pr == ParserResult.INVALID_FORMAT) {
-                            System.out.println(Globals.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
+                            System.out.println(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
                         } else if (pr != ParserResult.FILE_LOCKED) {
                             loaded.add(pr);
                         }
@@ -797,10 +798,10 @@ public class JabRef {
         }
 
         for (ParserResult pr : failed) {
-            String message = "<html>" + Globals.lang("Error opening file '%0'.", pr.getFile().getName())
+            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().getName())
                     + "<p>" + pr.getErrorMessage() + "</html>";
 
-            JOptionPane.showMessageDialog(JabRef.jrf, message, Globals.lang("Error opening file"),
+            JOptionPane.showMessageDialog(JabRef.jrf, message, Localization.lang("Error opening file"),
                     JOptionPane.ERROR_MESSAGE);
         }
 
@@ -814,14 +815,14 @@ public class JabRef {
                 }
                 if (wrns.length > JabRef.MAX_DIALOG_WARNINGS) {
                     wrn.append("... ");
-                    wrn.append(Globals.lang("%0 warnings", String.valueOf(wrns.length)));
+                    wrn.append(Localization.lang("%0 warnings", String.valueOf(wrns.length)));
                 }
                 else if (wrn.length() > 0) {
                     wrn.deleteCharAt(wrn.length() - 1);
                 }
                 JabRef.jrf.showBaseAt(i);
                 JOptionPane.showMessageDialog(JabRef.jrf, wrn.toString(),
-                        Globals.lang("Warnings") + " (" + pr.getFile().getName() + ")",
+                        Localization.lang("Warnings") + " (" + pr.getFile().getName() + ")",
                         JOptionPane.WARNING_MESSAGE);
             }
         }
@@ -856,13 +857,13 @@ public class JabRef {
     }
 
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
-        LOGGER.info(Globals.lang("Opening") + ": " + name);
+        LOGGER.info(Localization.lang("Opening") + ": " + name);
         File file = new File(name);
         if (!file.exists()) {
             ParserResult pr = new ParserResult(null, null, null);
             pr.setFile(file);
             pr.setInvalid(true);
-            System.err.println(Globals.lang("Error") + ": " + Globals.lang("File not found"));
+            System.err.println(Localization.lang("Error") + ": " + Localization.lang("File not found"));
             return pr;
 
         }
@@ -881,7 +882,7 @@ public class JabRef {
             }
 
             if (!FileBasedLock.waitForFileLock(file, 10)) {
-                System.out.println(Globals.lang("Error opening file") + " '" + name + "'. " +
+                System.out.println(Localization.lang("Error opening file") + " '" + name + "'. " +
                         "File is locked by another JabRef instance.");
                 return ParserResult.FILE_LOCKED;
             }
@@ -899,7 +900,7 @@ public class JabRef {
             if (pr.hasWarnings()) {
                 String[] warn = pr.warnings();
                 for (String aWarn : warn) {
-                    System.out.println(Globals.lang("Warning") + ": " + aWarn);
+                    System.out.println(Localization.lang("Warning") + ": " + aWarn);
                 }
 
             }
@@ -919,7 +920,7 @@ public class JabRef {
         String[] data = argument.split(",");
         try {
             if (data.length > 1 && !"*".equals(data[1])) {
-                System.out.println(Globals.lang("Importing") + ": " + data[0]);
+                System.out.println(Localization.lang("Importing") + ": " + data[0]);
                 try {
                     List<BibtexEntry> entries;
                     if (Globals.ON_WIN) {
@@ -931,12 +932,12 @@ public class JabRef {
                     }
                     return new ParserResult(entries);
                 } catch (IllegalArgumentException ex) {
-                    System.err.println(Globals.lang("Unknown import format") + ": " + data[1]);
+                    System.err.println(Localization.lang("Unknown import format") + ": " + data[1]);
                     return null;
                 }
             } else {
                 // * means "guess the format":
-                System.out.println(Globals.lang("Importing in unknown format")
+                System.out.println(Localization.lang("Importing in unknown format")
                         + ": " + data[0]);
 
                 ImportFormatReader.UnknownFormatImport importResult;
@@ -949,17 +950,17 @@ public class JabRef {
                 }
 
                 if (importResult != null) {
-                    System.out.println(Globals.lang("Format used") + ": "
+                    System.out.println(Localization.lang("Format used") + ": "
                             + importResult.format);
 
                     return importResult.parserResult;
                 } else {
-                    System.out.println(Globals.lang(
+                    System.out.println(Localization.lang(
                             "Could not find a suitable import format."));
                 }
             }
         } catch (IOException ex) {
-            System.err.println(Globals.lang("Error opening file") + " '"
+            System.err.println(Localization.lang("Error opening file") + " '"
                     + data[0] + "': " + ex.getLocalizedMessage());
         }
         return null;

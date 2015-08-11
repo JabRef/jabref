@@ -23,6 +23,7 @@ import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.PushToApplication;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,17 +71,17 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             connect;
     private static JButton manualConnect;
     private static JButton selectDocument;
-    private static final JButton setStyleFile = new JButton(Globals.lang("Select style"));
-    private static final JButton pushEntries = new JButton(Globals.lang("Cite"));
-    private static final JButton pushEntriesInt = new JButton(Globals.lang("Cite in-text"));
-    private static final JButton pushEntriesEmpty = new JButton(Globals.lang("Insert empty citation"));
-    private static final JButton pushEntriesAdvanced = new JButton(Globals.lang("Cite special"));
+    private static final JButton setStyleFile = new JButton(Localization.lang("Select style"));
+    private static final JButton pushEntries = new JButton(Localization.lang("Cite"));
+    private static final JButton pushEntriesInt = new JButton(Localization.lang("Cite in-text"));
+    private static final JButton pushEntriesEmpty = new JButton(Localization.lang("Insert empty citation"));
+    private static final JButton pushEntriesAdvanced = new JButton(Localization.lang("Cite special"));
     private static final JButton focus = new JButton("Focus OO document");
     private static JButton update;
     private static final JButton insertFullRef = new JButton("Insert reference text");
-    private static final JButton merge = new JButton(Globals.lang("Merge citations"));
-    private static final JButton manageCitations = new JButton(Globals.lang("Manage citations"));
-    private static final JButton settingsB = new JButton(Globals.lang("Settings"));
+    private static final JButton merge = new JButton(Localization.lang("Merge citations"));
+    private static final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
+    private static final JButton settingsB = new JButton(Localization.lang("Settings"));
     private static final JButton help = new JButton(GUIGlobals.getImage("help"));
     private static final JButton test = new JButton("Test");
     private JRadioButton inPar;
@@ -114,12 +115,12 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
         OpenOfficePanel.connect = new JButton(connectImage);
         OpenOfficePanel.manualConnect = new JButton(connectImage);
-        OpenOfficePanel.connect.setToolTipText(Globals.lang("Connect"));
-        OpenOfficePanel.manualConnect.setToolTipText(Globals.lang("Manual connect"));
+        OpenOfficePanel.connect.setToolTipText(Localization.lang("Connect"));
+        OpenOfficePanel.manualConnect.setToolTipText(Localization.lang("Manual connect"));
         OpenOfficePanel.selectDocument = new JButton(GUIGlobals.getImage("open"));
-        OpenOfficePanel.selectDocument.setToolTipText(Globals.lang("Select Writer document"));
+        OpenOfficePanel.selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         OpenOfficePanel.update = new JButton(GUIGlobals.getImage("refresh"));
-        OpenOfficePanel.update.setToolTipText(Globals.lang("Sync OO bibliography"));
+        OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
         String defExecutable;
         String defJarsDir;
         if (Globals.ON_WIN) {
@@ -161,7 +162,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     public void init(JabRefFrame frame, SidePaneManager manager) {
         OpenOfficePanel.frame = frame;
         this.manager = manager;
-        comp = new OOPanel(manager, GUIGlobals.getIconUrl("openoffice"), Globals.lang("OpenOffice"));
+        comp = new OOPanel(manager, GUIGlobals.getIconUrl("openoffice"), Localization.lang("OpenOffice"));
         try {
             initPanel();
             manager.register(getName(), comp);
@@ -174,7 +175,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         if (Globals.prefs.getBoolean("showOOPanel")) {
             manager.show(getName());
         }
-        JMenuItem item = new JMenuItem(Globals.lang("OpenOffice/LibreOffice connection"), GUIGlobals.getImage("openoffice"));
+        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"), GUIGlobals.getImage("openoffice"));
         item.addActionListener(new ActionListener() {
 
             @Override
@@ -209,16 +210,16 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 connect(false);
             }
         });
-        OpenOfficePanel.selectDocument.setToolTipText(Globals.lang("Select which open Writer document to work on"));
+        OpenOfficePanel.selectDocument.setToolTipText(Localization.lang("Select which open Writer document to work on"));
         OpenOfficePanel.selectDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
                 try {
                     OpenOfficePanel.ooBase.selectDocument();
-                    OpenOfficePanel.frame.output(Globals.lang("Connected to document") + ": " + OpenOfficePanel.ooBase.getCurrentDocumentTitle());
+                    OpenOfficePanel.frame.output(Localization.lang("Connected to document") + ": " + OpenOfficePanel.ooBase.getCurrentDocumentTitle());
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, ex.getMessage(), Globals.lang("Error"),
+                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, ex.getMessage(), Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -245,7 +246,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        OpenOfficePanel.pushEntries.setToolTipText(Globals.lang("Cite selected entries"));
+        OpenOfficePanel.pushEntries.setToolTipText(Localization.lang("Cite selected entries"));
         OpenOfficePanel.pushEntries.addActionListener(new ActionListener() {
 
             @Override
@@ -253,7 +254,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 pushEntries(true, true, false);
             }
         });
-        OpenOfficePanel.pushEntriesInt.setToolTipText(Globals.lang("Cite selected entries with in-text citation"));
+        OpenOfficePanel.pushEntriesInt.setToolTipText(Localization.lang("Cite selected entries with in-text citation"));
         OpenOfficePanel.pushEntriesInt.addActionListener(new ActionListener() {
 
             @Override
@@ -261,7 +262,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 pushEntries(false, true, false);
             }
         });
-        OpenOfficePanel.pushEntriesEmpty.setToolTipText(Globals.lang("Insert a citation without text (the entry will appear in the reference list)"));
+        OpenOfficePanel.pushEntriesEmpty.setToolTipText(Localization.lang("Insert a citation without text (the entry will appear in the reference list)"));
         OpenOfficePanel.pushEntriesEmpty.addActionListener(new ActionListener() {
 
             @Override
@@ -269,7 +270,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 pushEntries(false, false, false);
             }
         });
-        OpenOfficePanel.pushEntriesAdvanced.setToolTipText(Globals.lang("Cite selected entries with extra information"));
+        OpenOfficePanel.pushEntriesAdvanced.setToolTipText(Localization.lang("Cite selected entries with extra information"));
         OpenOfficePanel.pushEntriesAdvanced.addActionListener(new ActionListener() {
 
             @Override
@@ -285,7 +286,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 OpenOfficePanel.ooBase.setFocus();
             }
         });
-        OpenOfficePanel.update.setToolTipText(Globals.lang("Ensure that the bibliography is up-to-date"));
+        OpenOfficePanel.update.setToolTipText(Localization.lang("Ensure that the bibliography is up-to-date"));
         Action updateAction = new AbstractAction() {
 
             @Override
@@ -298,8 +299,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                             OpenOfficePanel.style.ensureUpToDate();
                         }
                     } catch (Throwable ex) {
-                        JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
-                                Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
+                                Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -311,8 +312,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                     OpenOfficePanel.ooBase.rebuildBibTextSection(databases, OpenOfficePanel.style);
                     //ooBase.sync(frame.basePanel().database(), style);
                     if (!unresolvedKeys.isEmpty()) {
-                        JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
-                                unresolvedKeys.get(0)), Globals.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                unresolvedKeys.get(0)), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (UndefinedCharacterFormatException ex) {
                     reportUndefinedCharacterFormat(ex);
@@ -321,8 +322,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (BibtexEntryNotFoundException ex) {
-                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
-                            ex.getBibtexKey()), Globals.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                            ex.getBibtexKey()), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                 }
                 catch (Exception e1) {
                     e1.printStackTrace();
@@ -343,7 +344,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        OpenOfficePanel.merge.setToolTipText(Globals.lang("Combine pairs of citations that are separated by spaces only"));
+        OpenOfficePanel.merge.setToolTipText(Localization.lang("Combine pairs of citations that are separated by spaces only"));
         OpenOfficePanel.merge.addActionListener(new ActionListener() {
 
             @Override
@@ -498,8 +499,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 diag.dispose();
             } else if (!adp.cancelled()) {
                 JOptionPane.showMessageDialog(diag,
-                        Globals.lang("Autodetection failed"),
-                        Globals.lang("Autodetection failed"),
+                        Localization.lang("Autodetection failed"),
+                        Localization.lang("Autodetection failed"),
                         JOptionPane.ERROR_MESSAGE);
             }
             if (!autoDetected) {
@@ -565,15 +566,15 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             URL[] jarList = new URL[jarFiles.length];
             for (int i = 0; i < jarList.length; i++) {
                 if (!jarFiles[i].exists()) {
-                    throw new Exception(Globals.lang("File not found") + ": " + jarFiles[i].getPath());
+                    throw new Exception(Localization.lang("File not found") + ": " + jarFiles[i].getPath());
                 }
                 jarList[i] = jarFiles[i].toURI().toURL();
             }
             OpenOfficePanel.addURL(jarList);
 
             // Show progress dialog:
-            final JDialog progDiag = new AutoDetectPaths(diag).showProgressDialog(diag, Globals.lang("Connecting"),
-                    Globals.lang("Please wait..."), false);
+            final JDialog progDiag = new AutoDetectPaths(diag).showProgressDialog(diag, Localization.lang("Connecting"),
+                    Localization.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();
             diag.dispose();
@@ -582,7 +583,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
 
             if (OpenOfficePanel.ooBase.isConnectedToDocument()) {
-                OpenOfficePanel.frame.output(Globals.lang("Connected to document") + ": " + OpenOfficePanel.ooBase.getCurrentDocumentTitle());
+                OpenOfficePanel.frame.output(Localization.lang("Connected to document") + ": " + OpenOfficePanel.ooBase.getCurrentDocumentTitle());
             }
 
             // Enable actions that depend on Connect:
@@ -601,12 +602,12 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         } catch (Throwable e) {
             e.printStackTrace();
             if (e instanceof UnsatisfiedLinkError) {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Unable to connect. One possible reason is that JabRef "
+                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Unable to connect. One possible reason is that JabRef "
                         + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
 
             }
             else {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Could not connect to running OpenOffice.\n"
+                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Could not connect to running OpenOffice.\n"
                         + "Make sure you have installed OpenOffice with Java support.\nIf connecting manually, please verify program and library paths.\n"
                         + "\nError message: " + e.getMessage()));
             }
@@ -676,40 +677,40 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     private void showConnectDialog() {
         dialogOkPressed = false;
-        final JDialog diag = new JDialog(OpenOfficePanel.frame, Globals.lang("Set connection parameters"), true);
+        final JDialog diag = new JDialog(OpenOfficePanel.frame, Localization.lang("Set connection parameters"), true);
         final JTextField ooPath = new JTextField(30);
-        JButton browseOOPath = new JButton(Globals.lang("Browse"));
+        JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(Globals.prefs.get("ooPath"));
         final JTextField ooExec = new JTextField(30);
-        JButton browseOOExec = new JButton(Globals.lang("Browse"));
+        JButton browseOOExec = new JButton(Localization.lang("Browse"));
         browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
         final JTextField ooJars = new JTextField(30);
-        JButton browseOOJars = new JButton(Globals.lang("Browse"));
+        JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
         ooExec.setText(Globals.prefs.get("ooExecutablePath"));
         ooJars.setText(Globals.prefs.get("ooJarsPath"));
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", ""));
         if (Globals.ON_WIN || Globals.ON_MAC) {
-            builder.append(Globals.lang("Path to OpenOffice directory"));
+            builder.append(Localization.lang("Path to OpenOffice directory"));
             builder.append(ooPath);
             builder.append(browseOOPath);
             builder.nextLine();
         }
         else {
-            builder.append(Globals.lang("Path to OpenOffice executable"));
+            builder.append(Localization.lang("Path to OpenOffice executable"));
             builder.append(ooExec);
             builder.append(browseOOExec);
             builder.nextLine();
 
-            builder.append(Globals.lang("Path to OpenOffice library dir"));
+            builder.append(Localization.lang("Path to OpenOffice library dir"));
             builder.append(ooJars);
             builder.append(browseOOJars);
             builder.nextLine();
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         //JButton auto = new JButton(Globals.lang("Autodetect"));
         ActionListener tfListener = new ActionListener() {
 
@@ -758,9 +759,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     private void pushEntries(boolean inParenthesis, boolean withText, boolean addPageInfo) {
         if (!OpenOfficePanel.ooBase.isConnectedToDocument()) {
-            JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Not connected to any Writer document. Please"
-                    + " make sure a document is open, and use the 'Select Writer document' button to connect to it."),
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Not connected to any Writer document. Please"
+                            + " make sure a document is open, and use the 'Select Writer document' button to connect to it."),
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -790,8 +791,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                     OpenOfficePanel.ooBase.insertEntry(entries, database, getBaseList(), OpenOfficePanel.style, inParenthesis, withText,
                             pageInfo, Globals.prefs.getBoolean("syncOOWhenCiting"));
                 } catch (FileNotFoundException ex) {
-                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
-                            Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
+                            Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (UndefinedCharacterFormatException ex) {
@@ -808,9 +809,9 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private void showConnectionLostErrorMessage() {
-        JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("Connection to OpenOffice has been lost. "
-                + "Please make sure OpenOffice is running, and try to reconnect."),
-                Globals.lang("Connection lost"), JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("Connection to OpenOffice has been lost. "
+                        + "Please make sure OpenOffice is running, and try to reconnect."),
+                Localization.lang("Connection lost"), JOptionPane.ERROR_MESSAGE);
     }
 
     private void insertFullRefs() {
@@ -841,19 +842,19 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
-        JOptionPane.showMessageDialog(OpenOfficePanel.frame, "<html>" + Globals.lang("Your style file specifies the paragraph format '%0', "
-                + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
-                + Globals.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
+        JOptionPane.showMessageDialog(OpenOfficePanel.frame, "<html>" + Localization.lang("Your style file specifies the paragraph format '%0', "
+                        + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
+                + Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
                 + "</html>",
-                Globals.lang(""), JOptionPane.ERROR_MESSAGE);
+                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
-        JOptionPane.showMessageDialog(OpenOfficePanel.frame, "<html>" + Globals.lang("Your style file specifies the character format '%0', "
-                + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
-                + Globals.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
+        JOptionPane.showMessageDialog(OpenOfficePanel.frame, "<html>" + Localization.lang("Your style file specifies the character format '%0', "
+                        + "which is undefined in your current OpenOffice document.", ex.getFormatName()) + "<br>"
+                + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
                 + "</html>",
-                Globals.lang(""), JOptionPane.ERROR_MESSAGE);
+                Localization.lang(""), JOptionPane.ERROR_MESSAGE);
     }
 
     public void insertUsingBST() {
@@ -884,14 +885,14 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private void showSettingsPopup() {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
-                Globals.lang("Automatically sync bibliography when inserting citations"),
+                Localization.lang("Automatically sync bibliography when inserting citations"),
                 Globals.prefs.getBoolean("syncOOWhenCiting"));
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem
-                (Globals.lang("Look up BibTeX entries in the active tab only"));
+                (Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem
-                (Globals.lang("Look up BibTeX entries in all open databases"));
+                (Localization.lang("Look up BibTeX entries in all open databases"));
         final JMenuItem clearConnectionSettings = new JMenuItem
-                (Globals.lang("Clear connection settings"));
+                (Localization.lang("Clear connection settings"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(useActiveBase);
         bg.add(useAllBases);
@@ -932,7 +933,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 Globals.prefs.clear("connectToOO3");
                 Globals.prefs.clear("ooUnoilPath");
                 Globals.prefs.clear("ooJurtPath");
-                OpenOfficePanel.frame.output(Globals.lang("Cleared connection settings."));
+                OpenOfficePanel.frame.output(Localization.lang("Cleared connection settings."));
             }
         });
 
@@ -1014,8 +1015,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     private void initSettingsPanel() {
         boolean inParen = Globals.prefs.getBoolean("ooInParCitation");
-        inPar = new JRadioButton(Globals.lang("Use in-parenthesis citation"), inParen);
-        inText = new JRadioButton(Globals.lang("Use in-text citation"), !inParen);
+        inPar = new JRadioButton(Localization.lang("Use in-parenthesis citation"), inParen);
+        inText = new JRadioButton(Localization.lang("Use in-text citation"), !inParen);
         ButtonGroup bg = new ButtonGroup();
         bg.add(inPar);
         bg.add(inText);
@@ -1041,8 +1042,8 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                     readStyleFile();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Globals.lang("You must select either a valid style file, or use one of the default styles."),
-                        Globals.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(OpenOfficePanel.frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
+                        Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             pushEntries(Globals.prefs.getBoolean("ooInParCitation"), entries);

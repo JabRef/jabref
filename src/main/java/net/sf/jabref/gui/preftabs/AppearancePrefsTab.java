@@ -28,6 +28,7 @@ import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.ColorSetupPanel;
+import net.sf.jabref.logic.l10n.Localization;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
@@ -59,11 +60,11 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         rowPadding = new JTextField(5);
 
         colorCodes = new JCheckBox(
-                Globals.lang("Color codes for required and optional fields"));
+                Localization.lang("Color codes for required and optional fields"));
 
-        overrideFonts = new JCheckBox(Globals.lang("Override default font settings"));
+        overrideFonts = new JCheckBox(Localization.lang("Override default font settings"));
 
-        showGrid = new JCheckBox(Globals.lang("Show gridlines"));
+        showGrid = new JCheckBox(Localization.lang("Show gridlines"));
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
@@ -71,18 +72,18 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.leadingColumnOffset(2);
         JLabel lab;
-        builder.appendSeparator(Globals.lang("General"));
+        builder.appendSeparator(Localization.lang("General"));
         JPanel p1 = new JPanel();
-        lab = new JLabel(Globals.lang("Menu and label font size") + ":");
+        lab = new JLabel(Localization.lang("Menu and label font size") + ":");
         p1.add(lab);
         p1.add(fontSize);
         builder.append(p1);
         builder.nextLine();
         builder.append(overrideFonts);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Table appearance"));
+        builder.appendSeparator(Localization.lang("Table appearance"));
         JPanel p2 = new JPanel();
-        p2.add(new JLabel(Globals.lang("Table row height padding") + ":"));
+        p2.add(new JLabel(Localization.lang("Table row height padding") + ":"));
         p2.add(rowPadding);
         builder.append(p2);
         builder.nextLine();
@@ -90,10 +91,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(showGrid);
         builder.nextLine();
-        JButton fontButton = new JButton(Globals.lang("Set table font"));
+        JButton fontButton = new JButton(Localization.lang("Set table font"));
         builder.append(fontButton);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Table and entry editor colors"));
+        builder.appendSeparator(Localization.lang("Table and entry editor colors"));
         builder.append(colorPanel);
 
         JPanel upper = new JPanel();
@@ -166,10 +167,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                     size != oldMenuFontSize) {
                 prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
                 JOptionPane.showMessageDialog(null,
-                        Globals.lang("You have changed the menu and label font size.")
+                        Localization.lang("You have changed the menu and label font size.")
                                 .concat(" ")
-                                .concat(Globals.lang("You must restart JabRef for this to come into effect.")),
-                        Globals.lang("Changed font settings"),
+                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                        Localization.lang("Changed font settings"),
                         JOptionPane.WARNING_MESSAGE);
             }
         } catch (NumberFormatException ex) {
@@ -190,8 +191,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
-                    (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
-                            Globals.lang(fieldName) + "'", Globals.lang(errorTitle),
+                    (null, Localization.lang("You must enter an integer value in the text field for") + " '" +
+                            Localization.lang(fieldName) + "'", Localization.lang(errorTitle),
                             JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -215,6 +216,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Appearance");
+        return Localization.lang("Appearance");
     }
 }

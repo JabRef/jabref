@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.export;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.mods.MODSDatabase;
 
 import javax.xml.transform.dom.DOMSource;
@@ -35,7 +35,7 @@ import java.io.File;
 class ModsExportFormat extends ExportFormat {
 
     public ModsExportFormat() {
-        super(Globals.lang("MODS"), "mods", null, null, ".xml");
+        super(Localization.lang("MODS"), "mods", null, null, ".xml");
     }
 
     @Override

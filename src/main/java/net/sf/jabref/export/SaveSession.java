@@ -16,6 +16,7 @@
 package net.sf.jabref.export;
 
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileBasedLock;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
@@ -119,7 +120,7 @@ public class SaveSession {
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that
             // repeating the action will have a different result.
             // On the other hand, our temporary file should still be clean, and won't be deleted.
-            throw new SaveException(Globals.lang("Save failed while committing changes") + ": " + ex2.getMessage());
+            throw new SaveException(Localization.lang("Save failed while committing changes") + ": " + ex2.getMessage());
         } finally {
             if (useLockFile) {
                 deleteLockFile();

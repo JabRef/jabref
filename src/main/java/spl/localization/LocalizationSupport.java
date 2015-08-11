@@ -1,6 +1,6 @@
 package spl.localization;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +12,7 @@ import net.sf.jabref.Globals;
 public class LocalizationSupport {
 
     public static String message(String key) {
-        return Globals.lang(key);
+        return Localization.lang(key);
     }
 
 }

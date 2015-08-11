@@ -16,6 +16,7 @@ import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.imports.PdfContentImporter;
 import net.sf.jabref.imports.PdfXmpImporter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.util.FileUtil;
@@ -159,7 +160,7 @@ public class PdfImporter {
 
                     if (localRes == null || localRes.isEmpty()) {
                         // import failed -> generate default entry
-                        LOGGER.info(Globals.lang("Import failed"));
+                        LOGGER.info(Localization.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -189,7 +190,7 @@ public class PdfImporter {
                         in = new FileInputStream(file);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Globals.lang("Import failed"), e);
+                        LOGGER.info(Localization.lang("Import failed"), e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -199,7 +200,7 @@ public class PdfImporter {
                         localRes = contentImporter.importEntries(in, status);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Globals.lang("Import failed"), e);
+                        LOGGER.info(Localization.lang("Import failed"), e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -286,8 +287,8 @@ public class PdfImporter {
 
                 // Create an UndoableInsertEntry object.
                 panel.undoManager.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
-                panel.output(Globals.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
-                        + Globals.lang("entry") + ".");
+                panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
+                        + Localization.lang("entry") + ".");
 
                 // We are going to select the new entry. Before that, make sure that we are in
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR

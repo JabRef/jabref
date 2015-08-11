@@ -21,8 +21,8 @@ import java.util.Set;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.groups.structure.ExplicitGroup;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * @author jzieren
@@ -73,14 +73,14 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": "
-                + Globals.lang("change assignment of entries");
+        return Localization.lang("Undo") + ": "
+                + Localization.lang("change assignment of entries");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": "
-                + Globals.lang("change assignment of entries");
+        return Localization.lang("Redo") + ": "
+                + Localization.lang("change assignment of entries");
     }
 
     @Override

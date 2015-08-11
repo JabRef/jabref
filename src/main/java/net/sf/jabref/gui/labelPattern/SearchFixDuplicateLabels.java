@@ -18,6 +18,7 @@ package net.sf.jabref.gui.labelPattern;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 
 import javax.swing.*;
@@ -77,7 +78,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
 
     @Override
     public void init() throws Throwable {
-        panel.output(Globals.lang("Resolving duplicate BibTeX keys..."));
+        panel.output(Localization.lang("Resolving duplicate BibTeX keys..."));
 
     }
 
@@ -112,7 +113,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
         }
-        panel.output(Globals.lang("Finished resolving duplicate BibTeX keys. %0 entries modified.",
+        panel.output(Localization.lang("Finished resolving duplicate BibTeX keys. %0 entries modified.",
                 String.valueOf(toGenerateFor.size())));
     }
 }

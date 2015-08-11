@@ -20,6 +20,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -35,15 +36,15 @@ class AdvancedCiteDialog {
     private static boolean defaultInPar = true;
     private boolean okPressed = false;
     private final JDialog diag;
-    private final JRadioButton inPar = new JRadioButton(Globals.lang("Cite selected entries"));
-    private final JRadioButton inText = new JRadioButton(Globals.lang("Cite selected entries with in-text citation"));
+    private final JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries"));
+    private final JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));
     private final JTextField pageInfo = new JTextField(15);
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
     public AdvancedCiteDialog(JabRefFrame parent) {
-        diag = new JDialog(parent, Globals.lang("Cite special"), true);
+        diag = new JDialog(parent, Localization.lang("Cite special"), true);
         ButtonGroup bg = new ButtonGroup();
         bg.add(inPar);
         bg.add(inText);
@@ -67,7 +68,7 @@ class AdvancedCiteDialog {
         b.nextLine();
         b.append(inText, 3);
         b.nextLine();
-        b.append(Globals.lang("Extra information (e.g. page number)") + ":");
+        b.append(Localization.lang("Extra information (e.g. page number)") + ":");
         b.append(pageInfo);
 
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

@@ -18,7 +18,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class NamedCompound extends CompoundEdit {
 
@@ -43,12 +43,12 @@ public class NamedCompound extends CompoundEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + name;
+        return Localization.lang("Undo") + ": " + name;
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + name;
+        return Localization.lang("Redo") + ": " + name;
     }
 
     /**

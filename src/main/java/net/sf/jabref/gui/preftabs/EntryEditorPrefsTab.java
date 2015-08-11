@@ -23,10 +23,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
+import net.sf.jabref.logic.l10n.Localization;
 import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -76,30 +76,30 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         this.frame = frame;
         setLayout(new BorderLayout());
 
-        autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"));
-        defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"));
-        showSource = new JCheckBox(Globals.lang("Show BibTeX source panel"));
-        emacsMode = new JCheckBox(Globals.lang("Use Emacs key bindings"));
-        emacsRebindCtrlA = new JCheckBox(Globals.lang("Rebind C-a, too"));
-        emacsRebindCtrlF = new JCheckBox(Globals.lang("Rebind C-f, too"));
-        disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
-        autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
+        autoOpenForm = new JCheckBox(Localization.lang("Open editor when a new entry is created"));
+        defSource = new JCheckBox(Localization.lang("Show BibTeX source by default"));
+        showSource = new JCheckBox(Localization.lang("Show BibTeX source panel"));
+        emacsMode = new JCheckBox(Localization.lang("Use Emacs key bindings"));
+        emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
+        emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
+        disableOnMultiple = new JCheckBox(Localization.lang("Disable entry editor when multiple entries are selected"));
+        autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
 
         shortestToComplete = new JSpinner(new SpinnerNumberModel(prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE), 1, 5, 1));
 
         // allowed name formats
-        autoCompFF = new JRadioButton(Globals.lang("Autocomplete names in 'Firstname Lastname' format only"));
-        autoCompLF = new JRadioButton(Globals.lang("Autocomplete names in 'Lastname, Firstname' format only"));
-        autoCompBoth = new JRadioButton(Globals.lang("Autocomplete names in both formats"));
+        autoCompFF = new JRadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
+        autoCompLF = new JRadioButton(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"));
+        autoCompBoth = new JRadioButton(Localization.lang("Autocomplete names in both formats"));
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(autoCompLF);
         buttonGroup.add(autoCompFF);
         buttonGroup.add(autoCompBoth);
 
         // treatment of first name
-        firstNameModeFull = new JRadioButton(Globals.lang("Use full firstname whenever possible"));
-        firstNameModeAbbr = new JRadioButton(Globals.lang("Use abbreviated firstname whenever possible"));
-        firstNameModeBoth = new JRadioButton(Globals.lang("Use abbreviated and full firstname"));
+        firstNameModeFull = new JRadioButton(Localization.lang("Use full firstname whenever possible"));
+        firstNameModeAbbr = new JRadioButton(Localization.lang("Use abbreviated firstname whenever possible"));
+        firstNameModeBoth = new JRadioButton(Localization.lang("Use abbreviated and full firstname"));
         ButtonGroup firstNameModeButtonGroup = new ButtonGroup();
         firstNameModeButtonGroup.add(firstNameModeFull);
         firstNameModeButtonGroup.add(firstNameModeAbbr);
@@ -161,7 +161,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                  "pref, 6dlu, pref, pref, pref, pref, 6dlu, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
-        builder.addSeparator(Globals.lang("Editor options"), cc.xyw(1, 1, 5));
+        builder.addSeparator(Localization.lang("Editor options"), cc.xyw(1, 1, 5));
         builder.add(autoOpenForm, cc.xy(2, 3));
         builder.add(disableOnMultiple, cc.xy(2, 5));
         builder.add(showSource, cc.xy(2, 7));
@@ -170,25 +170,25 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(emacsRebindCtrlA, cc.xy(2, 13));
         builder.add(emacsRebindCtrlF, cc.xy(2, 15));
         
-        builder.addSeparator(Globals.lang("Autocompletion options"), cc.xyw(1, 17, 5));
+        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 17, 5));
         builder.add(autoComplete, cc.xy(2, 19));
         
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
-        JLabel label = new JLabel(Globals.lang("Use autocompletion for the following fields")+":");
+        JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields")+":");
 
         builder3.append(label);
         builder3.append(autoCompFields);
-        JLabel label2 = new JLabel(Globals.lang("Autocomplete after following number of characters") + ":");
+        JLabel label2 = new JLabel(Localization.lang("Autocomplete after following number of characters") + ":");
         builder3.append(label2);
         builder3.append(shortestToComplete);
         builder.add(builder3.getPanel(), cc.xyw(2, 21, 3));
 
-        builder.addSeparator(Globals.lang("Name format used for autocompletion"), cc.xyw(2, 23, 4));
+        builder.addSeparator(Localization.lang("Name format used for autocompletion"), cc.xyw(2, 23, 4));
         builder.add(autoCompFF, cc.xy(2,24));
         builder.add(autoCompLF, cc.xy(2,25));
         builder.add(autoCompBoth, cc.xy(2,26));
         
-        builder.addSeparator(Globals.lang("Treatment of first names"), cc.xyw(2, 28, 4));
+        builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 28, 4));
         builder.add(firstNameModeAbbr, cc.xy(2,29));
         builder.add(firstNameModeFull, cc.xy(2,30));
         builder.add(firstNameModeBoth, cc.xy(2,31));
@@ -318,6 +318,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Entry editor");
+        return Localization.lang("Entry editor");
     }
 }

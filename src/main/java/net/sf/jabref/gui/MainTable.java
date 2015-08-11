@@ -30,6 +30,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -678,7 +679,7 @@ public class MainTable extends JTable {
 
         public IncompleteRenderer() {
             super(Globals.prefs.getColor(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND));
-            super.setToolTipText(Globals.lang("This entry is incomplete"));
+            super.setToolTipText(Localization.lang("This entry is incomplete"));
         }
 
         void setNumber(int number) {

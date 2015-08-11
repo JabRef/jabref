@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -65,19 +67,19 @@ public class MergeDialog extends JDialog {
     private void jbInit(JabRefFrame parent) {
         //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
         panel1.setLayout(borderLayout1);
-        ok.setText(Globals.lang("Ok"));
+        ok.setText(Localization.lang("Ok"));
         ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
-        Cancel.setText(Globals.lang("Cancel"));
+        Cancel.setText(Localization.lang("Cancel"));
         Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
         jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPanel1.setLayout(gridBagLayout1);
         entries.setToolTipText("");
         entries.setSelected(true);
-        entries.setText(Globals.lang("Import entries"));
+        entries.setText(Localization.lang("Import entries"));
         strings.setSelected(true);
-        strings.setText(Globals.lang("Import strings"));
-        groups.setText(Globals.lang("Import group definitions"));
-        selector.setText(Globals.lang("Import word selector definitions"));
+        strings.setText(Localization.lang("Import strings"));
+        groups.setText(Localization.lang("Import group definitions"));
+        selector.setText(Localization.lang("Import word selector definitions"));
         this.setModal(true);
         this.setResizable(false);
         getContentPane().add(panel1);

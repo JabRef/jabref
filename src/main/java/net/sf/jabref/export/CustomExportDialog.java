@@ -28,6 +28,7 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
 
@@ -59,7 +60,7 @@ class CustomExportDialog extends JDialog {
     }
 
     public CustomExportDialog(JabRefFrame parent_) {
-        super(parent_, Globals.lang("Edit custom export"), true);
+        super(parent_, Localization.lang("Edit custom export"), true);
         parent = parent_;
         ActionListener okListener = new ActionListener() {
 
@@ -85,7 +86,7 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
-        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("Ok"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);
@@ -99,10 +100,10 @@ class CustomExportDialog extends JDialog {
             }
         };
 
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(cancelAction);
 
-        JButton browse = new JButton(Globals.lang("Browse"));
+        JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(new ActionListener() {
 
             @Override
@@ -134,7 +135,7 @@ class CustomExportDialog extends JDialog {
         main.setLayout(gbl);
         main.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Export properties")));
+                        Localization.lang("Export properties")));
 
         // Main panel:
         GridBagConstraints con = new GridBagConstraints();
@@ -145,15 +146,15 @@ class CustomExportDialog extends JDialog {
         con.fill = GridBagConstraints.NONE;
         con.gridx = 0;
         con.gridy = 0;
-        JLabel nl = new JLabel(Globals.lang("Export name") + ':');
+        JLabel nl = new JLabel(Localization.lang("Export name") + ':');
         gbl.setConstraints(nl, con);
         main.add(nl);
         con.gridy = 1;
-        JLabel nr = new JLabel(Globals.lang("Main layout file") + ':');
+        JLabel nr = new JLabel(Localization.lang("Main layout file") + ':');
         gbl.setConstraints(nr, con);
         main.add(nr);
         con.gridy = 2;
-        JLabel nf = new JLabel(Globals.lang("File extension") + ':');
+        JLabel nf = new JLabel(Localization.lang("File extension") + ':');
         gbl.setConstraints(nf, con);
         main.add(nf);
 

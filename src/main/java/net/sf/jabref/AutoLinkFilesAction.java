@@ -10,6 +10,7 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -20,7 +21,7 @@ class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
         putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));
-        putValue(Action.NAME, Globals.lang("Automatically set file links"));
+        putValue(Action.NAME, Localization.lang("Automatically set file links"));
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
     }
 
@@ -29,11 +30,11 @@ class AutoLinkFilesAction extends AbstractAction {
         ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
         if (entries.isEmpty()) {
-            JabRef.jrf.basePanel().output(Globals.lang("No entries selected."));
+            JabRef.jrf.basePanel().output(Localization.lang("No entries selected."));
             return;
         }
         JDialog diag = new JDialog(JabRef.jrf, true);
-        final NamedCompound nc = new NamedCompound(Globals.lang("Automatically set file links"));
+        final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
         Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
 
             @Override
@@ -45,10 +46,10 @@ class AutoLinkFilesAction extends AbstractAction {
                         JabRef.jrf.basePanel().undoManager.addEdit(nc);
                         JabRef.jrf.basePanel().markBaseChanged();
                     }
-                    JabRef.jrf.output(Globals.lang("Finished autosetting external links."));
+                    JabRef.jrf.output(Localization.lang("Finished autosetting external links."));
                 } else {
-                    JabRef.jrf.output(Globals.lang("Finished autosetting external links.")
-                            + " " + Globals.lang("No files found."));
+                    JabRef.jrf.output(Localization.lang("Finished autosetting external links.")
+                            + " " + Localization.lang("No files found."));
                 }
             }
         }, diag);

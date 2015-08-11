@@ -48,6 +48,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -102,12 +103,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
-        diag = new JDialog(frame, Globals.lang("Manage keywords"), true);
+        diag = new JDialog(frame, Localization.lang("Manage keywords"), true);
 
-        JButton ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
-        JButton add = new JButton(Globals.lang("Add"));
-        JButton remove = new JButton(Globals.lang("Remove"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+        JButton add = new JButton(Localization.lang("Add"));
+        JButton remove = new JButton(Localization.lang("Remove"));
 
         keywordList.setVisibleRowCount(10);
 
@@ -129,7 +130,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("fill:200dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
-        builder.appendSeparator(Globals.lang("Keywords of selected entries"));
+        builder.appendSeparator(Localization.lang("Keywords of selected entries"));
         builder.append(intersectKeywords, 5);
         builder.nextLine();
         builder.append(mergeKeywords, 5);
@@ -369,7 +370,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
 
         BibtexEntry[] entries = bp.getSelectedEntries();
-        NamedCompound ce = new NamedCompound(Globals.lang("Update keywords"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibtexEntry entry : entries) {
             ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
 

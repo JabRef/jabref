@@ -58,8 +58,8 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.integrity.IntegrityCheck;
 import net.sf.jabref.wizard.integrity.IntegrityMessage;
 import net.sf.jabref.wizard.text.gui.HintListModel;
@@ -101,14 +101,14 @@ public class IntegrityMessagePanel
         JPanel fixPanel = new JPanel();
         //    BoxLayout box = new BoxLayout(fixPanel, BoxLayout.LINE_AXIS) ;
 
-        JLabel label1 = new JLabel(Globals.lang("Field_content"));
+        JLabel label1 = new JLabel(Localization.lang("Field_content"));
 
         content = new JTextField(40);
         content.addKeyListener(this);
-        applyButton = new JButton(Globals.lang("Apply"));
+        applyButton = new JButton(Localization.lang("Apply"));
         applyButton.addActionListener(this);
         applyButton.setEnabled(false);
-        JButton fixButton = new JButton(Globals.lang("Suggest"));
+        JButton fixButton = new JButton(Localization.lang("Suggest"));
         fixButton.setEnabled(false);
 
         fixPanel.add(label1);

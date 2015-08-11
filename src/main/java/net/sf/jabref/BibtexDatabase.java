@@ -35,6 +35,7 @@ Modified for use in JabRef
 
 package net.sf.jabref;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
 
 import java.beans.PropertyChangeEvent;
@@ -293,7 +294,7 @@ public class BibtexDatabase {
             throws KeyCollisionException
     {
         if (hasStringLabel(string.getName())) {
-            throw new KeyCollisionException(Globals.lang("A string with this label already exists"));
+            throw new KeyCollisionException(Localization.lang("A string with this label already exists"));
         }
 
         if (_strings.containsKey(string.getId())) {
@@ -544,8 +545,8 @@ public class BibtexDatabase {
             }
         }
         if (duplicate && issueWarning) {
-            JOptionPane.showMessageDialog(null, Globals.lang("Warning there is a duplicate key") + ':' + newKey,
-                    Globals.lang("Duplicate Key Warning"),
+            JOptionPane.showMessageDialog(null, Localization.lang("Warning there is a duplicate key") + ':' + newKey,
+                    Localization.lang("Duplicate Key Warning"),
                     JOptionPane.WARNING_MESSAGE);//, options);
 
         }

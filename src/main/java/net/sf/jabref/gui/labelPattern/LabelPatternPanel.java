@@ -36,6 +36,7 @@ import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.gui.help.HelpAction;
@@ -69,7 +70,7 @@ public class LabelPatternPanel extends JPanel {
         pan.setLayout(gbl);
         setLayout(gbl);
         // The header - can be removed
-        JLabel lblEntryType = new JLabel(Globals.lang("Entry type"));
+        JLabel lblEntryType = new JLabel(Localization.lang("Entry type"));
         Font f = new Font("plain", Font.BOLD, 12);
         lblEntryType.setFont(f);
         con.gridx = 0;
@@ -82,7 +83,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(lblEntryType, con);
         pan.add(lblEntryType);
 
-        JLabel lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
+        JLabel lblKeyPattern = new JLabel(Localization.lang("Key pattern"));
         lblKeyPattern.setFont(f);
         con.gridx = 1;
         con.gridy = 0;
@@ -96,14 +97,14 @@ public class LabelPatternPanel extends JPanel {
 
         con.gridy = 1;
         con.gridx = 0;
-        JLabel lab = new JLabel(Globals.lang("Default pattern"));
+        JLabel lab = new JLabel(Localization.lang("Default pattern"));
         gbl.setConstraints(lab, con);
         pan.add(lab);
         con.gridx = 1;
         gbl.setConstraints(defaultPat, con);
         pan.add(defaultPat);
         con.insets = new Insets(5, 5, 10, 5);
-        JButton btnDefault = new JButton(Globals.lang("Default"));
+        JButton btnDefault = new JButton(Localization.lang("Default"));
         btnDefault.addActionListener(new ActionListener() {
 
             @Override
@@ -141,13 +142,13 @@ public class LabelPatternPanel extends JPanel {
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(0, 5, 0, 5);
         JButton hlb = new JButton(GUIGlobals.getImage("helpSmall"));
-        hlb.setToolTipText(Globals.lang("Help on key patterns"));
+        hlb.setToolTipText(Localization.lang("Help on key patterns"));
         gbl.setConstraints(hlb, con);
         add(hlb);
         hlb.addActionListener(help);
 
         // And finally a button to reset everything
-        JButton btnDefaultAll = new JButton(Globals.lang("Reset all"));
+        JButton btnDefaultAll = new JButton(Localization.lang("Reset all"));
         con.gridx = 2;
         con.gridy = 2;
 
@@ -199,7 +200,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(tf, con);
         c.add(tf);
 
-        JButton but = new JButton(Globals.lang("Default"));
+        JButton but = new JButton(Localization.lang("Default"));
         con.gridx = 2;
         con.fill = GridBagConstraints.BOTH;
         con.weightx = 0;

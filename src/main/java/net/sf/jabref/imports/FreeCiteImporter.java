@@ -37,6 +37,7 @@ import net.sf.jabref.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 
 /**
@@ -91,7 +92,7 @@ public class FreeCiteImporter extends ImportFormat {
             writer.write(data);
             writer.flush();
         } catch (IOException e) {
-            status.showMessage(Globals.lang("Unable to connect to freecite online service."));
+            status.showMessage(Localization.lang("Unable to connect to freecite online service."));
             return null;
         } catch (Exception ex) {
             ex.printStackTrace();

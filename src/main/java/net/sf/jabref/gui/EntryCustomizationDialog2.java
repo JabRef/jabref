@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
@@ -60,7 +61,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
     /** Creates a new instance of EntryCustomizationDialog2 */
     public EntryCustomizationDialog2(JabRefFrame frame) {
-        super(frame, Globals.lang("Customize entry types"), false);
+        super(frame, Localization.lang("Customize entry types"), false);
 
         this.frame = frame;
         initGui();
@@ -90,12 +91,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         typeComp.setListSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         //typeComp.setEnabled(false);
-        reqComp = new FieldSetComponent(Globals.lang("Required fields"), new ArrayList<String>(), preset, true, true);
+        reqComp = new FieldSetComponent(Localization.lang("Required fields"), new ArrayList<String>(), preset, true, true);
         reqComp.setEnabled(false);
         reqComp.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         ListDataListener dataListener = new DataListener();
         reqComp.addListDataListener(dataListener);
-        optComp = new FieldSetComponent(Globals.lang("Optional fields"), new ArrayList<String>(), preset, true, true);
+        optComp = new FieldSetComponent(Localization.lang("Optional fields"), new ArrayList<String>(), preset, true, true);
         optComp.setEnabled(false);
         optComp.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         optComp.addListDataListener(dataListener);
@@ -103,7 +104,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         right.add(optComp);
 
         if (biblatexMode) {
-            optComp2 = new FieldSetComponent(Globals.lang("Optional fields") + " 2", new ArrayList<String>(), preset, true, true);
+            optComp2 = new FieldSetComponent(Localization.lang("Optional fields") + " 2", new ArrayList<String>(), preset, true, true);
             optComp2.setEnabled(false);
             optComp2.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
             optComp2.addListDataListener(dataListener);
@@ -114,8 +115,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
         ok = new JButton("Ok");
-        cancel = new JButton(Globals.lang("Cancel"));
-        apply = new JButton(Globals.lang("Apply"));
+        cancel = new JButton(Localization.lang("Cancel"));
+        apply = new JButton(Localization.lang("Apply"));
         ok.addActionListener(this);
         apply.addActionListener(this);
         cancel.addActionListener(this);
@@ -325,10 +326,10 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         if (type instanceof CustomEntryType) {
             if (BibtexEntryType.getStandardType(name) == null) {
                 int reply = JOptionPane.showConfirmDialog
-                        (frame, Globals.lang("All entries of this "
-                                + "type will be declared "
-                                + "typeless. Continue?"),
-                                Globals.lang("Delete custom format") +
+                        (frame, Localization.lang("All entries of this "
+                                        + "type will be declared "
+                                        + "typeless. Continue?"),
+                                Localization.lang("Delete custom format") +
                                         " '" + StringUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
                 if (reply != JOptionPane.YES_OPTION) {

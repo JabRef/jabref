@@ -18,8 +18,8 @@ package net.sf.jabref.export;
 import java.util.Set;
 
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
 
 /**
@@ -29,7 +29,7 @@ import net.sf.jabref.sql.DBExporterAndImporterFactory;
 public class PostgreSQLExport extends ExportFormat {
 
     public PostgreSQLExport() {
-        super(Globals.lang("PostgreSQL database"), "postgresql", null, null, ".sql");
+        super(Localization.lang("PostgreSQL database"), "postgresql", null, null, ".sql");
     }
 
     /**

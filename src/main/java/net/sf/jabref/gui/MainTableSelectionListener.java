@@ -29,6 +29,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -340,7 +341,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
                 @Override
                 public void run() {
-                    panel.output(Globals.lang("External viewer called") + '.');
+                    panel.output(Localization.lang("External viewer called") + '.');
 
                     Object link = entry.getField(fieldName);
                     if (link == null) {
@@ -388,14 +389,14 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                                             panel.metaData(), flEntry.getType());
                             boolean success = item.openLink();
                             if (!success) {
-                                panel.output(Globals.lang("Unable to open link."));
+                                panel.output(Localization.lang("Unable to open link."));
                             }
                         }
                     } else {
                         try {
                             Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
                         } catch (IOException ex) {
-                            panel.output(Globals.lang("Unable to open link."));
+                            panel.output(Localization.lang("Unable to open link."));
                         }
 
                         /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");

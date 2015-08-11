@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.remote.client;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.shared.Protocol;
 import net.sf.jabref.logic.util.StringUtil;
 import org.apache.commons.logging.Log;
@@ -33,7 +33,7 @@ public class RemoteListenerClient {
 
                 if (!Protocol.IDENTIFIER.equals(identifier)) {
                     String port = String.valueOf(remoteServerPort);
-                    String error = Globals.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
+                    String error = Localization.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
                     System.out.println(error);
                     return false;
                 }
