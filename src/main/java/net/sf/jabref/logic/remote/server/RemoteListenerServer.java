@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.remote.server;
 
 import net.sf.jabref.logic.remote.shared.Protocol;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -12,6 +14,8 @@ public class RemoteListenerServer implements Runnable {
 
     private static final int BACKLOG = 1;
     private static final int ONE_SECOND_TIMEOUT = 1000;
+
+    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServer.class);
 
     private final MessageHandler messageHandler;
     private final ServerSocket serverSocket;
@@ -47,7 +51,7 @@ public class RemoteListenerServer implements Runnable {
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("RemoteListenerServer crashed", e);
                 }
             }
         } finally {

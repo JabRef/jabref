@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.remote.server;
 
 import net.sf.jabref.JabRefExecutorService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 
@@ -15,6 +17,8 @@ import java.io.IOException;
 public class RemoteListenerServerLifecycle {
 
     private RemoteListenerServerThread remoteListenerServerThread = null;
+
+    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
 
     public void stop() {
         if (isOpen()) {
@@ -36,7 +40,7 @@ public class RemoteListenerServerLifecycle {
             result = new RemoteListenerServerThread(messageHandler, port);
         } catch (IOException e) {
             if (!e.getMessage().startsWith("Address already in use")) {
-                e.printStackTrace();
+                LOGGER.warn("Port is blocked", e);
             }
             result = null;
         }
