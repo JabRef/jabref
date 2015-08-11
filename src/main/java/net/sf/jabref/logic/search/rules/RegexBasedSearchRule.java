@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -70,7 +70,7 @@ public class RegexBasedSearchRule implements SearchRule {
 
         List<String> words = new SentenceAnalyzer(searchString).getWords();
 
-        List<Pattern> patterns = new ArrayList<Pattern>();
+        List<Pattern> patterns = new ArrayList<>();
         try {
             for (String word : words) {
                 patterns.add(Pattern.compile(word, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE));
