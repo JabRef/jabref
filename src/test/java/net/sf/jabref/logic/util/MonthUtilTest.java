@@ -8,7 +8,6 @@ public class MonthUtilTest {
 
     @Test
     public void testToMonthNumber() {
-
         Assert.assertEquals(0, MonthUtil.getMonth("jan").index);
         Assert.assertEquals(1, MonthUtil.getMonth("feb").index);
         Assert.assertEquals(2, MonthUtil.getMonth("mar").index);
@@ -76,6 +75,6 @@ public class MonthUtilTest {
         Assert.assertEquals(-1, MonthUtil.getMonth("3.2").index);
         Assert.assertEquals(-1, MonthUtil.getMonth("#test#").index);
         Assert.assertEquals(-1, MonthUtil.getMonth("").index);
+        Assert.assertFalse(MonthUtil.getMonth("8,").isValid());
     }
-
 }
