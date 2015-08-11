@@ -13,7 +13,7 @@ public class RemoteListenerClient {
 
     private static final Log LOGGER = LogFactory.getLog(RemoteListenerClient.class);
 
-    private static final int TWO_SECONDS_TIMEOUT = 2000;
+    private static final int TIMEOUT = 2000;
 
     /**
      * Attempt to send command line arguments to already running JabRef instance.
@@ -25,7 +25,7 @@ public class RemoteListenerClient {
         try {
             InetAddress local = InetAddress.getByName("localhost");
             Socket socket = new Socket(local, remoteServerPort);
-            socket.setSoTimeout(TWO_SECONDS_TIMEOUT);
+            socket.setSoTimeout(TIMEOUT);
 
             Protocol protocol = new Protocol(socket);
             try {
