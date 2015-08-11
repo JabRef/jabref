@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +17,8 @@ package net.sf.jabref.logic.net;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
 import java.net.CookieHandler;
@@ -33,6 +35,8 @@ public class URLDownload {
 
     private final URL source;
 
+    private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
+
     /**
      * URL download to a string.
      * <p>
@@ -44,6 +48,7 @@ public class URLDownload {
      *
      * @param source The URL to download.
      */
+
     public URLDownload(URL source) {
         this.source = source;
 
@@ -99,25 +104,15 @@ public class URLDownload {
     }
 
     public String downloadToString(String encoding) throws IOException {
-        InputStream input = new BufferedInputStream(openConnection().getInputStream());
-        Writer output = new StringWriter();
 
-        try {
+        try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
+             Writer output = new StringWriter();) {
             copy(input, output, encoding);
+            return output.toString();
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                input.close();
-            } catch (Exception ignored) {
-            }
-            try {
-                output.close();
-            } catch (Exception ignored) {
-            }
+            LOGGER.warn("Could not copy input", e);
+            return "";
         }
-
-        return output.toString();
     }
 
     private void copy(InputStream in, Writer out, String encoding) throws IOException {
@@ -133,22 +128,12 @@ public class URLDownload {
     }
 
     public void downloadToFile(File destination) throws IOException {
-        InputStream input = new BufferedInputStream(openConnection().getInputStream());
-        OutputStream output = new BufferedOutputStream(new FileOutputStream(destination));
 
-        try {
+        try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
+             OutputStream output = new BufferedOutputStream(new FileOutputStream(destination))) {
             copy(input, output);
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                input.close();
-            } catch (Exception ignored) {
-            }
-            try {
-                output.close();
-            } catch (Exception ignored) {
-            }
+            LOGGER.warn("Could not copy input", e);
         }
     }
 
