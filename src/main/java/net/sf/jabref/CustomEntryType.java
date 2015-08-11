@@ -42,7 +42,7 @@ public class CustomEntryType extends BibtexEntryType {
 
 
     public CustomEntryType(String name_, String[] req_, String[] priOpt_, String[] secOpt_) {
-        name = StringUtil.nCase(name_);
+        name = StringUtil.capitalizeFirst(name_);
         parseRequiredFields(req_);
         priOpt = priOpt_;
         opt = Util.arrayConcat(priOpt_, secOpt_);
@@ -53,7 +53,7 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     private CustomEntryType(String name_, String reqStr, String optStr) {
-        name = StringUtil.nCase(name_);
+        name = StringUtil.capitalizeFirst(name_);
         if (reqStr.isEmpty()) {
             req = new String[0];
         } else {

@@ -24,10 +24,10 @@ public class UtilTest {
 
     @Test
     public void testNCase() {
-        Assert.assertEquals("", StringUtil.nCase(""));
-        Assert.assertEquals("Hello world", StringUtil.nCase("Hello World"));
-        Assert.assertEquals("A", StringUtil.nCase("a"));
-        Assert.assertEquals("Aa", StringUtil.nCase("AA"));
+        Assert.assertEquals("", StringUtil.capitalizeFirst(""));
+        Assert.assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
+        Assert.assertEquals("A", StringUtil.capitalizeFirst("a"));
+        Assert.assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
     }
 
     @Test

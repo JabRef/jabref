@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -41,22 +41,22 @@ public class NameListNormalizer {
             If there is a semicolon, we go by that. If not, we assume commas, and count the parts
             separated by commas to determine which it is.
             */
-            String[] a2 = in.split("; ");
-            if (a2.length > 1) {
-                authors = a2;
+            String[] authors2 = in.split("; ");
+            if (authors2.length > 1) {
+                authors = authors2;
             }
             else {
-                a2 = in.split(", ");
-                if (a2.length > 3) { // Probably more than a single author, so we split by commas.
-                    authors = a2;
+                authors2 = in.split(", ");
+                if (authors2.length > 3) { // Probably more than a single author, so we split by commas.
+                    authors = authors2;
                 } else {
-                    if (a2.length == 3) {
+                    if (authors2.length == 3) {
                         // This could be a BibTeX formatted name containing a Jr particle,
                         // e.g. Smith, Jr., Peter
                         // We check if the middle part is <= 3 characters. If not, we assume we are
                         // dealing with three authors.
-                        if (a2[1].length() > 3) {
-                            authors = a2;
+                        if (authors2[1].length() > 3) {
+                            authors = authors2;
                         }
                     }
                 }
@@ -106,74 +106,74 @@ public class NameListNormalizer {
             }
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < authors.length; i++) {
             String norm = NameListNormalizer.normalizeName(authors[i]);
-            sb.append(norm);
+            stringBuilder.append(norm);
             if (i < authors.length - 1) {
-                sb.append(" and ");
+                stringBuilder.append(" and ");
             }
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     private static String normalizeName(String name) {
-        Matcher m = NameListNormalizer.lastFF.matcher(name);
-        if (m.matches()) {
-            String initials = m.group(2);
-            StringBuilder sb = new StringBuilder(m.group(1));
-            sb.append(", ");
+        Matcher matcher = NameListNormalizer.lastFF.matcher(name);
+        if (matcher.matches()) {
+            String initials = matcher.group(2);
+            StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
+            stringBuilder.append(", ");
             for (int i = 0; i < initials.length(); i++) {
-                sb.append(initials.charAt(i));
-                sb.append('.');
+                stringBuilder.append(initials.charAt(i));
+                stringBuilder.append('.');
                 if (i < initials.length() - 1) {
-                    sb.append(' ');
+                    stringBuilder.append(' ');
                 }
             }
-            return sb.toString();
+            return stringBuilder.toString();
         }
-        m = NameListNormalizer.lastFdotF.matcher(name);
-        if (m.matches()) {
-            String initials = m.group(2).replaceAll("[\\. ]+", "");
-            StringBuilder sb = new StringBuilder(m.group(1));
-            sb.append(", ");
+        matcher = NameListNormalizer.lastFdotF.matcher(name);
+        if (matcher.matches()) {
+            String initials = matcher.group(2).replaceAll("[\\. ]+", "");
+            StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
+            stringBuilder.append(", ");
             for (int i = 0; i < initials.length(); i++) {
-                sb.append(initials.charAt(i));
-                sb.append('.');
+                stringBuilder.append(initials.charAt(i));
+                stringBuilder.append('.');
                 if (i < initials.length() - 1) {
-                    sb.append(' ');
+                    stringBuilder.append(' ');
                 }
             }
-            return sb.toString();
+            return stringBuilder.toString();
         }
 
-        m = NameListNormalizer.FFlast.matcher(name);
-        if (m.matches()) {
-            String initials = m.group(1);
-            StringBuilder sb = new StringBuilder(m.group(2));
-            sb.append(", ");
+        matcher = NameListNormalizer.FFlast.matcher(name);
+        if (matcher.matches()) {
+            String initials = matcher.group(1);
+            StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
+            stringBuilder.append(", ");
             for (int i = 0; i < initials.length(); i++) {
-                sb.append(initials.charAt(i));
-                sb.append('.');
+                stringBuilder.append(initials.charAt(i));
+                stringBuilder.append('.');
                 if (i < initials.length() - 1) {
-                    sb.append(' ');
+                    stringBuilder.append(' ');
                 }
             }
-            return sb.toString();
+            return stringBuilder.toString();
         }
-        m = NameListNormalizer.FdotFlast.matcher(name);
-        if (m.matches()) {
-            String initials = m.group(1).replaceAll("[\\. ]+", "");
-            StringBuilder sb = new StringBuilder(m.group(2));
-            sb.append(", ");
+        matcher = NameListNormalizer.FdotFlast.matcher(name);
+        if (matcher.matches()) {
+            String initials = matcher.group(1).replaceAll("[\\. ]+", "");
+            StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
+            stringBuilder.append(", ");
             for (int i = 0; i < initials.length(); i++) {
-                sb.append(initials.charAt(i));
-                sb.append('.');
+                stringBuilder.append(initials.charAt(i));
+                stringBuilder.append('.');
                 if (i < initials.length() - 1) {
-                    sb.append(' ');
+                    stringBuilder.append(' ');
                 }
             }
-            return sb.toString();
+            return stringBuilder.toString();
         }
 
         if (name.indexOf(',') >= 0) {
@@ -184,49 +184,49 @@ public class NameListNormalizer {
                 name = name.substring(0, name.length() - 1);
             }
 
-            StringBuilder sb = new StringBuilder(name.substring(0, index));
-            sb.append(", ");
+            StringBuilder stringBuilder = new StringBuilder(name.substring(0, index));
+            stringBuilder.append(", ");
             // Check if the remainder is a single name:
-            String fName = name.substring(index + 1).trim();
-            String[] fParts = fName.split(" ");
-            if (fParts.length > 1) {
+            String firstName = name.substring(index + 1).trim();
+            String[] firstNameParts = firstName.split(" ");
+            if (firstNameParts.length > 1) {
                 // Multiple parts. Add all of them, and add a dot if they are single letter parts:
-                for (int i = 0; i < fParts.length; i++) {
-                    if (fParts[i].length() == 1) {
-                        sb.append(fParts[i]).append('.');
+                for (int i = 0; i < firstNameParts.length; i++) {
+                    if (firstNameParts[i].length() == 1) {
+                        stringBuilder.append(firstNameParts[i]).append('.');
                     } else {
-                        sb.append(fParts[i]);
+                        stringBuilder.append(firstNameParts[i]);
                     }
-                    if (i < fParts.length - 1) {
-                        sb.append(' ');
+                    if (i < firstNameParts.length - 1) {
+                        stringBuilder.append(' ');
                     }
                 }
             } else {
                 // Only a single part. Check if it looks like a name or initials:
-                Matcher m2 = NameListNormalizer.SINGLE_NAME.matcher(fParts[0]);
-                if (m2.matches()) {
-                    sb.append(fParts[0]);
+                Matcher nameMatcher = NameListNormalizer.SINGLE_NAME.matcher(firstNameParts[0]);
+                if (nameMatcher.matches()) {
+                    stringBuilder.append(firstNameParts[0]);
                 } else {
                     // It looks like initials.
-                    String initials = fParts[0].replaceAll("[\\.]+", "");
+                    String initials = firstNameParts[0].replaceAll("[\\.]+", "");
                     for (int i = 0; i < initials.length(); i++) {
-                        sb.append(initials.charAt(i));
-                        sb.append('.');
+                        stringBuilder.append(initials.charAt(i));
+                        stringBuilder.append('.');
                         if (i < initials.length() - 1) {
-                            sb.append(' ');
+                            stringBuilder.append(' ');
                         }
                     }
                 }
 
             }
-            return sb.toString();
+            return stringBuilder.toString();
         } else {
             // Name doesn't contain comma
             String[] parts = name.split(" +");
             boolean allNames = true;
             for (String part : parts) {
-                m = NameListNormalizer.SINGLE_NAME.matcher(part);
-                if (!m.matches()) {
+                matcher = NameListNormalizer.SINGLE_NAME.matcher(part);
+                if (!matcher.matches()) {
                     allNames = false;
                     break;
                 }
@@ -234,17 +234,17 @@ public class NameListNormalizer {
             if (allNames) {
                 // Looks like a name written in full with first name first.
                 // Change into last name first format:
-                StringBuilder sb = new StringBuilder(parts[parts.length - 1]);
+                StringBuilder stringBuilder = new StringBuilder(parts[parts.length - 1]);
                 if (parts.length > 1) {
-                    sb.append(',');
+                    stringBuilder.append(',');
                     for (int i = 0; i < parts.length - 1; i++) {
-                        sb.append(' ').append(parts[i]);
+                        stringBuilder.append(' ').append(parts[i]);
                         if (parts[i].length() == 1) {
-                            sb.append('.');
+                            stringBuilder.append('.');
                         }
                     }
                 }
-                return sb.toString();
+                return stringBuilder.toString();
             }
         }
 

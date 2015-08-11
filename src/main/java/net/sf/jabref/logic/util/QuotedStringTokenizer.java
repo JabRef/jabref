@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,11 +21,11 @@ package net.sf.jabref.logic.util;
  */
 public class QuotedStringTokenizer {
 
-    private final String m_content;
-    private final int m_contentLength;
-    private final String m_delimiters;
-    private final char m_quoteChar;
-    private int m_index = 0;
+    private final String content;
+    private final int contentLength;
+    private final String delimiters;
+    private final char quoteChar;
+    private int index = 0;
 
 
     /**
@@ -39,47 +39,47 @@ public class QuotedStringTokenizer {
      *            not treated as a delimiter, but as a token component.
      */
     public QuotedStringTokenizer(String content, String delimiters, char quoteCharacter) {
-        m_content = content;
-        m_delimiters = delimiters;
-        m_quoteChar = quoteCharacter;
-        m_contentLength = m_content.length();
+        this.content = content;
+        this.delimiters = delimiters;
+        quoteChar = quoteCharacter;
+        contentLength = this.content.length();
         // skip leading delimiters
-        while (isDelimiter(m_content.charAt(m_index)) && m_index < m_contentLength) {
-            ++m_index;
+        while (isDelimiter(this.content.charAt(index)) && index < contentLength) {
+            ++index;
         }
     }
 
     public String nextToken() {
         char c;
-        StringBuffer sb = new StringBuffer();
-        while (m_index < m_contentLength) {
-            c = m_content.charAt(m_index);
-            if (c == m_quoteChar) { // next is quoted
-                ++m_index;
-                if (m_index < m_contentLength)
+        StringBuilder stringBuilder = new StringBuilder();
+        while (index < contentLength) {
+            c = content.charAt(index);
+            if (c == quoteChar) { // next is quoted
+                ++index;
+                if (index < contentLength)
                  {
-                    sb.append(m_content.charAt(m_index));
+                    stringBuilder.append(content.charAt(index));
                 // ignore for delimiter search!
                 }
             } else if (isDelimiter(c)) { // unit finished
                 // advance index until next token or end
                 do {
-                    ++m_index;
-                } while (m_index < m_contentLength && isDelimiter(m_content.charAt(m_index)));
-                return sb.toString();
+                    ++index;
+                } while (index < contentLength && isDelimiter(content.charAt(index)));
+                return stringBuilder.toString();
             } else {
-                sb.append(c);
+                stringBuilder.append(c);
             }
-            ++m_index;
+            ++index;
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     private boolean isDelimiter(char c) {
-        return m_delimiters.indexOf(c) >= 0;
+        return delimiters.indexOf(c) >= 0;
     }
 
     public boolean hasMoreTokens() {
-        return m_index < m_contentLength;
+        return index < contentLength;
     }
 }

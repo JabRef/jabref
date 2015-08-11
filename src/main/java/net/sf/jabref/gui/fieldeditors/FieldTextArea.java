@@ -59,7 +59,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
         setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + StringUtil.nCase(this.fieldName) + ' ');
+        label = new FieldNameLabel(' ' + StringUtil.capitalizeFirst(this.fieldName) + ' ');
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

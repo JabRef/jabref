@@ -275,7 +275,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.nCase(tok.nextToken().trim()));
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -303,7 +303,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.nCase(tok.nextToken().trim()));
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }

@@ -124,9 +124,9 @@ public class MonthUtil {
         if (testString.length() > 3) {
             testString = testString.substring(0, 3);
         }
-        Month m = MonthUtil.getMonthByShortName(testString);
-        if (m.isValid()) {
-            return m;
+        Month month = MonthUtil.getMonthByShortName(testString);
+        if (month.isValid()) {
+            return month;
         }
 
         try {

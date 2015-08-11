@@ -8,77 +8,76 @@ public class StringUtil {
      * Returns the string, after shaving off whitespace at the beginning and end,
      * and removing (at most) one pair of braces or " surrounding it.
      *
-     * @param s
+     * @param toShave
      * @return
      */
-    public static String shaveString(String s) {
+    public static String shaveString(String toShave) {
 
-        if (s == null) {
+        if (toShave == null) {
             return null;
         }
-        char ch;
-        char ch2;
-        int beg = 0;
-        int end = s.length();
+        char first;
+        char second;
+        int begin = 0;
+        int end = toShave.length();
         // We start out assuming nothing will be removed.
-        boolean begok = false;
-        boolean endok = false;
-        while (!begok) {
-            if (beg < s.length()) {
-                ch = s.charAt(beg);
-                if (Character.isWhitespace(ch)) {
-                    beg++;
+        boolean beginOk = false;
+        boolean endOk = false;
+        while (!beginOk) {
+            if (begin < toShave.length()) {
+                first = toShave.charAt(begin);
+                if (Character.isWhitespace(first)) {
+                    begin++;
                 } else {
-                    begok = true;
+                    beginOk = true;
                 }
             } else {
-                begok = true;
+                beginOk = true;
             }
 
         }
-        while (!endok) {
-            if (end > beg + 1) {
-                ch = s.charAt(end - 1);
-                if (Character.isWhitespace(ch)) {
+        while (!endOk) {
+            if (end > begin + 1) {
+                first = toShave.charAt(end - 1);
+                if (Character.isWhitespace(first)) {
                     end--;
                 } else {
-                    endok = true;
+                    endOk = true;
                 }
             } else {
-                endok = true;
+                endOk = true;
             }
         }
 
-        if (end > beg + 1) {
-            ch = s.charAt(beg);
-            ch2 = s.charAt(end - 1);
-            if (ch == '{' && ch2 == '}' || ch == '"' && ch2 == '"') {
-                beg++;
+        if (end > begin + 1) {
+            first = toShave.charAt(begin);
+            second = toShave.charAt(end - 1);
+            if (first == '{' && second == '}' || first == '"' && second == '"') {
+                begin++;
                 end--;
             }
         }
-        s = s.substring(beg, end);
-        return s;
+        toShave = toShave.substring(begin, end);
+        return toShave;
     }
 
-    private static String rtrim(String s) {
-        return s.replaceAll("\\s+$", "");
+    private static String rightTrim(String toTrim) {
+        return toTrim.replaceAll("\\s+$", "");
     }
 
     /**
      * Concatenate all strings in the array from index 'from' to 'to' (excluding
      * to) with the given separator.
-     *
+     * <p>
      * Example:
-     *
+     * <p>
      * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
      * "ab\\cd\\ed"
      *
      * @param strings
      * @param separator
      * @param from
-     * @param to
-     *            Excluding strings[to]
+     * @param to        Excluding strings[to]
      * @return
      */
     public static String join(String[] strings, String separator, int from, int to) {
@@ -89,11 +88,11 @@ public class StringUtil {
         from = Math.max(from, 0);
         to = Math.min(strings.length, to);
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = from; i < to - 1; i++) {
-            sb.append(strings[i]).append(separator);
+            stringBuilder.append(strings[i]).append(separator);
         }
-        return sb.append(strings[to - 1]).toString();
+        return stringBuilder.append(strings[to - 1]).toString();
     }
 
     public static String join(String[] strings, String separator) {
@@ -103,13 +102,12 @@ public class StringUtil {
     /**
      * Returns the given string but with the first character turned into an
      * upper case character.
-     *
+     * <p>
      * Example: testTest becomes TestTest
      *
-     * @param string
-     *            The string to change the first character to upper case to.
+     * @param string The string to change the first character to upper case to.
      * @return A string has the first character turned to upper case and the
-     *         rest unchanged from the given one.
+     * rest unchanged from the given one.
      */
     public static String toUpperFirstLetter(String string) {
         if (string == null) {
@@ -126,8 +124,7 @@ public class StringUtil {
     /**
      * Takes a delimited string, splits it and returns
      *
-     * @param names
-     *            a <code>String</code> value
+     * @param names a <code>String</code> value
      * @return a <code>String[]</code> value
      */
     public static String[] split(String names, String delimiter) {
@@ -137,13 +134,13 @@ public class StringUtil {
         return names.split(delimiter);
     }
 
-    public static String nCase(String s) {
+    public static String capitalizeFirst(String toCapitalize) {
         // Make first character of String uppercase, and the
         // rest lowercase.
-        if (s.length() > 1) {
-            return s.substring(0, 1).toUpperCase() + s.substring(1, s.length()).toLowerCase();
+        if (toCapitalize.length() > 1) {
+            return toCapitalize.substring(0, 1).toUpperCase() + toCapitalize.substring(1, toCapitalize.length()).toLowerCase();
         } else {
-            return s.toUpperCase();
+            return toCapitalize.toUpperCase();
         }
 
     }
@@ -151,13 +148,13 @@ public class StringUtil {
     /**
      * Removes optional square brackets from the string s
      *
-     * @param s
+     * @param toStrip
      * @return
      */
-    public static String stripBrackets(String s) {
-        int beginIndex = s.startsWith("[") ? 1 : 0;
-        int endIndex = s.endsWith("]") ? s.length() - 1 : s.length();
-        return s.substring(beginIndex, endIndex);
+    public static String stripBrackets(String toStrip) {
+        int beginIndex = toStrip.startsWith("[") ? 1 : 0;
+        int endIndex = toStrip.endsWith("]") ? toStrip.length() - 1 : toStrip.length();
+        return toStrip.substring(beginIndex, endIndex);
     }
 
     /**
@@ -170,8 +167,8 @@ public class StringUtil {
         }
 
         String back = orgName;
-        int t = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
-        if (t < 1) {
+        int hiddenChar = orgName.indexOf(".", 1); // hidden files Linux/Unix (?)
+        if (hiddenChar < 1) {
             back = back + "." + defaultExtension;
         }
 
@@ -182,25 +179,25 @@ public class StringUtil {
      * Creates a substring from a text
      *
      * @param text
-     * @param i
+     * @param index
      * @param terminateOnEndBraceOnly
      * @return
      */
-    public static String getPart(String text, int i, boolean terminateOnEndBraceOnly) {
+    public static String getPart(String text, int index, boolean terminateOnEndBraceOnly) {
         char c;
         int count = 0;
 
         StringBuilder part = new StringBuilder();
 
         // advance to first char and skip whitespace
-        i++;
-        while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
-            i++;
+        index++;
+        while (index < text.length() && Character.isWhitespace(text.charAt(index))) {
+            index++;
         }
 
         // then grab whathever is the first token (counting braces)
-        while (i < text.length()) {
-            c = text.charAt(i);
+        while (index < text.length()) {
+            c = text.charAt(index);
             if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
                 // end argument and leave whitespace for further processing
                 break;
@@ -211,7 +208,7 @@ public class StringUtil {
                 count++;
             }
             part.append(c);
-            i++;
+            index++;
         }
         return part.toString();
     }
@@ -219,6 +216,7 @@ public class StringUtil {
     /**
      * Formats field contents for output. Must be "symmetric" with the parse method above,
      * so stored and reloaded fields are not mangled.
+     *
      * @param in
      * @param wrapAmount
      * @return the wrapped String.
@@ -226,42 +224,42 @@ public class StringUtil {
     public static String wrap(String in, int wrapAmount) {
 
         String[] lines = in.split("\n");
-        StringBuffer res = new StringBuffer();
-        addWrappedLine(res, lines[0], wrapAmount);
+        StringBuilder result = new StringBuilder();
+        addWrappedLine(result, lines[0], wrapAmount);
         for (int i = 1; i < lines.length; i++) {
 
             if (!lines[i].trim().equals("")) {
-                res.append(Globals.NEWLINE);
-                res.append('\t');
-                res.append(Globals.NEWLINE);
-                res.append('\t');
+                result.append(Globals.NEWLINE);
+                result.append('\t');
+                result.append(Globals.NEWLINE);
+                result.append('\t');
                 String line = lines[i];
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-                line = rtrim(line);
-                addWrappedLine(res, line, wrapAmount);
+                line = rightTrim(line);
+                addWrappedLine(result, line, wrapAmount);
             } else {
-                res.append(Globals.NEWLINE);
-                res.append('\t');
+                result.append(Globals.NEWLINE);
+                result.append('\t');
             }
         }
-        return res.toString();
+        return result.toString();
     }
 
-    private static void addWrappedLine(StringBuffer res, String line, int wrapAmount) {
+    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
-        int p = res.length();
+        int length = result.length();
         // Add the line, unmodified:
-        res.append(line);
+        result.append(line);
 
-        while (p < res.length()) {
-            int q = res.indexOf(" ", p + wrapAmount);
-            if (q < 0 || q >= res.length()) {
+        while (length < result.length()) {
+            int current = result.indexOf(" ", length + wrapAmount);
+            if (current < 0 || current >= result.length()) {
                 break;
             }
 
-            res.deleteCharAt(q);
-            res.insert(q, Globals.NEWLINE + "\t");
-            p = q + Globals.NEWLINE_LENGTH;
+            result.deleteCharAt(current);
+            result.insert(current, Globals.NEWLINE + "\t");
+            length = current + Globals.NEWLINE_LENGTH;
 
         }
     }
@@ -270,101 +268,95 @@ public class StringUtil {
      * Quotes each and every character, e.g. '!' as &#33;. Used for verbatim
      * display of arbitrary strings that may contain HTML entities.
      */
-    public static String quoteForHTML(String s) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); ++i) {
-            sb.append("&#").append((int) s.charAt(i)).append(";");
+    public static String quoteForHTML(String toQuote) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < toQuote.length(); ++i) {
+            result.append("&#").append((int) toQuote.charAt(i)).append(";");
         }
-        return sb.toString();
+        return result.toString();
     }
 
-    public static String quote(String s, String specials, char quoteChar) {
-        return quote(s, specials, quoteChar, 0);
+    public static String quote(String toQuote, String specials, char quoteChar) {
+        return quote(toQuote, specials, quoteChar, 0);
     }
 
     /**
      * Quote special characters.
      *
-     * @param s
-     *            The String which may contain special characters.
-     * @param specials
-     *            A String containing all special characters except the quoting
-     *            character itself, which is automatically quoted.
-     * @param quoteChar
-     *            The quoting character.
-     * @param linewrap
-     *            The number of characters after which a linebreak is inserted
-     *            (this linebreak is undone by unquote()). Set to 0 to disable.
+     * @param toQuote         The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting
+     *                  character itself, which is automatically quoted.
+     * @param quoteChar The quoting character.
+     * @param linewrap  The number of characters after which a linebreak is inserted
+     *                  (this linebreak is undone by unquote()). Set to 0 to disable.
      * @return A String with every special character (including the quoting
-     *         character itself) quoted.
+     * character itself) quoted.
      */
-    private static String quote(String s, String specials, char quoteChar, int linewrap) {
-        StringBuilder sb = new StringBuilder();
+    private static String quote(String toQuote, String specials, char quoteChar, int linewrap) {
+        StringBuilder result = new StringBuilder();
         char c;
         int lineLength = 0;
         boolean isSpecial;
-        for (int i = 0; i < s.length(); ++i) {
-            c = s.charAt(i);
+        for (int i = 0; i < toQuote.length(); ++i) {
+            c = toQuote.charAt(i);
             isSpecial = specials.indexOf(c) >= 0 || c == quoteChar;
             // linebreak?
             if (linewrap > 0
                     && (++lineLength >= linewrap || isSpecial && lineLength >= linewrap - 1)) {
-                sb.append(quoteChar);
-                sb.append('\n');
+                result.append(quoteChar);
+                result.append('\n');
                 lineLength = 0;
             }
             if (isSpecial) {
-                sb.append(quoteChar);
+                result.append(quoteChar);
                 ++lineLength;
             }
-            sb.append(c);
+            result.append(c);
         }
-        return sb.toString();
+        return result.toString();
     }
 
     /**
      * Unquote special characters.
      *
-     * @param s
-     *            The String which may contain quoted special characters.
-     * @param quoteChar
-     *            The quoting character.
+     * @param toUnquote         The String which may contain quoted special characters.
+     * @param quoteChar The quoting character.
      * @return A String with all quoted characters unquoted.
      */
-    public static String unquote(String s, char quoteChar) {
-        StringBuilder sb = new StringBuilder();
+    public static String unquote(String toUnquote, char quoteChar) {
+        StringBuilder result = new StringBuilder();
         char c;
         boolean quoted = false;
-        for (int i = 0; i < s.length(); ++i) {
-            c = s.charAt(i);
+        for (int i = 0; i < toUnquote.length(); ++i) {
+            c = toUnquote.charAt(i);
             if (quoted) { // append literally...
                 if (c != '\n') {
-                    sb.append(c);
+                    result.append(c);
                 }
                 quoted = false;
             } else if (c != quoteChar) {
-                sb.append(c);
+                result.append(c);
             } else { // quote char
                 quoted = true;
             }
         }
-        return sb.toString();
+        return result.toString();
     }
 
     /**
      * Append '.bib' to the string unless it ends with that.
-     *
+     * <p>
      * makeBibtexExtension("asfd") => "asdf.bib"
      * makeBibtexExtension("asdf.bib") => "asdf.bib"
      *
-     * @param s the string
+     * @param name the string
      * @return s or s + ".bib"
      */
-    public static String makeBibtexExtension(String s) {
-        if(!s.toLowerCase().endsWith(".bib")) {
-            return s + ".bib";
+    public static String makeBibtexExtension(String name) {
+        if (!name.toLowerCase().endsWith(".bib")) {
+            return name + ".bib";
         }
-        return s;
+        return name;
     }
 
     public static String booleanToBinaryString(boolean expression) {
