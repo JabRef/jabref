@@ -24,9 +24,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -39,6 +38,8 @@ import net.sf.jabref.export.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,16 +47,16 @@ import org.w3c.dom.NodeList;
 
 /**
  * Date: May 15, 2007; May 03, 2007
- *
+ * <p>
  * History
  * May 03, 2007 - Added export functionality
  * May 15, 2007 - Added import functionality
  * May 16, 2007 - Changed all interger entries to strings,
- * 				  except LCID which must be an integer.
- * 				  To avoid exception during integer parsing
- *				  the exception is caught and LCID is set to zero.
+ * except LCID which must be an integer.
+ * To avoid exception during integer parsing
+ * the exception is caught and LCID is set to zero.
  * Jan 06, 2012 - Changed the XML element ConferenceName to present
- * 				  the Booktitle instead of the organization field content
+ * the Booktitle instead of the organization field content
  *
  * @author S M Mahbub Murshed (udvranto@yahoo.com)
  * @version 2.0.0
@@ -63,6 +64,8 @@ import org.w3c.dom.NodeList;
  * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
  */
 class MSBibEntry {
+
+    private static final Log LOGGER = LogFactory.getLog(MSBibEntry.class);
 
     private String sourceType = "Misc";
     private String bibTexEntry = null;
@@ -160,9 +163,9 @@ class MSBibEntry {
         populateFromBibtex(bibtex);
     }
 
-    public MSBibEntry(Element entry, String _bcol) {
+    public MSBibEntry(Element entry, String bcol) {
         this();
-        populateFromXml(entry, _bcol);
+        populateFromXml(entry, bcol);
     }
 
     private String getFromXml(String name, Element entry) {
@@ -174,49 +177,48 @@ class MSBibEntry {
         return value;
     }
 
-    private void populateFromXml(Element entry, String _bcol) {
+    private void populateFromXml(Element entry, String bcol) {
         String temp = null;
 
-        sourceType = getFromXml(_bcol + "SourceType", entry);
+        sourceType = getFromXml(bcol + "SourceType", entry);
 
-        tag = getFromXml(_bcol + "Tag", entry);
+        tag = getFromXml(bcol + "Tag", entry);
 
-        temp = getFromXml(_bcol + "LCID", entry);
-        if (temp != null)
-        {
+        temp = getFromXml(bcol + "LCID", entry);
+        if (temp != null) {
             try {
                 LCID = Integer.parseInt(temp);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 LCID = -1;
             }
         }
 
-        title = getFromXml(_bcol + "Title", entry);
-        year = getFromXml(_bcol + "Year", entry);
-        month = getFromXml(_bcol + "Month", entry);
-        day = getFromXml(_bcol + "Day", entry);
+        title = getFromXml(bcol + "Title", entry);
+        year = getFromXml(bcol + "Year", entry);
+        month = getFromXml(bcol + "Month", entry);
+        day = getFromXml(bcol + "Day", entry);
 
-        shortTitle = getFromXml(_bcol + "ShortTitle", entry);
-        comments = getFromXml(_bcol + "Comments", entry);
+        shortTitle = getFromXml(bcol + "ShortTitle", entry);
+        comments = getFromXml(bcol + "Comments", entry);
 
-        temp = getFromXml(_bcol + "Pages", entry);
+        temp = getFromXml(bcol + "Pages", entry);
         if (temp != null) {
             pages = new PageNumbers(temp);
         }
 
-        volume = getFromXml(_bcol + "Volume", entry);
+        volume = getFromXml(bcol + "Volume", entry);
 
-        numberOfVolumes = getFromXml(_bcol + "NumberVolumes", entry);
+        numberOfVolumes = getFromXml(bcol + "NumberVolumes", entry);
 
-        edition = getFromXml(_bcol + "Edition", entry);
+        edition = getFromXml(bcol + "Edition", entry);
 
-        standardNumber = getFromXml(_bcol + "StandardNumber", entry);
+        standardNumber = getFromXml(bcol + "StandardNumber", entry);
 
-        publisher = getFromXml(_bcol + "Publisher", entry);
+        publisher = getFromXml(bcol + "Publisher", entry);
 
-        String city = getFromXml(_bcol + "City", entry);
-        String state = getFromXml(_bcol + "StateProvince", entry);
-        String country = getFromXml(_bcol + "CountryRegion", entry);
+        String city = getFromXml(bcol + "City", entry);
+        String state = getFromXml(bcol + "StateProvince", entry);
+        String country = getFromXml(bcol + "CountryRegion", entry);
         address = "";
         if (city != null) {
             address += city + ", ";
@@ -232,25 +234,25 @@ class MSBibEntry {
             address = null;
         }
 
-        bookTitle = getFromXml(_bcol + "BookTitle", entry);
+        bookTitle = getFromXml(bcol + "BookTitle", entry);
 
-        chapterNumber = getFromXml(_bcol + "ChapterNumber", entry);
+        chapterNumber = getFromXml(bcol + "ChapterNumber", entry);
 
-        journalName = getFromXml(_bcol + "JournalName", entry);
+        journalName = getFromXml(bcol + "JournalName", entry);
 
-        issue = getFromXml(_bcol + "Issue", entry);
+        issue = getFromXml(bcol + "Issue", entry);
 
-        periodicalTitle = getFromXml(_bcol + "PeriodicalTitle", entry);
+        periodicalTitle = getFromXml(bcol + "PeriodicalTitle", entry);
 
-        conferenceName = getFromXml(_bcol + "ConferenceName", entry);
-        department = getFromXml(_bcol + "Department", entry);
-        institution = getFromXml(_bcol + "Institution", entry);
+        conferenceName = getFromXml(bcol + "ConferenceName", entry);
+        department = getFromXml(bcol + "Department", entry);
+        institution = getFromXml(bcol + "Institution", entry);
 
-        thesisType = getFromXml(_bcol + "ThesisType", entry);
-        internetSiteTitle = getFromXml(_bcol + "InternetSiteTitle", entry);
-        String month = getFromXml(_bcol + "MonthAccessed", entry);
-        String day = getFromXml(_bcol + "DayAccessed", entry);
-        String year = getFromXml(_bcol + "YearAccessed", entry);
+        thesisType = getFromXml(bcol + "ThesisType", entry);
+        internetSiteTitle = getFromXml(bcol + "InternetSiteTitle", entry);
+        String month = getFromXml(bcol + "MonthAccessed", entry);
+        String day = getFromXml(bcol + "DayAccessed", entry);
+        String year = getFromXml(bcol + "YearAccessed", entry);
         dateAccessed = "";
         if (month != null) {
             dateAccessed += month + ' ';
@@ -266,43 +268,43 @@ class MSBibEntry {
             dateAccessed = null;
         }
 
-        url = getFromXml(_bcol + "URL", entry);
-        productionCompany = getFromXml(_bcol + "ProductionCompany", entry);
+        url = getFromXml(bcol + "URL", entry);
+        productionCompany = getFromXml(bcol + "ProductionCompany", entry);
 
-        publicationTitle = getFromXml(_bcol + "PublicationTitle", entry);
-        medium = getFromXml(_bcol + "Medium", entry);
-        albumTitle = getFromXml(_bcol + "AlbumTitle", entry);
-        recordingNumber = getFromXml(_bcol + "RecordingNumber", entry);
-        theater = getFromXml(_bcol + "Theater", entry);
-        distributor = getFromXml(_bcol + "Distributor", entry);
-        broadcastTitle = getFromXml(_bcol + "BroadcastTitle", entry);
-        broadcaster = getFromXml(_bcol + "Broadcaster", entry);
-        station = getFromXml(_bcol + "Station", entry);
-        type = getFromXml(_bcol + "Type", entry);
-        patentNumber = getFromXml(_bcol + "PatentNumber", entry);
-        court = getFromXml(_bcol + "Court", entry);
-        reporter = getFromXml(_bcol + "Reporter", entry);
-        caseNumber = getFromXml(_bcol + "CaseNumber", entry);
-        abbreviatedCaseNumber = getFromXml(_bcol + "AbbreviatedCaseNumber", entry);
-        bibTex_Series = getFromXml(_bcol + BIBTEX + "Series", entry);
-        bibTex_Abstract = getFromXml(_bcol + BIBTEX + "Abstract", entry);
-        bibTex_KeyWords = getFromXml(_bcol + BIBTEX + "KeyWords", entry);
-        bibTex_CrossRef = getFromXml(_bcol + BIBTEX + "CrossRef", entry);
-        bibTex_HowPublished = getFromXml(_bcol + BIBTEX + "HowPublished", entry);
-        bibTex_Affiliation = getFromXml(_bcol + BIBTEX + "Affiliation", entry);
-        bibTex_Contents = getFromXml(_bcol + BIBTEX + "Contents", entry);
-        bibTex_Copyright = getFromXml(_bcol + BIBTEX + "Copyright", entry);
-        bibTex_Price = getFromXml(_bcol + BIBTEX + "Price", entry);
-        bibTex_Size = getFromXml(_bcol + BIBTEX + "Size", entry);
+        publicationTitle = getFromXml(bcol + "PublicationTitle", entry);
+        medium = getFromXml(bcol + "Medium", entry);
+        albumTitle = getFromXml(bcol + "AlbumTitle", entry);
+        recordingNumber = getFromXml(bcol + "RecordingNumber", entry);
+        theater = getFromXml(bcol + "Theater", entry);
+        distributor = getFromXml(bcol + "Distributor", entry);
+        broadcastTitle = getFromXml(bcol + "BroadcastTitle", entry);
+        broadcaster = getFromXml(bcol + "Broadcaster", entry);
+        station = getFromXml(bcol + "Station", entry);
+        type = getFromXml(bcol + "Type", entry);
+        patentNumber = getFromXml(bcol + "PatentNumber", entry);
+        court = getFromXml(bcol + "Court", entry);
+        reporter = getFromXml(bcol + "Reporter", entry);
+        caseNumber = getFromXml(bcol + "CaseNumber", entry);
+        abbreviatedCaseNumber = getFromXml(bcol + "AbbreviatedCaseNumber", entry);
+        bibTex_Series = getFromXml(bcol + BIBTEX + "Series", entry);
+        bibTex_Abstract = getFromXml(bcol + BIBTEX + "Abstract", entry);
+        bibTex_KeyWords = getFromXml(bcol + BIBTEX + "KeyWords", entry);
+        bibTex_CrossRef = getFromXml(bcol + BIBTEX + "CrossRef", entry);
+        bibTex_HowPublished = getFromXml(bcol + BIBTEX + "HowPublished", entry);
+        bibTex_Affiliation = getFromXml(bcol + BIBTEX + "Affiliation", entry);
+        bibTex_Contents = getFromXml(bcol + BIBTEX + "Contents", entry);
+        bibTex_Copyright = getFromXml(bcol + BIBTEX + "Copyright", entry);
+        bibTex_Price = getFromXml(bcol + BIBTEX + "Price", entry);
+        bibTex_Size = getFromXml(bcol + BIBTEX + "Size", entry);
 
-        NodeList nodeLst = entry.getElementsByTagName(_bcol + "Author");
+        NodeList nodeLst = entry.getElementsByTagName(bcol + "Author");
         if (nodeLst.getLength() > 0) {
-            getAuthors((Element) nodeLst.item(0), _bcol);
+            getAuthors((Element) nodeLst.item(0), bcol);
         }
     }
 
     private void populateFromBibtex(BibtexEntry bibtex) {
-        // date = getDate(bibtex);	
+
         sourceType = getMSBibSourceType(bibtex);
 
         if (bibtex.getField("bibtexkey") != null) {
@@ -412,19 +414,15 @@ class MSBibEntry {
         /* SM: 2010.10 Modified for default source types */
         if (bibtex.getField("type") != null) {
             thesisType = bibtex.getField("type");
-        } else
-        {
+        } else {
             if (bibtex.getType().getName().equalsIgnoreCase("techreport")) {
                 thesisType = "Tech. rep.";
             } else if (bibtex.getType().getName().equalsIgnoreCase("mastersthesis")) {
                 thesisType = "Master's thesis";
             } else if (bibtex.getType().getName().equalsIgnoreCase("phdthesis")) {
                 thesisType = "Ph.D. dissertation";
-            } else if (bibtex.getType().getName().equalsIgnoreCase("unpublished"))
-             {
+            } else if (bibtex.getType().getName().equalsIgnoreCase("unpublished")) {
                 thesisType = "unpublished";
-            //else if (bibtex.getType().getName().equalsIgnoreCase("manual"))
-            //	thesisType = "manual";
             }
         }
 
@@ -538,31 +536,13 @@ class MSBibEntry {
         }
 
         boolean FORMATXML = false;
-        if (FORMATXML)
-        {
+        if (FORMATXML) {
             title = format(title);
-            // shortTitle = format(shortTitle);
-            // publisher = format(publisher);
-            // conferenceName = format(conferenceName);
-            // department = format(department);
-            // institution = format(institution);
-            // internetSiteTitle = format(internetSiteTitle);
-            // publicationTitle = format(publicationTitle);
-            // albumTitle = format(albumTitle);
-            // theater = format(theater);
-            // distributor = format(distributor);
-            // broadcastTitle = format(broadcastTitle);
-            // broadcaster = format(broadcaster);
-            // station = format(station);
-            // court = format(court);
-            // reporter = format(reporter);
-            // bibTex_Series = format(bibTex_Series);
             bibTex_Abstract = format(bibTex_Abstract);
         }
     }
 
-    private String format(String value)
-    {
+    private String format(String value) {
         if (value == null) {
             return null;
         }
@@ -573,42 +553,39 @@ class MSBibEntry {
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-    private int getLCID(String language)
-    {
+    private int getLCID(String language) {
         // TODO: add lanaguage to LCID mapping
 
         return 0;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-    private String getLanguage(int LCID)
-    {
+    private String getLanguage(int LCID) {
         // TODO: add lanaguage to LCID mapping
 
         return "english";
     }
 
-    private List<PersonName> getSpecificAuthors(String type, Element authors, String _bcol) {
+    private List<PersonName> getSpecificAuthors(String type, Element authors, String bcol) {
         List<PersonName> result = null;
-        NodeList nodeLst = authors.getElementsByTagName(_bcol + type);
+        NodeList nodeLst = authors.getElementsByTagName(bcol + type);
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagName(_bcol + "NameList");
+        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagName(bcol + "NameList");
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagName(_bcol + "Person");
+        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagName(bcol + "Person");
         if (person.getLength() <= 0) {
             return result;
         }
 
-        result = new LinkedList<PersonName>();
-        for (int i = 0; i < person.getLength(); i++)
-        {
-            NodeList firstName = ((Element) person.item(i)).getElementsByTagName(_bcol + "First");
-            NodeList lastName = ((Element) person.item(i)).getElementsByTagName(_bcol + "Last");
-            NodeList middleName = ((Element) person.item(i)).getElementsByTagName(_bcol + "Middle");
+        result = new LinkedList<>();
+        for (int i = 0; i < person.getLength(); i++) {
+            NodeList firstName = ((Element) person.item(i)).getElementsByTagName(bcol + "First");
+            NodeList lastName = ((Element) person.item(i)).getElementsByTagName(bcol + "Last");
+            NodeList middleName = ((Element) person.item(i)).getElementsByTagName(bcol + "Middle");
             PersonName name = new PersonName();
             if (firstName.getLength() > 0) {
                 name.setFirstname(firstName.item(0).getTextContent());
@@ -625,33 +602,30 @@ class MSBibEntry {
         return result;
     }
 
-    private void getAuthors(Element authorsElem, String _bcol) {
-        authors = getSpecificAuthors("Author", authorsElem, _bcol);
-        bookAuthors = getSpecificAuthors("BookAuthor", authorsElem, _bcol);
-        editors = getSpecificAuthors("Editor", authorsElem, _bcol);
-        translators = getSpecificAuthors("Translator", authorsElem, _bcol);
-        producerNames = getSpecificAuthors("ProducerName", authorsElem, _bcol);
-        composers = getSpecificAuthors("Composer", authorsElem, _bcol);
-        conductors = getSpecificAuthors("Conductor", authorsElem, _bcol);
-        performers = getSpecificAuthors("Performer", authorsElem, _bcol);
-        writers = getSpecificAuthors("Writer", authorsElem, _bcol);
-        directors = getSpecificAuthors("Director", authorsElem, _bcol);
-        compilers = getSpecificAuthors("Compiler", authorsElem, _bcol);
-        interviewers = getSpecificAuthors("Interviewer", authorsElem, _bcol);
-        interviewees = getSpecificAuthors("Interviewee", authorsElem, _bcol);
-        inventors = getSpecificAuthors("Inventor", authorsElem, _bcol);
-        counsels = getSpecificAuthors("Counsel", authorsElem, _bcol);
+    private void getAuthors(Element authorsElem, String bcol) {
+        authors = getSpecificAuthors("Author", authorsElem, bcol);
+        bookAuthors = getSpecificAuthors("BookAuthor", authorsElem, bcol);
+        editors = getSpecificAuthors("Editor", authorsElem, bcol);
+        translators = getSpecificAuthors("Translator", authorsElem, bcol);
+        producerNames = getSpecificAuthors("ProducerName", authorsElem, bcol);
+        composers = getSpecificAuthors("Composer", authorsElem, bcol);
+        conductors = getSpecificAuthors("Conductor", authorsElem, bcol);
+        performers = getSpecificAuthors("Performer", authorsElem, bcol);
+        writers = getSpecificAuthors("Writer", authorsElem, bcol);
+        directors = getSpecificAuthors("Director", authorsElem, bcol);
+        compilers = getSpecificAuthors("Compiler", authorsElem, bcol);
+        interviewers = getSpecificAuthors("Interviewer", authorsElem, bcol);
+        interviewees = getSpecificAuthors("Interviewee", authorsElem, bcol);
+        inventors = getSpecificAuthors("Inventor", authorsElem, bcol);
+        counsels = getSpecificAuthors("Counsel", authorsElem, bcol);
     }
 
     private List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new LinkedList<PersonName>();
+        List<PersonName> result = new LinkedList<>();
 
-        if (!authors.contains(" and "))
-        {
+        if (!authors.contains(" and ")) {
             result.add(new PersonName(authors));
-        }
-        else
-        {
+        } else {
             String[] names = authors.split(" and ");
             for (String name : names) {
                 result.add(new PersonName(name));
@@ -679,77 +653,49 @@ class MSBibEntry {
         String result = "Misc";
         if (bibtexType.equalsIgnoreCase("book")) {
             result = "Book";
-        } else if (bibtexType.equalsIgnoreCase("inbook"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("inbook")) {
             result = "BookSection";
             bibTexEntry = "inbook";
-        } /* SM 2010.10: generalized */
-        else if (bibtexType.equalsIgnoreCase("booklet"))
-        {
+        } /* SM 2010.10: generalized */ else if (bibtexType.equalsIgnoreCase("booklet")) {
             result = "BookSection";
             bibTexEntry = "booklet";
-        }
-        else if (bibtexType.equalsIgnoreCase("incollection"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("incollection")) {
             result = "BookSection";
             bibTexEntry = "incollection";
-        }
-
-        else if (bibtexType.equalsIgnoreCase("article")) {
+        } else if (bibtexType.equalsIgnoreCase("article")) {
             result = "JournalArticle";
-        } else if (bibtexType.equalsIgnoreCase("inproceedings"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("inproceedings")) {
             result = "ConferenceProceedings";
             bibTexEntry = "inproceedings";
-        } /* SM 2010.10: generalized */
-        else if (bibtexType.equalsIgnoreCase("conference"))
-        {
+        } /* SM 2010.10: generalized */ else if (bibtexType.equalsIgnoreCase("conference")) {
             result = "ConferenceProceedings";
             bibTexEntry = "conference";
-        }
-        else if (bibtexType.equalsIgnoreCase("proceedings"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("proceedings")) {
             result = "ConferenceProceedings";
             bibTexEntry = "proceedings";
-        }
-        else if (bibtexType.equalsIgnoreCase("collection"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("collection")) {
             result = "ConferenceProceedings";
             bibTexEntry = "collection";
-        }
-
-        else if (bibtexType.equalsIgnoreCase("techreport"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("techreport")) {
             result = "Report";
             bibTexEntry = "techreport";
-        } /* SM 2010.10: generalized */
-        else if (bibtexType.equalsIgnoreCase("manual"))
-        {
+        } /* SM 2010.10: generalized */ else if (bibtexType.equalsIgnoreCase("manual")) {
             result = "Report";
             bibTexEntry = "manual";
-        }
-        else if (bibtexType.equalsIgnoreCase("mastersthesis"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("mastersthesis")) {
             result = "Report";
             bibTexEntry = "mastersthesis";
-        }
-        else if (bibtexType.equalsIgnoreCase("phdthesis"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("phdthesis")) {
             result = "Report";
             bibTexEntry = "phdthesis";
-        }
-        else if (bibtexType.equalsIgnoreCase("unpublished"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("unpublished")) {
             result = "Report";
             bibTexEntry = "unpublished";
-        }
-
-        else if (bibtexType.equalsIgnoreCase("patent")) {
+        } else if (bibtexType.equalsIgnoreCase("patent")) {
             result = "Patent";
         } else if (bibtexType.equalsIgnoreCase("misc")) {
             result = "Misc";
-        } else if (bibtexType.equalsIgnoreCase("electronic"))
-        {
+        } else if (bibtexType.equalsIgnoreCase("electronic")) {
             result = "Misc";
             bibTexEntry = "electronic";
         }
@@ -760,42 +706,35 @@ class MSBibEntry {
     private Node getDOMrepresentation() {
         Node result = null;
         try {
-            DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-            result = getDOMrepresentation(d.newDocument());
-        } catch (Exception e)
-        {
-            throw new Error(e);
+            result = getDOMrepresentation(documentBuilder.newDocument());
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Could not create DocumentBuilder", e);
         }
         return result;
     }
 
-    private void addField(Document d, Element parent, String name, String value) {
+    private void addField(Document document, Element parent, String name, String value) {
         if (value == null) {
             return;
         }
-        Element elem = d.createElement(bcol + name);
-        // elem.appendChild(d.createTextNode(healXML(value)));
-        //		Text txt = d.createTextNode(value);
-        //		if(!txt.getTextContent().equals(value))
-        //			System.out.println("Values dont match!");
-        //			// throw new Exception("Values dont match!");
-        //		elem.appendChild(txt);
-        elem.appendChild(d.createTextNode(stripNonValidXMLCharacters(value)));
+        Element elem = document.createElement(bcol + name);
+        elem.appendChild(document.createTextNode(stripNonValidXMLCharacters(value)));
         parent.appendChild(elem);
     }
 
-    private void addAuthor(Document d, Element allAuthors, String entryName, List<PersonName> authorsLst) {
+    private void addAuthor(Document document, Element allAuthors, String entryName, List<PersonName> authorsLst) {
         if (authorsLst == null) {
             return;
         }
-        Element authorTop = d.createElement(bcol + entryName);
-        Element nameList = d.createElement(bcol + "NameList");
+        Element authorTop = document.createElement(bcol + entryName);
+        Element nameList = document.createElement(bcol + "NameList");
         for (PersonName name : authorsLst) {
-            Element person = d.createElement(bcol + "Person");
-            addField(d, person, "Last", name.getSurname());
-            addField(d, person, "Middle", name.getMiddlename());
-            addField(d, person, "First", name.getFirstname());
+            Element person = document.createElement(bcol + "Person");
+            addField(document, person, "Last", name.getSurname());
+            addField(document, person, "Middle", name.getMiddlename());
+            addField(document, person, "First", name.getFirstname());
             nameList.appendChild(person);
         }
         authorTop.appendChild(nameList);
@@ -803,34 +742,28 @@ class MSBibEntry {
         allAuthors.appendChild(authorTop);
     }
 
-    private void addAdrress(Document d, Element parent, String address) {
+    private void addAdrress(Document document, Element parent, String address) {
         if (address == null) {
             return;
         }
-
-        // US address parser
-        // See documentation here http://regexlib.com/REDetails.aspx?regexp_id=472
-        // Pattern p = Pattern.compile("^(?n:(((?<address1>(\\d{1,5}(\\ 1\\/[234])?(\\x20[A-Z]([a-z])+)+ )|(P\\.O\\.\\ Box\\ \\d{1,5}))\\s{1,2}(?i:(?<address2>(((APT|B LDG|DEPT|FL|HNGR|LOT|PIER|RM|S(LIP|PC|T(E|OP))|TRLR|UNIT)\\x20\\w{1,5})|(BSMT|FRNT|LBBY|LOWR|OFC|PH|REAR|SIDE|UPPR)\\.?)\\s{1,2})?))?)(?<city>[A-Z]([a-z])+(\\.?)(\\x20[A-Z]([a-z])+){0,2})([,\\x20]+?)(?<state>A[LKSZRAP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADL N]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD] |T[NX]|UT|V[AIT]|W[AIVY])([,\\x20]+?)(?<zipcode>(?!0{5})\\d{5}(-\\d {4})?)((([,\\x20]+?)(?<country>[A-Z]([a-z])+(\\.?)(\\x20[A-Z]([a-z])+){0,2}))?))$");
-        // the pattern above is for C#, may not work with java. Never tested though.
 
         // reduced subset, supports only "CITY , STATE, COUNTRY"
         // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
         // WORD SPACE , SPACE WORD SPACE , SPACE WORD
         // tested using http://www.javaregex.com/test.html
-        Pattern p = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
-        Matcher m = p.matcher(address);
-        if (m.matches() && m.groupCount() > 3)
-        {
-            addField(d, parent, "City", m.group(1));
-            addField(d, parent, "StateProvince", m.group(2));
-            addField(d, parent, "CountryRegion", m.group(3));
+        Pattern pattern = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
+        Matcher matcher = pattern.matcher(address);
+        if (matcher.matches() && matcher.groupCount() > 3) {
+            addField(document, parent, "City", matcher.group(1));
+            addField(document, parent, "StateProvince", matcher.group(2));
+            addField(document, parent, "CountryRegion", matcher.group(3));
         } else {
             /* SM: 2010.10 generalized */
-            addField(d, parent, "City", address);
+            addField(document, parent, "City", address);
         }
     }
 
-    private void addDate(Document d, Element parent, String date, String extra) {
+    private void addDate(Document document, Element parent, String date, String extra) {
         if (date == null) {
             return;
         }
@@ -839,210 +772,158 @@ class MSBibEntry {
         // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
         // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
         // tested using http://www.javaregex.com/test.html
-        Pattern p = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
-        Matcher m = p.matcher(date);
-        if (m.matches() && m.groupCount() > 3)
-        {
-            addField(d, parent, "Month" + extra, m.group(1));
-            addField(d, parent, "Day" + extra, m.group(2));
-            addField(d, parent, "Year" + extra, m.group(3));
+        Pattern pattern = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
+        Matcher matcher = pattern.matcher(date);
+        if (matcher.matches() && matcher.groupCount() > 3) {
+            addField(document, parent, "Month" + extra, matcher.group(1));
+            addField(document, parent, "Day" + extra, matcher.group(2));
+            addField(document, parent, "Year" + extra, matcher.group(3));
         }
     }
 
-    public Element getDOMrepresentation(Document d) {
+    public Element getDOMrepresentation(Document document) {
 
-        try {
-            Element msbibEntry = d.createElement(bcol + "Source");
 
-            addField(d, msbibEntry, "SourceType", sourceType);
-            addField(d, msbibEntry, BIBTEX + "Entry", bibTexEntry);
+        Element msbibEntry = document.createElement(bcol + "Source");
 
-            addField(d, msbibEntry, "Tag", tag);
-            addField(d, msbibEntry, "GUID", GUID);
-            if (LCID >= 0) {
-                addField(d, msbibEntry, "LCID", Integer.toString(LCID));
-            }
-            addField(d, msbibEntry, "Title", title);
-            addField(d, msbibEntry, "Year", year);
-            addField(d, msbibEntry, "ShortTitle", shortTitle);
-            addField(d, msbibEntry, "Comments", comments);
+        addField(document, msbibEntry, "SourceType", sourceType);
+        addField(document, msbibEntry, BIBTEX + "Entry", bibTexEntry);
 
-            Element allAuthors = d.createElement(bcol + "Author");
+        addField(document, msbibEntry, "Tag", tag);
+        addField(document, msbibEntry, "GUID", GUID);
+        if (LCID >= 0) {
+            addField(document, msbibEntry, "LCID", Integer.toString(LCID));
+        }
+        addField(document, msbibEntry, "Title", title);
+        addField(document, msbibEntry, "Year", year);
+        addField(document, msbibEntry, "ShortTitle", shortTitle);
+        addField(document, msbibEntry, "Comments", comments);
 
-            addAuthor(d, allAuthors, "Author", authors);
-            addAuthor(d, allAuthors, "BookAuthor", bookAuthors);
-            addAuthor(d, allAuthors, "Editor", editors);
-            addAuthor(d, allAuthors, "Translator", translators);
-            addAuthor(d, allAuthors, "ProducerName", producerNames);
-            addAuthor(d, allAuthors, "Composer", composers);
-            addAuthor(d, allAuthors, "Conductor", conductors);
-            addAuthor(d, allAuthors, "Performer", performers);
-            addAuthor(d, allAuthors, "Writer", writers);
-            addAuthor(d, allAuthors, "Director", directors);
-            addAuthor(d, allAuthors, "Compiler", compilers);
-            addAuthor(d, allAuthors, "Interviewer", interviewers);
-            addAuthor(d, allAuthors, "Interviewee", interviewees);
-            addAuthor(d, allAuthors, "Inventor", inventors);
-            addAuthor(d, allAuthors, "Counsel", counsels);
+        Element allAuthors = document.createElement(bcol + "Author");
 
-            msbibEntry.appendChild(allAuthors);
+        addAuthor(document, allAuthors, "Author", authors);
+        String bookAuthor = "BookAuthor";
+        addAuthor(document, allAuthors, bookAuthor, bookAuthors);
+        addAuthor(document, allAuthors, "Editor", editors);
+        addAuthor(document, allAuthors, "Translator", translators);
+        addAuthor(document, allAuthors, "ProducerName", producerNames);
+        addAuthor(document, allAuthors, "Composer", composers);
+        addAuthor(document, allAuthors, "Conductor", conductors);
+        addAuthor(document, allAuthors, "Performer", performers);
+        addAuthor(document, allAuthors, "Writer", writers);
+        addAuthor(document, allAuthors, "Director", directors);
+        addAuthor(document, allAuthors, "Compiler", compilers);
+        addAuthor(document, allAuthors, "Interviewer", interviewers);
+        addAuthor(document, allAuthors, "Interviewee", interviewees);
+        addAuthor(document, allAuthors, "Inventor", inventors);
+        addAuthor(document, allAuthors, "Counsel", counsels);
 
-            if (pages != null) {
-                addField(d, msbibEntry, "Pages", pages.toString("-"));
-            }
-            addField(d, msbibEntry, "Volume", volume);
-            addField(d, msbibEntry, "NumberVolumes", numberOfVolumes);
-            addField(d, msbibEntry, "Edition", edition);
-            addField(d, msbibEntry, "StandardNumber", standardNumber);
-            addField(d, msbibEntry, "Publisher", publisher);
+        msbibEntry.appendChild(allAuthors);
 
-            addAdrress(d, msbibEntry, address);
+        if (pages != null) {
+            addField(document, msbibEntry, "Pages", pages.toString("-"));
+        }
+        addField(document, msbibEntry, "Volume", volume);
+        addField(document, msbibEntry, "NumberVolumes", numberOfVolumes);
+        addField(document, msbibEntry, "Edition", edition);
+        addField(document, msbibEntry, "StandardNumber", standardNumber);
+        addField(document, msbibEntry, "Publisher", publisher);
 
-            addField(d, msbibEntry, "BookTitle", bookTitle);
-            addField(d, msbibEntry, "ChapterNumber", chapterNumber);
+        addAdrress(document, msbibEntry, address);
 
-            addField(d, msbibEntry, "JournalName", journalName);
-            addField(d, msbibEntry, "Issue", issue);
-            addField(d, msbibEntry, "PeriodicalTitle", periodicalTitle);
-            addField(d, msbibEntry, "ConferenceName", conferenceName);
+        addField(document, msbibEntry, "BookTitle", bookTitle);
+        addField(document, msbibEntry, "ChapterNumber", chapterNumber);
 
-            addField(d, msbibEntry, "Department", department);
-            addField(d, msbibEntry, "Institution", institution);
-            addField(d, msbibEntry, "ThesisType", thesisType);
-            addField(d, msbibEntry, "InternetSiteTitle", internetSiteTitle);
+        addField(document, msbibEntry, "JournalName", journalName);
+        addField(document, msbibEntry, "Issue", issue);
+        addField(document, msbibEntry, "PeriodicalTitle", periodicalTitle);
+        addField(document, msbibEntry, "ConferenceName", conferenceName);
 
-            addDate(d, msbibEntry, dateAccessed, "Accessed");
+        addField(document, msbibEntry, "Department", department);
+        addField(document, msbibEntry, "Institution", institution);
+        addField(document, msbibEntry, "ThesisType", thesisType);
+        addField(document, msbibEntry, "InternetSiteTitle", internetSiteTitle);
+
+        addDate(document, msbibEntry, dateAccessed, "Accessed");
 
             /* SM 2010.10 added month export */
-            addField(d, msbibEntry, "Month", month);
+        addField(document, msbibEntry, "Month", month);
 
-            addField(d, msbibEntry, "URL", url);
-            addField(d, msbibEntry, "ProductionCompany", productionCompany);
-            addField(d, msbibEntry, "PublicationTitle", publicationTitle);
-            addField(d, msbibEntry, "Medium", medium);
-            addField(d, msbibEntry, "AlbumTitle", albumTitle);
-            addField(d, msbibEntry, "RecordingNumber", recordingNumber);
-            addField(d, msbibEntry, "Theater", theater);
-            addField(d, msbibEntry, "Distributor", distributor);
-            addField(d, msbibEntry, "BroadcastTitle", broadcastTitle);
-            addField(d, msbibEntry, "Broadcaster", broadcaster);
-            addField(d, msbibEntry, "Station", station);
-            addField(d, msbibEntry, "Type", type);
-            addField(d, msbibEntry, "PatentNumber", patentNumber);
-            addField(d, msbibEntry, "Court", court);
-            addField(d, msbibEntry, "Reporter", reporter);
-            addField(d, msbibEntry, "CaseNumber", caseNumber);
-            addField(d, msbibEntry, "AbbreviatedCaseNumber", abbreviatedCaseNumber);
+        addField(document, msbibEntry, "URL", url);
+        addField(document, msbibEntry, "ProductionCompany", productionCompany);
+        addField(document, msbibEntry, "PublicationTitle", publicationTitle);
+        addField(document, msbibEntry, "Medium", medium);
+        addField(document, msbibEntry, "AlbumTitle", albumTitle);
+        addField(document, msbibEntry, "RecordingNumber", recordingNumber);
+        addField(document, msbibEntry, "Theater", theater);
+        addField(document, msbibEntry, "Distributor", distributor);
+        addField(document, msbibEntry, "BroadcastTitle", broadcastTitle);
+        addField(document, msbibEntry, "Broadcaster", broadcaster);
+        addField(document, msbibEntry, "Station", station);
+        addField(document, msbibEntry, "Type", type);
+        addField(document, msbibEntry, "PatentNumber", patentNumber);
+        addField(document, msbibEntry, "Court", court);
+        addField(document, msbibEntry, "Reporter", reporter);
+        addField(document, msbibEntry, "CaseNumber", caseNumber);
+        addField(document, msbibEntry, "AbbreviatedCaseNumber", abbreviatedCaseNumber);
 
-            addField(d, msbibEntry, BIBTEX + "Series", bibTex_Series);
-            addField(d, msbibEntry, BIBTEX + "Abstract", bibTex_Abstract);
-            addField(d, msbibEntry, BIBTEX + "KeyWords", bibTex_KeyWords);
-            addField(d, msbibEntry, BIBTEX + "CrossRef", bibTex_CrossRef);
-            addField(d, msbibEntry, BIBTEX + "HowPublished", bibTex_HowPublished);
-            addField(d, msbibEntry, BIBTEX + "Affiliation", bibTex_Affiliation);
-            addField(d, msbibEntry, BIBTEX + "Contents", bibTex_Contents);
-            addField(d, msbibEntry, BIBTEX + "Copyright", bibTex_Copyright);
-            addField(d, msbibEntry, BIBTEX + "Price", bibTex_Price);
-            addField(d, msbibEntry, BIBTEX + "Size", bibTex_Size);
+        addField(document, msbibEntry, BIBTEX + "Series", bibTex_Series);
+        addField(document, msbibEntry, BIBTEX + "Abstract", bibTex_Abstract);
+        addField(document, msbibEntry, BIBTEX + "KeyWords", bibTex_KeyWords);
+        addField(document, msbibEntry, BIBTEX + "CrossRef", bibTex_CrossRef);
+        addField(document, msbibEntry, BIBTEX + "HowPublished", bibTex_HowPublished);
+        addField(document, msbibEntry, BIBTEX + "Affiliation", bibTex_Affiliation);
+        addField(document, msbibEntry, BIBTEX + "Contents", bibTex_Contents);
+        addField(document, msbibEntry, BIBTEX + "Copyright", bibTex_Copyright);
+        addField(document, msbibEntry, BIBTEX + "Price", bibTex_Price);
+        addField(document, msbibEntry, BIBTEX + "Size", bibTex_Size);
 
             /* SM: 2010.10 end intype, paper support */
-            addField(d, msbibEntry, BIBTEX + "InType", bibTex_InType);
-            addField(d, msbibEntry, BIBTEX + "Paper", bibTex_Paper);
+        addField(document, msbibEntry, BIBTEX + "InType", bibTex_InType);
+        addField(document, msbibEntry, BIBTEX + "Paper", bibTex_Paper);
 
-            return msbibEntry;
-        } catch (Exception e)
-        {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
-            throw new Error(e);
-        }
-        // return null;
+        return msbibEntry;
     }
 
-    private void parseSingleStandardNumber(String type, String bibtype, String standardNum, HashMap<String, String> hm) {
+    private void parseSingleStandardNumber(String type, String bibtype, String standardNum, HashMap<String, String> map) {
         // tested using http://www.javaregex.com/test.html
-        Pattern p = Pattern.compile(':' + type + ":(.[^:]+)");
-        Matcher m = p.matcher(standardNum);
-        if (m.matches()) {
-            hm.put(bibtype, m.group(1));
+        Pattern pattern = Pattern.compile(':' + type + ":(.[^:]+)");
+        Matcher matcher = pattern.matcher(standardNum);
+        if (matcher.matches()) {
+            map.put(bibtype, matcher.group(1));
         }
     }
 
-    private void parseStandardNumber(String standardNum, HashMap<String, String> hm) {
+    private void parseStandardNumber(String standardNum, HashMap<String, String> map) {
         if (standardNumber == null) {
             return;
         }
-        parseSingleStandardNumber("ISBN", "isbn", standardNum, hm); /* SM: 2010.10: lower case */
-        parseSingleStandardNumber("ISSN", "issn", standardNum, hm); /* SM: 2010.10: lower case */
-        parseSingleStandardNumber("LCCN", "lccn", standardNum, hm); /* SM: 2010.10: lower case */
-        parseSingleStandardNumber("MRN", "mrnumber", standardNum, hm);
+        parseSingleStandardNumber("ISBN", "isbn", standardNum, map); /* SM: 2010.10: lower case */
+        parseSingleStandardNumber("ISSN", "issn", standardNum, map); /* SM: 2010.10: lower case */
+        parseSingleStandardNumber("LCCN", "lccn", standardNum, map); /* SM: 2010.10: lower case */
+        parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
         /* SM: 2010.10 begin DOI support */
-        parseSingleStandardNumber("DOI", "doi", standardNum, hm);
+        parseSingleStandardNumber("DOI", "doi", standardNum, map);
         /* SM: 2010.10 end DOI support */
     }
 
-    private void addAuthor(HashMap<String, String> hm, String type, List<PersonName> authorsLst) {
-        if (authorsLst == null) {
+    private void addAuthor(HashMap<String, String> map, String type, List<PersonName> authors) {
+        if (authors == null) {
             return;
         }
         String allAuthors = "";
         boolean First = true;
-        for (PersonName name : authorsLst) {
+        for (PersonName name : authors) {
             if (!First) {
                 allAuthors += " and ";
             }
             allAuthors += name.getFullname();
             First = false;
         }
-        hm.put(type, allAuthors);
+        map.put(type, allAuthors);
     }
 
-    //	public String mapMSBibToBibtexTypeString(String msbib) {		
-    //		String bibtex = "other";
-    //		if(msbib.equals("Book"))
-    //			bibtex = "book";
-    //		else if(msbib.equals("BookSection"))
-    //			bibtex = "inbook";
-    //		else if(msbib.equals("JournalArticle"))
-    //			bibtex = "article";
-    //		else if(msbib.equals("ArticleInAPeriodical"))
-    //			bibtex = "article";
-    //		else if(msbib.equals("ConferenceProceedings"))
-    //			bibtex = "conference";
-    //		else if(msbib.equals("Report"))
-    //			bibtex = "techreport";
-    //		else if(msbib.equals("InternetSite"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("DocumentFromInternetSite"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("DocumentFromInternetSite"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("ElectronicSource"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Art"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("SoundRecording"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Performance"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Film"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Interview"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Patent"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Case"))
-    //			bibtex = "other";
-    //		else if(msbib.equals("Misc"))
-    //			bibtex = "misc";
-    //		else
-    //			bibtex = "misc";
-    //
-    //		return bibtex;
-    //	}
-
-    private BibtexEntryType mapMSBibToBibtexType(String msbib)
-    {
+    private BibtexEntryType mapMSBibToBibtexType(String msbib) {
         BibtexEntryType bibtex = BibtexEntryTypes.OTHER;
         if (msbib.equals("Book")) {
             bibtex = BibtexEntryTypes.BOOK;
@@ -1064,70 +945,24 @@ class MSBibEntry {
     }
 
     public BibtexEntry getBibtexRepresentation() {
-        //		BibtexEntry entry = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, 
-        //				Globals.getEntryType(mapMSBibToBibtexTypeString(sourceType)));
-
-        //		BibtexEntry entry = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, 
-        //				mapMSBibToBibtexType(sourceType));
 
         BibtexEntry entry = null;
         if (tag == null) {
             entry = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
                     mapMSBibToBibtexType(sourceType));
-        }
-        else {
+        } else {
             entry = new BibtexEntry(tag,
                     mapMSBibToBibtexType(sourceType)); // id assumes an existing database so don't
         }
 
         // Todo: add check for BibTexEntry types
-        //		BibtexEntry entry = new BibtexEntry();
-        //		if(sourceType.equals("Book"))
-        //			entry.setType(BibtexEntryTypes.BOOK);
-        //		else if(sourceType.equals("BookSection"))
-        //			entry.setType(BibtexEntryTypes.INBOOK);
-        //		else if(sourceType.equals("JournalArticle"))
-        //			entry.setType(BibtexEntryTypes.ARTICLE);
-        //		else if(sourceType.equals("ArticleInAPeriodical"))
-        //			entry.setType(BibtexEntryTypes.ARTICLE);
-        //		else if(sourceType.equals("ConferenceProceedings"))
-        //			entry.setType(BibtexEntryTypes.CONFERENCE);
-        //		else if(sourceType.equals("Report"))
-        //			entry.setType(BibtexEntryTypes.TECHREPORT);
-        //		else if(sourceType.equals("InternetSite"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("DocumentFromInternetSite"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("DocumentFromInternetSite"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("ElectronicSource"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Art"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("SoundRecording"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Performance"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Film"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Interview"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Patent"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Case"))
-        //			entry.setType(BibtexEntryTypes.OTHER);
-        //		else if(sourceType.equals("Misc"))
-        //			entry.setType(BibtexEntryTypes.MISC);
-        //		else
-        //			entry.setType(BibtexEntryTypes.MISC);
 
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
 
         if (tag != null) {
             hm.put("bibtexkey", tag);
         }
-        //		if(GUID != null)
-        //			hm.put("GUID",GUID);
+
         if (LCID >= 0) {
             hm.put("language", getLanguage(LCID));
         }
@@ -1213,10 +1048,7 @@ class MSBibEntry {
         if (institution != null) {
             hm.put("institution", institution);
         }
-        //		if(thesisType !=null )
-        //			hm.put("type",thesisType);
-        //		if(internetSiteTitle !=null )
-        //			hm.put("title",internetSiteTitle);
+
         if (dateAccessed != null) {
             hm.put(MSBIB + "accessed", dateAccessed);
         }
@@ -1226,13 +1058,11 @@ class MSBibEntry {
         if (productionCompany != null) {
             hm.put(MSBIB + "productioncompany", productionCompany);
         }
-        //		if(publicationTitle !=null )
-        //			hm.put("title",publicationTitle);
+
         if (medium != null) {
             hm.put(MSBIB + "medium", medium);
         }
-        //		if(albumTitle !=null )
-        //			hm.put("title",albumTitle);
+
         if (recordingNumber != null) {
             hm.put(MSBIB + "recordingnumber", recordingNumber);
         }
@@ -1242,8 +1072,7 @@ class MSBibEntry {
         if (distributor != null) {
             hm.put(MSBIB + "distributor", distributor);
         }
-        //		if(broadcastTitle !=null )
-        //			hm.put("title",broadcastTitle);
+
         if (broadcaster != null) {
             hm.put(MSBIB + "broadcaster", broadcaster);
         }
@@ -1311,7 +1140,7 @@ class MSBibEntry {
      * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
      * standard</a>. This method will return an empty
      * String if the input is null or empty.
-     * 
+     * <p>
      * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
      *
      * @param in The String whose non-valid characters we want to remove.
@@ -1321,8 +1150,7 @@ class MSBibEntry {
         StringBuilder out = new StringBuilder(); // Used to hold the output.
         char current; // Used to reference the current character.
 
-        if (in == null || in != null && in.isEmpty())
-         {
+        if (in == null || in != null && in.isEmpty()) {
             return ""; // vacancy test.
         }
         for (int i = 0; i < in.length(); i++) {
@@ -1346,17 +1174,17 @@ class MSBibEntry {
      */
     @Override
     public String toString() {
-        StringWriter sresult = new StringWriter();
+        StringWriter result = new StringWriter();
         try {
             DOMSource source = new DOMSource(getDOMrepresentation());
-            StreamResult result = new StreamResult(sresult);
+            StreamResult streamResult = new StreamResult(result);
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, result);
-        } catch (Exception e) {
-            throw new Error(e);
+            trans.transform(source, streamResult);
+        } catch (TransformerException e) {
+            LOGGER.warn("Could not build XML representation", e);
         }
-        return sresult.toString();
+        return result.toString();
     }
 
 }
