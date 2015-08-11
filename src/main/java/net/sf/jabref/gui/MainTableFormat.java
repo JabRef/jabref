@@ -118,7 +118,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (disName != null) {
                     sb.append(disName);
                 } else {
-                    sb.append(StringUtil.nCase(fld[i]));
+                    sb.append(StringUtil.capitalizeFirst(fld[i]));
                 }
             }
             return sb.toString();
@@ -128,7 +128,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
               return disName ;
             } */
         }
-        //return Util.nCase(columns[col - padleft]);
+        //return Util.capitalizeFirst(columns[col - padleft]);
     }
 
     /**

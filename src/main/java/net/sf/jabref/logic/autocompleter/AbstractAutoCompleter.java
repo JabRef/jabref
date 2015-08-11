@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,13 +36,13 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
     private static final int SHORTEST_WORD = 4;
 
     // stores the strings as is
-    private final TreeSet<String> indexCaseSensitive = new TreeSet<String>();
+    private final TreeSet<String> indexCaseSensitive = new TreeSet<>();
 
     // stores strings in lowercase
-    private final TreeSet<String> indexCaseInsensitive = new TreeSet<String>();
+    private final TreeSet<String> indexCaseInsensitive = new TreeSet<>();
 
     // stores for a lowercase string the possible expanded strings
-    private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<String, TreeSet<String>>();
+    private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
 
 
 
@@ -56,29 +56,29 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
      * 
      * @see AbstractAutoCompleter#addBibtexEntry(BibtexEntry)
      */
-    public String[] complete(String str) {
-        if (AbstractAutoCompleter.stringMinLength(str)) {
+    public String[] complete(String toComplete) {
+        if (AbstractAutoCompleter.stringMinLength(toComplete)) {
             return null;
         }
-        String lstr = str.toLowerCase();
+        String lowerCase = toComplete.toLowerCase();
 
-        if (lstr.equals(str)) {
+        if (lowerCase.equals(toComplete)) {
             // user typed in lower case word -> we do an case-insenstive search
-            String ender = AbstractAutoCompleter.incrementLastCharacter(lstr);
-            SortedSet<String> subset = indexCaseInsensitive.subSet(lstr, ender);
+            String ender = AbstractAutoCompleter.incrementLastCharacter(lowerCase);
+            SortedSet<String> subset = indexCaseInsensitive.subSet(lowerCase, ender);
 
             // As subset only contains lower case strings, 
             // we have to to determine possible strings for each hit
-            ArrayList<String> res = new ArrayList<String>();
+            ArrayList<String> result = new ArrayList<>();
             for (String s : subset) {
-                res.addAll(possibleStringsForSearchString.get(s));
+                result.addAll(possibleStringsForSearchString.get(s));
             }
-            return res.toArray(new String[res.size()]);
+            return result.toArray(new String[result.size()]);
         } else {
             // user typed in a mix of upper case and lower case,
             // we assume user wants to have exact search
-            String ender = AbstractAutoCompleter.incrementLastCharacter(str);
-            SortedSet<String> subset = indexCaseSensitive.subSet(str, ender);
+            String ender = AbstractAutoCompleter.incrementLastCharacter(toComplete);
+            SortedSet<String> subset = indexCaseSensitive.subSet(toComplete, ender);
             return subset.toArray(new String[subset.size()]);
         }
     }
@@ -88,13 +88,13 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
      * 
      * Example: incrementLastCharacter("abc") returns "abd".
      */
-    private static String incrementLastCharacter(String str) {
-        char lastChar = str.charAt(str.length() - 1);
-        return str.substring(0, str.length() - 1) + Character.toString((char) (lastChar + 1));
+    private static String incrementLastCharacter(String toIncrement) {
+        char lastChar = toIncrement.charAt(toIncrement.length() - 1);
+        return toIncrement.substring(0, toIncrement.length() - 1) + Character.toString((char) (lastChar + 1));
     }
 
-    private static boolean stringMinLength(String str) {
-        return str.length() < AutoCompleterFactory.SHORTEST_TO_COMPLETE;
+    private static boolean stringMinLength(String toCheck) {
+        return toCheck.length() < AutoCompleterFactory.SHORTEST_TO_COMPLETE;
     }
 
     public void addWordToIndex(String word) {
@@ -104,14 +104,14 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
             // insensitive treatment
             // first, add the lower cased word to search index
             // second, add a mapping from the lower cased word to the real word
-            String word_lcase = word.toLowerCase();
-            indexCaseInsensitive.add(word_lcase);
-            TreeSet<String> set = possibleStringsForSearchString.get(word_lcase);
+            String lowerCase = word.toLowerCase();
+            indexCaseInsensitive.add(lowerCase);
+            TreeSet<String> set = possibleStringsForSearchString.get(lowerCase);
             if (set == null) {
-                set = new TreeSet<String>();
+                set = new TreeSet<>();
             }
             set.add(word);
-            possibleStringsForSearchString.put(word_lcase, set);
+            possibleStringsForSearchString.put(lowerCase, set);
         }
     }
 

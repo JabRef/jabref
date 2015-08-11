@@ -15,9 +15,9 @@ public class SentenceAnalyzer {
     }
 
     public List<String> getWords() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
         boolean escaped = false;
         boolean quoted = false;
         for(char c : query.toCharArray()) {
@@ -27,29 +27,29 @@ public class SentenceAnalyzer {
             } else {
                 // See if we have reached the end of a word:
                 if (!escaped && !quoted && Character.isWhitespace(c)) {
-                    if (sb.length() > 0) {
-                        result.add(sb.toString());
-                        sb = new StringBuffer();
+                    if (stringBuilder.length() > 0) {
+                        result.add(stringBuilder.toString());
+                        stringBuilder = new StringBuilder();
                     }
                 } else if (c == QUOTE_CHAR) {
                     // Whether it is a start or end quote, store the current
                     // word if any:
-                    if (sb.length() > 0) {
-                        result.add(sb.toString());
-                        sb = new StringBuffer();
+                    if (stringBuilder.length() > 0) {
+                        result.add(stringBuilder.toString());
+                        stringBuilder = new StringBuilder();
                     }
                     quoted = !quoted;
                 } else {
                     // All other possibilities exhausted, we add the char to
                     // the current word:
-                    sb.append(c);
+                    stringBuilder.append(c);
                 }
                 escaped = false;
             }
         }
         // Finished with the loop. If we have a current word, add it:
-        if (sb.length() > 0) {
-            result.add(sb.toString());
+        if (stringBuilder.length() > 0) {
+            result.add(stringBuilder.toString());
         }
 
         return result;

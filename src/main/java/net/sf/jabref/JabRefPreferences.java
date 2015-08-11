@@ -1383,10 +1383,10 @@ public class JabRefPreferences {
             return null;
         }
         if (priOpt == null) {
-            return new CustomEntryType(StringUtil.nCase(name), req, opt);
+            return new CustomEntryType(StringUtil.capitalizeFirst(name), req, opt);
         }
         String[] secOpt = Util.getRemainder(opt, priOpt);
-        return new CustomEntryType(StringUtil.nCase(name), req, priOpt, secOpt);
+        return new CustomEntryType(StringUtil.capitalizeFirst(name), req, priOpt, secOpt);
 
     }
 

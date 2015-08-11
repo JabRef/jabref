@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,40 +15,34 @@
 */
 package net.sf.jabref.logic.msbib;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-/**
- * Date: May 15, 2007; May 03, 2007
- *
- * History:
- * May 03, 2007 - Added suport for export
- * May 15, 2007 - Added suport for import
- *
- * @author S M Mahbub Murshed (udvranto@yahoo.com)
- * @version 2.0.0
- * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
- * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
- */
 public class MSBibDatabase {
 
     private Set<MSBibEntry> entries;
 
+    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     public MSBibDatabase() {
         // maybe make this sorted later...
-        entries = new HashSet<MSBibEntry>();
+        entries = new HashSet<>();
     }
 
     public MSBibDatabase(InputStream stream) {
@@ -68,32 +62,28 @@ public class MSBibDatabase {
     }
 
     public List<BibtexEntry> importEntries(InputStream stream) {
-        entries = new HashSet<MSBibEntry>();
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        Document docin = null;
+        entries = new HashSet<>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        Document inputDocument = null;
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.
                     newInstance().
                     newDocumentBuilder();
-            docin = dbuild.parse(stream);
-        } catch (Exception e) {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+            inputDocument = documentBuilder.parse(stream);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.warn("Could not parse document", e);
         }
         String bcol = "b:";
-        NodeList rootLst = docin.getElementsByTagName("b:Sources");
-        if (rootLst.getLength() == 0) {
-            rootLst = docin.getElementsByTagName("Sources");
+        NodeList rootList = inputDocument.getElementsByTagName("b:Sources");
+        if (rootList.getLength() == 0) {
+            rootList = inputDocument.getElementsByTagName("Sources");
             bcol = "";
         }
-        if (rootLst.getLength() == 0)
-         {
+        if (rootList.getLength() == 0) {
             return bibitems;
-        //    	if(docin!= null && docin.getDocumentElement().getTagName().contains("Sources") == false)
-        //    		return bibitems;
         }
 
-        NodeList sourceList = ((Element) rootLst.item(0)).getElementsByTagName(bcol + "Source");
+        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagName(bcol + "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
             MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i), bcol);
             entries.add(entry);
@@ -104,9 +94,9 @@ public class MSBibDatabase {
     }
 
     private void addEntries(BibtexDatabase database, Set<String> keySet) {
-        entries = new HashSet<MSBibEntry>();
-        for (String s : keySet) {
-            BibtexEntry entry = database.getEntryById(s);
+        entries = new HashSet<>();
+        for (String key : keySet) {
+            BibtexEntry entry = database.getEntryById(key);
             MSBibEntry newMods = new MSBibEntry(entry);
             entries.add(newMods);
         }
@@ -115,10 +105,10 @@ public class MSBibDatabase {
     public Document getDOMrepresentation() {
         Document result = null;
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.
                     newInstance().
                     newDocumentBuilder();
-            result = dbuild.newDocument();
+            result = documentBuilder.newDocument();
             Element msbibCollection = result.createElement("b:Sources");
             msbibCollection.setAttribute("SelectedStyle", "");
             msbibCollection.setAttribute("xmlns", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
@@ -130,10 +120,8 @@ public class MSBibDatabase {
             }
 
             result.appendChild(msbibCollection);
-        } catch (Exception e)
-        {
-            System.out.println("Exception caught..." + e);
-            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Could not build document", e);
         }
         return result;
     }

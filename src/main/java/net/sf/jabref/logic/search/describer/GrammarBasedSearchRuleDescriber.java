@@ -24,41 +24,41 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
 
     @Override
     public String getDescription() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         // describe advanced search expression
-        sb.append(Globals.lang("This group contains entries in which")).append(' ');
-        sb.append(new SearchBaseVisitor<String>() {
+        stringBuilder.append(Globals.lang("This group contains entries in which")).append(' ');
+        stringBuilder.append(new SearchBaseVisitor<String>() {
 
             @Override
-            public String visitStart(SearchParser.StartContext ctx) {
-                return visit(ctx.expression());
+            public String visitStart(SearchParser.StartContext context) {
+                return visit(context.expression());
             }
 
             @Override
-            public String visitUnaryExpression(SearchParser.UnaryExpressionContext ctx) {
-                return String.format("%s %s", Globals.lang("not"), visit(ctx.expression()));
+            public String visitUnaryExpression(SearchParser.UnaryExpressionContext context) {
+                return String.format("%s %s", Globals.lang("not"), visit(context.expression()));
             }
 
             @Override
-            public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
-                return String.format("%s", ctx.expression());
+            public String visitParenExpression(SearchParser.ParenExpressionContext context) {
+                return String.format("%s", context.expression());
             }
 
             @Override
-            public String visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
-                if (ctx.operator.getText().equalsIgnoreCase("AND")) {
-                    return String.format("(%s %s %s)", visit(ctx.left), Globals.lang("and"), visit(ctx.right));
+            public String visitBinaryExpression(SearchParser.BinaryExpressionContext context) {
+                if (context.operator.getText().equalsIgnoreCase("AND")) {
+                    return String.format("(%s %s %s)", visit(context.left), Globals.lang("and"), visit(context.right));
                 } else {
-                    return String.format("(%s %s %s)", visit(ctx.left), Globals.lang("or"), visit(ctx.right));
+                    return String.format("(%s %s %s)", visit(context.left), Globals.lang("or"), visit(context.right));
                 }
             }
 
             @Override
-            public String visitComparison(SearchParser.ComparisonContext ctx) {
+            public String visitComparison(SearchParser.ComparisonContext context) {
 
-                final String field = StringUtil.unquote(ctx.left.getText(), '"');
-                final String value = StringUtil.unquote(ctx.right.getText(), '"');
-                final GrammarBasedSearchRule.ComparisonOperator operator = GrammarBasedSearchRule.ComparisonOperator.build(ctx.operator.getText());
+                final String field = StringUtil.unquote(context.left.getText(), '"');
+                final String value = StringUtil.unquote(context.right.getText(), '"');
+                final GrammarBasedSearchRule.ComparisonOperator operator = GrammarBasedSearchRule.ComparisonOperator.build(context.operator.getText());
 
                 final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
                 final String termQuoted = StringUtil.quoteForHTML(value);
@@ -94,9 +94,9 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
             }
 
         }.visit(parseTree));
-        sb.append(". ");
-        sb.append(caseSensitive ? Globals.lang("The search is case sensitive.") : Globals.lang("The search is case insensitive."));
-        return sb.toString();
+        stringBuilder.append(". ");
+        stringBuilder.append(caseSensitive ? Globals.lang("The search is case sensitive.") : Globals.lang("The search is case insensitive."));
+        return stringBuilder.toString();
     }
 
 }

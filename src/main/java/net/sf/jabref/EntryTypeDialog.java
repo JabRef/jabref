@@ -103,7 +103,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         for (BibtexEntryType tp : BibtexEntryType.getAllValues()) {
             if (tp.isVisibleAtNewEntryDialog()) {
-                TypeButton b = new TypeButton(StringUtil.nCase(tp.getName()), tp);
+                TypeButton b = new TypeButton(StringUtil.capitalizeFirst(tp.getName()), tp);
                 b.addActionListener(this);
                 // Check if we should finish the row.
                 col++;

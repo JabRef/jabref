@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -14,25 +14,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 package net.sf.jabref.logic.util;
-
-/* Mp3dings - manage mp3 meta-information
- * Copyright (C) 2003 Moritz Ringler
- * $Id$
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -94,9 +75,9 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            String s = input.toLowerCase();
+            String lowerCase = input.toLowerCase();
 
-            Matcher matcher = UpperFirstCaseChanger.UF_PATTERN.matcher(s);
+            Matcher matcher = UpperFirstCaseChanger.UF_PATTERN.matcher(lowerCase);
 
             if (matcher.find()) {
                 return matcher.replaceFirst(matcher.group(0).toUpperCase());
@@ -115,12 +96,12 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            String s = input.toLowerCase();
-            String[] words = s.split("\\s+");
+            String lowerCase = input.toLowerCase();
+            String[] words = lowerCase.split("\\s+");
             String[] result = new String[words.length];
 
             for (int i = 0; i < words.length; i++) {
-                result[i] = StringUtil.nCase(words[i]);
+                result[i] = StringUtil.capitalizeFirst(words[i]);
             }
 
             return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
@@ -132,7 +113,7 @@ public class CaseChangers {
         private static final Set<String> notToCapitalize;
 
         static {
-            Set<String> smallerWords = new HashSet<String>();
+            Set<String> smallerWords = new HashSet<>();
 
             smallerWords.addAll(Arrays.asList("a", "an", "the", "and", "but", "or", "for", "nor", "as", "at", "by", "for",
                     "from", "in", "into", "near", "of", "on", "onto", "to", "with"));
@@ -149,8 +130,8 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            String s = input.toLowerCase();
-            String[] words = s.split("\\s+");
+            String lowerCase = input.toLowerCase();
+            String[] words = lowerCase.split("\\s+");
             String[] result = new String[words.length];
 
             for (int i = 0; i < words.length; i++) {
@@ -159,11 +140,11 @@ public class CaseChangers {
                 boolean alwaysCapitalizeFirstWord = i == 0;
                 boolean alwaysCapitalizeLastWord = i == words.length - 1;
                 if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord) {
-                    result[i] = StringUtil.nCase(word);
+                    result[i] = StringUtil.capitalizeFirst(word);
                 } else if (TitleCaseChanger.notToCapitalize.contains(word)) {
                     result[i] = word;
                 } else {
-                    result[i] = StringUtil.nCase(word);
+                    result[i] = StringUtil.capitalizeFirst(word);
                 }
             }
 

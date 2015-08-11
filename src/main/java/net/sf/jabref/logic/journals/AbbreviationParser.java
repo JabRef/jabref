@@ -1,5 +1,10 @@
 package net.sf.jabref.logic.journals;
 
+
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.util.LinkedList;
@@ -11,18 +16,16 @@ import java.util.Objects;
  */
 public class AbbreviationParser {
 
-    private final List<Abbreviation> abbreviations = new LinkedList<Abbreviation>();
+    private final List<Abbreviation> abbreviations = new LinkedList<>();
+
+    private static final Log LOGGER = LogFactory.getLog(AbbreviationParser.class);
 
     public void readJournalListFromResource(String resourceFileName) {
         URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
         try {
             readJournalList(new InputStreamReader(url.openStream()));
-        } catch (FileNotFoundException e) {
-            // TODO logging
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO logging
-            e.printStackTrace();
+            LOGGER.info("Could not read journal list from file " + resourceFileName, e);
         }
     }
 
@@ -37,21 +40,14 @@ public class AbbreviationParser {
      * @param in
      */
     private void readJournalList(Reader in) {
-        BufferedReader reader = new BufferedReader(in);
-        try {
+        try(BufferedReader reader = new BufferedReader(in)){
             String line;
             while ((line = reader.readLine()) != null) {
                 addLine(line);
             }
 
         } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ex2) {
-                ex2.printStackTrace();
-            }
+            LOGGER.info("Could not read journal list from file ", ex);
         }
     }
 

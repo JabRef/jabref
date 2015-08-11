@@ -135,15 +135,15 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     }
 
     @Override
-    public String[] complete(String str) {
+    public String[] complete(String toComplete) {
         // Normally, one would implement that using 
         // class inheritance. But this seemed overengineered
         if (this.lastNameOnlyAndSeparationBySpace) {
-            str = determinePrefixAndReturnRemainder(str, " ");
+            toComplete = determinePrefixAndReturnRemainder(toComplete, " ");
         } else {
-            str = determinePrefixAndReturnRemainder(str, " and ");
+            toComplete = determinePrefixAndReturnRemainder(toComplete, " and ");
         }
-        return super.complete(str);
+        return super.complete(toComplete);
     }
 
     public String getFieldName() {

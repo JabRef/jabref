@@ -45,14 +45,14 @@ public class PersonName {
         parseName(name);
     }
 
-    public PersonName(String firstName, String _middleName, String lastName) {
+    public PersonName(String firstName, String middleName, String lastName) {
         givenName = firstName;
-        middleName = _middleName;
+        this.middleName = middleName;
         surname = lastName;
     }
 
     private void parseName(String author) {
-        Vector<String> v = new Vector<String>();
+        Vector<String> names = new Vector<>();
         String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma
@@ -63,27 +63,27 @@ public class PersonName {
 
         // Tokenize just the firstName and middleNames as we have the surname
         // before the comma.
-        WSITools.tokenize(v, authorMod.substring(endOfLastName + 1).trim(), " \n\r");
+        WSITools.tokenize(names, authorMod.substring(endOfLastName + 1).trim(), " \n\r");
         if (endOfLastName >= 0) {
-            v.add(authorMod.substring(0, endOfLastName));
+            names.add(authorMod.substring(0, endOfLastName));
         }
 
-        int amountOfNames = v.size();
+        int amountOfNames = names.size();
 
         if (amountOfNames == 1) {
-            surname = v.get(0);
+            surname = names.get(0);
         } else if (amountOfNames == 2) {
-            givenName = v.get(0);
-            surname = v.get(1);
+            givenName = names.get(0);
+            surname = names.get(1);
         }
         else {
-            givenName = v.get(0);
+            givenName = names.get(0);
             middleName = "";
             for (int i = 1; i < amountOfNames - 1; i++) {
-                middleName += ' ' + v.get(i);
+                middleName += ' ' + names.get(i);
             }
             middleName = middleName.trim();
-            surname = v.get(amountOfNames - 1);
+            surname = names.get(amountOfNames - 1);
         }
     }
 

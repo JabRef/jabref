@@ -35,7 +35,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1233,13 +1232,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public NewEntryAction(String type_) {
             // This action leads to the creation of a specific entry.
-            putValue(Action.NAME, StringUtil.nCase(type_));
+            putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
             type = type_;
         }
 
         public NewEntryAction(String type_, KeyStroke key) {
             // This action leads to the creation of a specific entry.
-            putValue(Action.NAME, StringUtil.nCase(type_));
+            putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
             putValue(Action.ACCELERATOR_KEY, key);
             type = type_;
         }
@@ -2558,7 +2557,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public EditAction(String command, URL icon) {
             super(new ImageIcon(icon));
             this.command = command;
-            String nName = StringUtil.nCase(command);
+            String nName = StringUtil.capitalizeFirst(command);
             putValue(Action.NAME, nName);
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(nName));
             putValue(Action.SHORT_DESCRIPTION, Globals.lang(nName));

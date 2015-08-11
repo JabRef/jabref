@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,8 +32,8 @@ class Cookie {
      * DateFormats should not be reused among instances (or rather among threads), because they are not thread-safe.
      * If they are shared, their usage should be synchronized.
      */
-    private final DateFormat expiresFormat1 = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
-    private final DateFormat expiresFormat2 = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
+    private final DateFormat whiteSpaceFormat = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
+    private final DateFormat hyphenFormat = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
 
 
     /**
@@ -81,10 +81,10 @@ class Cookie {
                 this.path = value;
             } else if (name.equalsIgnoreCase("expires")) {
                 try {
-                    this.expires = expiresFormat1.parse(value);
+                    this.expires = whiteSpaceFormat.parse(value);
                 } catch (ParseException e) {
                     try {
-                        this.expires = expiresFormat2.parse(value);
+                        this.expires = hyphenFormat.parse(value);
                     } catch (ParseException e2) {
                         throw new IllegalArgumentException(
                                 "Bad date format in header: " + value);

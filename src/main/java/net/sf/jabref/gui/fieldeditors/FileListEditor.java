@@ -37,7 +37,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
-import javax.swing.event.UndoableEditListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
@@ -78,7 +77,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         this.metaData = metaData;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + StringUtil.nCase(fieldName) + " ");
+        label = new FieldNameLabel(" " + StringUtil.capitalizeFirst(fieldName) + " ");
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);

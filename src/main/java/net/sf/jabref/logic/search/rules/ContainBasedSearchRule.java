@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -54,7 +54,6 @@ public class ContainBasedSearchRule implements SearchRule {
 
         List<String> words = new SentenceAnalyzer(searchString).getWords();
 
-        //print(words);
         // We need match for all words:
         boolean[] matchFound = new boolean[words.size()];
 
@@ -69,8 +68,8 @@ public class ContainBasedSearchRule implements SearchRule {
                 int index = 0;
                 // Check if we have a match for each of the query words, ignoring
                 // those words for which we already have a match:
-                for (String s : words) {
-                    matchFound[index] = matchFound[index] || fieldContent.contains(s);
+                for (String word : words) {
+                    matchFound[index] = matchFound[index] || fieldContent.contains(word);
 
                     index++;
                 }

@@ -16,6 +16,8 @@
 package net.sf.jabref.logic.journals;
 
 import net.sf.jabref.Globals;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,11 +28,13 @@ import java.util.*;
  */
 public class JournalAbbreviationRepository {
 
-    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
-    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
-    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<String, Abbreviation>();
+    private final HashMap<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
+    private final HashMap<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
+    private final HashMap<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
 
-    private final SortedSet<Abbreviation> abbreviations = new TreeSet<Abbreviation>();
+    private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
+
+    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
 
     public void readJournalListFromResource(String resource) {
         AbbreviationParser parser = new AbbreviationParser();
@@ -53,16 +57,16 @@ public class JournalAbbreviationRepository {
     }
 
     public boolean isKnownName(String journalName) {
-        String s = Objects.requireNonNull(journalName).trim().toLowerCase();
-        return fullNameLowerCase2Abbreviation.get(s) != null
-                || isoLowerCase2Abbreviation.get(s) != null
-                || medlineLowerCase2Abbreviation.get(s) != null;
+        String nameKey = Objects.requireNonNull(journalName).trim().toLowerCase();
+        return fullNameLowerCase2Abbreviation.get(nameKey) != null
+                || isoLowerCase2Abbreviation.get(nameKey) != null
+                || medlineLowerCase2Abbreviation.get(nameKey) != null;
     }
 
     public boolean isAbbreviatedName(String journalName) {
-        String s = Objects.requireNonNull(journalName).trim().toLowerCase();
-        return isoLowerCase2Abbreviation.get(s) != null
-                || medlineLowerCase2Abbreviation.get(s) != null;
+        String nameKey = Objects.requireNonNull(journalName).trim().toLowerCase();
+        return isoLowerCase2Abbreviation.get(nameKey) != null
+                || medlineLowerCase2Abbreviation.get(nameKey) != null;
     }
 
     /**
@@ -72,14 +76,14 @@ public class JournalAbbreviationRepository {
      * @return The abbreviated name
      */
     public Optional<Abbreviation> getAbbreviation(String journalName) {
-        String s = Objects.requireNonNull(journalName).toLowerCase().trim();
+        String nameKey = Objects.requireNonNull(journalName).toLowerCase().trim();
 
-        if (fullNameLowerCase2Abbreviation.containsKey(s)) {
-            return Optional.of(fullNameLowerCase2Abbreviation.get(s));
-        } else if (isoLowerCase2Abbreviation.containsKey(s)) {
-            return Optional.of(isoLowerCase2Abbreviation.get(s));
-        } else if (medlineLowerCase2Abbreviation.containsKey(s)) {
-            return Optional.of(medlineLowerCase2Abbreviation.get(s));
+        if (fullNameLowerCase2Abbreviation.containsKey(nameKey)) {
+            return Optional.of(fullNameLowerCase2Abbreviation.get(nameKey));
+        } else if (isoLowerCase2Abbreviation.containsKey(nameKey)) {
+            return Optional.of(isoLowerCase2Abbreviation.get(nameKey));
+        } else if (medlineLowerCase2Abbreviation.containsKey(nameKey)) {
+            return Optional.of(medlineLowerCase2Abbreviation.get(nameKey));
         } else {
             return Optional.empty();
         }
@@ -91,8 +95,7 @@ public class JournalAbbreviationRepository {
         if (isKnownName(abbreviation.getName())) {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
-            // TODO logging strategy required
-            System.out.println(Globals.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
+            LOGGER.info(Globals.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
         }
 
         abbreviations.add(abbreviation);

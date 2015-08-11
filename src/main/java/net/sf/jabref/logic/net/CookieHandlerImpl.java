@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,13 +21,13 @@ import java.util.*;
 import java.io.IOException;
 
 /**
- * 
+ *
  */
 public class CookieHandlerImpl extends CookieHandler {
 
     // "Long" term storage for cookies, not serialized so only
     // for current JVM instance
-    private final List<Cookie> cache = new LinkedList<Cookie>();
+    private final List<Cookie> cache = new LinkedList<>();
 
 
     /**
@@ -53,19 +53,16 @@ public class CookieHandlerImpl extends CookieHandler {
                 Cookie cookie = new Cookie(uri, item);
                 // Remove cookie if it already exists
                 // New one will replace
-                for (Iterator<Cookie> i = cache.iterator(); i.hasNext();) {
+                for (Iterator<Cookie> i = cache.iterator(); i.hasNext(); ) {
                     Cookie existingCookie = i.next();
-                    if (/*(cookie.getURI().equals(
-                            existingCookie.getURI()))*/
-                    (cookie.domain.equals(existingCookie.domain))
-                            &&
-                            (cookie.getName().equals(
-                                    existingCookie.getName()))) {
+                    if ((cookie.domain.equals(existingCookie.domain))
+                                    &&
+                                    (cookie.getName().equals(
+                                            existingCookie.getName()))) {
                         i.remove();
                         break;
                     }
                 }
-                //System.out.println(cookie.getName()+" : "+cookie.domain+" : "+cookie.toString());
 
                 cache.add(cookie);
             }
@@ -81,7 +78,7 @@ public class CookieHandlerImpl extends CookieHandler {
      *                       to lists of field values representing the current request
      *                       headers
      * @return Immutable map, with field name "Cookie" to a list
-     *         of cookies
+     * of cookies
      */
 
     @Override
@@ -93,7 +90,7 @@ public class CookieHandlerImpl extends CookieHandler {
         // Retrieve all the cookies for matching URI
         // Put in comma-separated list
         StringBuilder cookies = new StringBuilder();
-        for (Iterator<Cookie> i = cache.iterator(); i.hasNext();) {
+        for (Iterator<Cookie> i = cache.iterator(); i.hasNext(); ) {
             //for (Cookie cookie : cache) {
             Cookie cookie = i.next();
             // Remove cookies that have expired
@@ -109,7 +106,7 @@ public class CookieHandlerImpl extends CookieHandler {
 
         // Map to return
         Map<String, List<String>> cookieMap =
-                new HashMap<String, List<String>>(requestHeaders);
+                new HashMap<>(requestHeaders);
 
         // Convert StringBuilder to List, store in map
         if (cookies.length() > 0) {

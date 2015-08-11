@@ -268,7 +268,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
                 //System.out.println("Defaulting: "+typeName);
-                String nm = StringUtil.nCase(stringListEntry.getKey());
+                String nm = StringUtil.capitalizeFirst(stringListEntry.getKey());
                 BibtexEntryType.removeType(nm);
 
                 updateTypesForEntries(nm);
@@ -294,8 +294,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (changesMade) {
                 //System.out.println("Updating: "+typeName);
                 CustomEntryType typ = biblatexMode ?
-                        new CustomEntryType(StringUtil.nCase(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
-                        new CustomEntryType(StringUtil.nCase(stringListEntry.getKey()), reqStr, optStr);
+                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
+                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
                 BibtexEntryType.addOrModifyCustomEntryType(typ);
                 updateTypesForEntries(typ.getName());
@@ -329,14 +329,14 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                                 + "type will be declared "
                                 + "typeless. Continue?"),
                                 Globals.lang("Delete custom format") +
-                                        " '" + StringUtil.nCase(name) + '\'', JOptionPane.YES_NO_OPTION,
+                                        " '" + StringUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
                 if (reply != JOptionPane.YES_OPTION) {
                     return;
                 }
             }
             BibtexEntryType.removeType(name);
-            updateTypesForEntries(StringUtil.nCase(name));
+            updateTypesForEntries(StringUtil.capitalizeFirst(name));
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);

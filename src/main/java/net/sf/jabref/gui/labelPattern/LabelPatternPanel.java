@@ -176,7 +176,7 @@ public class LabelPatternPanel extends JPanel {
 
     private JTextField addEntryType(Container c, String name, int y) {
 
-        JLabel lab = new JLabel(StringUtil.nCase(name));
+        JLabel lab = new JLabel(StringUtil.capitalizeFirst(name));
         name = name.toLowerCase();
         con.gridx = 0;
         con.gridy = y;
