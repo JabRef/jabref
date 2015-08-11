@@ -102,9 +102,9 @@ public class Globals {
 
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
-    private static final String RESOURCE_PREFIX = "resource/JabRef";
-    private static final String MENU_RESOURCE_PREFIX = "resource/Menu";
-    private static final String INTEGRITY_RESOURCE_PREFIX = "resource/IntegrityMessage";
+    private static final String RESOURCE_PREFIX = "l10n/JabRef";
+    private static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    private static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
 
     public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
 
