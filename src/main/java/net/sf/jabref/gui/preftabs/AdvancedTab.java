@@ -296,7 +296,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         try {
             int portNumber = Integer.parseInt(remoteServerPort.getText());
-            if (RemoteUtil.isValidPortNumber(portNumber)) {
+            if (RemoteUtil.isUserPort(portNumber)) {
                 return true; // Ok, the number was legal.
             } else {
                 throw new NumberFormatException();
