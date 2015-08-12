@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
+ * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
     /**

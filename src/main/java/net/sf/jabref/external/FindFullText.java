@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.util.DOIUtil;
+import net.sf.jabref.util.Doi;
 import net.sf.jabref.logic.net.URLDownload;
 
 /**
@@ -56,9 +56,9 @@ public class FindFullText {
     public FindResult findFullText(BibtexEntry entry) {
         String urlText = entry.getField("url");
         String doiText = entry.getField("doi");
-        // First try the DOI link, if defined:
+        // First try the Doi link, if defined:
         if (doiText != null && !doiText.trim().isEmpty()) {
-            FindResult resDoi = lookForFullTextAtURL(DOIUtil.getURI(doiText));
+            FindResult resDoi = lookForFullTextAtURL(new Doi(doiText).getUri());
             if (resDoi.status == FindFullText.FOUND_PDF) {
                 return resDoi;
             } else if (urlText != null && !urlText.trim().isEmpty()) {
@@ -66,14 +66,14 @@ public class FindFullText {
                 if (resUrl.status == FindFullText.FOUND_PDF) {
                     return resUrl;
                 } else {
-                    return resDoi; // If both URL and DOI fail, we assume that the error code for DOI is
+                    return resDoi; // If both URL and Doi fail, we assume that the error code for Doi is
                                    // probably the most relevant.
                 }
             } else {
                 return resDoi;
             }
         }
-        // No DOI? Try URL:
+        // No Doi? Try URL:
         else if (urlText != null && !urlText.trim().isEmpty()) {
             return lookForFullTextAtURL(urlText);
         }
@@ -129,7 +129,7 @@ public class FindFullText {
     }
 
     /**
-     * Follow redirects until the final location is reached. This is necessary to handle DOI links, which
+     * Follow redirects until the final location is reached. This is necessary to handle Doi links, which
      * redirect to publishers' web sites. We need to know the publisher's domain name in order to choose
      * which FullTextFinder to use.
      * @param url The url to start with.

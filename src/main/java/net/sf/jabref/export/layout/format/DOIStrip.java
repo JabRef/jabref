@@ -15,11 +15,11 @@
 */
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.util.DOIUtil;
+import net.sf.jabref.util.Doi;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
- * Will strip any prefixes from the DOI field, in order to output only the DOI number
+ * Will strip any prefixes from the Doi field, in order to output only the Doi number
  * 
  * @author mark-schenk 
  * @author olly98
@@ -32,7 +32,7 @@ public class DOIStrip implements LayoutFormatter {
         if (fieldText == null) {
             return null;
         } else {
-            return DOIUtil.getDOI(fieldText);
+            return new Doi(fieldText).getDoi();
         }
     }
 }

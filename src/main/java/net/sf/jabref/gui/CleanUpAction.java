@@ -42,7 +42,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.DOIUtil;
+import net.sf.jabref.util.Doi;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.util.Util;
@@ -386,36 +386,36 @@ public class CleanUpAction extends AbstractWorker {
         // fields to check
         String[] fields = {"note", "url", "ee"};
 
-        // First check if the DOI Field is empty
+        // First check if the Doi Field is empty
         if (bes.getField("doi") != null) {
             String doiFieldValue = bes.getField("doi");
-            if (DOIUtil.isURI(doiFieldValue)) {
-                String newValue = DOIUtil.getDOI(doiFieldValue);
+            if (Doi.containsHttpDoi(doiFieldValue)) {
+                String newValue = new Doi(doiFieldValue).getDoi();
                 ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
                 bes.setField("doi", newValue);
             }
-            if (DOIUtil.isDOI(doiFieldValue)) {
-                // DOI field seems to contain DOI
+            if (Doi.containsDoi(doiFieldValue)) {
+                // Doi field seems to contain Doi
                 // cleanup note, url, ee field
-                // we do NOT copy values to the DOI field as the DOI field contains a DOI!
+                // we do NOT copy values to the Doi field as the Doi field contains a Doi!
                 for (String field : fields) {
-                    if (DOIUtil.isDOI(bes.getField(field))) {
-                        DOIUtil.removeDOIfromBibtexEntryField(bes, field, ce);
+                    if (Doi.containsDoi(bes.getField(field))) {
+                        Doi.removeDOIfromBibtexEntryField(bes, field, ce);
                     }
                 }
             }
         } else {
-            // As the DOI field is empty we now check if note, url, or ee field contains a DOI
+            // As the Doi field is empty we now check if note, url, or ee field contains a Doi
 
             for (String field : fields) {
-                if (DOIUtil.isDOI(bes.getField(field))) {
-                    // update DOI
+                if (Doi.containsDoi(bes.getField(field))) {
+                    // update Doi
                     String oldValue = bes.getField("doi");
-                    String newValue = DOIUtil.getDOI(bes.getField(field));
+                    String newValue = new Doi(bes.getField(field)).getDoi();
                     ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
                     bes.setField("doi", newValue);
 
-                    DOIUtil.removeDOIfromBibtexEntryField(bes, field, ce);
+                    Doi.removeDOIfromBibtexEntryField(bes, field, ce);
                 }
             }
         }

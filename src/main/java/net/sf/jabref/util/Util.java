@@ -332,7 +332,7 @@ public class Util {
      * Make sure an URL is "portable", in that it doesn't contain bad characters
      * that break the open command in some OSes.
      * 
-     * A call to this method will also remove \\url{} enclosings and clean DOI links.
+     * A call to this method will also remove \\url{} enclosings and clean Doi links.
 	 * 
 	 * @param link :the URL to sanitize.
 	 * @return Sanitized URL
@@ -349,17 +349,17 @@ public class Util {
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
             link = link.replaceFirst("^doi:/*", "");
-            link = DOIUtil.getURI(link);
+            link = new Doi(link).getUri();
         }
 
         // converts doi-only link to full http address
-        // Morten Alver 6 Nov 2012: this extracts a nonfunctional DOI from some complete
+        // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
         // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
-        // the trailing "/abstract" is included but doesn't lead to a resolvable DOI).
+        // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
-        if (DOIUtil.isDOI(link) && !link.startsWith("http://")) {
-            link = DOIUtil.getURI(link);
+        if (Doi.containsDoi(link) && !link.startsWith("http://")) {
+            link = new Doi(link).getUri();
         }
 
         link = link.replaceAll("\\+", "%2B");

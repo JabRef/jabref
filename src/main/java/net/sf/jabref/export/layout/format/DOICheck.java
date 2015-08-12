@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.util.DOIUtil;
+import net.sf.jabref.util.Doi;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
@@ -39,10 +39,10 @@ public class DOICheck implements LayoutFormatter {
             return "";
         }
 
-        if (DOIUtil.isURI(fieldText)) {
+        if (Doi.containsHttpDoi(fieldText)) {
             return fieldText;
         } else {
-            return DOIUtil.getURI(fieldText);
+            return new Doi(fieldText).getUri();
         }
     }
 }
