@@ -45,8 +45,8 @@ class ReplaceStringDialog extends JDialog {
     private final JRadioButton
             allFi = new JRadioButton(Localization.lang("All fields"), true);
     private final JRadioButton field = new JRadioButton(Localization.lang("Limit to fields") + ":", false);
-    private boolean ok_pressed = false;
-    private String[] flds = null;
+    private boolean ok_pressed;
+    private String[] flds;
     private String s1;
     private String s2;
 

@@ -33,11 +33,11 @@ public class MetaData implements Iterable<String> {
     private static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
     private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
-    private GroupTreeNode groupsRoot = null;
-    private File file = null; // The File where this base gets saved.
+    private GroupTreeNode groupsRoot;
+    private File file; // The File where this base gets saved.
     private boolean groupTreeValid = true;
 
-    private LabelPattern labelPattern = null;
+    private LabelPattern labelPattern;
 
     private DBStrings dbStrings = new DBStrings();
 

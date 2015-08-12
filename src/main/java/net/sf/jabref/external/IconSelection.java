@@ -50,7 +50,7 @@ class IconSelection extends JDialog {
     private List<String> iconKeys;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private boolean okPressed = false;
+    private boolean okPressed;
     private int selected = -1;
     private final JDialog parent;
 

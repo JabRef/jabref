@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
-    private boolean hasRunConfig = false;
+    private boolean hasRunConfig;
     private static final int MAX_ENTRIES_TO_LOAD = 50;
     private static final String QUERY_MARKER = "___QUERY___";
     private static final String URL_START = "http://scholar.google.com";
@@ -49,7 +49,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
     //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
-    private boolean stopFetching = false;
+    private boolean stopFetching;
 
 
     @Override

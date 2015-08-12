@@ -151,7 +151,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private ComponentListener dialogPositionListener;
 
     private int[] threadState = new int[] {1};
-    private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing = false;
+    private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
     
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
@@ -520,7 +520,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(selectedFileFilter, database);
                 CheckableTreeNode rootNode = crawler.searchDirectory(directory, ff, threadState, new ChangeListener() {
 
-                    int counter = 0;
+                    int counter;
 
 
                     @Override
@@ -584,7 +584,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         entryType,
                         checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
-                            int counter = 0;
+                            int counter;
 
 
                             @Override

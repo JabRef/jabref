@@ -42,10 +42,10 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final int MAX_DISPLAYED_LETTERS = 35;
 
     /** The cell over which the user is currently dragging */
-    private Object highlight1Cell = null;
-    private Object[] highlight2Cells = null;
-    private Object[] highlight3Cells = null;
-    private Object highlightBorderCell = null;
+    private Object highlight1Cell;
+    private Object[] highlight2Cells;
+    private Object[] highlight3Cells;
+    private Object highlightBorderCell;
 
     private static final ImageIcon
             groupRefiningIcon = GUIGlobals.getImage("groupRefining");

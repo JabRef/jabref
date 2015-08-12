@@ -30,7 +30,7 @@ public class TXMLReader
 
     private Document config; // XML data
 
-    private boolean ready = false;
+    private boolean ready;
 
 
     public TXMLReader(String resPath)

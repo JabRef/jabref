@@ -26,12 +26,12 @@ import java.util.Hashtable;
  */
 public class LabelPattern extends Hashtable<String, ArrayList<String>> {
 
-    private ArrayList<String> defaultPattern = null;
+    private ArrayList<String> defaultPattern;
 
     /**
      * The parent of this LabelPattern.
      */
-    private LabelPattern parent = null;
+    private LabelPattern parent;
 
 
     public LabelPattern() {

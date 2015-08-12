@@ -68,15 +68,15 @@ class OOBibBase {
             "MISC", "PHDTHESIS", "PROCEEDINGS", "TECHREPORT", "UNPUBLISHED", "EMAIL", "WWW",
             "CUSTOM1", "CUSTOM2", "CUSTOM3", "CUSTOM4", "CUSTOM5"};
 
-    private XMultiServiceFactory mxDocFactory = null;
-    private XTextDocument mxDoc = null;
-    private XText text = null;
-    private XDesktop xDesktop = null;
-    private XTextViewCursorSupplier xViewCursorSupplier = null;
-    private XComponent xCurrentComponent = null;
-    private XComponentLoader xComponentLoader = null;
-    private XPropertyContainer userProperties = null;
-    private XPropertySet propertySet = null;
+    private XMultiServiceFactory mxDocFactory;
+    private XTextDocument mxDoc;
+    private XText text;
+    private XDesktop xDesktop;
+    private XTextViewCursorSupplier xViewCursorSupplier;
+    private XComponent xCurrentComponent;
+    private XComponentLoader xComponentLoader;
+    private XPropertyContainer userProperties;
+    private XPropertySet propertySet;
 
     private final boolean atEnd;
     private final AuthorYearTitleComparator entryComparator = new AuthorYearTitleComparator();
@@ -84,7 +84,7 @@ class OOBibBase {
 
     private final HashMap<String, String> uniquefiers = new HashMap<String, String>();
 
-    private String[] sortedReferenceMarks = null;
+    private String[] sortedReferenceMarks;
 
 
     public OOBibBase(String pathToOO, boolean atEnd) throws Exception {

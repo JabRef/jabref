@@ -48,8 +48,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     private final String fieldName;
     private final BasePanel panel;
-    private BibtexEntry[] sel = null;
-    private OptionsDialog optDiag = null;
+    private BibtexEntry[] sel;
+    private OptionsDialog optDiag;
 
     private static final Log log = LogFactory.getLog(AutoSetExternalFileForEntries.class);
 
@@ -62,7 +62,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private boolean overWriteAllowed = true;
     private boolean checkExisting = true;
 
-    private int entriesChanged = 0;
+    private int entriesChanged;
 
 
     public AutoSetExternalFileForEntries(BasePanel panel, String fieldName) {

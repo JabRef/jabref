@@ -46,7 +46,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     private final JabRefFrame frame;
     private final boolean openInNew;
     private final ImportFormat importer;
-    private IOException importError = null;
+    private IOException importError;
 
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
@@ -87,9 +87,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     class MyWorker extends AbstractWorker {
 
-        String[] filenames = null;
-        ParserResult bibtexResult = null; // Contains the merged import results
-        boolean fileOk = false;
+        String[] filenames;
+        ParserResult bibtexResult; // Contains the merged import results
+        boolean fileOk;
 
 
         @Override

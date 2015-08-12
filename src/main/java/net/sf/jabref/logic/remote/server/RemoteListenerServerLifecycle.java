@@ -17,7 +17,7 @@ import java.net.BindException;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private RemoteListenerServerThread remoteListenerServerThread = null;
+    private RemoteListenerServerThread remoteListenerServerThread;
 
     private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
 

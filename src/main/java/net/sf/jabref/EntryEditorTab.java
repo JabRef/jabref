@@ -54,10 +54,10 @@ class EntryEditorTab {
 
     private final HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
-    private FieldEditor activeField = null;
+    private FieldEditor activeField;
 
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor = null;
+    public FileListEditor fileListEditor;
 
 
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
@@ -272,7 +272,7 @@ class EntryEditorTab {
     }
 
 
-    private boolean updating = false;
+    private boolean updating;
 
 
     public void setEntry(BibtexEntry entry) {

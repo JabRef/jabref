@@ -134,9 +134,9 @@ public class AuthorList {
 
     // Variables for storing computed strings, so they only need be created
     // once:
-    private String authorsNatbib = null;
-    private String authorsFirstFirstAnds = null;
-    private String authorsAlph = null;
+    private String authorsNatbib;
+    private String authorsFirstFirstAnds;
+    private String authorsAlph;
 
     private final String[] authorsFirstFirst = new String[4];
     private final String[] authorsLastOnly = new String[2];

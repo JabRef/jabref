@@ -55,11 +55,11 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
     // IMPORT
     public final List<String> listOfDBs = new ArrayList<String>();
-    public boolean moreThanOne = false;
+    public boolean moreThanOne;
     // EXPORT
     public String selectedDB = "";
-    public boolean hasDBSelected = false;
-    public boolean removeAction = false;
+    public boolean hasDBSelected;
+    public boolean removeAction;
     public int selectedInt = -1;
     private final DialogType dialogType;
 

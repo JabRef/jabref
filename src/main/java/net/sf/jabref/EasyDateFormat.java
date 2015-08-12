@@ -8,7 +8,7 @@ public class EasyDateFormat {
     /**
      * The formatter objects
      */
-    private SimpleDateFormat dateFormatter = null;
+    private SimpleDateFormat dateFormatter;
 
     /**
      * Creates a String containing the current date (and possibly time),

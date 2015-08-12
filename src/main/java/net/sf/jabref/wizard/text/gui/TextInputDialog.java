@@ -156,7 +156,7 @@ public class TextInputDialog
 
     private final JabRefFrame _frame;
 
-    private boolean okPressed = false;
+    private boolean okPressed;
 
 
     public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal,

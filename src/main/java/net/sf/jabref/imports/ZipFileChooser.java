@@ -85,8 +85,8 @@ class ZipFileChooser extends JDialog {
                 Localization.lang("Last modified"),
                 Localization.lang("Size")
         };
-        private ZipEntry[] rows = null;
-        private ZipFile zipFile = null;
+        private ZipEntry[] rows;
+        private ZipFile zipFile;
 
 
         ZipFileChooserTableModel(ZipFile zipFile, ZipEntry[] rows) {

@@ -34,7 +34,7 @@ import java.awt.event.ActionEvent;
 class AdvancedCiteDialog {
 
     private static boolean defaultInPar = true;
-    private boolean okPressed = false;
+    private boolean okPressed;
     private final JDialog diag;
     private final JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries"));
     private final JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));

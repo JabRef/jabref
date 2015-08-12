@@ -25,7 +25,7 @@ public class QuotedStringTokenizer {
     private final int contentLength;
     private final String delimiters;
     private final char quoteChar;
-    private int index = 0;
+    private int index;
 
 
     /**

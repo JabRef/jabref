@@ -31,7 +31,7 @@ import net.sf.jabref.JabRef;
  */
 public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
-    private static SpecialFieldUpdateListener INSTANCE = null;
+    private static SpecialFieldUpdateListener INSTANCE;
 
 
     @Override

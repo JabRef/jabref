@@ -40,11 +40,11 @@ public class ExportFormat implements IExportFormat {
     private String lfFileName;
     private String directory;
     private String extension;
-    String encoding = null; // If this value is set, it will be used to override
+    String encoding; // If this value is set, it will be used to override
     // the default encoding for the basePanel.
 
     private FileFilter fileFilter;
-    private boolean customExport = false;
+    private boolean customExport;
     private final String LAYOUT_PREFIX = "/resource/layout/";
 
     /**

@@ -179,7 +179,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final PreviewPanel preview;
 
-    private boolean generatedKeys = false; // Set to true after keys have
+    private boolean generatedKeys; // Set to true after keys have
                                              // been
 
     // generated.
@@ -1227,7 +1227,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class DownloadFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
 
-        BibtexEntry entry = null;
+        BibtexEntry entry;
 
 
         public DownloadFile() {
@@ -1330,7 +1330,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class LinkLocalFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
 
-        BibtexEntry entry = null;
+        BibtexEntry entry;
 
 
         public LinkLocalFile() {

@@ -65,8 +65,8 @@ public class MainTable extends JTable {
     private final SortedList<BibtexEntry> sortedForSearch;
     private final SortedList<BibtexEntry> sortedForGrouping;
     private final boolean tableColorCodes;
-    private boolean showingFloatSearch = false;
-    private boolean showingFloatGrouping = false;
+    private boolean showingFloatSearch;
+    private boolean showingFloatGrouping;
     private final EventSelectionModel<BibtexEntry> selectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;

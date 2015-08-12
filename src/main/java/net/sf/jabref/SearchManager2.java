@@ -41,9 +41,9 @@ public class SearchManager2 extends SidePaneComponent
     private final JabRefFrame frame;
 
     private final IncrementalSearcher incSearcher;
-    private SearchResultsDialog searchDialog = null;
+    private SearchResultsDialog searchDialog;
 
-    private AutoCompleteListener autoCompleteListener = null;
+    private AutoCompleteListener autoCompleteListener;
 
     /**
      * subscribed Objects
@@ -74,9 +74,9 @@ public class SearchManager2 extends SidePaneComponent
     private final JRadioButton showResultsInDialog;
     private final JRadioButton searchAllBases;
     private final JCheckBoxMenuItem select;
-    private boolean incSearch = false;
-    private boolean startedFloatSearch = false;
-    private boolean startedFilterSearch = false;
+    private boolean incSearch;
+    private boolean startedFloatSearch;
+    private boolean startedFilterSearch;
 
     private int incSearchPos = -1; // To keep track of where we are in
 
@@ -548,7 +548,7 @@ public class SearchManager2 extends SidePaneComponent
 
         private final SearchRule rule;
         private final String searchTerm;
-        int hits = 0;
+        int hits;
 
         public SearchWorker(SearchRule rule, String searchTerm) {
             this.rule = rule;

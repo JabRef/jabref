@@ -36,7 +36,7 @@ public class CustomEntryType extends BibtexEntryType {
     private String[] req;
     private final String[] opt;
     private String[] priOpt;
-    private String[][] reqSets = null; // Sets of either-or required fields, if any
+    private String[][] reqSets; // Sets of either-or required fields, if any
     
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 

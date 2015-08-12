@@ -33,9 +33,9 @@ public class SpecialFieldValue {
     // localized menu string used at menu / button
     private final String menuString;
 
-    private SpecialFieldAction action = null;
+    private SpecialFieldAction action;
 
-    private SpecialFieldMenuAction menuAction = null;
+    private SpecialFieldMenuAction menuAction;
 
     private final ImageIcon icon;
 

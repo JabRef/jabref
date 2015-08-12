@@ -33,7 +33,7 @@ class LayoutEntry {
     private LayoutFormatter[] option;
 
     // Formatter to be run after other formatters:
-    private LayoutFormatter postFormatter = null;
+    private LayoutFormatter postFormatter;
 
     private String text;
 
@@ -43,7 +43,7 @@ class LayoutEntry {
 
     private final String classPrefix;
 
-    private ArrayList<String> invalidFormatter = null;
+    private ArrayList<String> invalidFormatter;
     
     // used at highlighting in preview area. 
     // Color chosen similar to JTextComponent.getSelectionColor(), which is

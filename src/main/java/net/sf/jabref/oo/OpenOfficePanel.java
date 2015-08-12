@@ -87,21 +87,21 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private static final JButton test = new JButton("Test");
     private JRadioButton inPar;
     private JRadioButton inText;
-    private JPanel settings = null;
-    private static String styleFile = null;
+    private JPanel settings;
+    private static String styleFile;
     private static OOBibBase ooBase;
     private static JabRefFrame frame;
     private SidePaneManager manager;
-    private static OOBibStyle style = null;
-    private static boolean useDefaultAuthoryearStyle = false;
-    private static boolean useDefaultNumericalStyle = false;
-    private StyleSelectDialog styleDialog = null;
-    private boolean dialogOkPressed = false;
-    private boolean autoDetected = false;
-    private String sOffice = null;
-    private Throwable connectException = null;
+    private static OOBibStyle style;
+    private static boolean useDefaultAuthoryearStyle;
+    private static boolean useDefaultNumericalStyle;
+    private StyleSelectDialog styleDialog;
+    private boolean dialogOkPressed;
+    private boolean autoDetected;
+    private String sOffice;
+    private Throwable connectException;
 
-    private static OpenOfficePanel instance = null;
+    private static OpenOfficePanel instance;
 
 
     public static OpenOfficePanel getInstance() {

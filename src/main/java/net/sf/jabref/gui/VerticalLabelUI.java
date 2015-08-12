@@ -44,7 +44,7 @@ import javax.swing.plaf.basic.BasicLabelUI;
  */
 public class VerticalLabelUI extends BasicLabelUI {
 
-    private boolean clockwise = false;
+    private boolean clockwise;
     // see comment in BasicLabelUI
     private Rectangle verticalViewR = new Rectangle();
     private Rectangle verticalIconR = new Rectangle();

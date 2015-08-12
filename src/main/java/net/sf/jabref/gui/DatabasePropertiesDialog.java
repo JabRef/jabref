@@ -62,7 +62,7 @@ import net.sf.jabref.logic.l10n.Localization;
 public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
-    private BasePanel panel = null;
+    private BasePanel panel;
     private final JComboBox encoding;
     private final JButton ok;
     private final JButton cancel;
@@ -94,7 +94,7 @@ public class DatabasePropertiesDialog extends JDialog {
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
     private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
-    private boolean oldProtectVal = false;
+    private boolean oldProtectVal;
 
 
     public DatabasePropertiesDialog(JFrame parent) {

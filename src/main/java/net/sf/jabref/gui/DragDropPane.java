@@ -41,7 +41,7 @@ import net.sf.jabref.GUIGlobals;
  */
 class DragDropPane extends JTabbedPane {
 
-    private boolean draggingState = false; // State var if we are at dragging or not
+    private boolean draggingState; // State var if we are at dragging or not
     private int indexDraggedTab; // The index of the tab we drag at the moment
     private final MarkerPane markerPane; // The glass panel for painting the position marker
 

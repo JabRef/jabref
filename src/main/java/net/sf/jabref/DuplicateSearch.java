@@ -149,7 +149,7 @@ public class DuplicateSearch implements Runnable {
 
     class SearcherRunnable implements Runnable {
 
-        private volatile boolean finished = false;
+        private volatile boolean finished;
 
         @Override
         public void run() {

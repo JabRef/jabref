@@ -34,7 +34,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class DragDropPopupPane extends DragDropPane {
 
-    private JPopupMenu popupMenu = null;
+    private JPopupMenu popupMenu;
 
 
     public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {

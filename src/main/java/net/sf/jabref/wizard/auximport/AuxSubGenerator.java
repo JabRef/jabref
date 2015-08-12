@@ -74,7 +74,7 @@ public class AuxSubGenerator
     private BibtexDatabase auxDB; // contains only the bibtex keys who found in aux file
 
     private int nestedAuxCounter; // counts the nested aux files
-    private int crossreferencedEntriesCount = 0; // counts entries pulled in due to crossref
+    private int crossreferencedEntriesCount; // counts entries pulled in due to crossref
 
 
     public AuxSubGenerator(BibtexDatabase refDBase)

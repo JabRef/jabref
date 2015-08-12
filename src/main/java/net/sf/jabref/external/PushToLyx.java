@@ -28,10 +28,10 @@ import net.sf.jabref.logic.l10n.Localization;
 public class PushToLyx implements PushToApplication {
 
     private final JTextField lyxPipe = new JTextField(30);
-    private JPanel settings = null;
+    private JPanel settings;
 
-    private boolean couldNotFindPipe = false;
-    private boolean couldNotWrite = false;
+    private boolean couldNotFindPipe;
+    private boolean couldNotWrite;
 
 
     @Override

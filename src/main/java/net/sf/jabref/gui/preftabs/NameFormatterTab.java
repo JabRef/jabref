@@ -70,7 +70,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     }
 
 
-    private boolean tableChanged = false;
+    private boolean tableChanged;
 
     private final JTable table;
 

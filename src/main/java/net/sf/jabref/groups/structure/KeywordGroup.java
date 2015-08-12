@@ -38,7 +38,7 @@ public class KeywordGroup extends AbstractGroup {
     private final String searchExpression;
     private final boolean caseSensitive;
     private final boolean regExp;
-    private Pattern pattern = null;
+    private Pattern pattern;
 
     /**
      * Creates a KeywordGroup with the specified properties.

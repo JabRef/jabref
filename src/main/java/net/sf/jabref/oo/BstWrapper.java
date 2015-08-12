@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 class BstWrapper {
 
     private final LayoutFormatter formatter = new FormatChars();
-    private VM vm = null;
+    private VM vm;
 
 
     public BstWrapper() {

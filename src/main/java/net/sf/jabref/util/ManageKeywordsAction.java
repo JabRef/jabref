@@ -74,7 +74,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
 
-    private JDialog diag = null;
+    private JDialog diag;
 
     // keyword to add
     private JTextField keyword;

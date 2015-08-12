@@ -31,7 +31,7 @@ public class SaveException extends Exception
             (Localization.lang("Unable to create backup"));
 
     private final BibtexEntry entry;
-    private int status = 0;
+    private int status;
 
 
     public SaveException(String message)

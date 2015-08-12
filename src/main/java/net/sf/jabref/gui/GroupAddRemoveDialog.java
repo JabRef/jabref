@@ -32,8 +32,8 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     private final BasePanel panel;
     private final boolean add;
-    private boolean move = false;
-    private BibtexEntry[] selection = null;
+    private boolean move;
+    private BibtexEntry[] selection;
     private JTree tree;
     private JButton ok;
 

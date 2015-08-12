@@ -116,7 +116,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     public final GenerateKeyAction generateKeyAction;
 
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    private FileListEditor fileListEditor = null;
+    private FileListEditor fileListEditor;
     private final AutoLinkAction autoLinkAction = new AutoLinkAction();
 
     private final AbstractAction writeXmp;
@@ -151,7 +151,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     private boolean updateSource = true; // This can be set to false to stop the source
-    private boolean movingToDifferentEntry = false; // Indicates that we are about to go to the next or previous entry
+    private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
 
     private final List<Object> tabs = new ArrayList<Object>();
 
@@ -163,7 +163,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     // at parsing the source was successful. It is used to determine whether the
     // dialog should close; it should stay open if the user received an error
     // message about the source, whatever he or she chose to do about it.
-    private String lastSourceStringAccepted = null; // This is used to prevent double
+    private String lastSourceStringAccepted; // This is used to prevent double
 
     // fields.
     // These values can be used to calculate the preferred height for the form.

@@ -83,7 +83,7 @@ public class BibtexCaseChanger {
     }
 
 
-    private int braceLevel = 0;
+    private int braceLevel;
 
 
     private int decrBraceLevel(String string, int braceLevel) {

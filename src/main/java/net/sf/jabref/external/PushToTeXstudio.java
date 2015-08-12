@@ -21,12 +21,12 @@ import net.sf.jabref.logic.util.OS;
 public class PushToTeXstudio implements PushToApplication {
 
     private final String defaultCiteCommand = "\\cite";
-    private JPanel settings = null;
+    private JPanel settings;
     private final JTextField citeCommand = new JTextField(30);
     private final JTextField progPath = new JTextField(30);
 
-    private boolean couldNotConnect = false;
-    private boolean couldNotRunClient = false;
+    private boolean couldNotConnect;
+    private boolean couldNotRunClient;
 
 
     @Override

@@ -31,7 +31,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     private final JabRefFrame frame;
     private final int level;
     private final JMenuItem menuItem;
-    private int besLength = 0;
+    private int besLength;
 
 
     public MarkEntriesAction(JabRefFrame frame, int level) {

@@ -12,7 +12,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class RankCompact extends Rank {
 
-    private static RankCompact INSTANCE = null;
+    private static RankCompact INSTANCE;
 
 
     private RankCompact() {

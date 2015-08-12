@@ -44,12 +44,12 @@ public class LayoutHelper {
     public static final int IS_FILENAME = 9;
     public static final int IS_FILEPATH = 10;
 
-    private static String currentGroup = null;
+    private static String currentGroup;
 
     private final PushbackReader _in;
     private final Vector<StringInt> parsedEntries = new Vector<StringInt>();
 
-    private boolean _eof = false;
+    private boolean _eof;
     private int line = 1;
 
 

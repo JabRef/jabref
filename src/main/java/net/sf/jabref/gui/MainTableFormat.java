@@ -75,7 +75,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
     private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
-    private int[][] nameCols = null;
+    private int[][] nameCols;
     private boolean namesAsIs;
     private boolean abbr_names;
     private boolean namesNatbib;

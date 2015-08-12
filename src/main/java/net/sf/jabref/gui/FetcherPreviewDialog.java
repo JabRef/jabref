@@ -27,7 +27,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     private final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
     //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
-    private boolean okPressed = false;
+    private boolean okPressed;
     private final JabRefFrame frame;
     private final int warningLimit;
 
@@ -174,7 +174,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
         private final String id;
         private final JLabel preview;
-        private boolean wanted = false;
+        private boolean wanted;
 
 
         public TableEntry(String id, JLabel preview) {

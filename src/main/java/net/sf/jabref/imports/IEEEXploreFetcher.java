@@ -64,13 +64,13 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private static final int MAX_FETCH = 100;
     private final int perPage = IEEEXploreFetcher.MAX_FETCH;
-    private int hits = 0;
-    private int unparseable = 0;
-    private int parsed = 0;
-    private int piv = 0;
-    private boolean shouldContinue = false;
-    private boolean includeAbstract = false;
-    private boolean importBibtex = false;
+    private int hits;
+    private int unparseable;
+    private int parsed;
+    private int piv;
+    private boolean shouldContinue;
+    private boolean includeAbstract;
+    private boolean importBibtex;
 
     private String terms;
     private final String endUrl = "&rowsPerPage=" + Integer.toString(perPage) + "&pageNumber=";

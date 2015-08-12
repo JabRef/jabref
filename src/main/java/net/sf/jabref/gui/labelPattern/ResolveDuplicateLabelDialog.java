@@ -35,7 +35,7 @@ class ResolveDuplicateLabelDialog {
 
     private final JDialog diag;
     private final List<JCheckBox> cbs = new ArrayList<JCheckBox>();
-    private boolean okPressed = false;
+    private boolean okPressed;
 
     private static final String layout = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
             "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n" +

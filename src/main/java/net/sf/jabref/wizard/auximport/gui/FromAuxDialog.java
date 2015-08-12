@@ -89,7 +89,7 @@ public class FromAuxDialog
     // all open databases from JabRefFrame
     private final JTabbedPane parentTabbedPane;
 
-    private boolean generatePressed = false;
+    private boolean generatePressed;
 
     private final AuxSubGenerator auxParser;
 

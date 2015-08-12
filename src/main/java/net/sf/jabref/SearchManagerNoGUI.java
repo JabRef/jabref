@@ -30,7 +30,7 @@ class SearchManagerNoGUI {
 
     private String searchTerm;
     private final BibtexDatabase database;
-    private BibtexDatabase base = null;
+    private BibtexDatabase base;
 
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
         searchTerm = term;

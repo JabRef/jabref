@@ -71,7 +71,7 @@ class KeyBindingsDialog extends JDialog {
     // stores default key bindings
     private final HashMap<String, String> defBinds;
 
-    private boolean clickedSave = false;
+    private boolean clickedSave;
 
 
     /**

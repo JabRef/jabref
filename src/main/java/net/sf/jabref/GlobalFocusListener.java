@@ -23,7 +23,7 @@ import javax.swing.JComponent;
 
 public class GlobalFocusListener implements FocusListener {
 
-    private Component focused = null;
+    private Component focused;
 
 
     public GlobalFocusListener() {

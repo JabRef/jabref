@@ -52,8 +52,8 @@ public class DownloadExternalFile {
     private final MetaData metaData;
     private final String bibtexKey;
     private FileListEntryEditor editor;
-    private boolean downloadFinished = false;
-    private boolean dontShowDialog = false;
+    private boolean downloadFinished;
+    private boolean dontShowDialog;
     
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 

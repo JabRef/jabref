@@ -44,7 +44,7 @@ import com.jgoodies.forms.layout.FormLayout;
 class TableColumnsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
-    private boolean tableChanged = false;
+    private boolean tableChanged;
     private final JTable colSetup;
     private int rowCount = -1;
     private int ncWidth = -1;

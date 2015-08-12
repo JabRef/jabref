@@ -42,11 +42,11 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ExternalFileTypeEditor extends JDialog {
 
-    private JFrame frame = null;
-    private JDialog dialog = null;
+    private JFrame frame;
+    private JDialog dialog;
     private ArrayList<ExternalFileType> fileTypes;
     private JTable table;
-    private ExternalFileTypeEntryEditor entryEditor = null;
+    private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -364,9 +364,9 @@ public class ExternalFileTypeEditor extends JDialog {
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
 
-        private JabRefFrame frame = null;
-        private JDialog dialog = null;
-        ExternalFileTypeEditor editor = null;
+        private JabRefFrame frame;
+        private JDialog dialog;
+        ExternalFileTypeEditor editor;
 
 
         public EditExternalFileTypesAction(JabRefFrame frame) {

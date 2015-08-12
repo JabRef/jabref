@@ -40,9 +40,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     private final BasePanel panel;
     private final JabRefFrame frame;
-    private boolean success = false;
-    private boolean cancelled = false;
-    private boolean fileLockedError = false;
+    private boolean success;
+    private boolean cancelled;
+    private boolean fileLockedError;
 
 
     public SaveDatabaseAction(BasePanel panel) {

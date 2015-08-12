@@ -43,7 +43,7 @@ class CustomExportDialog extends JDialog {
             name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
-    private boolean ok_pressed = false;
+    private boolean ok_pressed;
     private int index;
     private final JabRefFrame parent;
 

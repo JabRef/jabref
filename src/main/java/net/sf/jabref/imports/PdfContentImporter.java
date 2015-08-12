@@ -67,7 +67,7 @@ public class PdfContentImporter extends ImportFormat {
     // sometimes, a "line" is several lines in split
     private String curString;
 
-    private String year = null;
+    private String year;
 
 
     @Override

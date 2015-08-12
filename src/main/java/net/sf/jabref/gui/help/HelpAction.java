@@ -36,7 +36,7 @@ public class HelpAction extends MnemonicAwareAction {
 
     private final HelpDialog diag;
 
-    private Class resourceOwner = null;
+    private Class resourceOwner;
 
     private String helpFile;
 

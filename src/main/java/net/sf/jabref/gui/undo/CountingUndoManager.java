@@ -23,9 +23,9 @@ import net.sf.jabref.BasePanel;
 
 public class CountingUndoManager extends UndoManager {
 
-    private int unchangedPoint = 0;
-    private int current = 0;
-    private BasePanel panel = null;
+    private int unchangedPoint;
+    private int current;
+    private BasePanel panel;
 
 
     public CountingUndoManager(BasePanel basePanel) {

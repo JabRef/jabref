@@ -165,10 +165,10 @@ public class GUIGlobals {
             ;
 
     public static Color
-            editorTextColor = null;
-    public static Color validFieldBackgroundColor = null;
-    public static Color activeBackground = null;
-    public static Color invalidFieldBackgroundColor = null;
+            editorTextColor;
+    public static Color validFieldBackgroundColor;
+    public static Color activeBackground;
+    public static Color invalidFieldBackgroundColor;
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String META_FLAG_OLD = "bibkeeper-meta: ";

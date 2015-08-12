@@ -32,7 +32,7 @@ import java.io.File;
 public class AutoSaveManager {
 
     private final JabRefFrame frame;
-    private Timer t = null;
+    private Timer t;
 
 
     public AutoSaveManager(JabRefFrame frame) {

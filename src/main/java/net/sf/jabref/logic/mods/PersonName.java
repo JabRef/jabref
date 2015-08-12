@@ -33,9 +33,9 @@ import net.sf.jabref.AuthorList;
  */
 public class PersonName {
 
-    private String givenName = null;
-    private String surname = null;
-    private String middleName = null;
+    private String givenName;
+    private String surname;
+    private String middleName;
 
 
     public PersonName() {

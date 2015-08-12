@@ -45,7 +45,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
     protected static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next &gt;");
 
-    private boolean stopFetching = false;
+    private boolean stopFetching;
 
 
     @Override

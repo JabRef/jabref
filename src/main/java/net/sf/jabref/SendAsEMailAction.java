@@ -45,7 +45,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(SendAsEMailAction.class);
 
-    private String message = null;
+    private String message;
     private final JabRefFrame frame;
 
 

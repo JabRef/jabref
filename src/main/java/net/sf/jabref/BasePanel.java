@@ -154,13 +154,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     BibtexDatabase database;
 
-    private int mode = 0;
-    private EntryEditor currentEditor = null;
-    private PreviewPanel currentPreview = null;
+    private int mode;
+    private EntryEditor currentEditor;
+    private PreviewPanel currentPreview;
 
     boolean tmp = true;
 
-    private MainTableSelectionListener selectionListener = null;
+    private MainTableSelectionListener selectionListener;
     private ListEventListener<BibtexEntry> groupsHighlightListener;
     JSplitPane contentPane = new JSplitPane();
 
@@ -168,9 +168,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     JabRefFrame frame;
 
-    private String fileMonitorHandle = null;
-    private boolean saving = false;
-    private boolean updatedExternally = false;
+    private String fileMonitorHandle;
+    private boolean saving;
+    private boolean updatedExternally;
     private String encoding;
 
     GridBagLayout gbl = new GridBagLayout();
@@ -180,7 +180,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // required for the SearchAutoCompleterUpdater
     private AutoCompleter searchAutoCompleter;
 
-    private AutoCompleteListener searchCompleteListener = null;
+    private AutoCompleteListener searchCompleteListener;
 
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -193,24 +193,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //ExampleFileFilter fileFilter;
     // File filter for .bib files.
 
-    private boolean baseChanged = false;
-    private boolean nonUndoableChange = false;
+    private boolean baseChanged;
+    private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
 
     //EntryTableModel tableModel = null;
     //public EntryTable entryTable = null;
-    public MainTable mainTable = null;
-    public MainTableFormat tableFormat = null;
-    private FilterList<BibtexEntry> searchFilterList = null;
-    private FilterList<BibtexEntry> groupFilterList = null;
+    public MainTable mainTable;
+    public MainTableFormat tableFormat;
+    private FilterList<BibtexEntry> searchFilterList;
+    private FilterList<BibtexEntry> groupFilterList;
 
     public RightClickMenu rcm;
 
-    private BibtexEntry showing = null;
+    private BibtexEntry showing;
 
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
-    private boolean backOrForwardInProgress = false;
+    private boolean backOrForwardInProgress;
 
     // To indicate which entry is currently shown.
     public final HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
@@ -221,10 +221,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Hashmap to keep track of which entries currently have open
     // EntryTypeForm dialogs.
 
-    private PreambleEditor preambleEditor = null;
+    private PreambleEditor preambleEditor;
     // Keeps track of the preamble dialog if it is open.
 
-    private StringDialog stringDialog = null;
+    private StringDialog stringDialog;
     // Keeps track of the string dialog if it is open.
 
     private SaveDatabaseAction saveAction;
@@ -236,14 +236,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     //GroupSelector groupSelector;
 
-    private boolean showingSearch = false;
+    private boolean showingSearch;
 
-    public boolean sortingBySearchResults = false;
-    public boolean coloringBySearchResults = false;
-    public boolean hidingNonHits = false;
-    public boolean sortingByGroup = false;
-    public boolean sortingByCiteSeerResults = false;
-    public boolean coloringByGroup = false;
+    public boolean sortingBySearchResults;
+    public boolean coloringBySearchResults;
+    public boolean hidingNonHits;
+    public boolean sortingByGroup;
+    public boolean sortingByCiteSeerResults;
+    public boolean coloringByGroup;
 
     int lastSearchHits = -1; // The number of hits in the latest search.
     // Potential use in hiding non-hits completely.
@@ -712,8 +712,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // action for exporting database to external SQL database
         actions.put("dbExport", new AbstractWorker() {
 
-            String errorMessage = null;
-            boolean connectToDB = false;
+            String errorMessage;
+            boolean connectToDB;
 
 
             // run first, in EDT:
@@ -849,7 +849,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             //int[] rows;
             List<BibtexEntry> entries;
             int numSelected;
-            boolean cancelled = false;
+            boolean cancelled;
 
 
             // Run first, in EDT:

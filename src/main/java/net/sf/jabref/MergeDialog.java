@@ -47,7 +47,7 @@ public class MergeDialog extends JDialog {
     private final JCheckBox groups = new JCheckBox();
     private final JCheckBox selector = new JCheckBox();
 
-    private boolean okPressed = false;
+    private boolean okPressed;
 
 
     public boolean isOkPressed() {

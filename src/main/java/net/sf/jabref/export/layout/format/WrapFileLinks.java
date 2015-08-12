@@ -90,8 +90,8 @@ import java.io.IOException;
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
-    private String fileType = null;
-    private List<FormatEntry> format = null;
+    private String fileType;
+    private List<FormatEntry> format;
     private final Map<String, String> replacements = new HashMap<String, String>();
 
 
@@ -304,7 +304,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     static class FormatEntry {
 
         private final int type;
-        private String string = null;
+        private String string;
 
 
         public FormatEntry(int type) {

@@ -38,7 +38,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
             + "&submit=Search&sort=rlv&t=doc";
     private static final Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
 
-    private boolean stopFetching = false;
+    private boolean stopFetching;
 
 
     @Override

@@ -40,7 +40,7 @@ public class ExportFormats {
     private static final Map<String, IExportFormat> exportFormats = new TreeMap<String, IExportFormat>();
 
     // Global variable that is used for counting output entries when exporting:
-    public static int entryNumber = 0;
+    public static int entryNumber;
 
 
     public static void initAllExports() {
@@ -217,7 +217,7 @@ public class ExportFormats {
                     final Set<String> finEntryIDs = entryIds;
                     AbstractWorker exportWorker = new AbstractWorker() {
 
-                        String errorMessage = null;
+                        String errorMessage;
 
 
                         @Override

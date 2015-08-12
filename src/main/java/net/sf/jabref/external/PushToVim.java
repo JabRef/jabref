@@ -33,13 +33,13 @@ import java.io.InputStream;
  */
 public class PushToVim implements PushToApplication {
 
-    private JPanel settings = null;
+    private JPanel settings;
     private final JTextField vimPath = new JTextField(30);
     private final JTextField vimServer = new JTextField(30);
     private final JTextField citeCommand = new JTextField(30);
 
-    private boolean couldNotConnect = false;
-    private boolean couldNotRunClient = false;
+    private boolean couldNotConnect;
+    private boolean couldNotRunClient;
 
 
     @Override

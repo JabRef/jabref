@@ -24,7 +24,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class ReadStatus extends SpecialField {
 
-    private static ReadStatus INSTANCE = null;
+    private static ReadStatus INSTANCE;
 
     private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
 

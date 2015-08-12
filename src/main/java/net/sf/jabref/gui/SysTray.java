@@ -30,7 +30,7 @@ public class SysTray {
 
     private final JabRefFrame frame;
     private final TrayIcon icon;
-    private SystemTray tray = null;
+    private SystemTray tray;
 
 
     public SysTray(JabRefFrame frame) {

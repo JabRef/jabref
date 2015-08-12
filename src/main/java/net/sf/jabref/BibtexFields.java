@@ -68,7 +68,7 @@ public class BibtexFields {
     private final HashMap<String, BibtexSingleField> fieldSet;
 
     // contains all known (and public) bibtex fieldnames
-    private String[] PUBLIC_FIELDS = null;
+    private String[] PUBLIC_FIELDS;
 
 
     private BibtexFields()
@@ -458,16 +458,16 @@ public class BibtexFields {
 
         // a alternative displayname, e.g. used for
         // "citeseercitationcount"="Popularity"
-        private String alternativeDisplayName = null;
+        private String alternativeDisplayName;
 
         // the extras data
         // fieldExtras contains mappings to tell the EntryEditor to add a specific
         // function to this field, for instance a "browse" button for the "pdf" field.
-        private String extras = null;
+        private String extras;
 
         // This value defines whether contents of this field are expected to be
         // numeric values. This can be used to sort e.g. volume numbers correctly:
-        private boolean numeric = false;
+        private boolean numeric;
 
 
         // a comma separated list of alternative bibtex-fieldnames, e.g.

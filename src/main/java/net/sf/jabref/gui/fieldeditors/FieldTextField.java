@@ -38,7 +38,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
     private final String fieldName;
     private final JLabel label;
     private UndoManager undo;
-    private AutoCompleteListener autoCompleteListener = null;
+    private AutoCompleteListener autoCompleteListener;
 
 
     public FieldTextField(String fieldName, String content, boolean changeColorOnFocus) {

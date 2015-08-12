@@ -54,18 +54,18 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
     private final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
     final JList list;
-    private JScrollPane sp = null;
+    private JScrollPane sp;
     DefaultListModel listModel;
     private JComboBox sel;
     private JTextField input;
     private final JButton add;
     final JButton remove;
-    private JButton up = null;
-    private JButton down = null;
+    private JButton up;
+    private JButton down;
     final GridBagLayout gbl = new GridBagLayout();
     final GridBagConstraints con = new GridBagConstraints();
     final boolean forceLowerCase;
-    boolean changesMade = false;
+    boolean changesMade;
     private final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
 
 

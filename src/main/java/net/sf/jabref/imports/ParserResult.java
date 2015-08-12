@@ -32,21 +32,21 @@ public class ParserResult {
     private MetaData metaData;
     private final HashMap<String, BibtexEntryType> entryTypes;
 
-    private File file = null;
+    private File file;
     private final ArrayList<String> warnings = new ArrayList<String>();
     private final ArrayList<String> duplicateKeys = new ArrayList<String>();
 
-    private String errorMessage = null;
-    private String encoding = null; // Which encoding was used?
+    private String errorMessage;
+    private String encoding; // Which encoding was used?
 
-    private boolean postponedAutosaveFound = false;
-    private boolean invalid = false;
+    private boolean postponedAutosaveFound;
+    private boolean invalid;
 
-    private String jabrefVersion = null; // Which JabRef version wrote the file, if any?
-    private int jabrefMajorVersion = 0;
-    private int jabrefMinorVersion = 0;
-    private int jabrefMinor2Version = 0; // Numeric version representation
-    private boolean toOpenTab = false;
+    private String jabrefVersion; // Which JabRef version wrote the file, if any?
+    private int jabrefMajorVersion;
+    private int jabrefMinorVersion;
+    private int jabrefMinor2Version; // Numeric version representation
+    private boolean toOpenTab;
 
 
     public ParserResult(Collection<BibtexEntry> entries) {

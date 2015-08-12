@@ -35,11 +35,11 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     protected final JButton close = new JButton(GUIGlobals.getImage("close"));
 
-    private boolean visible = false;
+    private boolean visible;
 
     private final SidePaneManager manager;
 
-    protected BasePanel panel = null;
+    protected BasePanel panel;
 
 
     public SidePaneComponent(SidePaneManager manager, URL icon, String title) {

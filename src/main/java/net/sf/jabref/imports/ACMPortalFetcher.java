@@ -74,11 +74,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final int perPage = 20;
     private static final int MAX_FETCH = ACMPortalFetcher.perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
     private static final int WAIT_TIME = 200;
-    private boolean shouldContinue = false;
+    private boolean shouldContinue;
 
     // user settings
-    private boolean fetchAbstract = false;
-    private boolean acmOrGuide = false;
+    private boolean fetchAbstract;
+    private boolean acmOrGuide;
 
     private static final Pattern hitsPattern = Pattern.compile(".*Found <b>(\\d+,*\\d*)</b>.*");
     private static final Pattern maxHitsPattern = Pattern.compile(".*Results \\d+ - \\d+ of (\\d+,*\\d*).*");
@@ -248,7 +248,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
 
-    private int piv = 0;
+    private int piv;
 
 
     private void parse(String text, int startIndex, int firstEntryNumber, Map<String, JLabel> entries) {

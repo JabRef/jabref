@@ -17,7 +17,7 @@ public class IdGenerator {
         IdGenerator.idFormat.setGroupingUsed(false);
     }
 
-    private static int idCounter = 0;
+    private static int idCounter;
 
     public static synchronized String next() {
         String result = idFormat.format(idCounter);

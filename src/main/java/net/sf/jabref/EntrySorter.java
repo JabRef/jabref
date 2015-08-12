@@ -24,7 +24,7 @@ public class EntrySorter implements DatabaseChangeListener {
     private final Comparator<BibtexEntry> comp;
     private String[] idArray;
     private BibtexEntry[] entryArray;
-    private boolean changed = false;
+    private boolean changed;
 
 
     public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {

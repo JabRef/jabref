@@ -32,7 +32,7 @@ public class WaitForSaveOperation implements ActionListener {
     private final JabRefFrame frame;
     private final JDialog diag;
     private final Timer t = new Timer(500, this);
-    private boolean cancelled = false;
+    private boolean cancelled;
 
 
     public WaitForSaveOperation(JabRefFrame frame) {

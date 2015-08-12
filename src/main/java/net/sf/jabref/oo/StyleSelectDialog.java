@@ -114,7 +114,7 @@ class StyleSelectDialog {
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final BibtexEntry prevEntry = new BibtexEntry(IdGenerator.next());
 
-    private boolean okPressed = false;
+    private boolean okPressed;
     private String initSelection;
 
 

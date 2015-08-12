@@ -238,7 +238,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
 
-    private boolean draggingFile = false;
+    private boolean draggingFile;
 
 
     @Override

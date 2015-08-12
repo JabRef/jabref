@@ -52,12 +52,12 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class DbImportAction extends AbstractWorker {
 
-    private BibtexDatabase database = null;
-    private MetaData metaData = null;
-    private boolean connectToDB = false;
+    private BibtexDatabase database;
+    private MetaData metaData;
+    private boolean connectToDB;
     private final JabRefFrame frame;
-    private DBStrings dbs = null;
-    private ArrayList<Object[]> databases = null;
+    private DBStrings dbs;
+    private ArrayList<Object[]> databases;
 
 
     public DbImportAction(JabRefFrame frame) {

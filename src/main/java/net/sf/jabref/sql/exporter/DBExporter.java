@@ -64,7 +64,7 @@ import net.sf.jabref.sql.SQLUtil;
 public abstract class DBExporter extends DBImporterExporter {
 
     private final String fieldStr = SQLUtil.getFieldStr();
-    DBStrings dbStrings = null;
+    DBStrings dbStrings;
     private final ArrayList<String> dbNames = new ArrayList<String>();
 
 

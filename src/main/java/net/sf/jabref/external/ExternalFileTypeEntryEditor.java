@@ -41,24 +41,24 @@ import net.sf.jabref.logic.util.OS;
  */
 public class ExternalFileTypeEntryEditor {
 
-    private JFrame fParent = null;
-    private JDialog dParent = null;
+    private JFrame fParent;
+    private JDialog dParent;
     private JDialog diag;
     private final JTextField extension = new JTextField();
     private final JTextField name = new JTextField();
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
-    private String selectedIcon = null;
+    private String selectedIcon;
     private final JButton icon = new JButton(GUIGlobals.getImage("picture"));
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
     private final JRadioButton other = new JRadioButton("");
     final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
-    boolean applicationFieldEmpty = false;
+    boolean applicationFieldEmpty;
 
     private ExternalFileType entry;
-    private boolean okPressed = false;
+    private boolean okPressed;
 
 
     public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {

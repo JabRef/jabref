@@ -163,11 +163,11 @@ public class RepecNepImporter extends ImportFormat {
 
     private static final Collection<String> recognizedFields = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
 
-    private int line = 0;
+    private int line;
     private String lastLine = "";
     private String preLine = "";
-    private BufferedReader in = null;
-    private boolean inOverviewSection = false;
+    private BufferedReader in;
+    private boolean inOverviewSection;
 
 
     /**

@@ -74,7 +74,7 @@ public class BibtexParser {
 
     private HashMap<String, BibtexEntryType> entryTypes;
 
-    private boolean eof = false;
+    private boolean eof;
 
     private int line = 1;
 

@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
-    private String name = null;
+    private String name;
     private final SortedSet<String> journals = new TreeSet<String>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
@@ -61,7 +61,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private final Pattern numPattern = Pattern.compile("-?\\d+");
 
-    private boolean valid = false;
+    private boolean valid;
 
     private static final int NONE = 0;
     private static final int LAYOUT = 1;
@@ -75,7 +75,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String NAME_MARK = "NAME";
     private static final String JOURNALS_MARK = "JOURNALS";
     private static final String DEFAULT_MARK = "default";
-    private File styleFile = null;
+    private File styleFile;
     private static long styleFileModificationTime = Long.MIN_VALUE;
 
     //private Pattern quoted = Pattern.compile("\".*^\\\\\"");

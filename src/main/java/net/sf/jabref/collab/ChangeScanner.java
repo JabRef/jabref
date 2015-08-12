@@ -47,7 +47,7 @@ public class ChangeScanner implements Runnable {
     private final BasePanel panel;
     private final JabRefFrame frame;
 
-    private BibtexDatabase inTemp = null;
+    private BibtexDatabase inTemp;
     private MetaData mdInTemp;
 
 

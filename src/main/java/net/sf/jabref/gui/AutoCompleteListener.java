@@ -35,17 +35,17 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private final AutoCompleter completer;
 
     // These variables keep track of the situation from time to time.
-    private String toSetIn = null; // null indicates that there are no completions available
-    private String lastBeginning = null; // the letters, the user has typed until know
+    private String toSetIn; // null indicates that there are no completions available
+    private String lastBeginning; // the letters, the user has typed until know
     private int lastCaretPosition = -1;
-    private String[] lastCompletions = null;
-    private int lastShownCompletion = 0;
+    private String[] lastCompletions;
+    private int lastShownCompletion;
     private boolean consumeEnterKey = true;
 
     // This field is set if the focus listener should call another focus listener
     // after finishing. This is needed because the autocomplete listener must
     // run before the focus listener responsible for storing the current edit.
-    private FocusListener nextFocusListener = null;
+    private FocusListener nextFocusListener;
 
 
     public AutoCompleteListener(AutoCompleter completer) {

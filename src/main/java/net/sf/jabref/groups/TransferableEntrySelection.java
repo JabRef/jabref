@@ -31,7 +31,7 @@ class TransferableEntrySelection implements Transferable {
     private final BibtexEntry[] selectedEntries;
     private final String selectedEntriesCiteKeys;
 
-    private boolean includeCiteKeyword = false;
+    private boolean includeCiteKeyword;
 
     static {
         DataFlavor df1 = null;

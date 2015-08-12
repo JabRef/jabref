@@ -50,7 +50,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ExportToClipboardAction extends AbstractWorker {
 
-    private String message = null;
+    private String message;
     private final JabRefFrame frame;
     private final BibtexDatabase database;
 

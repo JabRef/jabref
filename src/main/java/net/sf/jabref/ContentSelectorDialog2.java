@@ -54,7 +54,7 @@ import net.sf.jabref.util.Util;
 class ContentSelectorDialog2 extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    private ActionListener wordEditFieldListener = null;
+    private ActionListener wordEditFieldListener;
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JPanel fieldPan = new JPanel();
@@ -68,7 +68,7 @@ class ContentSelectorDialog2 extends JDialog {
     private final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
     private final String FIELD_FIRST_LINE = Localization.lang("<field name>");
     private final MetaData metaData;
-    private String currentField = null;
+    private String currentField;
     TreeSet<String> fieldSet;
     private final JabRefFrame frame;
     private final BasePanel panel;

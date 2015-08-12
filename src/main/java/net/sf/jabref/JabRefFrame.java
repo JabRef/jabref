@@ -138,7 +138,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     final JSplitPane contentPane = new JSplitPane();
 
     final JabRefPreferences prefs = Globals.prefs;
-    private PreferencesDialog prefsDialog = null;
+    private PreferencesDialog prefsDialog;
 
     private int lastTabbedPanelSelectionIndex = -1;
 
@@ -183,7 +183,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final FileHistory fileHistory = new FileHistory(prefs, this);
 
-    private SysTray sysTray = null;
+    private SysTray sysTray;
 
     // The help window.
     public final HelpDialog helpDiag = new HelpDialog(this);
@@ -1220,8 +1220,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class NewEntryAction
             extends MnemonicAwareAction {
 
-        String type = null; // The type of item to create.
-        KeyStroke keyStroke = null; // Used for the specific instances.
+        String type; // The type of item to create.
+        KeyStroke keyStroke; // Used for the specific instances.
 
 
         public NewEntryAction(KeyStroke key) {
@@ -2466,7 +2466,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class LoadSessionAction extends MnemonicAwareAction {
 
-        volatile boolean running = false;
+        volatile boolean running;
 
         public LoadSessionAction() {
             super(GUIGlobals.getImage("loadSession"));
@@ -2638,7 +2638,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class DatabasePropertiesAction extends MnemonicAwareAction {
 
-        DatabasePropertiesDialog propertiesDialog = null;
+        DatabasePropertiesDialog propertiesDialog;
 
 
         public DatabasePropertiesAction() {
@@ -2659,7 +2659,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class BibtexKeyPatternAction extends MnemonicAwareAction {
 
-        BibtexKeyPatternDialog bibtexKeyPatternDialog = null;
+        BibtexKeyPatternDialog bibtexKeyPatternDialog;
 
 
         public BibtexKeyPatternAction() {

@@ -51,7 +51,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     private static final int dragScrollDistance = 5;
 
     /** time of last autoscroll event (for limiting speed). */
-    private static long lastDragAutoscroll = 0L;
+    private static long lastDragAutoscroll;
 
     /** minimum interval between two autoscroll events (for limiting speed). */
     private static final long minAutoscrollInterval = 50L;
@@ -63,7 +63,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     private Point idlePoint;
 
     /** time since which cursor is idling. */
-    private long idleStartTime = 0L;
+    private long idleStartTime;
 
     /** max. distance cursor may move in x or y direction while idling. */
     private static final int idleMargin = 1;
@@ -73,7 +73,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     private final GroupSelector groupSelector;
 
-    private GroupTreeNode dragNode = null;
+    private GroupTreeNode dragNode;
 
     private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
 

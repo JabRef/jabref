@@ -10,7 +10,7 @@ import net.sf.jabref.logic.l10n.Localization;
 public class SpecialFieldDatabaseChangeListener implements
         DatabaseChangeListener {
 
-    private static SpecialFieldDatabaseChangeListener INSTANCE = null;
+    private static SpecialFieldDatabaseChangeListener INSTANCE;
 
 
     @Override

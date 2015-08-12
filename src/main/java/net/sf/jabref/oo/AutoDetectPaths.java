@@ -37,8 +37,8 @@ import net.sf.jabref.logic.util.OS;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
-    private boolean foundPaths = false;
-    private boolean fileSearchCancelled = false;
+    private boolean foundPaths;
+    private boolean fileSearchCancelled;
     private JDialog prog;
     private final JDialog parent;
 

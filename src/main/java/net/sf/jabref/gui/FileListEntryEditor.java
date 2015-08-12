@@ -66,14 +66,14 @@ public class FileListEntryEditor {
     private final JComboBox types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
-    private ConfirmCloseFileListEntryEditor externalConfirm = null;
+    private ConfirmCloseFileListEntryEditor externalConfirm;
 
     private FileListEntry entry;
     private final MetaData metaData;
-    private boolean okPressed = false;
-    private boolean okDisabledExternally = false;
-    private boolean openBrowseWhenShown = false;
-    private boolean dontOpenBrowseUntilDisposed = false;
+    private boolean okPressed;
+    private boolean okDisabledExternally;
+    private boolean openBrowseWhenShown;
+    private boolean dontOpenBrowseUntilDisposed;
 
     private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 

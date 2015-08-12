@@ -36,7 +36,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
     private final BasePanel panel;
     private final EntryEditor editor;
-    private String message = null;
+    private String message;
 
 
     public WriteXMPEntryEditorAction(BasePanel panel, EntryEditor editor) {

@@ -62,7 +62,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
-    private FileListEntryEditor editor = null;
+    private FileListEntryEditor editor;
     private final JabRefFrame frame;
     private final MetaData metaData;
     private final String fieldName;

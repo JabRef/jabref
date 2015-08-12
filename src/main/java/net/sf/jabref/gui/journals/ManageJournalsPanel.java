@@ -502,7 +502,7 @@ class ManageJournalsPanel extends JPanel {
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
         final String[] names = new String[] {Localization.lang("Journal name"), Localization.lang("Abbreviation")};
-        List<JournalEntry> journals = null;
+        List<JournalEntry> journals;
 
 
         public AbbreviationsTableModel() {

@@ -43,20 +43,20 @@ class MODSEntry {
 
     private String entryType = "mods"; // could also be relatedItem
     private String id;
-    private List<PersonName> authors = null;
+    private List<PersonName> authors;
 
     // should really be handled with an enum
     private String issuance = "monographic";
-    private PageNumbers pages = null;
+    private PageNumbers pages;
 
-    private String publisher = null;
-    private String date = null;
+    private String publisher;
+    private String date;
 
-    private String title = null;
+    private String title;
 
     private String number;
     private String volume;
-    private String genre = null;
+    private String genre;
     private final Set<String> handledExtensions;
 
     private MODSEntry host;

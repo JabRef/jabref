@@ -40,7 +40,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class XmpPrefsTab extends JPanel implements PrefsTab {
 
-    private boolean tableChanged = false;
+    private boolean tableChanged;
 
     private int rowCount;
 

@@ -36,7 +36,7 @@ public class DBLPFetcher implements EntryFetcher {
     private static final String URL_PART1 = "?q=";
     private static final String URL_END = "&h=1000&c=4&f=0&format=json";
 
-    private volatile boolean shouldContinue = false;
+    private volatile boolean shouldContinue;
     private String query;
     private final DBLPHelper helper = new DBLPHelper();
 

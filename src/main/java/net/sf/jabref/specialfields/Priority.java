@@ -24,7 +24,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class Priority extends SpecialField {
 
-    private static Priority INSTANCE = null;
+    private static Priority INSTANCE;
 
     private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("priority"));
 

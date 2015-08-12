@@ -38,7 +38,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
 
     private String fieldName;
 
-    private AutoCompleteListener autoCompleteListener = null;
+    private AutoCompleteListener autoCompleteListener;
 
 
     public FieldTextArea(String fieldName, String content) {

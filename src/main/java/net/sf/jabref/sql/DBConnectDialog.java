@@ -46,7 +46,7 @@ public class DBConnectDialog extends JDialog {
 
     private DBStrings dbStrings = new DBStrings();
 
-    private boolean connectToDB = false;
+    private boolean connectToDB;
 
 
     /** Creates a new instance of DBConnectDialog */

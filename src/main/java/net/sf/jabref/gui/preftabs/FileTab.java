@@ -70,7 +70,7 @@ class FileTab extends JPanel implements PrefsTab {
     private final JTextField nonWrappableFields;
     private final JTextField doNotResolveStringsFor;
     private final JSpinner autoSaveInterval;
-    private boolean origAutoSaveSetting = false;
+    private boolean origAutoSaveSetting;
 
     private final ButtonGroup bgFieldOrderStyle;
     private JTextField userDefinedFieldOrder;

@@ -56,14 +56,14 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    private PreviewPanel[] previewPanel = null;
+    private PreviewPanel[] previewPanel;
     private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
     private PreviewPanel preview;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibtexEntry> tableRows;
     private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
-    private boolean workingOnPreview = false;
+    private boolean workingOnPreview;
 
     private boolean enabled = true;
 
@@ -71,8 +71,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
-    private int lastPressedCount = 0;
-    private long lastPressedTime = 0;
+    private int lastPressedCount;
+    private long lastPressedTime;
 
     private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
     

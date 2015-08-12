@@ -38,9 +38,9 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
     private final JLabel rootInfo = new JLabel(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
-    private Change selected = null;
-    private JComponent infoShown = null;
-    private boolean okPressed = false;
+    private Change selected;
+    private JComponent infoShown;
+    private boolean okPressed;
 
 
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,

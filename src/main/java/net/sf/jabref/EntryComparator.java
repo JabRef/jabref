@@ -30,7 +30,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
 
     private final String sortField;
     private final boolean descending;
-    private boolean binary = false;
+    private boolean binary;
     private final boolean numeric;
     private final Comparator<BibtexEntry> next;
 

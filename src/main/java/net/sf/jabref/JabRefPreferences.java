@@ -370,7 +370,7 @@ public class JabRefPreferences {
     public final CustomImportList customImports;
 
     // Object containing info about customized entry editor tabs.
-    private EntryEditorTabList tabList = null;
+    private EntryEditorTabList tabList;
     // Map containing all registered external file types:
     private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
@@ -381,20 +381,20 @@ public class JabRefPreferences {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public String[] fileDirForDatabase = null;
+    public String[] fileDirForDatabase;
 
     // Similarly to the previous variable, this is a global that can be used during
     // the export of a database if the database filename should be output. If a database
     // is tied to a file on disk, this variable is set to that file before export starts:
-    public File databaseFile = null;
+    public File databaseFile;
 
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
     // It is set before the export starts:
-    public HashMap<String, String> customExportNameFormatters = null;
+    public HashMap<String, String> customExportNameFormatters;
 
     // The only instance of this class:
-    private static JabRefPreferences singleton = null;
+    private static JabRefPreferences singleton;
 
 
     public static JabRefPreferences getInstance() {

@@ -60,7 +60,7 @@ public class BibtexDatabase {
 
     private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
 
-    private String _preamble = null;
+    private String _preamble;
 
     private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
 

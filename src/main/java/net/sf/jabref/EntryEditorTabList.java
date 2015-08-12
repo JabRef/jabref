@@ -24,8 +24,8 @@ import java.util.List;
  */
 public final class EntryEditorTabList {
 
-    private List<List<String>> list = null;
-    private List<String> names = null;
+    private List<List<String>> list;
+    private List<String> names;
 
 
     public EntryEditorTabList() {

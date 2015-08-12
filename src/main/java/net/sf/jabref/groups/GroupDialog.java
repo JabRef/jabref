@@ -94,13 +94,13 @@ class GroupDialog extends JDialog {
         }
     };
 
-    private boolean m_okPressed = false;
+    private boolean m_okPressed;
 
     private final BasePanel m_basePanel;
 
     private AbstractGroup m_resultingGroup;
 
-    private AbstractUndoableEdit m_undoAddPreviousEntires = null;
+    private AbstractUndoableEdit m_undoAddPreviousEntires;
 
     private final AbstractGroup m_editedGroup;
 

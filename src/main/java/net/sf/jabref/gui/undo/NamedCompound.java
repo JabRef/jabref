@@ -23,7 +23,7 @@ import net.sf.jabref.logic.l10n.Localization;
 public class NamedCompound extends CompoundEdit {
 
     private final String name;
-    private boolean hasEdits = false;
+    private boolean hasEdits;
 
 
     public NamedCompound(String name) {

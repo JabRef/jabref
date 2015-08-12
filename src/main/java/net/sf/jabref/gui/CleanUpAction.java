@@ -107,7 +107,7 @@ public class CleanUpAction extends AbstractWorker {
     private final JabRefFrame frame;
 
     // global variable to count unsuccessful renames
-    private int unsuccesfullRenames = 0;
+    private int unsuccesfullRenames;
 
 
     public CleanUpAction(BasePanel panel) {

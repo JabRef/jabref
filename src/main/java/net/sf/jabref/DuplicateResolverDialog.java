@@ -59,7 +59,7 @@ public class DuplicateResolverDialog extends JDialog {
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private JButton removeExact = null;
+    private JButton removeExact;
     private final JPanel options = new JPanel();
     private final JPanel main = new JPanel();
     private final JPanel source = new JPanel();

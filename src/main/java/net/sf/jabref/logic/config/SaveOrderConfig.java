@@ -19,7 +19,7 @@ public class SaveOrderConfig {
     public static class SortCriterion {
 
         public String field;
-        public boolean descending = false;
+        public boolean descending;
 
 
         public SortCriterion() {

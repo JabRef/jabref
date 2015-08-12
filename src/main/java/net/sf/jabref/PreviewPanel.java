@@ -264,7 +264,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private Action closeAction;
 
-    private ArrayList<String> wordsToHighlight = null;
+    private ArrayList<String> wordsToHighlight;
 
 
     private Action getCloseAction() {

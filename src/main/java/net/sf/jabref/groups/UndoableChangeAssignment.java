@@ -33,9 +33,9 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     private final Set<BibtexEntry> m_previousAssignmentBackup;
     private final Set<BibtexEntry> m_newAssignmentBackup;
     /** The path to the edited node */
-    private int[] m_pathToNode = null;
+    private int[] m_pathToNode;
     /** The root of the global groups tree */
-    private GroupTreeNode m_groupsRootHandle = null;
+    private GroupTreeNode m_groupsRootHandle;
 
 
     /**

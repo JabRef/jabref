@@ -35,14 +35,14 @@ import net.sf.jabref.logic.util.OS;
  */
 public class PushToEmacs implements PushToApplication {
 
-    private JPanel settings = null;
+    private JPanel settings;
     private final JTextField citeCommand = new JTextField(30);
     private final JTextField emacsPath = new JTextField(30);
     private final JTextField additionalParams = new JTextField(30);
     private final JCheckBox useEmacs23 = new JCheckBox();
 
-    private boolean couldNotConnect = false;
-    private boolean couldNotRunClient = false;
+    private boolean couldNotConnect;
+    private boolean couldNotRunClient;
 
 
     @Override

@@ -49,7 +49,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     protected JButton importTypes;
     protected JButton exportTypes;
     private final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
-    private String lastSelected = null;
+    private String lastSelected;
     private final Map<String, List<String>> reqLists = new HashMap<String, List<String>>();
     private final Map<String, List<String>> optLists = new HashMap<String, List<String>>();
     private final Map<String, List<String>> opt2Lists = new HashMap<String, List<String>>();

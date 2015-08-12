@@ -45,8 +45,8 @@ public class SynchronizeFileField extends AbstractWorker {
 
     private final String fieldName = GUIGlobals.FILE_FIELD;
     private final BasePanel panel;
-    private BibtexEntry[] sel = null;
-    private SynchronizeFileField.OptionsDialog optDiag = null;
+    private BibtexEntry[] sel;
+    private SynchronizeFileField.OptionsDialog optDiag;
 
     private final Object[] brokenLinkOptions =
     {Localization.lang("Ignore"), Localization.lang("Assign new file"), Localization.lang("Remove link"),

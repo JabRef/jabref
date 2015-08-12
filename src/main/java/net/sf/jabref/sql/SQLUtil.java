@@ -42,7 +42,7 @@ public class SQLUtil {
     private static final ArrayList<String> reservedDBWords = new ArrayList<String>(
             Collections.singletonList("key"));
 
-    private static ArrayList<String> allFields = null;
+    private static ArrayList<String> allFields;
 
 
     private SQLUtil() {

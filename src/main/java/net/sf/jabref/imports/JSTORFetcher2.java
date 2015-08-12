@@ -53,8 +53,8 @@ public class JSTORFetcher2 implements EntryFetcher {
     private static final Pattern nextPagePattern = Pattern.compile(
             "<a href=\"(.*)\">Next&nbsp;&raquo;");
     private static final String noAccessIndicator = "We do not recognize you as having access to JSTOR";
-    private boolean stopFetching = false;
-    private boolean noAccessFound = false;
+    private boolean stopFetching;
+    private boolean noAccessFound;
 
 
     @Override

@@ -26,9 +26,9 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class PushToWinEdt implements PushToApplication {
 
-    private boolean couldNotCall = false;
-    private boolean notDefined = false;
-    private JPanel settings = null;
+    private boolean couldNotCall;
+    private boolean notDefined;
+    private JPanel settings;
     private final JTextField winEdtPath = new JTextField(30);
     private final JTextField citeCommand = new JTextField(30);
 

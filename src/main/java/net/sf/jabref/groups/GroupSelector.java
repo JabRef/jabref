@@ -790,7 +790,7 @@ public class GroupSelector extends SidePaneComponent implements
         private final String searchTerm;
         private final ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
         private final boolean showOverlappingGroupsP;
-        int hits = 0;
+        int hits;
 
 
         public GroupingWorker(SearchRule rules, String searchTerm) {
@@ -961,7 +961,7 @@ public class GroupSelector extends SidePaneComponent implements
 
     private abstract class NodeAction extends AbstractAction {
 
-        GroupTreeNode m_node = null;
+        GroupTreeNode m_node;
 
 
         public NodeAction(String s) {

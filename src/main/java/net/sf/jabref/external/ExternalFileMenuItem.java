@@ -38,7 +38,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     private final MetaData metaData;
     private ExternalFileType fileType;
     private final JabRefFrame frame;
-    private String fieldName = null;
+    private String fieldName;
 
 
     public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,

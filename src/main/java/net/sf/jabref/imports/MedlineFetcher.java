@@ -40,11 +40,11 @@ public class MedlineFetcher implements EntryFetcher {
 
     class SearchResult {
 
-        public int count = 0;
+        public int count;
 
-        public int retmax = 0;
+        public int retmax;
 
-        public int retstart = 0;
+        public int retstart;
 
         public String ids = "";
 

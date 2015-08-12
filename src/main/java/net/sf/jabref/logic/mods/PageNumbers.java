@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
  */
 public class PageNumbers {
 
-    private String freeform = null;
+    private String freeform;
     private int start;
     private int end;
 

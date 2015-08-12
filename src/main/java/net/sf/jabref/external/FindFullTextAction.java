@@ -30,8 +30,8 @@ import java.io.IOException;
 public class FindFullTextAction extends AbstractWorker {
 
     private final BasePanel basePanel;
-    private BibtexEntry entry = null;
-    private FindFullText.FindResult result = null;
+    private BibtexEntry entry;
+    private FindFullText.FindResult result;
 
 
     public FindFullTextAction(BasePanel basePanel) {

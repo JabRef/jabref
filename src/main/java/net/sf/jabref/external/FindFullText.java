@@ -208,7 +208,7 @@ public class FindFullText {
     public static class FindResult {
 
         public final URL url;
-        public String host = null;
+        public String host;
         public final int status;
 
 

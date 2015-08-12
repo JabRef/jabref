@@ -91,18 +91,18 @@ public class Authors extends AbstractParamLayoutFormatter {
     private static final String AND = " and ";
     private static final String OXFORD = ", and ";
 
-    private int flMode = Authors.FIRST_FIRST;
+    private int flMode;
 
     private boolean
             abbreviate = true;
-    private boolean firstInitialOnly = false;
-    private boolean middleInitial = false;
-    private boolean lastNameOnly = false;
+    private boolean firstInitialOnly;
+    private boolean middleInitial;
+    private boolean lastNameOnly;
     private boolean abbrDots = true;
     private boolean abbrSpaces = true;
 
-    private boolean setSep = false;
-    private boolean setMaxAuthors = false;
+    private boolean setSep;
+    private boolean setMaxAuthors;
     private int maxAuthors = -1;
     private int authorNumberEtAl = 1;
 
