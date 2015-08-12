@@ -23,7 +23,7 @@ import javax.swing.Action;
 
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.JabRefDesktop;
 
 @SuppressWarnings("serial")
 public class ForkMeOnGitHubAction extends AbstractAction {
@@ -36,7 +36,7 @@ public class ForkMeOnGitHubAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            Util.openBrowser("https://github.com/JabRef/jabref");
+            JabRefDesktop.openBrowser("https://github.com/JabRef/jabref");
         } catch (IOException ex) {
             ex.printStackTrace();
             JabRef.jrf.basePanel().output(Localization.lang("Could not open browser.") + " " + Localization.lang("Please open http://github.com/JabRef/jabref manually."));

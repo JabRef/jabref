@@ -1,7 +1,7 @@
 package spl.listener;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.JabRefDesktop;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -19,7 +19,7 @@ public class LabelLinkListener implements MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         try {
-            Util.openExternalViewer(new MetaData(), "http://www.mr-dlib.org/docs/jabref_metadata_extraction_alpha.php", "url");
+            JabRefDesktop.openExternalViewer(new MetaData(), "http://www.mr-dlib.org/docs/jabref_metadata_extraction_alpha.php", "url");
         } catch (IOException exc) {
             exc.printStackTrace();
         }

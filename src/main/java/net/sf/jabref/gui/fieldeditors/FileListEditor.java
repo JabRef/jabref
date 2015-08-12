@@ -48,6 +48,7 @@ import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.util.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -223,7 +224,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                 if (row >= 0) {
                     FileListEntry entry = tableModel.getEntry(row);
                     try {
-                        Util.openFolderAndSelectFile(entry.getLink());
+                        JabRefDesktop.openFolderAndSelectFile(entry.getLink());
                     } catch (IOException ex) {
                         LOGGER.debug("Cannot open folder", ex);
                     }
@@ -246,7 +247,7 @@ public class FileListEditor extends JTable implements FieldEditor,
             FileListEntry entry = tableModel.getEntry(row);
             try {
                 ExternalFileType type = Globals.prefs.getExternalFileTypeByName(entry.getType().getName());
-                Util.openExternalFileAnyFormat(metaData, entry.getLink(),
+                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(),
                         type != null ? type : entry.getType());
             } catch (IOException e) {
                 e.printStackTrace();

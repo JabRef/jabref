@@ -68,6 +68,7 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1677,7 +1678,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 // getSelectedText()
                 try {
-                    Util.openExternalViewer(panel.metaData(), link, tf.getFieldName());
+                    JabRefDesktop.openExternalViewer(panel.metaData(), link, tf.getFieldName());
                 } catch (IOException ex) {
                     System.err.println("Error opening file.");
                 }

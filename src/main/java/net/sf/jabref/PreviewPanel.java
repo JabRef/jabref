@@ -37,7 +37,7 @@ import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.JabRefDesktop;
 
 /**
  * Displays an BibtexEntry using the given layout format.
@@ -346,7 +346,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                 if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
                         String address = hyperlinkEvent.getURL().toString();
-                        Util.openExternalViewer(PreviewPanel.this.metaData,
+                        JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData,
                                 address, "url");
                     } catch (IOException e) {
                         e.printStackTrace();

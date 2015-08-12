@@ -31,6 +31,7 @@ import javax.swing.Timer;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.util.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +48,6 @@ import java.util.List;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.util.Util;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
@@ -395,7 +395,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
                         }
                     } else {
                         try {
-                            Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
+                            JabRefDesktop.openExternalViewer(panel.metaData(), (String) link, fieldName);
                         } catch (IOException ex) {
                             panel.output(Localization.lang("Unable to open link."));
                         }

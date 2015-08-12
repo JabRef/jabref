@@ -67,7 +67,7 @@ import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -185,9 +185,9 @@ class StyleSelectDialog {
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
                     if (type != null) {
-                        Util.openExternalFileAnyFormat(new MetaData(), link, type);
+                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
                     } else {
-                        Util.openExternalFileUnknown(frame, null, new MetaData(), link,
+                        JabRefDesktop.openExternalFileUnknown(frame, null, new MetaData(), link,
                                 new UnknownExternalFileType("jstyle"));
                     }
                 } catch (IOException e) {

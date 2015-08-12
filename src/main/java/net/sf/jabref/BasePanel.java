@@ -125,6 +125,7 @@ import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.logic.util.FileBasedLock;
+import net.sf.jabref.util.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import ca.odell.glazedlists.FilterList;
@@ -1175,7 +1176,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             }
                             if (entry != null) {
                                 try {
-                                    Util.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+                                    JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
                                     output(Localization.lang("External viewer called") + '.');
                                 } catch (IOException e) {
                                     output(Localization.lang("Could not open link"));
@@ -1233,7 +1234,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension);
                                                 if (type != null) {
                                                     try {
-                                                        Util.openExternalFileAnyFormat(metaData, filepath, type);
+                                                        JabRefDesktop.openExternalFileAnyFormat(metaData, filepath, type);
                                                         output(Localization.lang("External viewer called") + '.');
                                                         return;
                                                     } catch (IOException ex) {
@@ -1272,7 +1273,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             if (filepath != null) {
                                 //output(Globals.lang("Calling external viewer..."));
                                 try {
-                                    Util.openExternalViewer(metaData(), filepath, field);
+                                    JabRefDesktop.openExternalViewer(metaData(), filepath, field);
                                     output(Localization.lang("External viewer called") + '.');
                                 } catch (IOException ex) {
                                     output(Localization.lang("Error") + ": " + ex.getMessage());
@@ -1340,7 +1341,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         List<File> files = Util.getListOfLinkedFiles(bes, metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
                         for (File f : files) {
                             try {
-                                Util.openFolderAndSelectFile(f.getAbsolutePath());
+                                JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
                             } catch (IOException e) {
                                 LOGGER.info("Could not open folder", e);
                             }
@@ -1365,7 +1366,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if (link != null) {
                         //output(Globals.lang("Calling external viewer..."));
                         try {
-                            Util.openExternalViewer(metaData(), link.toString(), field);
+                            JabRefDesktop.openExternalViewer(metaData(), link.toString(), field);
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException ex) {
                             output(Localization.lang("Error") + ": " + ex.getMessage());
@@ -1387,7 +1388,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                         if (entry != null) {
                             try {
-                                Util.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
+                                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.getLink(), entry.getType());
                                 output(Localization.lang("External viewer called") + '.');
                             } catch (IOException e) {
                                 output(Localization.lang("Could not open link"));
@@ -1418,7 +1419,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if (link != null) {
                         //output(Globals.lang("Calling external viewer..."));
                         try {
-                            Util.openExternalViewer(metaData(), link.toString(), "url");
+                            JabRefDesktop.openExternalViewer(metaData(), link.toString(), "url");
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException ex) {
                             output(Localization.lang("Error") + ": " + ex.getMessage());

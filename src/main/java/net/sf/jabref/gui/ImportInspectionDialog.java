@@ -81,6 +81,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.util.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -1111,7 +1112,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             Object link = entry.getField(fieldName);
             try {
                 if (link != null) {
-                    Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
+                    JabRefDesktop.openExternalViewer(panel.metaData(), (String) link, fieldName);
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();

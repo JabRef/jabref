@@ -24,7 +24,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.JabRefDesktop;
 
 /**
  * The menu item used in the popup menu for opening external resources associated
@@ -74,7 +74,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
                 if (this.fieldName != null) {
-                    Util.openExternalViewer(frame.basePanel().metaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(frame.basePanel().metaData(), link, fieldName);
                     return true;
                 }
                 else {
@@ -92,10 +92,10 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             }
 
             if (type instanceof UnknownExternalFileType) {
-                return Util.openExternalFileUnknown(frame, entry, metaData, link,
+                return JabRefDesktop.openExternalFileUnknown(frame, entry, metaData, link,
                         (UnknownExternalFileType) type);
             } else {
-                return Util.openExternalFileAnyFormat(metaData, link, type);
+                return JabRefDesktop.openExternalFileAnyFormat(metaData, link, type);
             }
 
         } catch (IOException e1) {

@@ -58,7 +58,7 @@ import net.sf.jabref.TransferableBibtexEntry;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.util.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -372,7 +372,7 @@ public class SearchResultsDialog {
                     Object link = entry.getField("url");
                     try {
                         if (link != null) {
-                            Util.openExternalViewer(p.metaData(), (String) link, "url");
+                            JabRefDesktop.openExternalViewer(p.metaData(), (String) link, "url");
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();

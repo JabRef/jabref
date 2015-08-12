@@ -62,6 +62,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,8 +72,6 @@ import net.sf.jabref.imports.UnlinkedFilesCrawler;
 import net.sf.jabref.imports.UnlinkedPDFFileFilter;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-import net.sf.jabref.util.Util;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -1018,7 +1017,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         if (userObject instanceof FileNodeWrapper && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
-                                Util.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
+                                JabRefDesktop.openExternalViewer(JabRef.jrf.basePanel().metaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }

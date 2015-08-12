@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -93,7 +94,7 @@ public class SendAsEMailAction extends AbstractWorker {
             attachments.add(f.getPath());
             if (openFolders) {
                 try {
-                    Util.openFolderAndSelectFile(f.getAbsolutePath());
+                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
                 } catch (IOException e) {
                     LOGGER.debug("Could not open file", e);
                 }
