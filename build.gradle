@@ -6,6 +6,7 @@ plugins {
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
+    id "com.github.hierynomus.license" version "0.11.0"
 }
 
 apply plugin: "java"
@@ -24,6 +25,22 @@ project.ext.nsisExec = hasProperty("nsisExec") ? getProperty("nsisExec") : "C:/P
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
+
+license {
+    // year is automatically filled in file
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = "JabRef contributors"
+    header = file('LICENSE_HEADER')
+
+    // retain existing headers for now
+    skipExistingHeaders = true
+
+    // only work for java files
+    includes(["**/*.java"])
+
+    // excludes generated files
+    excludes(["net/sf/jabref/bst/Bst*", "net/sf/jabref/search/*"])
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.5'
