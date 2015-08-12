@@ -4,6 +4,7 @@
     - Remove Mr.DLib support as MR.DLib will be shut down in 2015
     - Streamline logging API: Replace usages of java.util.logging with commons.logging
     - BREAKING: Remove plugin functionality.
+    - Fixes Bug#1297: No console message on closing.
 [dev_2.11]
     - Fix for bugs #1221 and #1261 (also partly #1243): order of fields in customized entry types no longer gets destroyed by the entry editor 
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)

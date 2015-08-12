@@ -42,17 +42,11 @@ public class FileUpdateMonitor implements Runnable {
     public void run() {
         // The running variable is used to make the thread stop when needed.
         while (true) {
-            //System.out.println("Polling...");
-            Iterator<String> i = entries.keySet().iterator();
-            for (; i.hasNext();) {
-                Entry e = entries.get(i.next());
+            for(Entry e : entries.values()) {
                 try {
                     if (e.hasBeenUpdated()) {
                         e.notifyListener();
                     }
-
-                    //else
-                    //System.out.println("File '"+e.file.getPath()+"' not modified.");
                 } catch (IOException ex) {
                     e.notifyFileRemoved();
                 }
@@ -62,7 +56,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                LOGGER.info("FileUpdateMonitor has been interrupted. Terminating...", ex);
+                LOGGER.debug("FileUpdateMonitor has been interrupted. Terminating...");
                 return;
             }
         }

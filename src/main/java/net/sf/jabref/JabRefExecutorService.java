@@ -42,8 +42,8 @@ public class JabRefExecutorService implements Executor {
             try {
                 future.get();
                 return;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
+
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
@@ -106,8 +106,8 @@ public class JabRefExecutorService implements Executor {
                 thread.join();
                 startedThreads.remove(thread);
                 return;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
+
             }
         }
     }
