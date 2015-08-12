@@ -265,7 +265,7 @@ public class VM implements Warn {
                     throw new VMException("Can only concatenate two String with *");
                 }
 
-                stack.push(o1 + o2);
+                stack.push(o1.toString() + o2);
             }
         });
 
@@ -1142,7 +1142,7 @@ public class VM implements Warn {
         }
 
         // Integers
-        Tree t = child.getChild(1);
+        t = child.getChild(1);
         // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
@@ -1153,7 +1153,7 @@ public class VM implements Warn {
             }
         }
         // Strings
-        Tree t = child.getChild(2);
+        t = child.getChild(2);
         // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
