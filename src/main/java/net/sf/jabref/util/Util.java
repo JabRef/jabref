@@ -472,24 +472,8 @@ public class Util {
      * @throws IOException
      */
     private static void openFileOnWindows(String link, boolean localFile) throws IOException {
-        /*
-         * if (localFile) { String[] spl = link.split("\\\\"); StringBuffer sb =
-         * new StringBuffer(); for (int i = 0; i < spl.length; i++) { if (i > 0)
-         * sb.append("\\"); if (spl[i].indexOf(" ") >= 0) spl[i] = "\"" + spl[i] +
-         * "\""; sb.append(spl[i]); } link = sb.toString(); }
-         */
-        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
-
-        // Bug fix for:
-        // http://sourceforge.net/tracker/index.php?func=detail&aid=1489454&group_id=92314&atid=600306
-        String cmd;
-        if (Globals.osName.startsWith("Windows 9")) {
-            cmd = "command.com /c start " + link;
-        } else {
-            cmd = "cmd.exe /c start " + link;
-        }
-
-        Runtime.getRuntime().exec(cmd);
+        // escape & and spaces
+        Runtime.getRuntime().exec("cmd.exe /c start " + link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \""));
     }
 
     /**
@@ -501,10 +485,8 @@ public class Util {
      */
     private static void openFileWithApplicationOnWindows(String link, String application)
             throws IOException {
-
-        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
-
-        Runtime.getRuntime().exec(application + " " + link);
+        // escape & and spaces
+        Runtime.getRuntime().exec(application + " " + link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \""));
     }
 
     /**
