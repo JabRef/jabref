@@ -27,11 +27,6 @@ public class SpringerLinkPdfDownload implements FullTextFinder {
     private static final String BASE_URL = "http://www.springerlink.com";
     private static final String CONTENT_BASE_URL = "http://www.springerlink.com/content/";
 
-
-    public SpringerLinkPdfDownload() {
-
-    }
-
     @Override
     public boolean supportsSite(URL url) {
         return url.getHost().toLowerCase().contains("www.springerlink.com");

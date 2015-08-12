@@ -26,10 +26,6 @@ public class ScienceDirectPdfDownload implements FullTextFinder {
 
     //private static final String BASE_URL = "http://www.sciencedirect.com";
 
-    public ScienceDirectPdfDownload() {
-
-    }
-
     @Override
     public boolean supportsSite(URL url) {
         return url.getHost().toLowerCase().contains("www.sciencedirect.com");

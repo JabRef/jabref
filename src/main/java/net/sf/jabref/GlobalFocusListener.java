@@ -25,10 +25,6 @@ public class GlobalFocusListener implements FocusListener {
 
     private Component focused;
 
-
-    public GlobalFocusListener() {
-    }
-
     @Override
     public void focusGained(FocusEvent e) {
         if (!e.isTemporary()) {

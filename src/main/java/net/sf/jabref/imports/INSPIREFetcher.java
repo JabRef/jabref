@@ -49,10 +49,6 @@ public class INSPIREFetcher implements EntryFetcher {
 
     private static final String INSPIRE_HOST = "inspirehep.net";
 
-
-    public INSPIREFetcher() {
-    }
-
     /**
      * Construct the query URL
      *

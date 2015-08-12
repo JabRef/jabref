@@ -34,10 +34,6 @@ public class ImportFormatReader {
     private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
 
-    public ImportFormatReader() {
-        super();
-    }
-
     public void resetImportFormats() {
         formats.clear();
 

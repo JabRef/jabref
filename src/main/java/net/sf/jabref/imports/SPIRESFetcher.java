@@ -47,10 +47,6 @@ public class SPIRESFetcher implements EntryFetcher {
 
     private static final String spiresHost = "www-spires.slac.stanford.edu";
 
-
-    public SPIRESFetcher() {
-    }
-
     /**
      * Construct the query URL
      * 

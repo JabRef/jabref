@@ -22,10 +22,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class CaseKeeper implements LayoutFormatter {
 
-    public CaseKeeper() {
-        super();
-    }
-
     private String format(String text, String[] listOfWords) {
         if (text == null) {
             return null;

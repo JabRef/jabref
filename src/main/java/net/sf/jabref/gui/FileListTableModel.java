@@ -36,10 +36,6 @@ public class FileListTableModel extends AbstractTableModel {
 
     private final ArrayList<FileListEntry> list = new ArrayList<FileListEntry>();
 
-
-    public FileListTableModel() {
-    }
-
     @Override
     public int getRowCount() {
         synchronized (list) {

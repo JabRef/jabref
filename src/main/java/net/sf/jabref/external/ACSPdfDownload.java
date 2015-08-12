@@ -26,11 +26,6 @@ public class ACSPdfDownload implements FullTextFinder {
 
     private static final String BASE_URL = "http://pubs.acs.org/doi/pdf/";
 
-
-    public ACSPdfDownload() {
-
-    }
-
     @Override
     public boolean supportsSite(URL url) {
         return url.getHost().toLowerCase().contains("acs.org");

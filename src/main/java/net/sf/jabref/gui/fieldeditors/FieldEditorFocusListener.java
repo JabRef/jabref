@@ -32,9 +32,6 @@ import java.awt.event.FocusListener;
  */
 public class FieldEditorFocusListener implements FocusListener {
 
-    public FieldEditorFocusListener() {
-    }
-
     @Override
     public void focusGained(FocusEvent event) {
         if (event.getSource() instanceof FieldEditor) {

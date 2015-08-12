@@ -31,10 +31,6 @@ import net.sf.jabref.export.layout.*;
  */
 public class Iso690FormatDate implements LayoutFormatter {
 
-    /** Creates a new instance of iso690NamesAuthors */
-    public Iso690FormatDate() {
-    }
-
     @Override
     public String format(String s) {
 
