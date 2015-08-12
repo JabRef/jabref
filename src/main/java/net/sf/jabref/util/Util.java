@@ -705,7 +705,7 @@ public class Util {
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
             link = link.replaceFirst("^doi:/*", "");
-            link = Globals.DOI_LOOKUP_PREFIX + link;
+            link = DOIUtil.DOI_LOOKUP_PREFIX + link;
         }
 
         // converts doi-only link to full http address
@@ -715,7 +715,7 @@ public class Util {
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
         if (DOIUtil.checkForPlainDOI(link) && !link.startsWith("http://")) {
-            link = Globals.DOI_LOOKUP_PREFIX + DOIUtil.getDOI(link);
+            link = DOIUtil.DOI_LOOKUP_PREFIX + DOIUtil.getDOI(link);
         }
 
         link = link.replaceAll("\\+", "%2B");

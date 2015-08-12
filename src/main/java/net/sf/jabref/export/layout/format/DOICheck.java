@@ -17,7 +17,6 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.util.DOIUtil;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.Globals;
 
 /**
  * Used to fix [ 1588028 ] export HTML table doi url.
@@ -43,7 +42,7 @@ public class DOICheck implements LayoutFormatter {
         if (DOIUtil.checkForDOIwithHTTPprefix(fieldText)) {
             return fieldText;
         } else {
-            return Globals.DOI_LOOKUP_PREFIX.concat(DOIUtil.getDOI(fieldText));
+            return DOIUtil.DOI_LOOKUP_PREFIX.concat(DOIUtil.getDOI(fieldText));
         }
     }
 }

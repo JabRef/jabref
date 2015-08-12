@@ -91,7 +91,6 @@ public class Globals {
     public static final String FILETYPE_PREFS_EXT = "_dir";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
-    public static final String DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
     public static final String NONE = "_non__";
     public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
 
