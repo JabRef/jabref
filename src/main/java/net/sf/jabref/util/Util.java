@@ -114,12 +114,11 @@ import com.jgoodies.forms.layout.FormLayout;
  * utility functions
  */
 public class Util {
+    private static final Log LOGGER = LogFactory.getLog(Util.class);
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
-    
-    private static final Log LOGGER = LogFactory.getLog(Util.class);
     
     private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
     
@@ -1363,10 +1362,13 @@ public class Util {
     }
 
     /**
+     * Optimized method for converting a String into an Integer
+     *
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
-     * @param str
-     * @return
+     * @param str the String holding an Integer value
+     * @throws NumberFormatException if str cannot be parsed to an int
+     * @return the int value of str
      */
     public static int intValueOf(String str) {
         int ival = 0;
