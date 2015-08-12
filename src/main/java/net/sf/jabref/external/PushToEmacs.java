@@ -25,6 +25,7 @@ import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * Created by IntelliJ IDEA.
@@ -131,7 +132,7 @@ public class PushToEmacs implements PushToApplication {
                 suffix = ")";
             }
 
-            com[com.length - 1] = Globals.ON_WIN ?
+            com[com.length - 1] = OS.WINDOWS ?
                     // Windows gnuclient escaping:
                     // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                     // so cmd receives: (insert \"\\cite{Blah2001}\")

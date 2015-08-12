@@ -24,6 +24,7 @@ import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.external.PushToApplication;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 import javax.swing.*;
 import java.awt.*;
@@ -123,11 +124,11 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
         String defExecutable;
         String defJarsDir;
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             Globals.prefs.putDefaultValue("ooPath", "C:\\Program Files\\OpenOffice.org 3");
             Globals.prefs.putDefaultValue("ooExecutablePath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\soffice.exe");
             Globals.prefs.putDefaultValue("ooJarsPath", "C:\\Program Files\\OpenOffice.org 2.3\\program\\classes");
-        } else if (Globals.ON_MAC) {
+        } else if (OS.OS_X) {
             Globals.prefs.putDefaultValue("ooExecutablePath", "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin");
             Globals.prefs.putDefaultValue("ooPath", "/Applications/OpenOffice.org.app");
             Globals.prefs.putDefaultValue("ooJarsPath", "/Applications/OpenOffice.org.app/Contents/basis-link");
@@ -529,7 +530,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             sOffice = Globals.prefs.get("ooExecutablePath");
 
             boolean openOffice3 = true;//Globals.prefs.getBoolean("connectToOO3");
-            if (Globals.ON_WIN) {
+            if (OS.WINDOWS) {
                 //if (openOffice3) {
                 unoilDir = ooPath + "\\Basis\\program\\classes";
                 ooBaseDirectory = ooPath + "\\URE\\java";
@@ -537,7 +538,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 //}
 
             }
-            else if (Globals.ON_MAC) {
+            else if (OS.OS_X) {
                 //if (openOffice3) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
                 ooBaseDirectory = ooPath + "/Contents/basis-link/ure-link/share/java";
@@ -690,7 +691,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         ooExec.setText(Globals.prefs.get("ooExecutablePath"));
         ooJars.setText(Globals.prefs.get("ooJarsPath"));
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", ""));
-        if (Globals.ON_WIN || Globals.ON_MAC) {
+        if (OS.WINDOWS || OS.OS_X) {
             builder.append(Localization.lang("Path to OpenOffice directory"));
             builder.append(ooPath);
             builder.append(browseOOPath);

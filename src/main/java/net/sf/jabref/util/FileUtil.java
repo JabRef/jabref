@@ -1,8 +1,8 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.util.OS;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -184,7 +184,7 @@ public class FileUtil {
                 return file;
             }
             // Ok, try to fix / and \ problems:
-            if (Globals.ON_WIN) {
+            if (OS.WINDOWS) {
                 // workaround for catching Java bug in regexp replacer
                 // and, why, why, why ... I don't get it - wegner 2006/01/22
                 try {
@@ -244,7 +244,7 @@ public class FileUtil {
         }
 
         String longName;
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             // case-insensitive matching on Windows
             longName = fileName.toString().toLowerCase();
             dir = dir.toLowerCase();

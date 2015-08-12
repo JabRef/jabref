@@ -78,15 +78,6 @@ public class Globals {
 
     }
 
-    // operating system (OS) detection
-    // TODO: what OS do we support?
-    // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
-    public static final String osName = System.getProperty("os.name", "unknown").toLowerCase();
-
-    public static final boolean ON_MAC = Globals.osName.startsWith("mac");
-    public static final boolean ON_WIN = Globals.osName.startsWith("win");
-    public static final boolean ON_LINUX = Globals.osName.startsWith("linux");
-
     // TODO: other stuff
     public static FileUpdateMonitor fileUpdateMonitor;
 

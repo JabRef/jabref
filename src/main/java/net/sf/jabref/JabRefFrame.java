@@ -78,6 +78,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -159,7 +160,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         void addAction(Action a) {
             JButton b = new JButton(a);
             b.setText(null);
-            if (!Globals.ON_MAC) {
+            if (!OS.OS_X) {
                 b.setMargin(marg);
             }
             add(b);
@@ -511,7 +512,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                if (Globals.ON_MAC) {
+                if (OS.OS_X) {
                     setState(Frame.ICONIFIED);
                 } else {
                     new CloseAction().actionPerformed(null);
@@ -634,7 +635,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //Note: The registration of Apple event is at the end of initialization, because
         //if the events happen too early (ie when the window is not initialized yet), the
         //opened (double-clicked) documents are not displayed.
-        if (Globals.ON_MAC) {
+        if (OS.OS_X) {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
@@ -1623,14 +1624,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         searchToggle = new JToggleButton(toggleSearch);
         searchToggle.setText(null);
-        if (!Globals.ON_MAC) {
+        if (!OS.OS_X) {
             searchToggle.setMargin(marg);
         }
         tlb.add(searchToggle);
 
         previewToggle = new JToggleButton(togglePreview);
         previewToggle.setText(null);
-        if (!Globals.ON_MAC) {
+        if (!OS.OS_X) {
             previewToggle.setMargin(marg);
         }
         tlb.add(previewToggle);
@@ -1638,20 +1639,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         groupToggle = new JToggleButton(toggleGroups);
         groupToggle.setText(null);
-        if (!Globals.ON_MAC) {
+        if (!OS.OS_X) {
             groupToggle.setMargin(marg);
         }
         tlb.add(groupToggle);
 
         highlightAny = new JToggleButton(toggleHighlightAny);
         highlightAny.setText(null);
-        if (!Globals.ON_MAC) {
+        if (!OS.OS_X) {
             highlightAny.setMargin(marg);
         }
         tlb.add(highlightAny);
         highlightAll = new JToggleButton(toggleHighlightAll);
         highlightAll.setText(null);
-        if (!Globals.ON_MAC) {
+        if (!OS.OS_X) {
             highlightAll.setMargin(marg);
         }
         tlb.add(highlightAll);

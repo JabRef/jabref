@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.logic.util.OS;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -67,7 +69,7 @@ public class JabRefFileChooser extends JFileChooser
 
     @Override
     protected void setUI(ComponentUI newUI) {
-        if (Globals.ON_MAC) {
+        if (OS.OS_X) {
             super.setUI(newUI);
         } else {
             super.setUI(new JabRefUI(this));

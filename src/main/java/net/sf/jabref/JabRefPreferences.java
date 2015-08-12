@@ -39,6 +39,7 @@ import javax.swing.KeyStroke;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -466,7 +467,7 @@ public class JabRefPreferences {
         prefs = Preferences.userNodeForPackage(JabRef.class);
         upgradeOldPreferences();
 
-        if (Globals.ON_MAC) {
+        if (OS.OS_X) {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
             //defaults.put("htmlviewer", "/Applications/Safari.app");
@@ -475,7 +476,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put(FONT_FAMILY, "SansSerif");
 
-        } else if (Globals.ON_WIN) {
+        } else if (OS.WINDOWS) {
             //defaults.put("pdfviewer", "cmd.exe /c start /b");
             //defaults.put("psviewer", "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
@@ -1123,7 +1124,7 @@ public class JabRefPreferences {
             keyBinds.put(bindName, s);
         }
 
-        if (Globals.ON_MAC) {
+        if (OS.OS_X) {
             return getKeyForMac(KeyStroke.getKeyStroke(s));
         } else {
             return KeyStroke.getKeyStroke(s);

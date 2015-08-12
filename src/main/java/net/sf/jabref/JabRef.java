@@ -34,6 +34,7 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -158,7 +159,7 @@ public class JabRef {
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
         Globals.NEWLINE_LENGTH = Globals.NEWLINE.length();
 
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
             // Based on http://stackoverflow.com/a/1928830
             JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
@@ -225,7 +226,7 @@ public class JabRef {
 
     static
     {
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             Native.register("shell32");
         }
     }
@@ -923,7 +924,7 @@ public class JabRef {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
                 try {
                     List<BibtexEntry> entries;
-                    if (Globals.ON_WIN) {
+                    if (OS.WINDOWS) {
                         entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
                     }
                     else {
@@ -941,7 +942,7 @@ public class JabRef {
                         + ": " + data[0]);
 
                 ImportFormatReader.UnknownFormatImport importResult;
-                if (Globals.ON_WIN) {
+                if (OS.WINDOWS) {
                     importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
                 }
                 else {

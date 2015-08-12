@@ -21,6 +21,7 @@ import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.util.FileUtil;
 
 import javax.swing.*;
@@ -299,10 +300,10 @@ public class DownloadExternalFile {
         * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
         *
         */
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             plannedName = plannedName.replaceAll(
                     "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
-        } else if (Globals.ON_MAC) {
+        } else if (OS.OS_X) {
             plannedName = plannedName.replaceAll(":", "");
         }
 

@@ -34,6 +34,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * This class produces a dialog box for editing an external file type.
@@ -95,7 +96,7 @@ public class ExternalFileTypeEntryEditor {
         builder.nextLine();
         builder.append(Localization.lang("Application"));
         JButton browseBut = new JButton(Localization.lang("Browse"));
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             builder.append(useDefault);
             builder.nextLine();
             JPanel p1 = new JPanel();
@@ -155,7 +156,7 @@ public class ExternalFileTypeEntryEditor {
             }
         });
 
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
                 private void handle(DocumentEvent e) {
@@ -246,7 +247,7 @@ public class ExternalFileTypeEntryEditor {
         if (selectedIcon != null) {
             entry.setIconName(selectedIcon);
         }
-        if (!Globals.ON_WIN) {
+        if (!OS.WINDOWS) {
             entry.setOpenWith(application.getText().trim());
         } else {
             // On Windows, store application as empty if the "Default" option is selected,

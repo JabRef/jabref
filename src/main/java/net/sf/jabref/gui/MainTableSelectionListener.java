@@ -30,6 +30,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -286,7 +287,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         // Workaround for Windows. Right-click is not popup trigger on mousePressed, but
         // on mouseReleased. Therefore we need to avoid taking action at this point, because
         // action will be taken when the button is released:
-        if (Globals.ON_WIN && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
+        if (OS.WINDOWS && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
             return;
         }
 

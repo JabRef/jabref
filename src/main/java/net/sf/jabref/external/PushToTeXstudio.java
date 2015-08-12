@@ -9,6 +9,7 @@ import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,7 +55,7 @@ public class PushToTeXstudio implements PushToApplication {
     }
 
     private String defaultProgramPath() {
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             String progFiles = System.getenv("ProgramFiles(x86)");
             if (progFiles == null) {
                 progFiles = System.getenv("ProgramFiles");
@@ -114,7 +115,7 @@ public class PushToTeXstudio implements PushToApplication {
             programPath = defaultProgramPath();
         }
         try {
-            String[] com = Globals.ON_WIN ?
+            String[] com = OS.WINDOWS ?
                     // No additional escaping is needed for TeXstudio:
                     new String[] {programPath, "--insert-cite", citeCom + "{" + keys + "}"}
                     : new String[] {programPath, "--insert-cite", citeCom + "{" + keys + "}"};

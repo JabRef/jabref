@@ -30,6 +30,7 @@ import java.util.List;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * Tools for automatically detecting jar and executable paths to OpenOffice.
@@ -87,7 +88,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
     private boolean autoDetectPaths() {
 
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             List<File> progFiles = AutoDetectPaths.findProgramFilesDir();
             File sOffice = null;
             if (fileSearchCancelled) {
@@ -144,7 +145,7 @@ public class AutoDetectPaths extends AbstractWorker {
             }
 
         }
-        else if (Globals.ON_MAC) {
+        else if (OS.OS_X) {
             File rootDir = new File("/Applications");
             File[] files = rootDir.listFiles();
             for (File file : files) {

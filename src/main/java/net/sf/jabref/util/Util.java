@@ -71,10 +71,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.FileNameCleaner;
-import net.sf.jabref.logic.util.MonthUtil;
-import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.logic.util.YearUtil;
+import net.sf.jabref.logic.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -397,12 +394,12 @@ public class Util {
             }
         } else if (fieldName.equals("ps")) {
             try {
-                if (Globals.ON_MAC) {
+                if (OS.OS_X) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
                     String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
-                } else if (Globals.ON_WIN) {
+                } else if (OS.WINDOWS) {
                     Util.openFileOnWindows(link, true);
                     /*
                      * cmdArray[0] = Globals.prefs.get("psviewer"); cmdArray[1] =
@@ -423,12 +420,12 @@ public class Util {
             }
         } else if (fieldName.equals("pdf")) {
             try {
-                if (Globals.ON_MAC) {
+                if (OS.OS_X) {
                     ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
                     String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
-                } else if (Globals.ON_WIN) {
+                } else if (OS.WINDOWS) {
                     Util.openFileOnWindows(link, true);
                     /*
                      * String[] spl = link.split("\\\\"); StringBuffer sb = new
@@ -554,13 +551,13 @@ public class Util {
         // For URLs, other solutions are
         //  * https://github.com/rajing/browserlauncher2, but it is not available in maven
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
-        if (Globals.ON_MAC) {
+        if (OS.OS_X) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
             String[] cmd = fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty() ?
                     new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
                     new String[] {"/usr/bin/open", filePath};
             Runtime.getRuntime().exec(cmd);
-        } else if (Globals.ON_WIN) {
+        } else if (OS.WINDOWS) {
             if (fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty()) {
                 // Application is specified. Use it:
                 Util.openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
@@ -1941,9 +1938,9 @@ public class Util {
      * @throws IOException
      */
     public static void openFolderAndSelectFile(String fileLink) throws IOException {
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             Util.openFolderAndSelectFileOnWindows(fileLink);
-        } else if (Globals.ON_LINUX) {
+        } else if (OS.LINUX) {
             Util.openFolderAndSelectFileOnLinux(fileLink);
         } else {
             Util.openFolderAndSelectFileGeneric(fileLink);

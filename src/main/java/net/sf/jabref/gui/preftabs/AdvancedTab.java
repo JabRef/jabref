@@ -42,6 +42,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import net.sf.jabref.logic.util.OS;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
@@ -118,7 +119,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
-        if (!Globals.ON_MAC) {
+        if (!OS.OS_X) {
             builder.appendSeparator(Localization.lang("Look and feel"));
             JLabel lab = new JLabel(Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
             builder.nextLine();
@@ -160,7 +161,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         p.add(remoteHelp.getIconButton());
         builder.append(p);
 
-        //if (Globals.ON_MAC) {
+        //if (Globals.OS_X) {
         builder.nextLine();
         builder.appendSeparator(Localization.lang("File dialog"));
         builder.nextLine();
