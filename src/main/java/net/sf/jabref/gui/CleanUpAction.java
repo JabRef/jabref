@@ -389,17 +389,17 @@ public class CleanUpAction extends AbstractWorker {
         // First check if the DOI Field is empty
         if (bes.getField("doi") != null) {
             String doiFieldValue = bes.getField("doi");
-            if (DOIUtil.isDOIwithHttpPrefix(doiFieldValue)) {
-                String newValue = DOIUtil.getPlainDOI(doiFieldValue);
+            if (DOIUtil.isURI(doiFieldValue)) {
+                String newValue = DOIUtil.getDOI(doiFieldValue);
                 ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
                 bes.setField("doi", newValue);
             }
-            if (DOIUtil.isPlainDOI(doiFieldValue)) {
+            if (DOIUtil.isDOI(doiFieldValue)) {
                 // DOI field seems to contain DOI
                 // cleanup note, url, ee field
                 // we do NOT copy values to the DOI field as the DOI field contains a DOI!
                 for (String field : fields) {
-                    if (DOIUtil.isPlainDOI(bes.getField(field))) {
+                    if (DOIUtil.isDOI(bes.getField(field))) {
                         DOIUtil.removeDOIfromBibtexEntryField(bes, field, ce);
                     }
                 }
@@ -408,10 +408,10 @@ public class CleanUpAction extends AbstractWorker {
             // As the DOI field is empty we now check if note, url, or ee field contains a DOI
 
             for (String field : fields) {
-                if (DOIUtil.isPlainDOI(bes.getField(field))) {
+                if (DOIUtil.isDOI(bes.getField(field))) {
                     // update DOI
                     String oldValue = bes.getField("doi");
-                    String newValue = DOIUtil.getPlainDOI(bes.getField(field));
+                    String newValue = DOIUtil.getDOI(bes.getField(field));
                     ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
                     bes.setField("doi", newValue);
 

@@ -237,7 +237,7 @@ public class PdfContentImporter extends ImportFormat {
             stripper.writeText(document, writer);
             String textResult = writer.toString();
 
-            String doi = DOIUtil.getPlainDOI(textResult);
+            String doi = DOIUtil.getDOI(textResult);
             if (doi.length() < textResult.length()) {
                 // A DOI was found in the text
                 // We do NO parsing of the text, but use the DOI fetcher

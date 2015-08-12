@@ -13,6 +13,8 @@ public class DOIUtil {
     // DOI-regexp provided by http://stackoverflow.com/a/10324802/873282
     // Some DOI's are not caught by the regexp in the above link, i.e. 10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S
     // Removed <> from non-permitted characters
+    // TODO: We need more tests if the regexes behave correctly!
+    // See http://www.doi.org/doi_handbook/2_Numbering.html#2.6
     private static final String REGEXP_PLAINDOI = "\\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\\'])\\S)+)\\b";
     private static final Pattern PATTERN_PLAINDOI = Pattern.compile(REGEXP_PLAINDOI);
     private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + REGEXP_PLAINDOI;
@@ -20,7 +22,7 @@ public class DOIUtil {
     /**
      * Check if the String matches a DOI (with http://...)
      */
-    public static boolean isDOIwithHttpPrefix(String check) {
+    public static boolean isURI(String check) {
         return check != null && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
     }
 
@@ -29,7 +31,7 @@ public class DOIUtil {
      * @param check - string to check
      * @return true if "check" contains a DOI
      */
-    public static boolean isPlainDOI(String check) {
+    public static boolean isDOI(String check) {
         return check != null && check.matches(".*" + REGEXP_PLAINDOI + ".*");
     }
 
@@ -39,7 +41,7 @@ public class DOIUtil {
      * @param doi - may not be null
      * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
      */
-    public static String getPlainDOI(String doi) {
+    public static String getDOI(String doi) {
         Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
         if (matcher.find()) {
             return matcher.group();
@@ -56,8 +58,8 @@ public class DOIUtil {
      * @param doi - may not be null
      * @return
      */
-    public static String getHttpUrl(String doi) {
-        return DOI_LOOKUP_PREFIX + getPlainDOI(doi);
+    public static String getURI(String doi) {
+        return DOI_LOOKUP_PREFIX + getDOI(doi);
     }
 
     public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {

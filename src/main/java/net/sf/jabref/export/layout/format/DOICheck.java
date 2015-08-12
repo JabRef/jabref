@@ -39,10 +39,10 @@ public class DOICheck implements LayoutFormatter {
             return "";
         }
 
-        if (DOIUtil.isDOIwithHttpPrefix(fieldText)) {
+        if (DOIUtil.isURI(fieldText)) {
             return fieldText;
         } else {
-            return DOIUtil.getHttpUrl(fieldText);
+            return DOIUtil.getURI(fieldText);
         }
     }
 }
