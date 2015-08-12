@@ -382,8 +382,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (InterruptedException ignored) {
+
             return null;
         }
     }

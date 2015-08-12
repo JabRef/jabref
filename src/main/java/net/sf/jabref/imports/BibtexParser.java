@@ -186,7 +186,7 @@ public class BibtexParser {
             }
             /*
              * try { Thread.currentThread().sleep(500); } catch
-             * (InterruptedException ex) {}
+             * (InterruptedException ignored) {}
              */
             break;
         }
@@ -217,7 +217,7 @@ public class BibtexParser {
             }
             /*
              * try { Thread.currentThread().sleep(500); } catch
-             * (InterruptedException ex) {}
+             * (InterruptedException ignored) {}
              */
             break;
         }
