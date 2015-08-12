@@ -58,8 +58,7 @@ public class FindFullText {
         String doiText = entry.getField("doi");
         // First try the DOI link, if defined:
         if (doiText != null && !doiText.trim().isEmpty()) {
-            doiText = DOIUtil.getDOI(doiText);
-            FindResult resDoi = lookForFullTextAtURL(DOIUtil.DOI_LOOKUP_PREFIX + doiText);
+            FindResult resDoi = lookForFullTextAtURL(DOIUtil.getHttpUrl(doiText));
             if (resDoi.status == FindFullText.FOUND_PDF) {
                 return resDoi;
             } else if (urlText != null && !urlText.trim().isEmpty()) {

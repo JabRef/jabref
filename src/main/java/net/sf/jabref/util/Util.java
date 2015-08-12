@@ -704,7 +704,7 @@ public class Util {
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
             link = link.replaceFirst("^doi:/*", "");
-            link = DOIUtil.DOI_LOOKUP_PREFIX + link;
+            link = DOIUtil.getHttpUrl(link);
         }
 
         // converts doi-only link to full http address
@@ -713,8 +713,8 @@ public class Util {
         // the trailing "/abstract" is included but doesn't lead to a resolvable DOI).
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
-        if (DOIUtil.checkForPlainDOI(link) && !link.startsWith("http://")) {
-            link = DOIUtil.DOI_LOOKUP_PREFIX + DOIUtil.getDOI(link);
+        if (DOIUtil.isPlainDOI(link) && !link.startsWith("http://")) {
+            link = DOIUtil.getHttpUrl(link);
         }
 
         link = link.replaceAll("\\+", "%2B");

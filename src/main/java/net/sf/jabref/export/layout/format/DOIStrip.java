@@ -32,7 +32,7 @@ public class DOIStrip implements LayoutFormatter {
         if (fieldText == null) {
             return null;
         } else {
-            return DOIUtil.getDOI(fieldText);
+            return DOIUtil.getPlainDOI(fieldText);
         }
     }
 }

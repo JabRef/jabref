@@ -20,7 +20,7 @@ public class DOIUtil {
     /**
      * Check if the String matches a DOI (with http://...)
      */
-    public static boolean checkForDOIwithHTTPprefix(String check) {
+    public static boolean isDOIwithHttpPrefix(String check) {
         return check != null && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
     }
 
@@ -29,7 +29,7 @@ public class DOIUtil {
      * @param check - string to check
      * @return true if "check" contains a DOI
      */
-    public static boolean checkForPlainDOI(String check) {
+    public static boolean isPlainDOI(String check) {
         return check != null && check.matches(".*" + REGEXP_PLAINDOI + ".*");
     }
 
@@ -39,13 +39,25 @@ public class DOIUtil {
      * @param doi - may not be null
      * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
      */
-    public static String getDOI(String doi) {
+    public static String getPlainDOI(String doi) {
         Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
         if (matcher.find()) {
             return matcher.group();
         } else {
             return doi;
         }
+    }
+
+    /**
+     * Returns the Http URL for a specific DOI
+     *
+     * TODO: this has problems when no doi is detected or is null.
+     * This has always been unchecked and needs to be investigated!
+     * @param doi - may not be null
+     * @return
+     */
+    public static String getHttpUrl(String doi) {
+        return DOI_LOOKUP_PREFIX + getPlainDOI(doi);
     }
 
     public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
