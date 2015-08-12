@@ -30,6 +30,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;
@@ -76,15 +77,15 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (entries.length == 0) {
 
-                JOptionPane.showMessageDialog(panel, Globals.lang("This operation requires at least one entry."),
-                        Globals.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(panel, Localization.lang("This operation requires at least one entry."),
+                        Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
                 goOn = false;
                 return;
 
             } else {
 
-                int response = JOptionPane.showConfirmDialog(panel, Globals.lang("Write XMP-metadata for all PDFs in current database?"),
-                        Globals.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
+                int response = JOptionPane.showConfirmDialog(panel, Localization.lang("Write XMP-metadata for all PDFs in current database?"),
+                        Localization.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
 
                 if (response != JOptionPane.YES_OPTION) {
@@ -101,7 +102,7 @@ public class WriteXMPAction extends AbstractWorker {
         }
         optDiag.open();
 
-        panel.output(Globals.lang("Writing XMP metadata..."));
+        panel.output(Localization.lang("Writing XMP metadata..."));
     }
 
     @Override
@@ -145,22 +146,22 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (files.isEmpty()) {
                 skipped++;
-                optDiag.progressArea.append("  " + Globals.lang("Skipped - No PDF linked") + ".\n");
+                optDiag.progressArea.append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
             } else {
                 for (File file : files) {
                     if (!file.exists()) {
                         skipped++;
-                        optDiag.progressArea.append("  " + Globals.lang("Skipped - PDF does not exist")
+                        optDiag.progressArea.append("  " + Localization.lang("Skipped - PDF does not exist")
                                 + ":\n");
                         optDiag.progressArea.append("    " + file.getPath() + "\n");
 
                     } else {
                         try {
                             XMPUtil.writeXMP(file, entry, database);
-                            optDiag.progressArea.append("  " + Globals.lang("Ok") + ".\n");
+                            optDiag.progressArea.append("  " + Localization.lang("Ok") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {
-                            optDiag.progressArea.append("  " + Globals.lang("Error while writing") + " '"
+                            optDiag.progressArea.append("  " + Localization.lang("Error while writing") + " '"
                                     + file.getPath() + "':\n");
                             optDiag.progressArea.append("    " + e.getLocalizedMessage() + "\n");
                             errors++;
@@ -171,13 +172,13 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (optDiag.canceled) {
                 optDiag.progressArea.append("\n"
-                        + Globals.lang("Operation canceled.\n"));
+                        + Localization.lang("Operation canceled.\n"));
                 break;
             }
         }
         optDiag.progressArea.append("\n"
-                + Globals.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
-                        .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+                + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
+                .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
         optDiag.done();
     }
 
@@ -187,7 +188,7 @@ public class WriteXMPAction extends AbstractWorker {
             return;
         }
 
-        panel.output(Globals.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).",
+        panel.output(Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
     }
 
@@ -196,9 +197,9 @@ public class WriteXMPAction extends AbstractWorker {
 
         private static final long serialVersionUID = 7459164400811785958L;
 
-        final JButton okButton = new JButton(Globals.lang("Ok"));
+        final JButton okButton = new JButton(Localization.lang("Ok"));
         final JButton cancelButton = new JButton(
-                Globals.lang("Cancel"));
+                Localization.lang("Cancel"));
 
         boolean canceled;
 
@@ -206,7 +207,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 
         public OptionsDialog(JFrame parent) {
-            super(parent, Globals.lang("Writing XMP metadata for selected entries..."), false);
+            super(parent, Localization.lang("Writing XMP metadata for selected entries..."), false);
             okButton.setEnabled(false);
 
             okButton.addActionListener(new ActionListener() {

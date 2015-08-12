@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -63,12 +64,12 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         boolean success = openLink();
         if (!success) {
-            frame.output(Globals.lang("Unable to open link."));
+            frame.output(Localization.lang("Unable to open link."));
         }
     }
 
     public boolean openLink() {
-        frame.output(Globals.lang("External viewer called") + ".");
+        frame.output(Localization.lang("External viewer called") + ".");
         try {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
@@ -106,10 +107,10 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     && !fileType.getOpenWith().isEmpty() &&
                     e1.getMessage().contains(fileType.getOpenWith())) {
 
-                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to open link. "
-                        + "The application '%0' associated with the file type '%1' could not be called.",
-                        fileType.getOpenWith(), fileType.getName()),
-                        Globals.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, Localization.lang("Unable to open link. "
+                                        + "The application '%0' associated with the file type '%1' could not be called.",
+                                fileType.getOpenWith(), fileType.getName()),
+                        Localization.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
 

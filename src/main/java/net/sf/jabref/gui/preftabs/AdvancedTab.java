@@ -38,6 +38,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
@@ -72,12 +73,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
-        useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
-        useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port") + ':');
-        useNativeFileDialogOnMac = new JCheckBox(Globals.lang("Use native file dialog"));
-        filechooserDisableRename = new JCheckBox(Globals.lang("Disable file renaming in non-native file dialog"));
-        useIEEEAbrv = new JCheckBox(Globals.lang("Use IEEE LaTeX abbreviations"));
-        biblatexMode = new JCheckBox(Globals.lang("BibLaTeX mode"));
+        useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
+        useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
+        useNativeFileDialogOnMac = new JCheckBox(Localization.lang("Use native file dialog"));
+        filechooserDisableRename = new JCheckBox(Localization.lang("Disable file renaming in non-native file dialog"));
+        useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
+        biblatexMode = new JCheckBox(Localization.lang("BibLaTeX mode"));
         remoteServerPort = new JTextField();
         String[] possibleLookAndFeels = {
                 "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
@@ -107,9 +108,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 clName.setEnabled(((JCheckBox) e.getSource()).isSelected());
             }
         });
-        useConvertToEquation = new JCheckBox(Globals.lang("Prefer converting subscripts and superscripts to equations rather than text"));
-        useCaseKeeperOnSearch = new JCheckBox(Globals.lang("Add {} to specified title words on search to keep the correct case"));
-        useUnitFormatterOnSearch = new JCheckBox(Globals.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
+        useConvertToEquation = new JCheckBox(Localization.lang("Prefer converting subscripts and superscripts to equations rather than text"));
+        useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
+        useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
@@ -118,8 +119,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel pan = new JPanel();
 
         if (!Globals.ON_MAC) {
-            builder.appendSeparator(Globals.lang("Look and feel"));
-            JLabel lab = new JLabel(Globals.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
+            builder.appendSeparator(Localization.lang("Look and feel"));
+            JLabel lab = new JLabel(Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
             builder.nextLine();
             builder.append(pan);
             builder.append(lab);
@@ -129,24 +130,24 @@ class AdvancedTab extends JPanel implements PrefsTab {
             builder.nextLine();
             builder.append(pan);
             JPanel pan2 = new JPanel();
-            lab = new JLabel(Globals.lang("Class name") + ':');
+            lab = new JLabel(Localization.lang("Class name") + ':');
             pan2.add(lab);
             pan2.add(className);
             builder.append(pan2);
             builder.nextLine();
             builder.append(pan);
-            lab = new JLabel(Globals.lang("Note that you must specify the fully qualified class name for the look and feel,"));
+            lab = new JLabel(Localization.lang("Note that you must specify the fully qualified class name for the look and feel,"));
             builder.append(lab);
             builder.nextLine();
             builder.append(pan);
-            lab = new JLabel(Globals.lang("and the class must be available in your classpath next time you start JabRef."));
+            lab = new JLabel(Localization.lang("and the class must be available in your classpath next time you start JabRef."));
             builder.append(lab);
             builder.nextLine();
         }
-        builder.appendSeparator(Globals.lang("Remote operation"));
+        builder.appendSeparator(Localization.lang("Remote operation"));
         builder.nextLine();
         builder.append(new JPanel());
-        builder.append(new JLabel("<html>" + Globals.lang("This feature lets new files be opened or imported into an "
+        builder.append(new JLabel("<html>" + Localization.lang("This feature lets new files be opened or imported into an "
                 + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
                 + "is useful when you open a file in JabRef<br>from your web browser."
                 + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time.") + "</html>"));
@@ -161,7 +162,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         //if (Globals.ON_MAC) {
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("File dialog"));
+        builder.appendSeparator(Localization.lang("File dialog"));
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useNativeFileDialogOnMac);
@@ -171,18 +172,18 @@ class AdvancedTab extends JPanel implements PrefsTab {
         //}
         // IEEE
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Search IEEEXplore"));
+        builder.appendSeparator(Localization.lang("Search IEEEXplore"));
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useIEEEAbrv);
 
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("BibLaTeX mode"));
+        builder.appendSeparator(Localization.lang("BibLaTeX mode"));
         builder.append(new JPanel());
         builder.append(biblatexMode);
 
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Import conversions"));
+        builder.appendSeparator(Localization.lang("Import conversions"));
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useConvertToEquation);
@@ -239,19 +240,19 @@ class AdvancedTab extends JPanel implements PrefsTab {
         if (useDefault.isSelected() == oldUseDef ||
                 !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
-                    Globals.lang("You have changed the look and feel setting.")
+                    Localization.lang("You have changed the look and feel setting.")
                             .concat(" ")
-                            .concat(Globals.lang("You must restart JabRef for this to come into effect.")),
-                    Globals.lang("Changed look and feel settings"),
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    Localization.lang("Changed look and feel settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
 
         if (biblatexMode.isSelected() != oldBiblMode) {
             JOptionPane.showMessageDialog(null,
-                    Globals.lang("You have toggled the BibLaTeX mode.")
+                    Localization.lang("You have toggled the BibLaTeX mode.")
                             .concat(" ")
                             .concat("You must restart JabRef for this change to come into effect."),
-                    Globals.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
+                    Localization.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
 
         preferences.putBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION, useConvertToEquation.isSelected());
@@ -267,10 +268,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
                 if(remotePreferences.useRemoteServer()) {
                     JOptionPane.showMessageDialog(null,
-                            Globals.lang("Remote server port")
+                            Localization.lang("Remote server port")
                                     .concat(" ")
                                     .concat("You must restart JabRef for this change to come into effect."),
-                            Globals.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
+                            Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
                 }
             }
         }
@@ -303,8 +304,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
-                    (null, Globals.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                            Globals.lang("Remote server port") + '\'', Globals.lang("Remote server port"),
+                    (null, Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
+                            Localization.lang("Remote server port") + '\'', Localization.lang("Remote server port"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -313,7 +314,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Advanced");
+        return Localization.lang("Advanced");
     }
 
 }

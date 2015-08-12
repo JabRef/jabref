@@ -48,6 +48,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
@@ -66,9 +67,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final String bibtexUrlEnd = "&expformat=bibtex";
     private static final String abstractUrl = "tab_abstract.cfm?id=";
 
-    private final JRadioButton acmButton = new JRadioButton(Globals.lang("The ACM Digital Library"));
-    private final JRadioButton guideButton = new JRadioButton(Globals.lang("The Guide to Computing Literature"));
-    private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
+    private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
+    private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
+    private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private static final int perPage = 20;
     private static final int MAX_FETCH = ACMPortalFetcher.perPage; // only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
@@ -143,9 +144,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             }
 
             if (hits == 0) {
-                status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        terms),
-                        Globals.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("No entries found for the search string '%0'",
+                                terms),
+                        Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -165,11 +166,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
-            status.showMessage(Globals.lang("Connection to ACM Portal failed"),
-                    Globals.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("Connection to ACM Portal failed"),
+                    Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Globals.lang(e.getMessage()),
-                    Globals.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(e.getMessage()),
+                    Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
         return false;
@@ -405,7 +406,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-            throw new IOException(Globals.lang("Could not parse number of hits"));
+            throw new IOException(Localization.lang("Could not parse number of hits"));
         }
         String substring = page.substring(ind, Math.min(ind + 42, page.length()));
         Matcher m = pattern.matcher(substring);
@@ -422,12 +423,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 //System.out.println(number);
                 return Integer.parseInt(number);
             } catch (NumberFormatException ex) {
-                throw new IOException(Globals.lang("Could not parse number of hits"));
+                throw new IOException(Localization.lang("Could not parse number of hits"));
             } catch (IllegalStateException e) {
-                throw new IOException(Globals.lang("Could not parse number of hits"));
+                throw new IOException(Localization.lang("Could not parse number of hits"));
             }
         }
-        throw new IOException(Globals.lang("Could not parse number of hits"));
+        throw new IOException(Localization.lang("Could not parse number of hits"));
     }
 
     /**

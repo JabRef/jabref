@@ -29,6 +29,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
@@ -52,7 +53,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             q = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             // this should never happen
-            status.setStatus(Globals.lang("Error"));
+            status.setStatus(Localization.lang("Error"));
             e.printStackTrace();
             return false;
         }
@@ -82,9 +83,9 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         try {
             bibtexString = Util.getResultsWithEncoding(conn, "UTF-8");
         } catch (FileNotFoundException e) {
-            status.showMessage(Globals.lang("Unknown DiVA entry: '%0'.",
-                    query),
-                    Globals.lang("Get BibTeX entry from DiVA"), JOptionPane.INFORMATION_MESSAGE);
+            status.showMessage(Localization.lang("Unknown DiVA entry: '%0'.",
+                            query),
+                    Localization.lang("Get BibTeX entry from DiVA"), JOptionPane.INFORMATION_MESSAGE);
             return false;
         } catch (IOException e) {
             e.printStackTrace();

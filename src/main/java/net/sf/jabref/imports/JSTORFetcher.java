@@ -30,8 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class fetches up to 200 citations from JStor by a given search query. It
@@ -118,9 +118,9 @@ public class JSTORFetcher implements EntryFetcher {
             Collection<BibtexEntry> entries = getBibtexEntries(ticket, citations);
 
             if (entries.isEmpty()) {
-                status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        query),
-                        Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("No entries found for the search string '%0'",
+                                query),
+                        Localization.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -129,7 +129,7 @@ public class JSTORFetcher implements EntryFetcher {
             }
             return true;
         } catch (IOException e) {
-            status.showMessage(Globals.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
+            status.showMessage(Localization.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
         }
         return false;
     }

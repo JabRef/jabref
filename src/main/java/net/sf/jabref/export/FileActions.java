@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class FileActions {
 
@@ -119,8 +120,8 @@ public class FileActions {
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(
-                        Globals.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n'
-                                + Globals.lang("Before saving, please edit any strings containing the # character."));
+                        Localization.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n'
+                                + Localization.lang("Before saving, please edit any strings containing the # character."));
             }
 
         } else {
@@ -452,14 +453,14 @@ public class FileActions {
             try {
                 reader = new InputStreamReader(reso.openStream());
             } catch (FileNotFoundException ex) {
-                throw new IOException(Globals.lang("Could not find layout file") + ": '" + name + "'.");
+                throw new IOException(Localization.lang("Could not find layout file") + ": '" + name + "'.");
             }
         } else {
             File f = new File(name);
             try {
                 reader = new FileReader(f);
             } catch (FileNotFoundException ex) {
-                throw new IOException(Globals.lang("Could not find layout file") + ": '" + name + "'.");
+                throw new IOException(Localization.lang("Could not find layout file") + ": '" + name + "'.");
             }
         }
 

@@ -21,8 +21,8 @@ import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
 import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
@@ -38,7 +38,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     }
 
     public RemoveFromGroupAction() {
-        super(Globals.lang("Remove entry selection from this group")); // JZTODO lyrics
+        super(Localization.lang("Remove entry selection from this group")); // JZTODO lyrics
     }
 
     public void setNode(GroupTreeNode node) {

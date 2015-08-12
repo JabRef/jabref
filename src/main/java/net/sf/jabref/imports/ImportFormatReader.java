@@ -18,6 +18,7 @@ package net.sf.jabref.imports;
 import java.io.*;
 import java.util.*;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -132,7 +133,7 @@ public class ImportFormatReader {
             stream = new FileInputStream(file);
 
             if (!importer.isRecognizedFormat(stream)) {
-                throw new IOException(Globals.lang("Wrong file format"));
+                throw new IOException(Localization.lang("Wrong file format"));
             }
 
             stream = new FileInputStream(file);

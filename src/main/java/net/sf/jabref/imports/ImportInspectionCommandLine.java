@@ -20,8 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
@@ -35,7 +35,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
 
     @Override
     public void setProgress(int current, int max) {
-        status.setStatus(Globals.lang("Progress: %0 of %1", String.valueOf(current), String
+        status.setStatus(Localization.lang("Progress: %0 of %1", String.valueOf(current), String
                 .valueOf(max)));
     }
 

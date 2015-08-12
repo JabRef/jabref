@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.search.describer;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchParser;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
@@ -26,7 +26,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
     public String getDescription() {
         StringBuilder stringBuilder = new StringBuilder();
         // describe advanced search expression
-        stringBuilder.append(Globals.lang("This group contains entries in which")).append(' ');
+        stringBuilder.append(Localization.lang("This group contains entries in which")).append(' ');
         stringBuilder.append(new SearchBaseVisitor<String>() {
 
             @Override
@@ -36,7 +36,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
 
             @Override
             public String visitUnaryExpression(SearchParser.UnaryExpressionContext context) {
-                return String.format("%s %s", Globals.lang("not"), visit(context.expression()));
+                return String.format("%s %s", Localization.lang("not"), visit(context.expression()));
             }
 
             @Override
@@ -47,9 +47,9 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
             @Override
             public String visitBinaryExpression(SearchParser.BinaryExpressionContext context) {
                 if (context.operator.getText().equalsIgnoreCase("AND")) {
-                    return String.format("(%s %s %s)", visit(context.left), Globals.lang("and"), visit(context.right));
+                    return String.format("(%s %s %s)", visit(context.left), Localization.lang("and"), visit(context.right));
                 } else {
-                    return String.format("(%s %s %s)", visit(context.left), Globals.lang("or"), visit(context.right));
+                    return String.format("(%s %s %s)", visit(context.left), Localization.lang("or"), visit(context.right));
                 }
             }
 
@@ -62,31 +62,31 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
 
                 final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
                 final String termQuoted = StringUtil.quoteForHTML(value);
-                final String fieldSpecQuoted = regExpFieldSpec ? Globals.lang(
+                final String fieldSpecQuoted = regExpFieldSpec ? Localization.lang(
                         "any field that matches the regular expression <b>%0</b>",
-                        StringUtil.quoteForHTML(field)) : Globals.lang("the field <b>%0</b>",
+                        StringUtil.quoteForHTML(field)) : Localization.lang("the field <b>%0</b>",
                         StringUtil.quoteForHTML(field));
 
                 if (operator == GrammarBasedSearchRule.ComparisonOperator.CONTAINS) {
                     if (regExp) {
-                        return Globals.lang(
+                        return Localization.lang(
                                 "%0 contains the Regular Expression <b>%1</b>", fieldSpecQuoted, termQuoted);
                     }
-                    return Globals.lang("%0 contains the term <b>%1</b>", fieldSpecQuoted, termQuoted);
+                    return Localization.lang("%0 contains the term <b>%1</b>", fieldSpecQuoted, termQuoted);
                 } else if (operator == GrammarBasedSearchRule.ComparisonOperator.EXACT) {
                     if (regExp) {
-                        return Globals.lang("%0 matches the Regular Expression <b>%1</b>",
+                        return Localization.lang("%0 matches the Regular Expression <b>%1</b>",
                                 fieldSpecQuoted, termQuoted);
                     }
-                    return Globals.lang("%0 matches the term <b>%1</b>",
+                    return Localization.lang("%0 matches the term <b>%1</b>",
                             fieldSpecQuoted,
                             termQuoted);
                 } else if (operator == GrammarBasedSearchRule.ComparisonOperator.DOES_NOT_CONTAIN) {
                     if (regExp) {
-                        return Globals.lang("%0 doesn't contain the Regular Expression <b>%1</b>",
+                        return Localization.lang("%0 doesn't contain the Regular Expression <b>%1</b>",
                                 fieldSpecQuoted, termQuoted);
                     }
-                    return Globals.lang("%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,
+                    return Localization.lang("%0 doesn't contain the term <b>%1</b>", fieldSpecQuoted,
                             termQuoted);
                 } else {
                     throw new IllegalStateException("CANNOT HAPPEN!");
@@ -95,7 +95,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
 
         }.visit(parseTree));
         stringBuilder.append(". ");
-        stringBuilder.append(caseSensitive ? Globals.lang("The search is case sensitive.") : Globals.lang("The search is case insensitive."));
+        stringBuilder.append(caseSensitive ? Localization.lang("The search is case sensitive.") : Localization.lang("The search is case insensitive."));
         return stringBuilder.toString();
     }
 

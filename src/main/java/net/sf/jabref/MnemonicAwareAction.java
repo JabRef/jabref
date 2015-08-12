@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -41,7 +43,7 @@ public abstract class MnemonicAwareAction extends AbstractAction {
     @Override
     public void putValue(String key, Object value) {
         if (key.equals(Action.NAME)) {
-            String name = Globals.menuTitle(value.toString());
+            String name = Localization.menuTitle(value.toString());
             int i = name.indexOf('&');
             if (i >= 0) {
                 char mnemonic = Character.toUpperCase(name.charAt(i + 1));

@@ -34,6 +34,7 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
@@ -135,7 +136,7 @@ public class DbImportAction extends AbstractWorker {
     private void performImport() {
         if (connectToDB) {
             try {
-                frame.output(Globals.lang("Attempting SQL import..."));
+                frame.output(Localization.lang("Attempting SQL import..."));
                 DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
                 DBImporter importer = factory.getImporter(dbs.getServerType());
                 Connection conn = importer.connectToDB(dbs);
@@ -168,16 +169,16 @@ public class DbImportAction extends AbstractWorker {
                                 metaData = (MetaData) res[1];
                                 dbs.isConfigValid(true);
                             }
-                            frame.output(Globals.lang(
+                            frame.output(Localization.lang(
                                     "%0 databases will be imported",
                                     Integer.toString(databases.size())));
                         } else {
-                            frame.output(Globals.lang("Importing cancelled"));
+                            frame.output(Localization.lang("Importing cancelled"));
                         }
                     }
                 } else {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("There are no available databases to be imported"),
-                            Globals.lang("Import from SQL database"),
+                    JOptionPane.showMessageDialog(frame, Localization.lang("There are no available databases to be imported"),
+                            Localization.lang("Import from SQL database"),
                             JOptionPane.INFORMATION_MESSAGE);
                 }
 
@@ -185,11 +186,11 @@ public class DbImportAction extends AbstractWorker {
                 String preamble = "Could not import from SQL database for the following reason:";
                 String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
-                JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
+                JOptionPane.showMessageDialog(frame, Localization.lang(preamble)
                         + '\n' + errorMessage,
-                        Globals.lang("Import from SQL database"),
+                        Localization.lang("Import from SQL database"),
                         JOptionPane.ERROR_MESSAGE);
-                frame.output(Globals.lang("Error importing from database"));
+                frame.output(Localization.lang("Error importing from database"));
                 ex.printStackTrace();
             }
         }
@@ -212,7 +213,7 @@ public class DbImportAction extends AbstractWorker {
                 pan.markBaseChanged();
             }
         }
-        frame.output(Globals.lang("Imported %0 databases successfully",
+        frame.output(Localization.lang("Imported %0 databases successfully",
                 Integer.toString(databases.size())));
     }
 

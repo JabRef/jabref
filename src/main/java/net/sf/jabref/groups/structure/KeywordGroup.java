@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -165,7 +166,7 @@ public class KeywordGroup extends AbstractGroup {
         }
         if (entries != null && entries.length > 0) {
             NamedCompound ce = new NamedCompound(
-                    Globals.lang("add entries to group"));
+                    Localization.lang("add entries to group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
                 if (!getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
@@ -200,7 +201,7 @@ public class KeywordGroup extends AbstractGroup {
         }
 
         if (entries != null && entries.length > 0) {
-            NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
+            NamedCompound ce = new NamedCompound(Localization.lang("remove from group"));
             boolean modified = false;
             for (BibtexEntry entry : entries) {
                 if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
@@ -372,16 +373,16 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     public static String getDescriptionForPreview(String field, String expr, boolean caseSensitive, boolean regExp) {
-        String header = regExp ? Globals.lang(
+        String header = regExp ? Localization.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
                 field, StringUtil.quoteForHTML(expr))
-                : Globals.lang(
+                : Localization.lang(
                 "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
                 field, StringUtil.quoteForHTML(expr));
-        String caseSensitiveText = caseSensitive ? Globals.lang("case sensitive") : Globals.lang("case insensitive");
+        String caseSensitiveText = caseSensitive ? Localization.lang("case sensitive") : Localization.lang("case insensitive");
         String footer = regExp ?
-                Globals.lang("Entries cannot be manually assigned to or removed from this group.")
-                : Globals.lang(
+                Localization.lang("Entries cannot be manually assigned to or removed from this group.")
+                : Localization.lang(
                 "Additionally, entries whose <b>%0</b> field does not contain "
                         + "<b>%1</b> can be assigned manually to this group by selecting them "
                         + "then using either drag and drop or the context menu. "
@@ -406,20 +407,20 @@ public class KeywordGroup extends AbstractGroup {
             sb.append(StringUtil.quoteForHTML(getName()));
         }
         sb.append("</b> - ");
-        sb.append(Globals.lang("dynamic group"));
+        sb.append(Localization.lang("dynamic group"));
         sb.append("<b>");
         sb.append(searchField);
         sb.append("</b>");
-        sb.append(Globals.lang("contains"));
+        sb.append(Localization.lang("contains"));
         sb.append(" <b>");
         sb.append(StringUtil.quoteForHTML(searchExpression));
         sb.append("</b>)");
         switch (getHierarchicalContext()) {
             case INCLUDING:
-                sb.append(", ").append(Globals.lang("includes subgroups"));
+                sb.append(", ").append(Localization.lang("includes subgroups"));
                 break;
             case REFINING:
-                sb.append(", ").append(Globals.lang("refines supergroup"));
+                sb.append(", ").append(Localization.lang("refines supergroup"));
                 break;
             default:
                 break;

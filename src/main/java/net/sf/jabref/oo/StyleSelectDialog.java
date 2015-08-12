@@ -66,6 +66,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -94,23 +95,23 @@ class StyleSelectDialog {
     private EventTableModel<OOBibStyle> tableModel;
     private EventSelectionModel<OOBibStyle> selectionModel;
     private final JPopupMenu popup = new JPopupMenu();
-    private final JMenuItem edit = new JMenuItem(Globals.lang("Edit"));
-    private final JRadioButton useDefaultAuthoryear = new JRadioButton(Globals.lang("Default style (author-year citations)"));
-    private final JRadioButton useDefaultNumerical = new JRadioButton(Globals.lang("Default style (numerical citations)"));
-    private final JRadioButton chooseDirectly = new JRadioButton(Globals.lang("Choose style file directly") + ":");
-    private final JRadioButton setDirectory = new JRadioButton(Globals.lang("Choose from a directory") + ":");
+    private final JMenuItem edit = new JMenuItem(Localization.lang("Edit"));
+    private final JRadioButton useDefaultAuthoryear = new JRadioButton(Localization.lang("Default style (author-year citations)"));
+    private final JRadioButton useDefaultNumerical = new JRadioButton(Localization.lang("Default style (numerical citations)"));
+    private final JRadioButton chooseDirectly = new JRadioButton(Localization.lang("Choose style file directly") + ":");
+    private final JRadioButton setDirectory = new JRadioButton(Localization.lang("Choose from a directory") + ":");
     private final JTextField directFile = new JTextField();
     private final JTextField styleDir = new JTextField();
-    private final JButton browseDirectFile = new JButton(Globals.lang("Browse"));
-    private final JButton browseStyleDir = new JButton(Globals.lang("Browse"));
-    private final JButton showDefaultAuthoryearStyle = new JButton(Globals.lang("View"));
-    private final JButton showDefaultNumericalStyle = new JButton(Globals.lang("View"));
+    private final JButton browseDirectFile = new JButton(Localization.lang("Browse"));
+    private final JButton browseStyleDir = new JButton(Localization.lang("Browse"));
+    private final JButton showDefaultAuthoryearStyle = new JButton(Localization.lang("View"));
+    private final JButton showDefaultNumericalStyle = new JButton(Localization.lang("View"));
 
     private PreviewPanel preview;
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final BibtexEntry prevEntry = new BibtexEntry(IdGenerator.next());
 
     private boolean okPressed = false;
@@ -196,7 +197,7 @@ class StyleSelectDialog {
             }
         });
 
-        diag = new JDialog(frame, Globals.lang("Styles"), true);
+        diag = new JDialog(frame, Localization.lang("Styles"), true);
 
         styles = new BasicEventList<OOBibStyle>();
         EventList<OOBibStyle> sortedStyles = new SortedList<OOBibStyle>(styles);
@@ -296,7 +297,7 @@ class StyleSelectDialog {
                 "fill:pref, fill:pref, fill:270dlu:grow"));
 
         b2.nextLine();
-        b2.append(new JLabel("<html>" + Globals.lang("This is the list of available styles. Select the one you want to use.") + "</html>"));
+        b2.append(new JLabel("<html>" + Localization.lang("This is the list of available styles. Select the one you want to use.") + "</html>"));
         b2.nextLine();
         b2.append(contentPane);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -312,15 +313,15 @@ class StyleSelectDialog {
                     if (chooseDirectly.isSelected()) {
                         File f = new File(directFile.getText());
                         if (!f.exists()) {
-                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use a default style."),
-                                    Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(diag, Localization.lang("You must select either a valid style file, or use a default style."),
+                                    Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                     }
                     else {
                         if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                            JOptionPane.showMessageDialog(diag, Globals.lang("You must select either a valid style file, or use a default style."),
-                                    Globals.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(diag, Localization.lang("You must select either a valid style file, or use a default style."),
+                                    Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                     }
@@ -516,11 +517,11 @@ class StyleSelectDialog {
         public String getColumnName(int i) {
             switch (i) {
             case 0:
-                return Globals.lang("Name");
+                return Localization.lang("Name");
             case 1:
-                return Globals.lang("Journals");
+                return Localization.lang("Journals");
             case 2:
-                return Globals.lang("File");
+                return Localization.lang("File");
             default:
                 return "";
             }
@@ -575,10 +576,10 @@ class StyleSelectDialog {
             }
 
             // Make a dialog box to display the contents:
-            final JDialog dd = new JDialog(diag, Globals.lang("Default style"), true);
-            JLabel header = new JLabel("<html>" + Globals.lang("The panel below shows the definition of the default style.")
+            final JDialog dd = new JDialog(diag, Localization.lang("Default style"), true);
+            JLabel header = new JLabel("<html>" + Localization.lang("The panel below shows the definition of the default style.")
                     //+"<br>"
-                    + Globals.lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
+                    + Localization.lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
                     + "</html>");
 
             header.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -588,7 +589,7 @@ class StyleSelectDialog {
             JScrollPane sp = new JScrollPane(ta);
             sp.setPreferredSize(new Dimension(700, 500));
             dd.getContentPane().add(sp, BorderLayout.CENTER);
-            JButton ok = new JButton(Globals.lang("Ok"));
+            JButton ok = new JButton(Localization.lang("Ok"));
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(ok);

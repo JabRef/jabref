@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.journals;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,7 +95,7 @@ public class JournalAbbreviationRepository {
         if (isKnownName(abbreviation.getName())) {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
-            LOGGER.info(Globals.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
+            LOGGER.info(Localization.lang("Duplicate Journal Abbreviation - old one will be overwritten by new one\nOLD: %0\nNEW: %1", previous.toString(), abbreviation.toString()));
         }
 
         abbreviations.add(abbreviation);

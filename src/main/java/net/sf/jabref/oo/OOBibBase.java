@@ -34,6 +34,7 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.oo.sorting.AuthorYearTitleComparator;
 import net.sf.jabref.oo.sorting.YearAuthorTitleComparator;
 
@@ -515,7 +516,7 @@ class OOBibBase {
                         if (num != null) {
                             citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         } else {
-                            throw new BibtexEntryNotFoundException(names[i], Globals.lang("Could not resolve BibTeX entry for citation marker '%0'.", names[i]));
+                            throw new BibtexEntryNotFoundException(names[i], Localization.lang("Could not resolve BibTeX entry for citation marker '%0'.", names[i]));
                         }
 
                         for (int j = 0; j < keys.length; j++) {

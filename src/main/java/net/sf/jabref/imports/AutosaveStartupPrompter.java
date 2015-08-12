@@ -29,6 +29,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.export.AutoSaveManager;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Runnable task that prompts the user for what to do about files loaded at startup,
@@ -56,10 +57,10 @@ public class AutosaveStartupPrompter implements Runnable {
             boolean tryingAutosave;
             if (Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
                 int answer = JOptionPane.showConfirmDialog(null, "<html>" +
-                        Globals.lang("An autosave file was found for this database. This could indicate ")
-                        + Globals.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
-                        + Globals.lang("Do you want to recover the database from the autosave file?") + "</html>",
-                        Globals.lang("Autosave of file '%0'", file.getName()), JOptionPane.YES_NO_OPTION);
+                        Localization.lang("An autosave file was found for this database. This could indicate ")
+                        + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
+                        + Localization.lang("Do you want to recover the database from the autosave file?") + "</html>",
+                        Localization.lang("Autosave of file '%0'", file.getName()), JOptionPane.YES_NO_OPTION);
                 tryingAutosave = answer == JOptionPane.YES_OPTION;
             } else {
                 tryingAutosave = true;
@@ -86,21 +87,21 @@ public class AutosaveStartupPrompter implements Runnable {
                 } else {
                     if (tryingAutosave) {
                         JOptionPane.showMessageDialog(frame,
-                                Globals.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName()),
-                                Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+                                Localization.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName()),
+                                Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                         tryingAutosave = false;
                         fileToLoad = file;
                     } else {
                         String message;
                         if (pr != null) {
                             message = "<html>" + pr.getErrorMessage() + "<p>" +
-                                    Globals.lang("Error opening file '%0'.", file.getName()) + "</html>";
+                                    Localization.lang("Error opening file '%0'.", file.getName()) + "</html>";
                         }
                         else {
-                            message = Globals.lang("Error opening file '%0'.", file.getName());
+                            message = Localization.lang("Error opening file '%0'.", file.getName());
                         }
                         JOptionPane.showMessageDialog(frame,
-                                message, Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+                                message, Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                         done = true;
                     }
 
@@ -119,7 +120,7 @@ public class AutosaveStartupPrompter implements Runnable {
                     }
                     frame.showBaseAt(location.get(pr));
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Globals.lang("Warnings"),
+                            Localization.lang("Warnings"),
                             JOptionPane.WARNING_MESSAGE);
                 }
             }

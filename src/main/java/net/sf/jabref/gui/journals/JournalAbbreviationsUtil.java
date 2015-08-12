@@ -6,6 +6,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -16,9 +17,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class JournalAbbreviationsUtil {
-    private static final String TOOLTIP_TEXT = "<HTML>" + Globals.lang("Switches between full and abbreviated journal name "
+    private static final String TOOLTIP_TEXT = "<HTML>" + Localization.lang("Switches between full and abbreviated journal name "
             + "if the journal name is known.")
-            + "<BR>" + Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>") + ".</HTML>";
+            + "<BR>" + Localization.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>") + ".</HTML>";
 
     /**
      * Create a control panel for the entry editor's journal field, to toggle
@@ -28,7 +29,7 @@ public class JournalAbbreviationsUtil {
      */
     public static JComponent getNameSwitcher(final EntryEditor entryEditor, final FieldEditor editor,
             final UndoManager undoManager) {
-        JButton button = new JButton(Globals.lang("Toggle abbreviation"));
+        JButton button = new JButton(Localization.lang("Toggle abbreviation"));
         button.setToolTipText(TOOLTIP_TEXT);
         button.addActionListener(new ActionListener() {
 
@@ -64,8 +65,8 @@ public class JournalAbbreviationsUtil {
             row++;
         }
 
-        return new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
-                Globals.lang("Abbreviation")}) {
+        return new DefaultTableModel(cells, new Object[] {Localization.lang("Full name"),
+                Localization.lang("Abbreviation")}) {
 
             @Override
             public boolean isCellEditable(int row, int column) {

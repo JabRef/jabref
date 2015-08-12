@@ -75,6 +75,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.imports.ImportInspector;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -151,8 +152,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final JProgressBar progressBar = new JProgressBar(SwingConstants.HORIZONTAL);
 
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton generate = new JButton(Globals.lang("Generate now"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton generate = new JButton(Localization.lang("Generate now"));
 
     private final EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
 
@@ -171,9 +172,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final JPopupMenu popup = new JPopupMenu();
 
-    private final JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
+    private final JButton deselectAllDuplicates = new JButton(Localization.lang("Deselect all duplicates"));
 
-    private final JButton stop = new JButton(Globals.lang("Stop"));
+    private final JButton stop = new JButton(Localization.lang("Stop"));
 
     private final PreviewPanel preview;
 
@@ -188,7 +189,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
 
-    private final JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs
+    private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"), Globals.prefs
             .getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
 
     private final JLabel duplLabel = new JLabel(GUIGlobals.getImage("duplicate"));
@@ -236,7 +237,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.newDatabase = newDatabase;
         preview = new PreviewPanel(null, metaData, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
 
-        duplLabel.setToolTipText(Globals.lang("Possible duplicate of existing entry. Click to resolve."));
+        duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
         sortedList = new SortedList<BibtexEntry>(entries);
         EventTableModel<BibtexEntry> tableModelGl = new EventTableModel<BibtexEntry>(sortedList,
@@ -274,7 +275,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         popup.addSeparator();
         if (!newDatabase) {
             GroupTreeNode node = metaData.getGroups();
-            JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
+            JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are
             // groups that can be added to.
             insertNodes(groupsAdd, node);
@@ -295,22 +296,22 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         bb.addButton(ok);
         bb.addButton(stop);
         JButton cancel = new JButton(
-                Globals.lang("Cancel"));
+                Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addRelatedGap();
-        JButton help = new JButton(Globals.lang("Help"));
+        JButton help = new JButton(Localization.lang("Help"));
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
-        JButton selectAll = new JButton(Globals.lang("Select all"));
+        JButton selectAll = new JButton(Localization.lang("Select all"));
         builder.addButton(selectAll);
-        JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+        JButton deselectAll = new JButton(Localization.lang("Deselect all"));
         builder.addButton(deselectAll);
         builder.addButton(deselectAllDuplicates);
         builder.addRelatedGap();
-        JButton delete = new JButton(Globals.lang("Delete"));
+        JButton delete = new JButton(Localization.lang("Delete"));
         builder.addButton(delete);
         builder.addRelatedGap();
         builder.addFixed(autoGenerate);
@@ -690,10 +691,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
-                                Globals.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
-                                Globals.lang("Disable this confirmation dialog"), false);
+                                Localization.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
+                                Localization.lang("Disable this confirmation dialog"), false);
                         int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
-                                cbm, Globals.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
+                                cbm, Localization.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
                         if (cbm.isSelected()) {
                             Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, false);
                         }
@@ -768,8 +769,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             int answer = JOptionPane
                                     .showConfirmDialog(
                                             ImportInspectionDialog.this,
-                                            Globals.lang("Cannot add entries to group without generating keys. Generate keys now?"),
-                                            Globals.lang("Add to group"), JOptionPane.YES_NO_OPTION);
+                                            Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                            Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
                             if (answer == JOptionPane.YES_OPTION) {
                                 generateKeys(false);
                             } else {
@@ -820,10 +821,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     panel.markBaseChanged();
 
                     if (!selected.isEmpty()) {
-                        frame.output(Globals.lang("Number of entries successfully imported") +
+                        frame.output(Localization.lang("Number of entries successfully imported") +
                                 ": " + selected.size());
                     } else {
-                        frame.output(Globals.lang("No entries imported."));
+                        frame.output(Localization.lang("No entries imported."));
                     }
                 }
             });
@@ -881,7 +882,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void actionPerformed(ActionEvent event) {
             signalStopFetching();
             dispose();
-            frame.output(Globals.lang("Import canceled by user"));
+            frame.output(Localization.lang("Import canceled by user"));
         }
     }
 
@@ -899,7 +900,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class DeleteListener extends AbstractAction implements ActionListener {
 
         public DeleteListener() {
-            super(Globals.lang("Delete"), GUIGlobals.getImage("delete"));
+            super(Localization.lang("Delete"), GUIGlobals.getImage("delete"));
         }
 
         @Override
@@ -1197,7 +1198,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class AttachUrl extends JMenuItem implements ActionListener {
 
         public AttachUrl() {
-            super(Globals.lang("Attach URL"));
+            super(Localization.lang("Attach URL"));
             addActionListener(this);
         }
 
@@ -1208,7 +1209,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             BibtexEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ImportInspectionDialog.this,
-                    Globals.lang("Enter URL"), entry.getField("url"));
+                    Localization.lang("Enter URL"), entry.getField("url"));
             entries.getReadWriteLock().writeLock().lock();
             if (result != null) {
                 if (result.isEmpty()) {
@@ -1229,7 +1230,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
 
         public DownloadFile() {
-            super(Globals.lang("Download file"));
+            super(Localization.lang("Download file"));
             addActionListener(this);
         }
 
@@ -1242,8 +1243,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             String bibtexKey = entry.getCiteKey();
             if (bibtexKey == null) {
                 int answer = JOptionPane.showConfirmDialog(frame,
-                        Globals.lang("This entry has no BibTeX key. Generate key now?"),
-                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                        Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();
@@ -1277,7 +1278,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class AutoSetLinks extends JMenuItem implements ActionListener {
 
         public AutoSetLinks() {
-            super(Globals.lang("Autoset external links"));
+            super(Localization.lang("Autoset external links"));
             addActionListener(this);
         }
 
@@ -1290,8 +1291,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             String bibtexKey = entry.getCiteKey();
             if (bibtexKey == null) {
                 int answer = JOptionPane.showConfirmDialog(frame,
-                        Globals.lang("This entry has no BibTeX key. Generate key now?"),
-                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                        Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();
@@ -1332,7 +1333,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
 
         public LinkLocalFile() {
-            super(Globals.lang("Link local file"));
+            super(Localization.lang("Link local file"));
             addActionListener(this);
         }
 
@@ -1382,7 +1383,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
 
         public AttachFile(String fileType) {
-            super(Globals.lang("Attach %0 file", new String[] {fileType.toUpperCase()}));
+            super(Localization.lang("Attach %0 file", new String[]{fileType.toUpperCase()}));
             this.fileType = fileType;
             addActionListener(this);
         }
@@ -1519,7 +1520,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         @Override
         public String getColumnName(int i) {
             if (i == 0) {
-                return Globals.lang("Keep");
+                return Localization.lang("Keep");
             }
             if (i >= PAD) {
                 return StringUtil.capitalizeFirst(fields[i - PAD]);

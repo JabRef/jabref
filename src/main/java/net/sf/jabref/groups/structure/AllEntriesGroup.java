@@ -19,7 +19,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 
 /**
@@ -30,7 +30,7 @@ public class AllEntriesGroup extends AbstractGroup {
     public static final String ID = "AllEntriesGroup:";
 
     public AllEntriesGroup() {
-        super(Globals.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
+        super(Localization.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
     }
 
     public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
@@ -121,12 +121,12 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return Globals.lang("This group contains all entries. It cannot be edited or removed.");
+        return Localization.lang("This group contains all entries. It cannot be edited or removed.");
     }
 
     @Override
     public String getShortDescription() {
-        return Globals.lang("<b>All Entries</b> (this group cannot be edited or removed)");
+        return Localization.lang("<b>All Entries</b> (this group cannot be edited or removed)");
     }
 
     @Override

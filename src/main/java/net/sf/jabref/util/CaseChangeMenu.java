@@ -34,7 +34,7 @@ package net.sf.jabref.util;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.CaseChangers;
 
 import javax.swing.JMenu;
@@ -50,12 +50,12 @@ public class CaseChangeMenu extends JMenu {
 
     public CaseChangeMenu(JTextComponent opener) {
         /* case */
-        super(Globals.lang("Change case"));
+        super(Localization.lang("Change case"));
         parent = opener;
 
         // create menu items, one for each case changer
         for (final CaseChangers.CaseChanger caseChanger : CaseChangers.ALL) {
-            JMenuItem menuItem = new JMenuItem(Globals.lang(caseChanger.getName()));
+            JMenuItem menuItem = new JMenuItem(Localization.lang(caseChanger.getName()));
             menuItem.addActionListener(new ActionListener() {
 
                 @Override

@@ -17,6 +17,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
@@ -83,7 +84,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             return true;
         } catch (IOException e) {
             e.printStackTrace();
-            status.showMessage(Globals.lang("Error fetching from Google Scholar"));
+            status.showMessage(Localization.lang("Error fetching from Google Scholar"));
             return false;
         }
     }

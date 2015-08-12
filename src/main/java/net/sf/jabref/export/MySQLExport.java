@@ -18,8 +18,8 @@ package net.sf.jabref.export;
 import java.util.Set;
 
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
 
 /**
@@ -28,7 +28,7 @@ import net.sf.jabref.sql.DBExporterAndImporterFactory;
 public class MySQLExport extends ExportFormat {
 
     public MySQLExport() {
-        super(Globals.lang("MySQL database"), "mysql", null, null, ".sql");
+        super(Localization.lang("MySQL database"), "mysql", null, null, ".sql");
     }
 
     /**

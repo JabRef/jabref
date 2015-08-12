@@ -78,17 +78,17 @@ def handleFileSet(mainFile, files, changeFiles):
             print ""
         
 def handleJavaCode(filename, lines, keyList, notTermList):
-    #Extract first string parameter from Globals.lang call. E.g., Globals.lang("Default")
+    #Extract first string parameter from Localization.lang call. E.g., Localization.lang("Default")
     reOnlyString = r'"((\\"|[^"])*)"[^"]*'
-    patt = re.compile(r'Globals\s*\.\s*lang\s*\(\s*' + reOnlyString)
+    patt = re.compile(r'Localization\s*\.\s*lang\s*\(\s*' + reOnlyString)
     #second pattern as Mr Dlib contribution indirectly uses Global.lang
     patta = re.compile(r'LocalizationSupport.message\(' + reOnlyString)
     pattOnlyString = re.compile(reOnlyString)
 
-    #Find multiline Globals lang statements. E.g.:
-    #Globals.lang("This is my string" +
+    #Find multiline Localization lang statements. E.g.:
+    #Localization.lang("This is my string" +
     # "with a long text")
-    patt2 = re.compile(r'Globals\s*\.\s*lang\s*\(([^)])*$')
+    patt2 = re.compile(r'Localization\s*\.\s*lang\s*\(([^)])*$')
 
     pattPlus = re.compile(r'^\s*\+')
 
@@ -176,10 +176,10 @@ def handleJavaCode(filename, lines, keyList, notTermList):
                 #else:
                 #   print "Not adding: "+found
                     
-            #Prepare a possible second run (multiple Globals.lang on this line)
+            #Prepare a possible second run (multiple Localization.lang on this line)
             if result:
                 lastPos = result.span()[1]
-                #regular expression is greedy. It will match until Globals.lang("
+                #regular expression is greedy. It will match until Localization.lang("
                 #therefore, we have to adjust lastPos
                 lastPos = lastPos - 14
                 if len(curline) <= lastPos:

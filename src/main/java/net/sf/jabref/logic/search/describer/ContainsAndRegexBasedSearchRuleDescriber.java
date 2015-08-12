@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.search.describer;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 import net.sf.jabref.logic.util.StringUtil;
 
@@ -26,10 +26,10 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
 
         System.out.println("words = " + words);
 
-        String searchDescription = regExp ? Globals.lang(
+        String searchDescription = regExp ? Localization.lang(
                 "This group contains entries in which any field contains the regular expression <b>%0</b>",
                 StringUtil.quoteForHTML(firstWord))
-                : Globals.lang("This group contains entries in which any field contains the term <b>%0</b>",
+                : Localization.lang("This group contains entries in which any field contains the term <b>%0</b>",
                 StringUtil.quoteForHTML(firstWord));
 
         if(words.size() > 1) {
@@ -38,14 +38,14 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
             for(String word : unprocessedWords) {
                 unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", StringUtil.quoteForHTML(word)));
             }
-            String andSeparator = String.format(" %s ", Globals.lang("and"));
+            String andSeparator = String.format(" %s ", Localization.lang("and"));
             String[] unprocessedWordsInHtmlFormatArray = unprocessedWordsInHtmlFormat.toArray(new String[unprocessedWordsInHtmlFormat.size()]);
             searchDescription += StringUtil.join(unprocessedWordsInHtmlFormatArray, andSeparator);
         }
 
-        String caseSensitiveDescription = caseSensitive ? Globals.lang("case sensitive") : Globals.lang("case insensitive");
-        String genericDescription = Globals.lang(
-                "Entries cannot be manually assigned to or removed from this group.") + "<p><br>" + Globals.lang(
+        String caseSensitiveDescription = caseSensitive ? Localization.lang("case sensitive") : Localization.lang("case insensitive");
+        String genericDescription = Localization.lang(
+                "Entries cannot be manually assigned to or removed from this group.") + "<p><br>" + Localization.lang(
                 "Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>");
         return String.format("%s (%s). %s", searchDescription, caseSensitiveDescription, genericDescription);
     }

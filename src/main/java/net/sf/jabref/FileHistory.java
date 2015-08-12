@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -33,7 +35,7 @@ public class FileHistory extends JMenu implements ActionListener {
 
 
     public FileHistory(JabRefPreferences prefs, JabRefFrame frame) {
-        String name = Globals.menuTitle("Recent files");
+        String name = Localization.menuTitle("Recent files");
         int i = name.indexOf('&');
         if (i >= 0) {
             setText(name.substring(0, i) + name.substring(i + 1));
@@ -132,7 +134,7 @@ public class FileHistory extends JMenu implements ActionListener {
         final File fileToOpen = new File(name);
 
         if (!fileToOpen.exists()) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("File not found") + ": " + fileToOpen.getName(),
+            JOptionPane.showMessageDialog(frame, Localization.lang("File not found") + ": " + fileToOpen.getName(),
                     "Error", JOptionPane.ERROR_MESSAGE);
             removeItem(name);
             return;

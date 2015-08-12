@@ -34,7 +34,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.wizard.integrity;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class IntegrityMessage implements Cloneable
 {
@@ -94,7 +94,7 @@ public class IntegrityMessage implements Cloneable
 
     private String getMessage()
     {
-        String back = Globals.getIntegrityMessage("ITEXT_" + type);
+        String back = Localization.getIntegrityMessage("ITEXT_" + type);
         if (back != null && fieldName != null)
         {
             back = back.replaceAll("\\$FIELD", fieldName);

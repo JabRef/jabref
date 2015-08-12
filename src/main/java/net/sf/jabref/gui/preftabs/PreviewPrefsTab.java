@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 
@@ -39,7 +40,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     JButton help;
 
-    private final JCheckBox pdfPreview = new JCheckBox(Globals.lang("Enable PDF preview"));
+    private final JCheckBox pdfPreview = new JCheckBox(Localization.lang("Enable PDF preview"));
 
     private static BibtexEntry entry;
 
@@ -55,7 +56,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         setLayout(layout);
         JLabel lab;
-        lab = new JLabel(Globals.lang("Preview") + " 1");
+        lab = new JLabel(Localization.lang("Preview") + " 1");
         GridBagConstraints layoutConstraints = new GridBagConstraints();
         layoutConstraints.anchor = GridBagConstraints.WEST;
         layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -73,10 +74,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weightx = 0;
         layoutConstraints.fill = GridBagConstraints.NONE;
         layoutConstraints.anchor = GridBagConstraints.WEST;
-        JButton testButton = new JButton(Globals.lang("Test"));
+        JButton testButton = new JButton(Localization.lang("Test"));
         layout.setConstraints(testButton, layoutConstraints);
         firstPanel.add(testButton);
-        JButton defaultButton = new JButton(Globals.lang("Default"));
+        JButton defaultButton = new JButton(Localization.lang("Default"));
         layout.setConstraints(defaultButton, layoutConstraints);
         firstPanel.add(defaultButton);
         layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -84,7 +85,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weightx = 1;
         layout.setConstraints(pan, layoutConstraints);
         firstPanel.add(pan);
-        lab = new JLabel(Globals.lang("Preview") + " 2");
+        lab = new JLabel(Localization.lang("Preview") + " 2");
         layout.setConstraints(lab, layoutConstraints);
         // p2.add(lab);
         layoutConstraints.weighty = 1;
@@ -96,10 +97,10 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weightx = 0;
         layoutConstraints.fill = GridBagConstraints.NONE;
         layoutConstraints.gridwidth = 1;
-        JButton testButton2 = new JButton(Globals.lang("Test"));
+        JButton testButton2 = new JButton(Localization.lang("Test"));
         layout.setConstraints(testButton2, layoutConstraints);
         secondPanel.add(testButton2);
-        JButton defaultButton2 = new JButton(Globals.lang("Default"));
+        JButton defaultButton2 = new JButton(Localization.lang("Default"));
         layout.setConstraints(defaultButton2, layoutConstraints);
         secondPanel.add(defaultButton2);
         layoutConstraints.gridwidth = 1;
@@ -112,13 +113,13 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weighty = 0;
         layoutConstraints.fill = GridBagConstraints.BOTH;
         layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        lab = new JLabel(Globals.lang("Preview") + " 1");
+        lab = new JLabel(Localization.lang("Preview") + " 1");
         layout.setConstraints(lab, layoutConstraints);
         add(lab);
         layoutConstraints.weighty = 1;
         layout.setConstraints(firstPanel, layoutConstraints);
         add(firstPanel);
-        lab = new JLabel(Globals.lang("Preview") + " 2");
+        lab = new JLabel(Localization.lang("Preview") + " 2");
         layoutConstraints.weighty = 0;
         JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
         layout.setConstraints(sep, layoutConstraints);
@@ -135,7 +136,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         { // Help Button
             HelpAction helpAction = new HelpAction(Globals.helpDiag, GUIGlobals.previewHelp,
-                    Globals.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
+                    Localization.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
             JButton help = helpAction.getIconButton();
             pdfPreviewPanel.add(help, BorderLayout.EAST);
         }
@@ -173,11 +174,11 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                 try {
                     PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(), layout1.getText());
                     testPanel.setPreferredSize(new Dimension(800, 350));
-                    JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"),
+                    JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"),
                             JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, Globals.lang("Parsing error") + ": " + Globals.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n' + Globals.lang("Look at stderr for details") + '.', Globals.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage() + '\n' + Localization.lang("Look at stderr for details") + '.', Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -191,7 +192,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
                     PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(), layout2.getText());
                     testPanel.setPreferredSize(new Dimension(800, 350));
                     JOptionPane.showMessageDialog(null, new JScrollPane(testPanel),
-                            Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+                            Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
                 } catch (StringIndexOutOfBoundsException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Parsing error: illegal backslash expression.\n" + ex.getMessage() + "\nLook at stderr for details.", "Parsing error", JOptionPane.ERROR_MESSAGE);
@@ -271,7 +272,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Entry preview");
+        return Localization.lang("Entry preview");
     }
 
 }

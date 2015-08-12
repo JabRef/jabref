@@ -25,6 +25,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.container.XNameAccess;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,12 +44,12 @@ class CitationManager {
     private final EventList<CitEntry> list;
     private JTable table;
     private EventTableModel<CitEntry> tableModel;
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase) throws Exception {
-        diag = new JDialog(frame, Globals.lang("Manage citations"), true);
+        diag = new JDialog(frame, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
         list = new BasicEventList<CitEntry>();
@@ -83,7 +84,7 @@ class CitationManager {
                     storeSettings();
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Problem modifying citation"));
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
                 }
                 diag.dispose();
             }
@@ -178,10 +179,10 @@ class CitationManager {
         public String getColumnName(int i) {
             switch (i) {
             case 0:
-                return Globals.lang("Citation");
+                return Localization.lang("Citation");
                 //case 1: return Globals.lang("Context");
             default:
-                return Globals.lang("Extra information");
+                return Localization.lang("Extra information");
             }
         }
 
@@ -218,8 +219,8 @@ class CitationManager {
         final JDialog diag;
         final JTextField pageInfo = new JTextField(20);
         final JLabel title;
-        final JButton ok = new JButton(Globals.lang("Ok"));
-        final JButton cancel = new JButton(Globals.lang("Cancel"));
+        final JButton ok = new JButton(Localization.lang("Ok"));
+        final JButton cancel = new JButton(Localization.lang("Cancel"));
         final CitEntry _entry;
 
 
@@ -228,13 +229,13 @@ class CitationManager {
             title = new JLabel(entry.context);
             pageInfo.setText(entry.pageInfo);
 
-            diag = new JDialog(CitationManager.this.diag, Globals.lang("Citation"), true);
+            diag = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
 
             DefaultFormBuilder b = new DefaultFormBuilder(
                     new FormLayout("left:pref, 4dlu, left:150dlu", ""));
             b.append(title, 3);
             b.nextLine();
-            b.append(Globals.lang("Extra information (e.g. page number)"));
+            b.append(Localization.lang("Extra information (e.g. page number)"));
             b.append(pageInfo);
             b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);

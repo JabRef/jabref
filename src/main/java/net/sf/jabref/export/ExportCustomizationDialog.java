@@ -30,6 +30,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -50,9 +51,9 @@ public class ExportCustomizationDialog extends JDialog {
 
     public ExportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
 
-        super(frame_, Globals.lang("Manage custom exports"), false);
+        super(frame_, Localization.lang("Manage custom exports"), false);
         frame = frame_;
-        JButton addExport = new JButton(Globals.lang("Add new"));
+        JButton addExport = new JButton(Localization.lang("Add new"));
         addExport.addActionListener(new ActionListener() {
 
             @Override
@@ -67,7 +68,7 @@ public class ExportCustomizationDialog extends JDialog {
             }
         });
 
-        JButton modify = new JButton(Globals.lang("Modify"));
+        JButton modify = new JButton(Localization.lang("Modify"));
         modify.addActionListener(new ActionListener() {
 
             @Override
@@ -90,7 +91,7 @@ public class ExportCustomizationDialog extends JDialog {
             }
         });
 
-        JButton remove = new JButton(Globals.lang("Remove"));
+        JButton remove = new JButton(Localization.lang("Remove"));
         remove.addActionListener(new ActionListener() {
 
             @Override
@@ -118,10 +119,10 @@ public class ExportCustomizationDialog extends JDialog {
             }
         };
 
-        JButton close = new JButton(Globals.lang("Close"));
+        JButton close = new JButton(Localization.lang("Close"));
         close.addActionListener(closeAction);
 
-        JButton help = new JButton(Globals.lang("Help"));
+        JButton help = new JButton(Localization.lang("Help"));
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
                 "Help"));
 
@@ -188,11 +189,11 @@ public class ExportCustomizationDialog extends JDialog {
         public String getColumnName(int col) {
             switch (col) {
             case 0:
-                return Globals.lang("Export name");
+                return Localization.lang("Export name");
             case 1:
-                return Globals.lang("Main layout file");
+                return Localization.lang("Main layout file");
             default:
-                return Globals.lang("File extension");
+                return Localization.lang("File extension");
             }
         }
 

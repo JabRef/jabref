@@ -36,10 +36,10 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -568,7 +568,7 @@ public abstract class DBExporter extends DBImporterExporter {
         Vector<Vector<String>> matrix = new Vector<Vector<String>>();
         dbNames.clear();
         v = new Vector<String>();
-        v.add(Globals.lang("< CREATE NEW DATABASE >"));
+        v.add(Localization.lang("< CREATE NEW DATABASE >"));
         matrix.add(v);
         while (rs.next()) {
             v = new Vector<String>();

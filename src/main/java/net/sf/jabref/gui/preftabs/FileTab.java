@@ -43,6 +43,7 @@ import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Preferences tab for file options. These options were moved out from GeneralTab to
@@ -83,19 +84,19 @@ class FileTab extends JPanel implements PrefsTab {
 
         HelpAction autosaveHelp = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp, "Help",
                 GUIGlobals.getIconUrl("helpSmall"));
-        openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
-        backup = new JCheckBox(Globals.lang("Backup old file when saving"));
-        autoSave = new JCheckBox(Globals.lang(JabRefPreferences.AUTO_SAVE));
-        promptBeforeUsingAutoSave = new JCheckBox(Globals.lang("Prompt before recovering a database from an autosave file"));
+        openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
+        backup = new JCheckBox(Localization.lang("Backup old file when saving"));
+        autoSave = new JCheckBox(Localization.lang(JabRefPreferences.AUTO_SAVE));
+        promptBeforeUsingAutoSave = new JCheckBox(Localization.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
         valueDelimiter = new JComboBox(new String[] {
-                Globals.lang("Quotes") + ": \", \"",
-                Globals.lang("Curly Brackets") + ": {, }"});
-        includeEmptyFields = new JCheckBox(Globals.lang("Include empty fields"));
-        sameColumn = new JCheckBox(Globals.lang("Start field contents in same column"));
-        camelCase = new JCheckBox(Globals.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
-        resolveStringsAll = new JRadioButton(Globals.lang("Resolve strings for all fields except") + ":");
-        resolveStringsStandard = new JRadioButton(Globals.lang("Resolve strings for standard BibTeX fields only"));
+                Localization.lang("Quotes") + ": \", \"",
+                Localization.lang("Curly Brackets") + ": {, }"});
+        includeEmptyFields = new JCheckBox(Localization.lang("Include empty fields"));
+        sameColumn = new JCheckBox(Localization.lang("Start field contents in same column"));
+        camelCase = new JCheckBox(Localization.lang("Use camel case for field names (e.g., \"HowPublished\" instead of \"howpublished\")"));
+        resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
+        resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(resolveStringsAll);
         bg.add(resolveStringsStandard);
@@ -108,7 +109,7 @@ class FileTab extends JPanel implements PrefsTab {
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
-        autoDoubleBraces = new JCheckBox(Globals.lang("Remove double braces around BibTeX fields when loading."));
+        autoDoubleBraces = new JCheckBox(Localization.lang("Remove double braces around BibTeX fields when loading."));
 
         autoSave.addChangeListener(new ChangeListener() {
 
@@ -122,7 +123,7 @@ class FileTab extends JPanel implements PrefsTab {
         FormLayout layout = new FormLayout("left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.appendSeparator(Globals.lang("General"));
+        builder.appendSeparator(Localization.lang("General"));
         builder.nextLine();
         builder.append(openLast, 3);
         builder.nextLine();
@@ -131,11 +132,11 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(autoDoubleBraces, 3);
         builder.nextLine();
 
-        JLabel label = new JLabel(Globals.lang("Store the following fields with braces around capital letters") + ":");
+        JLabel label = new JLabel(Localization.lang("Store the following fields with braces around capital letters") + ":");
         builder.append(label);
         builder.append(bracesAroundCapitalsFields);
         builder.nextLine();
-        label = new JLabel(Globals.lang("Do not wrap the following fields when saving") + ":");
+        label = new JLabel(Localization.lang("Do not wrap the following fields when saving") + ":");
         builder.append(label);
         builder.append(nonWrappableFields);
         builder.nextLine();
@@ -145,12 +146,12 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(doNotResolveStringsFor);
         builder.nextLine();
 
-        JLabel lab = new JLabel(Globals.lang("Newline separator") + ":");
+        JLabel lab = new JLabel(Localization.lang("Newline separator") + ":");
         builder.append(lab);
         builder.append(newlineSeparator);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Autosave"));
+        builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
         JButton help = new JButton(autosaveHelp);
         help.setText(null);
@@ -160,12 +161,12 @@ class FileTab extends JPanel implements PrefsTab {
         hPan.add(help, BorderLayout.EAST);
         builder.append(hPan);
         builder.nextLine();
-        builder.append(Globals.lang("Autosave interval (minutes)") + ":");
+        builder.append(Localization.lang("Autosave interval (minutes)") + ":");
         builder.append(autoSaveInterval);
         builder.nextLine();
         builder.append(promptBeforeUsingAutoSave);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Field saving options"));
+        builder.appendSeparator(Localization.lang("Field saving options"));
         builder.nextLine();
         builder.append(camelCase);
         builder.nextLine();
@@ -176,14 +177,14 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(new JPanel());
         builder.nextLine();
 
-        wrapFieldLine = new JCheckBox(Globals.lang("Wrap fields as ver 2.9.2"));
+        wrapFieldLine = new JCheckBox(Localization.lang("Wrap fields as ver 2.9.2"));
         builder.append(wrapFieldLine);
         builder.nextLine();
         //for LWang_AdjustableFieldOrder
         String[] _rbs0 = {"Save fields sorted in alphabetic order (as in versions 2.10+)", "Save fields in unsorted order (as until version 2.9.2)", "Save fields in user-defined order"};
         ArrayList<String> _rbs = new ArrayList<String>();
         for (String _rb : _rbs0) {
-            _rbs.add(Globals.lang(_rb));
+            _rbs.add(Localization.lang(_rb));
         }
         bgFieldOrderStyle = createRadioBg(_rbs);
         userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
@@ -356,7 +357,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("File");
+        return Localization.lang("File");
     }
 
 }

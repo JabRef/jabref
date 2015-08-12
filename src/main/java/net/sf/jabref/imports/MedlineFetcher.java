@@ -29,8 +29,8 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Fetch or search from Pubmed http://www.ncbi.nlm.nih.gov/sites/entrez/
@@ -173,12 +173,12 @@ public class MedlineFetcher implements EntryFetcher {
         query = query.trim().replace(';', ',');
 
         if (query.matches("\\d+[,\\d+]*")) {
-            frame.setStatus(Globals.lang("Fetching Medline by id..."));
+            frame.setStatus(Localization.lang("Fetching Medline by id..."));
 
             List<BibtexEntry> bibs = MedlineImporter.fetchMedline(query, frame);
 
             if (bibs.isEmpty()) {
-                frame.showMessage(Globals.lang("No references found"));
+                frame.showMessage(Localization.lang("No references found"));
             }
 
             for (BibtexEntry entry : bibs) {
@@ -188,7 +188,7 @@ public class MedlineFetcher implements EntryFetcher {
         }
 
         if (!query.isEmpty()) {
-            frame.setStatus(Globals.lang("Fetching Medline by term..."));
+            frame.setStatus(Localization.lang("Fetching Medline by term..."));
 
             String searchTerm = toSearchTerm(query);
 
@@ -196,7 +196,7 @@ public class MedlineFetcher implements EntryFetcher {
             SearchResult result = getIds(searchTerm, 0, 1);
 
             if (result.count == 0) {
-                frame.showMessage(Globals.lang("No references found"));
+                frame.showMessage(Localization.lang("No references found"));
                 return false;
             }
 
@@ -204,13 +204,13 @@ public class MedlineFetcher implements EntryFetcher {
             if (numberToFetch > MedlineFetcher.PACING) {
 
                 while (true) {
-                    String strCount = JOptionPane.showInputDialog(Globals.lang("References found") +
+                    String strCount = JOptionPane.showInputDialog(Localization.lang("References found") +
                             ": " + numberToFetch + "  " +
-                            Globals.lang("Number of references to fetch?"), Integer
+                            Localization.lang("Number of references to fetch?"), Integer
                             .toString(numberToFetch));
 
                     if (strCount == null) {
-                        frame.setStatus(Globals.lang("Medline import canceled"));
+                        frame.setStatus(Localization.lang("Medline import canceled"));
                         return false;
                     }
 
@@ -218,7 +218,7 @@ public class MedlineFetcher implements EntryFetcher {
                         numberToFetch = Integer.parseInt(strCount.trim());
                         break;
                     } catch (RuntimeException ex) {
-                        frame.showMessage(Globals.lang("Please enter a valid number"));
+                        frame.showMessage(Localization.lang("Please enter a valid number"));
                     }
                 }
             }
@@ -242,8 +242,8 @@ public class MedlineFetcher implements EntryFetcher {
             return true;
         }
         frame.showMessage(
-                Globals.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
-                Globals.lang("Input error"), JOptionPane.ERROR_MESSAGE);
+                Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
+                Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;
     }
 }

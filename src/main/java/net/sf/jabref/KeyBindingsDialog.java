@@ -15,6 +15,7 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 import java.awt.BorderLayout;
@@ -91,7 +92,7 @@ class KeyBindingsDialog extends JDialog {
     public KeyBindingsDialog(HashMap<String, String> name2binding, HashMap<String, String> defBinds) {
         super();
         this.defBinds = defBinds;
-        setTitle(Globals.lang("Key bindings"));
+        setTitle(Localization.lang("Key bindings"));
         setModal(true); //this needs to be modal so that client knows when ok or cancel was clicked
         getContentPane().setLayout(new BorderLayout());
         bindHM = name2binding;
@@ -103,10 +104,10 @@ class KeyBindingsDialog extends JDialog {
         getContentPane().add(listScroller, BorderLayout.CENTER);
 
         Box buttonBox = new Box(BoxLayout.X_AXIS);
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
-        JButton grabB = new JButton(Globals.lang("Grab"));
-        defB = new JButton(Globals.lang("Default"));
+        ok = new JButton(Localization.lang("Ok"));
+        cancel = new JButton(Localization.lang("Cancel"));
+        JButton grabB = new JButton(Localization.lang("Grab"));
+        defB = new JButton(Localization.lang("Default"));
         grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
         buttonBox.add(grabB);
         buttonBox.add(defB);
@@ -143,7 +144,7 @@ class KeyBindingsDialog extends JDialog {
     private void setTop() {
         Box topBox = new Box(BoxLayout.X_AXIS);
 
-        topBox.add(new JLabel(Globals.lang("Binding") + ":", JLabel.RIGHT));
+        topBox.add(new JLabel(Localization.lang("Binding") + ":", JLabel.RIGHT));
         topBox.add(keyTF);
         getContentPane().add(topBox, BorderLayout.NORTH);
 
@@ -249,7 +250,7 @@ class KeyBindingsDialog extends JDialog {
             String s = it.next();
             tableData[i][2] = s;
             tableData[i][1] = bindHM.get(s);
-            tableData[i][0] = Globals.lang(s);
+            tableData[i][0] = Localization.lang(s);
             i++;
             //listModel.addElement(s + " (" + bindHM.get(s) + ")");
         }
@@ -312,7 +313,7 @@ class KeyBindingsDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return col == 0 ? Globals.lang("Action") : Globals.lang("Shortcut");
+            return col == 0 ? Localization.lang("Action") : Localization.lang("Shortcut");
         }
 
         @Override
@@ -366,11 +367,11 @@ class KeyBindingsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int[] selected = table.getSelectedRows();
                 if (selected.length == 0) {
-                    int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this, Globals.lang("All key bindings will be reset to their defaults.") + " " + Globals.lang("Continue?"), Globals.lang("Resetting all key bindings"),
+                    int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this, Localization.lang("All key bindings will be reset to their defaults.") + " " + Localization.lang("Continue?"), Localization.lang("Resetting all key bindings"),
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE, null,
-                            new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
-                            Globals.lang("Ok"));
+                            new String[] {Localization.lang("Ok"), Localization.lang("Cancel")},
+                            Localization.lang("Ok"));
                     if (answer == JOptionPane.YES_OPTION) {
                         bindHM.clear();
                         Set<Entry<String, String>> entrySet = defBinds.entrySet();

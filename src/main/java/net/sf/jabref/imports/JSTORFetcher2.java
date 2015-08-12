@@ -16,8 +16,8 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
@@ -96,13 +96,13 @@ public class JSTORFetcher2 implements EntryFetcher {
             //System.out.println("JSTORFetcher2 processQuery after false citations=" + citations);
             if (citations.isEmpty()) {
                 if (!noAccessFound) {
-                    status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                            query),
-                            Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                    status.showMessage(Localization.lang("No entries found for the search string '%0'",
+                                    query),
+                            Localization.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    status.showMessage(Globals.lang("No entries found. It looks like you do not have access to search JStor.",
-                            query),
-                            Globals.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                    status.showMessage(Localization.lang("No entries found. It looks like you do not have access to search JStor.",
+                                    query),
+                            Localization.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 }
                 return false;
             }
@@ -123,7 +123,7 @@ public class JSTORFetcher2 implements EntryFetcher {
 
         } catch (IOException e) {
             e.printStackTrace();
-            status.showMessage(Globals.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
+            status.showMessage(Localization.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
         }
         return false;
     }
@@ -192,12 +192,12 @@ public class JSTORFetcher2 implements EntryFetcher {
                 numberOfRefs[0] = "0";
             }
             while (true) {
-                String strCount = JOptionPane.showInputDialog(Globals.lang("References found")
+                String strCount = JOptionPane.showInputDialog(Localization.lang("References found")
                         + ": " + countOfRefs + "  "
-                        + Globals.lang("Number of references to fetch?"), Integer.toString(countOfRefs));
+                        + Localization.lang("Number of references to fetch?"), Integer.toString(countOfRefs));
 
                 if (strCount == null) {
-                    status.setStatus(Globals.lang("JSTOR import cancelled"));
+                    status.setStatus(Localization.lang("JSTOR import cancelled"));
                     return JSTORFetcher2.CANCELLED;
                 }
 
@@ -206,7 +206,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                     refsRequested = Integer.parseInt(numberOfRefs[1]);
                     break;
                 } catch (RuntimeException ex) {
-                    status.showMessage(Globals.lang("Please enter a valid number"));
+                    status.showMessage(Localization.lang("Please enter a valid number"));
                 }
             }
         }

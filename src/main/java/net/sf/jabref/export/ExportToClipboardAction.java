@@ -39,6 +39,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,7 +67,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
         if (panel.getSelectedEntries().length == 0) {
-            message = Globals.lang("No entries selected.");
+            message = Localization.lang("No entries selected.");
             getCallBack().update();
             return;
         }
@@ -86,11 +87,11 @@ public class ExportToClipboardAction extends AbstractWorker {
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        int answer = JOptionPane.showOptionDialog(frame, list, Globals.lang("Select format"),
+        int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select format"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
-                new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
-                Globals.lang("Ok"));
+                new String[] {Localization.lang("Ok"), Localization.lang("Cancel")},
+                Localization.lang("Ok"));
 
         if (answer == JOptionPane.NO_OPTION) {
             return;
@@ -153,11 +154,11 @@ public class ExportToClipboardAction extends AbstractWorker {
             RtfSelection rs = new RtfSelection(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
-            message = Globals.lang("Entries exported to clipboard") + ": " + bes.length;
+            message = Localization.lang("Entries exported to clipboard") + ": " + bes.length;
 
         } catch (Exception e) {
             e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
-            message = Globals.lang("Error exporting to clipboard");
+            message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
             if (tmp != null) {

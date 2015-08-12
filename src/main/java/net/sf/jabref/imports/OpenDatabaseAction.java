@@ -34,6 +34,7 @@ import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.external.FileLinksUpgradeWarning;
 import net.sf.jabref.HandleDuplicateWarnings;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.FileBasedLock;
 import net.sf.jabref.logic.util.StringUtil;
@@ -73,7 +74,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         this.showDialog = showDialog;
         putValue(Action.NAME, "Open database");
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Open database"));
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }
 
     @Override
@@ -148,7 +149,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            frame.output(Globals.lang("File '%0' is already open.", toRaise.getFile().getPath()));
+            frame.output(Localization.lang("File '%0' is already open.", toRaise.getFile().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
     }
@@ -178,7 +179,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     public void openIt(File file, boolean raisePanel) {
         if (file != null && file.exists()) {
             File fileToLoad = file;
-            frame.output(Globals.lang("Opening") + ": '" + file.getPath() + "'");
+            frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
             boolean tryingAutosave = false;
             boolean autoSaveFound = AutoSaveManager.newerAutoSaveExists(file);
             if (autoSaveFound && !Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
@@ -190,10 +191,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // We have found a newer autosave, but we are not allowed to use it without
                 // prompting.
                 int answer = JOptionPane.showConfirmDialog(null, "<html>" +
-                        Globals.lang("An autosave file was found for this database. This could indicate ")
-                        + Globals.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
-                        + Globals.lang("Do you want to recover the database from the autosave file?") + "</html>",
-                        Globals.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                        Localization.lang("An autosave file was found for this database. This could indicate ")
+                        + Localization.lang("that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
+                        + Localization.lang("Do you want to recover the database from the autosave file?") + "</html>",
+                        Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
                     tryingAutosave = true;
@@ -212,10 +213,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     if (modTime != -1 && System.currentTimeMillis() - modTime
                             > SaveSession.LOCKFILE_CRITICAL_AGE) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
-                        int answer = JOptionPane.showConfirmDialog(null, "<html>" + Globals.lang("Error opening file")
-                                + " '" + fileName + "'. " + Globals.lang("File is locked by another JabRef instance.")
-                                + "<p>" + Globals.lang("Do you want to override the file lock?"),
-                                Globals.lang("File locked"), JOptionPane.YES_NO_OPTION);
+                        int answer = JOptionPane.showConfirmDialog(null, "<html>" + Localization.lang("Error opening file")
+                                + " '" + fileName + "'. " + Localization.lang("File is locked by another JabRef instance.")
+                                + "<p>" + Localization.lang("Do you want to override the file lock?"),
+                                Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
                             FileBasedLock.deleteLockFile(file);
                         } else {
@@ -223,9 +224,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         }
                     }
                     else if (!FileBasedLock.waitForFileLock(file, 10)) {
-                        JOptionPane.showMessageDialog(null, Globals.lang("Error opening file")
-                                + " '" + fileName + "'. " + Globals.lang("File is locked by another JabRef instance."),
-                                Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Localization.lang("Error opening file")
+                                + " '" + fileName + "'. " + Localization.lang("File is locked by another JabRef instance."),
+                                Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -240,14 +241,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     pr = null;
                 }
                 if (pr == null || pr == ParserResult.INVALID_FORMAT) {
-                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file") + " '" + fileName + "'",
-                            Globals.lang("Error"),
+                    JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
+                            Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
 
                     String message = "<html>" + errorMessage + "<p>" +
-                            (tryingAutosave ? Globals.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName())
+                            (tryingAutosave ? Localization.lang("Error opening autosave of '%0'. Trying to load '%0' instead.", file.getName())
                                     : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/) + "</html>";
-                    JOptionPane.showMessageDialog(null, message, Globals.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
 
                     if (tryingAutosave) {
                         tryingAutosave = false;
@@ -328,7 +329,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // (duplicate key warnings). I don't think this is a big problem for normal situations,
                     // and it may possibly be a bug in the Swing code.
                     JOptionPane.showMessageDialog(frame, wrn.toString(),
-                            Globals.lang("Warnings") + " (" + file.getName() + ")",
+                            Localization.lang("Warnings") + " (" + file.getName() + ")",
                             JOptionPane.WARNING_MESSAGE);
                 }
             });
@@ -338,9 +339,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
 
-        frame.output(Globals.lang("Opened database") + " '" + fileName +
-                "' " + Globals.lang("with") + " " +
-                db.getEntryCount() + " " + Globals.lang("entries") + ".");
+        frame.output(Localization.lang("Opened database") + " '" + fileName +
+                "' " + Localization.lang("with") + " " +
+                db.getEntryCount() + " " + Localization.lang("entries") + ".");
 
         return bp;
     }
@@ -397,11 +398,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             for (BibtexEntry entry : pr.getDatabase().getEntries()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
             }
-            LOGGER.info(Globals.lang("Synchronized special fields based on keywords"));
+            LOGGER.info(Localization.lang("Synchronized special fields based on keywords"));
         }
 
         if (!pr.getMetaData().isGroupTreeValid()) {
-            pr.addWarning(Globals.lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
+            pr.addWarning(Localization.lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
         }
 
         return pr;

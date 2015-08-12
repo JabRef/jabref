@@ -32,6 +32,7 @@ import net.sf.jabref.gui.help.HelpDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 class ExternalTab extends JPanel implements PrefsTab {
 
@@ -52,8 +53,8 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JCheckBox openFoldersOfAttachedFiles;
 
     private final JRadioButton useRegExpComboBox;
-    private final JRadioButton matchExactKeyOnly = new JRadioButton(Globals.lang("Autolink only files that match the BibTeX key"));
-    private final JRadioButton matchStartsWithKey = new JRadioButton(Globals.lang("Autolink files with names starting with the BibTeX key"));
+    private final JRadioButton matchExactKeyOnly = new JRadioButton(Localization.lang("Autolink only files that match the BibTeX key"));
+    private final JRadioButton matchStartsWithKey = new JRadioButton(Localization.lang("Autolink files with names starting with the BibTeX key"));
 
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs,
@@ -65,9 +66,9 @@ class ExternalTab extends JPanel implements PrefsTab {
         psDir = new JTextField(25);
         pdfDir = new JTextField(25);
         fileDir = new JTextField(25);
-        bibLocationAsFileDir = new JCheckBox(Globals.lang("Allow file links relative to each bib file's location"));
-        bibLocAsPrimaryDir = new JCheckBox(Globals.lang("Use the bib file location as primary file directory"));
-        bibLocAsPrimaryDir.setToolTipText(Globals.lang("When downloading files, or moving linked files to the "
+        bibLocationAsFileDir = new JCheckBox(Localization.lang("Allow file links relative to each bib file's location"));
+        bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
+        bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the bib file location rather than the file directory set above"));
         bibLocationAsFileDir.addChangeListener(new ChangeListener() {
 
@@ -76,11 +77,11 @@ class ExternalTab extends JPanel implements PrefsTab {
                 bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
             }
         });
-        JButton editFileTypes = new JButton(Globals.lang("Manage external file types"));
-        runAutoFileSearch = new JCheckBox(Globals.lang("When opening file link, search for matching file if no link is defined"));
-        allowFileAutoOpenBrowse = new JCheckBox(Globals.lang("Automatically open browse dialog when creating new file link"));
+        JButton editFileTypes = new JButton(Localization.lang("Manage external file types"));
+        runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
+        allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
-        useRegExpComboBox = new JRadioButton(Globals.lang("Use Regular Expression Search"));
+        useRegExpComboBox = new JRadioButton(Localization.lang("Use Regular Expression Search"));
         ItemListener regExpListener = new ItemListener() {
 
             @Override
@@ -104,7 +105,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.appendSeparator(Globals.lang("External file links"));
+        builder.appendSeparator(Localization.lang("External file links"));
         JPanel pan = new JPanel();
         builder.append(pan);
         /**
@@ -114,7 +115,7 @@ class ExternalTab extends JPanel implements PrefsTab {
          * 
          * Cannot really use %0 to refer to the file type, since this ruins translation.
          */
-        JLabel lab = new JLabel(Globals.lang("Main file directory") + ':');
+        JLabel lab = new JLabel(Localization.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
         browse = BrowseAction.buildForDir(this.frame, fileDir);
@@ -137,7 +138,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(regExpTextField);
 
         HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-                Globals.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
+                Localization.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
         builder.append(helpAction.getIconButton());
         builder.nextLine();
         builder.append(new JPanel());
@@ -147,28 +148,28 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(allowFileAutoOpenBrowse);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Sending of emails"));
+        builder.appendSeparator(Localization.lang("Sending of emails"));
         builder.append(new JPanel());
-        lab = new JLabel(Globals.lang("Subject for sending an email with references").concat(":"));
+        lab = new JLabel(Localization.lang("Subject for sending an email with references").concat(":"));
         builder.append(lab);
         emailSubject = new JTextField(25);
         builder.append(emailSubject);
         builder.nextLine();
         builder.append(new JPanel());
-        openFoldersOfAttachedFiles = new JCheckBox(Globals.lang("Automatically open folders of attached files"));
+        openFoldersOfAttachedFiles = new JCheckBox(Localization.lang("Automatically open folders of attached files"));
         builder.append(openFoldersOfAttachedFiles);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Legacy file fields"));
+        builder.appendSeparator(Localization.lang("Legacy file fields"));
         pan = new JPanel();
         builder.append(pan);
-        builder.append(new JLabel("<html>" + Globals.lang("Note that these settings are used for the legacy "
+        builder.append(new JLabel("<html>" + Localization.lang("Note that these settings are used for the legacy "
                 + "<b>pdf</b> and <b>ps</b> fields only.<br>For most users, setting the <b>Main file directory</b> "
                 + "above should be sufficient.") + "</html>"), 5);
         builder.nextLine();
         pan = new JPanel();
         builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PDF directory") + ':');
+        lab = new JLabel(Localization.lang("Main PDF directory") + ':');
         builder.append(lab);
         builder.append(pdfDir);
         browse = BrowseAction.buildForDir(this.frame, pdfDir);
@@ -177,13 +178,13 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         pan = new JPanel();
         builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PS directory") + ':');
+        lab = new JLabel(Localization.lang("Main PS directory") + ':');
         builder.append(lab);
         builder.append(psDir);
         browse = BrowseAction.buildForDir(this.frame, psDir);
         builder.append(new JButton(browse));
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("External programs"));
+        builder.appendSeparator(Localization.lang("External programs"));
 
         builder.nextLine();
 
@@ -209,7 +210,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication pt, JPanel p) {
-        JButton button = new JButton(Globals.lang("Settings for %0", pt.getApplicationName()),
+        JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()),
                 pt.getIcon());
         button.addActionListener(new ActionListener() {
 
@@ -273,6 +274,6 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("External programs");
+        return Localization.lang("External programs");
     }
 }

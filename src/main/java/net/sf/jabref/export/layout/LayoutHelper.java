@@ -20,7 +20,7 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.Vector;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Helper class to get a Layout object.
@@ -374,7 +374,7 @@ public class LayoutHelper {
                     for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6), parsedEntries.size() - 1)) {
                         lastFive.append(entry.s);
                     }
-                    throw new StringIndexOutOfBoundsException(Globals.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") + '\'');
+                    throw new StringIndexOutOfBoundsException(Localization.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
 
                 //System.out.println("NAME:" + name);

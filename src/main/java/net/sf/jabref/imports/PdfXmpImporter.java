@@ -20,8 +20,8 @@ import java.io.InputStream;
 import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.XMPUtil;
 
 /**
@@ -31,7 +31,7 @@ public class PdfXmpImporter extends ImportFormat {
 
     @Override
     public String getFormatName() {
-        return Globals.lang("XMP-annotated PDF");
+        return Localization.lang("XMP-annotated PDF");
     }
 
     /**

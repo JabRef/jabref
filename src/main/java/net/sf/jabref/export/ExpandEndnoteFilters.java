@@ -22,11 +22,11 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Worker;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.ResourceExtractor;
 import spin.Spin;
 
@@ -44,7 +44,7 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
     public ExpandEndnoteFilters(JabRefFrame frame) {
         this.frame = frame;
         putValue(Action.NAME, "Unpack EndNote filter set");
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang("<HTML>Unpack the zip file containing import/export filters for Endnote,<BR>"
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("<HTML>Unpack the zip file containing import/export filters for Endnote,<BR>"
                 + "for optimal interoperability with JabRef</HTML>"));
     }
 
@@ -63,8 +63,8 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
         file = new File(filename);
         if (file.exists()) {
             int confirm = JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' " +
-                    Globals.lang("exists. Overwrite file?"),
-                    Globals.lang("Unpack EndNote filter set"), JOptionPane.OK_CANCEL_OPTION);
+                    Localization.lang("exists. Overwrite file?"),
+                    Localization.lang("Unpack EndNote filter set"), JOptionPane.OK_CANCEL_OPTION);
             if (confirm != JOptionPane.OK_OPTION) {
                 return;
             }
@@ -84,6 +84,6 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
         String FILENAME = "/EndNote.zip";
         ResourceExtractor re = new ResourceExtractor(frame, FILENAME, file);
         re.run();
-        frame.output(Globals.lang("Unpacked file."));
+        frame.output(Localization.lang("Unpacked file."));
     }
 }

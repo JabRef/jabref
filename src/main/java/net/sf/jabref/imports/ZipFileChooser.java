@@ -53,6 +53,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -80,9 +81,9 @@ class ZipFileChooser extends JDialog {
     class ZipFileChooserTableModel extends AbstractTableModel {
 
         private final String[] columnNames = new String[] {
-                Globals.lang("Name"),
-                Globals.lang("Last modified"),
-                Globals.lang("Size")
+                Localization.lang("Name"),
+                Localization.lang("Last modified"),
+                Localization.lang("Size")
         };
         private ZipEntry[] rows = null;
         private ZipFile zipFile = null;
@@ -205,13 +206,13 @@ class ZipFileChooser extends JDialog {
      * @throws HeadlessException
      */
     public ZipFileChooser(ImportCustomizationDialog owner, ZipFile zipFile) throws HeadlessException {
-        super(owner, Globals.lang("Select file from ZIP-archive"), false);
+        super(owner, Localization.lang("Select file from ZIP-archive"), false);
 
         this.importCustomizationDialog = owner;
         this.zipFileChooser = this;
 
         // cancel: no entry is selected
-        JButton cancelButton = new JButton(Globals.lang("Cancel"));
+        JButton cancelButton = new JButton(Localization.lang("Cancel"));
         cancelButton.addActionListener(new ActionListener() {
 
             @Override
@@ -221,7 +222,7 @@ class ZipFileChooser extends JDialog {
         });
 
         // ok: get selected class and check if it is instantiable as an importer
-        JButton okButton = new JButton(Globals.lang("Ok"));
+        JButton okButton = new JButton(Localization.lang("Ok"));
         okButton.addActionListener(new ActionListener() {
 
             @Override
@@ -242,10 +243,10 @@ class ZipFileChooser extends JDialog {
                         dispose();
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        JOptionPane.showMessageDialog(zipFileChooser, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+                        JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }
                 } else {
-                    JOptionPane.showMessageDialog(zipFileChooser, Globals.lang("Please select an importer."));
+                    JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Please select an importer."));
                 }
             }
         });

@@ -8,6 +8,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +30,7 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public String getName() {
-        return Globals.lang("Insert selected citations into TeXstudio");
+        return Localization.lang("Insert selected citations into TeXstudio");
     }
 
     @Override
@@ -39,7 +40,7 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Globals.lang("Push selection to TeXstudio");
+        return Localization.lang("Push selection to TeXstudio");
     }
 
     @Override
@@ -91,10 +92,10 @@ public class PushToTeXstudio implements PushToApplication {
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref", ""));
-        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(Localization.lang("Cite command") + ":");
         builder.append(citeCommand);
         builder.nextLine();
-        builder.append(Globals.lang("Path to TeXstudio") + ":");
+        builder.append(Localization.lang("Path to TeXstudio") + ":");
         builder.append(progPath);
         settings = builder.getPanel();
     }
@@ -160,7 +161,7 @@ public class PushToTeXstudio implements PushToApplication {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "TeXstudio: could not connect",
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         }
         else if (couldNotRunClient) {
             String programPath = Globals.prefs.get("TeXstudioPath");
@@ -169,11 +170,11 @@ public class PushToTeXstudio implements PushToApplication {
             }
             JOptionPane.showMessageDialog(
                     panel.frame(),
-                    "TeXstudio: " + Globals.lang("Program '%0' not found", programPath),
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    "TeXstudio: " + Localization.lang("Program '%0' not found", programPath),
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         }
         else {
-            panel.output(Globals.lang("Pushed citations to TeXstudio"));
+            panel.output(Localization.lang("Pushed citations to TeXstudio"));
         }
     }
 

@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -153,7 +154,7 @@ class PdfPreviewPanel extends JPanel {
 
     private void clearPreview() {
         this.picLabel.setIcon(null);
-        this.picLabel.setText(Globals.lang("no preview available"));
+        this.picLabel.setText(Localization.lang("no preview available"));
     }
 
 }

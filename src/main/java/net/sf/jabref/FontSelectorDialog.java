@@ -49,6 +49,8 @@ modified slightly by nizar batada for JabRef
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -209,7 +211,7 @@ public class FontSelectorDialog extends JDialog {
     public FontSelectorDialog(Component comp, Font font) {
 
         //super(JOptionPane.getFrameForComponent(comp),jpicedt.Localizer.currentLocalizer().get("widget.FontSelector"),true); //
-        super(JOptionPane.getFrameForComponent(comp), Globals.lang("FontSelector"), true); //
+        super(JOptionPane.getFrameForComponent(comp), Localization.lang("FontSelector"), true); //
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(new EmptyBorder(12, 12, 12, 12));
         setContentPane(content);
@@ -217,14 +219,14 @@ public class FontSelectorDialog extends JDialog {
         JPanel listPanel = new JPanel(new GridLayout(1, 3, 6, 6));
 
         JPanel familyPanel = createTextFieldAndListPanel(
-                Globals.lang("Font Family"),
+                Localization.lang("Font Family"),
                 familyField = new JTextField(),
                 familyList = new JList(getFontList()));
         listPanel.add(familyPanel);
 
         String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
         JPanel sizePanel = createTextFieldAndListPanel(
-                Globals.lang("Font Size"),
+                Localization.lang("Font Size"),
                 sizeField = new JTextField(),
                 sizeList = new JList(sizes));
         listPanel.add(sizePanel);
@@ -232,7 +234,7 @@ public class FontSelectorDialog extends JDialog {
         String[] styles = {FontSelectorDialog.PLAIN, FontSelectorDialog.BOLD, FontSelectorDialog.ITALIC, FontSelectorDialog.BOLD_ITALIC};
 
         JPanel stylePanel = createTextFieldAndListPanel(
-                Globals.lang("Font Style"),
+                Localization.lang("Font Style"),
                 styleField = new JTextField(),
                 styleList = new JList(styles));
         styleField.setEditable(false);
@@ -259,7 +261,7 @@ public class FontSelectorDialog extends JDialog {
            |  enable antialiasing in the preview field, since I'm |
            |  working on introducing this in the table view.      |
            -------------------------------------------------------- */
-        preview = new JLabel(Globals.lang("Font Preview")) {
+        preview = new JLabel(Localization.lang("Font Preview")) {
 
             private static final long serialVersionUID = -4191591634265068189L;
 
@@ -275,7 +277,7 @@ public class FontSelectorDialog extends JDialog {
 
         };
 
-        preview.setBorder(new TitledBorder(Globals.lang("Font Preview")));
+        preview.setBorder(new TitledBorder(Localization.lang("Font Preview")));
 
         updatePreview();
 
@@ -290,14 +292,14 @@ public class FontSelectorDialog extends JDialog {
         buttons.setBorder(new EmptyBorder(12, 0, 0, 0));
         buttons.add(Box.createGlue());
 
-        ok = new JButton(Globals.lang("Ok"));
+        ok = new JButton(Localization.lang("Ok"));
         ok.addActionListener(new ActionHandler());
         getRootPane().setDefaultButton(ok);
         buttons.add(ok);
 
         buttons.add(Box.createHorizontalStrut(6));
 
-        cancel = new JButton(Globals.lang("Cancel"));
+        cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(new ActionHandler());
         buttons.add(cancel);
 

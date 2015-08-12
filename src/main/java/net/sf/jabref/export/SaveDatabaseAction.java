@@ -20,6 +20,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileBasedLock;
 
 import javax.swing.*;
@@ -62,10 +63,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             // Check for external modifications:
             if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
 
-                String[] opts = new String[] {Globals.lang("Review changes"), Globals.lang("Save"),
-                        Globals.lang("Cancel")};
-                int answer = JOptionPane.showOptionDialog(panel.frame(), Globals.lang("File has been updated externally. "
-                        + "What do you want to do?"), Globals.lang("File updated externally"),
+                String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
+                        Localization.lang("Cancel")};
+                int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("File has been updated externally. "
+                                + "What do you want to do?"), Localization.lang("File updated externally"),
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, opts, opts[0]);
                 //  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
@@ -123,8 +124,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                     Vector<String> pd = panel.metaData().getData(Globals.PROTECTED_FLAG_META);
                     boolean databaseProtectionFlag = pd != null && Boolean.parseBoolean(pd.get(0));
                     if (databaseProtectionFlag) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Database is protected. Cannot save until external changes have been reviewed."),
-                                Globals.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Database is protected. Cannot save until external changes have been reviewed."),
+                                Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
                         cancelled = true;
                     }
                     else {
@@ -134,7 +135,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 }
             }
 
-            panel.frame().output(Globals.lang("Saving database") + "...");
+            panel.frame().output(Localization.lang("Saving database") + "...");
             panel.setSaving(true);
         }
     }
@@ -145,15 +146,15 @@ public class SaveDatabaseAction extends AbstractWorker {
             // Reset title of tab
             frame.setTabTitle(panel, panel.getFile().getName(),
                     panel.getFile().getAbsolutePath());
-            frame.output(Globals.lang("Saved database") + " '"
+            frame.output(Localization.lang("Saved database") + " '"
                     + panel.getFile().getPath() + "'.");
             frame.setWindowTitle();
         } else if (!cancelled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
-                frame.output(Globals.lang("Could not save, file locked by another JabRef instance."));
+                frame.output(Localization.lang("Could not save, file locked by another JabRef instance."));
             } else {
-                frame.output(Globals.lang("Save failed"));
+                frame.output(Localization.lang("Save failed"));
             }
         }
     }
@@ -231,9 +232,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
         } catch (UnsupportedCharsetException ex2) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
-                    + "Character encoding '%0' is not supported.", encoding),
-                    Globals.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file. "
+                            + "Character encoding '%0' is not supported.", encoding),
+                    Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex == SaveException.FILE_LOCKED) {
@@ -252,9 +253,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             JOptionPane.showMessageDialog
-                    (frame, Globals.lang("Could not save file")
+                    (frame, Localization.lang("Could not save file")
                             + ".\n" + ex.getMessage(),
-                            Globals.lang("Save database"),
+                            Localization.lang("Save database"),
                             JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
 
@@ -267,19 +268,19 @@ public class SaveDatabaseAction extends AbstractWorker {
             DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref", ""));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.append(Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+            builder.append(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
                     session.getEncoding()));
             builder.append(ta);
-            builder.append(Globals.lang("What do you want to do?"));
-            String tryDiff = Globals.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Globals.lang("Save database"),
+            builder.append(Localization.lang("What do you want to do?"));
+            String tryDiff = Localization.lang("Try different encoding");
+            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Globals.lang("Save"), tryDiff, Globals.lang("Cancel")}, tryDiff);
+                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(frame, Globals.lang("Select encoding"), Globals.lang("Save database"),
-                        JOptionPane.QUESTION_MESSAGE, null, Globals.ENCODINGS, encoding);
+                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"), Localization.lang("Save database"),
+                        JOptionPane.QUESTION_MESSAGE, null, Localization.ENCODINGS, encoding);
                 if (choice != null) {
                     String newEncoding = (String) choice;
                     return saveDatabase(file, selectedOnly, newEncoding);
@@ -300,8 +301,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 session.cancel();
             }
         } catch (SaveException e) {
-            int ans = JOptionPane.showConfirmDialog(null, Globals.lang("Save failed during backup creation") + ". "
-                    + Globals.lang("Save without backup?"), Globals.lang("Unable to create backup"),
+            int ans = JOptionPane.showConfirmDialog(null, Localization.lang("Save failed during backup creation") + ". "
+                    + Localization.lang("Save without backup?"), Localization.lang("Unable to create backup"),
                     JOptionPane.YES_NO_OPTION);
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
@@ -361,8 +362,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             f = new File(chosenFile);
             // Check if the file already exists:
             if (f.exists() && JOptionPane.showConfirmDialog
-                    (frame, '\'' + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
-                            Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
+                    (frame, '\'' + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                            Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                         != JOptionPane.OK_OPTION) {
                 f = null;
             }

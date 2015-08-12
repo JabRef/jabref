@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * User: alver
@@ -47,29 +48,29 @@ public class ExportFormats {
         ExportFormats.exportFormats.clear();
 
         // Initialize Build-In Export Formats
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML"), "html", "html", null, ".html"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("DIN 1505"), "din1505", "din1505winword", "din1505", ".rtf"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML"), "html", "html", null, ".html"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("DIN 1505"), "din1505", "din1505winword", "din1505", ".rtf"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
         ExportFormats.putFormat(new ModsExportFormat());
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", ".html"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML list"),
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", ".html"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML list"),
                 "listrefs", "listrefs", "listrefs", ".html"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML table (with Abstract & BibTeX)"),
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("Harvard RTF"), "harvard", "harvard",
                 "harvard", ".rtf"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote", "endnote", ".txt"));
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("Endnote"), "endnote", "EndNote", "endnote", ".txt"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
-        ExportFormat ef = new ExportFormat(Globals.lang("RIS"), "ris", "ris", "ris", ".ris");
+        ExportFormat ef = new ExportFormat(Localization.lang("RIS"), "ris", "ris", "ris", ".ris");
         ef.encoding = "UTF-8";
         ExportFormats.putFormat(ef);
-        ExportFormats.putFormat(new ExportFormat(Globals.lang("MIS Quarterly"), "misq", "misq", "misq",".rtf"));
+        ExportFormats.putFormat(new ExportFormat(Localization.lang("MIS Quarterly"), "misq", "misq", "misq",".rtf"));
 
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
@@ -184,7 +185,7 @@ public class ExportFormats {
                     if (file.exists()) {
                         // Warn that the file exists:
                         if (JOptionPane.showConfirmDialog(frame, '\'' + file.getName() + "' "
-                                + Globals.lang("exists. Overwrite file?"), Globals.lang("Export"),
+                                + Localization.lang("exists. Overwrite file?"), Localization.lang("Export"),
                                 JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                             return;
                         }
@@ -240,15 +241,15 @@ public class ExportFormats {
                         public void update() {
                             // No error message. Report success:
                             if (errorMessage == null) {
-                                frame.output(Globals.lang("%0 export successful", format.getDisplayName()));
+                                frame.output(Localization.lang("%0 export successful", format.getDisplayName()));
                             }
                             // ... or show an error dialog:
                             else {
-                                frame.output(Globals.lang("Could not save file")
+                                frame.output(Localization.lang("Could not save file")
                                         + " - " + errorMessage);
                                 // Need to warn the user that saving failed!
-                                JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file")
-                                        + ".\n" + errorMessage, Globals.lang("Save database"),
+                                JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file")
+                                        + ".\n" + errorMessage, Localization.lang("Save database"),
                                         JOptionPane.ERROR_MESSAGE);
                             }
                         }

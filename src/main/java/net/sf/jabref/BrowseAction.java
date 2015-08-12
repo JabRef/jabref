@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,7 +57,7 @@ public class BrowseAction extends AbstractAction implements ActionListener {
     }
 
     private BrowseAction(JFrame frame, JTextField tc, boolean dir, JComponent focusTarget) {
-        super(Globals.lang("Browse"));
+        super(Localization.lang("Browse"));
         this.frame = frame;
         this.dir = dir;
         this.comp = tc;

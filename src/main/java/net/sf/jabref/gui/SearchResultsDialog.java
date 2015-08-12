@@ -56,6 +56,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.TransferableBibtexEntry;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
@@ -162,9 +163,9 @@ public class SearchResultsDialog {
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.basePanel());
-                    frame.output(Globals.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
-                            + Globals.lang("entries")
-                            : "1 " + Globals.lang("entry") + '.'));
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
+                            + Localization.lang("entries")
+                            : "1 " + Localization.lang("entry") + '.'));
                 }
             }
         });

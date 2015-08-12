@@ -19,6 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.util.FileUtil;
 
@@ -72,7 +73,7 @@ public class DownloadExternalFile {
     public void download(final DownloadCallback callback) throws IOException {
         dontShowDialog = false;
         final String res = JOptionPane.showInputDialog(frame,
-                Globals.lang("Enter URL to download"));
+                Localization.lang("Enter URL to download"));
 
         if (res == null || res.trim().isEmpty()) {
             return;
@@ -82,8 +83,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"),
-                    Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
+                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -114,8 +115,8 @@ public class DownloadExternalFile {
             // TODO: stop editor dialog if this results in an error:
             mimeType = udl.determineMimeType(); // Read MIME type
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                    + ex.getMessage(), Globals.lang("Download file"),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
+                    + ex.getMessage(), Localization.lang("Download file"),
                     JOptionPane.ERROR_MESSAGE);
             LOGGER.info("Error while downloading " + "'" + res + "'", ex);
             return;
@@ -135,8 +136,8 @@ public class DownloadExternalFile {
                     if (editor != null && editor.isVisible()) {
                         editor.setVisible(false, false);
                     }
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                                    + e2.getMessage(), Globals.lang("Download file"),
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
+                                    + e2.getMessage(), Localization.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
                     LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
                     return;
@@ -193,14 +194,14 @@ public class DownloadExternalFile {
                         : new File(entry.getLink());
                 if (f.isDirectory()) {
                     JOptionPane.showMessageDialog(frame,
-                            Globals.lang("Target file cannot be a directory."), Globals.lang("Download file"),
+                            Localization.lang("Target file cannot be a directory."), Localization.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
                 if (f.exists()) {
                     return JOptionPane.showConfirmDialog
-                            (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
-                                    Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
+                            (frame, "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                                    Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
                     == JOptionPane.OK_OPTION;
                 } else {
                     return true;

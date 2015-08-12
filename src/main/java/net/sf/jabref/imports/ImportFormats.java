@@ -30,6 +30,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -111,9 +112,9 @@ public class ImportFormats {
                     if (!file.exists()) {
                         // Warn that the file doesn't exists:
                         JOptionPane.showMessageDialog(frame,
-                                Globals.lang("File not found") +
+                                Localization.lang("File not found") +
                                         ": '" + file.getName() + "'.",
-                                Globals.lang("Import"), JOptionPane.ERROR_MESSAGE);
+                                Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     ImportMenuItem imi = new ImportMenuItem(frame,

@@ -43,6 +43,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,22 +64,22 @@ class ContentSelectorDialog2 extends JDialog {
     private final JPanel wordEditPan = new JPanel();
 
     final String
-            WORD_EMPTY_TEXT = Globals.lang("<no field>");
-    private final String WORD_FIRSTLINE_TEXT = Globals.lang("<select word>");
-    private final String FIELD_FIRST_LINE = Globals.lang("<field name>");
+            WORD_EMPTY_TEXT = Localization.lang("<no field>");
+    private final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
+    private final String FIELD_FIRST_LINE = Localization.lang("<field name>");
     private final MetaData metaData;
     private String currentField = null;
     TreeSet<String> fieldSet;
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final JButton help = new JButton(Globals.lang("Help"));
-    private final JButton newField = new JButton(Globals.lang("New"));
-    private final JButton removeField = new JButton(Globals.lang("Remove"));
-    private final JButton newWord = new JButton(Globals.lang("New"));
-    private final JButton removeWord = new JButton(Globals.lang("Remove"));
-    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton help = new JButton(Localization.lang("Help"));
+    private final JButton newField = new JButton(Localization.lang("New"));
+    private final JButton removeField = new JButton(Localization.lang("Remove"));
+    private final JButton newWord = new JButton(Localization.lang("New"));
+    private final JButton removeWord = new JButton(Localization.lang("Remove"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton();
-    private final JButton apply = new JButton(Globals.lang("Apply"));
+    private final JButton apply = new JButton(Localization.lang("Apply"));
     private final DefaultListModel fieldListModel = new DefaultListModel();
     private DefaultListModel wordListModel = new DefaultListModel();
     private final JList fieldList = new JList(fieldListModel);
@@ -104,7 +105,7 @@ class ContentSelectorDialog2 extends JDialog {
      */
     public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
             String fieldName) {
-        super(owner, Globals.lang("Setup selectors"));
+        super(owner, Localization.lang("Setup selectors"));
         this.setModal(modal);
         this.metaData = metaData;
         this.frame = frame;
@@ -306,7 +307,7 @@ class ContentSelectorDialog2 extends JDialog {
                 }
                 catch (Exception ex) {
                     LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
                 }
             }
         });
@@ -324,7 +325,7 @@ class ContentSelectorDialog2 extends JDialog {
                 }
                 catch (Exception ex) {
                     LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not apply changes."));
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
                 }
             }
         });
@@ -337,7 +338,7 @@ class ContentSelectorDialog2 extends JDialog {
                 dispose();
             }
         };
-        cancelAction.putValue(Action.NAME, Globals.lang("Cancel"));
+        cancelAction.putValue(Action.NAME, Localization.lang("Cancel"));
         cancel.setAction(cancelAction);
     }
 
@@ -489,10 +490,10 @@ class ContentSelectorDialog2 extends JDialog {
 
         fieldPan.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Field name")));
+                        Localization.lang("Field name")));
         wordPan.setBorder(BorderFactory.createTitledBorder
                 (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Keyword")));
+                        Localization.lang("Keyword")));
         fieldPan.setLayout(gbl);
         wordPan.setLayout(gbl);
         con.insets = new Insets(2, 2, 2, 2);

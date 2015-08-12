@@ -18,6 +18,7 @@ package net.sf.jabref.external;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public String getName() {
-        return Globals.lang("Insert selected citations into Vim");
+        return Localization.lang("Insert selected citations into Vim");
     }
 
     @Override
@@ -53,7 +54,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Globals.lang("Push selection to Vim");
+        return Localization.lang("Push selection to Vim");
     }
 
     @Override
@@ -88,17 +89,17 @@ public class PushToVim implements PushToApplication {
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
 
-        builder.append(new JLabel(Globals.lang("Path to Vim") + ":"));
+        builder.append(new JLabel(Localization.lang("Path to Vim") + ":"));
         builder.append(vimPath);
         BrowseAction action = BrowseAction.buildForFile(vimPath);
-        JButton browse = new JButton(Globals.lang("Browse"));
+        JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
         builder.nextLine();
-        builder.append(Globals.lang("Vim Server Name") + ":");
+        builder.append(Localization.lang("Vim Server Name") + ":");
         builder.append(vimServer);
         builder.nextLine();
-        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(Localization.lang("Cite command") + ":");
         builder.append(citeCommand);
         settings = builder.getPanel();
     }
@@ -150,17 +151,17 @@ public class PushToVim implements PushToApplication {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "<HTML>" +
-                            Globals.lang("Could not connect to Vim server. Make sure that "
+                            Localization.lang("Could not connect to Vim server. Make sure that "
                                     + "Vim is running<BR>with correct server name.")
                             + "</HTML>",
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (couldNotRunClient) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
-                    Globals.lang("Could not run the 'vim' program."),
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Could not run the 'vim' program."),
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
-            panel.output(Globals.lang("Pushed citations to Vim"));
+            panel.output(Localization.lang("Pushed citations to Vim"));
         }
     }
 

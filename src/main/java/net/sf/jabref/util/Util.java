@@ -70,6 +70,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileNameCleaner;
 import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.logic.util.StringUtil;
@@ -354,7 +355,7 @@ public class Util {
 
             // Check that the file exists:
             if (file == null || !file.exists()) {
-                throw new IOException(Globals.lang("File not found") + " (" + fieldName + "): '"
+                throw new IOException(Localization.lang("File not found") + " (" + fieldName + "): '"
                         + link + "'.");
             }
             link = file.getCanonicalPath();
@@ -391,7 +392,7 @@ public class Util {
             try {
                 Util.openBrowser(link);
             } catch (IOException e) {
-                System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
+                System.err.println(Localization.lang("Error_opening_file_'%0'.", link));
                 e.printStackTrace();
             }
         } else if (fieldName.equals("ps")) {
@@ -483,10 +484,10 @@ public class Util {
      * @param application Link to the app that opens the file.
      * @throws IOException
      */
-    private static void openFileWithApplicationOnWindows(String link, String application)
-            throws IOException {
-        // escape & and spaces
-        Runtime.getRuntime().exec(application + " " + link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \""));
+    private static void openFileWithApplicationOnWindows(String link, String application) throws IOException {
+        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
+
+        Runtime.getRuntime().exec(application + " " + link);
     }
 
     /**
@@ -613,13 +614,13 @@ public class Util {
     public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
             String link, UnknownExternalFileType fileType) throws IOException {
 
-        String cancelMessage = Globals.lang("Unable to open file.");
-        String[] options = new String[] {Globals.lang("Define '%0'", fileType.getName()),
-                Globals.lang("Change file type"), Globals.lang("Cancel")};
+        String cancelMessage = Localization.lang("Unable to open file.");
+        String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
+                Localization.lang("Change file type"), Localization.lang("Cancel")};
         String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(frame, Globals.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
-                fileType.getName()),
-                Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
+        int answer = JOptionPane.showOptionDialog(frame, Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
+                        fileType.getName()),
+                Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, options, defOption);
         if (answer == JOptionPane.CANCEL_OPTION) {
             frame.output(cancelMessage);
@@ -975,7 +976,7 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
-        NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
         for (BibtexEntry entry : entries) {
             FileListTableModel tableModel = new FileListTableModel();
@@ -1060,7 +1061,7 @@ public class Util {
                 + "your entries, so it is\nrecommended that you change the grouping field "
                 + "in your group\ndefinition to \"keywords\" or a non-standard name."
                 + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Globals.lang("Warning"),
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
 
@@ -1240,7 +1241,7 @@ public class Util {
         e.printStackTrace(new PrintWriter(writer));
         textArea.setText(writer.toString());
         JLabel lab = new JLabel(e.getMessage());
-        JButton flip = new JButton(Globals.lang("Details"));
+        JButton flip = new JButton(Localization.lang("Details"));
 
         FormLayout layout = new FormLayout("left:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
@@ -1290,7 +1291,7 @@ public class Util {
     public static UndoableEdit massSetField(Collection<BibtexEntry> entries, String field, String text,
             boolean overwriteValues) {
 
-        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         for (BibtexEntry entry : entries) {
             String oldVal = entry.getField(field);
             // If we are not allowed to overwrite values, check if there is a
@@ -1321,7 +1322,7 @@ public class Util {
      */
     public static UndoableEdit massRenameField(Collection<BibtexEntry> entries, String field,
             String newField, boolean overwriteValues) {
-        NamedCompound ce = new NamedCompound(Globals.lang("Rename field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
         for (BibtexEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
@@ -1355,10 +1356,10 @@ public class Util {
      */
     public static List<String> findEncodingsForString(String characters) {
         List<String> encodings = new ArrayList<String>();
-        for (int i = 0; i < Globals.ENCODINGS.length; i++) {
-            CharsetEncoder encoder = Charset.forName(Globals.ENCODINGS[i]).newEncoder();
+        for (int i = 0; i < Localization.ENCODINGS.length; i++) {
+            CharsetEncoder encoder = Charset.forName(Localization.ENCODINGS[i]).newEncoder();
             if (encoder.canEncode(characters)) {
-                encodings.add(Globals.ENCODINGS[i]);
+                encodings.add(Localization.ENCODINGS[i]);
             }
         }
         return encodings;
@@ -1599,7 +1600,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            LOGGER.info(Globals.lang("Wrong Format").concat(" ").concat(e.toString()), e);
+            LOGGER.info(Localization.lang("Wrong Format").concat(" ").concat(e.toString()), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
@@ -1785,10 +1786,10 @@ public class Util {
         final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
-            final JLabel label = new JLabel(Globals.lang("Searching for files"));
+            final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            diag.setTitle(Globals.lang("Autosetting links"));
+            diag.setTitle(Localization.lang("Autosetting links"));
             diag.getContentPane().add(prog, BorderLayout.CENTER);
             diag.getContentPane().add(label, BorderLayout.SOUTH);
 

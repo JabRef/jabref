@@ -26,6 +26,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -91,22 +92,22 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             return; // Nothing to do, just return.
         }
 
-        JCheckBox changeSettings = new JCheckBox(Globals.lang("Change table column and General fields settings to use the new feature"),
+        JCheckBox changeSettings = new JCheckBox(Localization.lang("Change table column and General fields settings to use the new feature"),
                 offerChangeSettings);
-        JCheckBox changeDatabase = new JCheckBox(Globals.lang("Upgrade old external file links to use the new feature"),
+        JCheckBox changeDatabase = new JCheckBox(Localization.lang("Upgrade old external file links to use the new feature"),
                 offerChangeDatabase);
-        JCheckBox setFileDir = new JCheckBox(Globals.lang("Set main external file directory") + ":", offerSetFileDir);
+        JCheckBox setFileDir = new JCheckBox(Localization.lang("Set main external file directory") + ":", offerSetFileDir);
         JTextField fileDir = new JTextField(30);
-        JCheckBox doNotShowDialog = new JCheckBox(Globals.lang("Do not show these options in the future"),
+        JCheckBox doNotShowDialog = new JCheckBox(Localization.lang("Do not show these options in the future"),
                 false);
 
         JPanel message = new JPanel();
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""), message);
         // Keep the formatting of these lines. Otherwise, strings have to be translated again.
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
-        b.append(new JLabel("<html>" + Globals.lang("This database was written using an older version of JabRef.") + "<br>"
-                + Globals.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
-                + Globals.lang("Do you want JabRef to do the following operations?") + "</html>"));
+        b.append(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
+                + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
+                + Localization.lang("Do you want JabRef to do the following operations?") + "</html>"));
         b.nextLine();
         if (offerChangeSettings) {
             b.append(changeSettings);
@@ -125,7 +126,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             JPanel pan = new JPanel();
             pan.add(setFileDir);
             pan.add(fileDir);
-            JButton browse = new JButton(Globals.lang("Browse"));
+            JButton browse = new JButton(Localization.lang("Browse"));
             browse.addActionListener(BrowseAction.buildForDir(fileDir));
             pan.add(browse);
             b.append(pan);
@@ -136,7 +137,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         b.append(doNotShowDialog);
 
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
-                message, Globals.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
+                message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {
             Globals.prefs.putBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING, false);
         }

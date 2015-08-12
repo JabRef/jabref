@@ -16,8 +16,8 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
@@ -66,7 +66,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Globals.menuTitle("Search ScienceDirect");
+        return Localization.menuTitle("Search ScienceDirect");
     }
 
     @Override
@@ -84,9 +84,9 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 return false;
             }
             if (citations.isEmpty()) {
-                status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        query),
-                        Globals.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("No entries found for the search string '%0'",
+                                query),
+                        Localization.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -106,7 +106,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             e.printStackTrace();
-            status.showMessage(Globals.lang("Error while fetching from ScienceDirect") + ": " + e.getMessage());
+            status.showMessage(Localization.lang("Error while fetching from ScienceDirect") + ": " + e.getMessage());
         }
         return false;
     }

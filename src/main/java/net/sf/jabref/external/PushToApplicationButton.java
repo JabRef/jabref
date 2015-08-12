@@ -21,6 +21,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.oo.OpenOfficePanel;
 
 import javax.swing.*;
@@ -59,7 +60,7 @@ public class PushToApplicationButton implements ActionListener {
     private static final URL ARROW_ICON = GUIGlobals.getIconUrl("secondary_sorted_reverse");
     private final MenuAction mAction = new MenuAction();
     private final JPopupMenu optPopup = new JPopupMenu();
-    private final JMenuItem settings = new JMenuItem(Globals.lang("Settings"));
+    private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
 
     /**
      * Set up the current available choices:
@@ -96,7 +97,7 @@ public class PushToApplicationButton implements ActionListener {
         menuButton.setPreferredSize(new Dimension(menuButton.getIcon().getIconWidth(),
                 menuButton.getIcon().getIconHeight()));
         menuButton.addActionListener(new MenuButtonActionListener());
-        menuButton.setToolTipText(Globals.lang("Select external application"));
+        menuButton.setToolTipText(Localization.lang("Select external application"));
         pushButton = new JButton();
         if (Globals.prefs.hasKey("pushToApplication")) {
             String appSelected = Globals.prefs.get("pushToApplication");
@@ -210,16 +211,16 @@ public class PushToApplicationButton implements ActionListener {
         final BooleanHolder okPressed = new BooleanHolder(false);
         JDialog dg;
         if (parent instanceof JDialog) {
-            dg = new JDialog((JDialog) parent, Globals.lang("Settings"), true);
+            dg = new JDialog((JDialog) parent, Localization.lang("Settings"), true);
         } else {
-            dg = new JDialog((JFrame) parent, Globals.lang("Settings"), true);
+            dg = new JDialog((JFrame) parent, Localization.lang("Settings"), true);
         }
         final JDialog diag = dg;
         options.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
@@ -308,7 +309,7 @@ public class PushToApplicationButton implements ActionListener {
         }
 
         public void setTitle(String appName) {
-            putValue(Action.NAME, Globals.lang("Push entries to external application (%0)",
+            putValue(Action.NAME, Localization.lang("Push entries to external application (%0)",
                     appName));
         }
 

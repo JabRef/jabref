@@ -36,6 +36,7 @@ import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -200,8 +201,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public PrintAction() {
-            super(Globals.lang("Print Preview"), GUIGlobals.getImage("psSmall"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Print Preview"));
+            super(Localization.lang("Print Preview"), GUIGlobals.getImage("psSmall"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print Preview"));
         }
 
         //DocumentPrinter printerService;
@@ -223,9 +224,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
                         // Inform the user... we don't know what to do.
                         JOptionPane.showMessageDialog(PreviewPanel.this,
-                                Globals.lang("Could not print preview") + ".\n"
+                                Localization.lang("Could not print preview") + ".\n"
                                         + e.getMessage(),
-                                Globals.lang("Printing Entry Preview"),
+                                Localization.lang("Printing Entry Preview"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -250,8 +251,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public CloseAction() {
-            super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Close window"));
+            super(Localization.lang("Close window"), GUIGlobals.getImage("close"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
 
         @Override

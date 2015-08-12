@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Vector;
 
 import net.sf.jabref.imports.*;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.SearchRule;
 
@@ -48,7 +49,7 @@ class SearchManagerNoGUI {
                 Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
         if (!searchRule.validateSearchStrings(searchTerm)) {
-            System.out.println(Globals.lang("Search failed: illegal search expression"));
+            System.out.println(Localization.lang("Search failed: illegal search expression"));
             return base;
         }
 

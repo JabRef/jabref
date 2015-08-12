@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;
 
 /**
@@ -38,7 +39,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
         super(GUIGlobals.getImage("saveAll"));
         this.frame = frame;
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Save all"));
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Save all open databases"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open databases"));
         putValue(Action.NAME, "Save all");
     }
 
@@ -46,10 +47,10 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
     public void actionPerformed(ActionEvent e) {
         databases = frame.getTabbedPane().getTabCount();
         saved = 0;
-        frame.output(Globals.lang("Saving all databases..."));
+        frame.output(Localization.lang("Saving all databases..."));
         Spin.off(this);
         run();
-        frame.output(Globals.lang("Save all finished."));
+        frame.output(Localization.lang("Save all finished."));
     }
 
     @Override

@@ -39,6 +39,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -118,11 +119,11 @@ public class ImportCustomizationDialog extends JDialog {
      * @throws HeadlessException
      */
     public ImportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
-        super(frame_, Globals.lang("Manage custom imports"), false);
+        super(frame_, Localization.lang("Manage custom imports"), false);
         this.importCustomizationDialog = this;
         frame = frame_;
 
-        JButton addFromFolderButton = new JButton(Globals.lang("Add from folder"));
+        JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(new ActionListener() {
 
             @Override
@@ -130,10 +131,10 @@ public class ImportCustomizationDialog extends JDialog {
                 String chosenFileStr = null;
                 CustomImportList.Importer importer = prefs.customImports.new Importer();
                 importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
-                        Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
+                        Localization.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
                 if (importer.getBasePath() != null) {
                     chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
-                            Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
+                            Localization.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
                 }
                 if (chosenFileStr != null) {
                     try {
@@ -145,36 +146,36 @@ public class ImportCustomizationDialog extends JDialog {
                         customImporterTable.repaint();
                         frame.setUpImportMenus();
                     } catch (Exception exc) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", chosenFileStr));
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", chosenFileStr));
                     } catch (NoClassDefFoundError exc) {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr));
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr));
                     }
 
                 }
             }
         });
-        addFromFolderButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
+        addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
 
-        JButton addFromJarButton = new JButton(Globals.lang("Add from jar"));
+        JButton addFromJarButton = new JButton(Localization.lang("Add from jar"));
         addFromJarButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 String basePath = FileDialogs.getNewFile(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".zip,.jar",
-                        Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
+                        Localization.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
                 ZipFile zipFile = null;
                 if (basePath != null) {
                     try {
                         zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
                     } catch (IOException exc) {
                         LOGGER.info("Could not open Zip-archive: \n" + exc.getMessage(), exc);
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0", basePath)
-                                + "\n" + Globals.lang("Have you chosen the correct package path?"));
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", basePath)
+                                + "\n" + Localization.lang("Have you chosen the correct package path?"));
                         return;
                     } catch (NoClassDefFoundError exc) {
                         exc.printStackTrace();
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0", basePath)
-                                + "\n" + Globals.lang("Have you chosen the correct package path?"));
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", basePath)
+                                + "\n" + Localization.lang("Have you chosen the correct package path?"));
                     }
                 }
 
@@ -188,9 +189,9 @@ public class ImportCustomizationDialog extends JDialog {
 
             }
         });
-        addFromJarButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
+        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
 
-        JButton showDescButton = new JButton(Globals.lang("Show description"));
+        JButton showDescButton = new JButton(Localization.lang("Show description"));
         showDescButton.addActionListener(new ActionListener() {
 
             @Override
@@ -203,15 +204,15 @@ public class ImportCustomizationDialog extends JDialog {
                         JOptionPane.showMessageDialog(frame, importFormat.getDescription());
                     } catch (Exception exc) {
                         exc.printStackTrace();
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }
                 } else {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
             }
         });
 
-        JButton removeButton = new JButton(Globals.lang("Remove"));
+        JButton removeButton = new JButton(Localization.lang("Remove"));
         removeButton.addActionListener(new ActionListener() {
 
             @Override
@@ -225,7 +226,7 @@ public class ImportCustomizationDialog extends JDialog {
                     customImporterTable.repaint();
                     frame.setUpImportMenus();
                 } else {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
             }
         });
@@ -238,10 +239,10 @@ public class ImportCustomizationDialog extends JDialog {
             }
         };
 
-        JButton closeButton = new JButton(Globals.lang("Close"));
+        JButton closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(closeAction);
 
-        JButton helpButton = new JButton(Globals.lang("Help"));
+        JButton helpButton = new JButton(Localization.lang("Help"));
         helpButton.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp,
                 "Help"));
 
@@ -296,10 +297,10 @@ public class ImportCustomizationDialog extends JDialog {
     class ImportTableModel extends AbstractTableModel {
 
         private final String[] columnNames = new String[] {
-                Globals.lang("Import name"),
-                Globals.lang("Command line id"),
-                Globals.lang("ImportFormat class"),
-                Globals.lang("Contained in")
+                Localization.lang("Import name"),
+                Localization.lang("Command line id"),
+                Localization.lang("ImportFormat class"),
+                Localization.lang("Contained in")
         };
 
 

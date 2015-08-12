@@ -33,6 +33,7 @@ import javax.swing.KeyStroke;
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -158,7 +159,7 @@ public class FieldContentSelector extends JComponent {
             add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2, this)));
         }
 
-        JButton manage = new JButton(Globals.lang("Manage"));
+        JButton manage = new JButton(Localization.lang("Manage"));
         gbl.setConstraints(manage, con);
         add(manage);
 

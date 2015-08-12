@@ -17,6 +17,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 
@@ -34,9 +35,9 @@ public class HandleDuplicateWarnings implements PostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult pr) {
         int answer = JOptionPane.showConfirmDialog(null,
-                "<html><p>" + Globals.lang("This database contains one or more duplicated BibTeX keys.")
-                        + "</p><p>" + Globals.lang("Do you want to resolve duplicate keys now?"),
-                Globals.lang("Duplicate BibTeX key"), JOptionPane.YES_NO_OPTION);
+                "<html><p>" + Localization.lang("This database contains one or more duplicated BibTeX keys.")
+                        + "</p><p>" + Localization.lang("Do you want to resolve duplicate keys now?"),
+                Localization.lang("Duplicate BibTeX key"), JOptionPane.YES_NO_OPTION);
         if (answer == JOptionPane.YES_OPTION) {
             panel.runCommand("resolveDuplicateKeys");
         }

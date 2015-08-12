@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.swing.*;
 
 import net.sf.jabref.gui.fieldeditors.FieldTextField;
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,8 +54,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private static final Log log = LogFactory.getLog(AutoSetExternalFileForEntries.class);
 
     private final Object[] brokenLinkOptions =
-    {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
-            Globals.lang("Quit synchronization")};
+    {Localization.lang("Ignore"), Localization.lang("Assign new file"), Localization.lang("Clear field"),
+            Localization.lang("Quit synchronization")};
 
     private boolean goOn = true;
     private boolean autoSet = true;
@@ -89,13 +90,13 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         overWriteAllowed = optDiag.autoSetAll.isSelected();
         checkExisting = optDiag.checkLinks.isSelected();
 
-        panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
+        panel.output(Localization.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
     @Override
     public void run() {
         if (!goOn) {
-            panel.output(Globals.lang("No entries selected."));
+            panel.output(Localization.lang("No entries selected."));
             return;
         }
         panel.frame().setProgressBarValue(0);
@@ -107,7 +108,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         int progress = 0;
         entriesChanged = 0;
         int brokenLinks = 0;
-        NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
+        NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", fieldName));
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
 
@@ -156,9 +157,9 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
                         int answer =
                                 JOptionPane.showOptionDialog(panel.frame(),
-                                        Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[] {old, aSel.getCiteKey()}),
-                                        Globals.lang("Broken link"),
+                                        Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
+                                                new String[]{old, aSel.getCiteKey()}),
+                                        Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
                                         );
@@ -194,7 +195,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         //log brokenLinks if some were found
         if (brokenLinks > 0) {
-            log.warn(Globals.lang("Found %0 broken links", brokenLinks + ""));
+            log.warn(Localization.lang("Found %0 broken links", brokenLinks + ""));
         }
 
         if (entriesChanged > 0) {
@@ -210,8 +211,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             return;
         }
 
-        panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
-                new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
+        panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed%c %1.",
+                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
         panel.frame().setProgressBarVisible(false);
         if (entriesChanged > 0) {
             panel.markBaseChanged();
@@ -226,15 +227,15 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         final JRadioButton autoSetAll;
         final JRadioButton autoSetNone;
         final JCheckBox checkLinks;
-        final JButton ok = new JButton(Globals.lang("Ok"));
-        final JButton cancel = new JButton(Globals.lang("Cancel"));
+        final JButton ok = new JButton(Localization.lang("Ok"));
+        final JButton cancel = new JButton(Localization.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
         private final String fieldName;
 
 
         public OptionsDialog(JFrame parent, String fieldName) {
-            super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
+            super(parent, Localization.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             final String fn = fieldName.toUpperCase();
             this.fieldName = fieldName;
             ok.addActionListener(new ActionListener() {
@@ -264,10 +265,10 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             im.put(Globals.prefs.getKey("Close dialog"), "close");
             am.put("close", closeAction);
 
-            autoSetUnset = new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
-            autoSetAll = new JRadioButton(Globals.lang("Autoset %0 links. Allow overwriting existing links.", fn), false);
-            autoSetNone = new JRadioButton(Globals.lang("Do not autoset"), false);
-            checkLinks = new JCheckBox(Globals.lang("Check existing %0 links", fn), true);
+            autoSetUnset = new JRadioButton(Localization.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
+            autoSetAll = new JRadioButton(Localization.lang("Autoset %0 links. Allow overwriting existing links.", fn), false);
+            autoSetNone = new JRadioButton(Localization.lang("Do not autoset"), false);
+            checkLinks = new JCheckBox(Localization.lang("Check existing %0 links", fn), true);
             ButtonGroup bg = new ButtonGroup();
             bg.add(autoSetUnset);
             bg.add(autoSetNone);
@@ -275,12 +276,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             FormLayout layout = new FormLayout("fill:pref", "");
             DefaultFormBuilder builder = new DefaultFormBuilder(layout);
             description = new JLabel("<HTML>" +
-                    Globals.lang(//"This function helps you keep your external %0 links up-to-date." +
+                    Localization.lang(//"This function helps you keep your external %0 links up-to-date." +
                             "Attempt to autoset %0 links for your entries. Autoset works if "
                                     + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.", fn)
                     + "</HTML>");
             //            name.setVerticalAlignment(JLabel.TOP);
-            builder.appendSeparator(Globals.lang("Autoset"));
+            builder.appendSeparator(Localization.lang("Autoset"));
             builder.append(description);
             builder.nextLine();
             builder.append(autoSetUnset);
@@ -289,10 +290,10 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             builder.nextLine();
             builder.append(autoSetNone);
             builder.nextLine();
-            builder.appendSeparator(Globals.lang("Check links"));
+            builder.appendSeparator(Localization.lang("Check links"));
 
             description = new JLabel("<HTML>" +
-                    Globals.lang("This makes JabRef look up each %0 link and check if the file exists. If not, you will be given options<BR>to resolve the problem.", fn)
+                    Localization.lang("This makes JabRef look up each %0 link and check if the file exists. If not, you will be given options<BR>to resolve the problem.", fn)
                     + "</HTML>");
             builder.append(description);
             builder.nextLine();

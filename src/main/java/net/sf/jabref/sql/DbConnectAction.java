@@ -17,8 +17,8 @@ package net.sf.jabref.sql;
 
 import net.sf.jabref.BaseAction;
 import net.sf.jabref.BasePanel;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.Globals;
 import net.sf.jabref.sql.exporter.DBExporter;
 
 import javax.swing.*;
@@ -79,25 +79,25 @@ public class DbConnectAction implements BaseAction {
             try {
 
                 panel.frame().output(
-                        Globals.lang("Establishing SQL connection..."));
+                        Localization.lang("Establishing SQL connection..."));
                 DBExporter exporter = (new DBExporterAndImporterFactory())
                         .getExporter(dbs.getServerType());
                 Connection conn = exporter.connectToDB(dbs);
                 conn.close();
                 dbs.isConfigValid(true);
                 panel.frame().output(
-                        Globals.lang("SQL connection established."));
+                        Localization.lang("SQL connection established."));
             } catch (Exception ex) {
                 String errorMessage = SQLUtil.getExceptionMessage(ex);
                 dbs.isConfigValid(false);
 
                 String preamble = "Could not connect to SQL database for the following reason:";
                 panel.frame().output(
-                        Globals.lang(preamble) + "  " + errorMessage);
+                        Localization.lang(preamble) + "  " + errorMessage);
 
                 JOptionPane.showMessageDialog(panel.frame(),
-                        Globals.lang(preamble) + '\n' + errorMessage,
-                        Globals.lang("Connect to SQL database"),
+                        Localization.lang(preamble) + '\n' + errorMessage,
+                        Localization.lang("Connect to SQL database"),
                         JOptionPane.ERROR_MESSAGE);
             } finally {
                 panel.metaData().setDBStrings(dbs);

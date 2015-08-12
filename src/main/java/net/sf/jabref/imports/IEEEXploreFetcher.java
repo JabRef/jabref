@@ -48,6 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -57,9 +58,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private final HTMLConverter htmlConverter = new HTMLConverter();
 
-    private final JCheckBox absCheckBox = new JCheckBox(Globals.lang("Include abstracts"), false);
-    private final JRadioButton htmlButton = new JRadioButton(Globals.lang("HTML parser"));
-    private final JRadioButton bibButton = new JRadioButton(Globals.lang("BibTeX importer"));
+    private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
+    private final JRadioButton htmlButton = new JRadioButton(Localization.lang("HTML parser"));
+    private final JRadioButton bibButton = new JRadioButton(Localization.lang("BibTeX importer"));
 
     private static final int MAX_FETCH = 100;
     private final int perPage = IEEEXploreFetcher.MAX_FETCH;
@@ -151,29 +152,29 @@ public class IEEEXploreFetcher implements EntryFetcher {
             String page = getResults(url);
 
             if (page.contains("You have entered an invalid search")) {
-                status.showMessage(Globals.lang("You have entered an invalid search '%0'.",
-                        terms),
-                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("You have entered an invalid search '%0'.",
+                                terms),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("Bad request")) {
-                status.showMessage(Globals.lang("Bad Request '%0'.",
-                        terms),
-                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("Bad Request '%0'.",
+                                terms),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("No results were found.")) {
-                status.showMessage(Globals.lang("No entries found for the search string '%0'",
-                        terms),
-                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("No entries found for the search string '%0'",
+                                terms),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
             if (page.contains("Error Page")) {
-                status.showMessage(Globals.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
-                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("Intermittent errors on the IEEE Xplore server. Please try again in a while."),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -183,10 +184,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             importBibtex = bibButton.isSelected();
 
             if (hits > IEEEXploreFetcher.MAX_FETCH) {
-                status.showMessage(Globals.lang("%0 entries found. To reduce server load, "
-                        + "only %1 will be downloaded.",
-                        new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
-                        Globals.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
+                status.showMessage(Localization.lang("%0 entries found. To reduce server load, "
+                                        + "only %1 will be downloaded.",
+                                new String[]{String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
+                        Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 hits = IEEEXploreFetcher.MAX_FETCH;
             }
 
@@ -209,11 +210,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ConnectException e) {
-            status.showMessage(Globals.lang("Connection to IEEEXplore failed"),
-                    Globals.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("Connection to IEEEXplore failed"),
+                    Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Globals.lang(e.getMessage()),
-                    Globals.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang(e.getMessage()),
+                    Localization.lang("Search IEEEXplore"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
         return false;
@@ -748,14 +749,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
         int ind = page.indexOf(marker);
         if (ind < 0) {
             System.out.println(page);
-            throw new IOException(Globals.lang("Could not parse number of hits"));
+            throw new IOException(Localization.lang("Could not parse number of hits"));
         }
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
         } else {
-            throw new IOException(Globals.lang("Could not parse number of hits"));
+            throw new IOException(Localization.lang("Could not parse number of hits"));
         }
     }
 

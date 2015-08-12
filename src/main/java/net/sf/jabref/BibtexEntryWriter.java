@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.export.FieldFormatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 
 import java.io.IOException;
@@ -269,7 +270,7 @@ public class BibtexEntryWriter {
             try {
                 out.write(fieldFormatter.format(o, name));
             } catch (Throwable ex) {
-                throw new IOException(Globals.lang("Error in field") + " '" + name + "': " + ex.getMessage());
+                throw new IOException(Localization.lang("Error in field") + " '" + name + "': " + ex.getMessage());
             }
             return true;
         } else {

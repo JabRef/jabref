@@ -17,8 +17,8 @@ package net.sf.jabref.groups.structure;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.groups.UndoableChangeAssignment;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.util.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.StringUtil;
@@ -243,7 +243,7 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     public static String getDescriptionForPreview() {
-        return Globals.lang("This group contains entries based on manual assignment. "
+        return Localization.lang("This group contains entries based on manual assignment. "
                 + "Entries can be assigned to this group by selecting them "
                 + "then using either drag and drop or the context menu. "
                 + "Entries can be removed from this group by selecting them "
@@ -255,13 +255,13 @@ public class ExplicitGroup extends AbstractGroup {
     @Override
     public String getShortDescription() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<b>").append(getName()).append("</b> -").append(Globals.lang("static group"));
+        sb.append("<b>").append(getName()).append("</b> -").append(Localization.lang("static group"));
         switch (getHierarchicalContext()) {
         case INCLUDING:
-            sb.append(", ").append(Globals.lang("includes subgroups"));
+            sb.append(", ").append(Localization.lang("includes subgroups"));
             break;
         case REFINING:
-            sb.append(", ").append(Globals.lang("refines supergroup"));
+            sb.append(", ").append(Localization.lang("refines supergroup"));
             break;
         default:
             break;

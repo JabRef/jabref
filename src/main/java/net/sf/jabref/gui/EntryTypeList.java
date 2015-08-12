@@ -27,7 +27,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.CustomEntryType;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -37,12 +37,12 @@ import net.sf.jabref.util.Util;
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener, ActionListener {
 
-    private final JButton def = new JButton(Globals.lang("Default"));
+    private final JButton def = new JButton(Localization.lang("Default"));
 
 
     /** Creates a new instance of EntryTypeList */
     public EntryTypeList(List<String> fields) {
-        super(Globals.lang("Entry types"), fields, false, true);
+        super(Localization.lang("Entry types"), fields, false, true);
 
         con.gridx = 0;
         con.gridy = 2;
@@ -69,15 +69,15 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         String testString = Util.checkLegalKey(s);
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Globals.lang("Entry type names are not allowed to contain white space or the following "
-                    + "characters") + ": # { } ~ , ^ &",
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, Localization.lang("Entry type names are not allowed to contain white space or the following "
+                            + "characters") + ": # { } ~ , ^ &",
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         else if (s.equalsIgnoreCase("comment")) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Globals.lang("The name 'comment' can not be used as an entry type name."),
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' can not be used as an entry type name."),
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         addFieldUncritically(s);
@@ -101,8 +101,8 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
                 // This shouldn't happen, since the Remove button should be disabled.
-                JOptionPane.showMessageDialog(null, Globals.lang("This entry type cannot be removed."),
-                        Globals.lang("Remove entry type"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Localization.lang("This entry type cannot be removed."),
+                        Localization.lang("Remove entry type"), JOptionPane.ERROR_MESSAGE);
             }
         }
     }

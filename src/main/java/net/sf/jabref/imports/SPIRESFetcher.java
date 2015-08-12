@@ -28,8 +28,8 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * 
@@ -127,15 +127,15 @@ public class SPIRESFetcher implements EntryFetcher {
 
             return pr.getDatabase();
         } catch (IOException e) {
-            frame.showMessage(Globals.lang(
-                    "An Exception ocurred while accessing '%0'", url)
-                    + "\n\n" + e, Globals.lang(getKeyName()),
+            frame.showMessage(Localization.lang(
+                            "An Exception ocurred while accessing '%0'", url)
+                    + "\n\n" + e, Localization.lang(getKeyName()),
                     JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
-            frame.showMessage(Globals.lang(
-                    "An Error occurred while fetching from SPIRES source (%0):",
-                    new String[] {url})
-                    + "\n\n" + e.getMessage(), Globals.lang(getKeyName()),
+            frame.showMessage(Localization.lang(
+                            "An Error occurred while fetching from SPIRES source (%0):",
+                            new String[]{url})
+                    + "\n\n" + e.getMessage(), Localization.lang(getKeyName()),
                     JOptionPane.ERROR_MESSAGE);
         }
         return null;
@@ -174,7 +174,7 @@ public class SPIRESFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Globals.menuTitle(getKeyName());
+        return Localization.menuTitle(getKeyName());
     }
 
     /*
@@ -215,7 +215,7 @@ public class SPIRESFetcher implements EntryFetcher {
             // dialog.setProgress(i + 1, keys.length);
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
-            frame.showMessage(Globals.lang("Error while fetching from Spires: ")
+            frame.showMessage(Localization.lang("Error while fetching from Spires: ")
                     + e.getMessage());
             e.printStackTrace();
         }

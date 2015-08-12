@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.DOIUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -223,7 +224,7 @@ public class PdfContentImporter extends ImportFormat {
 
         try {
             if (document.isEncrypted()) {
-                LOGGER.error(Globals.lang("Encrypted documents are not supported"));
+                LOGGER.error(Localization.lang("Encrypted documents are not supported"));
                 //return res;
             }
 
@@ -540,7 +541,7 @@ public class PdfContentImporter extends ImportFormat {
             res.add(entry);
         } catch (NoClassDefFoundError e) {
             if (e.getMessage().equals("org/bouncycastle/jce/provider/BouncyCastleProvider")) {
-                status.showMessage(Globals.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
+                status.showMessage(Localization.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
             } else {
                 LOGGER.error("Could not find class", e);
             }

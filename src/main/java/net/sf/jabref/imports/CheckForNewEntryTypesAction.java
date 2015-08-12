@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.CustomEntryType;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -46,7 +46,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult pr) {
 
-        StringBuilder sb = new StringBuilder(Globals.lang("Custom entry types found in file") + ": ");
+        StringBuilder sb = new StringBuilder(Localization.lang("Custom entry types found in file") + ": ");
         Object[] types = pr.getEntryTypes().keySet().toArray();
         Arrays.sort(types);
         for (Object type : types) {
@@ -55,8 +55,8 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         String s = sb.toString();
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 s.substring(0, s.length() - 2) + ".\n"
-                        + Globals.lang("Remember these entry types?"),
-                Globals.lang("Custom entry types"),
+                        + Localization.lang("Remember these entry types?"),
+                Localization.lang("Custom entry types"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 

@@ -40,6 +40,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -71,7 +72,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
-        super(p0, GUIGlobals.getIconUrl("www"), Globals.lang("Web search"));
+        super(p0, GUIGlobals.getIconUrl("www"), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
         List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
@@ -151,7 +152,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         tf.setName("tf");
         // add action to reset-button. resets tf and requests focus
         JButton reset = new JButton(
-                Globals.lang("Reset"));
+                Localization.lang("Reset"));
         reset.addActionListener(new AbstractAction() {
 
             @Override
@@ -181,7 +182,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // Go Button
         con.weighty = 0;
         con.gridwidth = 1;
-        JButton go = new JButton(Globals.lang("Fetch"));
+        JButton go = new JButton(Localization.lang("Fetch"));
         gbl.setConstraints(go, con);
         main.add(go);
 
@@ -222,19 +223,19 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (tf.getText().trim().isEmpty()) {
-            frame.output(Globals.lang("Please enter a search string"));
+            frame.output(Localization.lang("Please enter a search string"));
             return;
         }
 
         if (frame.basePanel() == null) {
-            frame.output(Globals.lang("Please open or start a new database before searching"));
+            frame.output(Localization.lang("Please open or start a new database before searching"));
             return;
         }
 
         // We have two categories of fetchers. One category can show previews first and ask the
         // user which ones to download:
         if (activeFetcher instanceof PreviewEntryFetcher) {
-            frame.output(Globals.lang("Searching..."));
+            frame.output(Localization.lang("Searching..."));
             frame.setProgressBarIndeterminate(true);
             frame.setProgressBarVisible(true);
             final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher) activeFetcher;
@@ -305,7 +306,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     class FetcherAction extends AbstractAction {
 
         public FetcherAction() {
-            super(Globals.lang("Web search"), GUIGlobals.getImage("www"));
+            super(Localization.lang("Web search"), GUIGlobals.getImage("www"));
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
         }

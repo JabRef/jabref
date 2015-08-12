@@ -16,7 +16,7 @@
 package net.sf.jabref.export;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Exception thrown if saving goes wrong. If caused by a specific
@@ -26,9 +26,9 @@ public class SaveException extends Exception
 {
 
     public static final SaveException FILE_LOCKED = new SaveException
-            (Globals.lang("Could not save, file locked by another JabRef instance."));
+            (Localization.lang("Could not save, file locked by another JabRef instance."));
     public static final SaveException BACKUP_CREATION = new SaveException
-            (Globals.lang("Unable to create backup"));
+            (Localization.lang("Unable to create backup"));
 
     private final BibtexEntry entry;
     private int status = 0;

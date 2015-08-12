@@ -31,6 +31,7 @@ import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.util.XMPUtil;
@@ -137,7 +138,7 @@ public class DroppedFileHandler {
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
             BibtexEntry entry) {
-        NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
         if (tryXmpImport(fileName, fileType, localFile, edits)) {
             edits.end();
@@ -189,7 +190,7 @@ public class DroppedFileHandler {
 
     public void linkPdfToEntry(String fileName, MainTable entryTable, BibtexEntry entry) {
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
-        NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
         // Show dialog
         boolean newEntry = false;
@@ -227,7 +228,7 @@ public class DroppedFileHandler {
 
     public void importXmp(List<BibtexEntry> xmpEntriesInFile, String fileName) {
         ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("pdf");
-        NamedCompound edits = new NamedCompound(Globals.lang("Drop %0", fileType.extension));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
         BibtexEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
@@ -291,10 +292,10 @@ public class DroppedFileHandler {
         }
 
         JLabel confirmationMessage = new JLabel(
-                Globals.lang("The PDF contains one or several bibtex-records.\nDo you want to import these as new entries into the current database?"));
+                Localization.lang("The PDF contains one or several bibtex-records.\nDo you want to import these as new entries into the current database?"));
 
-        int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage, Globals.lang(
-                "XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
+        int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage, Localization.lang(
+                        "XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (reply == JOptionPane.CANCEL_OPTION) {
@@ -363,7 +364,7 @@ public class DroppedFileHandler {
                                                  BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
         String citeKey = entry.getCiteKey();
 
-        String dialogTitle = Globals.lang("Link to file %0", linkFileName);
+        String dialogTitle = Localization.lang("Link to file %0", linkFileName);
         String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
@@ -373,14 +374,14 @@ public class DroppedFileHandler {
             }
         }
         if (found < 0) {
-            destDirLabel.setText(Globals.lang("File directory is not set or does not exist!"));
+            destDirLabel.setText(Localization.lang("File directory is not set or does not exist!"));
             copyRadioButton.setEnabled(false);
             moveRadioButton.setEnabled(false);
             renameToTextBox.setEnabled(false);
             renameCheckBox.setEnabled(false);
             linkInPlace.setSelected(true);
         } else {
-            destDirLabel.setText(Globals.lang("File directory is '%0':", dirs[found]));
+            destDirLabel.setText(Localization.lang("File directory is '%0':", dirs[found]));
             copyRadioButton.setEnabled(true);
             moveRadioButton.setEnabled(true);
             renameToTextBox.setEnabled(true);
@@ -402,17 +403,17 @@ public class DroppedFileHandler {
         };
 
         if (multipleEntries) {
-            linkInPlace.setText(Globals.lang("Leave files in their current directory."));
-            copyRadioButton.setText(Globals.lang("Copy files to file directory."));
+            linkInPlace.setText(Localization.lang("Leave files in their current directory."));
+            copyRadioButton.setText(Localization.lang("Copy files to file directory."));
 
-            moveRadioButton.setText(Globals.lang("Move files to file directory."));
+            moveRadioButton.setText(Localization.lang("Move files to file directory."));
         } else {
-            linkInPlace.setText(Globals.lang("Leave file in its current directory."));
-            copyRadioButton.setText(Globals.lang("Copy file to file directory."));
-            moveRadioButton.setText(Globals.lang("Move file to file directory."));
+            linkInPlace.setText(Localization.lang("Leave file in its current directory."));
+            copyRadioButton.setText(Localization.lang("Copy file to file directory."));
+            moveRadioButton.setText(Localization.lang("Move file to file directory."));
         }
 
-        renameCheckBox.setText(Globals.lang("Rename file to").concat(": "));
+        renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
         String targetName = Util.getLinkedFileName(database, entry);
@@ -428,7 +429,7 @@ public class DroppedFileHandler {
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
         try {
-            Object[] messages = {Globals.lang("How would you like to link to '%0'?", linkFileName),
+            Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName),
                     optionsPanel};
             int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -595,7 +596,7 @@ public class DroppedFileHandler {
 
         if (destFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame, "'" + destFile.getPath() + "' "
-                    + Globals.lang("exists. Overwrite?"), Globals.lang("File exists"),
+                    + Localization.lang("exists. Overwrite?"), Localization.lang("File exists"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;

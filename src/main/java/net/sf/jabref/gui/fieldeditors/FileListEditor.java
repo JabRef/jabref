@@ -46,6 +46,7 @@ import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
@@ -86,14 +87,14 @@ public class FileListEditor extends JTable implements FieldEditor,
         addMouseListener(new TableClickListener());
 
         JButton add = new JButton(GUIGlobals.getImage("add"));
-        add.setToolTipText(Globals.lang("New file link (INSERT)"));
+        add.setToolTipText(Localization.lang("New file link (INSERT)"));
         JButton remove = new JButton(GUIGlobals.getImage("remove"));
-        remove.setToolTipText(Globals.lang("Remove file link (DELETE)"));
+        remove.setToolTipText(Localization.lang("Remove file link (DELETE)"));
         JButton up = new JButton(GUIGlobals.getImage("up"));
 
         JButton down = new JButton(GUIGlobals.getImage("down"));
-        auto = new JButton(Globals.lang("Auto"));
-        JButton download = new JButton(Globals.lang("Download"));
+        auto = new JButton(Localization.lang("Auto"));
+        JButton download = new JButton(Localization.lang("Download"));
         add.setMargin(new Insets(0, 0, 0, 0));
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
@@ -202,7 +203,7 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
 
-        JMenuItem openLink = new JMenuItem(Globals.lang("Open"));
+        JMenuItem openLink = new JMenuItem(Localization.lang("Open"));
         menu.add(openLink);
         openLink.addActionListener(new ActionListener() {
 
@@ -212,7 +213,7 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
 
-        JMenuItem openFolder = new JMenuItem(Globals.lang("Open folder"));
+        JMenuItem openFolder = new JMenuItem(Localization.lang("Open folder"));
         menu.add(openFolder);
         openFolder.addActionListener(new ActionListener() {
 
@@ -230,11 +231,11 @@ public class FileListEditor extends JTable implements FieldEditor,
             }
         });
 
-        JMenuItem rename = new JMenuItem(Globals.lang("Move/Rename file"));
+        JMenuItem rename = new JMenuItem(Localization.lang("Move/Rename file"));
         menu.add(rename);
         rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
 
-        JMenuItem moveToFileDir = new JMenuItem(Globals.lang("Move to file directory"));
+        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
     }
@@ -395,10 +396,10 @@ public class FileListEditor extends JTable implements FieldEditor,
                 auto.setEnabled(true);
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
-                    frame.output(Globals.lang("Finished autosetting external links."));
+                    frame.output(Localization.lang("Finished autosetting external links."));
                 } else {
-                    frame.output(Globals.lang("Finished autosetting external links.")
-                            + " " + Globals.lang("No files found."));
+                    frame.output(Localization.lang("Finished autosetting external links.")
+                            + " " + Localization.lang("No files found."));
                 }
             }
         }, diag));
@@ -412,8 +413,8 @@ public class FileListEditor extends JTable implements FieldEditor,
         String bibtexKey = entryEditor.getEntry().getCiteKey();
         if (bibtexKey == null) {
             int answer = JOptionPane.showConfirmDialog(frame,
-                    Globals.lang("This entry has no BibTeX key. Generate key now?"),
-                    Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                    Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                    Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.OK_OPTION) {
                 ActionListener l = entryEditor.generateKeyAction;

@@ -19,6 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
 
@@ -71,8 +72,8 @@ public class MoveFileAction extends AbstractAction {
             }
         }
         if (found < 0) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("File_directory_is_not_set_or_does_not_exist!"),
-                    Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
+                    Localization.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         File file = new File(ln);
@@ -95,17 +96,17 @@ public class MoveFileAction extends AbstractAction {
                     // Determine which name to suggest:
                     String suggName = Util.getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry()).
                             concat(".").concat(flEntry.getType().extension);
-                    CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Move file to file directory?"),
-                            Globals.lang("Rename to '%0'", suggName),
+                    CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
+                            Localization.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));
                     int answer;
                     // Only ask about renaming file if the file doesn't have the proper name already:
                     if (!suggName.equals(file.getName())) {
-                        answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Move/Rename file"),
+                        answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Move/Rename file"),
                                 JOptionPane.YES_NO_OPTION);
                     } else {
-                        answer = JOptionPane.showConfirmDialog(frame, Globals.lang("Move file to file directory?"),
-                                Globals.lang("Move/Rename file"), JOptionPane.YES_NO_OPTION);
+                        answer = JOptionPane.showConfirmDialog(frame, Localization.lang("Move file to file directory?"),
+                                Localization.lang("Move/Rename file"), JOptionPane.YES_NO_OPTION);
                     }
                     if (answer != JOptionPane.YES_OPTION) {
                         return;
@@ -133,8 +134,8 @@ public class MoveFileAction extends AbstractAction {
                 newFile = new File(chosenFile);
                 // Check if the file already exists:
                 if (newFile.exists() && JOptionPane.showConfirmDialog
-                        (frame, "'" + newFile.getName() + "' " + Globals.lang("exists. Overwrite file?"),
-                                Globals.lang("Move/Rename file"), JOptionPane.OK_CANCEL_OPTION)
+                        (frame, "'" + newFile.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                                Localization.lang("Move/Rename file"), JOptionPane.OK_CANCEL_OPTION)
                             != JOptionPane.OK_OPTION) {
                     if (!toFileDir) {
                         repeat = true;
@@ -169,20 +170,20 @@ public class MoveFileAction extends AbstractAction {
                         eEditor.updateField(editor);
                         //JOptionPane.showMessageDialog(frame, Globals.lang("File moved"),
                         //        Globals.lang("Move/Rename file"), JOptionPane.INFORMATION_MESSAGE);
-                        frame.output(Globals.lang("File moved"));
+                        frame.output(Localization.lang("File moved"));
                     } else {
-                        JOptionPane.showMessageDialog(frame, Globals.lang("Move file failed"),
-                                Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Move file failed"),
+                                Localization.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
                     }
 
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not move file") + ": " + ex.getMessage(),
-                            Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not move file") + ": " + ex.getMessage(),
+                            Localization.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Could not move file") + ": " + ex.getMessage(),
-                            Globals.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not move file") + ": " + ex.getMessage(),
+                            Localization.lang("Move/Rename file"), JOptionPane.ERROR_MESSAGE);
                 }
 
             }
@@ -190,8 +191,8 @@ public class MoveFileAction extends AbstractAction {
         else {
 
             // File doesn't exist, so we can't move it.
-            JOptionPane.showMessageDialog(frame, Globals.lang("Could not find file '%0'.", flEntry.getLink()),
-                    Globals.lang("File not found"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", flEntry.getLink()),
+                    Localization.lang("File not found"), JOptionPane.ERROR_MESSAGE);
 
         }
 

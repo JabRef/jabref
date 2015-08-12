@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;
 
 public class DuplicateSearch implements Runnable {
@@ -43,11 +44,11 @@ public class DuplicateSearch implements Runnable {
 
     @Override
     public void run() {
-        final NamedCompound ce = new NamedCompound(Globals.lang("duplicate removal"));
+        final NamedCompound ce = new NamedCompound(Localization.lang("duplicate removal"));
         int duplicateCounter = 0;
 
         boolean autoRemoveExactDuplicates = false;
-        panel.output(Globals.lang("Searching for duplicates..."));
+        panel.output(Localization.lang("Searching for duplicates..."));
         Object[] keys = panel.database.getKeySet().toArray();
         if (keys.length < 2) {
             return;
@@ -133,8 +134,8 @@ public class DuplicateSearch implements Runnable {
                     }
                     panel.markBaseChanged();
                 }
-                panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Globals.lang("pairs processed") + ": " + dupliC);
+                panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
+                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
 
                 ce.end();
                 panel.undoManager.addEdit(ce);

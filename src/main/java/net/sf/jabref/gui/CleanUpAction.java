@@ -41,6 +41,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.DOIUtil;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.logic.util.MonthUtil;
@@ -116,12 +117,12 @@ public class CleanUpAction extends AbstractWorker {
     }
 
     private void initOptionsPanel() {
-        cleanUpSuperscrips = new JCheckBox(Globals.lang("Convert 1st, 2nd, ... to real superscripts"));
-        cleanUpDOI = new JCheckBox(Globals.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
-        cleanUpMonth = new JCheckBox(Globals.lang("Format content of month field to #mon#"));
-        cleanUpPageNumbers = new JCheckBox(Globals.lang("Ensure that page ranges are of the form num1--num2"));
-        cleanUpMakePathsRelative = new JCheckBox(Globals.lang("Make paths of linked files relative (if possible)"));
-        cleanUpRenamePDF = new JCheckBox(Globals.lang("Rename PDFs to given file name format pattern"));
+        cleanUpSuperscrips = new JCheckBox(Localization.lang("Convert 1st, 2nd, ... to real superscripts"));
+        cleanUpDOI = new JCheckBox(Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
+        cleanUpMonth = new JCheckBox(Localization.lang("Format content of month field to #mon#"));
+        cleanUpPageNumbers = new JCheckBox(Localization.lang("Ensure that page ranges are of the form num1--num2"));
+        cleanUpMakePathsRelative = new JCheckBox(Localization.lang("Make paths of linked files relative (if possible)"));
+        cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given file name format pattern"));
         cleanUpRenamePDF.addChangeListener(new ChangeListener() {
 
             @Override
@@ -129,14 +130,14 @@ public class CleanUpAction extends AbstractWorker {
                 cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
             }
         });
-        cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Globals.lang("Rename only PDFs having a relative path"));
-        cleanUpUpgradeExternalLinks = new JCheckBox(Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
-        cleanUpHTML = new JCheckBox(Globals.lang("Run HTML converter on title"));
-        cleanUpCase = new JCheckBox(Globals.lang("Run filter on title keeping the case of selected words"));
-        cleanUpLaTeX = new JCheckBox(Globals.lang("Remove unneccessary $, {, and } and move adjacent numbers into equations"));
-        cleanUpUnits = new JCheckBox(Globals.lang("Add brackets and replace separators with their non-breaking version for units"));
-        cleanUpUnicode = new JCheckBox(Globals.lang("Run Unicode converter on title, author(s), and abstract"));
-        cleanUpBiblatex = new JCheckBox(Globals.lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
+        cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Localization.lang("Rename only PDFs having a relative path"));
+        cleanUpUpgradeExternalLinks = new JCheckBox(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
+        cleanUpHTML = new JCheckBox(Localization.lang("Run HTML converter on title"));
+        cleanUpCase = new JCheckBox(Localization.lang("Run filter on title keeping the case of selected words"));
+        cleanUpLaTeX = new JCheckBox(Localization.lang("Remove unneccessary $, {, and } and move adjacent numbers into equations"));
+        cleanUpUnits = new JCheckBox(Localization.lang("Add brackets and replace separators with their non-breaking version for units"));
+        cleanUpUnicode = new JCheckBox(Localization.lang("Run Unicode converter on title, author(s), and abstract"));
+        cleanUpBiblatex = new JCheckBox(Localization.lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
         optionsPanel = new JPanel();
         retrieveSettings();
 
@@ -156,7 +157,7 @@ public class CleanUpAction extends AbstractWorker {
         builder.add(cleanUpUpgradeExternalLinks, cc.xyw(1, 10, 2));
         builder.add(cleanUpMakePathsRelative, cc.xyw(1, 11, 2));
         builder.add(cleanUpRenamePDF, cc.xyw(1, 12, 2));
-        String currentPattern = Globals.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+        String currentPattern = Localization.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern), cc.xyw(2, 13, 1));
         builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2, 14, 1));
         builder.add(cleanUpBiblatex, cc.xyw(1, 15, 2));
@@ -198,9 +199,9 @@ public class CleanUpAction extends AbstractWorker {
     }
 
     private int showCleanUpDialog() {
-        String dialogTitle = Globals.lang("Cleanup entries");
+        String dialogTitle = Localization.lang("Cleanup entries");
 
-        Object[] messages = {Globals.lang("What would you like to clean up?"), optionsPanel};
+        Object[] messages = {Localization.lang("What would you like to clean up?"), optionsPanel};
         return JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
     }
@@ -217,13 +218,13 @@ public class CleanUpAction extends AbstractWorker {
         modifiedEntriesCount = 0;
         int numSelected = panel.getSelectedEntries().length;
         if (numSelected == 0) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(frame, Globals.lang("First select entries to clean up."),
-                    Globals.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("First select entries to clean up."),
+                    Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
             cancelled = true;
             return;
         }
         frame.block();
-        panel.output(Globals.lang("Doing a cleanup for %0 entries...", Integer.toString(numSelected)));
+        panel.output(Localization.lang("Doing a cleanup for %0 entries...", Integer.toString(numSelected)));
     }
 
     @Override
@@ -252,9 +253,9 @@ public class CleanUpAction extends AbstractWorker {
         boolean choiceConvertToBiblatex = cleanUpBiblatex.isSelected();
 
         if (choiceRenamePDF && Globals.prefs.getBoolean(CleanUpAction.AKS_AUTO_NAMING_PDFS_AGAIN)) {
-            CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-                    Globals.lang("Disable this confirmation dialog"), false);
-            int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Autogenerate PDF Names"),
+            CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+                    Localization.lang("Disable this confirmation dialog"), false);
+            int answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Autogenerate PDF Names"),
                     JOptionPane.YES_NO_OPTION);
             if (cbm.isSelected()) {
                 Globals.prefs.putBoolean(CleanUpAction.AKS_AUTO_NAMING_PDFS_AGAIN, false);
@@ -273,13 +274,13 @@ public class CleanUpAction extends AbstractWorker {
                 panel.undoManager.addEdit(ce);
                 panel.markBaseChanged();
                 panel.updateEntryEditorIfShowing();
-                panel.output(Globals.lang("Upgraded links."));
+                panel.output(Localization.lang("Upgraded links."));
             }
         }
 
         for (BibtexEntry entry : panel.getSelectedEntries()) {
             // undo granularity is on entry level
-            NamedCompound ce = new NamedCompound(Globals.lang("Cleanup entry"));
+            NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
             if (choiceCleanUpSuperscripts) {
                 doCleanUpSuperscripts(entry, ce);
@@ -334,10 +335,10 @@ public class CleanUpAction extends AbstractWorker {
             return;
         }
         if (unsuccesfullRenames > 0) { //Rename failed for at least one entry
-            JOptionPane.showMessageDialog(frame, Globals.lang("File rename failed for") + " "
+            JOptionPane.showMessageDialog(frame, Localization.lang("File rename failed for") + " "
                     + unsuccesfullRenames
-                    + " " + Globals.lang("entries") + ".",
-                    Globals.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
+                    + " " + Localization.lang("entries") + ".",
+                    Localization.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
         }
         if (modifiedEntriesCount > 0) {
             panel.updateEntryEditorIfShowing();
@@ -346,13 +347,13 @@ public class CleanUpAction extends AbstractWorker {
         String message;
         switch (modifiedEntriesCount) {
         case 0:
-            message = Globals.lang("No entry needed a clean up");
+            message = Localization.lang("No entry needed a clean up");
             break;
         case 1:
-            message = Globals.lang("One entry needed a clean up");
+            message = Localization.lang("One entry needed a clean up");
             break;
         default:
-            message = Globals.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
+            message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
             break;
         }
         panel.output(message);

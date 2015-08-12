@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -279,7 +280,7 @@ public class BibtexParser {
                         try {
                             database.addString(bs);
                         } catch (KeyCollisionException ex) {
-                            parserResult.addWarning(Globals.lang("Duplicate string name") + ": "
+                            parserResult.addWarning(Localization.lang("Duplicate string name") + ": "
                                     + bs.getName());
                             // ex.printStackTrace();
                         }
@@ -337,7 +338,7 @@ public class BibtexParser {
                         } else {
                             // FIXME: user comments are simply dropped
                             // at least, we log that we ignored the comment
-                            LOGGER.info(Globals.lang("Dropped comment from database") + ":" + comment);
+                            LOGGER.info(Localization.lang("Dropped comment from database") + ":" + comment);
                         }
                     } else {
                         // The entry type was not recognized. This may mean that
@@ -371,14 +372,14 @@ public class BibtexParser {
                         if (duplicateKey) {
                             parserResult.addDuplicateKey(be.getCiteKey());
                         } else if (be.getCiteKey() == null || be.getCiteKey().equals("")) {
-                            parserResult.addWarning(Globals.lang("empty BibTeX key") + ": "
+                            parserResult.addWarning(Localization.lang("empty BibTeX key") + ": "
                                     + be.getAuthorTitleYear(40) + " ("
-                                    + Globals.lang("grouping may not work for this entry") + ")");
+                                    + Localization.lang("grouping may not work for this entry") + ")");
                         }
                     } catch (IOException ex) {
                         LOGGER.warn("Could not parse entry", ex);
-                        parserResult.addWarning(Globals.lang("Error occured when parsing entry") + ": '"
-                                + ex.getMessage() + "'. " + Globals.lang("Skipped entry."));
+                        parserResult.addWarning(Localization.lang("Error occured when parsing entry") + ": '"
+                                + ex.getMessage() + "'. " + Localization.lang("Skipped entry."));
 
                     }
                 }
@@ -729,7 +730,7 @@ public class BibtexParser {
                     }
 
                     // Finished, now reverse newKey and remove whitespaces:
-                    parserResult.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key.",
+                    parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key.",
                             String.valueOf(line)));
                     key = newKey.reverse();
                 }
@@ -738,12 +739,12 @@ public class BibtexParser {
 
         case ',':
 
-            parserResult.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
+            parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
                     String.valueOf(line)));
 
         case '\n':
 
-            parserResult.addWarning(Globals.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
+            parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
                     String.valueOf(line)));
 
             break;
@@ -1012,9 +1013,9 @@ public class BibtexParser {
                     // System.out.println("Unknown entry type:
                     // "+be.getType().getName());
                     _pr
-                            .addWarning(Globals.lang("unknown entry type") + ": "
+                            .addWarning(Localization.lang("unknown entry type") + ": "
                                     + be.getType().getName() + ":" + be.getField(BibtexFields.KEY_FIELD)
-                                    + " . " + Globals.lang("Type set to 'other'")
+                                    + " . " + Localization.lang("Type set to 'other'")
                                     + ".");
                     be.setType(BibtexEntryTypes.OTHER);
                 }

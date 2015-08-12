@@ -118,6 +118,7 @@ import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.imports.FreeCiteImporter;
@@ -187,7 +188,7 @@ public class TextInputDialog
         this.setModal(true);
         //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
-        String typeStr = Globals.lang("for");
+        String typeStr = Localization.lang("for");
         if (entry != null)
         {
             if (entry.getType() != null)
@@ -196,7 +197,7 @@ public class TextInputDialog
             }
         }
 
-        this.setTitle(Globals.lang("Plain_text_import") + " " + typeStr);
+        this.setTitle(Localization.lang("Plain_text_import") + " " + typeStr);
         getContentPane().add(panel1, BorderLayout.CENTER);
 
         initRawPanel();
@@ -218,9 +219,9 @@ public class TextInputDialog
                     }
                 });
 
-        tabbed.add(rawPanel, Globals.lang("Raw_source"));
-        tabbed.add(sourcePanel, Globals.lang("BibTeX_source"));
-        tabbed.add(warnPanel, Globals.lang("Messages_and_Hints"));
+        tabbed.add(rawPanel, Localization.lang("Raw_source"));
+        tabbed.add(sourcePanel, Localization.lang("BibTeX_source"));
+        tabbed.add(warnPanel, Localization.lang("Messages_and_Hints"));
 
         // Panel Layout
         panel1.setLayout(new BorderLayout());
@@ -265,7 +266,7 @@ public class TextInputDialog
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
-                Globals.lang("Text_Input_Area"));
+                Localization.lang("Text_Input_Area"));
 
         testPanel.setPreferredSize(new Dimension(450, 255));
         testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
@@ -311,7 +312,7 @@ public class TextInputDialog
         TitledBorder titledBorder1 = new TitledBorder(
                 BorderFactory.createLineBorder(
                         new Color(153, 153, 153), 2),
-                Globals.lang("Input"));
+                Localization.lang("Input"));
         inputPanel.setBorder(titledBorder1);
         //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
         inputPanel.setMinimumSize(new Dimension(10, 10));
@@ -330,21 +331,21 @@ public class TextInputDialog
         //fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
         // insert buttons
-        insertButton.setText(Globals.lang("Insert"));
+        insertButton.setText(Localization.lang("Insert"));
         insertButton.addActionListener(this);
 
         // parse with FreeCite button
-        parseWithFreeCiteButton.setText(Globals.lang("Parse with FreeCite"));
+        parseWithFreeCiteButton.setText(Localization.lang("Parse with FreeCite"));
         parseWithFreeCiteButton.addActionListener(this);
 
         // Radio buttons
-        JRadioButton appRadio = new JRadioButton(Globals.lang("Append"));
-        appRadio.setToolTipText(Globals.lang("append_the_selected_text_to_bibtex_key"));
+        JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
+        appRadio.setToolTipText(Localization.lang("append_the_selected_text_to_bibtex_key"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
-        overRadio = new JRadioButton(Globals.lang("Override"));
-        overRadio.setToolTipText(Globals.lang("override_the_bibtex_key_by_the_selected_text"));
+        overRadio = new JRadioButton(Localization.lang("Override"));
+        overRadio.setToolTipText(Localization.lang("override_the_bibtex_key_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
 
@@ -358,7 +359,7 @@ public class TextInputDialog
         radioPanel.add(overRadio);
 
         // insert sub components
-        JLabel label1 = new JLabel(Globals.lang("Available fields"));
+        JLabel label1 = new JLabel(Localization.lang("Available fields"));
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(label1, con);
         inputPanel.add(label1);
@@ -384,9 +385,9 @@ public class TextInputDialog
         rawPanel.add(leftPanel, BorderLayout.CENTER);
         rawPanel.add(inputPanel, BorderLayout.EAST);
 
-        JLabel desc = new JLabel("<html><h3>" + Globals.lang("Plain text import") + "</h3><p>"
-                + Globals.lang("This is a simple copy and paste dialog. First load or paste some text into "
-                        + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
+        JLabel desc = new JLabel("<html><h3>" + Localization.lang("Plain text import") + "</h3><p>"
+                + Localization.lang("This is a simple copy and paste dialog. First load or paste some text into "
+                + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -406,9 +407,9 @@ public class TextInputDialog
     private void initButtonPanel()
     {
 
-        okButton.setText(Globals.lang("Accept"));
+        okButton.setText(Localization.lang("Accept"));
         okButton.addActionListener(this);
-        cancelButton.setText(Globals.lang("Cancel"));
+        cancelButton.setText(Localization.lang("Cancel"));
         cancelButton.addActionListener(this);
 
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
@@ -888,25 +889,25 @@ abstract class BasicAction
 
     public BasicAction(String text, String description, URL icon)
     {
-        super(Globals.lang(text), new ImageIcon(icon));
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
+        super(Localization.lang(text), new ImageIcon(icon));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }
 
     public BasicAction(String text, String description, URL icon, KeyStroke key)
     {
-        super(Globals.lang(text), new ImageIcon(icon));
+        super(Localization.lang(text), new ImageIcon(icon));
         putValue(Action.ACCELERATOR_KEY, key);
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang(description));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }
 
     public BasicAction(String text)
     {
-        super(Globals.lang(text));
+        super(Localization.lang(text));
     }
 
     public BasicAction(String text, KeyStroke key)
     {
-        super(Globals.lang(text));
+        super(Localization.lang(text));
         putValue(Action.ACCELERATOR_KEY, key);
     }
 

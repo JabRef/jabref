@@ -34,6 +34,7 @@ import javax.swing.table.TableModel;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -158,7 +159,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Globals.lang("Field name") : Globals.lang("Column width");
+                return col == 0 ? Localization.lang("Field name") : Localization.lang("Column width");
             }
 
             @Override
@@ -238,13 +239,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         toolBar.add(moveDown);
         tabPanel.add(toolBar, BorderLayout.EAST);
 
-        showOneLetterHeadingForIconColumns = new JCheckBox(Globals.lang("Show one letter heading for icon columns"));
+        showOneLetterHeadingForIconColumns = new JCheckBox(Localization.lang("Show one letter heading for icon columns"));
 
-        fileColumn = new JCheckBox(Globals.lang("Show file column"));
-        pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
-        urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
-        preferUrl = new JRadioButton(Globals.lang("Show URL first"));
-        preferDoi = new JRadioButton(Globals.lang("Show DOI first"));
+        fileColumn = new JCheckBox(Localization.lang("Show file column"));
+        pdfColumn = new JCheckBox(Localization.lang("Show PDF/PS column"));
+        urlColumn = new JCheckBox(Localization.lang("Show URL/DOI column"));
+        preferUrl = new JRadioButton(Localization.lang("Show URL first"));
+        preferDoi = new JRadioButton(Localization.lang("Show DOI first"));
         ButtonGroup preferUrlDoiGroup = new ButtonGroup();
         preferUrlDoiGroup.add(preferUrl);
         preferUrlDoiGroup.add(preferDoi);
@@ -257,9 +258,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 preferDoi.setEnabled(urlColumn.isSelected());
             }
         });
-        arxivColumn = new JCheckBox(Globals.lang("Show ArXiv column"));
+        arxivColumn = new JCheckBox(Localization.lang("Show ArXiv column"));
 
-        extraFileColumns = new JCheckBox(Globals.lang("Show Extra columns"));
+        extraFileColumns = new JCheckBox(Localization.lang("Show Extra columns"));
         extraFileColumns.addChangeListener(new ChangeListener() {
 
             @Override
@@ -280,10 +281,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
         JButton helpButton = new JButton(GUIGlobals.getImage("helpSmall"));
-        helpButton.setToolTipText(Globals.lang("Help on special fields"));
+        helpButton.setToolTipText(Localization.lang("Help on special fields"));
         helpButton.addActionListener(help);
 
-        specialFieldsEnabled = new JCheckBox(Globals.lang("Enable special fields"));
+        specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {
 
             @Override
@@ -300,7 +301,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 writeSpecialFields.setEnabled(isEnabled);
             }
         });
-        rankingColumn = new JCheckBox(Globals.lang("Show rank"));
+        rankingColumn = new JCheckBox(Localization.lang("Show rank"));
         rankingColumn.addChangeListener(new ChangeListener() {
 
             @Override
@@ -308,23 +309,23 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 compactRankingColumn.setEnabled(rankingColumn.isSelected());
             }
         });
-        compactRankingColumn = new JCheckBox(Globals.lang("Compact rank"));
-        qualityColumn = new JCheckBox(Globals.lang("Show quality"));
-        priorityColumn = new JCheckBox(Globals.lang("Show priority"));
-        relevanceColumn = new JCheckBox(Globals.lang("Show relevance"));
-        printedColumn = new JCheckBox(Globals.lang("Show printed status"));
-        readStatusColumn = new JCheckBox(Globals.lang("Show read status"));
+        compactRankingColumn = new JCheckBox(Localization.lang("Compact rank"));
+        qualityColumn = new JCheckBox(Localization.lang("Show quality"));
+        priorityColumn = new JCheckBox(Localization.lang("Show priority"));
+        relevanceColumn = new JCheckBox(Localization.lang("Show relevance"));
+        printedColumn = new JCheckBox(Localization.lang("Show printed status"));
+        readStatusColumn = new JCheckBox(Localization.lang("Show read status"));
 
         // "sync keywords" and "write special" fields may be configured mutually exclusive only
         // The implementation supports all combinations (TRUE+TRUE and FALSE+FALSE, even if the latter does not make sense)
         // To avoid confusion, we opted to make the setting mutually exclusive
-        syncKeywords = new JRadioButton(Globals.lang("Synchronize with keywords"));
-        writeSpecialFields = new JRadioButton(Globals.lang("Write values of special fields as separate fields to BibTeX"));
+        syncKeywords = new JRadioButton(Localization.lang("Synchronize with keywords"));
+        writeSpecialFields = new JRadioButton(Localization.lang("Write values of special fields as separate fields to BibTeX"));
         ButtonGroup group = new ButtonGroup();
         group.add(syncKeywords);
         group.add(writeSpecialFields);
 
-        builder.appendSeparator(Globals.lang("Special table columns"));
+        builder.appendSeparator(Localization.lang("Special table columns"));
         builder.nextLine();
         builder.append(pan);
 
@@ -360,7 +361,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** end: special table columns and special fields ***/
 
-        builder.appendSeparator(Globals.lang("Entry table columns"));
+        builder.appendSeparator(Localization.lang("Entry table columns"));
         builder.nextLine();
         builder.append(pan);
         builder.append(tabPanel);
@@ -469,7 +470,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public DeleteRowAction() {
             super("Delete row", GUIGlobals.getImage("remove"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
         @Override
@@ -499,7 +500,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public AddRowAction() {
             super("Add row", GUIGlobals.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
         @Override
@@ -550,7 +551,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public MoveRowUpAction() {
             super("Up", GUIGlobals.getImage("up"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Move up"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
         }
 
         @Override
@@ -583,7 +584,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public MoveRowDownAction() {
             super("Down", GUIGlobals.getImage("down"));
-            putValue(Action.SHORT_DESCRIPTION, Globals.lang("Down"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
         }
 
         @Override
@@ -615,7 +616,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class UpdateOrderAction extends AbstractAction {
 
         public UpdateOrderAction() {
-            super(Globals.lang("Update to current column order"));
+            super(Localization.lang("Update to current column order"));
         }
 
         @Override
@@ -657,7 +658,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class UpdateWidthsAction extends AbstractAction {
 
         public UpdateWidthsAction() {
-            super(Globals.lang("Update to current column widths"));
+            super(Localization.lang("Update to current column widths"));
         }
 
         @Override
@@ -748,10 +749,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 oldWriteSpecialFields != newWriteSpecialFields;
         if (restartRequired) {
             JOptionPane.showMessageDialog(null,
-                    Globals.lang("You have changed settings for special fields.")
+                    Localization.lang("You have changed settings for special fields.")
                             .concat(" ")
-                            .concat(Globals.lang("You must restart JabRef for this to come into effect.")),
-                    Globals.lang("Changed special field settings"),
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    Localization.lang("Changed special field settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
 
@@ -817,6 +818,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Globals.lang("Entry table columns");
+        return Localization.lang("Entry table columns");
     }
 }

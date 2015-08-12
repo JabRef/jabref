@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import javax.swing.*;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 // created by : ?
@@ -57,7 +58,7 @@ public class DuplicateResolverDialog extends JDialog {
     private final JTabbedPane tabbed = new JTabbedPane();
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private JButton removeExact = null;
     private final JPanel options = new JPanel();
     private final JPanel main = new JPanel();
@@ -67,13 +68,13 @@ public class DuplicateResolverDialog extends JDialog {
 
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
-        super(frame, Globals.lang("Possible duplicate entries"), true);
+        super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
         Util.placeDialog(this, frame);
     }
 
     public DuplicateResolverDialog(JDialog frame, BibtexEntry one, BibtexEntry two, int type) {
-        super(frame, Globals.lang("Possible duplicate entries"), true);
+        super(frame, Localization.lang("Possible duplicate entries"), true);
         init(one, two, type);
         Util.placeDialog(this, frame);
     }
@@ -84,25 +85,25 @@ public class DuplicateResolverDialog extends JDialog {
         JButton first;
         switch (type) {
         case DUPLICATE_SEARCH:
-            first = new JButton(Globals.lang("Keep upper"));
-            second = new JButton(Globals.lang("Keep lower"));
-            both = new JButton(Globals.lang("Keep both"));
+            first = new JButton(Localization.lang("Keep upper"));
+            second = new JButton(Localization.lang("Keep lower"));
+            both = new JButton(Localization.lang("Keep both"));
             break;
         case INSPECTION:
-            first = new JButton(Globals.lang("Remove old entry"));
-            second = new JButton(Globals.lang("Remove entry from import"));
-            both = new JButton(Globals.lang("Keep both"));
+            first = new JButton(Localization.lang("Remove old entry"));
+            second = new JButton(Localization.lang("Remove entry from import"));
+            both = new JButton(Localization.lang("Keep both"));
             break;
         case DUPLICATE_SEARCH_WITH_EXACT:
-            first = new JButton(Globals.lang("Keep upper"));
-            second = new JButton(Globals.lang("Keep lower"));
-            both = new JButton(Globals.lang("Keep both"));
-            removeExact = new JButton(Globals.lang("Automatically remove exact duplicates"));
+            first = new JButton(Localization.lang("Keep upper"));
+            second = new JButton(Localization.lang("Keep lower"));
+            both = new JButton(Localization.lang("Keep both"));
+            removeExact = new JButton(Localization.lang("Automatically remove exact duplicates"));
             break;
         default:
-            first = new JButton(Globals.lang("Import and remove old entry"));
-            second = new JButton(Globals.lang("Do not import entry"));
-            both = new JButton(Globals.lang("Import and keep old entry"));
+            first = new JButton(Localization.lang("Import and remove old entry"));
+            second = new JButton(Localization.lang("Do not import entry"));
+            both = new JButton(Localization.lang("Import and keep old entry"));
         }
 
         String layout = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
@@ -127,7 +128,7 @@ public class DuplicateResolverDialog extends JDialog {
         con.weightx = 1;
         con.weighty = 0;
         TitleLabel lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
-                Globals.lang("Entry in current database"));
+                Localization.lang("Entry in current database"));
         gbl.setConstraints(lab, con);
         main.add(lab);
         con.weighty = 1;
@@ -138,7 +139,7 @@ public class DuplicateResolverDialog extends JDialog {
         con.weighty = 0;
         con.insets = new Insets(10, 10, 0, 10);
         lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
-                Globals.lang("Entry in import"));
+                Localization.lang("Entry in import"));
         gbl.setConstraints(lab, con);
         main.add(lab);
         con.weighty = 1;
@@ -152,8 +153,8 @@ public class DuplicateResolverDialog extends JDialog {
         sp = new JScrollPane(ta2);
         gbl.setConstraints(sp, con);
         source.add(sp);
-        tabbed.add(Globals.lang("Short form"), main);
-        tabbed.add(Globals.lang("Complete record"), source);
+        tabbed.add(Localization.lang("Short form"), main);
+        tabbed.add(Localization.lang("Complete record"), source);
         if (removeExact != null) {
             options.add(removeExact);
         }

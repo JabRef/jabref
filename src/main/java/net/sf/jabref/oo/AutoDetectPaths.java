@@ -29,6 +29,7 @@ import java.util.List;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Tools for automatically detecting jar and executable paths to OpenOffice.
@@ -75,8 +76,8 @@ public class AutoDetectPaths extends AbstractWorker {
 
     @Override
     public void init() throws Throwable {
-        prog = showProgressDialog(parent, Globals.lang("Autodetecting paths..."),
-                Globals.lang("Please wait..."), true);
+        prog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
+                Localization.lang("Please wait..."), true);
     }
 
     @Override
@@ -99,8 +100,8 @@ public class AutoDetectPaths extends AbstractWorker {
                 }
             }
             if (sOffice == null) {
-                JOptionPane.showMessageDialog(parent, Globals.lang("Unable to autodetect OpenOffice installation. Please choose the installation directory manually."),
-                        Globals.lang("Could not find OpenOffice installation"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(parent, Localization.lang("Unable to autodetect OpenOffice installation. Please choose the installation directory manually."),
+                        Localization.lang("Could not find OpenOffice installation"), JOptionPane.INFORMATION_MESSAGE);
                 JFileChooser jfc = new JFileChooser(new File("C:\\"));
                 jfc.setDialogType(JFileChooser.OPEN_DIALOG);
                 jfc.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -112,7 +113,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
                     @Override
                     public String getDescription() {
-                        return Globals.lang("Directories");
+                        return Localization.lang("Directories");
                     }
                 });
                 jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -227,10 +228,10 @@ public class AutoDetectPaths extends AbstractWorker {
                 bg.add(optRB);
                 bg.add(usrRB);
                 DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""));
-                b.append(Globals.lang("Found more than one OpenOffice executable. Please choose which one to connect to:"));
+                b.append(Localization.lang("Found more than one OpenOffice executable. Please choose which one to connect to:"));
                 b.append(optRB);
                 b.append(usrRB);
-                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(), Globals.lang("Choose OpenOffice executable"),
+                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(), Localization.lang("Choose OpenOffice executable"),
                         JOptionPane.OK_CANCEL_OPTION);
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     return false;
@@ -341,7 +342,7 @@ public class AutoDetectPaths extends AbstractWorker {
         fileSearchCancelled = false;
         final JDialog prog;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
             @Override

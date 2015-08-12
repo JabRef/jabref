@@ -20,6 +20,7 @@ import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Converts journal abbreviations back to full name for all selected entries.
@@ -62,9 +63,9 @@ public class UnabbreviateAction extends AbstractWorker {
             ce.end();
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
-            message = Globals.lang("Unabbreviated %0 journal names.", String.valueOf(count));
+            message = Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
         } else {
-            message = Globals.lang("No journal names could be unabbreviated.");
+            message = Localization.lang("No journal names could be unabbreviated.");
         }
     }
 

@@ -43,6 +43,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -61,14 +62,14 @@ public class PreferencesDialog extends JDialog {
     private final JabRefFrame frame;
 
     public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
-        super(parent, Globals.lang("JabRef preferences"), false);
+        super(parent, Localization.lang("JabRef preferences"), false);
         final JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
         final JList chooser;
 
-        JButton importPrefs = new JButton(Globals.lang("Import preferences"));
-        JButton exportPrefs = new JButton(Globals.lang("Export preferences"));
+        JButton importPrefs = new JButton(Localization.lang("Import preferences"));
+        JButton exportPrefs = new JButton(Localization.lang("Export preferences"));
 
         main = new JPanel();
         JPanel upper = new JPanel();
@@ -148,8 +149,8 @@ public class PreferencesDialog extends JDialog {
         upper.add(two, BorderLayout.WEST);
         upper.add(main, BorderLayout.CENTER);
 
-        JButton ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         ok.addActionListener(new OkAction());
         CancelAction cancelAction = new CancelAction();
         cancel.addActionListener(cancelAction);
@@ -164,8 +165,8 @@ public class PreferencesDialog extends JDialog {
         Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 
         // Import and export actions:
-        exportPrefs.setToolTipText(Globals.lang("Export preferences to file"));
-        importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
+        exportPrefs.setToolTipText(Localization.lang("Export preferences to file"));
+        importPrefs.setToolTipText(Localization.lang("Import preferences from file"));
         exportPrefs.addActionListener(new ActionListener() {
 
             @Override
@@ -178,15 +179,15 @@ public class PreferencesDialog extends JDialog {
                 File file = new File(filename);
                 if (!file.exists()
                         || JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
-                                + "' " + Globals.lang("exists. Overwrite file?"),
-                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                                + "' " + Localization.lang("exists. Overwrite file?"),
+                                Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
                     try {
                         prefs.exportPreferences(filename);
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(PreferencesDialog.this,
-                                Globals.lang("Could not export preferences")
-                                        + ": " + ex.getMessage(), Globals.lang("Export preferences"),
+                                Localization.lang("Could not export preferences")
+                                        + ": " + ex.getMessage(), Localization.lang("Export preferences"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -213,8 +214,8 @@ public class PreferencesDialog extends JDialog {
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
-                            Globals.lang("Could not import preferences")
-                                    + ": " + ex.getMessage(), Globals.lang("Import preferences"),
+                            Localization.lang("Could not import preferences")
+                                    + ": " + ex.getMessage(), Localization.lang("Import preferences"),
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -271,7 +272,7 @@ public class PreferencesDialog extends JDialog {
                     frame.setupAllTables();
                     frame.groupSelector.revalidateGroups(); // icons may have
                     // changed
-                    frame.output(Globals.lang("Preferences recorded."));
+                    frame.output(Localization.lang("Preferences recorded."));
                 }
             };
             worker.getWorker().run();
