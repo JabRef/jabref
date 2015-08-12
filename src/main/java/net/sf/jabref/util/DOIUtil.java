@@ -20,43 +20,54 @@ public class DOIUtil {
     private static final String REGEXP_DOI_WITH_HTTP_PREFIX = "http[s]?://[^\\s]*?" + REGEXP_PLAINDOI;
 
     /**
-     * Check if the String matches a DOI (with http://...)
+     * Check if the String matches a plain DOI
+     *
+     * @param value the String to check
+     * @return true if value contains a DOI
      */
-    public static boolean isURI(String check) {
-        return check != null && check.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
+    public static boolean isDOI(String value) {
+        return value != null && value.matches(".*" + REGEXP_PLAINDOI + ".*");
     }
 
     /**
+     * Check if the String matches a URI presentation of a DOI
      *
-     * @param check - string to check
-     * @return true if "check" contains a DOI
+     * <example>
+     *     The DOI name "10.1006/jmbi.1998.2354" would be made an actionable link as "http://doi.org/10.1006/jmbi.1998.2354".
+     * </example>
+     *
+     * @param value the String to check
+     * @return true if value contains a URI presentation of a DOI
      */
-    public static boolean isDOI(String check) {
-        return check != null && check.matches(".*" + REGEXP_PLAINDOI + ".*");
+    public static boolean isURI(String value) {
+        return value != null && value.matches(".*" + REGEXP_DOI_WITH_HTTP_PREFIX + ".*");
     }
 
     /**
-     * Remove the http://... from DOI
+     * Extract a plain DOI
      *
-     * @param doi - may not be null
-     * @return first DOI in the given String (without http://... prefix). If no DOI exists, the complete string is returned
+     * TODO: why not return null if no DOI is found?
+     *
+     * @param value the String containing the DOI
+     * @return the first plain DOI in value. If no DOI exists, the complete string is returned.
      */
-    public static String getDOI(String doi) {
-        Matcher matcher = PATTERN_PLAINDOI.matcher(doi);
+    public static String getDOI(String value) {
+        Matcher matcher = PATTERN_PLAINDOI.matcher(value);
         if (matcher.find()) {
             return matcher.group();
         } else {
-            return doi;
+            return value;
         }
     }
 
     /**
-     * Returns the Http URL for a specific DOI
+     * Return a URI presentation for a specific DOI
      *
      * TODO: this has problems when no doi is detected or is null.
      * This has always been unchecked and needs to be investigated!
-     * @param doi - may not be null
-     * @return
+     *
+     * @param doi the DOI value
+     * @return a URI representation of the DOI
      */
     public static String getURI(String doi) {
         return DOI_LOOKUP_PREFIX + getDOI(doi);
