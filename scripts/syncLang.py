@@ -2,7 +2,7 @@ import sys
 import os
 import re
 
-res_dir = "../src/main/resources/resource"
+res_dir = "../src/main/resources/l10n"
 
 keyFiles = {}
 
