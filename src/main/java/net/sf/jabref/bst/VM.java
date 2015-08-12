@@ -85,8 +85,7 @@ public class VM implements Warn {
     }
 
     public interface BstFunction {
-
-        public void execute(BstEntry context);
+        void execute(BstEntry context);
     }
 
 

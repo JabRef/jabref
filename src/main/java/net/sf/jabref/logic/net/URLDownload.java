@@ -106,7 +106,7 @@ public class URLDownload {
     public String downloadToString(String encoding) throws IOException {
 
         try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
-             Writer output = new StringWriter();) {
+             Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
         } catch (IOException e) {
