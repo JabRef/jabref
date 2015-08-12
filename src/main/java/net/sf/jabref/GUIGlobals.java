@@ -287,7 +287,7 @@ public class GUIGlobals {
             GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(resource, prefix);
         } catch (IOException e) {
             System.err.println(Localization.lang("Unable to read icon theme file") + " '" +
-                    resource.toString() + '\'');
+                    resource + '\'');
             // If we were trying to load a custom theme, try the default one as a fallback:
             if (resource != defaultResource) {
                 try {

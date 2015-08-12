@@ -1080,7 +1080,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
 
                     StringSelection ss = new StringSelection
-                            ("\\cite{" + sb.toString() + '}');
+                            ("\\cite{" + sb + '}');
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(ss, BasePanel.this);
 

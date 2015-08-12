@@ -218,7 +218,7 @@ class OOBibBase {
         } catch (Exception ex) {
             System.out.println("property already exists");
         }
-        System.out.println(set.getPropertyValue("Test").toString());
+        System.out.println(set.getPropertyValue("Test"));
 
     }
 
