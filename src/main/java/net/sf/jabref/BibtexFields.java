@@ -53,11 +53,6 @@ public class BibtexFields {
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
     private static final String ENTRYTYPE = "entrytype";
-    
-    /*
-     * some extra field definitions
-     */
-    private static final String ADDITIONAL_FIELDS = "/resource/fields/fields.xml";
 
     public static final String// Using this when I have no database open or when I read
             // non bibtex file formats (used by the ImportFormatReader.java)
@@ -244,9 +239,6 @@ public class BibtexFields {
         dummy.setDisplayable(false);
         add(dummy);
 
-        // read external field definitions
-        readXML(ADDITIONAL_FIELDS);
-
         // collect all public fields for the PUBLIC_FIELDS array
         Vector<String> pFields = new Vector<String>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
@@ -300,34 +292,6 @@ public class BibtexFields {
         // field == null check
         String key = field.name;
         fieldSet.put(key, field);
-    }
-
-    /** read a xml definiton file and put only NEW fields into the field list */
-    private void readXML(String resName)
-    {
-        TXMLReader reader = new TXMLReader(resName);
-        if (reader.isReady())
-        {
-            // get a list of all fields
-            NodeList fieldNodes = reader.getNodes("field");
-
-            int tagsCount = fieldNodes.getLength();
-            for (int t = 0; t < tagsCount; t++)
-            {
-                Element entry = (Element) fieldNodes.item(t);
-                String fName = reader.readStringAttribute(entry, "name", null);
-                if (fName != null) // something found ?
-                {
-                    fName = fName.toLowerCase();
-                    BibtexSingleField dummy = fieldSet.get(fName);
-                    if (dummy == null) // unknown field
-                    {
-                        dummy = new BibtexSingleField(reader, entry);
-                        fieldSet.put(fName, dummy);
-                    }
-                }
-            }
-        }
     }
 
     // --------------------------------------------------------------------------
