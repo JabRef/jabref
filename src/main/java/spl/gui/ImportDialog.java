@@ -7,7 +7,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.l10n.Localization;
-import spl.localization.LocalizationSupport;
 
 import javax.swing.*;
 
@@ -95,7 +94,7 @@ public class ImportDialog extends JDialog {
         } else {
             labelFileName.setText(new File(fileName).getName().substring(0, 33) + "...");
         }
-        this.setTitle(LocalizationSupport.message("Import_Metadata_From_PDF"));
+        this.setTitle(Localization.lang("Import_Metadata_From_PDF"));
 
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);

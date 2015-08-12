@@ -81,8 +81,6 @@ def handleJavaCode(filename, lines, keyList, notTermList):
     #Extract first string parameter from Localization.lang call. E.g., Localization.lang("Default")
     reOnlyString = r'"((\\"|[^"])*)"[^"]*'
     patt = re.compile(r'Localization\s*\.\s*lang\s*\(\s*' + reOnlyString)
-    #second pattern as Mr Dlib contribution indirectly uses Global.lang
-    patta = re.compile(r'LocalizationSupport.message\(' + reOnlyString)
     pattOnlyString = re.compile(reOnlyString)
 
     #Find multiline Localization lang statements. E.g.:
@@ -103,8 +101,6 @@ def handleJavaCode(filename, lines, keyList, notTermList):
 
         while (curline != ""):
             result = patt.search(curline)
-            if (not result):
-                result = patta.search(curline)
             result2 = patt2.search(curline)
 
             found = ""
