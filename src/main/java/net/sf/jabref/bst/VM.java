@@ -1130,44 +1130,41 @@ public class VM implements Warn {
      * these variables has a value for each entry on the list.
      */
     private void entry(Tree child) {
+        // Fields first
+        Tree t = child.getChild(0);
+        // assert t.getType() == Bst.IDLIST;
 
-        { // Fields first
-            Tree t = child.getChild(0);
-            // assert t.getType() == Bst.IDLIST;
+        for (int i = 0; i < t.getChildCount(); i++) {
+            String name = t.getChild(i).getText();
 
-            for (int i = 0; i < t.getChildCount(); i++) {
-                String name = t.getChild(i).getText();
-
-                for (BstEntry entry : entries) {
-                    entry.fields.put(name, null);
-                }
-            }
-        }
-        { // Integers
-            Tree t = child.getChild(1);
-            // assert t.getType() == Bst.IDLIST;
-
-            for (int i = 0; i < t.getChildCount(); i++) {
-                String name = t.getChild(i).getText();
-
-                for (BstEntry entry : entries) {
-                    entry.integers.put(name, 0);
-                }
-            }
-        }
-        { // Strings
-            Tree t = child.getChild(2);
-            // assert t.getType() == Bst.IDLIST;
-
-            for (int i = 0; i < t.getChildCount(); i++) {
-                String name = t.getChild(i).getText();
-                for (BstEntry entry : entries) {
-                    entry.strings.put(name, null);
-                }
-            }
             for (BstEntry entry : entries) {
-                entry.strings.put("sort.key$", null);
+                entry.fields.put(name, null);
             }
+        }
+
+        // Integers
+        Tree t = child.getChild(1);
+        // assert t.getType() == Bst.IDLIST;
+
+        for (int i = 0; i < t.getChildCount(); i++) {
+            String name = t.getChild(i).getText();
+
+            for (BstEntry entry : entries) {
+                entry.integers.put(name, 0);
+            }
+        }
+        // Strings
+        Tree t = child.getChild(2);
+        // assert t.getType() == Bst.IDLIST;
+
+        for (int i = 0; i < t.getChildCount(); i++) {
+            String name = t.getChild(i).getText();
+            for (BstEntry entry : entries) {
+                entry.strings.put(name, null);
+            }
+        }
+        for (BstEntry entry : entries) {
+            entry.strings.put("sort.key$", null);
         }
     }
 
@@ -1243,10 +1240,9 @@ public class VM implements Warn {
                 try {
 
                     switch (c.getType()) {
-                    case BstParser.STRING: {
+                    case BstParser.STRING:
                         String s = c.getText();
                         push(s.substring(1, s.length() - 1));
-                    }
                         break;
                     case BstParser.INTEGER:
                         push(Integer.parseInt(c.getText().substring(1)));
