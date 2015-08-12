@@ -42,6 +42,8 @@ More information on this can be found via `man git-shortlog`.
 
 
 ### Add yourself to the header
+If you create a new file, use `gradlew licenseFormat` to generate the headers of your new files automatically.
+
 The headers of each `.java` file state the authors.
 These entries should match the modifications done.
 If you do not want to add your real name, add yourself as `JabRef contributors`.
