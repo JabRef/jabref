@@ -898,7 +898,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    class DeleteListener extends AbstractAction implements ActionListener {
+    class DeleteListener extends AbstractAction {
 
         public DeleteListener() {
             super(Localization.lang("Delete"), GUIGlobals.getImage("delete"));

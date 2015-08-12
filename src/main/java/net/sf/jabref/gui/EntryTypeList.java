@@ -35,7 +35,7 @@ import net.sf.jabref.util.Util;
  * list of entry types in EntryCustomizationDialog2.
  * @author alver
  */
-public class EntryTypeList extends FieldSetComponent implements ListSelectionListener, ActionListener {
+public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
     private final JButton def = new JButton(Localization.lang("Default"));
 
