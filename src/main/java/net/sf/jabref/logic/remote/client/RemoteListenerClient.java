@@ -22,9 +22,7 @@ public class RemoteListenerClient {
      * @return true if successful, false otherwise.
      */
     public static boolean sendToActiveJabRefInstance(String[] args, int remoteServerPort) {
-        try {
-            InetAddress local = InetAddress.getByName("localhost");
-            Socket socket = new Socket(local, remoteServerPort);
+        try (Socket socket = new Socket(InetAddress.getByName("localhost"), remoteServerPort)) {
             socket.setSoTimeout(TIMEOUT);
 
             Protocol protocol = new Protocol(socket);

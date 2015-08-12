@@ -32,10 +32,6 @@ public class RemoteListenerServer implements Runnable {
                     Socket socket = serverSocket.accept();
                     socket.setSoTimeout(ONE_SECOND_TIMEOUT);
 
-                    if (Thread.interrupted()) {
-                        return;
-                    }
-
                     Protocol protocol = new Protocol(socket);
                     try {
                         protocol.sendMessage(Protocol.IDENTIFIER);

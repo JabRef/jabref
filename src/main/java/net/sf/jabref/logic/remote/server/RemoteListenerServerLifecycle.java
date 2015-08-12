@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.net.BindException;
 
 /**
  * Manages the RemoteListenerServerThread through typical life cycle methods.
@@ -14,7 +15,7 @@ import java.io.IOException;
  * <p/>
  * Observer: isOpen, isNotStartedBefore
  */
-public class RemoteListenerServerLifecycle {
+public class RemoteListenerServerLifecycle implements AutoCloseable {
 
     private RemoteListenerServerThread remoteListenerServerThread = null;
 
@@ -38,10 +39,10 @@ public class RemoteListenerServerLifecycle {
         RemoteListenerServerThread result;
         try {
             result = new RemoteListenerServerThread(messageHandler, port);
+        } catch (BindException e) {
+            LOGGER.warn("Port is blocked", e);
+            result = null;
         } catch (IOException e) {
-            if (!e.getMessage().startsWith("Address already in use")) {
-                LOGGER.warn("Port is blocked", e);
-            }
             result = null;
         }
         remoteListenerServerThread = result;
@@ -58,13 +59,18 @@ public class RemoteListenerServerLifecycle {
         }
     }
 
-    private boolean isNotStartedBefore() {
+    public boolean isNotStartedBefore() {
         // threads can only be started when in state NEW
-        return remoteListenerServerThread.getState() == Thread.State.NEW;
+        return remoteListenerServerThread == null ? true : remoteListenerServerThread.getState() == Thread.State.NEW;
     }
 
     public void openAndStart(MessageHandler messageHandler, int port) {
         open(messageHandler, port);
         start();
+    }
+
+    @Override
+    public void close() throws Exception {
+        stop();
     }
 }
