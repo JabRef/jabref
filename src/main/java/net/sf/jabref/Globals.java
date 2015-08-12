@@ -35,6 +35,14 @@ import java.util.regex.Pattern;
 public class Globals {
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
+    // JabRef version info
+    public static final BuildInfo BUILD_INFO = new BuildInfo();
+
+    // Newlines
+    // will be overridden in initialization due to feature #857 @ JabRef.java
+    public static String NEWLINE = System.getProperty("line.separator");
+    public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
+
     // Remote listener
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
 
@@ -79,24 +87,16 @@ public class Globals {
     }
 
     // TODO: other stuff
-    public static FileUpdateMonitor fileUpdateMonitor;
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
-    public static StreamEavesdropper streamEavesdropper;
     public static CacheableHandler handler;
-
-    public static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public static final String FILETYPE_PREFS_EXT = "_dir";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String NONE = "_non__";
     public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
-
-    public static GlobalFocusListener focusListener;
-
-    public static AutoSaveManager autoSaveManager;
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
@@ -106,14 +106,15 @@ public class Globals {
 
     public static SidePaneManager sidePaneManager;
 
-    // will be overridden in initialization due to feature #857 @ JabRef.java
-    public static String NEWLINE = System.getProperty("line.separator");
-    public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
-
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
+
+    // Background tasks
+    public static GlobalFocusListener focusListener;
+    public static FileUpdateMonitor fileUpdateMonitor;
+    public static StreamEavesdropper streamEavesdropper;
 
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
@@ -124,7 +125,9 @@ public class Globals {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
     }
 
-    // Initialize and start the autosave manager.
+    // Autosave manager
+    public static AutoSaveManager autoSaveManager;
+
     public static void startAutoSaveManager(JabRefFrame frame) {
         Globals.autoSaveManager = new AutoSaveManager(frame);
         Globals.autoSaveManager.startAutoSaveTimer();
