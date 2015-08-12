@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class DOIUtil {
     // Base URL
-    public static final String DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
+    public static final String DOI_LOOKUP_PREFIX = "http://doi.org/";
     // DOI-regexp provided by http://stackoverflow.com/a/10324802/873282
     // Some DOI's are not caught by the regexp in the above link, i.e. 10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S
     // Removed <> from non-permitted characters
