@@ -117,7 +117,7 @@ public class CleanUpAction extends AbstractWorker {
         initOptionsPanel();
     }
 
-    public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
+    private static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
         String doi_exp = "(?:urn:)?(?:doi:)?(10(?:\\.[0-9]+)+[/:](?:.+))";
         String origValue = bes.getField(fieldName);
         String value = origValue;
@@ -418,7 +418,7 @@ public class CleanUpAction extends AbstractWorker {
                 // Doi field seems to contain Doi
                 // -> cleanup note, url, ee field
                 for (String field : fields) {
-                    DOI.build(bes.getField((field))).ifPresent( _doi -> removeDOIfromBibtexEntryField(bes, field, ce));
+                    DOI.build(bes.getField((field))).ifPresent( unused -> removeDOIfromBibtexEntryField(bes, field, ce));
                 }
             }
         } else {
