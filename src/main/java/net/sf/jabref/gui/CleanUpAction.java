@@ -117,20 +117,10 @@ public class CleanUpAction extends AbstractWorker {
         initOptionsPanel();
     }
 
-    private static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
-        String doi_exp = "(?:urn:)?(?:doi:)?(10(?:\\.[0-9]+)+[/:](?:.+))";
+    private void removeFieldValue(BibtexEntry bes, String fieldName, NamedCompound ce) {
         String origValue = bes.getField(fieldName);
-        String value = origValue;
-        value = value.replaceAll("https?://[^\\s]+?" + doi_exp, "");
-        value = value.replaceAll(doi_exp, "");
-        value = value.trim();
-        if (value.isEmpty()) {
-            value = null;
-        }
-        if (!origValue.equals(value)) {
-            ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, value));
-            bes.setField(fieldName, value);
-        }
+        ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, ""));
+        bes.setField(fieldName, "");
     }
 
     private void initOptionsPanel() {
@@ -418,7 +408,7 @@ public class CleanUpAction extends AbstractWorker {
                 // Doi field seems to contain Doi
                 // -> cleanup note, url, ee field
                 for (String field : fields) {
-                    DOI.build(bes.getField((field))).ifPresent( unused -> removeDOIfromBibtexEntryField(bes, field, ce));
+                    DOI.build(bes.getField((field))).ifPresent( unused -> removeFieldValue(bes, field, ce));
                 }
             }
         } else {
@@ -433,7 +423,7 @@ public class CleanUpAction extends AbstractWorker {
                     ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
                     bes.setField("doi", newValue);
 
-                    removeDOIfromBibtexEntryField(bes, field, ce);
+                    removeFieldValue(bes, field, ce);
                 }
             }
         }
