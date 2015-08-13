@@ -309,15 +309,11 @@ public class UtilTest {
     public void testSanitizeUrl() {
 
         Assert.assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("http://www.vg.no/fil e.html"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
-        Assert.assertEquals("www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("www.vg.no/fil%20e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", Util.sanitizeUrl("http://www.vg.no/fil e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", Util.sanitizeUrl("www.vg.no/fil%20e.html"));
 
-        Assert.assertEquals("www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
 
         /**
          * Doi Test cases
