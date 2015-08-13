@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,8 +32,25 @@ public class DOI {
     // Pattern
     private static final Pattern DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Creates an Optional<DOI> from various schemes including URL, URN, and plain DOIs.
+     *
+     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor
+     * and checking for Optional.isPresent() instead.
+     *
+     * @param doi the DOI string
+     * @return an Optional containing the DOI or an empty Optional
+     */
+    public static Optional<DOI> build(String doi) {
+        try {
+            return Optional.of(new DOI(doi));
+        } catch(NullPointerException | IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
     // DOI
-    private String doi;
+    private final String doi;
 
     /**
      * Creates a DOI from various schemes including URL, URN, and plain DOIs.
@@ -40,6 +58,7 @@ public class DOI {
      * @param doi the DOI string
      * @throws NullPointerException if DOI is null
      * @throws IllegalArgumentException if doi does not include a valid DOI
+     * @return an instance of the DOI class
      */
     public DOI(String doi) {
         Objects.requireNonNull(doi);
@@ -47,8 +66,8 @@ public class DOI {
         // Remove whitespace
         doi = doi.trim();
 
-        // URL decoding
-        if(isHttpDOI(doi)) {
+        // HTTP URL decoding
+        if(doi.matches(HTTP_EXP)) {
             try {
                 // decodes path segment
                 URI url = new URI(doi);
@@ -66,40 +85,6 @@ public class DOI {
         } else {
             throw new IllegalArgumentException(doi + " is not a valid DOI.");
         }
-    }
-
-    /**
-     * Check if the String matches a plain DOI
-     *
-     * @param value the String to check
-     * @return true if value contains a DOI
-     */
-    public static boolean isDOI(String value) {
-        if(value == null)  {
-            return false;
-        }
-        // whitespace
-        value = value.trim();
-        return value.matches(DOI_EXP);
-    }
-
-    /**
-     * Check if the String matches a URI presentation of a DOI
-     *
-     * <example>
-     *     The Doi name "10.1006/jmbi.1998.2354" would be made an actionable link as "http://doi.org/10.1006/jmbi.1998.2354".
-     * </example>
-     *
-     * @param value the String to check
-     * @return true if value contains a URI presentation of a DOI
-     */
-    public static boolean isHttpDOI(String value) {
-        if(value == null)  {
-            return false;
-        }
-        // whitespace
-        value = value.trim();
-        return value.matches(HTTP_EXP);
     }
 
     /**

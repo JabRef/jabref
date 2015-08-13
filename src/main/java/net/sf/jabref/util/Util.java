@@ -34,15 +34,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -358,8 +350,10 @@ public class Util {
         // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
-        if (DOI.isDOI(link) && !link.startsWith("http://")) {
-            link = new DOI(link).getURL();
+        // TODO: this is broken (https:// + in general)
+        Optional<DOI> doi = DOI.build(link);
+        if (doi.isPresent() && !link.startsWith("http://")) {
+            link = doi.get().getURL();
         }
 
         link = link.replaceAll("\\+", "%2B");

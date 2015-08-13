@@ -103,49 +103,4 @@ public class DOITest {
         Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURL());
         Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURL());
     }
-
-    @Test
-    public void detectValidHttpDoi() {
-        // http
-        Assert.assertTrue(DOI.isHttpDOI("http://doi.acm.org/10.1145/1294928.1294933"));
-        // https
-        Assert.assertTrue(DOI.isHttpDOI("https://dx.doi.org/10.1007/978%20-3-642-15618-2_19"));
-        // whitespace
-        Assert.assertTrue(DOI.isHttpDOI(" http://dx.doi.org/10.1000/182 "));
-    }
-
-
-    @Test
-    public void detectInvalidHttpDoi() {
-        // wrong directory indicator
-        Assert.assertFalse(DOI.isHttpDOI("http://doi.acm.org/12.1006/jmbi.1998.2354"));
-        // missing divider
-        Assert.assertFalse(DOI.isHttpDOI("http://doi.acm.org/12.1006-jmbi.1998.2354"));
-        // other
-        Assert.assertFalse(DOI.isHttpDOI("http://www.xyz.com"));
-        Assert.assertFalse(DOI.isHttpDOI("http://dx.doing.org/fjdlfdsjfdlfdj.htm"));
-        Assert.assertFalse(DOI.isHttpDOI("thfjtfjglkjjlkk�lm5476576658796"));
-        Assert.assertFalse(DOI.isHttpDOI("10.1006/jmbi.1998.2354"));
-        Assert.assertFalse(DOI.isHttpDOI("other stuff http://dx.doi.org/10.1000/182 ffgg"));
-    }
-
-    @Test
-    public void detectValidDoi() {
-        Assert.assertTrue(DOI.isDOI("10.1145/1294928.1294933"));
-        Assert.assertTrue(DOI.isDOI("10.1007/978%20-3-642-15618-2_19"));
-        Assert.assertTrue(DOI.isDOI(" 10.1000/18\"2 "));
-        Assert.assertTrue(DOI.isDOI(" urn:doi:10.1000/18\"2 "));
-    }
-
-    @Test
-    public void detectInvalidDoi() {
-        // wrong directory indicator
-        Assert.assertFalse(DOI.isDOI("12.1006/jmbi.1998.2354"));
-        // missing divider
-        Assert.assertFalse(DOI.isDOI("10.1006-jmbi.1998.2354"));
-        // urn doi
-        Assert.assertFalse(DOI.isDOI(" doi:urn:10.1000/18\"2 "));
-        // other
-        Assert.assertFalse(DOI.isDOI("10.2489bh3rg788r3>/54"));
-    }
 }

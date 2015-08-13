@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -398,36 +399,37 @@ public class CleanUpAction extends AbstractWorker {
      * @param ce 
      */
     private void doCleanUpDOI(BibtexEntry bes, NamedCompound ce) {
-
         // fields to check
         String[] fields = {"note", "url", "ee"};
 
         // First check if the Doi Field is empty
         if (bes.getField("doi") != null) {
             String doiFieldValue = bes.getField("doi");
-            if (DOI.isHttpDOI(doiFieldValue)) {
-                String newValue = new DOI(doiFieldValue).getDOI();
-                ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
-                bes.setField("doi", newValue);
-            }
-            if (DOI.isDOI(doiFieldValue)) {
+
+            Optional<DOI> doi = DOI.build(doiFieldValue);
+
+            if(doi.isPresent()) {
+                String newValue = doi.get().getDOI();
+                if (!doiFieldValue.equals(newValue)) {
+                    ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
+                    bes.setField("doi", newValue);
+                }
+
                 // Doi field seems to contain Doi
-                // cleanup note, url, ee field
-                // we do NOT copy values to the Doi field as the Doi field contains a Doi!
+                // -> cleanup note, url, ee field
                 for (String field : fields) {
-                    if (DOI.isDOI(bes.getField(field))) {
-                        removeDOIfromBibtexEntryField(bes, field, ce);
-                    }
+                    DOI.build(bes.getField((field))).ifPresent( _doi -> removeDOIfromBibtexEntryField(bes, field, ce));
                 }
             }
         } else {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
-
             for (String field : fields) {
-                if (DOI.isDOI(bes.getField(field))) {
+                Optional<DOI> doi = DOI.build(bes.getField(field));
+
+                if (doi.isPresent()) {
                     // update Doi
                     String oldValue = bes.getField("doi");
-                    String newValue = new DOI(bes.getField(field)).getDOI();
+                    String newValue = doi.get().getDOI();
                     ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
                     bes.setField("doi", newValue);
 
