@@ -19,26 +19,13 @@ import net.sf.jabref.util.DOI;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
- * Used to fix [ 1588028 ] export HTML table doi url.
+ * Used to fix [ 1588028 ] export HTML table DOI URL.
  * 
- * Will prepend "http://dx.doi.org/" if only doi number and not a URL is given.
- *
- * @author mark-schenk
- * @author olly98
+ * Will prepend "http://doi.org/" if only DOI and not an URL is given.
  */
 public class DOICheck implements LayoutFormatter {
-
     @Override
     public String format(String fieldText) {
-
-        if (fieldText == null) {
-            return null;
-        }
-
-        if (fieldText.trim().isEmpty()) {
-            return "";
-        }
-
-        return new DOI(fieldText).getURL();
+        return DOI.build(fieldText).map(doi -> doi.getURL()).orElse("");
     }
 }

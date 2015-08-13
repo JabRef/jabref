@@ -20,19 +20,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Will strip any prefixes from the Doi field, in order to output only the Doi number
- * 
- * @author mark-schenk 
- * @author olly98
- *
  */
 public class DOIStrip implements LayoutFormatter {
-
     @Override
     public String format(String fieldText) {
-        if (fieldText == null) {
-            return null;
-        } else {
-            return new DOI(fieldText).getDOI();
-        }
+        return DOI.build(fieldText).map(doi -> doi.getDOI()).orElse("");
     }
 }
