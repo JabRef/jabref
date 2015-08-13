@@ -42,7 +42,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Doi;
+import net.sf.jabref.util.DOI;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.util.Util;
@@ -114,6 +114,22 @@ public class CleanUpAction extends AbstractWorker {
         this.panel = panel;
         this.frame = panel.frame();
         initOptionsPanel();
+    }
+
+    public static void removeDOIfromBibtexEntryField(BibtexEntry bes, String fieldName, NamedCompound ce) {
+        String doi_exp = "(?:urn:)?(?:doi:)?(10(?:\\.[0-9]+)+[/:](?:.+))";
+        String origValue = bes.getField(fieldName);
+        String value = origValue;
+        value = value.replaceAll("https?://[^\\s]+?" + doi_exp, "");
+        value = value.replaceAll(doi_exp, "");
+        value = value.trim();
+        if (value.isEmpty()) {
+            value = null;
+        }
+        if (!origValue.equals(value)) {
+            ce.addEdit(new UndoableFieldChange(bes, fieldName, origValue, value));
+            bes.setField(fieldName, value);
+        }
     }
 
     private void initOptionsPanel() {
@@ -389,18 +405,18 @@ public class CleanUpAction extends AbstractWorker {
         // First check if the Doi Field is empty
         if (bes.getField("doi") != null) {
             String doiFieldValue = bes.getField("doi");
-            if (Doi.containsHttpDoi(doiFieldValue)) {
-                String newValue = new Doi(doiFieldValue).getDoi();
+            if (DOI.isHttpDOI(doiFieldValue)) {
+                String newValue = new DOI(doiFieldValue).getDOI();
                 ce.addEdit(new UndoableFieldChange(bes, "doi", doiFieldValue, newValue));
                 bes.setField("doi", newValue);
             }
-            if (Doi.containsDoi(doiFieldValue)) {
+            if (DOI.isDOI(doiFieldValue)) {
                 // Doi field seems to contain Doi
                 // cleanup note, url, ee field
                 // we do NOT copy values to the Doi field as the Doi field contains a Doi!
                 for (String field : fields) {
-                    if (Doi.containsDoi(bes.getField(field))) {
-                        Doi.removeDOIfromBibtexEntryField(bes, field, ce);
+                    if (DOI.isDOI(bes.getField(field))) {
+                        removeDOIfromBibtexEntryField(bes, field, ce);
                     }
                 }
             }
@@ -408,14 +424,14 @@ public class CleanUpAction extends AbstractWorker {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
 
             for (String field : fields) {
-                if (Doi.containsDoi(bes.getField(field))) {
+                if (DOI.isDOI(bes.getField(field))) {
                     // update Doi
                     String oldValue = bes.getField("doi");
-                    String newValue = new Doi(bes.getField(field)).getDoi();
+                    String newValue = new DOI(bes.getField(field)).getDOI();
                     ce.addEdit(new UndoableFieldChange(bes, "doi", oldValue, newValue));
                     bes.setField("doi", newValue);
 
-                    Doi.removeDOIfromBibtexEntryField(bes, field, ce);
+                    removeDOIfromBibtexEntryField(bes, field, ce);
                 }
             }
         }

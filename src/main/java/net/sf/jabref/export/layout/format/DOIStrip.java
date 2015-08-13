@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.util.Doi;
+import net.sf.jabref.util.DOI;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
@@ -32,7 +32,7 @@ public class DOIStrip implements LayoutFormatter {
         if (fieldText == null) {
             return null;
         } else {
-            return new Doi(fieldText).getDoi();
+            return new DOI(fieldText).getDOI();
         }
     }
 }
