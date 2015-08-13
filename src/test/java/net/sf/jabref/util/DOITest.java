@@ -127,7 +127,6 @@ public class DOITest {
         Assert.assertFalse(DOI.isHttpDOI("thfjtfjglkjjlkk�lm5476576658796"));
         Assert.assertFalse(DOI.isHttpDOI("10.1006/jmbi.1998.2354"));
         Assert.assertFalse(DOI.isHttpDOI("other stuff http://dx.doi.org/10.1000/182 ffgg"));
-        Assert.assertFalse(DOI.isHttpDOI("thfjtfjglkjjlkk�lm5476576658796"));
     }
 
     @Test
