@@ -85,7 +85,7 @@ public class Localization {
                 translation = messages.getString(key.replaceAll(" ", "_"));
             }
         } catch (MissingResourceException ex) {
-            LOGGER.warn("Warning: could not get translation for \"" + key + "\"");
+            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
         }
         if (translation == null) {
             translation = key;
