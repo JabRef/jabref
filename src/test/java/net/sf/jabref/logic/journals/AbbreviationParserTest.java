@@ -11,9 +11,6 @@ public class AbbreviationParserTest {
     public void testReadJournalListFromResource() throws Exception {
         AbbreviationParser ap = new AbbreviationParser();
         ap.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-        for(Abbreviation abbreviation : ap.getAbbreviations()) {
-            System.out.println(abbreviation.toPropertiesLine());
-        }
          assertFalse(ap.getAbbreviations().isEmpty());
     }
 }

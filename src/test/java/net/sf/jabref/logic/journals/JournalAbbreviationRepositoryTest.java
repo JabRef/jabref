@@ -3,6 +3,8 @@ package net.sf.jabref.logic.journals;
 import net.sf.jabref.Globals;
 
 import static org.junit.Assert.*;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JournalAbbreviationRepositoryTest {
@@ -71,12 +73,12 @@ public class JournalAbbreviationRepositoryTest {
         assertEquals("Long Name = LA. N.", repository.getAbbreviations().first().toPropertiesLine());
     }
 
-    @Test //@Ignore(value = "only used for checking the parse logic")
+    @Test
     public void testParsing() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
         repository.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-        //repository.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
-        System.out.println(repository.toPropertiesString());
+        repository.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
+        assertTrue(!repository.getAbbreviations().isEmpty());
     }
 
 }
