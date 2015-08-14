@@ -24,6 +24,10 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class DOIStrip implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
-        return DOI.build(fieldText).map(doi -> doi.getDOI()).orElse("");
+        if (fieldText == null) {
+            return null;
+        }
+
+        return DOI.build(fieldText).map(doi -> doi.getDOI()).orElse(fieldText);
     }
 }
