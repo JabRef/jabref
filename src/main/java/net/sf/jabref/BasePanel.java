@@ -57,6 +57,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.DatabaseChangeEvent.ChangeType;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
@@ -152,7 +153,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     /* 
      * The database shown in this panel.
      */
-    BibtexDatabase database;
+    public BibtexDatabase database;
 
     private int mode;
     private EntryEditor currentEditor;
@@ -249,7 +250,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Potential use in hiding non-hits completely.
 
     // MetaData parses, keeps and writes meta data.
-    final MetaData metaData;
+    public final MetaData metaData;
 
     private final HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;

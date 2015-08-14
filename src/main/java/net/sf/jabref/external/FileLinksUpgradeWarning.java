@@ -20,6 +20,7 @@ import java.util.List;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;

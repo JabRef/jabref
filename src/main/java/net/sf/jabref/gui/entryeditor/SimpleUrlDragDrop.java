@@ -24,7 +24,7 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.entryeditor;
 
 import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
@@ -37,7 +37,6 @@ import java.net.URL;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
@@ -53,11 +52,11 @@ class SimpleUrlDragDrop implements DropTargetListener {
 
     private final FieldEditor editor;
 
-    private final StoreFieldAction storeFieldAction;
+    private final EntryEditor.StoreFieldAction storeFieldAction;
 
 
     public SimpleUrlDragDrop(FieldEditor _editor,
-            StoreFieldAction _storeFieldAction) {
+            EntryEditor.StoreFieldAction _storeFieldAction) {
         editor = _editor;
         storeFieldAction = _storeFieldAction;
     }

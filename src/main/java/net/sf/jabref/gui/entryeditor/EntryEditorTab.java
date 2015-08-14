@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.entryeditor;
 
 import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.swing.*;
 
+import net.sf.jabref.*;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldTextArea;
 import net.sf.jabref.gui.fieldeditors.FieldTextField;

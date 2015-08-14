@@ -246,8 +246,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
     private final AbstractAction importNew = ImportFormats.getImportAction(this, true);
-    final AbstractAction nextTab = new ChangeTabAction(true);
-    final AbstractAction prevTab = new ChangeTabAction(false);
+    public final AbstractAction nextTab = new ChangeTabAction(true);
+    public final AbstractAction prevTab = new ChangeTabAction(false);
     private final AbstractAction sortTabs = new SortTabsAction(this);
     private final AbstractAction undo = new GeneralAction("undo", "Undo", Localization.lang("Undo"),
                     prefs.getKey("Undo"));
