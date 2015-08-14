@@ -55,9 +55,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void update() {
-        //pdfURL = new URL("http://geog-www.sbs.ohio-state.edu/faculty/bmark/abbott_etal_ppp03.pdf");
         if (result.url != null) {
-            //System.out.println("PDF URL: "+result.url);
             String bibtexKey = entry.getCiteKey();
             String[] dirs = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             if (dirs.length == 0) {
@@ -72,7 +70,6 @@ public class FindFullTextAction extends AbstractWorker {
 
                     @Override
                     public void downloadComplete(FileListEntry file) {
-                        System.out.println("finished");
                         FileListTableModel tm = new FileListTableModel();
                         String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
                         tm.setContent(oldValue);
@@ -93,24 +90,16 @@ public class FindFullTextAction extends AbstractWorker {
         else {
             String message = null;
             switch (result.status) {
-            case FindFullText.UNKNOWN_DOMAIN:
-                message = Localization.lang("Unable to find full text article. No search algorithm "
-                        + "defined for the '%0' web site.", result.host);
-                break;
             case FindFullText.WRONG_MIME_TYPE:
                 message = Localization.lang("Found pdf link, but received the wrong MIME type. "
                         + "This could indicate that you don't have access to the fulltext article.");
                 break;
             case FindFullText.LINK_NOT_FOUND:
-                message = Localization.lang("Unable to find full text document in the linked web page.");
+                message = Localization.lang("Unable to find full text document.");
                 break;
             case FindFullText.IO_EXCEPTION:
                 message = Localization.lang("Connection error when trying to find full text document.");
                 break;
-            case FindFullText.NO_URLS_DEFINED:
-                message = Localization.lang("This entry provides no URL or DOI links.");
-                break;
-
             }
             basePanel.output(Localization.lang("Full text article download failed"));
             JOptionPane.showMessageDialog(basePanel.frame(), message, Localization.lang("Full text article download failed"),

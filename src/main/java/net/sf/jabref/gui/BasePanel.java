@@ -290,8 +290,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, (BaseAction) selectionListener::editSignalled);
 
-        actions.put("test", new FindFullTextAction(this));
-
         // The action for saving a database.
         actions.put(Actions.SAVE, saveAction);
 
@@ -1358,9 +1356,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
+
         actions.put(Actions.ADD_TO_GROUP, new GroupAddRemoveDialog(this, true, false));
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
+
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
     }
 
     /**

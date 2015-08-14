@@ -26,9 +26,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.crawler.ACS;
+import net.sf.jabref.logic.crawler.GoogleScholar;
+import net.sf.jabref.logic.crawler.ScienceDirect;
+import net.sf.jabref.logic.crawler.SpringerLink;
 import net.sf.jabref.logic.net.URLDownload;
 
 /**
@@ -36,108 +41,66 @@ import net.sf.jabref.logic.net.URLDownload;
  */
 public class FindFullText {
 
-    private static final int
-            FOUND_PDF = 0;
+    private static final int FOUND_PDF = 0;
     public static final int WRONG_MIME_TYPE = 1;
-    public static final int UNKNOWN_DOMAIN = 2;
-    public static final int LINK_NOT_FOUND = 3;
-    public static final int IO_EXCEPTION = 4;
-    public static final int NO_URLS_DEFINED = 5;
+    public static final int LINK_NOT_FOUND = 2;
+    public static final int IO_EXCEPTION = 3;
 
     private final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
 
 
     public FindFullText() {
-        finders.add(new ScienceDirectPdfDownload());
-        finders.add(new SpringerLinkPdfDownload());
-        finders.add(new ACSPdfDownload());
+        // Ordering is important, authorities first!
+        // Publisher
+        finders.add(new ScienceDirect());
+        finders.add(new SpringerLink());
+        finders.add(new ACS());
+        // Meta search
+        finders.add(new GoogleScholar());
     }
 
     public FindResult findFullText(BibtexEntry entry) {
-        String urlText = entry.getField("url");
-        String doiText = entry.getField("doi");
-        // First try the Doi link, if defined:
-        if (doiText != null && !doiText.trim().isEmpty()) {
-            FindResult resDoi = lookForFullTextAtURL(new DOI(doiText).getURLAsASCIIString());
-            if (resDoi.status == FindFullText.FOUND_PDF) {
-                return resDoi;
-            } else if (urlText != null && !urlText.trim().isEmpty()) {
-                FindResult resUrl = lookForFullTextAtURL(urlText);
-                if (resUrl.status == FindFullText.FOUND_PDF) {
-                    return resUrl;
-                } else {
-                    return resDoi; // If both URL and Doi fail, we assume that the error code for Doi is
-                                   // probably the most relevant.
-                }
-            } else {
-                return resDoi;
-            }
-        }
-        // No Doi? Try URL:
-        else if (urlText != null && !urlText.trim().isEmpty()) {
-            return lookForFullTextAtURL(urlText);
-        }
-        // No URL either? Return error code.
- else {
-            return new FindResult(FindFullText.NO_URLS_DEFINED, null);
-        }
-    }
+        for (FullTextFinder finder : finders) {
+            try {
+                Optional<URL> result = finder.findFullText(entry);
 
-    private FindResult lookForFullTextAtURL(String urlText) {
-        try {
-            URL url = new URL(urlText);
-            url = resolveRedirects(url, 0);
-            boolean domainKnown = false;
-            for (FullTextFinder finder : finders) {
-                if (finder.supportsSite(url)) {
-                    domainKnown = true;
-                    URL result = finder.findFullTextURL(url);
-                    if (result != null) {
-
-                        // Check the MIME type of this URL to see if it is a PDF. If not,
-                        // it could be because the user doesn't have access:
-                        try {
-                            String mimeType = new URLDownload(result).determineMimeType();
-                            if (mimeType != null && mimeType.toLowerCase().equals("application/pdf")) {
-                                return new FindResult(result, url);
-                            }
-                            else {
-                                new URLDownload(result).downloadToFile(new File("page.html"));
-                                return new FindResult(FindFullText.WRONG_MIME_TYPE, url);
-                            }
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                            return new FindResult(FindFullText.IO_EXCEPTION, url);
-                        }
+                if (result.isPresent()) {
+                    // TODO: recheck this!
+                    // Check the MIME type of this URL to see if it is a PDF. If not,
+                    // it could be because the user doesn't have access:
+                    // FIXME: redirection break this!
+                    // Property-based software engineering measurement
+                    // http://drum.lib.umd.edu/bitstream/1903/19/2/CS-TR-3368.pdf
+                    // FIXME:
+                    // INFO: Fulltext PDF found @ Google: https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/sose14-towards-application-portability-in-paas.pdf
+                    // javax.net.ssl.SSLProtocolException: handshake alert:  unrecognized_name
+                    // http://stackoverflow.com/questions/7615645/ssl-handshake-alert-unrecognized-name-error-since-upgrade-to-java-1-7-0
+                    String mimeType = new URLDownload(result.get()).determineMimeType();
+                    if (mimeType != null && mimeType.toLowerCase().equals("application/pdf")) {
+                        return new FindResult(result.get(), result.get());
+                    } else {
+                        return new FindResult(WRONG_MIME_TYPE, result.get());
                     }
-
                 }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return new FindResult(IO_EXCEPTION, null);
             }
-            if (!domainKnown) {
-                return new FindResult(FindFullText.UNKNOWN_DOMAIN, url);
-            } else {
-                return new FindResult(FindFullText.LINK_NOT_FOUND, url);
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        return null;
+        return new FindResult(LINK_NOT_FOUND, null);
     }
 
     /**
      * Follow redirects until the final location is reached. This is necessary to handle Doi links, which
      * redirect to publishers' web sites. We need to know the publisher's domain name in order to choose
      * which FullTextFinder to use.
-     * @param url The url to start with.
+     *
+     * @param url           The url to start with.
      * @param redirectCount The number of previous redirects. We will follow a maximum of 5 redirects.
      * @return the final URL, or the initial one in case there is no redirect.
      * @throws IOException for connection error
      */
-    private URL resolveRedirects(URL url, int redirectCount) throws IOException {
+    private static URL resolveRedirects(URL url, int redirectCount) throws IOException {
         URLConnection uc = url.openConnection();
         if (uc instanceof HttpURLConnection) {
             HttpURLConnection huc = (HttpURLConnection) uc;
@@ -146,7 +109,7 @@ public class FindFullText {
             int responseCode = huc.getResponseCode();
             String location = huc.getHeaderField("location");
             huc.disconnect();
-            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP && redirectCount < 5) {
+            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM && redirectCount < 5) {
                 //System.out.println(responseCode);
                 //System.out.println(location);
                 try {
@@ -185,8 +148,7 @@ public class FindFullText {
                     sb.append((char) c);
                 }
                 return sb.toString();
-            }
-            else {
+            } else {
                 return null; // TODO: are other types of connection (https?) relevant?
             }
         } finally {
@@ -226,18 +188,6 @@ public class FindFullText {
             if (originalUrl != null) {
                 this.host = originalUrl.getHost();
             }
-        }
-    }
-
-
-    public static void dumpToFile(String text, File f) {
-        try {
-            FileWriter fw = new FileWriter(f);
-            fw.write(text);
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-
         }
     }
 }
