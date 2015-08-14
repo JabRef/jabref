@@ -24,8 +24,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
