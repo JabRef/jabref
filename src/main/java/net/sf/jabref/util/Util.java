@@ -28,21 +28,10 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLConnection;
-import java.net.URLDecoder;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -340,28 +329,31 @@ public class Util {
     public static String sanitizeUrl(String link) {
         link = link.trim();
 
-        // First check if it is enclosed in \\url{}. If so, remove
-// the wrapper.
+        // First check if it is enclosed in \\url{}. If so, remove the wrapper.
         if (link.startsWith("\\url{") && link.endsWith("}")) {
             link = link.substring(5, link.length() - 1);
         }
 
-        if (link.matches("^doi:/*.*")) {
-            // Remove 'doi:'
-            link = link.replaceFirst("^doi:/*", "");
-            link = new Doi(link).getUri();
-        }
-
+        // DOI cleanup
         // converts doi-only link to full http address
         // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
         // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
         // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
         // To prevent mangling of working URLs I'm disabling this check if the link is already
         // a full http link:
-        if (Doi.containsDoi(link) && !link.startsWith("http://")) {
-            link = new Doi(link).getUri();
+        // TODO: not sure if this is allowed
+        if (link.matches("^doi:/*.*")) {
+            // Remove 'doi:'
+            link = link.replaceFirst("^doi:/*", "");
+            link = new DOI(link).getURL();
         }
 
+        Optional<DOI> doi = DOI.build(link);
+        if (doi.isPresent() && !link.matches("^https?://.*")) {
+            link = doi.get().getURL();
+        }
+
+        // FIXME: everything below is really flawed atm
         link = link.replaceAll("\\+", "%2B");
 
         try {

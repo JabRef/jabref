@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Doi;
+import net.sf.jabref.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -237,7 +237,7 @@ public class PdfContentImporter extends ImportFormat {
             stripper.writeText(document, writer);
             String textResult = writer.toString();
 
-            String doi = new Doi(textResult).getDoi();
+            String doi = new DOI(textResult).getDOI();
             if (doi.length() < textResult.length()) {
                 // A Doi was found in the text
                 // We do NO parsing of the text, but use the Doi fetcher

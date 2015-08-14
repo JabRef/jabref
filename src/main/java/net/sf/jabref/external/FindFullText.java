@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.util.Doi;
+import net.sf.jabref.util.DOI;
 import net.sf.jabref.logic.net.URLDownload;
 
 /**
@@ -58,7 +58,7 @@ public class FindFullText {
         String doiText = entry.getField("doi");
         // First try the Doi link, if defined:
         if (doiText != null && !doiText.trim().isEmpty()) {
-            FindResult resDoi = lookForFullTextAtURL(new Doi(doiText).getUri());
+            FindResult resDoi = lookForFullTextAtURL(new DOI(doiText).getURL());
             if (resDoi.status == FindFullText.FOUND_PDF) {
                 return resDoi;
             } else if (urlText != null && !urlText.trim().isEmpty()) {

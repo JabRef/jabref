@@ -17,6 +17,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.*;
 import java.util.List;
 
@@ -308,23 +309,19 @@ public class UtilTest {
     public void testSanitizeUrl() {
 
         Assert.assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("http://www.vg.no/fil e.html"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
-        Assert.assertEquals("www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("www.vg.no/fil%20e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", Util.sanitizeUrl("http://www.vg.no/fil e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", Util.sanitizeUrl("www.vg.no/fil%20e.html"));
 
-        Assert.assertEquals("www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
 
         /**
          * Doi Test cases
          */
-        Assert.assertEquals(Doi.RESOLVER + "10.1109/VLHCC.2004.20", Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
-        Assert.assertEquals(Doi.RESOLVER + "10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
-        Assert.assertEquals(Doi.RESOLVER + "10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
-        Assert.assertEquals(Doi.RESOLVER + "10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
 
         /**
          * Additional testcases provided by Hannes Restel and Micha Beckmann.
