@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,8 +36,8 @@ public final class EntryEditorTabList {
     }
 
     private void init() {
-        list = new ArrayList<List<String>>();
-        names = new ArrayList<String>();
+        list = new ArrayList<>();
+        names = new ArrayList<>();
         int i = 0;
         String name;
         String[] fields;
