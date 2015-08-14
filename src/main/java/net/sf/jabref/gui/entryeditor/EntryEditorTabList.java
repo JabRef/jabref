@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,7 +13,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.entryeditor;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +36,8 @@ public final class EntryEditorTabList {
     }
 
     private void init() {
-        list = new ArrayList<List<String>>();
-        names = new ArrayList<String>();
+        list = new ArrayList<>();
+        names = new ArrayList<>();
         int i = 0;
         String name;
         String[] fields;

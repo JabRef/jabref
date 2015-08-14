@@ -217,7 +217,7 @@ public class FieldContentSelector extends JComponent {
         editor.requestFocus();
     }
 
-    void rebuildComboBox() {
+    public void rebuildComboBox() {
         comboBox.removeAllItems();
 
         // TODO: CO - What for?

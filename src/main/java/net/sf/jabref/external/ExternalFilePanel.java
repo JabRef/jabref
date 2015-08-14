@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;

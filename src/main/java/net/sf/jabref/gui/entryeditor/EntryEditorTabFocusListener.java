@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.entryeditor;
 
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 
@@ -31,9 +31,10 @@ import java.awt.event.FocusListener;
  */
 class EntryEditorTabFocusListener implements FocusListener {
 
-    private JTextComponent c;
+    private JTextComponent textComponent;
 
-    private DocumentListener d;
+    private DocumentListener documentListener;
+
     private final EntryEditorTab entryEditorTab;
 
 
@@ -42,27 +43,27 @@ class EntryEditorTabFocusListener implements FocusListener {
     }
 
     @Override
-    public void focusGained(FocusEvent e) {
+    public void focusGained(FocusEvent event) {
 
         synchronized (this) {
-            if (c != null) {
-                c.getDocument().removeDocumentListener(d);
-                c = null;
-                d = null;
+            if (textComponent != null) {
+                textComponent.getDocument().removeDocumentListener(documentListener);
+                textComponent = null;
+                documentListener = null;
             }
 
-            if (e.getSource() instanceof JTextComponent) {
+            if (event.getSource() instanceof JTextComponent) {
 
-                c = (JTextComponent) e.getSource();
+                textComponent = (JTextComponent) event.getSource();
                 /**
                  * [ 1553552 ] Not properly detecting changes to flag as
                  * changed
                  */
-                d = new DocumentListener() {
+                documentListener = new DocumentListener() {
 
                     void fire() {
-                        if (c.isFocusOwner()) {
-                            entryEditorTab.markIfModified((FieldEditor) c);
+                        if (textComponent.isFocusOwner()) {
+                            entryEditorTab.markIfModified((FieldEditor) textComponent);
                         }
                     }
 
@@ -81,14 +82,14 @@ class EntryEditorTabFocusListener implements FocusListener {
                         fire();
                     }
                 };
-                c.getDocument().addDocumentListener(d);
+                textComponent.getDocument().addDocumentListener(documentListener);
 
                 /**
                  * Makes the vertical scroll panel view follow the focus
                  */
-                Component cScrollPane = c.getParent().getParent();
-                if (cScrollPane instanceof JScrollPane) {
-                    JScrollPane componentPane = (JScrollPane) cScrollPane;
+                Component scrollPane = textComponent.getParent().getParent();
+                if (scrollPane instanceof JScrollPane) {
+                    JScrollPane componentPane = (JScrollPane) scrollPane;
                     Component cPane = componentPane.getParent();
                     if (cPane instanceof JPanel) {
                         JPanel panel = (JPanel) cPane;
@@ -100,21 +101,21 @@ class EntryEditorTabFocusListener implements FocusListener {
             }
         }
 
-        entryEditorTab.setActive((FieldEditor) e.getSource());
+        entryEditorTab.setActive((FieldEditor) event.getSource());
 
     }
 
     @Override
-    public void focusLost(FocusEvent e) {
+    public void focusLost(FocusEvent event) {
         synchronized (this) {
-            if (c != null) {
-                c.getDocument().removeDocumentListener(d);
-                c = null;
-                d = null;
+            if (textComponent != null) {
+                textComponent.getDocument().removeDocumentListener(documentListener);
+                textComponent = null;
+                documentListener = null;
             }
         }
-        if (!e.isTemporary()) {
-            entryEditorTab.getParent().updateField(e.getSource());
+        if (!event.isTemporary()) {
+            entryEditorTab.getParent().updateField(event.getSource());
         }
     }
 }

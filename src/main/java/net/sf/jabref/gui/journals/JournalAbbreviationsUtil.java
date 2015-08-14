@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.EntryEditor;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
