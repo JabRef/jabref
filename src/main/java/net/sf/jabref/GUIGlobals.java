@@ -437,7 +437,7 @@ public class GUIGlobals {
 
         for (ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
             lab = new JLabel(fileType.getIcon());
-            lab.setToolTipText(Localization.lang("Open " + fileType.getName() + " file"));
+            lab.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             GUIGlobals.tableIcons.put(fileType.getName(), lab);
         }
 
