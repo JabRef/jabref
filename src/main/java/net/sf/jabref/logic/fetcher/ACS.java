@@ -1,30 +1,13 @@
-/*  Copyright (C) 2014 Commonwealth Scientific and Industrial Research Organisation
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+package net.sf.jabref.logic.fetcher;
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-package net.sf.jabref.logic.crawler;
-
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.external.FullTextFinder;
-import net.sf.jabref.util.DOI;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.IOException;
 import java.util.Objects;
@@ -58,7 +41,7 @@ public class ACS implements FullTextFinder {
         if(doi.isPresent()) {
             String source = String.format(SOURCE, doi.get().getDOI());
             // Retrieve PDF link
-            Document html = Jsoup.connect(source).get();
+            Document html = Jsoup.connect(source).timeout(5000).ignoreHttpErrors(true).get();
             Element link = html.select(".pdf-high-res a").first();
 
             if(link != null) {

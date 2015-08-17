@@ -1,16 +1,13 @@
-package net.sf.jabref.logic.crawler;
+package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
-
-import static org.junit.Assert.*;
 
 public class GoogleScholarTest {
     GoogleScholar finder;

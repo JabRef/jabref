@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.external;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -30,10 +28,7 @@ import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.logic.crawler.ACS;
-import net.sf.jabref.logic.crawler.GoogleScholar;
-import net.sf.jabref.logic.crawler.ScienceDirect;
-import net.sf.jabref.logic.crawler.SpringerLink;
+import net.sf.jabref.logic.fetcher.*;
 import net.sf.jabref.logic.net.URLDownload;
 
 /**

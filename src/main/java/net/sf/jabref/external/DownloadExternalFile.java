@@ -159,8 +159,6 @@ public class DownloadExternalFile {
         if (mimeType != null) {
             System.out.println("mimetype:" + mimeType);
             suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
-            /*if (suggestedType != null)
-                System.out.println("Found type '"+suggestedType.getName()+"' by MIME type '"+udl.getMimeType()+"'");*/
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
@@ -286,7 +284,7 @@ public class DownloadExternalFile {
         editor.setOkEnabled(true);
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
-
+    // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
 
         String plannedName = bibtexKey;
@@ -298,7 +296,10 @@ public class DownloadExternalFile {
         * [ 1548875 ] download pdf produces unsupported filename
         *
         * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
-        *
+        * FIXME: rework this! just allow alphanumeric stuff or so?
+        * https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#naming_conventions
+        * http://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os
+        * https://support.apple.com/en-us/HT202808
         */
         if (OS.WINDOWS) {
             plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
@@ -310,7 +311,7 @@ public class DownloadExternalFile {
     }
 
     /**
-     * Look for the last '.' in the link, and returnthe following characters.
+     * Look for the last '.' in the link, and return the following characters.
      * This gives the extension for most reasonably named links.
      *
      * @param link The link

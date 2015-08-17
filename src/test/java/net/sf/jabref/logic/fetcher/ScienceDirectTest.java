@@ -1,25 +1,21 @@
-package net.sf.jabref.logic.crawler;
+package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.external.FullTextFinder;
-import net.sf.jabref.logic.crawler.ACS;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
-public class ACSTest {
-    ACS finder;
+public class ScienceDirectTest {
+    ScienceDirect finder;
     BibtexEntry entry;
 
     @Before
     public void setup() {
-        finder = new ACS();
+        finder = new ScienceDirect();
         entry = new BibtexEntry();
     }
 
@@ -30,17 +26,17 @@ public class ACSTest {
 
     @Test
     public void findByDOI() throws IOException {
-        entry.setField("doi", "10.1021/bk-2006-STYG.ch014");
+        entry.setField("doi", "10.1016/j.aasri.2014.09.002");
 
         Assert.assertEquals(
-                Optional.of(new URL("http://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014")),
+                Optional.of(new URL("http://api.elsevier.com/content/article/doi/10.1016/j.aasri.2014.09.002?httpAccept=application/pdf")),
                 finder.findFullText(entry)
         );
     }
 
     @Test
     public void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1021/bk-2006-WWW.ch014");
+        entry.setField("doi", "10.1016/j.aasri.2014.0559.002");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
