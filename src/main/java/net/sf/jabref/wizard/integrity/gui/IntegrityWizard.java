@@ -44,6 +44,7 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class IntegrityWizard extends JDialog implements ActionListener {

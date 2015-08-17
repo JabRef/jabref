@@ -32,8 +32,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.GUIGlobals;
-
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.
  * 

@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;

@@ -20,6 +20,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 

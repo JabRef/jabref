@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.gui.GUIGlobals;
+
 import java.util.Comparator;
 
 /**

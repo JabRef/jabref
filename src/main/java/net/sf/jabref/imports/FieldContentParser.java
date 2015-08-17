@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted

@@ -32,7 +32,6 @@ import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;

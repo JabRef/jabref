@@ -27,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
+import net.sf.jabref.gui.GUIGlobals;
 import org.jdesktop.swingx.JXTitledPanel;
 
 public abstract class SidePaneComponent extends JXTitledPanel {

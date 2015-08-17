@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.fieldeditors.FieldTextArea;
 import org.junit.Assert;
 import org.junit.Before;

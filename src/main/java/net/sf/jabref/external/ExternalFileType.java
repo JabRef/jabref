@@ -17,7 +17,7 @@ package net.sf.jabref.external;
 
 import javax.swing.*;
 
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.

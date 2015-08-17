@@ -24,7 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 

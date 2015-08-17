@@ -12,6 +12,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;

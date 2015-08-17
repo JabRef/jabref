@@ -35,6 +35,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.JabRefDesktop;

@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldTextArea;
 import net.sf.jabref.gui.fieldeditors.FieldTextField;

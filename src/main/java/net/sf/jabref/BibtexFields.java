@@ -35,11 +35,11 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
 
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.util.TXMLReader;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class BibtexFields {
 

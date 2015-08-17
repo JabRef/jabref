@@ -20,7 +20,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileBasedLock;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 import java.io.File;
 import java.io.IOException;

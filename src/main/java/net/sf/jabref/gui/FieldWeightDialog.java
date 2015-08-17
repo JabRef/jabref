@@ -24,7 +24,6 @@ import java.util.TreeSet;
 import javax.swing.*;
 
 import net.sf.jabref.BibtexFields;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.JabRefFrame;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

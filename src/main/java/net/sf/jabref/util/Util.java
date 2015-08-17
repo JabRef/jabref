@@ -68,7 +68,7 @@ import net.sf.jabref.BibtexFields;
 import net.sf.jabref.CallBack;
 import net.sf.jabref.EasyDateFormat;
 import net.sf.jabref.EntryMarker;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;

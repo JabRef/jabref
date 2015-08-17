@@ -24,7 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

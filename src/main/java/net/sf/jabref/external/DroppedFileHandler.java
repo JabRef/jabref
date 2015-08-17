@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 
 import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;

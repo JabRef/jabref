@@ -20,6 +20,7 @@ import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.migrations.VersionHandling;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 
 import net.sf.jabref.sql.DBStrings;

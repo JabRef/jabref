@@ -33,7 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;

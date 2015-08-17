@@ -15,6 +15,7 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

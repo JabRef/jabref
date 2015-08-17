@@ -20,7 +20,7 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 import java.util.*;
 import java.io.File;
