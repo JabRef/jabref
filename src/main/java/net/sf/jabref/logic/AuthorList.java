@@ -473,11 +473,6 @@ public class AuthorList {
             von_part_start = -1;
             von_part_end = -1;
         }
-        if (jrAsFirstname) {
-            // This variable, if set, indicates that the first name starts with "jr.", which
-            // is an indication that we may have a name formatted as "Firstname Lastname, Jr."
-            // which is an acceptable format for BibTeX.
-        }
 
         // Third step: do actual splitting, construct Author object
         return new Author(first_part_start < 0 ? null : concatTokens(first_part_start,
@@ -1125,8 +1120,6 @@ public class AuthorList {
                         if (inner.contains("}")) {
                             if (properBrackets(inner)) {
                                 s = inner;
-                            } else {
-                                // no proper brackets if inner string: s is left untouched
                             }
                         } else {
                             //  no inner curly brackets found, no check needed, inner can just be used as s
@@ -1298,19 +1291,4 @@ public class AuthorList {
         }
     }
 
-
-    public static void main(String[] args) {
-        //String s = "Ford, Jr., Henry and Guy L. {Steele Jr.} and Olaf Nilsen, Jr.";
-        String s = "Olaf von Nilsen, Jr.";
-        AuthorList al = AuthorList.getAuthorList(s);
-        for (int i = 0; i < al.size(); i++) {
-            Author a = al.getAuthor(i);
-            System.out.println((i + 1) + ": first = '" + a.getFirst() + '\'');
-            System.out.println((i + 1) + ": last = '" + a.getLast() + '\'');
-            System.out.println((i + 1) + ": jr = '" + a.getJr() + '\'');
-            System.out.println((i + 1) + ": von = '" + a.getVon() + '\'');
-        }
-
-        System.out.println(new CreateDocBookAuthors().format(s));
-    }
 }
