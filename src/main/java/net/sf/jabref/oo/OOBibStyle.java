@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.oo;
 
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;

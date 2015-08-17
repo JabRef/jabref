@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.logic;
 
 import net.sf.jabref.export.layout.format.CreateDocBookAuthors;
 import net.sf.jabref.util.Util;
@@ -265,7 +265,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsFirstFirst()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsFirstFirst
+     * @see AuthorList#getAuthorsFirstFirst
      */
     public static String fixAuthor_firstNameFirstCommas(String authors, boolean abbr,
             boolean oxfordComma) {
@@ -275,7 +275,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsFirstFirstAnds()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsFirstFirstAnds
+     * @see AuthorList#getAuthorsFirstFirstAnds
      */
     public static String fixAuthor_firstNameFirst(String authors) {
         return AuthorList.getAuthorList(authors).getAuthorsFirstFirstAnds();
@@ -284,7 +284,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsLastFirst()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsLastFirst
+     * @see AuthorList#getAuthorsLastFirst
      */
     public static String fixAuthor_lastNameFirstCommas(String authors, boolean abbr,
             boolean oxfordComma) {
@@ -294,7 +294,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsLastFirstAnds(true)
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsLastFirstAnds
+     * @see AuthorList#getAuthorsLastFirstAnds
      */
     public static String fixAuthor_lastNameFirst(String authors) {
         return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(false);
@@ -303,7 +303,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsLastFirstAnds()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsLastFirstAnds
+     * @see AuthorList#getAuthorsLastFirstAnds
      */
     public static String fixAuthor_lastNameFirst(String authors, boolean abbreviate) {
         return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(abbreviate);
@@ -312,7 +312,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsLastOnly()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsLastOnly
+     * @see AuthorList#getAuthorsLastOnly
      */
     public static String fixAuthor_lastNameOnlyCommas(String authors, boolean oxfordComma) {
         return AuthorList.getAuthorList(authors).getAuthorsLastOnly(oxfordComma);
@@ -321,7 +321,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsForAlphabetization()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsForAlphabetization
+     * @see AuthorList#getAuthorsForAlphabetization
      */
     public static String fixAuthorForAlphabetization(String authors) {
         return AuthorList.getAuthorList(authors).getAuthorsForAlphabetization();
@@ -330,7 +330,7 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsNatbib()
      * 
-     * @see net.sf.jabref.AuthorList#getAuthorsNatbib
+     * @see AuthorList#getAuthorsNatbib
      */
     public static String fixAuthor_Natbib(String authors) {
         return AuthorList.getAuthorList(authors).getAuthorsNatbib();

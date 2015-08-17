@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.AuthorList;
 
 /**
  * Imports an Ovid file.

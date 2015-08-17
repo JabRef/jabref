@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.AuthorList;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on

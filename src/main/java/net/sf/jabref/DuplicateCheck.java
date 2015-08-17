@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.logic.AuthorList;
+
 import java.util.HashMap;
 import java.util.HashSet;
 

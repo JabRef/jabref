@@ -22,11 +22,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.AuthorList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.AuthorList.Author;
+import net.sf.jabref.logic.AuthorList.Author;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 import net.sf.jabref.util.Util;
 

@@ -19,7 +19,7 @@ import java.util.Vector;
 
 import net.sf.jabref.export.layout.WSITools;
 
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.logic.AuthorList;
 
 /**
  * @author Michael Wrighton, S M Mahbub Murshed

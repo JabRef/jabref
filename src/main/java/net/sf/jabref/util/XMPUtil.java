@@ -25,6 +25,7 @@ import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
+import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.logic.util.MonthUtil;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;

@@ -41,7 +41,7 @@ import net.sf.jabref.export.layout.WSITools;
 import java.util.Vector;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.logic.AuthorList;
 
 /**
  * Create DocBook authors formatter.

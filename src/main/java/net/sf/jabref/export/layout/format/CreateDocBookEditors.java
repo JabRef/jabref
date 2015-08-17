@@ -36,7 +36,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.logic.AuthorList;
 
 /**
  * Create DocBook editors formatter.

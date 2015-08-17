@@ -16,7 +16,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.logic.AuthorList;
 
 /**
  *

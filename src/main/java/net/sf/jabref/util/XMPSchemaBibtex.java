@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.logic.AuthorList;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
 import org.w3c.dom.Element;

@@ -18,7 +18,7 @@ package net.sf.jabref.gui;
 import java.util.HashMap;
 import java.util.Vector;
 
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
