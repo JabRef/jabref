@@ -32,7 +32,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.gui.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;

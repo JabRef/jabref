@@ -59,7 +59,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
-import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.gui.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.gui.GUIGlobals;

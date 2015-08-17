@@ -18,6 +18,7 @@ package net.sf.jabref.export;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
+import net.sf.jabref.gui.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.logic.l10n.Localization;

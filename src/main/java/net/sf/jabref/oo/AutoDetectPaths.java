@@ -16,7 +16,7 @@
 package net.sf.jabref.oo;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.gui.AbstractWorker;
 
 import javax.swing.*;
 import java.io.File;

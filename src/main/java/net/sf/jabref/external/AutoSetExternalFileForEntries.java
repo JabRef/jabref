@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import javax.swing.*;
 
+import net.sf.jabref.gui.AbstractWorker;
 import net.sf.jabref.gui.fieldeditors.FieldTextField;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
