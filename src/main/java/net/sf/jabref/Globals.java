@@ -17,6 +17,8 @@ package net.sf.jabref;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.export.AutoSaveManager;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;

@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.export;
 
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 

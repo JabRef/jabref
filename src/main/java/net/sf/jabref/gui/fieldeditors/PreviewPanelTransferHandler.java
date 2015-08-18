@@ -28,7 +28,7 @@ import javax.swing.TransferHandler;
 import javax.swing.text.BadLocationException;
 
 import net.sf.jabref.EntryContainer;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

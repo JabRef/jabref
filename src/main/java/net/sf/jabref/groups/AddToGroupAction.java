@@ -22,7 +22,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;

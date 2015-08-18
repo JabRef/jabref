@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 

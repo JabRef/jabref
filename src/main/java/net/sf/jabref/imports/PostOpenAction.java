@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 
 /**
  * This interface defines potential actions that may need to be taken after

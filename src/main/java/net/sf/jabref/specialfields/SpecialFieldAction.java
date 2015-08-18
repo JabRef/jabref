@@ -17,7 +17,7 @@ package net.sf.jabref.specialfields;
 
 import net.sf.jabref.BaseAction;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 

@@ -20,7 +20,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;
 

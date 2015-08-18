@@ -19,7 +19,7 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 
 public class CountingUndoManager extends UndoManager {
 

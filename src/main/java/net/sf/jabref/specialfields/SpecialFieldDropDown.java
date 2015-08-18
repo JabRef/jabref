@@ -27,8 +27,8 @@ import javax.swing.JPopupMenu;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.util.OS;
 
 public class SpecialFieldDropDown {

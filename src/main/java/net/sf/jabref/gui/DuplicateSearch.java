@@ -19,13 +19,16 @@
 //            - new SearcherRunnable.setFinish() method
 //            - replace thread.sleep in run() by wait() and notify() mechanism
 
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.logic.l10n.Localization;

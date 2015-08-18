@@ -24,7 +24,7 @@ import javax.swing.event.HyperlinkListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

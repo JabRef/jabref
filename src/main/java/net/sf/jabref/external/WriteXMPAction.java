@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;

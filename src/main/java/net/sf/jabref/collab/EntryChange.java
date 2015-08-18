@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;

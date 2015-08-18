@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.collab;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 
 import javax.swing.tree.DefaultMutableTreeNode;

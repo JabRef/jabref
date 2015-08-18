@@ -24,10 +24,13 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.MergeDialog;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;

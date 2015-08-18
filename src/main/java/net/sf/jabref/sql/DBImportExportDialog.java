@@ -17,7 +17,7 @@ package net.sf.jabref.sql;
  */
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.AbstractAction;

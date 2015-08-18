@@ -15,6 +15,7 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;
 import net.sf.jabref.logic.l10n.Localization;
