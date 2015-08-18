@@ -55,7 +55,7 @@ public class BibtexDatabase {
 
     private String preamble;
 
-    private final HashMap<String, BibtexString> bibtexStrings = new HashMap<>();
+    private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
