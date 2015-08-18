@@ -50,8 +50,10 @@ public class JabRefDesktop {
             if (split.length >= 2) {
                 if (split[split.length - 1].equalsIgnoreCase("pdf")) {
                     fieldName = "pdf";
+                    // @formatter:off
                 } else if (split[split.length - 1].equalsIgnoreCase("ps")
                         || split.length >= 3 && split[split.length - 2].equalsIgnoreCase("ps")) {
+                    // @formatter:on
                     fieldName = "ps";
                 }
             }
@@ -237,9 +239,11 @@ public class JabRefDesktop {
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
         if (OS.OS_X) {
             // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+            // @formatter:off
             String[] cmd = fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty() ?
                     new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
                     new String[] {"/usr/bin/open", filePath};
+            // @formatter:on
             Runtime.getRuntime().exec(cmd);
         } else if (OS.WINDOWS) {
             if (fileType.getOpenWith() != null && !fileType.getOpenWith().isEmpty()) {

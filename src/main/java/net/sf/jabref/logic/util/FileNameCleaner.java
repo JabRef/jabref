@@ -27,6 +27,7 @@ public class FileNameCleaner {
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
      */
+    // @formatter:off
     private static final int[] ILLEGAL_CHARS = {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -38,7 +39,7 @@ public class FileNameCleaner {
             92,
             124
     };
-
+    // @formatter:on
 
     /**
      * Replaces illegal characters in given fileName by '_'

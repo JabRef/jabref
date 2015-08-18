@@ -54,10 +54,12 @@ class FieldContentParser {
 
             int c = content.charAt(i);
             if (c == '\n') {
+                // @formatter:off
                 if (content.length() > i + 1 && content.charAt(i + 1) == '\t'
                         && (content.length() == i + 2 || !Character.isWhitespace(content.charAt(i + 2)))) {
                     // We have either \n\t followed by non-whitespace, or \n\t at the
                     // end. Both cases indicate a wrap made by JabRef. Remove and insert space if necessary.
+                    // @formatter:on
 
                     content.deleteCharAt(i); // \n
                     content.deleteCharAt(i); // \t
@@ -72,23 +74,25 @@ class FieldContentParser {
                         // Increment i because of the inserted character:
                         i++;
                     }
-                }
-                else if (content.length() > i + 3 && content.charAt(i + 1) == '\t'
+                    // @formatter:off
+                } else if (content.length() > i + 3 && content.charAt(i + 1) == '\t'
                         && content.charAt(i + 2) == ' '
                         && !Character.isWhitespace(content.charAt(i + 3))) {
                     // We have \n\t followed by ' ' followed by non-whitespace, which indicates
                     // a wrap made by JabRef <= 1.7.1. Remove:
+                    // @formatter:on
                     content.deleteCharAt(i); // \n
                     content.deleteCharAt(i); // \t
                     // Remove space only if necessary:
                     if (i > 0 && Character.isWhitespace(content.charAt(i - 1))) {
                         content.deleteCharAt(i);
                     }
-                }
-                else if (content.length() > i + 3 && content.charAt(i + 1) == '\t'
+                    // @formatter:off
+                } else if (content.length() > i + 3 && content.charAt(i + 1) == '\t'
                         && content.charAt(i + 2) == '\n' && content.charAt(i + 3) == '\t') {
                     // We have \n\t\n\t, which looks like a JabRef-formatted empty line.
                     // Remove the tabs and keep one of the line breaks:
+                    // @formatter:on
                     content.deleteCharAt(i + 1); // \t
                     content.deleteCharAt(i + 1); // \n
                     content.deleteCharAt(i + 1); // \t

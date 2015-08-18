@@ -9,12 +9,14 @@ import org.junit.Assert;
 import java.io.StringReader;
 
 public class BibtexTestData {
+
     public static BibtexEntry getBibtexEntry() {
         BibtexDatabase database = getBibtexDatabase();
         return database.getEntriesByKey("HipKro03")[0];
     }
 
     public static BibtexDatabase getBibtexDatabase() {
+        // @formatter:off
         StringReader reader = new StringReader(
                 "@ARTICLE{HipKro03,\n"
                         + "  author = {Eric von Hippel and Georg von Krogh},\n"
@@ -28,6 +30,7 @@ public class BibtexTestData {
                         + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
                         + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}"
         );
+        // @formatter:on
 
         BibtexParser parser = new BibtexParser(reader);
         ParserResult result = null;

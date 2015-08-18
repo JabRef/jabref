@@ -224,6 +224,7 @@ public class BibtexNameFormatter {
                 }
                 if (sb.length() > 0) {
                     boolean noDisTie = false;
+                    // @formatter:off
                     if ((sb.charAt(sb.length() - 1) == '~') &&
                             ((BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
                             ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
@@ -232,6 +233,7 @@ public class BibtexNameFormatter {
                             sb.append(' ');
                         }
                     }
+                    // @formatter:on
                 }
             } else if (c[i] == '}') {
                 if (warn != null) {

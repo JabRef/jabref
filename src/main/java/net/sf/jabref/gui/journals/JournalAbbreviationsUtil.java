@@ -17,9 +17,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class JournalAbbreviationsUtil {
+
+    // @formatter:off
     private static final String TOOLTIP_TEXT = "<HTML>" + Localization.lang("Switches between full and abbreviated journal name "
             + "if the journal name is known.")
             + "<BR>" + Localization.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>") + ".</HTML>";
+    // @formatter:on
 
     /**
      * Create a control panel for the entry editor's journal field, to toggle

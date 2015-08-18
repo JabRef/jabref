@@ -34,6 +34,7 @@ class SearchManagerNoGUI {
     private final BibtexDatabase database;
     private BibtexDatabase base;
 
+
     public SearchManagerNoGUI(String term, BibtexDatabase dataBase) {
         searchTerm = term;
         database = dataBase;
@@ -92,9 +93,11 @@ class SearchManagerNoGUI {
             reg1Set = true;
         } else {
             if (year1 < 2000) {
+                // @formatter:off
                 regPt1 = "199+[" + years[0].substring(3, 4) + "-"
                         + Math.min(Integer.parseInt(years[1].substring(3, 4)), 9) + "]";
                 reg1Set = true;
+                // @formatter:on
             }
         }
         if (Integer.parseInt(years[1]) >= 2000 && year1 < 2000) { //for 200.
@@ -102,8 +105,10 @@ class SearchManagerNoGUI {
             reg2Set = true;
         } else {
             if (year2 >= 2000) {
+                // @formatter:off
                 regPt2 = "200+[" + years[0].substring(3, 4) + "-"
                         + Math.min(Integer.parseInt(years[1].substring(3, 4)), 9) + "]";
+                // @formatter:on
                 reg2Set = true;
             }
         }

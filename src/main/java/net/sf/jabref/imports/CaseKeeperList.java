@@ -22,6 +22,7 @@ package net.sf.jabref.imports;
  */
 class CaseKeeperList {
 
+    // @formatter:off
     // Common words in IEEE Xplore that should always be in the given case
     private final String[] wordListIEEEXplore = new String[] {
             "1-D",
@@ -989,7 +990,7 @@ class CaseKeeperList {
             wordListDayMonth,
             wordListCountries
     };
-
+    // @formatter:on
 
     public CaseKeeperList() {
 
