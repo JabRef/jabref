@@ -57,23 +57,23 @@ import org.apache.commons.logging.LogFactory;
 
 public class BibtexDatabase {
 
-    private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
+    private final Map<String, BibtexEntry> entries = new Hashtable<>();
 
-    private String _preamble;
+    private String preamble;
 
-    private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
+    private final HashMap<String, BibtexString> bibtexStrings = new HashMap<>();
 
-    private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
+    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
     private boolean followCrossrefs = true;
-    
+
     private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     /**
      * use a map instead of a set since i need to know how many of each key is
      * inthere
      */
-    private final HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> allKeys = new HashMap<>();
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if
