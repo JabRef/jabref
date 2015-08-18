@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -113,7 +112,7 @@ public class BibtexDatabase {
     /**
      * Returns the number of entries.
      */
-    public synchronized int getEntryCount() {
+    public int getEntryCount() {
         return entries.size();
     }
 
@@ -121,7 +120,7 @@ public class BibtexDatabase {
      * Returns a Set containing the keys to all entries.
      * Use getKeySet().iterator() to iterate over all entries.
      */
-    public synchronized Set<String> getKeySet() {
+    public Set<String> getKeySet() {
         return entries.keySet();
     }
 
@@ -147,11 +146,11 @@ public class BibtexDatabase {
     /**
      * Returns the entry with the given ID (-> entry_type + hashcode).
      */
-    public synchronized BibtexEntry getEntryById(String id) {
+    public BibtexEntry getEntryById(String id) {
         return entries.get(id);
     }
 
-    public synchronized Collection<BibtexEntry> getEntries() {
+    public Collection<BibtexEntry> getEntries() {
         return entries.values();
     }
 
@@ -278,7 +277,7 @@ public class BibtexDatabase {
     /**
      * Removes the string at the given index.
      */
-    public synchronized void removeString(String id) {
+    public void removeString(String id) {
         bibtexStrings.remove(id);
     }
 
@@ -301,14 +300,14 @@ public class BibtexDatabase {
     /**
      * Returns the string at the given index.
      */
-    public synchronized BibtexString getString(String o) {
+    public BibtexString getString(String o) {
         return bibtexStrings.get(o);
     }
 
     /**
      * Returns the number of strings.
      */
-    public synchronized int getStringCount() {
+    public int getStringCount() {
         return bibtexStrings.size();
     }
 
