@@ -97,8 +97,7 @@ class PdfPreviewPanel extends JPanel {
         }
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, int width,
-            int height, int type) {
+    private BufferedImage resizeImage(BufferedImage originalImage, int width, int height, int type) {
         int h = originalImage.getHeight();
         int w = originalImage.getWidth();
         if (height == 0 || width == 0) {

@@ -41,8 +41,7 @@ package net.sf.jabref.export.layout;
  *
  * @author     wegnerj
  */
-class StringInt implements java.io.Serializable
-{
+class StringInt implements java.io.Serializable {
 
     /**
      *  Description of the Field
@@ -61,8 +60,7 @@ class StringInt implements java.io.Serializable
      * @param  _s  Description of the Parameter
      * @param  _i  Description of the Parameter
      */
-    public StringInt(String _s, int _i)
-    {
+    public StringInt(String _s, int _i) {
         s = _s;
         i = _i;
     }

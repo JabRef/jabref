@@ -54,5 +54,4 @@ public class ContentAutoCompleters extends AutoCompleters {
             }
         }
     }
-
 }

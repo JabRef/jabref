@@ -26,11 +26,11 @@ import java.util.List;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
+
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(MetaData metaData, String link, String fieldName)
-            throws IOException {
+    public static void openExternalViewer(MetaData metaData, String link, String fieldName) throws IOException {
 
         if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
@@ -41,8 +41,7 @@ public class JabRefDesktop {
 
             // Check that the file exists:
             if (file == null || !file.exists()) {
-                throw new IOException(Localization.lang("File not found") + " (" + fieldName + "): '"
-                        + link + "'.");
+                throw new IOException(Localization.lang("File not found") + " (" + fieldName + "): '" + link + "'.");
             }
             link = file.getCanonicalPath();
 
@@ -104,8 +103,7 @@ public class JabRefDesktop {
                     Runtime.getRuntime().exec(cmdArray);
                 }
             } catch (IOException e) {
-                System.err.println("An error occured on the command: "
-                        + Globals.prefs.get("psviewer") + " " + link);
+                System.err.println("An error occured on the command: " + Globals.prefs.get("psviewer") + " " + link);
             }
         } else if (fieldName.equals("pdf")) {
             try {
@@ -139,13 +137,11 @@ public class JabRefDesktop {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("An error occured on the command: "
-                        + Globals.prefs.get("pdfviewer") + " #" + link);
+                System.err.println("An error occured on the command: " + Globals.prefs.get("pdfviewer") + " #" + link);
                 System.err.println(e.getMessage());
             }
         } else {
-            System.err
-                    .println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+            System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
     }
 
@@ -185,8 +181,7 @@ public class JabRefDesktop {
      *            The file name.
      * @return false if the link couldn't be resolved, true otherwise.
      */
-    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link,
-            final ExternalFileType fileType) throws IOException {
+    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link, final ExternalFileType fileType) throws IOException {
 
         boolean httpLink = false;
 

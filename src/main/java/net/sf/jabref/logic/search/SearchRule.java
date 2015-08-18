@@ -39,6 +39,7 @@ public interface SearchRule {
     String DUMMY_QUERY = "dummy";
     String NULL_QUERY = null;
 
+
     boolean applyRule(String query, BibtexEntry bibtexEntry);
 
     boolean validateSearchStrings(String query);

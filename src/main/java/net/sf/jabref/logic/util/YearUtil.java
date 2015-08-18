@@ -6,6 +6,7 @@ public class YearUtil {
 
     private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 
+
     /**
      * Will convert a two digit year using the following scheme (describe at
      * http://www.filemaker.com/help/02-Adding%20and%20view18.html):
@@ -49,11 +50,13 @@ public class YearUtil {
         }
     }
 
+
     private static class Year {
 
         private final int year;
         private final int century;
         private final int yearShort;
+
 
         public Year(int year) {
             this.year = year;

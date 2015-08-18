@@ -20,6 +20,7 @@ public class RemoteListenerServer implements Runnable {
     private final MessageHandler messageHandler;
     private final ServerSocket serverSocket;
 
+
     public RemoteListenerServer(MessageHandler messageHandler, int port) throws IOException {
         this.serverSocket = new ServerSocket(port, BACKLOG, InetAddress.getByName("localhost"));
         this.messageHandler = messageHandler;

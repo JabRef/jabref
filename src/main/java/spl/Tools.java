@@ -90,8 +90,7 @@ class Tools {
                     URL url = new URL(link);
                     File file = new File(url.toURI());
                     return file.getPath();
-                }
-                else if (mindmapUrl != null) {
+                } else if (mindmapUrl != null) {
                     URL url = new URL(mindmapUrl, link);
                     File file = new File(url.toURI());
                     return file.getPath();
@@ -103,8 +102,7 @@ class Tools {
             } catch (IllegalArgumentException e) {
                 return link;
             }
-        }
-        else {
+        } else {
             return link;
         }
         return link;

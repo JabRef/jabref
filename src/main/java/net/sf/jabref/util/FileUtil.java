@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class FileUtil {
+
     /**
      * Returns the extension of a file or null if the file does not have one (no . in name).
      *
@@ -44,18 +45,16 @@ public class FileUtil {
      * @return boolean Whether the copy succeeded, or was stopped due to the
      *         file already existing.
      */
-    public static boolean copyFile(File source, File dest, boolean deleteIfExists)
-            throws IOException {
+    public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
 
         BufferedInputStream in = null;
         BufferedOutputStream out = null;
         try {
             // Check if the file already exists.
             if (dest.exists()) {
-                if (!deleteIfExists)
-                 {
+                if (!deleteIfExists) {
                     return false;
-                // else dest.delete();
+                    // else dest.delete();
                 }
             }
 
@@ -190,9 +189,7 @@ public class FileUtil {
                 try {
                     name = name.replaceAll("/", "\\\\");
                 } catch (StringIndexOutOfBoundsException exc) {
-                    System.err
-                            .println("An internal Java error was caused by the entry " +
-                                    "\"" + name + "\"");
+                    System.err.println("An internal Java error was caused by the entry " + "\"" + name + "\"");
                 }
             } else {
                 name = name.replaceAll("\\\\", "/");

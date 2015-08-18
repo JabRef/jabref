@@ -23,6 +23,7 @@ public class BuildInfo {
 
     private final String version;
 
+
     public BuildInfo() {
         this("/resource/build.properties");
     }

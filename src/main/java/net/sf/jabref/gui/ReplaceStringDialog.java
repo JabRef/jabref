@@ -38,14 +38,12 @@ import net.sf.jabref.util.Util;
  */
 class ReplaceStringDialog extends JDialog {
 
-    private final JTextField
-            fields = new JTextField("", 30);
+    private final JTextField fields = new JTextField("", 30);
     private final JTextField from = new JTextField("", 30);
     private final JTextField to = new JTextField("", 30);
 
     private final JCheckBox selOnly = new JCheckBox(Localization.lang("Limit to selected entries"), false);
-    private final JRadioButton
-            allFi = new JRadioButton(Localization.lang("All fields"), true);
+    private final JRadioButton allFi = new JRadioButton(Localization.lang("All fields"), true);
     private final JRadioButton field = new JRadioButton(Localization.lang("Limit to fields") + ":", false);
     private boolean ok_pressed;
     private String[] flds;

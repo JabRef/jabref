@@ -16,5 +16,6 @@
 package net.sf.jabref.bst;
 
 public interface Warn {
+
     void warn(String s);
 }

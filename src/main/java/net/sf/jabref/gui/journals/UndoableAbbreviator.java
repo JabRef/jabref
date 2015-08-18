@@ -13,6 +13,7 @@ public class UndoableAbbreviator {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final boolean isoAbbreviationStyle;
 
+
     public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, boolean isoAbbreviationStyle) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.isoAbbreviationStyle = isoAbbreviationStyle;
@@ -27,8 +28,7 @@ public class UndoableAbbreviator {
      * @param ce        If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean abbreviate(BibtexDatabase database, BibtexEntry entry,
-                              String fieldName, CompoundEdit ce) {
+    public boolean abbreviate(BibtexDatabase database, BibtexEntry entry, String fieldName, CompoundEdit ce) {
         String text = entry.getField(fieldName);
         if (text == null) {
             return false;

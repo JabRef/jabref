@@ -97,22 +97,19 @@ class FieldContentParser {
 
                     // Now, if more \n\t pairs are following, keep each line break. This
                     // preserves several line breaks properly. Repeat until done:
-                    while (content.length() > i + 1 && content.charAt(i) == '\n'
-                            && content.charAt(i + 1) == '\t') {
+                    while (content.length() > i + 1 && content.charAt(i) == '\n' && content.charAt(i + 1) == '\t') {
 
                         content.deleteCharAt(i + 1);
                         i++;
                     }
-                }
-                else if (content.length() > i + 1 && content.charAt(i + 1) != '\n') {
+                } else if (content.length() > i + 1 && content.charAt(i + 1) != '\n') {
                     // We have a line break not followed by another line break.
                     // Interpretation before JabRef 2.10:
                     //   line break made by whatever other editor, so we will remove the line break.
                     // Current interpretation:
                     //   keep line break
                     i++;
-                }
-                else if (content.length() > i + 1 && content.charAt(i + 1) == '\n') {
+                } else if (content.length() > i + 1 && content.charAt(i + 1) == '\n') {
                     // we have a line break followed by another line break.
                     // This is a linebreak was manually input by the user
                     // Handling before JabRef 2.10:
@@ -123,13 +120,11 @@ class FieldContentParser {
                     i++;
                     // do not handle \n again
                     i++;
-                }
-                else {
+                } else {
                     i++;
-                //content.deleteCharAt(i);
+                    //content.deleteCharAt(i);
                 }
-            }
-            else if (c == ' ') {
+            } else if (c == ' ') {
                 //if ((content.length()>i+2) && (content.charAt(i+1)==' ')) {
                 if (i > 0 && content.charAt(i - 1) == ' ') {
                     // We have two spaces in a row. Don't include this one.

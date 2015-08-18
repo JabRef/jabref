@@ -31,6 +31,7 @@ public class StreamEavesdropper {
     private final PrintStream systemOut;
     private final PrintStream systemErr;
 
+
     public static StreamEavesdropper eavesdropOnSystem() {
         StreamEavesdropper streamEavesdropper = new StreamEavesdropper(System.out, System.err);
         System.setOut(streamEavesdropper.getOutStream());

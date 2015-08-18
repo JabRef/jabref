@@ -15,6 +15,7 @@ public class RemoteListenerClient {
 
     private static final int TIMEOUT = 2000;
 
+
     /**
      * Attempt to send command line arguments to already running JabRef instance.
      *

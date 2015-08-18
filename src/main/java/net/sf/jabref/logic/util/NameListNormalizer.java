@@ -29,6 +29,7 @@ public class NameListNormalizer {
     private static final Pattern FdotFlast = Pattern.compile("([\\. \\p{javaUpperCase}]+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
     private static final Pattern SINGLE_NAME = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]*)");
 
+
     public static String normalizeAuthorList(String in) {
         boolean andSep = false;
         String[] authors = in.split("( |,)and ", -1);
@@ -44,8 +45,7 @@ public class NameListNormalizer {
             String[] authors2 = in.split("; ");
             if (authors2.length > 1) {
                 authors = authors2;
-            }
-            else {
+            } else {
                 authors2 = in.split(", ");
                 if (authors2.length > 3) { // Probably more than a single author, so we split by commas.
                     authors = authors2;
@@ -83,8 +83,7 @@ public class NameListNormalizer {
                 }
                 newAuthors[semiSep.length] = authors[1];
                 authors = newAuthors;
-            }
-            else {
+            } else {
                 // Check if there is a comma in the last name. If so, we can assume that comma
                 // is not used to separate the names:
                 boolean lnfn = authors[1].indexOf(",") > 0;

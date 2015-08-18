@@ -182,7 +182,7 @@ public abstract class AbstractGroup {
      * value, the call is ignored.
      */
     public void setHierarchicalContext(GroupHierarchyType context) {
-        if(context == null) {
+        if (context == null) {
             return;
         }
         this.context = context;

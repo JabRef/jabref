@@ -12,6 +12,7 @@ public class RemotePreferences {
 
     private final JabRefPreferences preferences;
 
+
     public RemotePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
     }

@@ -68,5 +68,4 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
         parts.add(current.toString());
         return parts.toArray(new String[parts.size()]);
     }
-
 }

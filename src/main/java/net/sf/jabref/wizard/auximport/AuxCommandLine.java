@@ -39,15 +39,13 @@ import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 
-public class AuxCommandLine
-{
+public class AuxCommandLine {
 
     private final String auxName;
     private final BibtexDatabase bib;
 
 
-    public AuxCommandLine(String auxFileName, BibtexDatabase refDBase)
-    {
+    public AuxCommandLine(String auxFileName, BibtexDatabase refDBase) {
         auxName = StringUtil.getCorrectFileName(auxFileName, "aux");
         bib = refDBase;
     }

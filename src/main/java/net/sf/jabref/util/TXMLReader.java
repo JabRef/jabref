@@ -25,91 +25,73 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.*;
 
-public class TXMLReader
-{
+public class TXMLReader {
 
     private Document config; // XML data
 
     private boolean ready;
 
 
-    public TXMLReader(String resPath)
-    {
+    public TXMLReader(String resPath) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try
-        {
+        try {
             DocumentBuilder builder = factory.newDocumentBuilder();
 
             InputStream stream = null;
-            if (resPath != null)
-            {
+            if (resPath != null) {
                 stream = TXMLReader.class.getResourceAsStream(resPath);
             }
             // not found, check the src/ directory (IDE mode)
-            if (stream == null)
-            {
-                try
-                {
+            if (stream == null) {
+                try {
                     stream = new FileInputStream("src" + resPath);
-                } catch (Exception ignored)
-                {
+                } catch (Exception ignored) {
 
                 }
             }
 
-            if (stream != null)
-            {
+            if (stream != null) {
                 config = builder.parse(stream);
                 ready = true;
             }
-        } catch (Exception oe)
-        {
+        } catch (Exception oe) {
             oe.printStackTrace();
         }
     }
 
     // ---------------------------------------------------------------------------
 
-    public boolean isReady()
-    {
+    public boolean isReady() {
         return ready;
     }
 
-    public NodeList getNodes(String name)
-    {
+    public NodeList getNodes(String name) {
         return config.getElementsByTagName(name);
     }
 
     // ---------------------------------------------------------------------------
 
-    private Element getFirstElement(Element element, String name)
-    {
+    private Element getFirstElement(Element element, String name) {
         NodeList nl = element.getElementsByTagName(name);
-        if (nl.getLength() < 1)
-        {
-            throw new RuntimeException(
-                    "Element: " + element + " does not contain: " + name);
+        if (nl.getLength() < 1) {
+            throw new RuntimeException("Element: " + element + " does not contain: " + name);
         }
         return (Element) nl.item(0);
     }
 
     /** returns all "plain" data of a subnode with name <name> */
-    public String getSimpleElementText(Element node, String name)
-    {
+    public String getSimpleElementText(Element node, String name) {
         Element namedElement = getFirstElement(node, name);
         return getSimpleElementText(namedElement);
     }
 
     /** collect all "plain" data of a xml node */
-    private String getSimpleElementText(Element node)
-    {
+    private String getSimpleElementText(Element node) {
         StringBuffer sb = new StringBuffer();
         NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++)
-        {
+        for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (child instanceof Text)
-            {
+            if (child instanceof Text) {
                 sb.append(child.getNodeValue().trim());
             }
         }
@@ -119,18 +101,13 @@ public class TXMLReader
     // ---------------------------------------------------------------------------
     // read some attributes
     // --------------------------------------------------------------------------
-    public int readIntegerAttribute(Element node, String attrName, int defaultValue)
-    {
+    public int readIntegerAttribute(Element node, String attrName, int defaultValue) {
         int back = defaultValue;
-        if (node != null)
-        {
+        if (node != null) {
             String data = node.getAttribute(attrName);
-            if (data != null)
-            {
-                if (!data.isEmpty())
-                {
-                    try
-                    {
+            if (data != null) {
+                if (!data.isEmpty()) {
+                    try {
                         back = Integer.parseInt(data);
                     } catch (Exception ignored) {
                     }
@@ -140,15 +117,11 @@ public class TXMLReader
         return back;
     }
 
-    public String readStringAttribute(Element node, String attrName, String defaultValue)
-    {
-        if (node != null)
-        {
+    public String readStringAttribute(Element node, String attrName, String defaultValue) {
+        if (node != null) {
             String data = node.getAttribute(attrName);
-            if (data != null)
-            {
-                if (!data.isEmpty())
-                {
+            if (data != null) {
+                if (!data.isEmpty()) {
                     return data;
                 }
             }
@@ -156,15 +129,11 @@ public class TXMLReader
         return defaultValue;
     }
 
-    public double readDoubleAttribute(Element node, String attrName, double defaultValue)
-    {
-        if (node != null)
-        {
+    public double readDoubleAttribute(Element node, String attrName, double defaultValue) {
+        if (node != null) {
             String data = node.getAttribute(attrName);
-            if (data != null)
-            {
-                if (!data.isEmpty())
-                {
+            if (data != null) {
+                if (!data.isEmpty()) {
                     return Double.parseDouble(data);
                 }
             }

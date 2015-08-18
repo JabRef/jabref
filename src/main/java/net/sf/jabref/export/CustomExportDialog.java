@@ -39,8 +39,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 class CustomExportDialog extends JDialog {
 
-    private final JTextField
-            name = new JTextField(60);
+    private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
     private boolean ok_pressed;

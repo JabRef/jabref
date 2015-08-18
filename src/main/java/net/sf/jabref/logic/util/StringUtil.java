@@ -301,8 +301,7 @@ public class StringUtil {
             c = toQuote.charAt(i);
             isSpecial = specials.indexOf(c) >= 0 || c == quoteChar;
             // linebreak?
-            if (linewrap > 0
-                    && (++lineLength >= linewrap || isSpecial && lineLength >= linewrap - 1)) {
+            if (linewrap > 0 && (++lineLength >= linewrap || isSpecial && lineLength >= linewrap - 1)) {
                 result.append(quoteChar);
                 result.append('\n');
                 lineLength = 0;

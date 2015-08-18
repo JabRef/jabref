@@ -17,6 +17,7 @@ public class EntryMarker {
 
     private static final Pattern MARK_NUMBER_PATTERN = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
+
     /**
      * @param increment whether the given increment should be added to the current one. Currently never used in JabRef
      */
@@ -30,22 +31,13 @@ public class EntryMarker {
             if (index >= 0) {
                 // Already marked 1 for this user.
                 prevMarkLevel = 1;
-                newValue = s.substring(0, index)
-                        + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length())
-                        + Globals.prefs.WRAPPED_USERNAME.substring(0,
-                                Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" +
-                        (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
-                                : markIncrement) + "]";
-            }
-            else {
+                newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length()) + Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + "]";
+            } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);
                 if (m.find()) {
                     try {
                         prevMarkLevel = Integer.parseInt(m.group(1));
-                        newValue = s.substring(0, m.start(1)) +
-                                (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement)
-                                        : markIncrement) +
-                                s.substring(m.end(1));
+                        newValue = s.substring(0, m.start(1)) + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + s.substring(m.end(1));
                     } catch (NumberFormatException ex) {
                         // Do nothing.
                     }
@@ -53,20 +45,17 @@ public class EntryMarker {
             }
         }
         if (newValue == null) {
-            newValue = Globals.prefs.WRAPPED_USERNAME.substring(0,
-                    Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
+            newValue = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
         }
 
-        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                .getField(BibtexFields.MARKED), newValue));
+        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newValue));
         be.setField(BibtexFields.MARKED, newValue);
     }
 
     /**
      * SIDE EFFECT: Unselectes given entry
      */
-    public static void unmarkEntry(BibtexEntry be, boolean onlyMaxLevel,
-            BibtexDatabase database, NamedCompound ce) {
+    public static void unmarkEntry(BibtexEntry be, boolean onlyMaxLevel, BibtexDatabase database, NamedCompound ce) {
         Object o = be.getField(BibtexFields.MARKED);
         if (o != null) {
             String s = o.toString();
@@ -81,28 +70,23 @@ public class EntryMarker {
             if (index >= 0) {
                 // Marked 1 for this user.
                 if (!onlyMaxLevel) {
-                    newValue = s.substring(0, index)
-                            + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
+                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
                 } else {
                     return;
                 }
-            }
-            else {
+            } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);
                 if (m.find()) {
                     try {
                         int prevMarkLevel = Integer.parseInt(m.group(1));
                         if (!onlyMaxLevel || prevMarkLevel == MARK_COLOR_LEVELS) {
                             if (prevMarkLevel > 1) {
-                                newValue = s.substring(0, m.start(1)) +
-                                        s.substring(m.end(1));
+                                newValue = s.substring(0, m.start(1)) + s.substring(m.end(1));
                             } else {
-                                String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0,
-                                        Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":1]";
+                                String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":1]";
                                 index = s.indexOf(toRemove);
                                 if (index >= 0) {
-                                    newValue = s.substring(0, index)
-                                            + s.substring(index + toRemove.length());
+                                    newValue = s.substring(0, index) + s.substring(index + toRemove.length());
                                 }
                             }
                         } else {
@@ -126,8 +110,7 @@ public class EntryMarker {
             	sb.append(s.substring(piv));
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
-            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                    .getField(BibtexFields.MARKED), newValue));
+            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newValue));
             be.setField(BibtexFields.MARKED, newValue);
         }
     }

@@ -22,6 +22,7 @@ public class Protocol {
     private final OutputStream out;
     private final InputStream in;
 
+
     public Protocol(Socket socket) throws IOException {
         this.socket = socket;
         this.out = socket.getOutputStream();
@@ -50,14 +51,17 @@ public class Protocol {
     public void close() {
         try {
             in.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         try {
             out.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         try {
             socket.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 }

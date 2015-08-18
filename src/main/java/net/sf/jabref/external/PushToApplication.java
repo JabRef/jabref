@@ -65,8 +65,7 @@ public interface PushToApplication {
      * @param entries
      * @param metaData
      */
-    void pushEntries(BibtexDatabase database, BibtexEntry[] entries,
-                     String keyString, MetaData metaData);
+    void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after

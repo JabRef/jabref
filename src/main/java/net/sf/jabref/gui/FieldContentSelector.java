@@ -231,7 +231,6 @@ public class FieldContentSelector extends JComponent {
             }
         }
     }
-
     // Not used since the comboBox is not editable
 
     //	/**

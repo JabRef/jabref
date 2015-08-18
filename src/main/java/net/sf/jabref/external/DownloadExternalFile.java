@@ -56,7 +56,7 @@ public class DownloadExternalFile {
     private FileListEntryEditor editor;
     private boolean downloadFinished;
     private boolean dontShowDialog;
-    
+
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
 
@@ -75,8 +75,7 @@ public class DownloadExternalFile {
      */
     public void download(final DownloadCallback callback) throws IOException {
         dontShowDialog = false;
-        final String res = JOptionPane.showInputDialog(frame,
-                Localization.lang("Enter URL to download"));
+        final String res = JOptionPane.showInputDialog(frame, Localization.lang("Enter URL to download"));
 
         if (res == null || res.trim().isEmpty()) {
             return;
@@ -86,8 +85,7 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
-                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"), Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -303,8 +301,7 @@ public class DownloadExternalFile {
         *
         */
         if (OS.WINDOWS) {
-            plannedName = plannedName.replaceAll(
-                    "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
+            plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
         } else if (OS.OS_X) {
             plannedName = plannedName.replaceAll(":", "");
         }
@@ -351,8 +348,7 @@ public class DownloadExternalFile {
                 // not a proper suffix, so we should give up:
                 if (suffix.indexOf('/') > 0) {
                     return "";
-                }
-                else {
+                } else {
                     return suffix; // return the first one we found, anyway.
                 }
             } else {

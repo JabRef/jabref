@@ -18,8 +18,7 @@ public class SearchDescribers {
         if (searchRule instanceof GrammarBasedSearchRule) {
             GrammarBasedSearchRule grammarBasedSearchRule = (GrammarBasedSearchRule) searchRule;
 
-            return new GrammarBasedSearchRuleDescriber(grammarBasedSearchRule.isCaseSensitiveSearch(),
-                    grammarBasedSearchRule.isRegExpSearch(), grammarBasedSearchRule.getTree());
+            return new GrammarBasedSearchRuleDescriber(grammarBasedSearchRule.isCaseSensitiveSearch(), grammarBasedSearchRule.isRegExpSearch(), grammarBasedSearchRule.getTree());
         } else if (searchRule instanceof ContainBasedSearchRule) {
             ContainBasedSearchRule containBasedSearchRule = (ContainBasedSearchRule) searchRule;
 
@@ -29,8 +28,7 @@ public class SearchDescribers {
 
             return new ContainsAndRegexBasedSearchRuleDescriber(regexBasedSearchRule.isCaseSensitive(), true, query);
         } else {
-            throw new IllegalStateException("Cannot find a describer for searchRule " +
-                    searchRule + " and query " + query);
+            throw new IllegalStateException("Cannot find a describer for searchRule " + searchRule + " and query " + query);
         }
     }
 

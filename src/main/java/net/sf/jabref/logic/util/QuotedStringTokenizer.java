@@ -56,10 +56,9 @@ public class QuotedStringTokenizer {
             c = content.charAt(index);
             if (c == quoteChar) { // next is quoted
                 ++index;
-                if (index < contentLength)
-                 {
+                if (index < contentLength) {
                     stringBuilder.append(content.charAt(index));
-                // ignore for delimiter search!
+                    // ignore for delimiter search!
                 }
             } else if (isDelimiter(c)) { // unit finished
                 // advance index until next token or end

@@ -75,12 +75,11 @@ public class ExternalFilePanel extends JPanel {
     private BibtexDatabase database;
 
     private final MetaData metaData;
-    
+
     private static final Log LOGGER = LogFactory.getLog(ExternalFilePanel.class);
 
 
-    public ExternalFilePanel(final String fieldName, final MetaData metaData,
-            final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
+    public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
         this(null, metaData, null, fieldName, off, editor);
         this.entry = entry;
         this.entryEditor = null;
@@ -228,8 +227,7 @@ public class ExternalFilePanel extends JPanel {
 
         String[] dirs = metaData.getFileDirectory(fieldName);
         String directory = null;
-        if (dirs.length > 0)
-         {
+        if (dirs.length > 0) {
             directory = dirs[0]; // Default to the first directory in the list
         }
 
@@ -244,8 +242,7 @@ public class ExternalFilePanel extends JPanel {
             }
         }
 
-        String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
-                JFileChooser.OPEN_DIALOG, false);
+        String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName, JFileChooser.OPEN_DIALOG, false);
 
         if (chosenFile != null) {
             File newFile = new File(chosenFile);
@@ -253,8 +250,7 @@ public class ExternalFilePanel extends JPanel {
 
             if (directory != null && position.startsWith(directory)) {
                 // Construct path relative to pdf base dir
-                String relPath = position.substring(directory.length(), position.length())
-                        + File.separator + newFile.getName();
+                String relPath = position.substring(directory.length(), position.length()) + File.separator + newFile.getName();
 
                 // Remove leading path separator
                 if (relPath.startsWith(File.separator)) {
@@ -497,5 +493,4 @@ public class ExternalFilePanel extends JPanel {
             }
         };
     }
-
 }

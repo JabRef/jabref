@@ -66,5 +66,4 @@ public class CaseChangeMenu extends JMenu {
             this.add(menuItem);
         }
     }
-
 }

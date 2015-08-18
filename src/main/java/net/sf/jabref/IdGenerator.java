@@ -19,6 +19,7 @@ public class IdGenerator {
 
     private static int idCounter;
 
+
     public static synchronized String next() {
         String result = idFormat.format(idCounter);
         idCounter++;
@@ -29,4 +30,3 @@ public class IdGenerator {
         return idFormat.getMinimumIntegerDigits();
     }
 }
-

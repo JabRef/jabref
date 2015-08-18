@@ -27,6 +27,7 @@ public class AutoCompleterFactory {
 
     public static int SHORTEST_TO_COMPLETE = Globals.prefs.getInt(JabRefPreferences.SHORTEST_TO_COMPLETE);
 
+
     public static AutoCompleter getFor(String fieldName) {
         if ("author".equals(fieldName) || "editor".equals(fieldName)) {
             return new NameFieldAutoCompleter(fieldName);
@@ -40,7 +41,7 @@ public class AutoCompleterFactory {
     }
 
     public static AutoCompleter getFor(String fieldName, String secondFieldName) {
-        return new NameFieldAutoCompleter(new String[]{fieldName, secondFieldName}, true);
+        return new NameFieldAutoCompleter(new String[] {fieldName, secondFieldName}, true);
     }
 
 }

@@ -38,14 +38,13 @@ import net.sf.jabref.util.Util;
 
 public class DuplicateResolverDialog extends JDialog {
 
-    private static final int
-            NOT_CHOSEN = -1;
+    private static final int NOT_CHOSEN = -1;
     public static final int KEEP_BOTH = 0;
     public static final int KEEP_UPPER = 1;
     public static final int KEEP_LOWER = 2;
     public static final int AUTOREMOVE_EXACT = 3;
     public static final int BREAK = 5; // close
-            public static final int IMPORT_AND_DELETE_OLD = 1;
+    public static final int IMPORT_AND_DELETE_OLD = 1;
     public static final int IMPORT_AND_KEEP_OLD = 0;
     public static final int DO_NOT_IMPORT = 2;
     public static final int DUPLICATE_SEARCH = 1;
@@ -268,23 +267,19 @@ public class DuplicateResolverDialog extends JDialog {
     }
 
     public static int resolveDuplicate(JFrame frame, BibtexEntry one, BibtexEntry two) {
-        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two,
-                DuplicateResolverDialog.DUPLICATE_SEARCH);
+        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two, DuplicateResolverDialog.DUPLICATE_SEARCH);
         drd.setVisible(true); // drd.show(); -> deprecated since 1.5
         return drd.getSelected();
     }
 
     public static int resolveDuplicate(JDialog frame, BibtexEntry one, BibtexEntry two) {
-        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two,
-                DuplicateResolverDialog.DUPLICATE_SEARCH);
+        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two, DuplicateResolverDialog.DUPLICATE_SEARCH);
         drd.setVisible(true); // drd.show(); -> deprecated since 1.5
         return drd.getSelected();
     }
 
-    public static int resolveDuplicateInImport(JabRefFrame frame, BibtexEntry existing,
-            BibtexEntry imported) {
-        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, existing, imported,
-                DuplicateResolverDialog.IMPORT_CHECK);
+    public static int resolveDuplicateInImport(JabRefFrame frame, BibtexEntry existing, BibtexEntry imported) {
+        DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, existing, imported, DuplicateResolverDialog.IMPORT_CHECK);
         drd.setVisible(true); // drd.show(); -> deprecated since 1.5
         return drd.getSelected();
     }

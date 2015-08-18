@@ -22,33 +22,27 @@ import net.sf.jabref.logic.l10n.Localization;
  * Exception thrown if saving goes wrong. If caused by a specific
  * entry, keeps track of which entry caused the problem.
  */
-public class SaveException extends Exception
-{
+public class SaveException extends Exception {
 
-    public static final SaveException FILE_LOCKED = new SaveException
-            (Localization.lang("Could not save, file locked by another JabRef instance."));
-    public static final SaveException BACKUP_CREATION = new SaveException
-            (Localization.lang("Unable to create backup"));
+    public static final SaveException FILE_LOCKED = new SaveException(Localization.lang("Could not save, file locked by another JabRef instance."));
+    public static final SaveException BACKUP_CREATION = new SaveException(Localization.lang("Unable to create backup"));
 
     private final BibtexEntry entry;
     private int status;
 
 
-    public SaveException(String message)
-    {
+    public SaveException(String message) {
         super(message);
         entry = null;
     }
 
-    public SaveException(String message, int status)
-    {
+    public SaveException(String message, int status) {
         super(message);
         entry = null;
         this.status = status;
     }
 
-    public SaveException(String message, BibtexEntry entry)
-    {
+    public SaveException(String message, BibtexEntry entry) {
         super(message);
         this.entry = entry;
     }
@@ -57,13 +51,11 @@ public class SaveException extends Exception
         return status;
     }
 
-    public BibtexEntry getEntry()
-    {
+    public BibtexEntry getEntry() {
         return entry;
     }
 
-    public boolean specificEntry()
-    {
+    public boolean specificEntry() {
         return entry != null;
     }
 }

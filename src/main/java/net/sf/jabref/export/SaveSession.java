@@ -60,8 +60,7 @@ public class SaveSession {
     private VerifyingWriter writer;
 
 
-    public SaveSession(File file, String encoding, boolean backup) throws IOException,
-            UnsupportedCharsetException {
+    public SaveSession(File file, String encoding, boolean backup) throws IOException, UnsupportedCharsetException {
         this.file = file;
         tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
