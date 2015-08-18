@@ -15,7 +15,6 @@
 */
 package net.sf.jabref;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.MainTableFormat;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.logic.util.MonthUtil;
@@ -74,7 +73,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
         this.fieldName = field;
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
-        isTypeHeader = this.field[0].equals(GUIGlobals.TYPE_HEADER);
+        isTypeHeader = this.field[0].equals(BibtexEntry.TYPE_HEADER);
         isNameField = this.field[0].equals("author")
                 || this.field[0].equals("editor");
         isYearField = this.field[0].equals("year");

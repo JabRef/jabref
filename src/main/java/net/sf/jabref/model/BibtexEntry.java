@@ -45,13 +45,13 @@ import java.util.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.FieldFormatter;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.MonthUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexEntry {
 
+    public static final String TYPE_HEADER = "entrytype";
     private static final String ID_FIELD = "id";
 
     private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
@@ -173,7 +173,7 @@ public class BibtexEntry {
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
             this.type = type;
-            firePropertyChangedEvent(GUIGlobals.TYPE_HEADER,
+            firePropertyChangedEvent(TYPE_HEADER,
                     oldType != null ? oldType.getName() : null,
                     type.getName());
         } catch (PropertyVetoException pve) {

@@ -269,7 +269,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             // Go through the fields until we find one with content:
             int j = 0;
             for (int i = 0; i < fld.length; i++) {
-                if (fld[i].equals(GUIGlobals.TYPE_HEADER)) {
+                if (fld[i].equals(BibtexEntry.TYPE_HEADER)) {
                     o = be.getType().getName();
                 } else {
                     o = be.getFieldOrAlias(fld[i]);
