@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.model.BibtexString;
+
 import java.util.Comparator;
 
 public class BibtexStringComparator implements Comparator<BibtexString> {
