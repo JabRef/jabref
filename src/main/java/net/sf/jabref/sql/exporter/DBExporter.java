@@ -36,7 +36,7 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.BibtexString;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;

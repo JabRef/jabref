@@ -16,6 +16,8 @@
 package net.sf.jabref.gui.worker;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -56,8 +56,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sf.jabref.*;
 import net.sf.jabref.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;

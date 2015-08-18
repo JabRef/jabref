@@ -26,7 +26,7 @@ import java.io.File;
 import javax.swing.*;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;

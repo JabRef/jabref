@@ -22,8 +22,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.l10n.Localization;

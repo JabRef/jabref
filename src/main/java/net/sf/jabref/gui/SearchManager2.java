@@ -13,12 +13,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.SearchTextListener;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;

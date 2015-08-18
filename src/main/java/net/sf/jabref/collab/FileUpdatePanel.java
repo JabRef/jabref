@@ -22,8 +22,7 @@ import java.io.File;
 
 import javax.swing.*;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener,

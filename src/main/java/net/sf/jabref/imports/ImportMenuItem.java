@@ -28,6 +28,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;

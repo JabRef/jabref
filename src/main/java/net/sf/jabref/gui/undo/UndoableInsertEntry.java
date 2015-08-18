@@ -18,6 +18,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 
 /**
  * This class represents the removal of an entry. The constructor needs

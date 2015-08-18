@@ -26,11 +26,11 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.MnemonicAwareAction;

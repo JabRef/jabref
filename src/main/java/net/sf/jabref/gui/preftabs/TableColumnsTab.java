@@ -33,7 +33,9 @@ import javax.swing.table.TableModel;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;

@@ -18,7 +18,7 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;

@@ -28,8 +28,8 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;

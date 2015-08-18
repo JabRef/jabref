@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -23,10 +23,10 @@ import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import net.sf.jabref.*;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;

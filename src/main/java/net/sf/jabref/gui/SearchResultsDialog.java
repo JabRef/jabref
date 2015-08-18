@@ -42,17 +42,14 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.EntryComparator;
 import net.sf.jabref.FieldComparator;
 import net.sf.jabref.GeneralRenderer;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
 import net.sf.jabref.TransferableBibtexEntry;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.logic.l10n.Localization;

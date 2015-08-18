@@ -37,9 +37,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;

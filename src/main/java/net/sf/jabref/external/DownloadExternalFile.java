@@ -19,6 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;

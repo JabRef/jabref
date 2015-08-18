@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -75,7 +75,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.gui.*;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.action.AutoLinkFilesAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -139,7 +139,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane. 
     public SidePaneManager sidePaneManager;
 
-    JTabbedPane tabbedPane; // initialized at constructor
+    public JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
@@ -285,7 +285,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             //    			                                            Globals.lang("Set priority")),
             manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors");
     private final AbstractAction saveSessionAction = new SaveSessionAction();
-    final AbstractAction loadSessionAction = new LoadSessionAction();
+    public final AbstractAction loadSessionAction = new LoadSessionAction();
     private final AbstractAction incrementalSearch = new GeneralAction("incSearch", "Incremental search",
                     Localization.lang("Start incremental search"),
                     prefs.getKey("Incremental search"));
@@ -2458,7 +2458,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class LoadSessionAction extends MnemonicAwareAction {
+    public class LoadSessionAction extends MnemonicAwareAction {
 
         volatile boolean running;
 

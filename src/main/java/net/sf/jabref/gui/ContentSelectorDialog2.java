@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -43,7 +43,9 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

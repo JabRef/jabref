@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -27,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
-import net.sf.jabref.gui.GUIGlobals;
 import org.jdesktop.swingx.JXTitledPanel;
 
 public abstract class SidePaneComponent extends JXTitledPanel {

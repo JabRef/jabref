@@ -29,8 +29,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;

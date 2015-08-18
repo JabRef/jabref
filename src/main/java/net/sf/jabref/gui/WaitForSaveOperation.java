@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;

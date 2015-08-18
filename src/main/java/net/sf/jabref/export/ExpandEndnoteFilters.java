@@ -22,7 +22,7 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.Worker;
 import net.sf.jabref.gui.FileDialogs;

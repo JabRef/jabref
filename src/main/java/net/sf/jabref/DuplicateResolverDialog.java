@@ -24,6 +24,8 @@ import java.io.StringWriter;
 import javax.swing.*;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

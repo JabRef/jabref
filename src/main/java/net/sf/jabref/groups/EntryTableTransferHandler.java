@@ -36,10 +36,10 @@ import net.sf.jabref.gui.net.MonitoredURLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;

@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -28,6 +28,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 

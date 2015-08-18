@@ -12,6 +12,7 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 
 /**

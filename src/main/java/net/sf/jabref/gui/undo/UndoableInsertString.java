@@ -18,6 +18,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class UndoableInsertString extends AbstractUndoableEdit {

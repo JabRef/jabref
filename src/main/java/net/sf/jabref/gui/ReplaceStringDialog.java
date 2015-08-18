@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -24,6 +24,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;

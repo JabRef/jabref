@@ -31,6 +31,8 @@ import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.SaveException;
 import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;

@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
