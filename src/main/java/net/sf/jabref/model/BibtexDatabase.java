@@ -163,8 +163,8 @@ public class BibtexDatabase {
         int keyHash = key.hashCode(); // key hash for better performance
 
         Set<String> keySet = entries.keySet();
-        for (String entrieID : keySet) {
-            BibtexEntry entry = getEntryById(entrieID);
+        for (String entryID : keySet) {
+            BibtexEntry entry = getEntryById(entryID);
             if (entry != null && entry.getCiteKey() != null) {
                 String citeKey = entry.getCiteKey();
                 if (citeKey != null) {
@@ -179,15 +179,15 @@ public class BibtexDatabase {
 
     public synchronized BibtexEntry[] getEntriesByKey(String key) {
 
-        ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> result = new ArrayList<>();
 
-        for (BibtexEntry entry : this.entries.values()) {
+        for (BibtexEntry entry : entries.values()) {
             if (key.equals(entry.getCiteKey())) {
-                entries.add(entry);
+                result.add(entry);
             }
         }
 
-        return entries.toArray(new BibtexEntry[entries.size()]);
+        return result.toArray(new BibtexEntry[result.size()]);
     }
 
     /**
@@ -331,7 +331,7 @@ public class BibtexDatabase {
         if (content == null) {
             throw new IllegalArgumentException("Content for resolveForStrings must not be null.");
         }
-        return resolveContent(content, new HashSet<String>());
+        return resolveContent(content, new HashSet<>());
     }
 
     /**
@@ -347,10 +347,10 @@ public class BibtexDatabase {
     public List<BibtexEntry> resolveForStrings(Collection<BibtexEntry> entries, boolean inPlace) {
 
         if (entries == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("entries must not be null");
         }
 
-        List<BibtexEntry> results = new ArrayList<BibtexEntry>(entries.size());
+        List<BibtexEntry> results = new ArrayList<>(entries.size());
 
         for (BibtexEntry entry : entries) {
             results.add(this.resolveForStrings(entry, inPlace));
@@ -409,14 +409,14 @@ public class BibtexDatabase {
 
                 // Ok, we found the string. Now we must make sure we
                 // resolve any references to other strings in this one.
-                String res = string.getContent();
-                res = resolveContent(res, usedIds);
+                String result = string.getContent();
+                result = resolveContent(result, usedIds);
 
                 // Finished with recursing this branch, so we remove our
                 // ID again:
                 usedIds.remove(string.getId());
 
-                return res;
+                return result;
             }
         }
 
@@ -431,7 +431,7 @@ public class BibtexDatabase {
     }
 
     private String resolveContent(String res, HashSet<String> usedIds) {
-        //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
+
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
