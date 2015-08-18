@@ -22,17 +22,17 @@ public class BibtexString {
 
     /**
      * Type of a \@String.
-     *
+     * <p>
      * Differentiate a \@String based on its usage:
-     *
+     * <p>
      * - {@link #AUTHOR}: prefix "a", for author and editor fields.
      * - {@link #INSTITUTION}: prefix "i", for institution and organization
-     *                         field
+     * field
      * - {@link #PUBLISHER}: prefix "p", for publisher fields
      * - {@link #OTHER}: no prefix, for any field
-     *
+     * <p>
      * Examples:
-     *
+     * <p>
      * \@String { aKahle    = "Kahle, Brewster " } -> author
      * \@String { aStallman = "Stallman, Richard" } -> author
      * \@String { iMIT      = "{Massachusetts Institute of Technology ({MIT})}" } -> institution
@@ -41,15 +41,15 @@ public class BibtexString {
      * \@String { eg        = "for example" } -> other
      * \@String { et        = " and " } -> other
      * \@String { lBigMac   = "Big Mac" } -> other
-     *
+     * <p>
      * Usage:
-     *
+     * <p>
      * \@Misc {
-     *   title       = "The GNU Project"
-     *   author      = aStallman # et # aKahle
-     *   institution = iMIT
-     *   publisher   = pMIT
-     *   note        = "Just " # eg
+     * title       = "The GNU Project"
+     * author      = aStallman # et # aKahle
+     * institution = iMIT
+     * publisher   = pMIT
+     * note        = "Just " # eg
      * }
      *
      * @author Jan Kubovy <jan@kubovy.eu>
@@ -85,57 +85,57 @@ public class BibtexString {
     }
 
 
-    private String _name;
-    private String _content;
-    private String _id;
-    private Type _type;
+    private String name;
+    private String content;
+    private String id;
+    private Type type;
 
 
     public BibtexString(String id, String name, String content) {
-        _id = id;
-        _name = name;
-        _content = content;
-        _type = Type.get(name);
+        this.id = id;
+        this.name = name;
+        this.content = content;
+        type = Type.get(name);
     }
 
     public BibtexString(String id, String name, String content, Type type) {
-        _id = id;
-        _name = name;
-        _content = content;
-        _type = type;
+        this.id = id;
+        this.name = name;
+        this.content = content;
+        this.type = type;
     }
 
     public String getId() {
-        return _id;
+        return id;
     }
 
     public void setId(String id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public void setName(String name) {
-        _name = name;
-        _type = Type.get(name);
+        this.name = name;
+        type = Type.get(name);
     }
 
     public String getContent() {
-        return _content == null ? "" : _content;
+        return content == null ? "" : content;
     }
 
     public void setContent(String content) {
-        _content = content;
+        this.content = content;
     }
 
     @Override
     public Object clone() {
-        return new BibtexString(_id, _name, _content);
+        return new BibtexString(id, name, content);
     }
 
     public Type getType() {
-        return _type;
+        return type;
     }
 }
