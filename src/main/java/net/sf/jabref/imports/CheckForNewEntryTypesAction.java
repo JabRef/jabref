@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.BibtexEntryType;
-import net.sf.jabref.CustomEntryType;
+import net.sf.jabref.model.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

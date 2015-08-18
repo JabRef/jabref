@@ -13,18 +13,17 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.model;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;

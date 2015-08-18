@@ -42,6 +42,7 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.CustomEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

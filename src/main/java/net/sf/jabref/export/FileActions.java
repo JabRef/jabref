@@ -34,6 +34,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.CustomEntryType;
 
 public class FileActions {
 

@@ -26,7 +26,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.model.BibtexEntryType;
-import net.sf.jabref.CustomEntryType;
+import net.sf.jabref.model.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
