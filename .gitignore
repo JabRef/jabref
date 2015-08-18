@@ -18,6 +18,9 @@ src/main/resources/windows/nsis/dist/
 # Gradle
 build/
 .gradle
+# generated when `gradlew --gui` is called
+ui/
+gradle-app.setting
 
 # Netbeans
 nbproject/private/
