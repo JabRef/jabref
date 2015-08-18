@@ -52,7 +52,6 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.CheckBoxMessage;
 import net.sf.jabref.DuplicateCheck;
-import net.sf.jabref.DuplicateResolverDialog;
 import net.sf.jabref.EntryMarker;
 import net.sf.jabref.FieldComparator;
 import net.sf.jabref.GeneralRenderer;
