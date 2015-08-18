@@ -26,6 +26,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
@@ -34,7 +36,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     private final BasePanel basePanel;
     private BibtexEntry entry;
-    private FindFullText.FindResult result;
+    private Optional<URL> result;
 
 
     public FindFullTextAction(BasePanel basePanel) {
@@ -55,7 +57,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void update() {
-        if (result.url != null) {
+        if (result.isPresent()) {
             String bibtexKey = entry.getCiteKey();
             String[] dirs = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             if (dirs.length == 0) {
@@ -66,7 +68,7 @@ public class FindFullTextAction extends AbstractWorker {
             DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(),
                     bibtexKey);
             try {
-                def.download(result.url, new DownloadExternalFile.DownloadCallback() {
+                def.download(result.get(), new DownloadExternalFile.DownloadCallback() {
 
                     @Override
                     public void downloadComplete(FileListEntry file) {
@@ -88,23 +90,10 @@ public class FindFullTextAction extends AbstractWorker {
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }
         else {
-            String message = null;
-            switch (result.status) {
-            case FindFullText.WRONG_MIME_TYPE:
-                message = Localization.lang("Found pdf link, but received the wrong MIME type. "
-                        + "This could indicate that you don't have access to the fulltext article.");
-                break;
-            case FindFullText.LINK_NOT_FOUND:
-                message = Localization.lang("Unable to find full text document.");
-                break;
-            case FindFullText.IO_EXCEPTION:
-                message = Localization.lang("Connection error when trying to find full text document.");
-                break;
-            }
-            basePanel.output(Localization.lang("Full text article download failed"));
-            JOptionPane.showMessageDialog(basePanel.frame(), message, Localization.lang("Full text article download failed"),
-                    JOptionPane.ERROR_MESSAGE);
-        }
+            String message = Localization.lang("Full text article download failed");
 
+            basePanel.output(message);
+            JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

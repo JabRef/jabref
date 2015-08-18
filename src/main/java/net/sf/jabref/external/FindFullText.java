@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.io.IOException;
@@ -35,14 +20,7 @@ import net.sf.jabref.logic.net.URLDownload;
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FindFullText {
-
-    private static final int FOUND_PDF = 0;
-    public static final int WRONG_MIME_TYPE = 1;
-    public static final int LINK_NOT_FOUND = 2;
-    public static final int IO_EXCEPTION = 3;
-
     private final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
-
 
     public FindFullText() {
         // Ordering is important, authorities first!
@@ -54,7 +32,7 @@ public class FindFullText {
         finders.add(new GoogleScholar());
     }
 
-    public FindResult findFullText(BibtexEntry entry) {
+    public Optional<URL> findFullText(BibtexEntry entry) {
         for (FullTextFinder finder : finders) {
             try {
                 Optional<URL> result = finder.findFullText(entry);
@@ -72,17 +50,17 @@ public class FindFullText {
                     // http://stackoverflow.com/questions/7615645/ssl-handshake-alert-unrecognized-name-error-since-upgrade-to-java-1-7-0
                     String mimeType = new URLDownload(result.get()).determineMimeType();
                     if (mimeType != null && mimeType.toLowerCase().equals("application/pdf")) {
-                        return new FindResult(result.get(), result.get());
+                        return Optional.of(result.get());
                     } else {
-                        return new FindResult(WRONG_MIME_TYPE, result.get());
+                        // TODO log
                     }
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
-                return new FindResult(IO_EXCEPTION, null);
+                // TODO log
+                continue;
             }
         }
-        return new FindResult(LINK_NOT_FOUND, null);
+        return Optional.empty();
     }
 
     /**
@@ -105,8 +83,6 @@ public class FindFullText {
             String location = huc.getHeaderField("location");
             huc.disconnect();
             if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM && redirectCount < 5) {
-                //System.out.println(responseCode);
-                //System.out.println(location);
                 try {
                     URL newUrl = new URL(location);
                     return resolveRedirects(newUrl, redirectCount + 1);
@@ -159,30 +135,5 @@ public class FindFullText {
             }
         }
 
-    }
-
-
-    public static class FindResult {
-
-        public final URL url;
-        public String host;
-        public final int status;
-
-
-        public FindResult(URL url, URL originalUrl) {
-            this.url = url;
-            this.status = FindFullText.FOUND_PDF;
-            if (originalUrl != null) {
-                host = originalUrl.getHost();
-            }
-        }
-
-        public FindResult(int status, URL originalUrl) {
-            this.url = null;
-            this.status = status;
-            if (originalUrl != null) {
-                this.host = originalUrl.getHost();
-            }
-        }
     }
 }
