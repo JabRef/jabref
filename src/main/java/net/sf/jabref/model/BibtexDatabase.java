@@ -232,7 +232,7 @@ public class BibtexDatabase {
 
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
 
-        return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
+        return checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
@@ -267,7 +267,7 @@ public class BibtexDatabase {
         } else {
             entry.clearField(BibtexFields.KEY_FIELD);
         }
-        return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
+        return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }
 
     /**
@@ -520,7 +520,7 @@ public class BibtexDatabase {
     //############################################
     // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
-    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
+    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
         // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
         boolean duplicate;
@@ -543,7 +543,7 @@ public class BibtexDatabase {
                 duplicate = addKeyToSet(newKey);
             }
         }
-        if (duplicate && issueWarning) {
+        if (duplicate) {
             LOGGER.warn(Localization.lang("Warning there is a duplicate key") + ':' + newKey);
         }
         return duplicate;
