@@ -21,6 +21,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.action.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;

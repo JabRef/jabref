@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui.worker;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.*;
 import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.gui.AbstractWorker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.JabRefDesktop;

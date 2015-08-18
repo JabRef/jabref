@@ -57,7 +57,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BrowseAction;
+import net.sf.jabref.gui.action.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.IdGenerator;
 import net.sf.jabref.JabRef;

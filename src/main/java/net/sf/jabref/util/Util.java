@@ -60,7 +60,7 @@ import net.sf.jabref.logic.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.gui.AbstractWorker;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;

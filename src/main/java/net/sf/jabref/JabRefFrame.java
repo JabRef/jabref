@@ -76,6 +76,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.action.AutoLinkFilesAction;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.logic.l10n.Localization;

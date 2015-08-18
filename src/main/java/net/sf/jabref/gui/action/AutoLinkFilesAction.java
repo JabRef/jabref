@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +9,10 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
@@ -18,7 +22,7 @@ import net.sf.jabref.util.Util;
  * This Action may only be used in a menu or button.
  * Never in the entry editor. FileListEditor and EntryEditor have other ways to update the file links
  */
-class AutoLinkFilesAction extends AbstractAction {
+public class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
         putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));

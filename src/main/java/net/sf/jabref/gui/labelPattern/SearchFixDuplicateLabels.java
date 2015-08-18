@@ -16,7 +16,7 @@
 package net.sf.jabref.gui.labelPattern;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.AbstractWorker;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.logic.l10n.Localization;

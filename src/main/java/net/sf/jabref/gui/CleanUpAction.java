@@ -33,6 +33,7 @@ import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.imports.HTMLConverter;
 import net.sf.jabref.imports.CaseKeeper;
 import net.sf.jabref.imports.UnitFormatter;

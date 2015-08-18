@@ -28,7 +28,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.AbstractWorker;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.logic.l10n.Localization;

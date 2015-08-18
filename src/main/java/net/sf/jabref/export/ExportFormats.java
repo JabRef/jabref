@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.AbstractWorker;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 

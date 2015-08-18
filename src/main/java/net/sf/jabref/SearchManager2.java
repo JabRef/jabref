@@ -15,7 +15,7 @@
 */
 package net.sf.jabref;
 
-import net.sf.jabref.gui.AbstractWorker;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.SearchResultsDialog;

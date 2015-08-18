@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.gui.AbstractWorker;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
