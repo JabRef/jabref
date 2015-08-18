@@ -31,6 +31,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -20,7 +20,7 @@ import java.util.List;
 
 import net.sf.jabref.util.Util;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 

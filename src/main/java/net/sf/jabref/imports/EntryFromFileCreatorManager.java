@@ -14,6 +14,9 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators. 

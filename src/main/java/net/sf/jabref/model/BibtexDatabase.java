@@ -33,8 +33,9 @@ Modified for use in JabRef
 // modified : r.nagel 23.08.2004
 //                - insert getEntryByKey() methode needed by AuxSubGenerator
 
-package net.sf.jabref;
+package net.sf.jabref.model;
 
+import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
 

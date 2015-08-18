@@ -26,6 +26,8 @@ import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
+import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

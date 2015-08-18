@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.export;
 
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 

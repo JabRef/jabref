@@ -31,6 +31,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.util.Util;
 
 /**

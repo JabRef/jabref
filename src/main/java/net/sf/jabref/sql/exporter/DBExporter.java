@@ -32,9 +32,9 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.BibtexString;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;

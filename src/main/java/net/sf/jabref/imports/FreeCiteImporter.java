@@ -31,9 +31,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexEntryTypes;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.OutputPrinter;

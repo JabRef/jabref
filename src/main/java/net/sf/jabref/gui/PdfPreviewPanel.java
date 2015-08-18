@@ -28,10 +28,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;

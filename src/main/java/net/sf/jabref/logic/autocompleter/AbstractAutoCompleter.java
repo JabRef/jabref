@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * An autocompleter delivers possible completions for a given String. There are

@@ -53,6 +53,7 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
 
 class StringDialog extends JDialog {
 

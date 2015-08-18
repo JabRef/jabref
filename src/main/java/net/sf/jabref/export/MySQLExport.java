@@ -17,7 +17,7 @@ package net.sf.jabref.export;
 
 import java.util.Set;
 
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;

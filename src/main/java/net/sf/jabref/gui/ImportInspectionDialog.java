@@ -47,8 +47,8 @@ import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.CheckBoxMessage;
 import net.sf.jabref.DuplicateCheck;

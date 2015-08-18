@@ -111,7 +111,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;

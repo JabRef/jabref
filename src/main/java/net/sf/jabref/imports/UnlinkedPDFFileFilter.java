@@ -3,8 +3,8 @@ package net.sf.jabref.imports;
 import java.io.File;
 import java.io.FileFilter;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * {@link FileFilter} implementation, that allows only files which are not

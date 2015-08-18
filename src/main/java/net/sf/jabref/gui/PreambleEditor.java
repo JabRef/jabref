@@ -20,7 +20,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldTextArea;

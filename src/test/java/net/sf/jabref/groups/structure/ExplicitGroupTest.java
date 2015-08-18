@@ -1,6 +1,8 @@
 package net.sf.jabref.groups.structure;
 
 import net.sf.jabref.*;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryTypes;
 import org.junit.Before;
 import org.junit.Test;
 

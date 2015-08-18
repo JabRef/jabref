@@ -39,8 +39,8 @@ package net.sf.jabref.wizard.integrity;
 
 import java.util.Vector;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 public class IntegrityCheck
 {

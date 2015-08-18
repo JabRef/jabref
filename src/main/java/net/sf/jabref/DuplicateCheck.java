@@ -16,6 +16,8 @@
 package net.sf.jabref;
 
 import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.export;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.export.layout.Layout;
@@ -163,7 +163,7 @@ public class ExportFormat implements IExportFormat {
      * @throws Exception
      *             if any other error occurred during export.
      * 
-     * @see net.sf.jabref.export.IExportFormat#performExport(net.sf.jabref.BibtexDatabase,
+     * @see net.sf.jabref.export.IExportFormat#performExport(net.sf.jabref.model.BibtexDatabase,
      *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
      */
     @Override

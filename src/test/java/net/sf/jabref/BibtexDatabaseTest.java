@@ -3,6 +3,7 @@ package net.sf.jabref;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
+import net.sf.jabref.model.BibtexDatabase;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

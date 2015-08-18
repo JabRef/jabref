@@ -35,6 +35,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.util.Util;
 
 /**

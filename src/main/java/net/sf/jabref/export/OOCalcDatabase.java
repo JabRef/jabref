@@ -28,6 +28,8 @@ import net.sf.jabref.export.layout.format.GetOpenOfficeType;
 import net.sf.jabref.export.layout.format.RemoveBrackets;
 import net.sf.jabref.export.layout.format.RemoveWhitespace;
 
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;

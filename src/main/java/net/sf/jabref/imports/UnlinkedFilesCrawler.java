@@ -6,7 +6,7 @@ import java.io.FileFilter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.FindUnlinkedFilesDialog.FileNodeWrapper;
 

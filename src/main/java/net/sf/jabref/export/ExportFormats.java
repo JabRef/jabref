@@ -30,6 +30,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * User: alver

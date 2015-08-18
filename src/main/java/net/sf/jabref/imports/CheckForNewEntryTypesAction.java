@@ -21,7 +21,7 @@ import java.util.Iterator;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
 

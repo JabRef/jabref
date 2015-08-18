@@ -28,6 +28,8 @@ import net.sf.jabref.gui.action.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 import javax.swing.*;
 import java.awt.*;

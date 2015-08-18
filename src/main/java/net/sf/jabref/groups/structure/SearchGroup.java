@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.groups.structure;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;

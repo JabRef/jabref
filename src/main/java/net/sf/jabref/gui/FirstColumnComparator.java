@@ -17,8 +17,8 @@ package net.sf.jabref.gui;
 
 import java.util.Comparator;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
 
 class FirstColumnComparator implements Comparator<BibtexEntry> {
 

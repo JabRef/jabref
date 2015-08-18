@@ -1,7 +1,7 @@
 package net.sf.jabref.util;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.imports.BibtexParser;
@@ -17,7 +17,6 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.io.StringReader;
-import java.net.URI;
 import java.util.*;
 import java.util.List;
 

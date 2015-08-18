@@ -27,7 +27,7 @@ Note:
 Modified for use in JabRef.
 
 */
-package net.sf.jabref;
+package net.sf.jabref.model;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,6 +35,9 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.sf.jabref.CustomEntryType;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.util.Util;
 
 /**

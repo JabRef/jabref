@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.util.Util;
 
 /**

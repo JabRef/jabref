@@ -27,6 +27,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 class EntryChange extends Change {
 

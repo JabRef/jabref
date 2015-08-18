@@ -20,6 +20,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 

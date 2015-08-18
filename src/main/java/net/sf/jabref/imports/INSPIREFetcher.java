@@ -26,8 +26,8 @@ import java.net.URLEncoder;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 

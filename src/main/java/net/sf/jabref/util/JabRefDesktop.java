@@ -9,6 +9,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.BibtexEntry;
 
 import javax.swing.*;
 import java.awt.*;

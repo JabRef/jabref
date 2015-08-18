@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 
 import java.util.StringTokenizer;
 

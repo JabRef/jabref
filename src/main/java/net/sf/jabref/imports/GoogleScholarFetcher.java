@@ -19,6 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.BibtexEntry;
 
 import javax.swing.*;
 import java.io.*;

@@ -28,7 +28,7 @@ Modified for use in JabRef.
 
 */
 
-package net.sf.jabref;
+package net.sf.jabref.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
@@ -43,6 +43,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import net.sf.jabref.*;
 import net.sf.jabref.export.FieldFormatter;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.MonthUtil;

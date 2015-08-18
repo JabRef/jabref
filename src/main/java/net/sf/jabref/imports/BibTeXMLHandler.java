@@ -19,6 +19,8 @@ import java.util.ArrayList;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
