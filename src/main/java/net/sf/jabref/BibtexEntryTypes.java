@@ -685,7 +685,7 @@ public class BibtexEntryTypes {
 
 	                @Override
 	                public String[] getRequiredFields() {
-	                    return null;
+	                    return new String[]{};
 	                }
 
 	                @Override
@@ -720,7 +720,7 @@ public class BibtexEntryTypes {
 
 	                @Override
 	                public String[] getRequiredFields() {
-	                    return null;
+	                    return new String[]{};
 	                }
 
 	                @Override
@@ -761,7 +761,7 @@ public class BibtexEntryTypes {
 
 	                @Override
 	                public String[] getRequiredFields() {
-	                    return null;
+	                    return new String[]{};
 	                }
 
 	                @Override
@@ -794,12 +794,12 @@ public class BibtexEntryTypes {
 
 	                @Override
 	                public String[] getOptionalFields() {
-	                    return null;
+	                    return new String[]{};
 	                }
 
 	                @Override
 	                public String[] getRequiredFields() {
-	                    return null;
+	                    return new String[]{};
 	                }
 
 	                @Override
