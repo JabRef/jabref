@@ -5,6 +5,8 @@ import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
 import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryTypes;
 import org.apache.jempbox.xmp.*;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;

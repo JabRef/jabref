@@ -20,7 +20,7 @@ import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.logic.l10n.Localization;
 

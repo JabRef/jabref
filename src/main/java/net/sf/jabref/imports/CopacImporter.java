@@ -22,9 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexEntryTypes;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryTypes;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.OutputPrinter;
 

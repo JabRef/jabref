@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

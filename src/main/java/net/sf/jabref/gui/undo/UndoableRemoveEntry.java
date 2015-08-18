@@ -19,6 +19,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * This class represents the removal of an entry. The constructor needs

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

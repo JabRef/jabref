@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.search.matchers;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 
 import ca.odell.glazedlists.matchers.Matcher;
 

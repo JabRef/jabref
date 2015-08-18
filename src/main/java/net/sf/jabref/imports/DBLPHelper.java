@@ -18,7 +18,7 @@ package net.sf.jabref.imports;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 
 class DBLPHelper {
 

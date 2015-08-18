@@ -17,7 +17,7 @@ package net.sf.jabref.groups.migrations;
 
 import java.util.Vector;
 
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;

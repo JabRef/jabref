@@ -20,6 +20,8 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

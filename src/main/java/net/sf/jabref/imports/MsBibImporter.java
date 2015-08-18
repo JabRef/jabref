@@ -22,7 +22,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 

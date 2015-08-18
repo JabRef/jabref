@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.GUIGlobals;
@@ -23,6 +22,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
 
 import javax.swing.*;
 import java.io.IOException;

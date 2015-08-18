@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;

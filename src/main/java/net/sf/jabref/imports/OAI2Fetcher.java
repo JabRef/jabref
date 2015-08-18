@@ -33,6 +33,8 @@ import net.sf.jabref.*;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryTypes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 

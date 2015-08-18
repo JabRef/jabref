@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.XMPUtil;
 import net.sf.jabref.gui.FileListTableModel;

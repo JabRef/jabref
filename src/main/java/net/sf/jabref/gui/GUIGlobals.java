@@ -55,7 +55,6 @@ public class GUIGlobals {
             frameTitle = "JabRef";
     public static final String stringsTitle = "Strings for database";
     public static final String untitledTitle = "untitled";
-    public static final String TYPE_HEADER = "entrytype";
     public static final String NUMBER_COL = "#";
     public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
 

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.oo;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.IdGenerator;
 
 /**

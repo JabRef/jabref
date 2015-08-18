@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexString;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 

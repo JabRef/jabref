@@ -29,6 +29,8 @@ import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;

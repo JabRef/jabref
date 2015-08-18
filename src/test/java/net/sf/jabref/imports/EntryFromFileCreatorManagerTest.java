@@ -1,7 +1,7 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 import org.junit.Assert;
 import org.junit.Ignore;

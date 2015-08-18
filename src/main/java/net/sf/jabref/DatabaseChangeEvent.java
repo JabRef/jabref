@@ -15,6 +15,9 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+
 public class DatabaseChangeEvent {
 
     public enum ChangeType {

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import net.sf.jabref.*;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on

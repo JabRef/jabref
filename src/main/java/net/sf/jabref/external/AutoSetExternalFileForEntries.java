@@ -27,6 +27,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.fieldeditors.FieldTextField;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

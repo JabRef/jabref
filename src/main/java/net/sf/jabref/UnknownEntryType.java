@@ -15,6 +15,10 @@
 */
 package net.sf.jabref;
 
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
+
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
  * during bibtex parsing. The only known information is the type name.

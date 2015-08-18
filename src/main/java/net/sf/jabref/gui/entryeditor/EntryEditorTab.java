@@ -41,6 +41,7 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.

@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.DatabaseChangeEvent;
 import net.sf.jabref.DatabaseChangeListener;
 import net.sf.jabref.IdComparator;

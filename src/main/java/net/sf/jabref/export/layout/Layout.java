@@ -18,8 +18,8 @@ package net.sf.jabref.export.layout;
 import java.util.Vector;
 import java.util.ArrayList;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * Main class for formatting DOCUMENT ME!

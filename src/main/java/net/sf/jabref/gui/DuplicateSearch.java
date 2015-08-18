@@ -31,6 +31,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
 import spin.Spin;
 
 public class DuplicateSearch implements Runnable {

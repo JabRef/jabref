@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;

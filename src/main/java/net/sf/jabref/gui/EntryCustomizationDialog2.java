@@ -31,6 +31,9 @@ import net.sf.jabref.*;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.CustomEntryType;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
 

@@ -16,12 +16,12 @@
 package net.sf.jabref.imports;
 
 import java.io.File;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntryType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.MetaData;
 
 public class ParserResult {

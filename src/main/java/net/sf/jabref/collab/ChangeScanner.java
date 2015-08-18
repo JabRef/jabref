@@ -36,6 +36,9 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexString;
 import net.sf.jabref.util.Util;
 
 public class ChangeScanner implements Runnable {

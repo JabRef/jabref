@@ -30,6 +30,9 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntryTypes;
 import net.sf.jabref.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

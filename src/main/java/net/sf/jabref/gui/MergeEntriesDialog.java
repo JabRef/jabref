@@ -28,8 +28,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;

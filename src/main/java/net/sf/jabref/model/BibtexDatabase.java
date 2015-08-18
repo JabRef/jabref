@@ -27,18 +27,12 @@ Note:
 Modified for use in JabRef
 
 */
+package net.sf.jabref.model;
 
-// created by : ?
-//
-// modified : r.nagel 23.08.2004
-//                - insert getEntryByKey() methode needed by AuxSubGenerator
-
-package net.sf.jabref;
-
+import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
@@ -46,35 +40,33 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.swing.JOptionPane;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexDatabase {
 
-    private final Map<String, BibtexEntry> _entries = new Hashtable<String, BibtexEntry>();
+    private final Map<String, BibtexEntry> entries = new ConcurrentHashMap<>();
 
-    private String _preamble;
+    private String preamble;
 
-    private final HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
+    private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
-    private final Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
+    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
     private boolean followCrossrefs = true;
-    
+
     private static final Log LOGGER = LogFactory.getLog(BibtexDatabase.class);
 
     /**
      * use a map instead of a set since i need to know how many of each key is
      * inthere
      */
-    private final HashMap<String, Integer> allKeys = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> allKeys = new HashMap<>();
 
     /*
      * Entries are stored in a HashMap with the ID as key. What happens if
@@ -84,47 +76,35 @@ public class BibtexDatabase {
      * Map.
      */
     private final VetoableChangeListener listener =
-            new VetoableChangeListener()
-            {
+            propertyChangeEvent -> {
+                if (propertyChangeEvent.getPropertyName() == null) {
+                    fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibtexEntry) propertyChangeEvent.getSource()));
+                } else if ("id".equals(propertyChangeEvent.getPropertyName())) {
+                    // locate the entry under its old key
+                    BibtexEntry oldEntry =
+                            entries.remove(propertyChangeEvent.getOldValue());
 
-                @Override
-                public void vetoableChange(PropertyChangeEvent pce)
-                        throws PropertyVetoException
-                {
-                    if (pce.getPropertyName() == null) {
-                        fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibtexEntry) pce.getSource()));
-                    } else if ("id".equals(pce.getPropertyName()))
-                    {
-                        // locate the entry under its old key
-                        BibtexEntry oldEntry =
-                                _entries.remove(pce.getOldValue());
-
-                        if (oldEntry != pce.getSource())
-                        {
-                            // Something is very wrong!
-                            // The entry under the old key isn't
-                            // the one that sent this event.
-                            // Restore the old state.
-                            _entries.put((String) pce.getOldValue(), oldEntry);
-                            throw new PropertyVetoException("Wrong old ID", pce);
-                        }
-
-                        if (_entries.get(pce.getNewValue()) != null)
-                        {
-                            _entries.put((String) pce.getOldValue(), oldEntry);
-                            throw new PropertyVetoException
-                            ("New ID already in use, please choose another",
-                                    pce);
-                        }
-
-                        // and re-file this entry
-                        _entries.put((String) pce.getNewValue(),
-                                (BibtexEntry) pce.getSource());
-                    } else {
-                        fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibtexEntry) pce.getSource()));
-                        //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
-                        //    +"\n"+pce.getNewValue());
+                    if (oldEntry != propertyChangeEvent.getSource()) {
+                        // Something is very wrong!
+                        // The entry under the old key isn't
+                        // the one that sent this event.
+                        // Restore the old state.
+                        entries.put((String) propertyChangeEvent.getOldValue(), oldEntry);
+                        throw new PropertyVetoException("Wrong old ID", propertyChangeEvent);
                     }
+
+                    if (entries.get(propertyChangeEvent.getNewValue()) != null) {
+                        entries.put((String) propertyChangeEvent.getOldValue(), oldEntry);
+                        throw new PropertyVetoException
+                                ("New ID already in use, please choose another",
+                                        propertyChangeEvent);
+                    }
+
+                    // and re-file this entry
+                    entries.put((String) propertyChangeEvent.getNewValue(),
+                            (BibtexEntry) propertyChangeEvent.getSource());
+                } else {
+                    fireDatabaseChanged(new DatabaseChangeEvent(BibtexDatabase.this, DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibtexEntry) propertyChangeEvent.getSource()));
                 }
             };
 
@@ -132,18 +112,16 @@ public class BibtexDatabase {
     /**
      * Returns the number of entries.
      */
-    public synchronized int getEntryCount()
-    {
-        return _entries.size();
+    public int getEntryCount() {
+        return entries.size();
     }
 
     /**
      * Returns a Set containing the keys to all entries.
      * Use getKeySet().iterator() to iterate over all entries.
      */
-    public synchronized Set<String> getKeySet()
-    {
-        return _entries.keySet();
+    public Set<String> getKeySet() {
+        return entries.keySet();
     }
 
     /**
@@ -151,43 +129,42 @@ public class BibtexDatabase {
      * sorted by the given Comparator.
      */
     public synchronized EntrySorter getSorter(Comparator<BibtexEntry> comp) {
-        EntrySorter sorter = new EntrySorter(_entries, comp);
+        EntrySorter sorter = new EntrySorter(entries, comp);
         addDatabaseChangeListener(sorter);
         return sorter;
     }
 
     /**
      * Just temporary, for testing purposes....
+     *
      * @return
      */
     public Map<String, BibtexEntry> getEntryMap() {
-        return _entries;
+        return entries;
     }
 
     /**
      * Returns the entry with the given ID (-> entry_type + hashcode).
      */
-    public synchronized BibtexEntry getEntryById(String id)
-    {
-        return _entries.get(id);
+    public BibtexEntry getEntryById(String id) {
+        return entries.get(id);
     }
 
-    public synchronized Collection<BibtexEntry> getEntries() {
-        return _entries.values();
+    public Collection<BibtexEntry> getEntries() {
+        return entries.values();
     }
 
     /**
      * Returns the entry with the given bibtex key.
      */
-    public synchronized BibtexEntry getEntryByKey(String key)
-    {
+    public synchronized BibtexEntry getEntryByKey(String key) {
         BibtexEntry back = null;
 
         int keyHash = key.hashCode(); // key hash for better performance
 
-        Set<String> keySet = _entries.keySet();
-        for (String entrieID : keySet) {
-            BibtexEntry entry = getEntryById(entrieID);
+        Set<String> keySet = entries.keySet();
+        for (String entryID : keySet) {
+            BibtexEntry entry = getEntryById(entryID);
             if (entry != null && entry.getCiteKey() != null) {
                 String citeKey = entry.getCiteKey();
                 if (citeKey != null) {
@@ -202,15 +179,15 @@ public class BibtexDatabase {
 
     public synchronized BibtexEntry[] getEntriesByKey(String key) {
 
-        ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> result = new ArrayList<>();
 
-        for (BibtexEntry entry : _entries.values()) {
+        for (BibtexEntry entry : entries.values()) {
             if (key.equals(entry.getCiteKey())) {
-                entries.add(entry);
+                result.add(entry);
             }
         }
 
-        return entries.toArray(new BibtexEntry[entries.size()]);
+        return result.toArray(new BibtexEntry[result.size()]);
     }
 
     /**
@@ -218,32 +195,29 @@ public class BibtexDatabase {
      * use Util.createId(...) to make up a unique ID for an entry.
      */
     public synchronized boolean insertEntry(BibtexEntry entry)
-            throws KeyCollisionException
-    {
+            throws KeyCollisionException {
         String id = entry.getId();
-        if (getEntryById(id) != null)
-        {
+        if (getEntryById(id) != null) {
             throw new KeyCollisionException(
                     "ID is already in use, please choose another");
         }
 
         entry.addPropertyChangeListener(listener);
 
-        _entries.put(id, entry);
+        entries.put(id, entry);
 
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
 
-        return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
+        return checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
      * Removes the entry with the given string.
-     * 
+     * <p>
      * Returns null if not found.
      */
-    public synchronized BibtexEntry removeEntry(String id)
-    {
-        BibtexEntry oldValue = _entries.remove(id);
+    public synchronized BibtexEntry removeEntry(String id) {
+        BibtexEntry oldValue = entries.remove(id);
 
         if (oldValue == null) {
             return null;
@@ -257,8 +231,7 @@ public class BibtexDatabase {
     }
 
     public synchronized boolean setCiteKeyForEntry(String id, String key) {
-        if (!_entries.containsKey(id))
-         {
+        if (!entries.containsKey(id)) {
             return false; // Entry doesn't exist!
         }
         BibtexEntry entry = getEntryById(id);
@@ -268,47 +241,44 @@ public class BibtexDatabase {
         } else {
             entry.clearField(BibtexFields.KEY_FIELD);
         }
-        return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
+        return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }
 
     /**
      * Sets the database's preamble.
      */
-    public synchronized void setPreamble(String preamble)
-    {
-        _preamble = preamble;
+    public synchronized void setPreamble(String preamble) {
+        this.preamble = preamble;
     }
 
     /**
      * Returns the database's preamble.
      */
-    public synchronized String getPreamble()
-    {
-        return _preamble;
+    public synchronized String getPreamble() {
+        return preamble;
     }
 
     /**
      * Inserts a Bibtex String at the given index.
      */
     public synchronized void addString(BibtexString string)
-            throws KeyCollisionException
-    {
+            throws KeyCollisionException {
         if (hasStringLabel(string.getName())) {
             throw new KeyCollisionException(Localization.lang("A string with this label already exists"));
         }
 
-        if (_strings.containsKey(string.getId())) {
+        if (bibtexStrings.containsKey(string.getId())) {
             throw new KeyCollisionException("Duplicate BibtexString id.");
         }
 
-        _strings.put(string.getId(), string);
+        bibtexStrings.put(string.getId(), string);
     }
 
     /**
      * Removes the string at the given index.
      */
-    public synchronized void removeString(String id) {
-        _strings.remove(id);
+    public void removeString(String id) {
+        bibtexStrings.remove(id);
     }
 
     /**
@@ -316,7 +286,7 @@ public class BibtexDatabase {
      * These are in no sorted order.
      */
     public Set<String> getStringKeySet() {
-        return _strings.keySet();
+        return bibtexStrings.keySet();
     }
 
     /**
@@ -324,28 +294,28 @@ public class BibtexDatabase {
      * These are in no particular order.
      */
     public Collection<BibtexString> getStringValues() {
-        return _strings.values();
+        return bibtexStrings.values();
     }
 
     /**
      * Returns the string at the given index.
      */
-    public synchronized BibtexString getString(String o) {
-        return _strings.get(o);
+    public BibtexString getString(String o) {
+        return bibtexStrings.get(o);
     }
 
     /**
      * Returns the number of strings.
      */
-    public synchronized int getStringCount() {
-        return _strings.size();
+    public int getStringCount() {
+        return bibtexStrings.size();
     }
 
     /**
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-        for (BibtexString value : _strings.values()) {
+        for (BibtexString value : bibtexStrings.values()) {
             if (value.getName().equals(label)) {
                 return true;
             }
@@ -361,29 +331,26 @@ public class BibtexDatabase {
         if (content == null) {
             throw new IllegalArgumentException("Content for resolveForStrings must not be null.");
         }
-        return resolveContent(content, new HashSet<String>());
+        return resolveContent(content, new HashSet<>());
     }
 
     /**
      * Take the given collection of BibtexEntry and resolve any string
      * references.
-     * 
-     * @param entries
-     *            A collection of BibtexEntries in which all strings of the form
-     *            #xxx# will be resolved against the hash map of string
-     *            references stored in the databasee.
-     *            
+     *
+     * @param entries A collection of BibtexEntries in which all strings of the form
+     *                #xxx# will be resolved against the hash map of string
+     *                references stored in the databasee.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
-     * 
-     * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified. 
+     * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
     public List<BibtexEntry> resolveForStrings(Collection<BibtexEntry> entries, boolean inPlace) {
 
         if (entries == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("entries must not be null");
         }
 
-        List<BibtexEntry> results = new ArrayList<BibtexEntry>(entries.size());
+        List<BibtexEntry> results = new ArrayList<>(entries.size());
 
         for (BibtexEntry entry : entries) {
             results.add(this.resolveForStrings(entry, inPlace));
@@ -393,20 +360,16 @@ public class BibtexDatabase {
 
     /**
      * Take the given BibtexEntry and resolve any string references.
-     * 
-     * @param entry
-     *            A BibtexEntry in which all strings of the form #xxx# will be
-     *            resolved against the hash map of string references stored in
-     *            the databasee.
-     * 
-     * @param inPlace
-     *            If inPlace is true then the given BibtexEntry will be
-     *            modified, if false then a copy is made using close made before
-     *            resolving the strings.
-     * 
+     *
+     * @param entry   A BibtexEntry in which all strings of the form #xxx# will be
+     *                resolved against the hash map of string references stored in
+     *                the databasee.
+     * @param inPlace If inPlace is true then the given BibtexEntry will be
+     *                modified, if false then a copy is made using close made before
+     *                resolving the strings.
      * @return a BibtexEntry with all string references resolved. It is
-     *         dependent on the value of inPlace whether a copy is made or the
-     *         given BibtexEntries is modified.
+     * dependent on the value of inPlace whether a copy is made or the
+     * given BibtexEntries is modified.
      */
     public BibtexEntry resolveForStrings(BibtexEntry entry, boolean inPlace) {
 
@@ -428,7 +391,7 @@ public class BibtexDatabase {
      * If the string is undefined, returns null.
      */
     private String resolveString(String label, HashSet<String> usedIds) {
-        for (BibtexString string : _strings.values()) {
+        for (BibtexString string : bibtexStrings.values()) {
 
             //Util.pr(label+" : "+string.getName());
             if (string.getName().toLowerCase().equals(label.toLowerCase())) {
@@ -446,14 +409,14 @@ public class BibtexDatabase {
 
                 // Ok, we found the string. Now we must make sure we
                 // resolve any references to other strings in this one.
-                String res = string.getContent();
-                res = resolveContent(res, usedIds);
+                String result = string.getContent();
+                result = resolveContent(result, usedIds);
 
                 // Finished with recursing this branch, so we remove our
                 // ID again:
                 usedIds.remove(string.getId());
 
-                return res;
+                return result;
             }
         }
 
@@ -468,7 +431,7 @@ public class BibtexDatabase {
     }
 
     private String resolveContent(String res, HashSet<String> usedIds) {
-        //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
+
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
@@ -521,7 +484,7 @@ public class BibtexDatabase {
     //############################################
     // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
-    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning) {
+    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
         // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
         boolean duplicate;
@@ -544,11 +507,8 @@ public class BibtexDatabase {
                 duplicate = addKeyToSet(newKey);
             }
         }
-        if (duplicate && issueWarning) {
-            JOptionPane.showMessageDialog(null, Localization.lang("Warning there is a duplicate key") + ':' + newKey,
-                    Localization.lang("Duplicate Key Warning"),
-                    JOptionPane.WARNING_MESSAGE);//, options);
-
+        if (duplicate) {
+            LOGGER.warn(Localization.lang("Warning there is a duplicate key") + ':' + newKey);
         }
         return duplicate;
     }
@@ -571,8 +531,7 @@ public class BibtexDatabase {
     //========================================================
     private boolean addKeyToSet(String key) {
         boolean exists = false;
-        if (key == null || key.isEmpty())
-         {
+        if (key == null || key.isEmpty()) {
             return false;//don't put empty key
         }
         if (allKeys.containsKey(key)) {
@@ -597,8 +556,7 @@ public class BibtexDatabase {
             Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
             if (tI == 1) {
                 allKeys.remove(key);
-            }
-            else {
+            } else {
                 allKeys.put(key, tI - 1);//decrementInteger( tI ));
             }
         }
@@ -621,22 +579,21 @@ public class BibtexDatabase {
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
-     * 
+     * <p>
      * If a database is given, this function will try to resolve any string
      * references in the field-value.
      * Also, if a database is given, this function will try to find values for
      * unset fields in the entry linked by the "crossref" field, if any.
-     * 
-     * @param field
-     *            The field to return the value of.
-     * @param bibtex maybenull
-     *            The bibtex entry which contains the field.
+     *
+     * @param field    The field to return the value of.
+     * @param bibtex   maybenull
+     *                 The bibtex entry which contains the field.
      * @param database maybenull
-     *            The database of the bibtex entry.
+     *                 The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
     public static String getResolvedField(String field, BibtexEntry bibtex,
-            BibtexDatabase database) {
+                                          BibtexDatabase database) {
 
         if (field.equals("bibtextype")) {
             return bibtex.getType().getName();
@@ -667,9 +624,9 @@ public class BibtexDatabase {
     /**
      * Returns a text with references resolved according to an optionally given
      * database.
-    
+     *
      * @param toResolve maybenull The text to resolve.
-     * @param database maybenull The database to use for resolving the text.
+     * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      */
     public static String getText(String toResolve, BibtexDatabase database) {

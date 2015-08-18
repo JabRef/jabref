@@ -2,6 +2,8 @@ package net.sf.jabref;
 
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 import java.util.TreeSet;
 import java.util.regex.Matcher;

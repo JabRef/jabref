@@ -12,6 +12,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
 
 /**
  * Created by IntelliJ IDEA.

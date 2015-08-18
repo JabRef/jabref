@@ -3,7 +3,7 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Map;
 import java.util.Vector;
 
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;

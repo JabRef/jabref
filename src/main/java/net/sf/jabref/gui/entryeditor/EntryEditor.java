@@ -61,6 +61,9 @@ import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -239,7 +242,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
 
-                Set<String> deprecatedFields = new HashSet<>(BibtexEntry.FieldAliasesOldToNew.keySet());
+                Set<String> deprecatedFields = new HashSet<>(BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 String[] secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
@@ -250,8 +253,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 Set<String> optionalFieldsAndAliases = new HashSet<>();
                 for (String field : entry.getOptionalFields()) {
                     optionalFieldsAndAliases.add(field);
-                    if (BibtexEntry.FieldAliasesNewToOld.containsKey(field)) {
-                        optionalFieldsAndAliases.add(BibtexEntry.FieldAliasesNewToOld.get(field));
+                    if (BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.containsKey(field)) {
+                        optionalFieldsAndAliases.add(BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.get(field));
                     }
                 }
 

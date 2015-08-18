@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 

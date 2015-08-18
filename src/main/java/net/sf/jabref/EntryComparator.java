@@ -15,8 +15,8 @@
 */
 package net.sf.jabref;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.BibtexEntry;
 
 import java.util.Comparator;
 
@@ -89,7 +89,7 @@ public class EntryComparator implements Comparator<BibtexEntry> {
             //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
             }
 
-        } else if (sortField.equals(GUIGlobals.TYPE_HEADER)) {
+        } else if (sortField.equals(BibtexEntry.TYPE_HEADER)) {
             // Sort by type.
             f1 = e1.getType().getName();
             f2 = e2.getType().getName();
