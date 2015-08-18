@@ -44,13 +44,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibtexDatabase {
 
-    private final Map<String, BibtexEntry> entries = new Hashtable<>();
+    private final Map<String, BibtexEntry> entries = new ConcurrentHashMap<>();
 
     private String preamble;
 
