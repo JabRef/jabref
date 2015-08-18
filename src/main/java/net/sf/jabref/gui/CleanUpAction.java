@@ -701,7 +701,7 @@ public class CleanUpAction extends AbstractWorker {
      */
     private void doConvertToBiblatex(BibtexEntry entry, NamedCompound ce) {
 
-        for (Map.Entry<String, String> alias : BibtexEntry.FieldAliasesOldToNew.entrySet()) {
+        for (Map.Entry<String, String> alias : BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.entrySet()) {
             String oldFieldName = alias.getKey();
             String newFieldName = alias.getValue();
             String oldValue = entry.getField(oldFieldName);

@@ -47,44 +47,51 @@ import net.sf.jabref.*;
 import net.sf.jabref.export.FieldFormatter;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.MonthUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class BibtexEntry
-{
+public class BibtexEntry {
 
     private static final String ID_FIELD = "id";
-    public static final Map<String, String> FieldAliasesOldToNew = new HashMap<String, String>(); // Bibtex to BibLatex
-    public static final Map<String, String> FieldAliasesNewToOld = new HashMap<String, String>(); // BibLatex to Bibtex
+
+    private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
+
+    public static final Map<String, String> FIELD_ALIASES_OLD_TO_NEW = new HashMap<>(); // Bibtex to BibLatex
+    public static final Map<String, String> FIELD_ALIASES_NEW_TO_OLD = new HashMap<>(); // BibLatex to Bibtex
 
     static {
-        BibtexEntry.FieldAliasesOldToNew.put("address", "location");
-        BibtexEntry.FieldAliasesNewToOld.put("location", "address");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("address", "location");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("location", "address");
 
-        BibtexEntry.FieldAliasesOldToNew.put("annote", "annotation");
-        BibtexEntry.FieldAliasesNewToOld.put("annotation", "annote");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("annote", "annotation");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("annotation", "annote");
 
-        BibtexEntry.FieldAliasesOldToNew.put("archiveprefix", "eprinttype");
-        BibtexEntry.FieldAliasesNewToOld.put("eprinttype", "archiveprefix");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("archiveprefix", "eprinttype");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("eprinttype", "archiveprefix");
 
-        BibtexEntry.FieldAliasesOldToNew.put("journal", "journaltitle");
-        BibtexEntry.FieldAliasesNewToOld.put("journaltitle", "journal");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("journal", "journaltitle");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("journaltitle", "journal");
 
-        BibtexEntry.FieldAliasesOldToNew.put("key", "sortkey");
-        BibtexEntry.FieldAliasesNewToOld.put("sortkey", "key");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("key", "sortkey");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("sortkey", "key");
 
-        BibtexEntry.FieldAliasesOldToNew.put("pdf", "file");
-        BibtexEntry.FieldAliasesNewToOld.put("file", "pdf");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("pdf", "file");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("file", "pdf");
 
-        BibtexEntry.FieldAliasesOldToNew.put("primaryclass", "eprintclass");
-        BibtexEntry.FieldAliasesNewToOld.put("eprintclass", "primaryclass");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("primaryclass", "eprintclass");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("eprintclass", "primaryclass");
 
-        BibtexEntry.FieldAliasesOldToNew.put("school", "institution");
-        BibtexEntry.FieldAliasesNewToOld.put("institution", "school");
+        BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.put("school", "institution");
+        BibtexEntry.FIELD_ALIASES_NEW_TO_OLD.put("institution", "school");
     }
 
-    private String _id;
-    private BibtexEntryType _type;
-    private Map<String, String> _fields = new HashMap<String, String>();
-    private final VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
+    private String id;
+
+    private BibtexEntryType type;
+
+    private Map<String, String> fields = new HashMap<>();
+
+    private final VetoableChangeSupport changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -95,40 +102,34 @@ public class BibtexEntry
         this(IdGenerator.next());
     }
 
-    public BibtexEntry(String id)
-    {
+    public BibtexEntry(String id) {
         this(id, BibtexEntryTypes.OTHER);
     }
 
-    public BibtexEntry(String id, BibtexEntryType type)
-    {
-        if (id == null)
-        {
+    public BibtexEntry(String id, BibtexEntryType type) {
+        if (id == null) {
             throw new NullPointerException("Every BibtexEntry must have an ID");
         }
 
-        _id = id;
+        this.id = id;
         setType(type);
     }
 
     /**
      * Returns an array describing the optional fields for this entry.
      */
-    public String[] getOptionalFields()
-    {
-        return _type.getOptionalFields().clone();
+    public String[] getOptionalFields() {
+        return type.getOptionalFields().clone();
     }
 
     /**
      * Returns an array describing the required fields for this entry.
      */
-    public String[] getRequiredFields()
-    {
-        return _type.getRequiredFields().clone();
+    public String[] getRequiredFields() {
+        return type.getRequiredFields().clone();
     }
 
-    public String[] getUserDefinedFields()
-    {
+    public String[] getUserDefinedFields() {
 
         return Globals.prefs.getStringArray(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER);
     }
@@ -138,52 +139,40 @@ public class BibtexEntry
      * set for this particular entry.
      */
     public Set<String> getAllFields() {
-        return new TreeSet<String>(_fields.keySet());
-    }
-
-    /**
-     * Returns a string describing the required fields for this entry.
-     */
-    public String describeRequiredFields()
-    {
-        return _type.describeRequiredFields();
+        return new TreeSet<>(fields.keySet());
     }
 
     /**
      * Returns true if this entry contains the fields it needs to be
      * complete.
      */
-    public boolean hasAllRequiredFields(BibtexDatabase database)
-    {
-        return _type.hasAllRequiredFields(this, database);
+    public boolean hasAllRequiredFields(BibtexDatabase database) {
+        return type.hasAllRequiredFields(this, database);
     }
 
     /**
      * Returns this entry's type.
      */
-    public BibtexEntryType getType()
-    {
-        return _type;
+    public BibtexEntryType getType() {
+        return type;
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(BibtexEntryType type)
-    {
-        if (type == null)
-        {
-            throw new NullPointerException(
+    public void setType(BibtexEntryType type) {
+        if (type == null) {
+            throw new IllegalArgumentException(
                     "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
         }
 
-        BibtexEntryType oldType = _type;
+        BibtexEntryType oldType = this.type;
 
         try {
             // We set the type before throwing the changeEvent, to enable
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
-            _type = type;
+            this.type = type;
             firePropertyChangedEvent(GUIGlobals.TYPE_HEADER,
                     oldType != null ? oldType.getName() : null,
                     type.getName());
@@ -199,17 +188,18 @@ public class BibtexEntry
      * to what is returned. This method is called when a user changes
      * the type customization, to make sure all entries are set with
      * current types.
+     *
      * @return true if the entry could find a type, false if not (in
      * this case the type will have been set to
      * BibtexEntryTypes.TYPELESS).
      */
     public boolean updateType() {
-        BibtexEntryType newType = BibtexEntryType.getType(_type.getName());
+        BibtexEntryType newType = BibtexEntryType.getType(type.getName());
         if (newType != null) {
-            _type = newType;
+            type = newType;
             return true;
         }
-        _type = BibtexEntryTypes.TYPELESS;
+        type = BibtexEntryTypes.TYPELESS;
         return false;
     }
 
@@ -220,56 +210,53 @@ public class BibtexEntry
     public void setId(String id) throws KeyCollisionException {
 
         if (id == null) {
-            throw new NullPointerException("Every BibtexEntry must have an ID");
+            throw new IllegalArgumentException("Every BibtexEntry must have an ID");
         }
 
-        try
-        {
-            firePropertyChangedEvent(BibtexEntry.ID_FIELD, _id, id);
-        } catch (PropertyVetoException pv)
-        {
+        try {
+            firePropertyChangedEvent(BibtexEntry.ID_FIELD, this.id, id);
+        } catch (PropertyVetoException pv) {
             throw new KeyCollisionException("Couldn't change ID: " + pv);
         }
 
-        _id = id;
+        this.id = id;
     }
 
     /**
      * Returns this entry's ID.
      */
-    public String getId()
-    {
-        return _id;
+    public String getId() {
+        return id;
     }
 
     /**
      * Returns the contents of the given field, or null if it is not set.
      */
     public String getField(String name) {
-        return _fields.get(name);
+        return fields.get(name);
     }
 
     /**
      * Returns the contents of the given field, its alias or null if both are
      * not set.
-     * 
+     * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
      * on the BibLatex documentation, chapter 2.2.5:
-     *  address 		<-> location
-     *  annote			<-> annotation 
-     *  archiveprefix 	<-> eprinttype 
-     *  journal 		<-> journaltitle 
-     *  key				<-> sortkey 
-     * 	pdf 			<-> file 
-     * 	primaryclass 	<-> eprintclass 
-     * 	school 			<-> institution 
+     * address 		<-> location
+     * annote			<-> annotation
+     * archiveprefix 	<-> eprinttype
+     * journal 		<-> journaltitle
+     * key				<-> sortkey
+     * pdf 			<-> file
+     * primaryclass 	<-> eprintclass
+     * school 			<-> institution
      * These work bidirectional.
-     * 
+     * <p>
      * Special attention is paid to dates: (see the BibLatex documentation,
-     * chapter 2.3.8) 
-     * 	The fields 'year' and 'month' are used if the 'date'
-     * 	field is empty. Conversely, getFieldOrAlias("year") also tries to
-     * 	extract the year from the 'date' field (analogously for 'month').
+     * chapter 2.3.8)
+     * The fields 'year' and 'month' are used if the 'date'
+     * field is empty. Conversely, getFieldOrAlias("year") also tries to
+     * extract the year from the 'date' field (analogously for 'month').
      */
     public String getFieldOrAlias(String name) {
         String fieldValue = getField(name);
@@ -280,9 +267,9 @@ public class BibtexEntry
         // No value of this field found, so look at the alias
 
         // Create bidirectional dictionary between field names and their aliases
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.putAll(BibtexEntry.FieldAliasesOldToNew);
-        aliases.putAll(BibtexEntry.FieldAliasesNewToOld);
+        Map<String, String> aliases = new HashMap<>();
+        aliases.putAll(BibtexEntry.FIELD_ALIASES_OLD_TO_NEW);
+        aliases.putAll(BibtexEntry.FIELD_ALIASES_NEW_TO_OLD);
 
         String aliasForField = aliases.get(name);
         if (aliasForField != null) {
@@ -291,12 +278,10 @@ public class BibtexEntry
 
         // So we did not found the field itself or its alias...
         // Finally, handle dates
-        if (name.equals("date"))
-        {
+        if (name.equals("date")) {
             String year = getField("year");
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
-            if (year != null)
-            {
+            if (year != null) {
                 if (month.isValid()) {
                     return year + '-' + month.twoDigitNumber;
                 } else {
@@ -304,8 +289,7 @@ public class BibtexEntry
                 }
             }
         }
-        if (name.equals("year") || name.equals("month"))
-        {
+        if (name.equals("year") || name.equals("month")) {
             String date = getField("date");
             if (date == null) {
                 return null;
@@ -341,8 +325,7 @@ public class BibtexEntry
                 if (name.equals("year")) {
                     return Integer.toString(calendar.get(Calendar.YEAR));
                 }
-                if (name.equals("month"))
-                 {
+                if (name.equals("month")) {
                     return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0			
                 }
             } catch (ParseException e) {
@@ -357,6 +340,7 @@ public class BibtexEntry
                         return Integer.toString(calendar.get(Calendar.YEAR));
                     }
                 } catch (ParseException e2) {
+                    LOGGER.warn("Could not parse entry " + name, e);
                     return null; // Date field not in valid format
                 }
             }
@@ -366,8 +350,8 @@ public class BibtexEntry
     }
 
     public String getCiteKey() {
-        return _fields.containsKey(BibtexFields.KEY_FIELD) ?
-                _fields.get(BibtexFields.KEY_FIELD) : null;
+        return fields.containsKey(BibtexFields.KEY_FIELD) ?
+                fields.get(BibtexFields.KEY_FIELD) : null;
     }
 
     /**
@@ -378,13 +362,13 @@ public class BibtexEntry
      * does not check values for content, so e.g. empty strings will be set as such.
      */
     public void setField(Map<String, String> fields) {
-        _fields.putAll(fields);
+        this.fields.putAll(fields);
     }
 
     /**
      * Set a field, and notify listeners about the change.
      *
-     * @param name The field to set.
+     * @param name  The field to set.
      * @param value The value to set.
      */
     public void setField(String name, String value) {
@@ -394,17 +378,17 @@ public class BibtexEntry
                     "' is reserved");
         }
 
-        String oldValue = _fields.get(name);
+        String oldValue = fields.get(name);
         try {
             // We set the field before throwing the changeEvent, to enable
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
-            _fields.put(name, value);
+            fields.put(name, value);
             firePropertyChangedEvent(name, oldValue, value);
         } catch (PropertyVetoException pve) {
             // Since we have already made the change, we must undo it since
             // the change was rejected:
-            _fields.put(name, oldValue);
+            fields.put(name, oldValue);
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
 
@@ -422,8 +406,8 @@ public class BibtexEntry
             throw new IllegalArgumentException("The field name '" + name +
                     "' is reserved");
         }
-        Object oldValue = _fields.get(name);
-        _fields.remove(name);
+        Object oldValue = fields.get(name);
+        fields.remove(name);
         try {
             firePropertyChangedEvent(name, oldValue, null);
         } catch (PropertyVetoException pve) {
@@ -437,9 +421,9 @@ public class BibtexEntry
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param fields An array of field names to be checked.
+     * @param fields   An array of field names to be checked.
      * @param database The database in which to look up crossref'd entries, if any. This
-     *  argument can be null, meaning that no attempt will be made to follow crossrefs.
+     *                 argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
@@ -463,9 +447,8 @@ public class BibtexEntry
     }
 
     private void firePropertyChangedEvent(String fieldName, Object oldValue,
-            Object newValue) throws PropertyVetoException
-    {
-        _changeSupport.fireVetoableChange(new PropertyChangeEvent(this,
+                                          Object newValue) throws PropertyVetoException {
+        changeSupport.fireVetoableChange(new PropertyChangeEvent(this,
                 fieldName, oldValue, newValue));
     }
 
@@ -474,25 +457,24 @@ public class BibtexEntry
      * changes. This is useful for an object that needs to update
      * itself each time a field changes.
      */
-    public void addPropertyChangeListener(VetoableChangeListener listener)
-    {
-        _changeSupport.addVetoableChangeListener(listener);
+    public void addPropertyChangeListener(VetoableChangeListener listener) {
+        changeSupport.addVetoableChangeListener(listener);
     }
 
     /**
      * Removes a property listener.
      */
-    public void removePropertyChangeListener(VetoableChangeListener listener)
-    {
-        _changeSupport.removeVetoableChangeListener(listener);
+    public void removePropertyChangeListener(VetoableChangeListener listener) {
+        changeSupport.removeVetoableChangeListener(listener);
     }
 
     /**
      * Write this entry to the given Writer, with the given FieldFormatter.
+     *
      * @param write True if this is a write, false if it is a display. The write will
-     * not include non-writeable fields if it is a write, otherwise non-displayable fields
-     * will be ignored. Refer to GUIGlobals for isWriteableField(String) and
-     * isDisplayableField(String).
+     *              not include non-writeable fields if it is a write, otherwise non-displayable fields
+     *              will be ignored. Refer to GUIGlobals for isWriteableField(String) and
+     *              isDisplayableField(String).
      */
     public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
         new BibtexEntryWriter(ff, write).write(this, out);
@@ -503,8 +485,8 @@ public class BibtexEntry
      */
     @Override
     public Object clone() {
-        BibtexEntry clone = new BibtexEntry(_id, _type);
-        clone._fields = new HashMap<String, String>(_fields);
+        BibtexEntry clone = new BibtexEntry(id, type);
+        clone.fields = new HashMap<>(fields);
         return clone;
     }
 
@@ -531,12 +513,12 @@ public class BibtexEntry
 
     /**
      * @param maxCharacters The maximum number of characters (additional
-     * characters are replaced with "..."). Set to 0 to disable truncation.
+     *                      characters are replaced with "..."). Set to 0 to disable truncation.
      * @return A short textual description of the entry in the format:
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {
+        String[] s = new String[]{
                 getField("author"),
                 getField("title"),
                 getField("year")};
