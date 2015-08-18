@@ -58,9 +58,7 @@ import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.*;
 import net.sf.jabref.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.gui.worker.SendAsEMailAction;
+import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;

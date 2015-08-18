@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.gui.worker;
 
-import net.sf.jabref.CallBack;
-import net.sf.jabref.Worker;
 import spin.Spin;
 
 /**

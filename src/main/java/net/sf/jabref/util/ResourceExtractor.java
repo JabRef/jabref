@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.JabRef;
-import net.sf.jabref.Worker;
+import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.net.URLDownload;
 
 /**

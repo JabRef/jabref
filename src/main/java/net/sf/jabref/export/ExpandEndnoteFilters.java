@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Worker;
+import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.ResourceExtractor;
