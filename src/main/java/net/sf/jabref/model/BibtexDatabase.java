@@ -52,8 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -546,10 +544,7 @@ public class BibtexDatabase {
             }
         }
         if (duplicate && issueWarning) {
-            JOptionPane.showMessageDialog(null, Localization.lang("Warning there is a duplicate key") + ':' + newKey,
-                    Localization.lang("Duplicate Key Warning"),
-                    JOptionPane.WARNING_MESSAGE);//, options);
-
+            LOGGER.warn(Localization.lang("Warning there is a duplicate key") + ':' + newKey);
         }
         return duplicate;
     }
