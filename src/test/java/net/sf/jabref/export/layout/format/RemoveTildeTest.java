@@ -3,31 +3,26 @@ package net.sf.jabref.export.layout.format;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class RemoveTildeTest {
+    private LayoutFormatter formatter;
+
+    @Before
+    public void setup() {
+        formatter = new RemoveTilde();
+    }
 
     @Test
     public void testFormatString() {
-
-        LayoutFormatter l = new RemoveTilde();
-
-        Assert.assertEquals("", l.format(""));
-
-        Assert.assertEquals("simple", l.format("simple"));
-
-        Assert.assertEquals(" ", l.format("~"));
-
-        Assert.assertEquals("   ", l.format("~~~"));
-
-        Assert.assertEquals(" \\~ ", l.format("~\\~~"));
-
-        Assert.assertEquals("\\\\ ", l.format("\\\\~"));
-
-        Assert.assertEquals("Doe Joe and Jane, M. and Kamp, J. A.", l
-                .format("Doe Joe and Jane, M. and Kamp, J.~A."));
-
-        Assert.assertEquals("T\\~olkien, J. R. R.", l
-                .format("T\\~olkien, J.~R.~R."));
+        Assert.assertEquals("", formatter.format(""));
+        Assert.assertEquals("simple", formatter.format("simple"));
+        Assert.assertEquals(" ", formatter.format("~"));
+        Assert.assertEquals("   ", formatter.format("~~~"));
+        Assert.assertEquals(" \\~ ", formatter.format("~\\~~"));
+        Assert.assertEquals("\\\\ ", formatter.format("\\\\~"));
+        Assert.assertEquals("Doe Joe and Jane, M. and Kamp, J. A.", formatter.format("Doe Joe and Jane, M. and Kamp, J.~A."));
+        Assert.assertEquals("T\\~olkien, J. R. R.", formatter.format("T\\~olkien, J.~R.~R."));
     }
 }
