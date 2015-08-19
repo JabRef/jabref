@@ -23,7 +23,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;

@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.OutputPrinter;
 
 /**
  * Role of an importer for JabRef.

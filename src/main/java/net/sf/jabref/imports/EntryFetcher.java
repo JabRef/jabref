@@ -17,7 +17,6 @@ package net.sf.jabref.imports;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**

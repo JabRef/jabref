@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.OutputPrinter;
 
 /**
  * Importer for COPAC format.

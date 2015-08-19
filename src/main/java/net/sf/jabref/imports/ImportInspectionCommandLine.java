@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class ImportInspectionCommandLine implements ImportInspector {

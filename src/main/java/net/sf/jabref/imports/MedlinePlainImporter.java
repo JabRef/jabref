@@ -29,7 +29,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.OutputPrinter;
 
 /**
  * Importer for the MEDLINE Plain format.

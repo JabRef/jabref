@@ -8,6 +8,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
+import net.sf.jabref.imports.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;

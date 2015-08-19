@@ -57,7 +57,7 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.OutputPrinter;
+import net.sf.jabref.imports.OutputPrinter;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.groups.structure.AbstractGroup;

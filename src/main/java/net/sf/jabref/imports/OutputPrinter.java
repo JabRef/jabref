@@ -1,4 +1,4 @@
-/*  Copyright (C) 2011 JabRef contributors.
+/*  Copyright (C) 2003-2011 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,26 +13,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.imports;
 
-/**
- * Outputs nothing
- * 
- * Used where really no output is desired
- * 
- */
-public class OutputPrinterToNull implements OutputPrinter {
+public interface OutputPrinter {
 
-    @Override
-    public void setStatus(String s) {
-    }
+    void setStatus(String s);
 
-    @Override
-    public void showMessage(Object message, String title, int msgType) {
-    }
+    void showMessage(Object message, String title, int msgType);
 
-    @Override
-    public void showMessage(String string) {
-    }
+    void showMessage(String string);
 
 }

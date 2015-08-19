@@ -16,7 +16,6 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 

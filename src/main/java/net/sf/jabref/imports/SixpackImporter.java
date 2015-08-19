@@ -28,8 +28,6 @@ import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.*;
-
 /**
  * Imports a Biblioscape Tag File. The format is described on
  * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm Several

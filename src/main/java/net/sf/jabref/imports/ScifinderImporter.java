@@ -25,7 +25,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.OutputPrinter;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
