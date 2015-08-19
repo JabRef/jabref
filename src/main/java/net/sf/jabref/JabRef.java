@@ -33,10 +33,7 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;

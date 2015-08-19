@@ -39,6 +39,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;

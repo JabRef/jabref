@@ -28,11 +28,8 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
