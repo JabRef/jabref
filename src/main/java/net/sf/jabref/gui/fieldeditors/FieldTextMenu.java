@@ -32,7 +32,7 @@
 //
 // modified :
 
-package net.sf.jabref;
+package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
