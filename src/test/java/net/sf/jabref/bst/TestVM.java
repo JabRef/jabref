@@ -1,6 +1,6 @@
 package net.sf.jabref.bst;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.StackFunction;
 import net.sf.jabref.imports.BibtexParser;

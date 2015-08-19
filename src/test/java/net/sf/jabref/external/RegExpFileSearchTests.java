@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

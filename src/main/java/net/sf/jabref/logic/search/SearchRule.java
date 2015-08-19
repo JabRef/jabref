@@ -26,7 +26,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 public interface SearchRule {
 

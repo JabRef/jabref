@@ -84,9 +84,9 @@ import net.sf.jabref.imports.*;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

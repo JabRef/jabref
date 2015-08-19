@@ -5,8 +5,8 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldTextArea;
 import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.testutils.TestUtils;
 
 import org.junit.Assert;

@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 

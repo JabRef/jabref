@@ -16,8 +16,8 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.MetaData;
 
 import javax.swing.*;

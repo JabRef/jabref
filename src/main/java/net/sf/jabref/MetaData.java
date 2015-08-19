@@ -23,7 +23,7 @@ import net.sf.jabref.groups.migrations.VersionHandling;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 
-import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.logic.util.StringUtil;
 

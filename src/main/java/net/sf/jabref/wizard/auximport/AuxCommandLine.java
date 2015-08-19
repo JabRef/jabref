@@ -35,7 +35,7 @@ package net.sf.jabref.wizard.auximport;
 
 import java.util.Vector;
 
-import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
 

@@ -21,7 +21,7 @@ import java.beans.VetoableChangeListener;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.JabRef;
 
 /**

@@ -27,7 +27,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.

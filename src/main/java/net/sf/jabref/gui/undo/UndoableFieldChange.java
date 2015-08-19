@@ -21,7 +21,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * This class represents a change in any field value. The relevant

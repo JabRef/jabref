@@ -47,8 +47,8 @@ import javax.swing.table.TableModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.DuplicateCheck;
 import net.sf.jabref.EntryMarker;
 import net.sf.jabref.FieldComparator;

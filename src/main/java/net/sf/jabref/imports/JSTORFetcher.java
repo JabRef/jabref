@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 

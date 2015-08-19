@@ -27,7 +27,7 @@ Note:
 Modified for use in JabRef
 
 */
-package net.sf.jabref.model;
+package net.sf.jabref.model.database;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

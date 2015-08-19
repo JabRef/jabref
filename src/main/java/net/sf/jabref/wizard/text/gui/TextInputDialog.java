@@ -113,7 +113,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;

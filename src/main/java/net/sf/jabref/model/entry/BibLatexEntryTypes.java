@@ -13,7 +13,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.model;
+package net.sf.jabref.model.entry;
+
+import net.sf.jabref.model.database.BibtexDatabase;
 
 /**
  * This class defines entry types for BibLatex support.

@@ -16,7 +16,7 @@
 
 package net.sf.jabref;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Entry containers work on a single entry, which can be asked for 

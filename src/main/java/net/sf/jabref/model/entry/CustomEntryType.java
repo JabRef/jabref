@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.model;
+package net.sf.jabref.model.entry;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -24,6 +24,7 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;

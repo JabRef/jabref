@@ -33,7 +33,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.integrity;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class IntegrityMessage implements Cloneable

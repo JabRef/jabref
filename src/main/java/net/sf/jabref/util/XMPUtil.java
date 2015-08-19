@@ -28,9 +28,9 @@ import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.util.MonthUtil;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -502,7 +502,7 @@ public class XMPUtil {
      * @throws IOException
      *             Thrown if an IOException occured while writing to the stream.
      * 
-     * @see #toXMP(java.util.Collection, net.sf.jabref.model.BibtexDatabase) if you don't need strings to be
+     * @see #toXMP(java.util.Collection, BibtexDatabase) if you don't need strings to be
      *      resolved.
      */
     private static void toXMP(Collection<BibtexEntry> bibtexEntries,

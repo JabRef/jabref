@@ -29,7 +29,7 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.util.CaseChangers;
 import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.

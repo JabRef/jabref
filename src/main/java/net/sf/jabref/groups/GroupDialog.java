@@ -29,7 +29,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;

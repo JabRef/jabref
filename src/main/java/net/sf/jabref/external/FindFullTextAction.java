@@ -22,7 +22,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
 import java.io.IOException;

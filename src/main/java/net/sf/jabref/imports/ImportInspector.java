@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * An ImportInspector can be passed to a EntryFetcher and will receive entries

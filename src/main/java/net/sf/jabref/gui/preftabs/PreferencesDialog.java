@@ -47,7 +47,7 @@ import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
 
 /**

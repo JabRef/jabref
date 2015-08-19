@@ -32,8 +32,8 @@ import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 

@@ -1,7 +1,7 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.AssertUtil;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.FileBasedTestCase;
 import org.junit.Assert;
 import org.junit.Ignore;

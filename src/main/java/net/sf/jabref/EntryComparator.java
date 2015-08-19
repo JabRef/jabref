@@ -17,7 +17,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.util.Comparator;
 

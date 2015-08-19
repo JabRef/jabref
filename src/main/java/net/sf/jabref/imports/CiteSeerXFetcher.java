@@ -19,7 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.NameListNormalizer;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
 import java.io.IOException;

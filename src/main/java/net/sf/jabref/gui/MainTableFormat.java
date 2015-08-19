@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.StringUtil;

@@ -15,9 +15,9 @@
 */
 package net.sf.jabref;
 
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.DatabaseChangeEvent;
-import net.sf.jabref.model.DatabaseChangeListener;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.DatabaseChangeEvent;
+import net.sf.jabref.model.database.DatabaseChangeListener;
 
 import java.util.*;
 

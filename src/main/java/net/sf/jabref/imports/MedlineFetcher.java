@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;

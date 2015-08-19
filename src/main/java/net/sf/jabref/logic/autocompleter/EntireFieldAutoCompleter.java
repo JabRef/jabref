@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Stores the full original value of one field of the given BibtexEntries.

@@ -1,7 +1,7 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.Assert;
 import org.junit.Ignore;

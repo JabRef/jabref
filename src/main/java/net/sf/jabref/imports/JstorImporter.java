@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import net.sf.jabref.*;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on

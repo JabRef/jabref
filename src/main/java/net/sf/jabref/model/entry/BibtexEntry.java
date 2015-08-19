@@ -28,7 +28,7 @@ Modified for use in JabRef.
 
 */
 
-package net.sf.jabref.model;
+package net.sf.jabref.model.entry;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
@@ -45,6 +45,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.model.database.BibtexDatabase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

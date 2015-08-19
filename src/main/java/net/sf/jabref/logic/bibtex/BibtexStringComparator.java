@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.bibtex;
 
-import net.sf.jabref.model.BibtexString;
+import net.sf.jabref.model.entry.BibtexString;
 
 import java.util.Comparator;
 

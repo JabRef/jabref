@@ -23,7 +23,7 @@ import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;

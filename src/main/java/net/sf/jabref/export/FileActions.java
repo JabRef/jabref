@@ -36,7 +36,11 @@ import net.sf.jabref.logic.bibtex.CrossRefEntryComparator;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.*;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.CustomEntryType;
 
 public class FileActions {
 

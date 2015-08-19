@@ -25,7 +25,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.JabRefDesktop;
 
 /**

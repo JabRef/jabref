@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

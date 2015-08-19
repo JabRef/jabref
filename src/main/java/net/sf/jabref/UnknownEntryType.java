@@ -15,9 +15,9 @@
 */
 package net.sf.jabref;
 
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 
 /**
  * This class is used to represent an unknown entry type, e.g. encountered

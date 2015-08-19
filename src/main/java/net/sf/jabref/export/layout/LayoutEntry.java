@@ -26,8 +26,8 @@ import net.sf.jabref.export.layout.format.NameFormatter;
 import net.sf.jabref.export.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
 
 class LayoutEntry {

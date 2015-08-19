@@ -1,4 +1,6 @@
-package net.sf.jabref.model;
+package net.sf.jabref.model.entry;
+
+import net.sf.jabref.model.database.BibtexDatabase;
 
 public class BibtexEntryTypes {
 

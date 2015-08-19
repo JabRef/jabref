@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.DatabaseChangeEvent;
-import net.sf.jabref.model.DatabaseChangeListener;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.DatabaseChangeEvent;
+import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.logic.id.IdComparator;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

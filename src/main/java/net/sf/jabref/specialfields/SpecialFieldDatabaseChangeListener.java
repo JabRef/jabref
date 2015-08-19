@@ -1,8 +1,8 @@
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.DatabaseChangeEvent;
-import net.sf.jabref.model.DatabaseChangeListener;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.database.DatabaseChangeEvent;
+import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;

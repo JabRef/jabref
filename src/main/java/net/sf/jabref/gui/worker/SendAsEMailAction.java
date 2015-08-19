@@ -31,7 +31,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;

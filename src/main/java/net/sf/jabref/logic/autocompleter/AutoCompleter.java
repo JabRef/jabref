@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 public interface AutoCompleter {
 

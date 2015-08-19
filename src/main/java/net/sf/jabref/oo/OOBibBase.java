@@ -35,8 +35,8 @@ import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.oo.sorting.AuthorYearTitleComparator;
 import net.sf.jabref.oo.sorting.YearAuthorTitleComparator;
 

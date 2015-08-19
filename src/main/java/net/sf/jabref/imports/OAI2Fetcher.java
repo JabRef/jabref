@@ -34,8 +34,8 @@ import net.sf.jabref.*;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 

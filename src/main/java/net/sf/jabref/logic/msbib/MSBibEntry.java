@@ -29,9 +29,9 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
-import net.sf.jabref.model.BibtexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.XMLChars;

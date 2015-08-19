@@ -35,8 +35,8 @@ import java.util.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

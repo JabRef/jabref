@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 

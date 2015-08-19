@@ -27,7 +27,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.BibtexDatabase;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;

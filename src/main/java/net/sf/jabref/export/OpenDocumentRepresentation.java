@@ -29,8 +29,8 @@ import net.sf.jabref.export.layout.format.RemoveBrackets;
 import net.sf.jabref.export.layout.format.RemoveWhitespace;
 
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;

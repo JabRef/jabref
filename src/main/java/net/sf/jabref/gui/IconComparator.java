@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.util.Comparator;
 

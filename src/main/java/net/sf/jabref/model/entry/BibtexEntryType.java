@@ -27,7 +27,7 @@ Note:
 Modified for use in JabRef.
 
 */
-package net.sf.jabref.model;
+package net.sf.jabref.model.entry;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,6 +37,7 @@ import java.util.TreeMap;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.util.Util;
 
 /**

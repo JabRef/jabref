@@ -12,7 +12,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import spl.PdfImporter;
 import spl.PdfImporter.ImportPdfFilesResult;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;

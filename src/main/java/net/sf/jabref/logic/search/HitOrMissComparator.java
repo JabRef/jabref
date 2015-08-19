@@ -16,7 +16,7 @@
 package net.sf.jabref.logic.search;
 
 import ca.odell.glazedlists.matchers.Matcher;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.util.Comparator;
 import java.util.Objects;

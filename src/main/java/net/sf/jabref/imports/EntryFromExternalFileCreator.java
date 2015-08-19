@@ -2,7 +2,7 @@ package net.sf.jabref.imports;
 
 import java.io.File;
 
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.external.ExternalFileType;
 
 /** EntryCreator for any predefined ExternalFileType.

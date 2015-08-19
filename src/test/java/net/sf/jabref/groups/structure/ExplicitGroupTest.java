@@ -2,8 +2,8 @@ package net.sf.jabref.groups.structure;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -6,8 +6,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.export.FieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.model.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 
 import java.io.IOException;
 import java.io.Writer;

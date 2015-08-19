@@ -27,7 +27,7 @@ import java.util.HashMap;
 import net.sf.jabref.*;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Imports an Ovid file.

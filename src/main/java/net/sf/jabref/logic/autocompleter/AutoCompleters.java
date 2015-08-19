@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import java.util.HashMap;
 
