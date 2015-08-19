@@ -24,7 +24,7 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -41,7 +41,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;

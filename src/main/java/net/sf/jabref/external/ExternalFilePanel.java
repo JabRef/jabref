@@ -38,6 +38,7 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OpenFileFilter;
+import net.sf.jabref.gui.UrlDragDrop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
