@@ -26,7 +26,7 @@ import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.logic.BibtexEntryWriter;
+import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexEntry;

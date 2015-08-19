@@ -23,7 +23,7 @@ import java.io.StringWriter;
 
 import javax.swing.*;
 
-import net.sf.jabref.logic.BibtexEntryWriter;
+import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

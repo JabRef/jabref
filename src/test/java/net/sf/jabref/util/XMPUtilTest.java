@@ -6,7 +6,7 @@ import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.logic.BibtexEntryWriter;
+import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryTypes;
