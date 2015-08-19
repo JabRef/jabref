@@ -22,7 +22,6 @@ import java.util.TreeMap;
 import javax.swing.Action;
 import javax.swing.JTabbedPane;
 
-import net.sf.jabref.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

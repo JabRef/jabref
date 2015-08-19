@@ -20,7 +20,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.oo.OpenOfficePanel;
 

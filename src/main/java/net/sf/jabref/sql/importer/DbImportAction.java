@@ -33,7 +33,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.sql.DBConnectDialog;
