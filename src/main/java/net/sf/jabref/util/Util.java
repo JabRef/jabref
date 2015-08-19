@@ -1434,10 +1434,8 @@ public class Util {
         }
 
         Runnable r = new Runnable() {
-
             @Override
             public void run() {
-
                 // determine directories to search in
                 ArrayList<File> dirs = new ArrayList<File>();
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
@@ -1450,6 +1448,7 @@ public class Util {
                 for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }
+
                 // Run the search operation:
                 Map<BibtexEntry, java.util.List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
@@ -1460,7 +1459,6 @@ public class Util {
                 }
 
                 boolean foundAny = false;
-
                 // Iterate over the entries:
                 for (BibtexEntry anEntry : result.keySet()) {
                     FileListTableModel tableModel;
@@ -1522,9 +1520,9 @@ public class Util {
                 }
 
                 // handle callbacks and dialog
+                // FIXME: The ID signals if action was successful :/
                 final int id = foundAny ? 1 : 0;
                 SwingUtilities.invokeLater(new Runnable() {
-
                     @Override
                     public void run() {
                         if (diag != null) {
@@ -1537,10 +1535,13 @@ public class Util {
                 });
             }
         };
+        // FIXME: workaround so that dialog doesn't block run()?
+        Thread t = new Thread(r);
+        t.start();
         if (diag != null) {
             diag.setVisible(true);
         }
-        return r;
+        return t;
     }
 
     /**
