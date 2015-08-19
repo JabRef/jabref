@@ -17,7 +17,7 @@ package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.SearchTextListener;
+import net.sf.jabref.gui.SearchTextListener;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
