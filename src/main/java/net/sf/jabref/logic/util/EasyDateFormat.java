@@ -1,4 +1,7 @@
-package net.sf.jabref;
+package net.sf.jabref.logic.util;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
