@@ -19,7 +19,7 @@
 //
 // modified :
 
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
