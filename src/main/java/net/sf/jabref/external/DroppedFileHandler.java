@@ -26,6 +26,7 @@ import javax.swing.event.ChangeListener;
 import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;

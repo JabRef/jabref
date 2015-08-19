@@ -13,14 +13,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 /**
  * BaseAction is used to define actions that are called from the
  * base frame through runCommand(). runCommand() finds the
  * appropriate BaseAction object, and runs its action() method.
  */
-public interface BaseAction {//implements Runnable {
-
+public interface BaseAction {
     void action() throws Throwable;
 }

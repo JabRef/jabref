@@ -57,6 +57,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;

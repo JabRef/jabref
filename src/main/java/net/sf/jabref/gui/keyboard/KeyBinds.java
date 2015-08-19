@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.keyboard;
 
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
 

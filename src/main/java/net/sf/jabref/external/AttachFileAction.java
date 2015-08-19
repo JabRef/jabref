@@ -1,6 +1,5 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.entry.BibtexEntry;

@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;

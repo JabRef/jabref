@@ -106,9 +106,7 @@ public class MetaData implements Iterable<String> {
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    public MetaData() {
-
-    }
+    public MetaData() {}
 
     /**
      * Add default metadata for new database:

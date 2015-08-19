@@ -39,6 +39,7 @@ import javax.swing.KeyStroke;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
@@ -61,7 +62,6 @@ import net.sf.jabref.logic.util.StringUtil;
 import net.sf.jabref.util.Util;
 
 public class JabRefPreferences {
-    
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**

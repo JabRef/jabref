@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.awt.Component;
 import java.awt.event.FocusEvent;
@@ -22,7 +22,6 @@ import java.awt.event.FocusListener;
 import javax.swing.JComponent;
 
 public class GlobalFocusListener implements FocusListener {
-
     private Component focused;
 
     @Override
@@ -33,8 +32,7 @@ public class GlobalFocusListener implements FocusListener {
     }
 
     @Override
-    public void focusLost(FocusEvent e) {
-    }
+    public void focusLost(FocusEvent e) {}
 
     public JComponent getFocused() {
         return (JComponent) focused;
