@@ -16,12 +16,9 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.FileUtil;
 import net.sf.jabref.util.Util;
