@@ -4,7 +4,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.OpenFileFilter;
+import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.logic.util.StringUtil;
 

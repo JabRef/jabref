@@ -24,7 +24,6 @@ import javax.swing.JFrame;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.OpenFileFilter;
 
 /**
  * Created by IntelliJ IDEA.

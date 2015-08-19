@@ -73,7 +73,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.OpenFileFilter;
+import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
