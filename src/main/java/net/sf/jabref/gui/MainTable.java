@@ -30,6 +30,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;

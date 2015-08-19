@@ -16,7 +16,7 @@
 package net.sf.jabref.oo.sorting;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 
 import java.util.Comparator;
 

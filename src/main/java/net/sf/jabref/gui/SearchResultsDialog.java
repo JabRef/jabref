@@ -43,8 +43,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.EntryComparator;
-import net.sf.jabref.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.GeneralRenderer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

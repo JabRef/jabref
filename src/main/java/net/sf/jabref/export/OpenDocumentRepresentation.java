@@ -23,11 +23,12 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.GetOpenOfficeType;
 import net.sf.jabref.export.layout.format.RemoveBrackets;
 import net.sf.jabref.export.layout.format.RemoveWhitespace;
 
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.w3c.dom.Document;
