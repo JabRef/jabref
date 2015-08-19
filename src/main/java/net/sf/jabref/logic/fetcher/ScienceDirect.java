@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL from a ScienceDirect article page.
+ * FullTextFinder implementation that attempts to find a PDF URL at ScienceDirect.
  *
  * @see http://dev.elsevier.com/
  */

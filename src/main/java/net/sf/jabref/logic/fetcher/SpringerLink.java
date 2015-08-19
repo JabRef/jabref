@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL from SpringerLink.
+ * FullTextFinder implementation that attempts to find a PDF URL at SpringerLink.
  *
  * Uses Springer API, see @link{https://dev.springer.com}
  */

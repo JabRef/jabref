@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL from a ACS DOI.
+ * FullTextFinder implementation that attempts to find a PDF URL at ACS.
  */
 public class ACS implements FullTextFinder {
     private static final Log LOGGER = LogFactory.getLog(ACS.class);

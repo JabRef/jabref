@@ -383,6 +383,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("New entry from plain text"),
             prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
 
+
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
