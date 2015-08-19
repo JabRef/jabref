@@ -50,6 +50,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
+        // TODO: just download for all entries and save files without dialog
         entry = basePanel.getSelectedEntries()[0];
         FindFullText fft = new FindFullText();
         result = fft.findFullText(entry);
@@ -61,15 +62,14 @@ public class FindFullTextAction extends AbstractWorker {
             String bibtexKey = entry.getCiteKey();
             String[] dirs = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             if (dirs.length == 0) {
-                // TODO: error message if file dir not defined
-                //JOptionPane.showMessageDialog(frame, Globals.lang);
+                // FIXME: Localization
+                JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(),
-                    bibtexKey);
+            // TODO: this needs its own thread as it blocks the UI!
+            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(), bibtexKey);
             try {
                 def.download(result.get(), new DownloadExternalFile.DownloadCallback() {
-
                     @Override
                     public void downloadComplete(FileListEntry file) {
                         FileListTableModel tm = new FileListTableModel();
@@ -77,8 +77,7 @@ public class FindFullTextAction extends AbstractWorker {
                         tm.setContent(oldValue);
                         tm.addEntry(tm.getRowCount(), file);
                         String newValue = tm.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry,
-                                GUIGlobals.FILE_FIELD, oldValue, newValue);
+                        UndoableFieldChange edit = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue);
                         entry.setField(GUIGlobals.FILE_FIELD, newValue);
                         basePanel.undoManager.addEdit(edit);
                         basePanel.markBaseChanged();
@@ -91,7 +90,6 @@ public class FindFullTextAction extends AbstractWorker {
         }
         else {
             String message = Localization.lang("Full text article download failed");
-
             basePanel.output(message);
             JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
         }
