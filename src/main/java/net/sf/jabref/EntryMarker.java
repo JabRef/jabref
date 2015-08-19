@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.BibtexDatabase;

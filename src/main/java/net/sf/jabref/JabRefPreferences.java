@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;

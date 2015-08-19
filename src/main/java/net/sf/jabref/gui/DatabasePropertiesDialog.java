@@ -39,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.BibtexFields;
 import net.sf.jabref.gui.action.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

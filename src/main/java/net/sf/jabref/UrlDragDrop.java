@@ -41,6 +41,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;

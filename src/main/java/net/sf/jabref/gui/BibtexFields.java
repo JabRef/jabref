@@ -28,14 +28,15 @@
 // modified : r.nagel 25.04.2006
 //            export/import of some definition from/to a xml file
 
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.HashSet;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.util.TXMLReader;
 

@@ -17,8 +17,7 @@ package net.sf.jabref.imports;
 
 import java.util.ArrayList;
 
-import net.sf.jabref.*;
-
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryType;

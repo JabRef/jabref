@@ -27,7 +27,7 @@ import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.OutputPrinter;
 
 import java.util.regex.Pattern;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 
 /**
  * INSPEC format importer.

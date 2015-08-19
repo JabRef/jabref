@@ -23,8 +23,6 @@ import java.util.TreeSet;
 
 import javax.swing.*;
 
-import net.sf.jabref.BibtexFields;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

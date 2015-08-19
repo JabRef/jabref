@@ -114,7 +114,7 @@ import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;

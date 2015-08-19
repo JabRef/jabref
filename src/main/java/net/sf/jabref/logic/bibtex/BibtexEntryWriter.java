@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.bibtex;
 
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.export.FieldFormatter;

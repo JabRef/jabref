@@ -28,7 +28,7 @@ import java.util.HashMap;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.OutputPrinter;
 
 /**

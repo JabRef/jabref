@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryTypes;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.OutputPrinter;
 
 /**

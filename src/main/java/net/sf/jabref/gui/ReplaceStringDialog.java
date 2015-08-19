@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.BibtexFields;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;

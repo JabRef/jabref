@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.gui.labelPattern;
 
-import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableKeyChange;

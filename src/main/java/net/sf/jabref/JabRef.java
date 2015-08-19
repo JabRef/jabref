@@ -34,6 +34,7 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;

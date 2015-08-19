@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexEntry;

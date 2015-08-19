@@ -16,6 +16,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;

@@ -64,7 +64,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.EasyDateFormat;
 import net.sf.jabref.EntryMarker;

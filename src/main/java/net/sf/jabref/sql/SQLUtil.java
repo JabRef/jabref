@@ -23,7 +23,7 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.*;
 
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 
 /**
  * 

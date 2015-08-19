@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 
 /**
  * Importer for records downloaded from CSA: Cambridge Scientific Abstracts

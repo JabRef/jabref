@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.sf.jabref.BibtexFields;
+import net.sf.jabref.gui.BibtexFields;
 
 /**
  * Importer for the ISI Web of Science format.
