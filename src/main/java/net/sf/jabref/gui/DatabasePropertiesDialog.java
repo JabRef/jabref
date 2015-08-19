@@ -49,6 +49,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -255,7 +256,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInSpecifiedOrder.addActionListener(listener);
 
         ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
-        v.add(BibtexFields.KEY_FIELD);
+        v.add(BibtexEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
         savePriSort = new JComboBox(allPlusKey);

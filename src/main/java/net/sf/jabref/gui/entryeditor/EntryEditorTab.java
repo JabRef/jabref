@@ -188,8 +188,8 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final FieldTextField textField = new FieldTextField(BibtexFields.KEY_FIELD, parent
-                    .getEntry().getField(BibtexFields.KEY_FIELD), true);
+            final FieldTextField textField = new FieldTextField(BibtexEntry.KEY_FIELD, parent
+                    .getEntry().getField(BibtexEntry.KEY_FIELD), true);
             setupJTextComponent(textField, null);
 
             editors.put("bibtexkey", textField);

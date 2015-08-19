@@ -28,7 +28,6 @@ import net.sf.jabref.export.layout.format.GetOpenOfficeType;
 import net.sf.jabref.export.layout.format.RemoveBrackets;
 import net.sf.jabref.export.layout.format.RemoveWhitespace;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.w3c.dom.Document;
@@ -54,7 +53,7 @@ class OOCalcDatabase {
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
-        comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
+        comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
         // Set up a list of all entries, if keySet==null, or the entries whose
@@ -160,7 +159,7 @@ class OOCalcDatabase {
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "isbn"));
-                addTableCell(result, row, getField(e, BibtexFields.KEY_FIELD));
+                addTableCell(result, row, getField(e, BibtexEntry.KEY_FIELD));
                 addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
                 addTableCell(result, row, getField(e, "journal"));

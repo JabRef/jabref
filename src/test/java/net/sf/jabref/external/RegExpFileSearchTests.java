@@ -10,7 +10,6 @@ import java.util.Map;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
@@ -33,7 +32,7 @@ public class RegExpFileSearchTests {
         //given
         List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         BibtexEntry entry = new BibtexEntry("123", BibtexEntryTypes.ARTICLE);
-        entry.setField(BibtexFields.KEY_FIELD, "pdfInDatabase");
+        entry.setField(BibtexEntry.KEY_FIELD, "pdfInDatabase");
         entry.setField("year", "2001");
         entries.add(entry);
 

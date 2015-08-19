@@ -1460,7 +1460,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // this updates the table automatically, on close, but not
             // within the tab
-            Object oldValue = entry.getField(BibtexFields.KEY_FIELD);
+            Object oldValue = entry.getField(BibtexEntry.KEY_FIELD);
 
             if (oldValue != null) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -1485,13 +1485,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // Store undo information:
             panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
-                    (String) oldValue, entry.getField(BibtexFields.KEY_FIELD)));
+                    (String) oldValue, entry.getField(BibtexEntry.KEY_FIELD)));
 
             // here we update the field
-            String bibtexKeyData = entry.getField(BibtexFields.KEY_FIELD);
+            String bibtexKeyData = entry.getField(BibtexEntry.KEY_FIELD);
 
             // set the field named for "bibtexkey"
-            setField(BibtexFields.KEY_FIELD, bibtexKeyData);
+            setField(BibtexEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
 

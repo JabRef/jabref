@@ -24,7 +24,6 @@ import java.util.*;
 import net.sf.jabref.*;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -134,7 +133,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 String id = rsEntries.getString("entries_id");
                 BibtexEntry entry = new BibtexEntry(IdGenerator.next(),
                         types.get(rsEntries.getString("entry_types_id")));
-                entry.setField(BibtexFields.KEY_FIELD,
+                entry.setField(BibtexEntry.KEY_FIELD,
                         rsEntries.getString("cite_key"));
                 for (String col : colNames) {
                     String value = rsEntries.getString(col);

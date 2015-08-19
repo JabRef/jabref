@@ -24,7 +24,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -103,7 +102,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         String citeKey;//, message = "";
         boolean first = true;
         for (BibtexEntry bes : entries) {
-            citeKey = bes.getField(BibtexFields.KEY_FIELD);
+            citeKey = bes.getField(BibtexEntry.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
             if (citeKey == null || citeKey.equals("")) {
                 continue;

@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
@@ -212,7 +211,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
             return PreviewPrefsTab.entry;
         }
         PreviewPrefsTab.entry = new BibtexEntry(IdGenerator.next(), BibtexEntryType.getType("article"));
-        PreviewPrefsTab.entry.setField(BibtexFields.KEY_FIELD, "conceicao1997");
+        PreviewPrefsTab.entry.setField(BibtexEntry.KEY_FIELD, "conceicao1997");
         PreviewPrefsTab.entry
                 .setField(
                         "author",

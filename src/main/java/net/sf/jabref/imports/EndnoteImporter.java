@@ -248,7 +248,7 @@ public class EndnoteImporter extends ImportFormat {
                         Type = "mastersthesis";
                     }
                 } else if (prefix.equals("F")) {
-                    hm.put(BibtexFields.KEY_FIELD, Util
+                    hm.put(BibtexEntry.KEY_FIELD, Util
                             .checkLegalKey(val));
                 }
             }

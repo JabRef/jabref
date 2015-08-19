@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -501,7 +500,7 @@ public class LabelPatternUtil {
             if (!key.equals(oldKey)) {
                 if (LabelPatternUtil.database.getEntryById(entry.getId()) == null) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibtexFields.KEY_FIELD, key);
+                    entry.setField(BibtexEntry.KEY_FIELD, key);
                 } else {
                     LabelPatternUtil.database.setCiteKeyForEntry(entry.getId(), key);
                 }
@@ -534,7 +533,7 @@ public class LabelPatternUtil {
             if (!moddedKey.equals(oldKey)) {
                 if (LabelPatternUtil.database.getEntryById(entry.getId()) == null) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibtexFields.KEY_FIELD, moddedKey);
+                    entry.setField(BibtexEntry.KEY_FIELD, moddedKey);
                 } else {
                     LabelPatternUtil.database.setCiteKeyForEntry(entry.getId(), moddedKey);
                 }

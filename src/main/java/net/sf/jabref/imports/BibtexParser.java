@@ -39,7 +39,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
@@ -467,7 +466,7 @@ public class BibtexParser {
             key = null;
         }
 
-        result.setField(BibtexFields.KEY_FIELD, key);
+        result.setField(BibtexEntry.KEY_FIELD, key);
         skipWhitespace();
 
         while (true) {
@@ -1019,7 +1018,7 @@ public class BibtexParser {
                     // "+be.getType().getName());
                     _pr
                             .addWarning(Localization.lang("unknown entry type") + ": "
-                                    + be.getType().getName() + ":" + be.getField(BibtexFields.KEY_FIELD)
+                                    + be.getType().getName() + ":" + be.getField(BibtexEntry.KEY_FIELD)
                                     + " . " + Localization.lang("Type set to 'other'")
                                     + ".");
                     be.setType(BibtexEntryTypes.OTHER);

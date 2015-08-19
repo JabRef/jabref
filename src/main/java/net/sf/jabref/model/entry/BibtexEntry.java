@@ -42,7 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.MonthUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -52,6 +51,7 @@ import org.apache.commons.logging.LogFactory;
 public class BibtexEntry {
 
     public static final String TYPE_HEADER = "entrytype";
+    public static final String KEY_FIELD = "bibtexkey";
     private static final String ID_FIELD = "id";
 
     private static final Log LOGGER = LogFactory.getLog(BibtexEntry.class);
@@ -350,8 +350,8 @@ public class BibtexEntry {
     }
 
     public String getCiteKey() {
-        return fields.containsKey(BibtexFields.KEY_FIELD) ?
-                fields.get(BibtexFields.KEY_FIELD) : null;
+        return fields.containsKey(KEY_FIELD) ?
+                fields.get(KEY_FIELD) : null;
     }
 
     /**
@@ -480,7 +480,7 @@ public class BibtexEntry {
 
     @Override
     public String toString() {
-        return getType().getName() + ':' + getField(BibtexFields.KEY_FIELD);
+        return getType().getName() + ':' + getField(KEY_FIELD);
     }
 
     public boolean isSearchHit() {

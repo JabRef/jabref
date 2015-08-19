@@ -30,7 +30,6 @@ Modified for use in JabRef
 package net.sf.jabref.model.database;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.MonthUtil;
 
@@ -240,9 +239,9 @@ public class BibtexDatabase {
         BibtexEntry entry = getEntryById(id);
         String oldKey = entry.getCiteKey();
         if (key != null) {
-            entry.setField(BibtexFields.KEY_FIELD, key);
+            entry.setField(BibtexEntry.KEY_FIELD, key);
         } else {
-            entry.clearField(BibtexFields.KEY_FIELD);
+            entry.clearField(BibtexEntry.KEY_FIELD);
         }
         return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }
@@ -609,7 +608,7 @@ public class BibtexDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if (o == null && database != null && database.followCrossrefs && !field.equals(BibtexFields.KEY_FIELD)) {
+        if (o == null && database != null && database.followCrossrefs && !field.equals(BibtexEntry.KEY_FIELD)) {
             Object crossRef = bibtex.getField("crossref");
             if (crossRef != null) {
                 BibtexEntry referred = database.getEntryByKey((String) crossRef);

@@ -213,13 +213,13 @@ class ReplaceStringDialog extends JDialog {
         if (allFields()) {
 
             for (String s : be.getAllFields()) {
-                if (!s.equals(BibtexFields.KEY_FIELD)) {
+                if (!s.equals(BibtexEntry.KEY_FIELD)) {
                     counter += replaceField(be, s, ce);
                 }
             }
         } else {
             for (String fld : flds) {
-                if (!fld.equals(BibtexFields.KEY_FIELD)) {
+                if (!fld.equals(BibtexEntry.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
                 }
             }

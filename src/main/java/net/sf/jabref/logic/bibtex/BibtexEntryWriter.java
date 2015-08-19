@@ -94,10 +94,10 @@ public class BibtexEntryWriter {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
-        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        String str = StringUtil.shaveString(entry.getField(BibtexEntry.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
-        written.put(BibtexFields.KEY_FIELD, null);
+        written.put(BibtexEntry.KEY_FIELD, null);
         // Write required fields first.
         // Thereby, write the title field first.
         boolean hasWritten = writeField(entry, out, "title", false, false);
@@ -159,10 +159,10 @@ public class BibtexEntryWriter {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName().toUpperCase(Locale.US) + '{');
 
-        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        String str = StringUtil.shaveString(entry.getField(BibtexEntry.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
-        written.put(BibtexFields.KEY_FIELD, null);
+        written.put(BibtexEntry.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
         String[] s = entry.getRequiredFields();
@@ -204,10 +204,10 @@ public class BibtexEntryWriter {
         // Write header with type and bibtex-key.
         out.write('@' + entry.getType().getName() + '{');
 
-        String str = StringUtil.shaveString(entry.getField(BibtexFields.KEY_FIELD));
+        String str = StringUtil.shaveString(entry.getField(BibtexEntry.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
         HashMap<String, String> written = new HashMap<String, String>();
-        written.put(BibtexFields.KEY_FIELD, null);
+        written.put(BibtexEntry.KEY_FIELD, null);
         boolean hasWritten = false;
 
         // Write user defined fields first.

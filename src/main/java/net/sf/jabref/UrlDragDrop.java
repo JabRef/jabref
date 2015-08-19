@@ -41,12 +41,12 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -174,7 +174,7 @@ public class UrlDragDrop implements DropTargetListener {
                     //auto file name:
                     File file = new File(new File(Globals.prefs
                             .get("pdfDirectory")), editor.getEntry()
-                            .getField(BibtexFields.KEY_FIELD)
+                            .getField(BibtexEntry.KEY_FIELD)
                             + ".pdf");
                     frame.output(Localization.lang("Downloading..."));
                     MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);

@@ -27,7 +27,6 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.export.layout.Layout;
 
 import com.sun.star.beans.Property;
@@ -302,7 +301,7 @@ class OOUtil {
         }
         BibtexEntry e = (BibtexEntry) entry.clone();
         for (String field : e.getAllFields()) {
-            if (field.equals(BibtexFields.KEY_FIELD)) {
+            if (field.equals(BibtexEntry.KEY_FIELD)) {
                 continue;
             }
             String value = e.getField(field);

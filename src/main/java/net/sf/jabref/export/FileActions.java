@@ -347,7 +347,7 @@ public class FileActions {
         comparators.add(new FieldComparator(saveSettings.pri, saveSettings.priD));
         comparators.add(new FieldComparator(saveSettings.sec, saveSettings.secD));
         comparators.add(new FieldComparator(saveSettings.ter, saveSettings.terD));
-        comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
+        comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
 
         return comparators;
     }

@@ -39,6 +39,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
@@ -85,7 +86,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
         Vector<String> fieldNames = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
-        fieldNames.add(BibtexFields.KEY_FIELD);
+        fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
         priSort = new JComboBox(allPlusKey);

@@ -754,7 +754,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // If this entry should be added to any groups, do it now:
                     Set<GroupTreeNode> groups = groupAdditions.get(entry);
                     if (!groupingCanceled && (groups != null)) {
-                        if (entry.getField(BibtexFields.KEY_FIELD) == null) {
+                        if (entry.getField(BibtexEntry.KEY_FIELD) == null) {
                             // The entry has no key, so it can't be added to the
                             // group.
                             // The best course of action is probably to ask the
@@ -773,7 +773,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         }
 
                         // If the key existed, or exists now, go ahead:
-                        if (entry.getField(BibtexFields.KEY_FIELD) != null) {
+                        if (entry.getField(BibtexEntry.KEY_FIELD) != null) {
                             for (GroupTreeNode node : groups) {
                                 if (node.getGroup().supportsAdd()) {
                                     // Add the entry:

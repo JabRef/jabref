@@ -20,7 +20,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.StringUtil;
@@ -143,7 +142,7 @@ public class CustomEntryType extends BibtexEntryType {
     @Override
     public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
         // First check if the bibtex key is set:
-        if (entry.getField(BibtexFields.KEY_FIELD) == null) {
+        if (entry.getField(BibtexEntry.KEY_FIELD) == null) {
             return false;
         }
         // Then check other fields:

@@ -487,7 +487,7 @@ public class MainTable extends JTable {
             BibtexEntry be = sortedForGrouping.get(row);
             BibtexEntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibtexFields.KEY_FIELD) || type.isRequired(columnName)) {
+            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.isRequired(columnName)) {
                 return MainTable.REQUIRED;
             }
             if (type.isOptional(columnName)) {

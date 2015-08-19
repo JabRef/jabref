@@ -17,7 +17,6 @@ package net.sf.jabref.imports;
 
 import java.util.ArrayList;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -80,7 +79,7 @@ class BibTeXMLHandler extends DefaultHandler {
                 }
             }
             b = new BibtexEntry(IdGenerator.next());
-            b.setField(BibtexFields.KEY_FIELD, articleID);
+            b.setField(BibtexEntry.KEY_FIELD, articleID);
         } else if (raw.equals("bibtex:article") ||
                 raw.equals("bibtex:inbook") ||
                 raw.equals("bibtex:book") ||

@@ -16,7 +16,6 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
@@ -271,7 +270,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     BibtexEntry entry = entries.iterator().next();
                     boolean clearKeys = true;
                     if (clearKeys) {
-                        entry.setField(BibtexFields.KEY_FIELD, null);
+                        entry.setField(BibtexEntry.KEY_FIELD, null);
                     }
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:

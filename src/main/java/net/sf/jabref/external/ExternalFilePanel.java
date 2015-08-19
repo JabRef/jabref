@@ -36,7 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -166,7 +165,7 @@ public class ExternalFilePanel extends JPanel {
     }
 
     private Object getKey() {
-        return getEntry().getField(BibtexFields.KEY_FIELD);
+        return getEntry().getField(BibtexEntry.KEY_FIELD);
     }
 
     private void output(String s) {
