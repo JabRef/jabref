@@ -1,6 +1,7 @@
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.database.BibtexDatabase;
