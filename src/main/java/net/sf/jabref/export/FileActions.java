@@ -32,6 +32,7 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.bibtex.BibtexStringComparator;
+import net.sf.jabref.logic.bibtex.CrossRefEntryComparator;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.logic.l10n.Localization;
