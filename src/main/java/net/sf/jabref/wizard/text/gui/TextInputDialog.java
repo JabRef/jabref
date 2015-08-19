@@ -110,7 +110,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.ClipBoardManager;
@@ -602,7 +604,7 @@ public class TextInputDialog
         StringWriter sw = new StringWriter(200);
         try
         {
-            entry.write(sw, new net.sf.jabref.export.LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored)

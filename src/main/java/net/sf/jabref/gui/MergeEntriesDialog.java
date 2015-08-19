@@ -28,6 +28,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryType;
 import net.sf.jabref.Globals;
@@ -288,7 +289,7 @@ public class MergeEntriesDialog extends JDialog {
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
-            mergedEntry.write(sw, new LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
             System.err.println(Localization.lang("Error in entry" + ": " + ex.getMessage()));
         }
@@ -421,7 +422,7 @@ public class MergeEntriesDialog extends JDialog {
         // Update the Bibtex source view
         StringWriter sw = new StringWriter();
         try {
-            mergedEntry.write(sw, new LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
             System.err.println(Localization.lang("Error in entry" + ": " + ex.getMessage()));
         }

@@ -34,8 +34,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
-import java.io.IOException;
-import java.io.Writer;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParseException;
@@ -44,8 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.FieldFormatter;
-import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.MonthUtil;
 import org.apache.commons.logging.Log;
@@ -468,18 +464,6 @@ public class BibtexEntry {
      */
     public void removePropertyChangeListener(VetoableChangeListener listener) {
         changeSupport.removeVetoableChangeListener(listener);
-    }
-
-    /**
-     * Write this entry to the given Writer, with the given FieldFormatter.
-     *
-     * @param write True if this is a write, false if it is a display. The write will
-     *              not include non-writeable fields if it is a write, otherwise non-displayable fields
-     *              will be ignored. Refer to GUIGlobals for isWriteableField(String) and
-     *              isDisplayableField(String).
-     */
-    public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
-        new BibtexEntryWriter(ff, write).write(this, out);
     }
 
     /**

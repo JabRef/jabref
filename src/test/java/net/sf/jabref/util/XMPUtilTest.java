@@ -1,10 +1,12 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.*;
+import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
 import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryTypes;
@@ -120,7 +122,7 @@ public class XMPUtilTest {
     public static String bibtexEntry2BibtexString(BibtexEntry e)
             throws IOException {
         StringWriter sw = new StringWriter();
-        e.write(sw, new net.sf.jabref.export.LatexFieldFormatter(), false);
+        new BibtexEntryWriter(new LatexFieldFormatter(), false).write(e, sw);
         return sw.getBuffer().toString();
     }
 

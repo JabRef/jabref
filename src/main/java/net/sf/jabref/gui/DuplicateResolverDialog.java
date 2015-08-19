@@ -23,6 +23,7 @@ import java.io.StringWriter;
 
 import javax.swing.*;
 
+import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -239,10 +240,10 @@ public class DuplicateResolverDialog extends JDialog {
     private void setSourceView(BibtexEntry one, BibtexEntry two) {
         try {
             StringWriter sw = new StringWriter();
-            one.write(sw, new LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(one, sw);
             ta1.setText(sw.getBuffer().toString());
             sw = new StringWriter();
-            two.write(sw, new LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(two, sw);
             ta2.setText(sw.getBuffer().toString());
         } catch (IOException ignored) {
         }

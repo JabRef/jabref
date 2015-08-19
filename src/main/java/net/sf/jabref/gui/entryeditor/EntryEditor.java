@@ -49,6 +49,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.fieldeditors.*;
+import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
@@ -577,7 +578,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             try {
                 LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-                entry.write(stringWriter, formatter, false);
+                new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
 
                 String srcString = stringWriter.getBuffer().toString();
                 source.setText(srcString);
