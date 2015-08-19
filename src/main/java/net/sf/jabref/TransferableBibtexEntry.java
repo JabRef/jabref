@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.logic.BibtexEntryWriter;
 import net.sf.jabref.model.BibtexEntry;
 
 import javax.swing.*;

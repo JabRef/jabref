@@ -1,5 +1,8 @@
-package net.sf.jabref;
+package net.sf.jabref.logic;
 
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.export.FieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.StringUtil;
