@@ -243,7 +243,7 @@ public class DuplicateCheck {
      *                 harmonize their length. If false, use interpolation to harmonize the strings.
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
-    private static double correlateByWords(String s1, String s2, boolean truncate) {
+    static double correlateByWords(String s1, String s2, boolean truncate) {
         String[] w1 = s1.split("\\s");
         String[] w2 = s2.split("\\s");
         int n = Math.min(w1.length, w2.length);
@@ -345,13 +345,4 @@ public class DuplicateCheck {
         return newArray;
     }
 
-    public static void main(String[] args) {
-        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
-        String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
-        String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
-
-        System.out.println(DuplicateCheck.correlateByWords(d1, d2, false));
-        System.out.println(DuplicateCheck.correlateByWords(d1, d3, false));
-        System.out.println(DuplicateCheck.correlateByWords(d2, d3, false));
-    }
 }

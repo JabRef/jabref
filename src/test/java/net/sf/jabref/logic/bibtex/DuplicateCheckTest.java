@@ -1,5 +1,7 @@
-package net.sf.jabref;
+package net.sf.jabref.logic.bibtex;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -8,6 +10,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +38,7 @@ public class DuplicateCheckTest {
         two.setField("author", "Billy Bob");
         Assert.assertTrue(DuplicateCheck.isDuplicate(one, two));
 
-        //TODO algorithm things bob and joyce is the same with high accuracy
+        //TODO algorithm thinks bob and joyce is the same with high accuracy
         two.setField("author", "James Joyce");
         Assert.assertFalse(DuplicateCheck.isDuplicate(one, two));
 
@@ -61,6 +65,17 @@ public class DuplicateCheckTest {
         two.setField("title", "Another title");
         two.setField("journal", "B");
         Assert.assertFalse(DuplicateCheck.isDuplicate(one, two));
+    }
+
+    @Test
+    public void testWordCorrelation() {
+        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
+        String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
+        String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
+
+        assertEquals(1.0, (DuplicateCheck.correlateByWords(d1, d2, false)), 0.01);
+        assertEquals(0.88, (DuplicateCheck.correlateByWords(d1, d3, false)), 0.01);
+        assertEquals(0.88, (DuplicateCheck.correlateByWords(d2, d3, false)), 0.01);
     }
 
 }
