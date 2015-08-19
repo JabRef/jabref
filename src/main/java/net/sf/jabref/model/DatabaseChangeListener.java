@@ -13,39 +13,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref;
+package net.sf.jabref.model;
 
-import net.sf.jabref.model.BibtexDatabase;
-import net.sf.jabref.model.BibtexEntry;
+public interface DatabaseChangeListener {
 
-public class DatabaseChangeEvent {
+    void databaseChanged(DatabaseChangeEvent e);
 
-    public enum ChangeType {
-        ADDED_ENTRY, REMOVED_ENTRY, CHANGED_ENTRY, CHANGING_ENTRY
-    }
-
-
-    private final BibtexEntry entry;
-    private final ChangeType type;
-    private final BibtexDatabase source;
-
-
-    public DatabaseChangeEvent(BibtexDatabase source, ChangeType type,
-            BibtexEntry entry) {
-        this.source = source;
-        this.type = type;
-        this.entry = entry;
-    }
-
-    public BibtexDatabase getSource() {
-        return source;
-    }
-
-    public BibtexEntry getEntry() {
-        return entry;
-    }
-
-    public ChangeType getType() {
-        return type;
-    }
 }
