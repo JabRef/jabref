@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryType;
 import org.apache.commons.logging.Log;

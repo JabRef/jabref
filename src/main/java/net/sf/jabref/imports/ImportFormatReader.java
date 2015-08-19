@@ -18,6 +18,7 @@ package net.sf.jabref.imports;
 import java.io.*;
 import java.util.*;
 
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexEntry;

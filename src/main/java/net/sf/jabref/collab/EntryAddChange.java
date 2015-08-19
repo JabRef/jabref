@@ -23,6 +23,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexEntry;
 

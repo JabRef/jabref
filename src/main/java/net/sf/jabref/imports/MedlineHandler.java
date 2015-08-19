@@ -21,7 +21,7 @@ import java.util.TreeSet;
 
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;

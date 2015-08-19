@@ -45,6 +45,7 @@ import java.util.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.FieldFormatter;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.MonthUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

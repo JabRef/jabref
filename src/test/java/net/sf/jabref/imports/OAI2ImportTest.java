@@ -2,7 +2,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.model.BibtexEntry;
 import net.sf.jabref.model.BibtexEntryType;
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 
 import org.junit.Assert;
 import org.junit.Before;

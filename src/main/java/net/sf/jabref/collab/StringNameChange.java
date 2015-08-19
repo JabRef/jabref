@@ -19,6 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.BibtexDatabase;
 import net.sf.jabref.model.BibtexString;

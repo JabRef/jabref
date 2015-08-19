@@ -56,7 +56,7 @@ import net.sf.jabref.EntryMarker;
 import net.sf.jabref.FieldComparator;
 import net.sf.jabref.GeneralRenderer;
 import net.sf.jabref.Globals;
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.KeyCollisionException;

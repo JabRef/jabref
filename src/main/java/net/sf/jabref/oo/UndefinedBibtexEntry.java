@@ -16,7 +16,7 @@
 package net.sf.jabref.oo;
 
 import net.sf.jabref.model.BibtexEntry;
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 
 /**
  * Subclass of BibtexEntry for representing entries referenced in a document that can't

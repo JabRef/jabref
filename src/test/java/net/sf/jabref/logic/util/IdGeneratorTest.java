@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.util;
 
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
