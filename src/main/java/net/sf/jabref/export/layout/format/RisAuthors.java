@@ -17,7 +17,7 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.*;
 import net.sf.jabref.export.layout.*;
-import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.entry.AuthorList;
 
 public class RisAuthors implements ParamLayoutFormatter {
 

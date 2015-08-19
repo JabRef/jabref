@@ -1,13 +1,13 @@
 package net.sf.jabref;
 
-import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.entry.AuthorList;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Christopher Oezbek <oezi@oezi.de>
  * @version 0.1 - Still fails for stuff in AuthorList that is ambiguous
- * @see net.sf.jabref.logic.AuthorList Class tested.
+ * @see AuthorList Class tested.
  */
 public class AuthorListTest {
 

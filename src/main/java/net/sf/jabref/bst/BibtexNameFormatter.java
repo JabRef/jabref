@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.bst;
 
-import net.sf.jabref.logic.AuthorList;
-import net.sf.jabref.logic.AuthorList.Author;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.AuthorList.Author;
 
 /**
  * From Bibtex:

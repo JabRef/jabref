@@ -1,5 +1,6 @@
 package net.sf.jabref.logic;
 
+import net.sf.jabref.model.entry.AuthorList;
 import org.junit.Ignore;
 import org.junit.Test;
 

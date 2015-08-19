@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.sf.jabref.*;
-import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;

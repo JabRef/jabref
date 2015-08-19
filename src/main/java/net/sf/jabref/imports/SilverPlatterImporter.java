@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.AuthorList;
+import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.OutputPrinter;
 
 import java.util.regex.Pattern;
