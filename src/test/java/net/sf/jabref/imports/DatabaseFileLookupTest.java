@@ -2,8 +2,8 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.FindUnlinkedFilesDialog;
-import net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode;
+import net.sf.jabref.gui.FindUnlinkedFilesDialog;
+import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
@@ -99,12 +99,12 @@ public class DatabaseFileLookupTest {
 
     /**
      * Connector-Method for the private method
-     * {@link FindUnlinkedFilesDialog#getFileListFromNode(net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode)} of the dialog
+     * {@link FindUnlinkedFilesDialog#getFileListFromNode(FindUnlinkedFilesDialog.CheckableTreeNode)} of the dialog
      * {@link FindUnlinkedFilesDialog}. <br>
      * <br>
      * This method uses <b>reflection</b> to get access to that method.
      *
-     * @see FindUnlinkedFilesDialog#getFileListFromNode(net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode)
+     * @see FindUnlinkedFilesDialog#getFileListFromNode(FindUnlinkedFilesDialog.CheckableTreeNode)
      */
     private List<File> getFileListFromNode(CheckableTreeNode node) throws Exception {
         return DatabaseFileLookupTest.invokeMethod("getFileListFromNode", FindUnlinkedFilesDialog.class, node);

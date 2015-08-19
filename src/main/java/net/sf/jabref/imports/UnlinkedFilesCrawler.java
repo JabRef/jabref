@@ -7,8 +7,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.FindUnlinkedFilesDialog.CheckableTreeNode;
-import net.sf.jabref.FindUnlinkedFilesDialog.FileNodeWrapper;
+import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
+import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
 
 /**
  * Util class for searching files on the filessystem which are not linked to a

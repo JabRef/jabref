@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import net.sf.jabref.gui.FindUnlinkedFilesDialog;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
