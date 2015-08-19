@@ -81,6 +81,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.imports.*;
+import net.sf.jabref.logic.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -2205,7 +2206,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 for (String s : database.getKeySet()) {
                     BibtexEntry existingEntry = database.getEntryById(s);
                     if (DuplicateCheck.isDuplicate(entry, existingEntry
-                            )) {
+                    )) {
                         DuplicateResolverDialog drd = new DuplicateResolverDialog
                                 (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                         drd.setVisible(true);

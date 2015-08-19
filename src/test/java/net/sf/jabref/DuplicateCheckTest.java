@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import net.sf.jabref.logic.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
