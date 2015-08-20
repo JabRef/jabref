@@ -28,8 +28,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.XMLChars;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.format.XMLChars;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

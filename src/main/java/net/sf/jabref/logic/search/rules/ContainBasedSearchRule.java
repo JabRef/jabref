@@ -18,7 +18,7 @@ package net.sf.jabref.logic.search.rules;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 

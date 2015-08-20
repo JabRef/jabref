@@ -3,7 +3,7 @@ package net.sf.jabref.logic.labelPattern;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.importer.BibtexParser;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;

@@ -24,8 +24,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.action.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
-import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.imports.PostOpenAction;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;

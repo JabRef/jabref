@@ -47,7 +47,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;

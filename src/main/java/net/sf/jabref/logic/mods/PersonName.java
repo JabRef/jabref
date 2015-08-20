@@ -17,7 +17,7 @@ package net.sf.jabref.logic.mods;
 
 import java.util.Vector;
 
-import net.sf.jabref.export.layout.WSITools;
+import net.sf.jabref.exporter.layout.WSITools;
 
 import net.sf.jabref.model.entry.AuthorList;
 

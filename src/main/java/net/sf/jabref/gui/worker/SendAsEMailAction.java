@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;

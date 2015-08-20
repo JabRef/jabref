@@ -21,9 +21,9 @@ import java.util.*;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.ParserResult;
 
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;

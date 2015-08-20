@@ -27,7 +27,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;

@@ -38,7 +38,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;

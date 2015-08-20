@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.remote;
 
 import net.sf.jabref.JabRef;
-import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.remote.server.MessageHandler;
 
 import javax.swing.SwingUtilities;

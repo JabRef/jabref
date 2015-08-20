@@ -72,10 +72,10 @@ import net.sf.jabref.logic.util.io.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.imports.EntryFromFileCreator;
-import net.sf.jabref.imports.EntryFromFileCreatorManager;
-import net.sf.jabref.imports.UnlinkedFilesCrawler;
-import net.sf.jabref.imports.UnlinkedPDFFileFilter;
+import net.sf.jabref.importer.EntryFromFileCreator;
+import net.sf.jabref.importer.EntryFromFileCreatorManager;
+import net.sf.jabref.importer.UnlinkedFilesCrawler;
+import net.sf.jabref.importer.UnlinkedPDFFileFilter;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -164,7 +164,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     /**
      * For Unit-testing only. <i>Don't remove!</i> <br>
-     * Used via reflection in {@link net.sf.jabref.imports.DatabaseFileLookup} to construct this
+     * Used via reflection in {@link net.sf.jabref.importer.DatabaseFileLookup} to construct this
      * class.
      */
     @SuppressWarnings("unused")

@@ -33,8 +33,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.XMLChars;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 

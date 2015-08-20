@@ -1,6 +1,6 @@
 package net.sf.jabref;
 
-import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.cli.*;
 

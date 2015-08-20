@@ -3,8 +3,8 @@ package net.sf.jabref.bst;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.StackFunction;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.ParserResult;
 
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;

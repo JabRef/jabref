@@ -48,14 +48,14 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.export.CustomExportList;
-import net.sf.jabref.export.ExportComparator;
+import net.sf.jabref.exporter.CustomExportList;
+import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.PersistenceTableColumnListener;
-import net.sf.jabref.imports.CustomImportList;
+import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -368,7 +368,7 @@ public class JabRefPreferences {
     public final CustomExportList customExports;
 
     /**
-     * Set with all custom {@link net.sf.jabref.imports.ImportFormat}s
+     * Set with all custom {@link net.sf.jabref.importer.ImportFormat}s
      */
     public final CustomImportList customImports;
 

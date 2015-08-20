@@ -33,9 +33,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.exporter.layout.Layout;
+import net.sf.jabref.exporter.layout.LayoutHelper;
+import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;

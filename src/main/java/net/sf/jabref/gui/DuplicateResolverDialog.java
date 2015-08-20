@@ -28,7 +28,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 

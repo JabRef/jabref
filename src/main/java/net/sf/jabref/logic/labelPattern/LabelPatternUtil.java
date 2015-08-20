@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.model.entry.AuthorList.Author;
-import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
 import net.sf.jabref.util.Util;
 
 /**

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
 

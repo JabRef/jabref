@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.exporter.SaveSession;
 
 import java.io.File;
 

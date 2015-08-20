@@ -27,7 +27,7 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.exporter.layout.Layout;
 
 import com.sun.star.beans.Property;
 import com.sun.star.beans.XPropertySet;

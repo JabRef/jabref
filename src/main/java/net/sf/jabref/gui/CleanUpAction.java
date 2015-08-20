@@ -34,9 +34,9 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.imports.HTMLConverter;
-import net.sf.jabref.imports.CaseKeeper;
-import net.sf.jabref.imports.UnitFormatter;
+import net.sf.jabref.importer.HTMLConverter;
+import net.sf.jabref.importer.fetcher.CaseKeeper;
+import net.sf.jabref.importer.fetcher.UnitFormatter;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 

@@ -110,7 +110,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -123,7 +123,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.imports.FreeCiteImporter;
+import net.sf.jabref.importer.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 

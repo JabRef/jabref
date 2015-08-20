@@ -18,7 +18,7 @@ package net.sf.jabref;
 import java.util.Collection;
 import java.util.Vector;
 
-import net.sf.jabref.imports.*;
+import net.sf.jabref.importer.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.SearchRule;

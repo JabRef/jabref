@@ -19,9 +19,9 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.LayoutHelper;
+import net.sf.jabref.exporter.layout.Layout;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.LayoutHelper;
 
 import java.io.*;
 import java.util.*;

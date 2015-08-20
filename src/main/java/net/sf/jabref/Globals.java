@@ -16,12 +16,12 @@
 package net.sf.jabref;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
-import net.sf.jabref.export.AutoSaveManager;
+import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.GlobalFocusListener;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpDialog;
-import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.logging.CacheableHandler;
@@ -101,7 +101,7 @@ public class Globals {
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String NONE = "_non__";
-    public static final String FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
+    public static final String FORMATTER_PACKAGE = "net.sf.jabref.exporter.layout.format.";
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required

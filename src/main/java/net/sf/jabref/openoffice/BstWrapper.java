@@ -17,8 +17,8 @@ package net.sf.jabref.openoffice;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.FormatChars;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.format.FormatChars;
 import net.sf.jabref.bst.VM;
 import org.antlr.runtime.RecognitionException;
 

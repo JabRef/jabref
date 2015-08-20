@@ -17,7 +17,7 @@ package net.sf.jabref.openoffice;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
 import java.util.HashMap;
 
 /**
