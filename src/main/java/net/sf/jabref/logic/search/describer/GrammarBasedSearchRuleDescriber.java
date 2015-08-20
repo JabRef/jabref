@@ -4,7 +4,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchParser;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Objects;

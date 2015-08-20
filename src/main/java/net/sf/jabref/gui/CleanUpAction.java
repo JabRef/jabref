@@ -45,9 +45,9 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.DOI;
-import net.sf.jabref.util.FileUtil;
-import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.util.Util;
 
 public class CleanUpAction extends AbstractWorker {

@@ -29,7 +29,7 @@ import javax.swing.*;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 

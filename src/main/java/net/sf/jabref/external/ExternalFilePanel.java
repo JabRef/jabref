@@ -51,9 +51,9 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.util.FileUtil;
-import net.sf.jabref.util.UtilFindFiles;
-import net.sf.jabref.util.XMPUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
  * Initial Version:
@@ -475,7 +475,7 @@ public class ExternalFilePanel extends JPanel {
                 String[] dirs = metaData.getFileDirectory(fieldName);
                 Collections.addAll(list, dirs);
 
-                String found = UtilFindFiles.findPdf(getEntry(), fieldName, list
+                String found = FileFinder.findPdf(getEntry(), fieldName, list
                         .toArray(new String[list.size()]));// , off);
 
                 // To activate findFile:

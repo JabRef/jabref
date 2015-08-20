@@ -22,9 +22,8 @@ import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +46,7 @@ public class CustomEntryType extends BibtexEntryType {
         this.name = StringUtil.capitalizeFirst(name);
         parseRequiredFields(required);
         this.priOpt = priOpt;
-        optional = Util.arrayConcat(priOpt, secOpt);
+        optional = StringUtil.arrayConcat(priOpt, secOpt);
     }
 
     public CustomEntryType(String name, String[] required, String[] optional) {
@@ -113,7 +112,7 @@ public class CustomEntryType extends BibtexEntryType {
 
     @Override
     public String[] getSecondaryOptionalFields() {
-        return Util.getRemainder(optional, priOpt);
+        return StringUtil.getRemainder(optional, priOpt);
     }
 
     @Override

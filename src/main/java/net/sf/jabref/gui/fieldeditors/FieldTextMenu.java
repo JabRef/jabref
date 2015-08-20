@@ -48,10 +48,9 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.CaseChangeMenu;
-import net.sf.jabref.logic.util.NameListNormalizer;
+import net.sf.jabref.gui.CaseChangeMenu;
+import net.sf.jabref.logic.util.strings.NameListNormalizer;
 import net.sf.jabref.util.GoogleUrlCleaner;
 
 public class FieldTextMenu implements MouseListener

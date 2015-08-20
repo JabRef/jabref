@@ -44,7 +44,7 @@ import java.util.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.logic.id.IdGenerator;
-import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

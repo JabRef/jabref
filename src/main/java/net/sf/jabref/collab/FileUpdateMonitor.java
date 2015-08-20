@@ -15,15 +15,13 @@
 */
 package net.sf.jabref.collab;
 
-import net.sf.jabref.util.FileUtil;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.io.FileUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * This thread monitors a set of files, each associated with a FileUpdateListener, for changes

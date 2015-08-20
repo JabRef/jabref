@@ -17,7 +17,7 @@ package net.sf.jabref.export.layout.format;
 
 import java.io.File;
 
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.ParamLayoutFormatter;

@@ -40,7 +40,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.sql.DBImportExportDialog;

@@ -26,7 +26,7 @@ import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.FileBasedLock;
+import net.sf.jabref.logic.util.io.FileBasedLock;
 
 import javax.swing.*;
 import java.io.File;

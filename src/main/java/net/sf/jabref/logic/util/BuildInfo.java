@@ -13,16 +13,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref.logic.util;
 
 import java.io.IOException;
 import java.util.Properties;
 
 public class BuildInfo {
-
     private final String version;
-
 
     public BuildInfo() {
         this("/resource/build.properties");
@@ -30,6 +27,7 @@ public class BuildInfo {
 
     public BuildInfo(String path) {
         Properties properties = new Properties();
+
         try {
             properties.load(getClass().getResourceAsStream(path));
         } catch (IOException | NullPointerException ignored) {
@@ -40,5 +38,4 @@ public class BuildInfo {
     public String getVersion() {
         return version;
     }
-
 }

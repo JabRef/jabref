@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;

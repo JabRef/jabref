@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.logic.util.CaseChangers;
-import net.sf.jabref.logic.util.MonthUtil;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.CaseChangers;
+import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**

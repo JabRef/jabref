@@ -32,7 +32,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.MetaData;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 

@@ -39,7 +39,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.util.TXMLReader;
+import net.sf.jabref.logic.util.io.TXMLReader;
 
 import org.w3c.dom.Element;
 

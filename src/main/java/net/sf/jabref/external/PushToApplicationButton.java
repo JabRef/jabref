@@ -22,7 +22,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.oo.OpenOfficePanel;
+import net.sf.jabref.openoffice.OpenOfficePanel;
 
 import javax.swing.*;
 

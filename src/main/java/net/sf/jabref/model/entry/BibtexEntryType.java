@@ -37,8 +37,8 @@ import java.util.TreeMap;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.util.Util;
 
 /**
  * Provides a list of known entry types
@@ -127,7 +127,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     }
 
     public String[] getSecondaryOptionalFields() {
-        return Util.getRemainder(getOptionalFields(), getPrimaryOptionalFields());
+        return StringUtil.getRemainder(getOptionalFields(), getPrimaryOptionalFields());
     }
 
     public abstract String describeRequiredFields();

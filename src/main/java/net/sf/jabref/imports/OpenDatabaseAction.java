@@ -37,8 +37,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.FileBasedLock;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

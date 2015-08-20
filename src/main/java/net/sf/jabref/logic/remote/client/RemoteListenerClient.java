@@ -2,7 +2,7 @@ package net.sf.jabref.logic.remote.client;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.shared.Protocol;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

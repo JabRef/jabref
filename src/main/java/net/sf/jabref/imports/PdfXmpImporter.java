@@ -21,7 +21,7 @@ import java.util.List;
 
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.XMPUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
  * Wraps the XMPUtility function to be used as an ImportFormat.

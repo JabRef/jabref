@@ -26,7 +26,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.JabRefDesktop;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 
 /**
  * The menu item used in the popup menu for opening external resources associated

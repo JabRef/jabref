@@ -24,7 +24,7 @@ import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to

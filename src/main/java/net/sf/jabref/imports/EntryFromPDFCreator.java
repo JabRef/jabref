@@ -16,8 +16,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.util.EncryptionNotSupportedException;
-import net.sf.jabref.util.XMPUtil;
+import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
+import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
  * Uses XMPUtils to get one BibtexEntry for a PDF-File. 
