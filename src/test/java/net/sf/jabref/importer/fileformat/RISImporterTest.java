@@ -1,9 +1,8 @@
-package net.sf.jabref.importer;
+package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.*;
 
-import net.sf.jabref.importer.fileformat.IsiImporter;
-import net.sf.jabref.importer.fileformat.RisImporter;
+import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
@@ -39,7 +38,7 @@ public class RISImporterTest {
     @Test
     public void testProcessSubSup() {
 
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
         hm.put("title", "/sub 3/");
         IsiImporter.processSubSup(hm);
         Assert.assertEquals("$_3$", hm.get("title"));
