@@ -24,7 +24,7 @@ import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 
 import javax.swing.*;
 

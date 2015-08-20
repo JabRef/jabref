@@ -26,7 +26,7 @@ import java.util.HashMap;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.logic.util.MonthUtil;
+import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**

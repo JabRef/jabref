@@ -32,7 +32,7 @@ import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * 

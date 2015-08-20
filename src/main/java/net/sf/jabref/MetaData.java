@@ -25,7 +25,7 @@ import net.sf.jabref.logic.labelPattern.LabelPattern;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class MetaData implements Iterable<String> {
 

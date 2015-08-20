@@ -23,8 +23,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
-import net.sf.jabref.logic.util.QuotedStringTokenizer;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import javax.swing.undo.AbstractUndoableEdit;
 

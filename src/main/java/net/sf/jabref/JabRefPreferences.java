@@ -58,8 +58,7 @@ import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.imports.CustomImportList;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
@@ -1391,7 +1390,7 @@ public class JabRefPreferences {
         if (priOpt == null) {
             return new CustomEntryType(StringUtil.capitalizeFirst(name), req, opt);
         }
-        String[] secOpt = Util.getRemainder(opt, priOpt);
+        String[] secOpt = StringUtil.getRemainder(opt, priOpt);
         return new CustomEntryType(StringUtil.capitalizeFirst(name), req, priOpt, secOpt);
 
     }
@@ -1563,7 +1562,7 @@ public class JabRefPreferences {
             i++;
         }
         //System.out.println("Encoded: '"+Util.encodeStringArray(array)+"'");
-        put("externalFileTypes", Util.encodeStringArray(array));
+        put("externalFileTypes", StringUtil.encodeStringArray(array));
     }
 
     /**
@@ -1579,7 +1578,7 @@ public class JabRefPreferences {
             return;
         }
         // Read the prefs information for file types:
-        String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
+        String[][] vals = StringUtil.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
         for (String[] val : vals) {
             if (val.length == 2 && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:

@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.FileListEntry;

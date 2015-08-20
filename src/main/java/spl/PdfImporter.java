@@ -23,9 +23,9 @@ import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.util.XMPUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

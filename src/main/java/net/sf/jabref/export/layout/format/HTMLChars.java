@@ -17,7 +17,7 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * This formatter escapes characters so they are suitable for HTML.

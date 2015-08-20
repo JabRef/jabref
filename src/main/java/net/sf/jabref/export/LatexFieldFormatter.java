@@ -19,8 +19,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.StringUtil;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.Vector;
 
@@ -65,7 +64,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         }
 
         if (Globals.prefs.putBracesAroundCapitals(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
-            text = Util.putBracesAroundCapitals(text);
+            text = StringUtil.putBracesAroundCapitals(text);
         }
 
         // normalize newlines

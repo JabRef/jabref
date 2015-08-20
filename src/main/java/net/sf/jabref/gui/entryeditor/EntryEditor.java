@@ -62,7 +62,8 @@ import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.util.EasyDateFormat;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -72,7 +73,7 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.util.JabRefDesktop;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -248,7 +249,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 String[] secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
-                String[] optionalFieldsNotPrimaryOrDeprecated = Util.getRemainder(secondaryOptionalFields,
+                String[] optionalFieldsNotPrimaryOrDeprecated = StringUtil.getRemainder(secondaryOptionalFields,
                         deprecatedFields.toArray(new String[deprecatedFields.size()]));
 
                 // Get list of all optional fields of this entry and their aliases

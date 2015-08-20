@@ -5,6 +5,9 @@ import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
+import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
+import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
+import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.id.IdGenerator;

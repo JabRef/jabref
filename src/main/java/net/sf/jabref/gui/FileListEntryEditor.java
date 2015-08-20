@@ -31,11 +31,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.util.JabRefDesktop;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;

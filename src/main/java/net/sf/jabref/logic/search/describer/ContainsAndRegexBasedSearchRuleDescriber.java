@@ -2,7 +2,7 @@ package net.sf.jabref.logic.search.describer;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.LinkedList;
 import java.util.List;

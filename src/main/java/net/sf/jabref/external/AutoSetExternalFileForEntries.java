@@ -42,7 +42,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
 
 /**

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.util.DOI;
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**

@@ -20,8 +20,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.util.QuotedStringTokenizer;
-import net.sf.jabref.logic.util.StringUtil;
+import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import java.util.Collections;

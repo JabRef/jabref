@@ -43,9 +43,9 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.*;
-import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -503,7 +503,7 @@ public class BibtexParser {
         // with braces around
         // capitals, we should remove those now when reading the field:
         if (Globals.prefs.putBracesAroundCapitals(key)) {
-            content = Util.removeBracesAroundCapitals(content);
+            content = StringUtil.removeBracesAroundCapitals(content);
         }
         if (!content.isEmpty()) {
             if (entry.getField(key) == null) {

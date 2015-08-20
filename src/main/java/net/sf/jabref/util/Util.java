@@ -29,8 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +55,13 @@ import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.*;
+import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.logic.util.date.YearUtil;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.util.io.FileNameCleaner;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.strings.UnicodeCharMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,7 +71,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.worker.CallBack;
-import net.sf.jabref.logic.util.EasyDateFormat;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
@@ -140,24 +145,17 @@ public class Util {
                     // This part should normally be a string reference, but if it's
                     // a pure number, it is not.
                     String s2 = StringUtil.shaveString(s);
-                    if(isInteger(s2)) {
+
+                    try {
+                        Integer.parseInt(s2);
                         result.append(s2);
-                    } else {
+                    } catch (NumberFormatException e) {
                         result.append('#').append(s2).append('#');
                     }
                 }
             }
         }
         return result.toString();
-    }
-
-    private static boolean isInteger(String s) {
-        try {
-            Integer.parseInt(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
     /**
@@ -168,6 +166,7 @@ public class Util {
      * @return will return the publication date of the entry or null if no year
      *         was found.
      */
+    // TODO: Should be instance method of BibTexEntry
     public static String getPublicationDate(BibtexEntry entry) {
 
         Object o = entry.getField("year");
@@ -233,7 +232,7 @@ public class Util {
     /**
      * Replace non-english characters like umlauts etc. with a sensible letter
      * or letter combination that bibtex can accept. The basis for replacement
-     * is the HashMap GLobals.UNICODE_CHARS.
+     * is the HashMap Globals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
         for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
@@ -450,9 +449,6 @@ public class Util {
     }
 
 
-    private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
-
-
     /**
      * Takes a string that contains bracketed expression and expands each of
      * these using getFieldAndFormat.
@@ -464,6 +460,8 @@ public class Util {
      * @param database
      * @return
      */
+    private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
+
     public static String expandBrackets(String bracketString, BibtexEntry entry,
             BibtexDatabase database) {
         Matcher m = Util.squareBracketsPattern.matcher(bracketString);
@@ -726,114 +724,6 @@ public class Util {
     }
 
     /**
-     * Wrap all uppercase letters, or sequences of uppercase letters, in curly
-     * braces. Ignore letters within a pair of # character, as these are part of
-     * a string label that should not be modified.
-     * 
-     * @param s
-     *            The string to modify.
-     * @return The resulting string after wrapping capitals.
-     */
-    public static String putBracesAroundCapitals(String s) {
-
-        boolean inString = false;
-        boolean isBracing = false;
-        boolean escaped = false;
-        int inBrace = 0;
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            // Update variables based on special characters:
-            int c = s.charAt(i);
-            if (c == '{') {
-                inBrace++;
-            } else if (c == '}') {
-                inBrace--;
-            } else if (!escaped && c == '#') {
-                inString = !inString;
-            }
-
-            // See if we should start bracing:
-            if (inBrace == 0 && !isBracing && !inString && Character.isLetter((char) c)
-                    && Character.isUpperCase((char) c)) {
-
-                buf.append('{');
-                isBracing = true;
-            }
-
-            // See if we should close a brace set:
-            if (isBracing && !(Character.isLetter((char) c) && Character.isUpperCase((char) c))) {
-
-                buf.append('}');
-                isBracing = false;
-            }
-
-            // Add the current character:
-            buf.append((char) c);
-
-            // Check if we are entering an escape sequence:
-            escaped = c == '\\' && !escaped;
-
-        }
-        // Check if we have an unclosed brace:
-        if (isBracing) {
-            buf.append('}');
-        }
-
-        return buf.toString();
-
-        /*
-         * if (s.length() == 0) return s; // Protect against ArrayIndexOutOf....
-         * StringBuffer buf = new StringBuffer();
-         * 
-         * Matcher mcr = titleCapitalPattern.matcher(s.substring(1)); while
-         * (mcr.find()) { String replaceStr = mcr.group();
-         * mcr.appendReplacement(buf, "{" + replaceStr + "}"); }
-         * mcr.appendTail(buf); return s.substring(0, 1) + buf.toString();
-         */
-    }
-
-
-    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
-
-
-    /**
-     * This method looks for occurences of capital letters enclosed in an
-     * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
-     * pairs of braces are removed.
-     * 
-     * @param s
-     *            The String to analyze.
-     * @return A new String with braces removed.
-     */
-    public static String removeBracesAroundCapitals(String s) {
-        String previous = s;
-        while ((s = Util.removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
-            previous = s;
-        }
-        return s;
-    }
-
-    /**
-     * This method looks for occurences of capital letters enclosed in one pair
-     * of braces, e.g. "{AB}". All these are replaced by only the capitals in
-     * between the braces.
-     * 
-     * @param s
-     *            The String to analyze.
-     * @return A new String with braces removed.
-     */
-    private static String removeSingleBracesAroundCapitals(String s) {
-        Matcher mcr = Util.BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
-        StringBuffer buf = new StringBuffer();
-        while (mcr.find()) {
-            String replaceStr = mcr.group();
-            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
-        }
-        mcr.appendTail(buf);
-        return buf.toString();
-    }
-
-    /**
      * This method looks up what kind of external binding is used for the given
      * field, and constructs on OpenFileFilter suitable for browsing for an
      * external file.
@@ -979,26 +869,6 @@ public class Util {
     }
 
     /**
-     * Make a list of supported character encodings that can encode all
-     * characters in the given String.
-     * 
-     * @param characters
-     *            A String of characters that should be supported by the
-     *            encodings.
-     * @return A List of character encodings
-     */
-    public static List<String> findEncodingsForString(String characters) {
-        List<String> encodings = new ArrayList<String>();
-        for (int i = 0; i < Localization.ENCODINGS.length; i++) {
-            CharsetEncoder encoder = Charset.forName(Localization.ENCODINGS[i]).newEncoder();
-            if (encoder.canEncode(characters)) {
-                encodings.add(Localization.ENCODINGS[i]);
-            }
-        }
-        return encodings;
-    }
-
-    /**
      * Optimized method for converting a String into an Integer
      *
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
@@ -1030,106 +900,6 @@ public class Util {
                 throw new NumberFormatException(str);
             }
         }
-    }
-
-    /**
-     * Encodes a two-dimensional String array into a single string, using ':' and
-     * ';' as separators. The characters ':' and ';' are escaped with '\'.
-     * @param values The String array.
-     * @return The encoded String.
-     */
-    public static String encodeStringArray(String[][] values) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(Util.encodeStringArray(values[i]));
-            if (i < values.length - 1) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Encodes a String array into a single string, using ':' as separator.
-     * The characters ':' and ';' are escaped with '\'.
-     * @param entry The String array.
-     * @return The encoded String.
-     */
-    private static String encodeStringArray(String[] entry) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entry.length; i++) {
-            sb.append(Util.encodeString(entry[i]));
-            if (i < entry.length - 1) {
-                sb.append(':');
-            }
-
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Decodes an encoded double String array back into array form. The array
-     * is assumed to be square, and delimited by the characters ';' (first dim) and
-     * ':' (second dim).
-     * @param value The encoded String to be decoded.
-     * @return The decoded String array.
-     */
-    public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<ArrayList<String>>();
-        StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<String>();
-        boolean escaped = false;
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!escaped && c == '\\') {
-                escaped = true;
-                continue;
-            }
-            else if (!escaped && c == ':') {
-                thisEntry.add(sb.toString());
-                sb = new StringBuilder();
-            }
-            else if (!escaped && c == ';') {
-                thisEntry.add(sb.toString());
-                sb = new StringBuilder();
-                newList.add(thisEntry);
-                thisEntry = new ArrayList<String>();
-            } else {
-                sb.append(c);
-            }
-            escaped = false;
-        }
-        if (sb.length() > 0) {
-            thisEntry.add(sb.toString());
-        }
-        if (!thisEntry.isEmpty()) {
-            newList.add(thisEntry);
-        }
-
-        // Convert to String[][]:
-        String[][] res = new String[newList.size()][];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = new String[newList.get(i).size()];
-            for (int j = 0; j < res[i].length; j++) {
-                res[i][j] = newList.get(i).get(j);
-            }
-        }
-        return res;
-    }
-
-    public static String encodeString(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == ';' || c == ':' || c == '\\') {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
     }
 
     /**
@@ -1172,55 +942,6 @@ public class Util {
         // of execution will not continue until run() is finished.
         clb.update(); // Runs the update() method on the EDT.
     }
-
-    /**
-     * Build a String array containing all those elements of all that are not
-     * in subset.
-     * @param all The array of all values.
-     * @param subset The subset of values.
-     * @return The remainder that is not part of the subset.
-     */
-    public static String[] getRemainder(String[] all, String[] subset) {
-    	if (subset.length == 0) {
-    		return all;
-    	}
-    	if (all.equals(subset)) {
-    		return new String[0];
-    	}
-    	
-        ArrayList<String> al = new ArrayList<String>();
-        for (String anAll : all) {
-            boolean found = false;
-            for (String aSubset : subset) {
-                if (aSubset.equals(anAll)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                al.add(anAll);
-            }
-        }
-        return al.toArray(new String[al.size()]);
-    }
-    
-	/**
-	 * Concatenate two String arrays
-	 * 
-	 * @param array1
-	 *            the first string array
-	 * @param array2
-	 *            the second string array
-	 * @return The concatenation of array1 and array2
-	 */
-	public static String[] arrayConcat(String[] array1, String[] array2) {
-		int len1 = array1.length;
-		int len2 = array2.length;
-		String[] union = new String[len1 + len2];
-		System.arraycopy(array1, 0, union, 0, len1);
-		System.arraycopy(array2, 0, union, len1, len2);
-		return union;
-	}
 
     /**
      * Determines filename provided by an entry in a database
@@ -1325,6 +1046,7 @@ public class Util {
      * @param rootPane the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
      * @param cancelAction the action to bind
      */
+    // TODO: move to GUI
     public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane,
             Action cancelAction) {
         InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -1601,7 +1323,7 @@ public class Util {
         HashMap<BibtexEntry, List<File>> result = new HashMap<BibtexEntry, List<File>>();
 
         // First scan directories
-        Set<File> filesWithExtension = UtilFindFiles.findFiles(extensions, directories);
+        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
 
         // Initialize Result-Set
         for (BibtexEntry entry : entries) {
@@ -1654,8 +1376,7 @@ public class Util {
      * @param database
      * @return
      */
-    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry,
-            BibtexDatabase database) {
+    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry, BibtexDatabase database) {
 
         fieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 

@@ -16,7 +16,7 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
