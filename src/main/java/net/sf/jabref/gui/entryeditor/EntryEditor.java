@@ -57,7 +57,7 @@ import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.gui.journals.JournalAbbreviationsUtil;
 import net.sf.jabref.logic.l10n.Localization;

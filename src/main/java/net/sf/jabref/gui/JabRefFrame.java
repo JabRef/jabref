@@ -83,6 +83,7 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;

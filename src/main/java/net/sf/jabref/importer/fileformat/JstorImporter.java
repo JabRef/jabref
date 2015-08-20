@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer;
+package net.sf.jabref.importer.fileformat;
 
 import java.io.InputStream;
 import java.io.BufferedReader;
@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;

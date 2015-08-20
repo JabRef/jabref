@@ -89,7 +89,7 @@ import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.importer.AppendDatabaseAction;
-import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fetcher.SPIRESFetcher;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;

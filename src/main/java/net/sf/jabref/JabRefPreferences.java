@@ -41,6 +41,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -368,7 +369,7 @@ public class JabRefPreferences {
     public final CustomExportList customExports;
 
     /**
-     * Set with all custom {@link net.sf.jabref.importer.ImportFormat}s
+     * Set with all custom {@link ImportFormat}s
      */
     public final CustomImportList customImports;
 

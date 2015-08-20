@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.importer;
 
+import net.sf.jabref.importer.fileformat.ImportFormat;
+
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 

@@ -4,7 +4,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
-import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.strings.StringUtil;

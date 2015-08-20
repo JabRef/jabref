@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

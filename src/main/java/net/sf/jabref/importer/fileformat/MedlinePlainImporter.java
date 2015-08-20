@@ -15,7 +15,7 @@
     
 */
 
-package net.sf.jabref.importer;
+package net.sf.jabref.importer.fileformat;
 
 import java.util.regex.Pattern;
 import java.io.InputStream;
@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.AuthorList;

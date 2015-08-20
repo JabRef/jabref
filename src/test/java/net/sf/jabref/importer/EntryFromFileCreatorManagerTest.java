@@ -1,5 +1,6 @@
 package net.sf.jabref.importer;
 
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 

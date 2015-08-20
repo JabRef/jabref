@@ -123,7 +123,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.importer.FreeCiteImporter;
+import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 

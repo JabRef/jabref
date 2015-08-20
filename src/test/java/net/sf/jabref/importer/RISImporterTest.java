@@ -2,6 +2,8 @@ package net.sf.jabref.importer;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.importer.fileformat.IsiImporter;
+import net.sf.jabref.importer.fileformat.RisImporter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;

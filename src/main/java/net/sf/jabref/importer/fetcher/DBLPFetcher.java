@@ -27,6 +27,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.bibtex.DuplicateCheck;
 

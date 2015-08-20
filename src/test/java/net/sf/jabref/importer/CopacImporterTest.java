@@ -2,6 +2,7 @@ package net.sf.jabref.importer;
 
 import net.sf.jabref.*;
 
+import net.sf.jabref.importer.fileformat.CopacImporter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;

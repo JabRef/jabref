@@ -15,7 +15,7 @@
  *  along with JAbRef.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-package net.sf.jabref.importer;
+package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**

@@ -49,6 +49,7 @@ import javax.swing.JRadioButton;
 
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;

@@ -16,7 +16,7 @@
 package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;

@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.MedlineImporter;
+import net.sf.jabref.importer.fileformat.MedlineImporter;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.GUIGlobals;

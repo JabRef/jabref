@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.importer.BibtexParser;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.net.URLDownload;
