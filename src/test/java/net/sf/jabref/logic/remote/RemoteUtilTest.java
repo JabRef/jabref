@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.remote;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class RemoteUtilTest {

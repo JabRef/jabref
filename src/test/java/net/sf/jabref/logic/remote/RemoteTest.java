@@ -1,13 +1,11 @@
 package net.sf.jabref.logic.remote;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
-import net.sf.jabref.logic.remote.server.MessageHandler;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 
 public class RemoteTest {
