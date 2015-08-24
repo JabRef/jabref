@@ -33,9 +33,11 @@ public class ImportFormatReader {
 
     public static final String BIBTEX_FORMAT = "BibTeX";
 
-    /** all import formats, in the default order of import formats */
+    /**
+     * all import formats, in the default order of import formats
+     */
     private final SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
-    
+
     private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
 
@@ -81,12 +83,12 @@ public class ImportFormatReader {
 
     /**
      * Format for a given CLI-ID.
-     * 
+     * <p>
      * <p>Will return the first format according to the default-order of
      * format that matches the given ID.</p>
-     * 
-     * @param cliId  CLI-Id
-     * @return  Import Format or <code>null</code> if none matches
+     *
+     * @param cliId CLI-Id
+     * @return Import Format or <code>null</code> if none matches
      */
     private ImportFormat getByCliId(String cliId) {
         for (ImportFormat format : formats) {
@@ -155,12 +157,9 @@ public class ImportFormatReader {
         BibtexDatabase database = new BibtexDatabase();
 
         for (BibtexEntry entry : bibentries) {
-            try {
-                entry.setId(IdGenerator.next());
-                database.insertEntry(entry);
-            } catch (KeyCollisionException ex) {
-                System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-            }
+
+            entry.setId(IdGenerator.next());
+            database.insertEntry(entry);
         }
 
         return database;
@@ -168,9 +167,9 @@ public class ImportFormatReader {
 
     /**
      * All custom importers.
-     * 
+     * <p>
      * <p>Elements are in default order.</p>
-     * 
+     *
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getCustomImportFormats() {
@@ -185,9 +184,9 @@ public class ImportFormatReader {
 
     /**
      * All built-in importers.
-     * 
+     * <p>
      * <p>Elements are in default order.</p>
-     * 
+     *
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getBuiltInInputFormats() {
@@ -202,11 +201,11 @@ public class ImportFormatReader {
 
     /**
      * All importers.
-     * 
+     * <p>
      * <p>
      * Elements are in default order.
      * </p>
-     * 
+     *
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getImportFormats() {
@@ -215,10 +214,10 @@ public class ImportFormatReader {
 
     /**
      * Human readable list of all known import formats (name and CLI Id).
-     * 
+     * <p>
      * <p>List is in default-order.</p>
-     * 
-     * @return  human readable list of all known import formats
+     *
+     * @return human readable list of all known import formats
      */
     public String getImportFormatList() {
         StringBuilder sb = new StringBuilder();
@@ -242,6 +241,7 @@ public class ImportFormatReader {
 
     /**
      * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
+     *
      * @param name
      * @return The name after expanding initials.
      */
@@ -308,8 +308,7 @@ public class ImportFormatReader {
                     Character.isLetter(d) && Character.isUpperCase(d)) {
                 sb.append(c);
                 sb.append(". ");
-            }
-            else {
+            } else {
                 sb.append(c);
             }
             c = d;
@@ -318,8 +317,7 @@ public class ImportFormatReader {
                 Character.isLetter(d) && Character.isUpperCase(d)) {
             sb.append(c);
             sb.append(". ");
-        }
-        else {
+        } else {
             sb.append(c);
         }
         return sb.toString().trim();
@@ -329,10 +327,10 @@ public class ImportFormatReader {
         File f = new File(filename);
 
         if (!f.exists() && !f.canRead() && !f.isFile()) {
-            
+
             LOGGER.info("Error " + filename + " is not a valid file and|or is not readable.");
             return null;
-            
+
         } else {
             return f;
         }
@@ -377,7 +375,7 @@ public class ImportFormatReader {
      * an unsucessful import (wrong format) that returns a number of empty entries.
      */
     private static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
-        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
+        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext(); ) {
             BibtexEntry entry = i.next();
 
             // If there are no fields, remove the entry:
@@ -404,10 +402,10 @@ public class ImportFormatReader {
     /**
      * Tries to import a file by iterating through the available import filters,
      * and keeping the import that seems most promising.
-     * 
+     * <p>
      * If all fails this method attempts to read this file as bibtex.
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     public UnknownFormatImport importUnknownFormat(String filename) {
 

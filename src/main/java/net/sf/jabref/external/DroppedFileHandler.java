@@ -45,13 +45,13 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * This class holds the functionality of autolinking to a file that's dropped
  * onto an entry.
- * 
+ * <p>
  * Options for handling the files are:
- * 
+ * <p>
  * 1) Link to the file in its current position (disabled if the file is remote)
- * 
+ * <p>
  * 2) Copy the file to ??? directory, rename after bibtex key, and extension
- * 
+ * <p>
  * 3) Move the file to ??? directory, rename after bibtex key, and extension
  */
 public class DroppedFileHandler {
@@ -89,7 +89,7 @@ public class DroppedFileHandler {
         grp.add(moveRadioButton);
 
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref", "bottom:14pt,pref,pref,pref,pref");
-        layout.setRowGroups(new int[][] {{1, 2, 3, 4, 5}});
+        layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
         DefaultFormBuilder builder = new DefaultFormBuilder(layout, optionsPanel);
         builder.border(Borders.DIALOG);
         CellConstraints cc = new CellConstraints();
@@ -106,40 +106,30 @@ public class DroppedFileHandler {
     /**
      * Offer copy/move/linking options for a dragged external file. Perform the
      * chosen operation, if any.
-     * 
-     * @param fileName
-     *            The name of the dragged file.
-     * @param fileType
-     *            The FileType associated with the file.
-     * @param localFile
-     *            Indicate whether this is a local file, or a remote file copied
-     *            to a local temporary file.
-     * @param mainTable
-     *            The MainTable the file was dragged to.
-     * @param dropRow
-     *            The row where the file was dropped.
+     *
+     * @param fileName  The name of the dragged file.
+     * @param fileType  The FileType associated with the file.
+     * @param localFile Indicate whether this is a local file, or a remote file copied
+     *                  to a local temporary file.
+     * @param mainTable The MainTable the file was dragged to.
+     * @param dropRow   The row where the file was dropped.
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
-            MainTable mainTable, int dropRow) {
+                                  MainTable mainTable, int dropRow) {
 
         BibtexEntry entry = mainTable.getEntryAt(dropRow);
         handleDroppedfile(fileName, fileType, localFile, entry);
     }
 
     /**
-     *
-     * @param fileName
-     *        The name of the dragged file.
-     * @param fileType
-     *        The FileType associated with the file.
-     * @param localFile
-     *            Indicate whether this is a local file, or a remote file copied
-     *            to a local temporary file.
-     * @param entry
-     *        The target entry for the drop.
+     * @param fileName  The name of the dragged file.
+     * @param fileType  The FileType associated with the file.
+     * @param localFile Indicate whether this is a local file, or a remote file copied
+     *                  to a local temporary file.
+     * @param entry     The target entry for the drop.
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
-            BibtexEntry entry) {
+                                  BibtexEntry entry) {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.extension));
 
         if (tryXmpImport(fileName, fileType, localFile, edits)) {
@@ -257,14 +247,12 @@ public class DroppedFileHandler {
         if (success) {
 
             for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
-                try {
-                    aXmpEntriesInFile.setId(IdGenerator.next());
-                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
-                    panel.getDatabase().insertEntry(aXmpEntriesInFile);
-                    doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
-                } catch (KeyCollisionException ignored) {
 
-                }
+                aXmpEntriesInFile.setId(IdGenerator.next());
+                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
+                panel.getDatabase().insertEntry(aXmpEntriesInFile);
+                doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
+
             }
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
@@ -276,7 +264,7 @@ public class DroppedFileHandler {
     // Done by MrDlib
 
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
-            NamedCompound edits) {
+                                 NamedCompound edits) {
 
         if (!fileType.extension.equals("pdf")) {
             return false;
@@ -344,14 +332,12 @@ public class DroppedFileHandler {
         if (success) {
 
             for (BibtexEntry aXmpEntriesInFile : xmpEntriesInFile) {
-                try {
-                    aXmpEntriesInFile.setId(IdGenerator.next());
-                    edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
-                    panel.getDatabase().insertEntry(aXmpEntriesInFile);
-                    doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
-                } catch (KeyCollisionException ignored) {
 
-                }
+                aXmpEntriesInFile.setId(IdGenerator.next());
+                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
+                panel.getDatabase().insertEntry(aXmpEntriesInFile);
+                doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
+
             }
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
@@ -452,19 +438,15 @@ public class DroppedFileHandler {
 
     /**
      * Make a extension to the file.
-     * 
-     * @param entry
-     *            The entry to extension from.
-     * @param fileType
-     *            The FileType associated with the file.
-     * @param filename
-     *            The path to the file.
-     * @param edits
-     *            An NamedCompound action this action is to be added to. If none
-     *            is given, the edit is added to the panel's undoManager.
+     *
+     * @param entry    The entry to extension from.
+     * @param fileType The FileType associated with the file.
+     * @param filename The path to the file.
+     * @param edits    An NamedCompound action this action is to be added to. If none
+     *                 is given, the edit is added to the panel's undoManager.
      */
     private void doLink(BibtexEntry entry, ExternalFileType fileType, String filename,
-            boolean avoidDuplicate, NamedCompound edits) {
+                        boolean avoidDuplicate, NamedCompound edits) {
 
         String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
@@ -508,19 +490,15 @@ public class DroppedFileHandler {
     /**
      * Move the given file to the base directory for its file type, and rename
      * it to the given filename.
-     * 
-     * @param fileName
-     *            The name of the source file.
-     * @param fileType
-     *            The FileType associated with the file.
-     * @param destFilename
-     *            The destination filename.
-     * @param edits
-     *            TODO we should be able to undo this action
+     *
+     * @param fileName     The name of the source file.
+     * @param fileType     The FileType associated with the file.
+     * @param destFilename The destination filename.
+     * @param edits        TODO we should be able to undo this action
      * @return true if the operation succeeded.
      */
     private boolean doMove(String fileName, ExternalFileType fileType, String destFilename,
-            NamedCompound edits) {
+                           NamedCompound edits) {
         String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
@@ -560,19 +538,15 @@ public class DroppedFileHandler {
     /**
      * Copy the given file to the base directory for its file type, and give it
      * the given name.
-     * 
-     * @param fileName
-     *            The name of the source file.
-     * @param fileType
-     *            The FileType associated with the file.
-     * @param toFile
-     *            The destination filename. An existing path-component will be removed.
-     * @param edits
-     *            TODO we should be able to undo this!
+     *
+     * @param fileName The name of the source file.
+     * @param fileType The FileType associated with the file.
+     * @param toFile   The destination filename. An existing path-component will be removed.
+     * @param edits    TODO we should be able to undo this!
      * @return
      */
     private boolean doCopy(String fileName, ExternalFileType fileType, String toFile,
-            NamedCompound edits) {
+                           NamedCompound edits) {
 
         String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         int found = -1;
@@ -598,7 +572,7 @@ public class DroppedFileHandler {
 
         if (destFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame, "'" + destFile.getPath() + "' "
-                    + Localization.lang("exists. Overwrite?"), Localization.lang("File exists"),
+                            + Localization.lang("exists. Overwrite?"), Localization.lang("File exists"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;

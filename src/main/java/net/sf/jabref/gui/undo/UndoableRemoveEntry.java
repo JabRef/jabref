@@ -36,7 +36,7 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
 
 
     public UndoableRemoveEntry(BibtexDatabase base, BibtexEntry entry,
-            BasePanel panel) {
+                               BasePanel panel) {
         this.base = base;
         this.entry = entry;
         this.panel = panel;
@@ -57,13 +57,9 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
         super.undo();
 
         // Revert the change.
-        try {
-            String id = IdGenerator.next();
-            entry.setId(id);
-            base.insertEntry(entry);
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-        }
+        String id = IdGenerator.next();
+        entry.setId(id);
+        base.insertEntry(entry);
     }
 
     @Override

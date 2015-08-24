@@ -42,7 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.util.date.MonthUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -222,7 +221,7 @@ public class BibtexEntry {
      * Sets this entry's ID, provided the database containing it
      * doesn't veto the change.
      */
-    public void setId(String id) throws KeyCollisionException {
+    public void setId(String id) {
 
         if (id == null) {
             throw new IllegalArgumentException("Every BibtexEntry must have an ID");
@@ -231,7 +230,7 @@ public class BibtexEntry {
         try {
             firePropertyChangedEvent(BibtexEntry.ID_FIELD, this.id, id);
         } catch (PropertyVetoException pv) {
-            throw new KeyCollisionException("Couldn't change ID: " + pv);
+            throw new IllegalStateException("Couldn't change ID: " + pv);
         }
 
         this.id = id;

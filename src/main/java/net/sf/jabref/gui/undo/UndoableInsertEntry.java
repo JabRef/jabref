@@ -36,7 +36,7 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
 
     public UndoableInsertEntry(BibtexDatabase base, BibtexEntry entry,
-            BasePanel panel) {
+                               BasePanel panel) {
         this.base = base;
         this.entry = entry;
         this.panel = panel;
@@ -70,14 +70,10 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
     public void redo() {
         super.redo();
 
-        // Redo the change.
-        try {
-            String id = IdGenerator.next();
-            entry.setId(id);
-            base.insertEntry(entry);
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-        }
+        // Redo the change
+        String id = IdGenerator.next();
+        entry.setId(id);
+        base.insertEntry(entry);
     }
 
 }
