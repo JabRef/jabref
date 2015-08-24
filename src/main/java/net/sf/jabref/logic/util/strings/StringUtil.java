@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-
+    private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r");
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
      * and removing (at most) one pair of braces or " surrounding it.
@@ -643,5 +643,19 @@ public class StringUtil {
         }
         mcr.appendTail(buf);
         return buf.toString();
+    }
+
+    /**
+     * Replaces all platform-dependent line breaks by UNIX-style newlines.
+     *
+     * <example>
+     * Legacy Macintosh \r -> \n
+     * Windows \r\n -> \n
+     * </example>
+     *
+     * @return a String with only \n as line breaks
+     */
+    public static String unifyLineBreaks(String s) {
+        return LINE_BREAKS.matcher(s).replaceAll("\n");
     }
 }

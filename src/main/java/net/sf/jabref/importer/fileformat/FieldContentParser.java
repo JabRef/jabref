@@ -16,6 +16,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
@@ -33,10 +34,8 @@ class FieldContentParser {
     public StringBuffer format(StringBuffer content, String key) {
         int i = 0;
 
-        // Remove windows newlines and insert unix ones:
-        // TODO: 2005.12.3: Added replace from \r to \n, to work around a reported problem of words stiched together.
-        // But: we need to find out why these lone \r characters appear in his file.
-        content = new StringBuffer(content.toString().replaceAll("\r\n", "\n").replaceAll("\r", "\n"));
+        // Unify line breaks
+        content = new StringBuffer(StringUtil.unifyLineBreaks(content.toString()));
 
         while (i < content.length()) {
             int c = content.charAt(i);
