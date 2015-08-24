@@ -554,7 +554,7 @@ public class JabRefPreferences {
         defaults.put(EXPORT_TERTIARY_SORT_FIELD, "");
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
-        defaults.put(NEWLINE, System.lineSeparator();
+        defaults.put(NEWLINE, System.lineSeparator());
 
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
