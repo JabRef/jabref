@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.keyboard.KeyCollisionException;
-import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
@@ -336,8 +335,8 @@ public class BibtexParser {
                             }
 
                         } else if (comment.substring(0,
-                                Math.min(comment.length(), GUIGlobals.ENTRYTYPE_FLAG.length())).equals(
-                                GUIGlobals.ENTRYTYPE_FLAG)) {
+                                Math.min(comment.length(), Globals.ENTRYTYPE_FLAG.length())).equals(
+                                Globals.ENTRYTYPE_FLAG)) {
                             // A custom entry type can also be stored in a
                             // "@comment"
                             CustomEntryType typ = CustomEntryType.parseEntryType(comment);

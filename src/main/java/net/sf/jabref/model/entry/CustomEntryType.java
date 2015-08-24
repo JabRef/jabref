@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 
@@ -211,7 +210,7 @@ public class CustomEntryType extends BibtexEntryType {
 
     public void save(Writer out) throws IOException {
         out.write("@comment{");
-        out.write(GUIGlobals.ENTRYTYPE_FLAG);
+        out.write(Globals.ENTRYTYPE_FLAG);
         out.write(getName());
         out.write(": req[");
         out.write(getRequiredFieldsString());
@@ -230,7 +229,7 @@ public class CustomEntryType extends BibtexEntryType {
     public static CustomEntryType parseEntryType(String comment) {
         try {
             String rest;
-            rest = comment.substring(GUIGlobals.ENTRYTYPE_FLAG.length());
+            rest = comment.substring(Globals.ENTRYTYPE_FLAG.length());
             int nPos = rest.indexOf(':');
             String name = rest.substring(0, nPos);
             rest = rest.substring(nPos + 2);

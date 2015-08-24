@@ -135,7 +135,6 @@ public class GUIGlobals {
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String META_FLAG_OLD = "bibkeeper-meta: ";
-    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
 
     // some fieldname constants
     public static final double DEFAULT_FIELD_WEIGHT = 1;

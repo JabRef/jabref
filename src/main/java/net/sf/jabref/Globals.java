@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class Globals {
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
     // JabRef version info
