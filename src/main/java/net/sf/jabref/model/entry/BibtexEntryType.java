@@ -29,15 +29,10 @@ Modified for use in JabRef.
 */
 package net.sf.jabref.model.entry;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibtexDatabase;
 
 /**
@@ -127,7 +122,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
     }
 
     public String[] getSecondaryOptionalFields() {
-        return StringUtil.getRemainder(getOptionalFields(), getPrimaryOptionalFields());
+        String[] optionalFields = getOptionalFields();
+
+        if (optionalFields == null) {
+            return new String[0];
+        }
+
+        return Arrays.stream(optionalFields).filter(field -> !isPrimary(field)).toArray(String[]::new);
     }
 
     public abstract String describeRequiredFields();
@@ -153,15 +154,22 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 
     public boolean isOptional(String field) {
         String[] optionalFields = getOptionalFields();
+
         if (optionalFields == null) {
             return false;
         }
-        for (String optionalField : optionalFields) {
-            if (optionalField.equals(field)) {
-                return true;
-            }
+
+        return Arrays.asList(optionalFields).contains(field);
+    }
+
+    private boolean isPrimary(String field) {
+        String[] primaryFields = getPrimaryOptionalFields();
+
+        if (primaryFields == null) {
+            return false;
         }
-        return false;
+
+        return Arrays.asList(primaryFields).contains(field);
     }
 
     public boolean isVisibleAtNewEntryDialog() {
@@ -179,7 +187,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         if (entryType == null) {
             return null;
         } else {
-            return  entryType;
+            return entryType;
         }
     }
 
