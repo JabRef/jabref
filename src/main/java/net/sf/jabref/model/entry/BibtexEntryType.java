@@ -131,8 +131,6 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
         return Arrays.stream(optionalFields).filter(field -> !isPrimary(field)).toArray(String[]::new);
     }
 
-    public abstract String describeRequiredFields();
-
     public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
 
     public String[] getUtilityFields() {
