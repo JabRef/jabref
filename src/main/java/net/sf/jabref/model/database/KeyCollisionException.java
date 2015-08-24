@@ -23,7 +23,7 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref.gui.keyboard;
+package net.sf.jabref.model.database;
 
 public class KeyCollisionException extends RuntimeException {
 

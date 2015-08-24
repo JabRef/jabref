@@ -55,7 +55,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.external.DownloadExternalFile;

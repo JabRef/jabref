@@ -19,7 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.keyboard.KeyCollisionException;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;

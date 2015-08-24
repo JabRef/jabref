@@ -12,7 +12,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.keyboard.KeyCollisionException;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;

@@ -18,7 +18,6 @@ package net.sf.jabref.importer;
 import java.io.*;
 import java.util.*;
 
-import net.sf.jabref.gui.keyboard.KeyCollisionException;
 import net.sf.jabref.importer.fileformat.*;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
