@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,6 @@
 package net.sf.jabref.model.entry;
 
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.model.entry.BibtexEntryType;
 
 /**
  * This class is used to represent an unknown entry type, e.g. encountered
@@ -50,11 +48,6 @@ public class UnknownEntryType extends BibtexEntryType {
     @Override
     public String[] getRequiredFields() {
         return fields;
-    }
-
-    @Override
-    public String describeRequiredFields() {
-        return "unknown";
     }
 
     @Override

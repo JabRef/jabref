@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -118,16 +118,6 @@ public class CustomEntryType extends BibtexEntryType {
     @Override
     public String[] getRequiredFieldsForCustomization() {
         return getRequiredFieldsString().split(";");
-    }
-
-    @Override
-    public String describeRequiredFields() {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < required.length; i++) {
-            result.append(required[i]);
-            result.append(i <= required.length - 1 && required.length > 1 ? ", " : "");
-        }
-        return result.toString();
     }
 
     /**

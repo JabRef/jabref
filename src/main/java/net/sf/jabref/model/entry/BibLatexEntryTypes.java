@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -61,11 +61,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -99,11 +94,6 @@ class BibLatexEntryTypes {
             return new String[] {"editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
                     "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
                     "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -144,11 +134,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -175,11 +160,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -212,11 +192,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -245,11 +220,6 @@ class BibLatexEntryTypes {
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "howpublished", "chapter", "pages", "doi", "eprint",
                     "eprintclass", "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -289,11 +259,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -330,11 +295,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -361,11 +321,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -402,11 +357,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -435,11 +385,6 @@ class BibLatexEntryTypes {
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "howpublished", "location", "doi", "eprint", "eprintclass",
                     "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -472,11 +417,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -505,11 +445,6 @@ class BibLatexEntryTypes {
         public String[] getPrimaryOptionalFields() {
             return new String[] {"holder", "subtitle", "titleaddon", "doi", "eprint", "eprintclass",
                     "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -545,11 +480,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -576,11 +506,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ARTICLE.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -615,11 +540,6 @@ class BibLatexEntryTypes {
             return new String[] {"subtitle", "titleaddon", "maintitle", "mainsubtitle",
                     "maintitleaddon", "eventtitle", "volume", "publisher", "isbn", "chapter", "pages",
                     "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -658,11 +578,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -689,11 +604,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return BibLatexEntryTypes.COLLECTION.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -726,11 +636,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -759,11 +664,6 @@ class BibLatexEntryTypes {
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "number", "isrn", "chapter", "pages", "pagetotal", "doi",
                     "eprint", "eprintclass", "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -825,11 +725,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -861,11 +756,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -892,11 +782,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "howpublished", "pubstate", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -931,11 +816,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -962,11 +842,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -1002,11 +877,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -1036,11 +906,6 @@ class BibLatexEntryTypes {
         public String[] getPrimaryOptionalFields() {
             return new String[] {"subtitle", "titleaddon", "type", "chapter", "pages", "pagetotal", "doi", "eprint",
                     "eprintclass", "eprinttype", "url", "urldate"};
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -1076,11 +941,6 @@ class BibLatexEntryTypes {
         }
 
         @Override
-        public String describeRequiredFields() {
-            return "";
-        }
-
-        @Override
         public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
             return entry.allFieldsPresent(getRequiredFields(), database);
         }
@@ -1107,11 +967,6 @@ class BibLatexEntryTypes {
         @Override
         public String[] getPrimaryOptionalFields() {
             return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
-        }
-
-        @Override
-        public String describeRequiredFields() {
-            return "";
         }
 
         @Override
@@ -1147,12 +1002,6 @@ class BibLatexEntryTypes {
         public String[] getRequiredFields()
         {
             return null;
-        }
-
-        @Override
-        public String describeRequiredFields()
-        {
-            return "None";
         }
 
         @Override
