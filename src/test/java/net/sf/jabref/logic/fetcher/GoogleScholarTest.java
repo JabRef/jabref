@@ -41,6 +41,8 @@ public class GoogleScholarTest {
 
     @Test
     public void noLinkFound() throws IOException {
+        entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
+
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 }

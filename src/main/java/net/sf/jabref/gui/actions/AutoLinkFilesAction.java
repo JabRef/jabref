@@ -32,7 +32,7 @@ public class AutoLinkFilesAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> entries = new ArrayList<>();
         Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
         if (entries.isEmpty()) {
             JabRef.jrf.basePanel().output(Localization.lang("No entries selected."));
