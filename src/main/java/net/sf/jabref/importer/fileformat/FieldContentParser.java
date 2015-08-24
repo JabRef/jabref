@@ -119,6 +119,7 @@ class FieldContentParser {
                     // We have two spaces in a row. Don't include this one.
                     // Yes, of course we have, but in Filenames it is necessary to have all spaces. :-)
                     // This is the reason why the next lines are required
+                    // FIXME: just don't edit some fields rather than hacking every exception?
                     if (key != null && key.equals(GUIGlobals.FILE_FIELD)) {
                         i++;
                     } else {
