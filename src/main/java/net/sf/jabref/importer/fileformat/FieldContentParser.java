@@ -23,7 +23,6 @@ import net.sf.jabref.gui.GUIGlobals;
  * writing the same fields.
  */
 class FieldContentParser {
-
     /**
      * Performs the reformatting
      * @param content StringBuffer containing the field to format. key contains field name according to field
@@ -32,17 +31,6 @@ class FieldContentParser {
      * or may not be the same as the argument given.
      */
     public StringBuffer format(StringBuffer content, String key) {
-
-        /*System.out.println("Content: '"+content+"'");
-        byte[] bt = content.toString().getBytes();
-        for (int i = 0; i < bt.length; i++) {
-            byte b = bt[i];
-            System.out.print(b+" ");
-        }
-        System.out.println("");
-        */
-        //boolean rep = false;
-
         int i = 0;
 
         // Remove windows newlines and insert unix ones:
@@ -51,7 +39,6 @@ class FieldContentParser {
         content = new StringBuffer(content.toString().replaceAll("\r\n", "\n").replaceAll("\r", "\n"));
 
         while (i < content.length()) {
-
             int c = content.charAt(i);
             if (c == '\n') {
                 // @formatter:off
@@ -60,14 +47,13 @@ class FieldContentParser {
                     // We have either \n\t followed by non-whitespace, or \n\t at the
                     // end. Both cases indicate a wrap made by JabRef. Remove and insert space if necessary.
                     // @formatter:on
-
                     content.deleteCharAt(i); // \n
                     content.deleteCharAt(i); // \t
                     // Add space only if necessary:
                     // Note 2007-05-26, mortenalver: the following line was modified. It previously
                     // didn't add a space if the line break was at i==0. This caused some occurences of
                     // "string1 # { and } # string2" constructs lose the space in front of the "and" because
-                    // the line wrap caused a JabRef linke break at the start of a value containing the " and ".
+                    // the line wrap caused a JabRef line break at the start of a value containing the " and ".
                     // The bug was caused by a protective check for i>0 to avoid intexing char -1 in content.
                     if (i == 0 || !Character.isWhitespace(content.charAt(i - 1))) {
                         content.insert(i, ' ');
@@ -102,7 +88,6 @@ class FieldContentParser {
                     // Now, if more \n\t pairs are following, keep each line break. This
                     // preserves several line breaks properly. Repeat until done:
                     while (content.length() > i + 1 && content.charAt(i) == '\n' && content.charAt(i + 1) == '\t') {
-
                         content.deleteCharAt(i + 1);
                         i++;
                     }
@@ -132,8 +117,7 @@ class FieldContentParser {
                 //if ((content.length()>i+2) && (content.charAt(i+1)==' ')) {
                 if (i > 0 && content.charAt(i - 1) == ' ') {
                     // We have two spaces in a row. Don't include this one.
-
-                    // Yes, of course we have, but in Filenames it is nessary to have all spaces. :-)
+                    // Yes, of course we have, but in Filenames it is necessary to have all spaces. :-)
                     // This is the reason why the next lines are required
                     if (key != null && key.equals(GUIGlobals.FILE_FIELD)) {
                         i++;
@@ -149,12 +133,7 @@ class FieldContentParser {
             } else {
                 i++;
             }
-
         }
-
-        // normalize to linebreaks of the operating system
-        // not necessary as linebreaks are normalized during writing (at LatexFieldFormatter)
-        //content = new StringBuffer(content.toString().replaceAll("\n", Globals.NEWLINE));
 
         return content;
     }
@@ -168,5 +147,4 @@ class FieldContentParser {
     public StringBuffer format(StringBuffer content) {
         return format(content, null);
     }
-
 }
