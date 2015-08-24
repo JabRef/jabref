@@ -236,7 +236,7 @@ public class PdfContentImporter extends ImportFormat {
             stripper.setStartPage(1);
             stripper.setEndPage(1);
             stripper.setSortByPosition(true);
-            stripper.setParagraphEnd(System.getProperty("line.separator"));
+            stripper.setParagraphEnd(System.lineSeparator());
             StringWriter writer = new StringWriter();
             stripper.writeText(document, writer);
             String textResult = writer.toString();
@@ -287,7 +287,7 @@ public class PdfContentImporter extends ImportFormat {
             String publisher = null;
             BibtexEntryType type = BibtexEntryTypes.INPROCEEDINGS;
 
-            final String lineBreak = System.getProperty("line.separator");
+            final String lineBreak = System.lineSeparator();
 
             split = textResult.split(lineBreak);
 
