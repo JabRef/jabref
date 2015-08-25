@@ -163,7 +163,6 @@ public class JabRef {
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
-        Globals.NEWLINE_LENGTH = Globals.NEWLINE.length();
 
         if (OS.WINDOWS) {
             // Set application user model id so that pinning JabRef to the Win7/8 taskbar works

@@ -47,7 +47,6 @@ public class Globals {
     // Newlines
     // will be overridden in initialization due to feature #857 @ JabRef.java
     public static String NEWLINE = System.lineSeparator();
-    public static int NEWLINE_LENGTH = Globals.NEWLINE.length();
 
     // Remote listener
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();

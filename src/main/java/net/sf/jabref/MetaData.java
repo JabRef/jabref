@@ -304,7 +304,7 @@ public class MetaData implements Iterable<String> {
     }
 
     private void wrapStringBuffer(StringBuffer sb, int lineLength) {
-        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE_LENGTH) {
+        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE.length()) {
             sb.insert(i, Globals.NEWLINE);
         }
     }

@@ -267,7 +267,7 @@ public class StringUtil {
 
             result.deleteCharAt(current);
             result.insert(current, Globals.NEWLINE + "\t");
-            length = current + Globals.NEWLINE_LENGTH;
+            length = current + Globals.NEWLINE.length();
 
         }
     }

@@ -305,7 +305,6 @@ class FileTab extends JPanel implements PrefsTab {
         prefs.put(net.sf.jabref.JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant
         Globals.NEWLINE = newline;
-        Globals.NEWLINE_LENGTH = newline.length();
 
         prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
         prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
