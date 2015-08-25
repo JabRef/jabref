@@ -7,10 +7,11 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 public class Localization {
+    private static final Log LOGGER = LogFactory.getLog(Localization.class);
+
     // Encodings
     public static final String[] ENCODINGS;
     public static final Map<String, String> ENCODING_NAMES_LOOKUP;
-    private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
     private static final String RESOURCE_PREFIX = "l10n/JabRef";
     private static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
