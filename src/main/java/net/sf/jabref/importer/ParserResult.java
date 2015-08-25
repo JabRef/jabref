@@ -25,7 +25,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.MetaData;
 
 public class ParserResult {
-
     public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
     private final BibtexDatabase base;
@@ -37,17 +36,17 @@ public class ParserResult {
     private final ArrayList<String> duplicateKeys = new ArrayList<String>();
 
     private String errorMessage;
-    private String encoding; // Which encoding was used?
+    // Which encoding was used?
+    private String encoding;
 
     private boolean postponedAutosaveFound;
     private boolean invalid;
-
-    private String jabrefVersion; // Which JabRef version wrote the file, if any?
-    private int jabrefMajorVersion;
-    private int jabrefMinorVersion;
-    private int jabrefMinor2Version; // Numeric version representation
     private boolean toOpenTab;
 
+    // Which JabRef version wrote the file, if any?
+    private String jabrefVersion;
+    private int jabrefMajorVersion;
+    private int jabrefMinorVersion;
 
     public ParserResult(Collection<BibtexEntry> entries) {
         this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
@@ -101,14 +100,6 @@ public class ParserResult {
 
     public void setJabrefMinorVersion(int jabrefMinorVersion) {
         this.jabrefMinorVersion = jabrefMinorVersion;
-    }
-
-    public int getJabrefMinor2Version() {
-        return jabrefMinor2Version;
-    }
-
-    public void setJabrefMinor2Version(int jabrefMinor2Version) {
-        this.jabrefMinor2Version = jabrefMinor2Version;
     }
 
     public BibtexDatabase getDatabase() {

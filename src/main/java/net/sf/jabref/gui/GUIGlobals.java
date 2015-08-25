@@ -49,22 +49,20 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
+    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     // Frame titles.
-    public static final String
-            frameTitle = "JabRef";
+    public static final String frameTitle = "JabRef";
     public static final String stringsTitle = "Strings for database";
     public static final String untitledTitle = "untitled";
     public static final String NUMBER_COL = "#";
-    public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
     public static Font CURRENTFONT;
     public static Font typeNameFont;
 
-    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
-
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE = "This file was created with JabRef";
+    public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
     // Size of help window.
     public static final Dimension

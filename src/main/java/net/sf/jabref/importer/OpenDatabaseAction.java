@@ -372,10 +372,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             Reader utf16Reader = ImportFormatReader.getUTF16Reader(fileToOpen);
             suppliedEncoding = OpenDatabaseAction.checkForEncoding(utf16Reader);
             utf16Reader.close();
-            //System.out.println("Result of UTF-16 test: "+suppliedEncoding);
         }
-
-        //System.out.println(suppliedEncoding != null ? "Encoding: '"+suppliedEncoding+"' Len: "+suppliedEncoding.length() : "no supplied encoding");
 
         if (suppliedEncoding != null) {
             try {
@@ -432,7 +429,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         keepon = false;
                     }
                 }
-                //System.out.println(headerText.toString());
+
                 found: if (piv == GUIGlobals.SIGNATURE.length()) {
                     keepon = false;
 

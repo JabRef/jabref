@@ -117,14 +117,10 @@ public class BibtexParser {
         String str;
 
         while ((str = in.readLine()) != null) {
-
             if (pat1.matcher(str).find()) {
-                return true;
-            } else if (str.startsWith(GUIGlobals.SIGNATURE)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -932,6 +928,7 @@ public class BibtexParser {
                 }
                 String versionNum = sb.toString().trim();
                 // See if it fits the X.y. pattern:
+                // FIXME: This does not support digits > 9, so 2.80 would be not recognized!
                 if (Pattern.compile("[1-9]+\\.[1-9A-Za-z ]+\\.").matcher(versionNum).matches()) {
                     // It matched. Remove the last period and return:
                     return versionNum.substring(0, versionNum.length() - 1);
@@ -953,18 +950,11 @@ public class BibtexParser {
     private void setMajorMinorVersions() {
         String v = parserResult.getJabrefVersion();
         Pattern p = Pattern.compile("([0-9]+)\\.([0-9]+).*");
-        Pattern p2 = Pattern.compile("([0-9]+)\\.([0-9]+)\\.([0-9]+).*");
         Matcher m = p.matcher(v);
-        Matcher m2 = p2.matcher(v);
         if (m.matches()) {
             if (m.groupCount() >= 2) {
                 parserResult.setJabrefMajorVersion(Integer.parseInt(m.group(1)));
                 parserResult.setJabrefMinorVersion(Integer.parseInt(m.group(2)));
-            }
-        }
-        if (m2.matches()) {
-            if (m2.groupCount() >= 3) {
-                parserResult.setJabrefMinor2Version(Integer.parseInt(m2.group(3)));
             }
         }
     }
