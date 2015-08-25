@@ -44,7 +44,9 @@ public class Globals {
 
     // JabRef version info
     public static final BuildInfo BUILD_INFO = new BuildInfo();
-
+    // Signature written at the top of the .bib file.
+    public static final String SIGNATURE = "This file was created with JabRef";
+    public static final String encPrefix = "Encoding: ";
     // Newlines
     // will be overridden in initialization due to feature #857 @ JabRef.java
     public static String NEWLINE = System.lineSeparator();

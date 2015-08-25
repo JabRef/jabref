@@ -910,7 +910,7 @@ public class BibtexParser {
             headerText.append((char) c);
             if (piv == 0 && (Character.isWhitespace((char) c) || c == '%')) {
                 read();
-            } else if (c == GUIGlobals.SIGNATURE.charAt(piv)) {
+            } else if (c == Globals.SIGNATURE.charAt(piv)) {
                 piv++;
                 read();
             } else {
@@ -918,7 +918,7 @@ public class BibtexParser {
             }
 
             // Check if we've reached the end of the signature's standard part:
-            if (piv == GUIGlobals.SIGNATURE.length()) {
+            if (piv == Globals.SIGNATURE.length()) {
                 keepon = false;
 
                 // Found the standard part. Now read the version number:

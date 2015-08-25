@@ -60,10 +60,6 @@ public class GUIGlobals {
     public static Font CURRENTFONT;
     public static Font typeNameFont;
 
-    // Signature written at the top of the .bib file.
-    public static final String SIGNATURE = "This file was created with JabRef";
-    public static final String encPrefix = "Encoding: "; // Part of the signature in written bib files.
-
     // Size of help window.
     public static final Dimension
             helpSize = new Dimension(700, 600);

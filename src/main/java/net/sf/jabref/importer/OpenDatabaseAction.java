@@ -422,7 +422,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     offset++;
                 } else {
                     headerText.append((char) c);
-                    if (c == GUIGlobals.SIGNATURE.charAt(piv)) {
+                    if (c == Globals.SIGNATURE.charAt(piv)) {
                         piv++;
                     } else {
                         //if (((char)c) == '@')
@@ -430,7 +430,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
                 }
 
-                found: if (piv == GUIGlobals.SIGNATURE.length()) {
+                found: if (piv == Globals.SIGNATURE.length()) {
                     keepon = false;
 
                     //if (headerText.length() > GUIGlobals.SIGNATURE.length())
@@ -446,12 +446,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
                     // Then we must skip the "Encoding: ". We may already have read the first
                     // character:
-                    if ((char) c != GUIGlobals.encPrefix.charAt(0)) {
+                    if ((char) c != Globals.encPrefix.charAt(0)) {
                         break found;
                     }
 
-                    for (int i = 1; i < GUIGlobals.encPrefix.length(); i++) {
-                        if (reader.read() != GUIGlobals.encPrefix.charAt(i))
+                    for (int i = 1; i < Globals.encPrefix.length(); i++) {
+                        if (reader.read() != Globals.encPrefix.charAt(i))
                          {
                             break found; // No,
                         // it
