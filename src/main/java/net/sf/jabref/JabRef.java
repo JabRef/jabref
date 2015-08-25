@@ -38,6 +38,7 @@ import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -57,7 +58,6 @@ import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
@@ -673,7 +673,7 @@ public class JabRef {
         // Call the method performCompatibilityUpdate(), which does any
         // necessary changes for users with a preference set from an older
         // Jabref version.
-        Util.performCompatibilityUpdate();
+        PreferencesMigrations.performCompatibilityUpdate();
 
         // Set up custom or default icon theme:
         // This is now done at processArguments
