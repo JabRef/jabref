@@ -114,9 +114,7 @@ public class BibtexEntryWriter {
         }
         // Then optional fields.
         s = entry.getOptionalFields();
-        boolean first = true;
-        boolean previous;
-        previous = false;
+
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
             for (String value : s) {
@@ -124,7 +122,7 @@ public class BibtexEntryWriter {
                     //writeField(s[i], out, fieldFormatter);
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
                     written.put(value, null);
-                    previous = true;
+
                 }
             }
         }
@@ -137,10 +135,10 @@ public class BibtexEntryWriter {
                 remainingFields.add(key);
             }
         }
-        first = previous;
+
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, hasWritten && first);
-            first = false;
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, false);
+
         }
 
         // Finally, end the entry.
