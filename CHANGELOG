@@ -1,4 +1,5 @@
 [master]
+    - No longer add blank lines inside a bibtex entry
     - Perform syntax improvements enabled by Java 1.7+ (diamond operator, try-with-resources)
     - List of authors is now auto generated `scripts/generate-authors.sh` and inserted into L10N About.html
     - Remove Mr.DLib support as MR.DLib will be shut down in 2015
