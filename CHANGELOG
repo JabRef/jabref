@@ -1,4 +1,5 @@
 [dev_2.11]
+    - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
     - Backport from 2.80: Fixes Bug#1297: No console message on closing.
     - Fix for bugs #1221 and #1261 (also partly #1243): order of fields in customized entry types no longer gets destroyed by the entry editor 
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)

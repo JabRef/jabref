@@ -115,7 +115,7 @@ public class BibtexEntryWriter {
             for (String value : s) {
                 if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
                     //writeField(s[i], out, fieldFormatter);
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, hasWritten && first);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
                     written.put(value, null);
                     first = false;
                     previous = true;
@@ -133,7 +133,7 @@ public class BibtexEntryWriter {
         }
         first = previous;
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, hasWritten && first);
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, false);
             first = false;
         }
 
@@ -233,7 +233,7 @@ public class BibtexEntryWriter {
 
         first = previous;
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, hasWritten && first);
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, false);
             first = false;
         }
 
