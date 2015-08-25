@@ -49,6 +49,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType> {
 
     static {
         // Put the standard entry types into the type map.
+        Globals.prefs = JabRefPreferences.getInstance();
         if (!Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
             ALL_TYPES.put("article", BibtexEntryTypes.ARTICLE);
             ALL_TYPES.put("inbook", BibtexEntryTypes.INBOOK);
