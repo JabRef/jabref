@@ -18,7 +18,7 @@ public class BibtexEntryWriter {
     /**
      * Display name map for entry field names.
      */
-    private static final Map<String, String> tagDisplayNameMap = new HashMap<String, String>();
+    private static final Map<String, String> tagDisplayNameMap = new HashMap<>();
 
     static {
         // The field name display map.
@@ -96,18 +96,18 @@ public class BibtexEntryWriter {
 
         String str = StringUtil.shaveString(entry.getField(BibtexEntry.KEY_FIELD));
         out.write((str == null ? "" : str) + ',' + Globals.NEWLINE);
-        HashMap<String, String> written = new HashMap<String, String>();
+        HashMap<String, String> written = new HashMap<>();
         written.put(BibtexEntry.KEY_FIELD, null);
         // Write required fields first.
         // Thereby, write the title field first.
-        boolean hasWritten = writeField(entry, out, "title", false, false);
+        boolean hasWritten = writeField(entry, out, "title", false);
         written.put("title", null);
         String[] s = entry.getRequiredFields();
         if (s != null) {
             Arrays.sort(s); // Sorting in alphabetic order.
             for (String value : s) {
                 if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
                     written.put(value, null);
                 }
             }
@@ -119,8 +119,7 @@ public class BibtexEntryWriter {
             Arrays.sort(s); // Sorting in alphabetic order.
             for (String value : s) {
                 if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    //writeField(s[i], out, fieldFormatter);
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
                     written.put(value, null);
 
                 }
@@ -137,7 +136,7 @@ public class BibtexEntryWriter {
         }
 
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, false);
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
 
         }
 
@@ -165,7 +164,7 @@ public class BibtexEntryWriter {
         String[] s = entry.getRequiredFields();
         if (s != null) {
             for (String value : s) {
-                hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
+                hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
                 written.put(value, null);
             }
         }
@@ -175,13 +174,13 @@ public class BibtexEntryWriter {
             for (String value : s) {
                 if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
                     //writeField(s[i], out, fieldFormatter);
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
                     written.put(value, null);
                 }
             }
         }
         // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<String>();
+        TreeSet<String> remainingFields = new TreeSet<>();
         for (String key : entry.getAllFields()) {
             boolean writeIt = write ? BibtexFields.isWriteableField(key) :
                     BibtexFields.isDisplayableField(key);
@@ -190,7 +189,7 @@ public class BibtexEntryWriter {
             }
         }
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, false);
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
         }
 
         // Finally, end the entry.
@@ -213,16 +212,14 @@ public class BibtexEntryWriter {
             //do not sort, write as it is.
             for (String value : s) {
                 if (!written.containsKey(value)) { // If field appears both in req. and opt. don't repeat.
-                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten, false);
+                    hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
                     written.put(value, null);
                 }
             }
         }
 
         // Then write remaining fields in alphabetic order.
-        boolean first;
-        boolean previous;
-        previous = false;
+
         //STA get remaining fields
         TreeSet<String> remainingFields = new TreeSet<String>();
         for (String key : entry.getAllFields()) {
@@ -236,10 +233,9 @@ public class BibtexEntryWriter {
         }
         //END get remaining fields
 
-        first = previous;
+
         for (String field : remainingFields) {
-            hasWritten = hasWritten | writeField(entry, out, field, hasWritten, hasWritten && first);
-            first = false;
+            hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
         }
 
         // Finally, end the entry.
@@ -258,15 +254,13 @@ public class BibtexEntryWriter {
      *                   it was not set
      * @throws IOException In case of an IO error
      */
-    private boolean writeField(BibtexEntry entry, Writer out, String name, boolean isNotFirst, boolean isNextGroup) throws IOException {
+    private boolean writeField(BibtexEntry entry, Writer out, String name, boolean isNotFirst) throws IOException {
         String o = entry.getField(name);
         if (o != null || includeEmptyFields) {
             if (isNotFirst) {
                 out.write(',' + Globals.NEWLINE);
             }
-            if (isNextGroup) {
-                out.write(Globals.NEWLINE);
-            }
+
             out.write("  " + getFieldDisplayName(name) + " = ");
 
             try {
