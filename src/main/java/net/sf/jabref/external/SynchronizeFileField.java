@@ -268,7 +268,6 @@ public class SynchronizeFileField extends AbstractWorker {
             }
         }
 
-        //for (BibtexEntry entr : changedEntries)
         if (!changedEntries.isEmpty()) {
             // Add the undo edit:
             ce.end();
