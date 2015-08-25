@@ -928,7 +928,6 @@ public class BibtexParser {
                 }
                 String versionNum = sb.toString().trim();
                 // See if it fits the X.y. pattern:
-                // FIXME: This does not support digits > 9, so 2.80 would be not recognized!
                 if (Pattern.compile("[1-9]+\\.[1-9A-Za-z ]+\\.").matcher(versionNum).matches()) {
                     // It matched. Remove the last period and return:
                     return versionNum.substring(0, versionNum.length() - 1);

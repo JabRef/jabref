@@ -72,9 +72,6 @@ public class BibtexParserTest {
                                 + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"
                 )));
 
-        Assert.assertTrue(BibtexParser.isRecognizedFormat(new StringReader(
-                "This file was created with JabRef 2.1 beta 2." + "\n" + "Encoding: Cp1252" + "\n")));
-
         Assert.assertTrue(BibtexParser
                 .isRecognizedFormat(new StringReader(
                         "@INPROCEEDINGS{CroAnnHow05,"
