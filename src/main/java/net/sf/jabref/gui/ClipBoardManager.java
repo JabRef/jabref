@@ -30,18 +30,14 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-public class ClipBoardManager implements ClipboardOwner
-{
-
+public class ClipBoardManager implements ClipboardOwner {
     public static final ClipBoardManager clipBoard = new ClipBoardManager();
-
 
     /**
      * Empty implementation of the ClipboardOwner interface.
      */
     @Override
-    public void lostOwnership(Clipboard aClipboard, Transferable aContents)
-    {
+    public void lostOwnership(Clipboard aClipboard, Transferable aContents) {
         //do nothing
     }
 
@@ -49,8 +45,7 @@ public class ClipBoardManager implements ClipboardOwner
      * Place a String on the clipboard, and make this class the
      * owner of the Clipboard's contents.
      */
-    public void setClipboardContents(String aString)
-    {
+    public void setClipboardContents(String aString) {
         StringSelection stringSelection = new StringSelection(aString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, this);
@@ -62,24 +57,18 @@ public class ClipBoardManager implements ClipboardOwner
      * @return any text found on the Clipboard; if none found, return an
      * empty String.
      */
-    public String getClipboardContents()
-    {
+    public String getClipboardContents() {
         String result = "";
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         //odd: the Object param of getContents is not currently used
         Transferable contents = clipboard.getContents(null);
-        if (contents != null &&
-                contents.isDataFlavorSupported(DataFlavor.stringFlavor))
-        {
-            try
-            {
+        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException ex)
-            {
+            } catch (UnsupportedFlavorException ex) {
                 //highly unlikely since we are using a standard DataFlavor
                 System.out.println(ex);
-            } catch (IOException ex)
-            {
+            } catch (IOException ex) {
                 System.out.println(ex);
             }
         }

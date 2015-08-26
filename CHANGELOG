@@ -1,4 +1,5 @@
 [master]
+    - Pasting a Google search URL now automatically cleans search meta data on insertion.
     - No longer write JabRef version to BibTex file header.
     - No longer add blank lines inside a bibtex entry
     - Perform syntax improvements enabled by Java 1.7+ (diamond operator, try-with-resources)

@@ -51,18 +51,14 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.CaseChangeMenu;
 import net.sf.jabref.logic.util.strings.NameListNormalizer;
-import net.sf.jabref.util.GoogleUrlCleaner;
+import net.sf.jabref.logic.util.io.URLUtil;
 
-public class FieldTextMenu implements MouseListener
-{
-
+public class FieldTextMenu implements MouseListener {
     private final FieldEditor myFieldName;
     private final JPopupMenu inputMenu = new JPopupMenu();
     private final CopyAction copyAct = new CopyAction();
 
-
-    public FieldTextMenu(FieldEditor fieldComponent)
-    {
+    public FieldTextMenu(FieldEditor fieldComponent) {
         myFieldName = fieldComponent;
 
         // copy/paste Menu
@@ -71,7 +67,6 @@ public class FieldTextMenu implements MouseListener
         inputMenu.add(copyAct);
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
-        inputMenu.add(new UrlAction());
 
         if (myFieldName.getTextComponent() instanceof JTextComponent) {
             inputMenu.add(new CaseChangeMenu((JTextComponent) myFieldName.getTextComponent()));
@@ -79,38 +74,27 @@ public class FieldTextMenu implements MouseListener
     }
 
     @Override
-    public void mouseClicked(MouseEvent e)
-    {
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
-    public void mouseEntered(MouseEvent e)
-    {
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
-    public void mouseExited(MouseEvent e)
-    {
-    }
+    public void mouseExited(MouseEvent e) {}
 
     @Override
-    public void mousePressed(MouseEvent e)
-    {
+    public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
 
     @Override
-    public void mouseReleased(MouseEvent e)
-    {
+    public void mouseReleased(MouseEvent e) {
         maybeShowPopup(e);
     }
 
-    private void maybeShowPopup(MouseEvent e)
-    {
-        if (e.isPopupTrigger())
-        {
-            if (myFieldName != null)
-            {
+    private void maybeShowPopup(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            if (myFieldName != null) {
                 myFieldName.requestFocus();
 
                 // enable/disable copy to clipboard if selected text available
@@ -121,38 +105,29 @@ public class FieldTextMenu implements MouseListener
                         cStat = true;
                     }
                 }
-
                 copyAct.setEnabled(cStat);
                 inputMenu.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
 
-
-    // ---------------------------------------------------------------------------
-    abstract static class BasicAction extends AbstractAction
-    {
-
-        public BasicAction(String text, String description, URL icon)
-        {
+    abstract static class BasicAction extends AbstractAction {
+        public BasicAction(String text, String description, URL icon) {
             super(Localization.lang(text), new ImageIcon(icon));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
-        public BasicAction(String text, String description, URL icon, KeyStroke key)
-        {
+        public BasicAction(String text, String description, URL icon, KeyStroke key) {
             super(Localization.lang(text), new ImageIcon(icon));
             putValue(Action.ACCELERATOR_KEY, key);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
-        public BasicAction(String text)
-        {
+        public BasicAction(String text) {
             super(Localization.lang(text));
         }
 
-        public BasicAction(String text, KeyStroke key)
-        {
+        public BasicAction(String text, KeyStroke key) {
             super(Localization.lang(text));
             putValue(Action.ACCELERATOR_KEY, key);
         }
@@ -161,65 +136,38 @@ public class FieldTextMenu implements MouseListener
         public abstract void actionPerformed(ActionEvent e);
     }
 
-    //---------------------------------------------------------------
-    /*class MenuHeaderAction extends BasicAction
-    {
-      public MenuHeaderAction(String comment)
-      {
-        super("Edit -" +comment);
-        this.setEnabled(false);
-      }
-
-      public void actionPerformed(ActionEvent e) { }
-    }
-      */
-
-    // ---------------------------------------------------------------------------
-    class PasteAction extends BasicAction
-    {
-
-        public PasteAction()
-        {
-            super("Paste from clipboard", "Paste from clipboard",
-                    GUIGlobals.getIconUrl("paste"));
+    class PasteAction extends BasicAction {
+        public PasteAction() {
+            super("Paste from clipboard", "Paste from clipboard", GUIGlobals.getIconUrl("paste"));
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            try
-            {
+        public void actionPerformed(ActionEvent e) {
+            try {
                 String data = ClipBoardManager.clipBoard.getClipboardContents();
-                if (data != null) {
-                    if (!data.isEmpty()) {
-                        if (myFieldName != null) {
-                            myFieldName.paste(data);
-                        }
+                if (!data.isEmpty()) {
+                    // auto corrections
+                    // clean Google search URLs
+                    data = URLUtil.cleanGoogleSearchURL(data);
+
+                    // paste data
+                    if (myFieldName != null) {
+                        myFieldName.paste(data);
                     }
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
     }
 
-    // ---------------------------------------------------------------------------
-    class CopyAction extends BasicAction
-    {
-
-        public CopyAction()
-        {
+    class CopyAction extends BasicAction {
+        public CopyAction() {
             super("Copy to clipboard", "Copy to clipboard", GUIGlobals.getIconUrl("copy"));
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            try
-            {
-                //        String data = ( String ) systemClip.getContents( null ).getTransferData(
-                //            DataFlavor.stringFlavor ) ;
-                if (myFieldName != null)
-                {
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (myFieldName != null) {
                     String data = myFieldName.getSelectedText();
                     if (data != null) {
                         if (!data.isEmpty()) {
@@ -233,7 +181,6 @@ public class FieldTextMenu implements MouseListener
     }
 
     class ReplaceAction extends BasicAction {
-
         public ReplaceAction() {
             super("Normalize to BibTeX name format");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
@@ -250,22 +197,4 @@ public class FieldTextMenu implements MouseListener
             myFieldName.setText(NameListNormalizer.normalizeAuthorList(input));
         }
     }
-
-    class UrlAction extends BasicAction {
-
-        public UrlAction() {
-            super("Clean Google URL");
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, clean URL that Google search returned"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            if (myFieldName.getText().isEmpty()) {
-                return;
-            }
-            String input = myFieldName.getText();
-            myFieldName.setText(GoogleUrlCleaner.cleanUrl(input));
-        }
-    }
-
 }
