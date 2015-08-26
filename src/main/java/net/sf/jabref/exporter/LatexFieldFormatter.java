@@ -25,6 +25,9 @@ import java.util.Vector;
 
 public class LatexFieldFormatter implements FieldFormatter {
 
+    // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
+    public static final String BIBTEX_STRING = "__string";
+
     public static LatexFieldFormatter buildIgnoreHashes() {
         return new LatexFieldFormatter(true);
     }
@@ -63,7 +66,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             return valueDelimitersZero + "" + valueDelimitersOne;
         }
 
-        if (Globals.prefs.putBracesAroundCapitals(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
+        if (Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName)) {
             text = StringUtil.putBracesAroundCapitals(text);
         }
 
@@ -90,7 +93,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         } else {
             // Default operation - we only resolve strings for standard fields:
             resolveStrings = BibtexFields.isStandardField(fieldName)
-                    || Globals.BIBTEX_STRING.equals(fieldName);
+                    || BIBTEX_STRING.equals(fieldName);
         }
         if (!resolveStrings) {
             int brc = 0;

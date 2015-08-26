@@ -128,7 +128,7 @@ public class FileActions {
         fw.write("@String { " + bs.getName() + suffix + " = ");
         if (!bs.getContent().isEmpty()) {
             try {
-                String formatted = new LatexFieldFormatter().format(bs.getContent(), Globals.BIBTEX_STRING);
+                String formatted = new LatexFieldFormatter().format(bs.getContent(), LatexFieldFormatter.BIBTEX_STRING);
                 fw.write(formatted);
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException(

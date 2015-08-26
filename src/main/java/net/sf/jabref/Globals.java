@@ -113,9 +113,6 @@ public class Globals {
 
     public static SidePaneManager sidePaneManager;
 
-    // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
-    public static final String BIBTEX_STRING = "__string";
-
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
     // Background tasks
