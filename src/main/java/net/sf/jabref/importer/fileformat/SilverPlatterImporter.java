@@ -24,13 +24,12 @@ import java.util.HashMap;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
 import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -214,7 +213,7 @@ public class SilverPlatterImporter extends ImportFormat {
 
             }
 
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
+            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(h);

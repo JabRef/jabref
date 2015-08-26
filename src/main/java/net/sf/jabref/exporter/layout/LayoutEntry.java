@@ -480,7 +480,7 @@ class LayoutEntry {
             return text;
         }
 
-        Matcher matcher = Globals.getPatternForWords(toHighlight).matcher(text);
+        Matcher matcher = Util.getPatternForWords(toHighlight).matcher(text);
 
         if (Character.isLetterOrDigit(text.charAt(0))) {
             String hlColor = HIGHLIGHT_COLOR;

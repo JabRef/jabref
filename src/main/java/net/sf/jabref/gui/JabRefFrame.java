@@ -133,8 +133,8 @@ import osx.macadapter.MacAdapter;
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-
     private static final long serialVersionUID = 1L;
+    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     final JSplitPane contentPane = new JSplitPane();
 
@@ -150,9 +150,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
-
-    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
-
 
     class ToolBar extends JToolBar {
 

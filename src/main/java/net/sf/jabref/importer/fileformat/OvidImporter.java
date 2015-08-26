@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.*;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
  * Imports an Ovid file.
@@ -232,7 +232,7 @@ public class OvidImporter extends ImportFormat {
                     h.put("title", h.remove("chaptertitle"));
                 }
             }
-            BibtexEntry b = new BibtexEntry(IdGenerator.next(), Globals.getEntryType(entryType));
+            BibtexEntry b = new BibtexEntry(IdGenerator.next(), BibtexEntryTypes.getEntryType(entryType));
             b.setField(h);
 
             bibitems.add(b);

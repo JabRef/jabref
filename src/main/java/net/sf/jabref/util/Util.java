@@ -1388,4 +1388,27 @@ public class Util {
         return fieldValue;
     }
 
+    // Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
+    public static Pattern getPatternForWords(ArrayList<String> words) {
+        if (words == null || words.isEmpty() || words.get(0).isEmpty()) {
+            return Pattern.compile("");
+        }
+
+        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
+
+        // compile the words to a regex in the form (w1) | (w2) | (w3)
+        String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
+        for (int i = 1; i < words.size(); i++) {
+            searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i))).concat(")");
+        }
+
+        Pattern pattern;
+        if (Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
+            pattern = Pattern.compile(searchPattern);
+        } else {
+            pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
+        }
+
+        return pattern;
+    }
 }

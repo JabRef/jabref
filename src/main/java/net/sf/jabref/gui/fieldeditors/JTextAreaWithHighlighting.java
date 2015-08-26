@@ -18,6 +18,7 @@ package net.sf.jabref.gui.fieldeditors;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.SearchTextListener;
+import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
             return;
         }
 
-        Matcher matcher = Globals.getPatternForWords(words).matcher(content);
+        Matcher matcher = Util.getPatternForWords(words).matcher(content);
 
         while (matcher.find()) {
             try {
