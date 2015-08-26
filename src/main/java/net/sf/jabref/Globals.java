@@ -27,15 +27,11 @@ import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class Globals {
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
