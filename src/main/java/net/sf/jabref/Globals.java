@@ -94,7 +94,6 @@ public class Globals {
 
     }
 
-    // TODO: other stuff
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
     public static CacheableHandler handler;
