@@ -74,13 +74,16 @@ public class FieldTextMenu implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
     @Override
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -111,34 +114,11 @@ public class FieldTextMenu implements MouseListener {
         }
     }
 
-    abstract static class BasicAction extends AbstractAction {
-        public BasicAction(String text, String description, URL icon) {
-            super(Localization.lang(text), new ImageIcon(icon));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-        }
-
-        public BasicAction(String text, String description, URL icon, KeyStroke key) {
-            super(Localization.lang(text), new ImageIcon(icon));
-            putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-        }
-
-        public BasicAction(String text) {
-            super(Localization.lang(text));
-        }
-
-        public BasicAction(String text, KeyStroke key) {
-            super(Localization.lang(text));
-            putValue(Action.ACCELERATOR_KEY, key);
-        }
-
-        @Override
-        public abstract void actionPerformed(ActionEvent e);
-    }
-
-    class PasteAction extends BasicAction {
+    class PasteAction extends AbstractAction {
         public PasteAction() {
-            super("Paste from clipboard", "Paste from clipboard", GUIGlobals.getIconUrl("paste"));
+            putValue(Action.NAME, Localization.lang("Paste from clipboard"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
+            putValue(Action.SMALL_ICON, GUIGlobals.getImage("paste"));
         }
 
         @Override
@@ -159,9 +139,11 @@ public class FieldTextMenu implements MouseListener {
         }
     }
 
-    class CopyAction extends BasicAction {
+    class CopyAction extends AbstractAction {
         public CopyAction() {
-            super("Copy to clipboard", "Copy to clipboard", GUIGlobals.getIconUrl("copy"));
+            putValue(Action.NAME, Localization.lang("Copy to clipboard"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy to clipboard"));
+            putValue(Action.SMALL_ICON, GUIGlobals.getImage("copy"));
         }
 
         @Override
@@ -175,14 +157,13 @@ public class FieldTextMenu implements MouseListener {
                         }
                     }
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         }
     }
 
-    class ReplaceAction extends BasicAction {
+    class ReplaceAction extends AbstractAction {
         public ReplaceAction() {
-            super("Normalize to BibTeX name format");
+            putValue(Action.NAME, Localization.lang("Normalize to BibTeX name format"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
         }
 
