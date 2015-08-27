@@ -32,7 +32,7 @@
 //
 // modified :
 
-package net.sf.jabref.gui.fieldeditors;
+package net.sf.jabref.gui.fieldeditors.contextmenu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -48,8 +48,8 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.gui.CaseChangeMenu;
 import net.sf.jabref.logic.util.strings.NameListNormalizer;
 import net.sf.jabref.logic.util.io.URLUtil;
 

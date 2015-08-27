@@ -15,13 +15,11 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import net.sf.jabref.gui.BaseAction;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.util.Util;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

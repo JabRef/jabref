@@ -43,9 +43,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class RightClickMenu extends JPopupMenu
-        implements PopupMenuListener {
-
+public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
 
     private final BasePanel panel;
