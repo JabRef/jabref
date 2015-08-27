@@ -32,6 +32,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 
+import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -88,6 +89,7 @@ public class GUIGlobals {
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
     public static SidePaneManager sidePaneManager;
+    public static HelpDialog helpDiag;
 
     private static HashMap<String, String> iconMap;
 

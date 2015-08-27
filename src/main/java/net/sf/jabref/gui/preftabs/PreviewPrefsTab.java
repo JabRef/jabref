@@ -140,7 +140,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         pdfPreviewPanel.add(pdfPreview, BorderLayout.WEST);
 
         { // Help Button
-            HelpAction helpAction = new HelpAction(Globals.helpDiag, GUIGlobals.previewHelp,
+            HelpAction helpAction = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.previewHelp,
                     Localization.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
             JButton help = helpAction.getIconButton();
             pdfPreviewPanel.add(help, BorderLayout.EAST);

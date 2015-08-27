@@ -225,7 +225,7 @@ class ManageJournalsPanel extends JPanel {
                 }
             }
         });
-        help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.journalAbbrHelp));
+        help.addActionListener(new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp));
 
         AbstractAction cancelAction = new AbstractAction() {
 

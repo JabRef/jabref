@@ -661,7 +661,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager = new SidePaneManager(this);
 
         GUIGlobals.sidePaneManager = this.sidePaneManager;
-        Globals.helpDiag = this.helpDiag;
+        GUIGlobals.helpDiag = this.helpDiag;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager2(this, sidePaneManager);

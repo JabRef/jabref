@@ -374,7 +374,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
             }
         });
 
-        OpenOfficePanel.help.addActionListener(new HelpAction(Globals.helpDiag, "OpenOfficeIntegration.html"));
+        OpenOfficePanel.help.addActionListener(new HelpAction(GUIGlobals.helpDiag, "OpenOfficeIntegration.html"));
 
         OpenOfficePanel.manageCitations.addActionListener(new ActionListener() {
 
