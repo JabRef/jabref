@@ -34,17 +34,17 @@
 
 package net.sf.jabref.gui.fieldeditors.contextmenu;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.action.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.URLUtil;
@@ -59,8 +59,7 @@ public class FieldTextMenu implements MouseListener {
         myFieldName = fieldComponent;
 
         // copy/paste Menu
-        PasteAction pasteAct = new PasteAction();
-        inputMenu.add(pasteAct);
+        inputMenu.add(new PasteAction((Component) myFieldName));
         inputMenu.add(copyAct);
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
@@ -108,31 +107,6 @@ public class FieldTextMenu implements MouseListener {
                 copyAct.setEnabled(cStat);
                 inputMenu.show(e.getComponent(), e.getX(), e.getY());
             }
-        }
-    }
-
-    class PasteAction extends AbstractAction {
-        public PasteAction() {
-            putValue(Action.NAME, Localization.lang("Paste from clipboard"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
-            putValue(Action.SMALL_ICON, GUIGlobals.getImage("paste"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                String data = ClipBoardManager.clipBoard.getClipboardContents();
-                if (!data.isEmpty()) {
-                    // auto corrections
-                    // clean Google search URLs
-                    data = URLUtil.cleanGoogleSearchURL(data);
-
-                    // paste data
-                    if (myFieldName != null) {
-                        myFieldName.paste(data);
-                    }
-                }
-            } catch (Exception ignored) {}
         }
     }
 

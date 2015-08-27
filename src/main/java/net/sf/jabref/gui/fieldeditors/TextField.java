@@ -18,7 +18,9 @@ package net.sf.jabref.gui.fieldeditors;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.action.PasteAction;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.awt.Color;
@@ -47,6 +49,7 @@ public class TextField extends JTextField implements FieldEditor {
     public TextField(String fieldName, String content, boolean changeColorOnFocus) {
         super(content);
 
+        setupPasteListener();
         setupUndoRedo();
 
         updateFont();
@@ -157,6 +160,13 @@ public class TextField extends JTextField implements FieldEditor {
         if (autoCompleteListener != null) {
             autoCompleteListener.clearCurrentSuggestion(this);
         }
+    }
+
+    private void setupPasteListener() {
+        //register "Paste" action
+        getActionMap().put("Paste", new PasteAction(this));
+        // Bind paste command to KeyBinds.PASTE
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.PASTE), "Paste");
     }
 
     private void setupUndoRedo() {
