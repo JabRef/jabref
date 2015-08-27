@@ -879,7 +879,6 @@ public class JabRefPreferences {
     }
 
     public void setLanguageDependentDefaultValues() {
-
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
         defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
@@ -1140,6 +1139,7 @@ public class JabRefPreferences {
     /**
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
      * users, with the Command key preferred instead of Control.
+     * TODO: Move to OS.java? Or replace with portable Java key codes, i.e. KeyEvent
      */
     private KeyStroke getKeyForMac(KeyStroke ks) {
         if (ks == null) {
@@ -1157,20 +1157,16 @@ public class JabRefPreferences {
                 modifiers = modifiers | InputEvent.ALT_MASK;
             }
 
-            return KeyStroke.getKeyStroke(keyCode, getShortcutMask() + modifiers);
-        }
-    }
-    
-    private int getShortcutMask() {
-        if (SHORTCUT_MASK == -1) {
-            try {
-                SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-            } catch (Throwable ignored) {
+            if (SHORTCUT_MASK == -1) {
+                try {
+                    SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+                } catch (Throwable ignored) {
 
+                }
             }
-        }
 
-        return SHORTCUT_MASK;
+            return KeyStroke.getKeyStroke(keyCode, SHORTCUT_MASK + modifiers);
+        }
     }
 
     /**

@@ -30,13 +30,9 @@ import javax.swing.ImageIcon;
  */
 public abstract class MnemonicAwareAction extends AbstractAction {
 
-    public MnemonicAwareAction() {
-        //super("");
-    }
+    public MnemonicAwareAction() {}
 
     public MnemonicAwareAction(ImageIcon icon) {
-        //super(icon);
-
         putValue(Action.SMALL_ICON, icon);
     }
 

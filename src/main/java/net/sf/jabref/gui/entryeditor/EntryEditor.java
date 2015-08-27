@@ -89,8 +89,8 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements VetoableChangeListener, EntryContainer {
-
     private static final long serialVersionUID = 1L;
+    private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
     private BibtexEntry entry;
@@ -141,8 +141,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private final EntryEditor ths = this;
 
     private final HashSet<FieldContentSelector> contentSelectors = new HashSet<>();
-
-    private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry

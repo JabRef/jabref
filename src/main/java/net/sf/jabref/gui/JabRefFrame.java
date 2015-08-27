@@ -1851,18 +1851,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    class SelectKeysAction
-            extends AbstractAction {
-
+    class SelectKeysAction extends AbstractAction {
         public SelectKeysAction() {
             super(Localization.lang("Customize key bindings"));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeyBindingsDialog d = new KeyBindingsDialog
-                    (new HashMap<String, String>(prefs.getKeyBindings()),
-                            prefs.getDefaultKeys());
+            KeyBindingsDialog d = new KeyBindingsDialog(new HashMap<String, String>(prefs.getKeyBindings()), prefs.getDefaultKeys());
             d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
             Util.placeDialog(d, JabRefFrame.this);

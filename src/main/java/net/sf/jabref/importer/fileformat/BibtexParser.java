@@ -247,8 +247,7 @@ public class BibtexParser {
                 }
 
                 // True if not comment, preamble or string.
-                if (isEntry)
-                {
+                if (isEntry) {
                     /**
                      * Morten Alver 13 Aug 2006: Trying to make the parser more
                      * robust. If an exception is thrown when parsing an entry,

@@ -138,9 +138,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
-
     private static final long serialVersionUID = 1L;
-
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     public static final int SHOWING_NOTHING = 0;
@@ -156,8 +154,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private int mode;
     private EntryEditor currentEditor;
     private PreviewPanel currentPreview;
-
-    boolean tmp = true;
 
     private MainTableSelectionListener selectionListener;
     private ListEventListener<BibtexEntry> groupsHighlightListener;
@@ -189,15 +185,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>();
     private final List<BibtexEntry> nextEntries = new ArrayList<BibtexEntry>();
 
-    //ExampleFileFilter fileFilter;
-    // File filter for .bib files.
-
     private boolean baseChanged;
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
 
-    //EntryTableModel tableModel = null;
-    //public EntryTable entryTable = null;
     public MainTable mainTable;
     public MainTableFormat tableFormat;
     private FilterList<BibtexEntry> searchFilterList;
@@ -215,10 +206,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public final HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
     // To contain instantiated entry editors. This is to save time
     // in switching between entries.
-
-    //HashMap entryTypeForms = new HashMap();
-    // Hashmap to keep track of which entries currently have open
-    // EntryTypeForm dialogs.
 
     private PreambleEditor preambleEditor;
     // Keeps track of the preamble dialog if it is open.
@@ -551,8 +538,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void action() {
                 // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
-                Transferable content = Toolkit.getDefaultToolkit()
-                        .getSystemClipboard().getContents(null);
+                Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
                 if (content != null) {
                     BibtexEntry[] bes = null;
                     if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
@@ -567,9 +553,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                         try {
-                            BibtexParser bp = new BibtexParser
-                                    (new java.io.StringReader((String) content.getTransferData(
-                                            DataFlavor.stringFlavor)));
+                            BibtexParser bp = new BibtexParser(new StringReader((String) content.getTransferData(DataFlavor.stringFlavor)));
                             BibtexDatabase db = bp.parse().getDatabase();
                             LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                             if (db.getEntryCount() > 0) {
@@ -587,8 +571,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // or were parsed from a string
                     if (bes != null && bes.length > 0) {
 
-                        NamedCompound ce = new NamedCompound
-                                (Localization.lang(bes.length > 1 ? "paste entries" : "paste entry"));
+                        NamedCompound ce = new NamedCompound(Localization.lang(bes.length > 1 ? "paste entries" : "paste entry"));
 
                         // Store the first inserted bibtexentry.
                         // bes[0] does not work as bes[0] is first clonded,
