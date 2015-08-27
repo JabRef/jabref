@@ -138,11 +138,6 @@ public class TextField extends JTextField implements FieldEditor {
     @Override
     // Only replaces selected text if found
     public void paste(String textToInsert) {
-        int sel = getSelectionEnd() - getSelectionStart();
-        if (sel < 1) {
-            int cPos = getCaretPosition();
-            select(cPos, cPos);
-        }
         replaceSelection(textToInsert);
     }
 

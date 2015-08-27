@@ -17,7 +17,10 @@ package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.SearchTextListener;
+import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.logic.util.io.URLUtil;
 import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
@@ -48,11 +51,38 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
     public JTextAreaWithHighlighting() {
         super();
         setupUndoRedo();
+        setupPasteListener();
     }
 
     JTextAreaWithHighlighting(String text) {
         super(text);
         setupUndoRedo();
+        setupPasteListener();
+    }
+    
+    private void setupPasteListener() {
+        //register "Paste" action
+        getActionMap().put("Paste",
+                new AbstractAction("Paste") {
+
+                    @Override
+                    public void actionPerformed(ActionEvent evt) {
+                        try {
+                            String data = ClipBoardManager.clipBoard.getClipboardContents();
+                            if (!data.isEmpty()) {
+                                // auto corrections
+                                // clean Google search URLs
+                                data = URLUtil.cleanGoogleSearchURL(data);
+
+                                // replace selection with data
+                                JTextAreaWithHighlighting.this.replaceSelection(data);
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                });
+
+        // Bind paste command to KeyBinds.PASTE
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.PASTE), "Paste");
     }
 
     private void setupUndoRedo() {
@@ -84,7 +114,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
                 });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey("Undo"), "Undo");
+        getInputMap().put(Globals.prefs.getKey(KeyBinds.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo",
@@ -103,7 +133,7 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchTextLi
 
         // Bind the redo action to ctrl-Y
         boolean bind = true;
-        KeyStroke redoKey = Globals.prefs.getKey("Redo");
+        KeyStroke redoKey = Globals.prefs.getKey(KeyBinds.REDO);
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             // If emacs is enabled, check if we have a conflict at keys
             // If yes, do not bind

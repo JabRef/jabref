@@ -129,13 +129,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void paste(String textToInsert) {
-        int sel = getSelectionEnd() - getSelectionStart();
-        if (sel > 0) {
-            replaceSelection(textToInsert);
-        } else {
-            int cPos = this.getCaretPosition();
-            this.insert(textToInsert, cPos);
-        }
+        replaceSelection(textToInsert); 
     }
 
     @Override
