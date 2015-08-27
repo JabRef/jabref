@@ -622,7 +622,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * in the other tabs.
      */
     private void setupJTextComponent(JTextComponent textComponent) {
-
         // Set up key bindings and focus listener for the FieldEditor.
         InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = textComponent.getActionMap();
@@ -1078,7 +1077,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private class FieldListener extends FocusAdapter {
 
         /*
-         * Focus listener that fires the storeFieldAction when a FieldTextArea
+         * Focus listener that fires the storeFieldAction when a TextArea
          * loses focus.
          */
         @Override
@@ -1187,9 +1186,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             boolean movingAway = movingToDifferentEntry;
             movingToDifferentEntry = false;
 
-            if (event.getSource() instanceof FieldTextField) {
+            if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
-                FieldTextField textField = (FieldTextField) event.getSource();
+                TextField textField = (TextField) event.getSource();
                 String oldValue = entry.getCiteKey();
                 String newValue = textField.getText();
 
@@ -1561,7 +1560,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         @Override
         public void mouseClicked(MouseEvent evt) {
             if (evt.getClickCount() == 2) {
-                FieldTextArea tf = (FieldTextArea) evt.getSource();
+                TextArea tf = (TextArea) evt.getSource();
 
                 if (tf.getText().isEmpty()) {
                     return;

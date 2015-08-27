@@ -31,8 +31,8 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.fieldeditors.FieldTextArea;
-import net.sf.jabref.gui.fieldeditors.FieldTextField;
+import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 
@@ -134,6 +134,7 @@ class EntryEditorTab {
         DefaultFormBuilder builder = new DefaultFormBuilder
                 (new FormLayout(colSpec, rowSpec), panel);
 
+        // BibTex edit fields are defined here
         for (int i = 0; i < fields.length; i++) {
             // Create the text area:
             int editorType = BibtexFields.getEditorType(fields[i]);
@@ -146,8 +147,8 @@ class EntryEditorTab {
                 fileListEditor = (FileListEditor) fieldEditor;
                 defaultHeight = 0;
             } else {
-                fieldEditor = new FieldTextArea(fields[i], null);
-                frame.getSearchManager().addSearchListener((FieldTextArea) fieldEditor);
+                fieldEditor = new TextArea(fields[i], null);
+                frame.getSearchManager().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
@@ -188,7 +189,7 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final FieldTextField textField = new FieldTextField(BibtexEntry.KEY_FIELD, parent
+            final TextField textField = new TextField(BibtexEntry.KEY_FIELD, parent
                     .getEntry().getField(BibtexEntry.KEY_FIELD), true);
             setupJTextComponent(textField, null);
 

@@ -3,7 +3,7 @@ package net.sf.jabref.logic.autocompleter;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.fieldeditors.FieldTextArea;
+import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -149,7 +149,7 @@ public class AutoCompleterTest {
         TestUtils.initJabRef();
         BibtexEntry bibtexEntry = new BibtexEntry();
         bibtexEntry.setField("author", "Brigitte Laurant");
-        FieldEditor authorTextField = new FieldTextArea("author", "Hans Meiser");
+        FieldEditor authorTextField = new TextArea("author", "Hans Meiser");
         EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
@@ -168,7 +168,7 @@ public class AutoCompleterTest {
         TestUtils.initJabRef();
         BibtexEntry bibtexEntry = new BibtexEntry();
         bibtexEntry.setField("journal", "Testtext");
-        FieldEditor authorTextField = new FieldTextArea("journal", "New Testtext");
+        FieldEditor authorTextField = new TextArea("journal", "New Testtext");
         EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.basePanel(), bibtexEntry);
         // perform action ...
         editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));

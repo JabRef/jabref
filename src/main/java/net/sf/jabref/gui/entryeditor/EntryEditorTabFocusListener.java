@@ -26,7 +26,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 /*
- * Focus listener that fires the storeFieldAction when a FieldTextArea loses
+ * Focus listener that fires the storeFieldAction when a TextArea loses
  * focus.
  */
 class EntryEditorTabFocusListener implements FocusListener {

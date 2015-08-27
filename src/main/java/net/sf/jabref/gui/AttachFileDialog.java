@@ -30,7 +30,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.fieldeditors.FieldTextField;
+import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -63,7 +63,7 @@ public class AttachFileDialog extends JDialog {
         this.metaData = metaData;
         this.entry = entry;
         this.fieldName = fieldName;
-        this.editor = new FieldTextField(fieldName, entry.getField(fieldName), false);
+        this.editor = new TextField(fieldName, entry.getField(fieldName), false);
 
         initGui();
     }
@@ -73,7 +73,7 @@ public class AttachFileDialog extends JDialog {
         this.metaData = metaData;
         this.entry = entry;
         this.fieldName = fieldName;
-        this.editor = new FieldTextField(fieldName, entry.getField(fieldName), false);
+        this.editor = new TextField(fieldName, entry.getField(fieldName), false);
 
         initGui();
     }

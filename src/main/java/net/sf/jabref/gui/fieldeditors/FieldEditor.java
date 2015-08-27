@@ -25,7 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.event.UndoableEditListener;
 
 /**
- * FieldEditors is a common interface between the FieldTextField and FieldTextArea.
+ * FieldEditors is a common interface between the TextField and TextArea.
  */
 public interface FieldEditor {
 

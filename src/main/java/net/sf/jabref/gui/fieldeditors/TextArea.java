@@ -21,14 +21,15 @@ import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
 
 /**
- * An implementation of the FieldEditor backed by a JTextArea. Used for
- * multi-line input.
+ * An implementation of the FieldEditor backed by a JTextArea.
+ * Used for multi-line input, currently all BibTexFields except Bibtex key!
  */
-public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEditor {
+public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     private final JScrollPane scrollPane;
 
@@ -39,7 +40,7 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
     private AutoCompleteListener autoCompleteListener;
 
 
-    public FieldTextArea(String fieldName, String content) {
+    public TextArea(String fieldName, String content) {
         super(content);
 
 
@@ -65,7 +66,6 @@ public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEdi
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
         label.addMouseListener(popMenu);
-
     }
 
     @Override

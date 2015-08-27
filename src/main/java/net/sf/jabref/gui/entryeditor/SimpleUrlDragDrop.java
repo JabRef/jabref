@@ -36,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
  */
 
 class SimpleUrlDragDrop implements DropTargetListener {
-
     private static final Log LOGGER = LogFactory.getLog(SimpleUrlDragDrop.class);
 
     private final FieldEditor editor;

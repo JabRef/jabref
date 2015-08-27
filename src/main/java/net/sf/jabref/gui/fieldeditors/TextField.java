@@ -15,10 +15,13 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
+import net.sf.jabref.gui.BaseAction;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.util.Util;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -31,7 +34,11 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-public class FieldTextField extends JTextField implements FieldEditor {
+/**
+ * An implementation of the FieldEditor backed by a JTextField.
+ * Used for single-line input, only BibTex key at the moment?!
+ */
+public class TextField extends JTextField implements FieldEditor {
 
     private final String fieldName;
     private final JLabel label;
@@ -39,7 +46,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
     private AutoCompleteListener autoCompleteListener;
 
 
-    public FieldTextField(String fieldName, String content, boolean changeColorOnFocus) {
+    public TextField(String fieldName, String content, boolean changeColorOnFocus) {
         super(content);
 
         setupUndoRedo();
@@ -62,56 +69,6 @@ public class FieldTextField extends JTextField implements FieldEditor {
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
         label.addMouseListener(popMenu);
-    }
-
-    private void setupUndoRedo() {
-        undo = new UndoManager();
-        Document doc = getDocument();
-
-        // Listen for undo and redo events
-        doc.addUndoableEditListener(new UndoableEditListener() {
-
-            @Override
-            public void undoableEditHappened(UndoableEditEvent evt) {
-                undo.addEdit(evt.getEdit());
-            }
-        });
-
-        // Create an undo action and add it to the text component
-        getActionMap().put("Undo",
-                new AbstractAction("Undo") {
-
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        try {
-                            if (undo.canUndo()) {
-                                undo.undo();
-                            }
-                        } catch (CannotUndoException ignored) {
-                        }
-                    }
-                });
-
-        // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.prefs.getKey("Undo"), "Undo");
-
-        // Create a redo action and add it to the text component
-        getActionMap().put("Redo",
-                new AbstractAction("Redo") {
-
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        try {
-                            if (undo.canRedo()) {
-                                undo.redo();
-                            }
-                        } catch (CannotRedoException ignored) {
-                        }
-                    }
-                });
-
-        // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.prefs.getKey("Redo"), "Redo");
     }
 
     @Override
@@ -181,6 +138,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
 
     @Override
+    // Only replaces selected text if found
     public void paste(String textToInsert) {
         int sel = getSelectionEnd() - getSelectionStart();
         if (sel < 1) {
@@ -191,14 +149,10 @@ public class FieldTextField extends JTextField implements FieldEditor {
     }
 
     @Override
-    public void undo() {
-
-    }
+    public void undo() {}
 
     @Override
-    public void redo() {
-
-    }
+    public void redo() {}
 
     @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
@@ -210,5 +164,55 @@ public class FieldTextField extends JTextField implements FieldEditor {
         if (autoCompleteListener != null) {
             autoCompleteListener.clearCurrentSuggestion(this);
         }
+    }
+
+    private void setupUndoRedo() {
+        undo = new UndoManager();
+        Document doc = getDocument();
+
+        // Listen for undo and redo events
+        doc.addUndoableEditListener(new UndoableEditListener() {
+
+            @Override
+            public void undoableEditHappened(UndoableEditEvent evt) {
+                undo.addEdit(evt.getEdit());
+            }
+        });
+
+        // Create an undo action and add it to the text component
+        getActionMap().put("Undo",
+                new AbstractAction("Undo") {
+
+                    @Override
+                    public void actionPerformed(ActionEvent evt) {
+                        try {
+                            if (undo.canUndo()) {
+                                undo.undo();
+                            }
+                        } catch (CannotUndoException ignored) {
+                        }
+                    }
+                });
+
+        // Bind the undo action to ctl-Z
+        getInputMap().put(Globals.prefs.getKey("Undo"), "Undo");
+
+        // Create a redo action and add it to the text component
+        getActionMap().put("Redo",
+                new AbstractAction("Redo") {
+
+                    @Override
+                    public void actionPerformed(ActionEvent evt) {
+                        try {
+                            if (undo.canRedo()) {
+                                undo.redo();
+                            }
+                        } catch (CannotRedoException ignored) {
+                        }
+                    }
+                });
+
+        // Bind the redo action to ctl-Y
+        getInputMap().put(Globals.prefs.getKey("Redo"), "Redo");
     }
 }

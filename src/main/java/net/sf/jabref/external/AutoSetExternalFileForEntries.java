@@ -27,7 +27,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FocusRequester;
 import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.fieldeditors.FieldTextField;
+import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.apache.commons.logging.Log;
@@ -118,7 +118,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
 
         ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
-        FieldTextField editor = new FieldTextField(fieldName, "", false);
+        TextField editor = new TextField(fieldName, "", false);
 
         // Find the default directory for this field type:
         String[] dirs = panel.metaData().getFileDirectory(fieldName);

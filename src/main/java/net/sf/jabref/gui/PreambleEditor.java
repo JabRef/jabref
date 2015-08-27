@@ -23,7 +23,7 @@ import javax.swing.*;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.fieldeditors.FieldTextArea;
+import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -79,9 +79,9 @@ class PreambleEditor extends JDialog {
 
         String content = base.getPreamble();
 
-        ed = new FieldTextArea(Localization.lang("Preamble"), content != null ? content : "");
+        ed = new TextArea(Localization.lang("Preamble"), content != null ? content : "");
         //ed.addUndoableEditListener(panel.undoListener);
-        setupJTextComponent((FieldTextArea) ed);
+        setupJTextComponent((TextArea) ed);
 
         gbl.setConstraints(ed.getLabel(), con);
         pan.add(ed.getLabel());
@@ -123,7 +123,7 @@ class PreambleEditor extends JDialog {
     private class FieldListener extends FocusAdapter {
 
         /*
-        * Focus listener that fires the storeFieldAction when a FieldTextArea
+        * Focus listener that fires the storeFieldAction when a TextArea
         * loses focus.
         */
         @Override

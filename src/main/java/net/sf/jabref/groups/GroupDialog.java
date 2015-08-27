@@ -24,7 +24,7 @@ import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.fieldeditors.FieldTextField;
+import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRules;
 import net.sf.jabref.logic.search.describer.SearchDescribers;
@@ -71,7 +71,7 @@ class GroupDialog extends JDialog {
             Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
     private final JTextField m_kgSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
-    private final FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "",
+    private final TextField m_kgSearchTerm = new net.sf.jabref.gui.fieldeditors.TextField("keywords", "",
             false);
     private final JCheckBox m_kgCaseSensitive = new JCheckBox(
             Localization.lang("Case sensitive"));

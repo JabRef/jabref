@@ -104,7 +104,7 @@ public class SynchronizeFileField extends AbstractWorker {
         //final OpenFileFilter off = Util.getFileFilterForField(fieldName);
 
         //ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
-        //FieldTextField editor = new FieldTextField(fieldName, "", false);
+        //TextField editor = new TextField(fieldName, "", false);
 
         Set<BibtexEntry> changedEntries = new HashSet<BibtexEntry>();
 
