@@ -39,7 +39,7 @@ public class URLUtil {
         Objects.requireNonNull(url);
 
         // Detect Google search URL
-        final String searchExp = "^https?://(?:www\\.)?google\\.[a-z]+?/url.*";
+        final String searchExp = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
 
         if(!url.matches(searchExp)) {
             return url;
