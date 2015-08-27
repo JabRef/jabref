@@ -25,12 +25,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class CaseChangeMenu extends JMenu {
-
     private final JTextComponent parent;
 
-
     public CaseChangeMenu(JTextComponent opener) {
-        /* case */
         super(Localization.lang("Change case"));
         parent = opener;
 

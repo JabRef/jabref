@@ -37,21 +37,18 @@ package net.sf.jabref.gui.fieldeditors.contextmenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.NameListNormalizer;
 import net.sf.jabref.logic.util.io.URLUtil;
+import net.sf.jabref.logic.util.strings.NameListNormalizer;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor myFieldName;
