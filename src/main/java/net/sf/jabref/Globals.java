@@ -104,8 +104,6 @@ public class Globals {
 
     public static HelpDialog helpDiag;
 
-    public static SidePaneManager sidePaneManager;
-
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
     // Background tasks

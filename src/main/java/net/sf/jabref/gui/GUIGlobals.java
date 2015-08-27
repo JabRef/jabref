@@ -87,6 +87,7 @@ public class GUIGlobals {
     private static final HashMap<String, JLabel> tableIcons = new HashMap<>(); // Contains table icon mappings. Set up
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
+    public static SidePaneManager sidePaneManager;
 
     private static HashMap<String, String> iconMap;
 

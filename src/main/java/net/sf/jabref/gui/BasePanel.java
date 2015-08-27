@@ -258,7 +258,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.metaData = metaData;
         // System.out.println(encoding);
         //super(JSplitPane.HORIZONTAL_SPLIT, true);
-        this.sidePaneManager = Globals.sidePaneManager;
+        this.sidePaneManager = GUIGlobals.sidePaneManager;
         this.frame = frame;
         database = db;
 
