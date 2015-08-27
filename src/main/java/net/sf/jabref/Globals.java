@@ -36,8 +36,6 @@ import java.io.FileNotFoundException;
 public class Globals {
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
-    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
-
     // JabRef version info
     public static final BuildInfo BUILD_INFO = new BuildInfo();
     // Signature written at the top of the .bib file.

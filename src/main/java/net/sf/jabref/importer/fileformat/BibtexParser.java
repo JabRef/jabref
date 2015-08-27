@@ -223,8 +223,8 @@ public class BibtexParser {
                             }
 
                         } else if (comment.substring(0,
-                                Math.min(comment.length(), Globals.ENTRYTYPE_FLAG.length())).equals(
-                                Globals.ENTRYTYPE_FLAG)) {
+                                Math.min(comment.length(), CustomEntryType.ENTRYTYPE_FLAG.length())).equals(
+                                CustomEntryType.ENTRYTYPE_FLAG)) {
                             // A custom entry type can also be stored in a
                             // "@comment"
                             CustomEntryType typ = CustomEntryType.parseEntryType(comment);

@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomEntryType extends BibtexEntryType {
 
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
     private String[] required;
     private final String[] optional;
@@ -210,7 +211,7 @@ public class CustomEntryType extends BibtexEntryType {
 
     public void save(Writer out) throws IOException {
         out.write("@comment{");
-        out.write(Globals.ENTRYTYPE_FLAG);
+        out.write(ENTRYTYPE_FLAG);
         out.write(getName());
         out.write(": req[");
         out.write(getRequiredFieldsString());
@@ -229,7 +230,7 @@ public class CustomEntryType extends BibtexEntryType {
     public static CustomEntryType parseEntryType(String comment) {
         try {
             String rest;
-            rest = comment.substring(Globals.ENTRYTYPE_FLAG.length());
+            rest = comment.substring(ENTRYTYPE_FLAG.length());
             int nPos = rest.indexOf(':');
             String name = rest.substring(0, nPos);
             rest = rest.substring(nPos + 2);
