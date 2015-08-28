@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.action;
+package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

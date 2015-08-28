@@ -17,11 +17,9 @@ package net.sf.jabref.gui.fieldeditors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.SearchTextListener;
-import net.sf.jabref.gui.action.PasteAction;
+import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.keyboard.KeyBinds;
-import net.sf.jabref.logic.util.io.URLUtil;
 import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;

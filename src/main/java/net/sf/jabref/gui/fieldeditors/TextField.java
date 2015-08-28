@@ -18,7 +18,7 @@ package net.sf.jabref.gui.fieldeditors;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.action.PasteAction;
+import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.util.strings.StringUtil;

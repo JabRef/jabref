@@ -44,10 +44,9 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.action.PasteAction;
+import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.URLUtil;
 import net.sf.jabref.logic.util.strings.NameListNormalizer;
 
 public class FieldTextMenu implements MouseListener {
