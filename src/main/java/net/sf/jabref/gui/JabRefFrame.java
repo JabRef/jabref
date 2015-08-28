@@ -27,23 +27,11 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -90,6 +78,8 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
+import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -204,9 +194,70 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             close = new CloseDatabaseAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
-    private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
-    private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
-    private final AbstractAction integrityCheckAction = new IntegrityCheckAction(this);
+    private final AbstractAction newDatabaseAction = new MnemonicAwareAction(GUIGlobals.getImage("new")) {
+        private JabRefFrame jabRefFrame = this;
+
+        {
+            putValue(Action.NAME, "New database");
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX database"));
+            //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Create a new, empty, database.
+            BibtexDatabase database = new BibtexDatabase();
+            jabRefFrame.addTab(database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
+            jabRefFrame.output(Localization.lang("New database created."));
+        }
+    };
+    private final AbstractAction newSubDatabaseAction = new MnemonicAwareAction(GUIGlobals.getImage("new")) {
+        private JabRefFrame jabRefFrame = this;
+
+        {
+            putValue(Action.NAME, "New subdatabase based on AUX file");
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX subdatabase"));
+            //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Create a new, empty, database.
+
+            FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.tabbedPane);
+
+            Util.placeDialog(dialog, jabRefFrame);
+            dialog.setVisible(true);
+
+            if (dialog.generatePressed()) {
+                BasePanel bp = new BasePanel(jabRefFrame,
+                        dialog.getGenerateDB(), // database
+                        null, // file
+                        new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
+                jabRefFrame.tabbedPane.add(Localization.lang(GUIGlobals.untitledTitle), bp);
+                jabRefFrame.tabbedPane.setSelectedComponent(bp);
+                jabRefFrame.output(Localization.lang("New database created."));
+            }
+        }
+    };
+    private final AbstractAction integrityCheckAction = new AbstractAction(Localization.menuTitle("Integrity check"), GUIGlobals.getImage("integrityCheck")) {
+        private JabRefFrame jabRefFrame = this;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Object selComp = jabRefFrame.tabbedPane.getSelectedComponent();
+            if (selComp != null) {
+                BasePanel bp = (BasePanel) selComp;
+                BibtexDatabase refBase = bp.getDatabase();
+                if (refBase != null) {
+                    IntegrityWizard wizard = new IntegrityWizard(jabRefFrame, jabRefFrame.basePanel());
+                    Util.placeDialog(wizard, jabRefFrame);
+                    wizard.setVisible(true);
+
+                }
+            }
+        }
+    };
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction help = new HelpAction("JabRef help", helpDiag,
             GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
@@ -436,7 +487,44 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION)
     );
 
-    private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
+    private final AbstractAction autoLinkFile = new AbstractAction() {
+        {
+            putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));
+            putValue(Action.NAME, Localization.lang("Automatically set file links"));
+            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+            Collections.addAll(entries, JabRef.jrf.basePanel().getSelectedEntries());
+            if (entries.isEmpty()) {
+                JabRef.jrf.basePanel().output(Localization.lang("No entries selected."));
+                return;
+            }
+            JDialog diag = new JDialog(JabRef.jrf, true);
+            final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
+            Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.basePanel().metaData(), new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getID() > 0) {
+                        // entry has been updated in Util.autoSetLinks, only treat nc and status message
+                        if (nc.hasEdits()) {
+                            nc.end();
+                            JabRef.jrf.basePanel().undoManager.addEdit(nc);
+                            JabRef.jrf.basePanel().markBaseChanged();
+                        }
+                        JabRef.jrf.output(Localization.lang("Finished autosetting external links."));
+                    } else {
+                        JabRef.jrf.output(Localization.lang("Finished autosetting external links.")
+                                + " " + Localization.lang("No files found."));
+                    }
+                }
+            }, diag);
+            JabRefExecutorService.INSTANCE.execute(runnable);
+        }
+    };
 
     private PushToApplicationButton pushExternalButton;
 
