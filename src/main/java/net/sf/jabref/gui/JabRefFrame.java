@@ -76,7 +76,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.action.AutoLinkFilesAction;
+import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
@@ -122,8 +122,6 @@ import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
-import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
@@ -206,9 +204,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             close = new CloseDatabaseAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
-    private final AbstractAction newDatabaseAction = new NewDatabaseAction();
-    private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction();
-    private final AbstractAction integrityCheckAction = new IntegrityCheckAction();
+    private final AbstractAction newDatabaseAction = new NewDatabaseAction(this);
+    private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
+    private final AbstractAction integrityCheckAction = new IntegrityCheckAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction help = new HelpAction("JabRef help", helpDiag,
             GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
@@ -255,16 +253,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             "right", prefs.getKey("Forward"));
     final AbstractAction back = new GeneralAction("back", "Back", Localization.lang("Back"),
             "left", prefs.getKey("Back"));
-    private final AbstractAction//cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
-            //   GUIGlobals.cutIconFile,
-            //   prefs.getKey("Cut")),
-            delete = new GeneralAction("delete", "Delete", Localization.lang("Delete"),
+    private final AbstractAction delete = new GeneralAction("delete", "Delete", Localization.lang("Delete"),
             prefs.getKey("Delete"));
-    private final AbstractAction//copy = new GeneralAction("copy", "Copy", Globals.lang("Copy"),
-            //                         GUIGlobals.copyIconFile,
-            //                         prefs.getKey("Copy")),
-            copy = new EditAction("copy", GUIGlobals.getIconUrl("copy"));
-    private final AbstractAction paste = new EditAction("paste", GUIGlobals.getIconUrl("paste"));
+    private final AbstractAction copy = new EditAction("copy", GUIGlobals.getIconUrl("copy"));
+    private final AbstractAction paste = new EditAction(Actions.PASTE, GUIGlobals.getIconUrl("paste"));
     private final AbstractAction cut = new EditAction("cut", GUIGlobals.getIconUrl("cut"));
     private final AbstractAction mark = new GeneralAction("markEntries", "Mark entries",
             Localization.lang("Mark entries"),
@@ -450,7 +442,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final List<Action> fetcherActions = new LinkedList<Action>();
 
-    private SearchManager2 searchManager;
+    private SearchManager searchManager;
 
     public GroupSelector groupSelector;
 
@@ -465,25 +457,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final JMenu checkAndFix = JabRefFrame.subMenu("Legacy tools...");
 
     // The action for adding a new entry of unspecified type.
-    private final NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
+    private final NewEntryAction newEntryAction = new NewEntryAction(this, prefs.getKey("New entry"));
     private final NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]
             {
-                    new NewEntryAction("article", prefs.getKey("New article")),
-                    new NewEntryAction("book", prefs.getKey("New book")),
-                    new NewEntryAction("phdthesis", prefs.getKey("New phdthesis")),
-                    new NewEntryAction("inbook", prefs.getKey("New inbook")),
-                    new NewEntryAction("mastersthesis", prefs.getKey("New mastersthesis")),
-                    new NewEntryAction("proceedings", prefs.getKey("New proceedings")),
-                    new NewEntryAction("inproceedings"),
-                    new NewEntryAction("conference"),
-                    new NewEntryAction("incollection"),
-                    new NewEntryAction("booklet"),
-                    new NewEntryAction("manual"),
-                    new NewEntryAction("techreport"),
-                    new NewEntryAction("unpublished",
+                    new NewEntryAction(this, "article", prefs.getKey("New article")),
+                    new NewEntryAction(this, "book", prefs.getKey("New book")),
+                    new NewEntryAction(this, "phdthesis", prefs.getKey("New phdthesis")),
+                    new NewEntryAction(this, "inbook", prefs.getKey("New inbook")),
+                    new NewEntryAction(this, "mastersthesis", prefs.getKey("New mastersthesis")),
+                    new NewEntryAction(this, "proceedings", prefs.getKey("New proceedings")),
+                    new NewEntryAction(this, "inproceedings"),
+                    new NewEntryAction(this, "conference"),
+                    new NewEntryAction(this, "incollection"),
+                    new NewEntryAction(this, "booklet"),
+                    new NewEntryAction(this, "manual"),
+                    new NewEntryAction(this, "techreport"),
+                    new NewEntryAction(this, "unpublished",
                             prefs.getKey("New unpublished")),
-                    new NewEntryAction("misc"),
-                    new NewEntryAction("other")
+                    new NewEntryAction(this, "misc"),
+                    new NewEntryAction(this, "other")
             };
 
 
@@ -664,7 +656,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         GUIGlobals.helpDiag = this.helpDiag;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
-        searchManager = new SearchManager2(this, sidePaneManager);
+        searchManager = new SearchManager(this, sidePaneManager);
 
         sidePaneManager.register("groups", groupSelector);
         sidePaneManager.register("search", searchManager);
@@ -1097,11 +1089,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    class GeneralAction
-            extends MnemonicAwareAction {
+    class GeneralAction extends MnemonicAwareAction {
+        private final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
         private final String command;
-
 
         public GeneralAction(String command, String text,
                              String description, URL icon) {
@@ -1184,103 +1175,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
     }
-
-    /**
-     * This got removed when we introduced SearchManager2.
-     * class IncrementalSearchAction extends AbstractAction {
-     * public IncrementalSearchAction() {
-     * super("Incremental search", new ImageIcon(GUIGlobals.searchIconFile));
-     * putValue(SHORT_DESCRIPTION, Globals.lang("Start incremental search"));
-     * putValue(ACCELERATOR_KEY, prefs.getKey("Incremental search"));
-     * }
-     * public void actionPerformed(ActionEvent e) {
-     * if (tabbedPane.getTabCount() > 0)
-     * searchManager.startIncrementalSearch();
-     * }
-     * }
-     * <p>
-     * class SearchAction extends AbstractAction {
-     * public SearchAction() {
-     * super("Search", new ImageIcon(GUIGlobals.searchIconFile));
-     * putValue(SHORT_DESCRIPTION, Globals.lang("Start search"));
-     * putValue(ACCELERATOR_KEY, prefs.getKey("Search"));
-     * }
-     * public void actionPerformed(ActionEvent e) {
-     * if (tabbedPane.getTabCount() > 0)
-     * searchManager.startSearch();
-     * }
-     * }
-     */
-
-    class NewEntryAction
-            extends MnemonicAwareAction {
-
-        String type; // The type of item to create.
-        KeyStroke keyStroke; // Used for the specific instances.
-
-
-        public NewEntryAction(KeyStroke key) {
-            // This action leads to a dialog asking for entry type.
-            super(GUIGlobals.getImage("add"));
-            putValue(Action.NAME, "New entry");
-            putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX entry"));
-        }
-
-        public NewEntryAction(String type_) {
-            // This action leads to the creation of a specific entry.
-            putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
-            type = type_;
-        }
-
-        public NewEntryAction(String type_, KeyStroke key) {
-            // This action leads to the creation of a specific entry.
-            putValue(Action.NAME, StringUtil.capitalizeFirst(type_));
-            putValue(Action.ACCELERATOR_KEY, key);
-            type = type_;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String thisType = type;
-            if (thisType == null) {
-                EntryTypeDialog etd = new EntryTypeDialog(JabRefFrame.this);
-                Util.placeDialog(etd, JabRefFrame.this);
-                etd.setVisible(true);
-                BibtexEntryType tp = etd.getChoice();
-                if (tp == null) {
-                    return;
-                }
-                thisType = tp.getName();
-            }
-
-            if (tabbedPane.getTabCount() > 0) {
-                ((BasePanel) tabbedPane.getSelectedComponent())
-                        .newEntry(BibtexEntryType.getType(thisType));
-            } else {
-                LOGGER.info("Action 'New entry' must be disabled when no "
-                        + "database is open.");
-            }
-        }
-    }
-
-
-    /*
-         private void setupDatabaseLayout() {
-      // This method is called whenever this frame has been provided
-      // with a database, and completes the layout.
-
-
-      if (file != null)
-     setTitle(GUIGlobals.baseTitle+file.getName());
-      else
-      setTitle(GUIGlobals.untitledTitle);
-
-      //DragNDropManager dndm = new DragNDropManager(this);
-
-      //setNonEmptyState();
-      Util.pr("JabRefFrame: Must set non-empty state.");
-      }*/
 
     /**
      * Refresh import menus.
@@ -1489,27 +1383,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(customImpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
-
-        /*options.add(new AbstractAction("Font") {
-        public void actionPerformed(ActionEvent e) {
-            Font f=new FontSelectorDialog
-          (JabRefFrame.this, GUIGlobals.CURRENTFONT).getSelectedFont();
-         if(f==null)
-          return;
-         else
-          GUIGlobals.CURRENTFONT=f;
-         // updatefont
-         prefs.put(JabRefPreferences.FONT_FAMILY, GUIGlobals.CURRENTFONT.getFamily());
-         prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
-         prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
-         if (tabbedPane.getTabCount() > 0) {
-          for (int i=0; i<tabbedPane.getTabCount(); i++) {
-           baseAt(i).entryTable.updateFont();
-           baseAt(i).refreshTable();
-          }
-         }
-        }
-        });*/
 
         options.add(selectKeys);
         mb.add(options);
@@ -1880,14 +1753,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * The action concerned with closing the window.
      */
     class CloseAction extends MnemonicAwareAction {
-
         public CloseAction() {
             putValue(Action.NAME, "Quit");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Quit JabRef"));
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
-            //putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-            //    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
         }
 
         @Override
@@ -1896,13 +1765,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
     // The action for closing the current database and leaving the window open.
     private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
 
-
     class CloseDatabaseAction extends MnemonicAwareAction {
-
         public CloseDatabaseAction() {
             super(GUIGlobals.getImage("close"));
             putValue(Action.NAME, "Close database");
@@ -1960,93 +1826,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 markActiveBasePanel();
             }
             setWindowTitle();
-            updateEnabledState(); // Man, this is what I call a bug that this is not called.
+            updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
             output(Localization.lang("Closed database") + '.');
+            // FIXME: why?
             System.gc(); // Test
         }
     }
 
-    // The action concerned with opening a new database.
-    class NewDatabaseAction
-            extends MnemonicAwareAction {
-
-        public NewDatabaseAction() {
-            super(GUIGlobals.getImage("new"));
-            putValue(Action.NAME, "New database");
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX database"));
-            //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Create a new, empty, database.
-            BibtexDatabase database = new BibtexDatabase();
-            addTab(database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
-            output(Localization.lang("New database created."));
-        }
-    }
-
-    // The action concerned with generate a new (sub-)database from latex aux file.
-    class NewSubDatabaseAction extends MnemonicAwareAction {
-
-        public NewSubDatabaseAction() {
-            super(GUIGlobals.getImage("new"));
-            putValue(Action.NAME, "New subdatabase based on AUX file");
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX subdatabase"));
-            //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Create a new, empty, database.
-
-            FromAuxDialog dialog = new FromAuxDialog(JabRefFrame.this, "", true, JabRefFrame.this.tabbedPane);
-
-            Util.placeDialog(dialog, JabRefFrame.this);
-            dialog.setVisible(true);
-
-            if (dialog.generatePressed()) {
-                BasePanel bp = new BasePanel(JabRefFrame.this,
-                        dialog.getGenerateDB(), // database
-                        null, // file
-                        new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING)); // meta data
-                tabbedPane.add(Localization.lang(GUIGlobals.untitledTitle), bp);
-                tabbedPane.setSelectedComponent(bp);
-                output(Localization.lang("New database created."));
-            }
-        }
-    }
-
-    // The action should test the database and report errors/warnings
-    class IntegrityCheckAction extends AbstractAction {
-
-        public IntegrityCheckAction() {
-            super(Localization.menuTitle("Integrity check"),
-                    GUIGlobals.getImage("integrityCheck"));
-            //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
-            //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Object selComp = tabbedPane.getSelectedComponent();
-            if (selComp != null) {
-                BasePanel bp = (BasePanel) selComp;
-                BibtexDatabase refBase = bp.getDatabase();
-                if (refBase != null) {
-                    IntegrityWizard wizard = new IntegrityWizard(JabRefFrame.this, basePanel());
-                    Util.placeDialog(wizard, JabRefFrame.this);
-                    wizard.setVisible(true);
-
-                }
-            }
-        }
-    }
-
-
     // The action for opening the preferences dialog.
     private final AbstractAction showPrefs = new ShowPrefsAction();
-
 
     class ShowPrefsAction
             extends MnemonicAwareAction {
@@ -2527,7 +2315,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * relevant name in its action map.
      */
     class EditAction extends MnemonicAwareAction {
-
         private final String command;
 
         public EditAction(String command, URL icon) {
@@ -2547,8 +2334,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             //Util.pr(Globals.focusListener.getFocused().toString());
             JComponent source = Globals.focusListener.getFocused();
             try {
-                source.getActionMap().get(command).actionPerformed
-                        (new ActionEvent(source, 0, command));
+                source.getActionMap().get(command).actionPerformed(new ActionEvent(source, 0, command));
             } catch (NullPointerException ex) {
                 // No component is focused, so we do nothing.
             }
@@ -2735,21 +2521,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
-    /*private class ForegroundLabel extends JLabel {
-         public ForegroundLabel(String s) {
-             super(s);
-             setFont(new Font("plain", Font.BOLD, 70));
-             setHorizontalAlignment(JLabel.CENTER);
-         }
-
-        public void paint(Graphics g) {
-            Graphics2D g2 = (Graphics2D)g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            super.paint(g2);    //To change body of overridden methods use File | Settings | File Templates.
-        }
-    }       */
-
     private static class MyGlassPane extends JPanel {
 
         //ForegroundLabel infoLabel = new ForegroundLabel("Showing search");
@@ -2789,7 +2560,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    public SearchManager2 getSearchManager() {
+    public SearchManager getSearchManager() {
         return searchManager;
     }
 

@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
-public class SearchManager2 extends SidePaneComponent
+public class SearchManager extends SidePaneComponent
         implements ActionListener, KeyListener, ItemListener, CaretListener {
 
     private final JabRefFrame frame;
@@ -85,7 +85,7 @@ public class SearchManager2 extends SidePaneComponent
     // an incremental search. -1 means
     // that the search is inactive.
 
-    public SearchManager2(JabRefFrame frame, SidePaneManager manager) {
+    public SearchManager(JabRefFrame frame, SidePaneManager manager) {
         super(manager, GUIGlobals.getIconUrl("search"), Localization.lang("Search"));
 
         this.frame = frame;
@@ -229,8 +229,8 @@ public class SearchManager2 extends SidePaneComponent
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 Globals.prefs.putBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE, searchAutoComplete.isSelected());
-                if (SearchManager2.this.frame.basePanel() != null) {
-                    SearchManager2.this.frame.basePanel().updateSearchManager();
+                if (SearchManager.this.frame.basePanel() != null) {
+                    SearchManager.this.frame.basePanel().updateSearchManager();
                 }
 
             }
@@ -322,7 +322,7 @@ public class SearchManager2 extends SidePaneComponent
             @Override
             public void actionPerformed(ActionEvent e) {
                 hideAway();
-                //SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
+                //SearchManager.this.actionPerformed(new ActionEvent(escape, 0, ""));
             }
         });
         setSearchButtonSizes();

@@ -24,7 +24,7 @@ import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.PushToApplication;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.action.BrowseAction;
+import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;

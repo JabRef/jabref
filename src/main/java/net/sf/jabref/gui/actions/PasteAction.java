@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.action;
+package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;

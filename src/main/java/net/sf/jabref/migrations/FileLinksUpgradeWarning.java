@@ -22,7 +22,7 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.action.BrowseAction;
+import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
