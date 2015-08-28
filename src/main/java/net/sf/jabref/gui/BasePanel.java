@@ -1496,9 +1496,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 String id = IdGenerator.next();
                 BibtexEntry bibEntry = new BibtexEntry(id, tp);
-                TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this,
-                        "import", true,
-                        bibEntry);
+                TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this, "import", true, bibEntry);
                 Util.placeDialog(tidialog, BasePanel.this);
                 tidialog.setVisible(true);
 

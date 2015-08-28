@@ -129,10 +129,7 @@ import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class TextInputDialog
-        extends JDialog implements ActionListener
-{
-
+public class TextInputDialog extends JDialog implements ActionListener {
     private final JButton okButton = new JButton();
     private final JButton cancelButton = new JButton();
     private final JButton insertButton = new JButton();
@@ -160,10 +157,7 @@ public class TextInputDialog
 
     private boolean okPressed;
 
-
-    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal,
-            BibtexEntry bibEntry)
-    {
+    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibtexEntry bibEntry) {
         super(frame, title, modal);
 
         warnPanel = new IntegrityMessagePanel(panel);
@@ -174,15 +168,12 @@ public class TextInputDialog
         entry = bibEntry;
         marked = new TagToMarkedTextStore();
 
-        try
-        {
+        try {
             jbInit(frame);
             pack();
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         updateSourceView();
     }
 
@@ -208,9 +199,7 @@ public class TextInputDialog
 
         JTabbedPane tabbed = new JTabbedPane();
         tabbed.addChangeListener(
-                new ChangeListener()
-                {
-
+                new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e)
                     {
@@ -234,22 +223,16 @@ public class TextInputDialog
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent.prefs().getKey("Close dialog"), "close");
-        am.put("close", new AbstractAction()
-        {
-
+        am.put("close", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         });
     }
 
-    // ---------------------------------------------------------------------------
     // Panel with text import functionality
-    private void initRawPanel()
-    {
-
+    private void initRawPanel() {
         rawPanel.setLayout(new BorderLayout());
 
         // Textarea
@@ -260,11 +243,9 @@ public class TextInputDialog
         doc = textPane.getStyledDocument();
         addStylesToDocument(doc);
 
-        try
-        {
+        try {
             doc.insertString(0, "", doc.getStyle("regular"));
-        } catch (Exception ignored)
-        {
+        } catch (Exception ignored) {
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane,
@@ -298,7 +279,6 @@ public class TextInputDialog
         leftPanel.add(toolBar, BorderLayout.NORTH);
         leftPanel.add(testPanel, BorderLayout.CENTER);
 
-        // ----------------------------------------------------------------
         JPanel inputPanel = new JPanel();
 
         // Panel Layout
@@ -383,7 +363,6 @@ public class TextInputDialog
         gbl.setConstraints(insertButton, con);
         inputPanel.add(insertButton);
 
-        // ----------------------------------------------------------------------
         rawPanel.add(leftPanel, BorderLayout.CENTER);
         rawPanel.add(inputPanel, BorderLayout.EAST);
 
@@ -402,13 +381,7 @@ public class TextInputDialog
         rawPanel.add(desc, BorderLayout.SOUTH);
     }
 
-    // ---------------------------------------------------------------------------
-
-    // ---------------------------------------------------------------------------
-
-    private void initButtonPanel()
-    {
-
+    private void initButtonPanel() {
         okButton.setText(Localization.lang("Accept"));
         okButton.addActionListener(this);
         cancelButton.setText(Localization.lang("Cancel"));
@@ -421,14 +394,10 @@ public class TextInputDialog
         bb.addButton(parseWithFreeCiteButton);
         bb.addButton(cancelButton);
         bb.addGlue();
-
     }
 
-    // ---------------------------------------------------------------------------
-
     // Panel with bibtex source code
-    private void initSourcePanel()
-    {
+    private void initSourcePanel() {
         //    preview =  new PreviewPanel(entry) ;
         preview = new JTextArea();
         preview.setEditable(false);
@@ -443,13 +412,9 @@ public class TextInputDialog
         sourcePanel.add(paneScrollPane, BorderLayout.CENTER);
     }
 
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    private void addStylesToDocument(StyledDocument doc)
-    {
+    private void addStylesToDocument(StyledDocument doc) {
         //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().
-                getStyle(StyleContext.DEFAULT_STYLE);
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = doc.addStyle("regular", def);
         StyleConstants.setFontFamily(def, "SansSerif");
@@ -474,16 +439,12 @@ public class TextInputDialog
         StyleConstants.setFontSize(s, 16);
     }
 
-    // ---------------------------------------------------------------------------
-    private void insertTextForTag()
-    {
+    private void insertTextForTag() {
         String type = (String) fieldList.getSelectedValue();
-        if (type != null)
-        {
+        if (type != null) {
             String txt = textPane.getSelectedText();
 
-            if (txt != null)
-            {
+            if (txt != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
 
@@ -495,15 +456,13 @@ public class TextInputDialog
                         doc.getStyle("marked"), true);
 
                 // override an existing entry
-                if (overRadio.isSelected())
-                {
+                if (overRadio.isSelected()) {
                     entry.setField(type, txt);
                     // erase old text selection
                     marked.setStyleForTag(type, "regular", doc); // delete all previous styles
                     marked.insertPosition(type, selStart, selEnd); // insert new selection style
                 }
-                else // append text
-                {
+                else {
                     // memorize the selection for text highlighting
                     marked.appendPosition(type, selStart, selEnd);
 
@@ -511,18 +470,16 @@ public class TextInputDialog
                     String old = entry.getField(type);
 
                     // merge old and selected text
-                    if (old != null)
-                    {
+                    if (old != null) {
                         // insert a new author with an additional "and"
-                        if (type.hashCode() == "author".hashCode())
-                        {
+                        if (type.hashCode() == "author".hashCode()) {
                             entry.setField(type, old + " and " + txt);
                         } else {
                             entry.setField(type, old + txt);
                         }
                     }
-                    else // "null"+"txt" Strings forbidden
-                    {
+                    // "null"+"txt" Strings forbidden
+                    else {
                         entry.setField(type, txt);
                     }
                 }
@@ -532,33 +489,24 @@ public class TextInputDialog
         }
     }
 
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    public boolean okPressed()
-    {
+    public boolean okPressed() {
         return okPressed;
     }
-
-    // ---------------------------------------------------------------------------
 
     //  ActionListener
     //  handling of buttons-click actions
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
 
-        if (source == this.okButton)
-        {
+        if (source == this.okButton) {
             okPressed = true;
             dispose();
         }
-        else if (source == this.cancelButton)
-        {
+        else if (source == this.cancelButton) {
             dispose();
         }
-        else if (source == this.insertButton)
-        {
+        else if (source == this.insertButton) {
             insertTextForTag();
         }
         else if (source == this.parseWithFreeCiteButton) {
@@ -597,26 +545,20 @@ public class TextInputDialog
         }
     }
 
-    // ---------------------------------------------------------------------------
     // update the bibtex source view and available List
-    private void updateSourceView()
-    {
+    private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
-        try
-        {
+        try {
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
-        } catch (IOException ignored)
-        {
+        } catch (IOException ignored) {
         }
 
         fieldList.clearSelection();
     }
 
-    // ---------------------------------------------------------------------------
-    private String[] getAllFields()
-    {
+    private String[] getAllFields() {
         ArrayList<String> f = new ArrayList<String>();
         String[] req = entry.getRequiredFields();
         String[] opt = entry.getOptionalFields();
@@ -631,134 +573,86 @@ public class TextInputDialog
         return f.toArray(new String[f.size()]);
     }
 
-
-    // ---------------------------------------------------------------------------
-    class PasteAction
-            extends BasicAction
-    {
-
-        public PasteAction()
-        {
+    class PasteAction extends BasicAction {
+        public PasteAction() {
             super("Paste", "Paste from clipboard", GUIGlobals.getIconUrl("paste"));
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
             String data = ClipBoardManager.clipBoard.getClipboardContents();
-            if (data != null)
-            {
+            if (data != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();
-                if (selEnd - selStart > 0)
-                {
+                if (selEnd - selStart > 0) {
                     textPane.replaceSelection("");
                 }
                 int cPos = textPane.getCaretPosition();
-                try
-                {
+                try {
                     doc.insertString(cPos, data, doc.getStyle("regular"));
-                } catch (Exception ignored)
-                {
-                }
+                } catch (Exception ignored) {}
             }
         }
     }
 
-    // ---------------------------------------------------------------------------
-    class LoadAction
-            extends BasicAction
-    {
-
-        public LoadAction()
-        {
+    class LoadAction extends BasicAction {
+        public LoadAction() {
             super("Open", "Open_file", GUIGlobals.getIconUrl("open"));
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            try
-            {
+        public void actionPerformed(ActionEvent e) {
+            try {
                 String chosen = FileDialogs.getNewFile(_frame, null, null,
                         ".txt",
                         JFileChooser.OPEN_DIALOG, false);
-                if (chosen != null)
-                {
+                if (chosen != null) {
                     File newFile = new File(chosen);
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
-                    if (eKit != null)
-                    {
+                    if (eKit != null) {
                         eKit.read(new FileInputStream(newFile), doc, 0);
                         doc.setLogicalStyle(0, doc.getStyle("regular"));
                     }
                 }
-            } catch (Exception ignored)
-            {
-            }
+            } catch (Exception ignored) {}
         }
     }
 
-    // ---------------------------------------------------------------------------
-    class ClearAction
-            extends BasicAction
-    {
-
-        public ClearAction()
-        {
+    class ClearAction extends BasicAction {
+        public ClearAction() {
             super("Clear", "Clear_inputarea", GUIGlobals.getIconUrl("new"));
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
             textPane.setText("");
         }
     }
 
-    // ---------------------------------------------------------------------------
-    class MenuHeaderAction
-            extends BasicAction
-    {
-
-        public MenuHeaderAction()
-        {
+    class MenuHeaderAction extends BasicAction {
+        public MenuHeaderAction() {
             super("Edit");
             this.setEnabled(false);
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
-        }
+        public void actionPerformed(ActionEvent e) {}
     }
 
-    // ---------------------------------------------------------------------------
-
-    class FieldListSelectionHandler
-            implements ListSelectionListener
-    {
-
+    class FieldListSelectionHandler implements ListSelectionListener {
         private int lastIndex = -1;
 
-
         @Override
-        public void valueChanged(ListSelectionEvent e)
-        {
+        public void valueChanged(ListSelectionEvent e) {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
             int index = lsm.getAnchorSelectionIndex();
-            if (index != lastIndex)
-            {
-
+            if (index != lastIndex) {
                 boolean isAdjusting = e.getValueIsAdjusting();
 
-                if (!isAdjusting) // if selection is finished
-                {
-                    //            System.out.println( "Event for index" + index ) ;
-                    if (lastIndex > -1)
-                    {
+                if (!isAdjusting) {
+                    if (lastIndex > -1) {
                         String tag1 = (String) fieldList.getModel().getElementAt(lastIndex);
                         marked.setStyleForTag(tag1, "used", doc);
                     }
@@ -772,22 +666,15 @@ public class TextInputDialog
         }
     }
 
-    // ---------------------------------------------------------------------------
-
     // simple JList Renderer
     // based on : Advanced JList Programming at developers.sun.com
-    class SimpleCellRenderer
-            extends DefaultListCellRenderer
-    {
-
+    class SimpleCellRenderer extends DefaultListCellRenderer {
         private final Font baseFont;
         private final Font usedFont;
         private final ImageIcon okIcon = GUIGlobals.getImage("complete");
         private final ImageIcon needIcon = GUIGlobals.getImage("wrong");
 
-
-        public SimpleCellRenderer(Font normFont)
-        {
+        public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;
             usedFont = baseFont.deriveFont(Font.ITALIC);
         }
@@ -813,15 +700,13 @@ public class TextInputDialog
              */
             String s = value.toString();
             //        setIcon((s.length > 10) ? longIcon : shortIcon);
-            if (entry.getField(s) != null)
-            {
+            if (entry.getField(s) != null) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
                 this.setToolTipText("filled");
             }
-            else
-            {
+            else {
                 this.setIcon(needIcon);
                 this.setToolTipText("field is missing");
             }
@@ -829,86 +714,57 @@ public class TextInputDialog
         }
     }
 
-    //---------------------------------------------------------------
-
-    private class FieldListMouseListener
-            extends MouseAdapter
-    {
-
+    private class FieldListMouseListener extends MouseAdapter {
         @Override
-        public void mouseClicked(MouseEvent e)
-        {
-            if (e.getClickCount() == 2)
-            {
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
                 insertTextForTag();
             }
         }
     }
 }
 
-//---------------------------------------------------------------
-class PopupListener
-        extends MouseAdapter
-{
-
+class PopupListener extends MouseAdapter {
     private final JPopupMenu popMenu;
 
-
-    public PopupListener(JPopupMenu menu)
-    {
+    public PopupListener(JPopupMenu menu) {
         popMenu = menu;
     }
 
     @Override
-    public void mousePressed(MouseEvent e)
-    {
+    public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
 
     @Override
-    public void mouseReleased(MouseEvent e)
-    {
+    public void mouseReleased(MouseEvent e) {
         maybeShowPopup(e);
     }
 
-    private void maybeShowPopup(MouseEvent e)
-    {
-        if (e.isPopupTrigger())
-        {
-            //      System.out.println("show "
-            //                         + e.getComponent() +"  x =" + e.getX() +"y =" + e.getY() ) ;
-            //      popMenu.setVisible(true);
+    private void maybeShowPopup(MouseEvent e) {
+        if (e.isPopupTrigger()) {
             popMenu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
 }
 
-//---------------------------------------------------------------
-
-abstract class BasicAction
-        extends AbstractAction
-{
-
-    public BasicAction(String text, String description, URL icon)
-    {
+abstract class BasicAction extends AbstractAction {
+    public BasicAction(String text, String description, URL icon) {
         super(Localization.lang(text), new ImageIcon(icon));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }
 
-    public BasicAction(String text, String description, URL icon, KeyStroke key)
-    {
+    public BasicAction(String text, String description, URL icon, KeyStroke key) {
         super(Localization.lang(text), new ImageIcon(icon));
         putValue(Action.ACCELERATOR_KEY, key);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }
 
-    public BasicAction(String text)
-    {
+    public BasicAction(String text) {
         super(Localization.lang(text));
     }
 
-    public BasicAction(String text, KeyStroke key)
-    {
+    public BasicAction(String text, KeyStroke key) {
         super(Localization.lang(text));
         putValue(Action.ACCELERATOR_KEY, key);
     }
@@ -916,7 +772,3 @@ abstract class BasicAction
     @Override
     public abstract void actionPerformed(ActionEvent e);
 }
-//---------------------------------------------------------------
-
-//---------------------------------------------------------------
-

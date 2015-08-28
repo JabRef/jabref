@@ -256,7 +256,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction delete = new GeneralAction("delete", "Delete", Localization.lang("Delete"),
             prefs.getKey("Delete"));
     private final AbstractAction copy = new EditAction("copy", GUIGlobals.getIconUrl("copy"));
-    private final AbstractAction paste = new EditAction("Paste", GUIGlobals.getIconUrl("paste"));
+    private final AbstractAction paste = new EditAction(Actions.PASTE, GUIGlobals.getIconUrl("paste"));
     private final AbstractAction cut = new EditAction("cut", GUIGlobals.getIconUrl("cut"));
     private final AbstractAction mark = new GeneralAction("markEntries", "Mark entries",
             Localization.lang("Mark entries"),
