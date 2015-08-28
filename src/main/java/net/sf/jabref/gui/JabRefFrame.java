@@ -253,15 +253,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             "right", prefs.getKey("Forward"));
     final AbstractAction back = new GeneralAction("back", "Back", Localization.lang("Back"),
             "left", prefs.getKey("Back"));
-    private final AbstractAction//cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
-            //   GUIGlobals.cutIconFile,
-            //   prefs.getKey("Cut")),
-            delete = new GeneralAction("delete", "Delete", Localization.lang("Delete"),
+    private final AbstractAction delete = new GeneralAction("delete", "Delete", Localization.lang("Delete"),
             prefs.getKey("Delete"));
-    private final AbstractAction//copy = new GeneralAction("copy", "Copy", Globals.lang("Copy"),
-            //                         GUIGlobals.copyIconFile,
-            //                         prefs.getKey("Copy")),
-            copy = new EditAction("copy", GUIGlobals.getIconUrl("copy"));
+    private final AbstractAction copy = new EditAction("copy", GUIGlobals.getIconUrl("copy"));
     private final AbstractAction paste = new EditAction("Paste", GUIGlobals.getIconUrl("paste"));
     private final AbstractAction cut = new EditAction("cut", GUIGlobals.getIconUrl("cut"));
     private final AbstractAction mark = new GeneralAction("markEntries", "Mark entries",
@@ -1096,6 +1090,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
 
     class GeneralAction extends MnemonicAwareAction {
+        private final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+
         private final String command;
 
         public GeneralAction(String command, String text,
@@ -1757,14 +1753,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * The action concerned with closing the window.
      */
     class CloseAction extends MnemonicAwareAction {
-
         public CloseAction() {
             putValue(Action.NAME, "Quit");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Quit JabRef"));
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
-            //putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-            //    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
         }
 
         @Override
@@ -1773,10 +1765,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-
     // The action for closing the current database and leaving the window open.
     private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
-
 
     class CloseDatabaseAction extends MnemonicAwareAction {
         public CloseDatabaseAction() {
@@ -1836,8 +1826,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 markActiveBasePanel();
             }
             setWindowTitle();
-            updateEnabledState(); // Man, this is what I call a bug that this is not called.
+            updateEnabledState(); // FIXME: Man, this is what I call a bug that this is not called.
             output(Localization.lang("Closed database") + '.');
+            // FIXME: why?
             System.gc(); // Test
         }
     }
@@ -2324,7 +2315,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * relevant name in its action map.
      */
     class EditAction extends MnemonicAwareAction {
-
         private final String command;
 
         public EditAction(String command, URL icon) {
@@ -2344,8 +2334,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             //Util.pr(Globals.focusListener.getFocused().toString());
             JComponent source = Globals.focusListener.getFocused();
             try {
-                source.getActionMap().get(command).actionPerformed
-                        (new ActionEvent(source, 0, command));
+                source.getActionMap().get(command).actionPerformed(new ActionEvent(source, 0, command));
             } catch (NullPointerException ex) {
                 // No component is focused, so we do nothing.
             }
