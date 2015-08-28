@@ -24,6 +24,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	Nathan Dunn
 	Alexis Gallagher
 	David Gleich
+	Behrouz Javanmardi
 	Bernd Kalbfuss
 	Martin Kähmer
 	Ervin Kolenovic

@@ -198,6 +198,7 @@ public class GUIGlobals {
         GUIGlobals.LANGUAGES.put("Bahasa Indonesia", "in");
         GUIGlobals.LANGUAGES.put("Brazilian Portugese", "pt_BR");
         GUIGlobals.LANGUAGES.put("Russian", "ru");
+        GUIGlobals.LANGUAGES.put("Persian (فارسی)", "fa");
 
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();

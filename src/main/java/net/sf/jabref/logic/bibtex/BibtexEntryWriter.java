@@ -113,19 +113,19 @@ public class BibtexEntryWriter {
                 }
             }
         }
-        // Then optional fields.
-        requiredFields = entry.getOptionalFields();
 
-        if (requiredFields != null) {
-            Arrays.sort(requiredFields); // Sorting in alphabetic order.
-            for (String value : requiredFields) {
+        // Then optional fields.
+        String[] optionalFields = entry.getOptionalFields();
+        if (optionalFields != null) {
+            Arrays.sort(optionalFields); // Sorting in alphabetic order.
+            for (String value : optionalFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
                     writtenFields.add(value);
-
                 }
             }
         }
+
         // Then write remaining fields in alphabetic order.
         TreeSet<String> remainingFields = new TreeSet<>();
         for (String key : entry.getAllFields()) {
@@ -138,7 +138,6 @@ public class BibtexEntryWriter {
 
         for (String field : remainingFields) {
             hasWritten = hasWritten | writeField(entry, out, field, hasWritten);
-
         }
 
         // Finally, end the entry.
