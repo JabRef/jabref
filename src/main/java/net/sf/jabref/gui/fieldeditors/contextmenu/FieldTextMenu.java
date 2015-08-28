@@ -8,8 +8,7 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
@@ -18,32 +17,11 @@ import net.sf.jabref.logic.util.strings.NameListNormalizer;
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
-    private final AbstractAction copyAct;
+    private final CopyAction copyAct;
 
     public FieldTextMenu(FieldEditor fieldComponent) {
         field = fieldComponent;
-        final JTextComponent field1 = (JTextComponent) field;
-        copyAct = new AbstractAction() {
-            private JTextComponent field = field1;
-
-            {
-                putValue(Action.NAME, Localization.lang("Copy to clipboard"));
-                putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy to clipboard"));
-                putValue(Action.SMALL_ICON, GUIGlobals.getImage("copy"));
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (field != null) {
-                    String data = field.getSelectedText();
-                    if (data != null) {
-                        if (!data.isEmpty()) {
-                            ClipBoardManager.clipBoard.setClipboardContents(data);
-                        }
-                    }
-                }
-            }
-        };
+        copyAct = new CopyAction((JTextComponent) field);
         initMenu();
     }
 

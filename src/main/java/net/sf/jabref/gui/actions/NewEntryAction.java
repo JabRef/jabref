@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class NewEntryAction extends MnemonicAwareAction {
-    private final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
+    private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
 
     private JabRefFrame jabRefFrame;
     String type; // The type of item to create.
