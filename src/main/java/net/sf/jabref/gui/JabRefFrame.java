@@ -262,7 +262,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             //                         GUIGlobals.copyIconFile,
             //                         prefs.getKey("Copy")),
             copy = new EditAction("copy", GUIGlobals.getIconUrl("copy"));
-    private final AbstractAction paste = new EditAction("paste", GUIGlobals.getIconUrl("paste"));
+    private final AbstractAction paste = new EditAction("Paste", GUIGlobals.getIconUrl("paste"));
     private final AbstractAction cut = new EditAction("cut", GUIGlobals.getIconUrl("cut"));
     private final AbstractAction mark = new GeneralAction("markEntries", "Mark entries",
             Localization.lang("Mark entries"),
