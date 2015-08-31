@@ -190,11 +190,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
                      MetaData metaData, String encoding) {
-        assert frame != null;
-        assert db != null;
+        Objects.requireNonNull(frame);
+        Objects.requireNonNull(db);
         //file may be null
-        assert encoding != null;
-        assert metaData != null;
+        Objects.requireNonNull(encoding);
+        Objects.requireNonNull(metaData);
 
         this.encoding = encoding;
         this.metaData = metaData;
