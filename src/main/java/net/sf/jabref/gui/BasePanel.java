@@ -215,13 +215,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private SaveDatabaseAction saveAction;
 
-    /**
-     * The group selector component for this database. Instantiated by the
-     * SidePaneManager if necessary, or from this class if merging groups from a
-     * different database.
-     */
-    //GroupSelector groupSelector;
-
     private boolean showingSearch;
 
     public boolean sortingBySearchResults;
