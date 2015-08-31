@@ -329,10 +329,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void output(String s) {
-        boolean suppressOutput = false;
-        if (!suppressOutput) {
             frame.output(s);
-        }
     }
 
     private void setupActions() {
