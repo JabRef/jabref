@@ -735,15 +735,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put("mergeEntries", (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
+        actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
-        actions.put("search", (BaseAction) () -> {
+        actions.put(Actions.SEARCH, (BaseAction) () -> {
             sidePaneManager.show("search");
             frame.searchToggle.setSelected(true);
             frame.getSearchManager().startSearch();
         });
 
-        actions.put("toggleSearch", (BaseAction) () -> {
+        actions.put(Actions.TOGGLE_SEARCH, (BaseAction) () -> {
             sidePaneManager.toggle("search");
             boolean on = sidePaneManager.isComponentVisible("search");
             frame.searchToggle.setSelected(on);
@@ -752,14 +752,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("incSearch", (BaseAction) () -> {
+        actions.put(Actions.INC_SEARCH, (BaseAction) () -> {
             sidePaneManager.show("search");
             frame.searchToggle.setSelected(true);
             frame.getSearchManager().startIncrementalSearch();
         });
 
         // The action for copying the selected entry's key.
-        actions.put("copyKey", (BaseAction) () -> {
+        actions.put(Actions.COPY_KEY, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
             if (bes != null && bes.length > 0) {
                 storeCurrentEdit();
@@ -797,7 +797,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for copying a cite for the selected entry.
-        actions.put("copyCiteKey", new BaseAction() {
+        actions.put(Actions.COPY_CITE_KEY, new BaseAction() {
 
             @Override
             public void action() {
@@ -840,7 +840,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for copying the BibTeX key and the title for the first selected entry
-        actions.put("copyKeyAndTitle", new BaseAction() {
+        actions.put(Actions.COPY_KEY_AND_TITLE, new BaseAction() {
 
             @Override
             public void action() {
@@ -891,9 +891,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
+        actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
-        actions.put("openFile", new BaseAction() {
+        actions.put(Actions.OPEN_FILE, new BaseAction() {
 
             @Override
             public void action() {
@@ -1032,9 +1032,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("addFileLink", new AttachFileAction(this));
+        actions.put(Actions.ADD_FILE_LINK, new AttachFileAction(this));
 
-        actions.put("openExternalFile", new BaseAction() {
+        actions.put(Actions.OPEN_EXTERNAL_FILE, new BaseAction() {
 
             @Override
             public void action() {
@@ -1070,7 +1070,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("openFolder", new BaseAction() {
+        actions.put(Actions.OPEN_FOLDER, new BaseAction() {
 
             @Override
             public void action() {
@@ -1092,7 +1092,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("openUrl", new BaseAction() {
+        actions.put(Actions.OPEN_URL, new BaseAction() {
 
             @Override
             public void action() {
@@ -1143,7 +1143,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("openSpires", new BaseAction() {
+        actions.put(Actions.OPEN_SPIRES, new BaseAction() {
 
             @Override
             public void action() {
@@ -1171,7 +1171,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("replaceAll", new BaseAction() {
+        actions.put(Actions.REPLACE_ALL, new BaseAction() {
 
             @Override
             public void action() {
@@ -1203,9 +1203,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("dupliCheck", (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
+        actions.put(Actions.DUPLI_CHECK, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
 
-        actions.put("plainTextImport", new BaseAction() {
+        actions.put(Actions.PLAIN_TEXT_IMPORT, new BaseAction() {
 
             @Override
             public void action() {
@@ -1232,9 +1232,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("markEntries", new MarkEntriesAction(frame, 0));
+        actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
 
-        actions.put("unmarkEntries", new BaseAction() {
+        actions.put(Actions.UNMARK_ENTRIES, new BaseAction() {
 
             @Override
             public void action() {
@@ -1264,7 +1264,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("unmarkAll", (BaseAction) () -> {
+        actions.put(Actions.UNMARK_ALL, (BaseAction) () -> {
             NamedCompound ce = new NamedCompound(Localization.lang("Unmark all"));
 
             for (BibtexEntry be : database.getEntries()) {
@@ -1301,14 +1301,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             actions.put(status.getActionName(), status.getAction(this.frame));
         }
 
-        actions.put("togglePreview", (BaseAction) () -> {
+        actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {
             boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
             Globals.prefs.putBoolean(JabRefPreferences.PREVIEW_ENABLED, enabled);
             frame.setPreviewActive(enabled);
             frame.previewToggle.setSelected(enabled);
         });
 
-        actions.put("toggleHighlightGroupsMatchingAny", (BaseAction) () -> {
+        actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY, (BaseAction) () -> {
             boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY);
             Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, enabled);
             frame.highlightAny.setSelected(enabled);
@@ -1320,7 +1320,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             groupsHighlightListener.listChanged(null);
         });
 
-        actions.put("toggleHighlightGroupsMatchingAll", (BaseAction) () -> {
+        actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL, (BaseAction) () -> {
             boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL);
             Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, enabled);
             frame.highlightAll.setSelected(enabled);
@@ -1332,35 +1332,35 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             groupsHighlightListener.listChanged(null);
         });
 
-        actions.put("switchPreview", (BaseAction) selectionListener::switchPreview);
+        actions.put(Actions.SWITCH_PREVIEW, (BaseAction) selectionListener::switchPreview);
 
-        actions.put("manageSelectors", (BaseAction) () -> {
+        actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
             ContentSelectorDialog2 csd = new ContentSelectorDialog2
                     (frame, frame, BasePanel.this, false, metaData, null);
             Util.placeDialog(csd, frame);
             csd.setVisible(true);
         });
 
-        actions.put("exportToClipboard", new ExportToClipboardAction(frame, database()));
-        actions.put("sendAsEmail", new SendAsEMailAction(frame));
+        actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame, database()));
+        actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
-        actions.put("writeXMP", new WriteXMPAction(this));
+        actions.put(Actions.WRITE_XMP, new WriteXMPAction(this));
 
-        actions.put("abbreviateIso", new AbbreviateAction(this, true));
-        actions.put("abbreviateMedline", new AbbreviateAction(this, false));
-        actions.put("unabbreviate", new UnabbreviateAction(this));
-        actions.put("autoSetPdf", new AutoSetExternalFileForEntries(this, "pdf"));
-        actions.put("autoSetPs", new AutoSetExternalFileForEntries(this, "ps"));
-        actions.put("autoSetFile", new SynchronizeFileField(this));
+        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
+        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
+        actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
+        actions.put(Actions.AUTO_SET_PDF, new AutoSetExternalFileForEntries(this, "pdf"));
+        actions.put(Actions.AUTO_SET_PS, new AutoSetExternalFileForEntries(this, "ps"));
+        actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
 
-        actions.put("back", (BaseAction) BasePanel.this::back);
-        actions.put("forward", (BaseAction) BasePanel.this::forward);
+        actions.put(Actions.BACK, (BaseAction) BasePanel.this::back);
+        actions.put(Actions.FORWARD, (BaseAction) BasePanel.this::forward);
 
-        actions.put("resolveDuplicateKeys", new SearchFixDuplicateLabels(this));
+        actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
-        actions.put("addToGroup", new GroupAddRemoveDialog(this, true, false));
-        actions.put("removeFromGroup", new GroupAddRemoveDialog(this, false, false));
-        actions.put("moveToGroup", new GroupAddRemoveDialog(this, true, true));
+        actions.put(Actions.ADD_TO_GROUP, new GroupAddRemoveDialog(this, true, false));
+        actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
+        actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
     }
 
     /**
