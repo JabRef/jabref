@@ -1967,10 +1967,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public void updateEntryPreviewToRow(BibtexEntry e) {
-
-    }
-
     public void adjustSplitter() {
         int mode = getMode();
         if (mode == BasePanel.SHOWING_PREVIEW) {
