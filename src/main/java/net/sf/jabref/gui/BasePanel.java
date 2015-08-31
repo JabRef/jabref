@@ -45,6 +45,7 @@ import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.journals.AbbreviateAction;
@@ -278,27 +279,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         saveAction = new SaveDatabaseAction(this);
         CleanUpAction cleanUpAction = new CleanUpAction(this);
 
-        actions.put("undo", undoAction);
-        actions.put("redo", redoAction);
+        actions.put(Actions.UNDO, undoAction);
+        actions.put(Actions.REDO, redoAction);
 
-        actions.put("focusTable", (BaseAction) () -> new FocusRequester(mainTable));
+        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> new FocusRequester(mainTable));
 
         // The action for opening an entry editor.
-        actions.put("edit", (BaseAction) selectionListener::editSignalled);
+        actions.put(Actions.EDIT, (BaseAction) selectionListener::editSignalled);
 
         actions.put("test", new FindFullTextAction(this));
 
         // The action for saving a database.
-        actions.put("save", saveAction);
+        actions.put(Actions.SAVE, saveAction);
 
-        actions.put("saveAs", (BaseAction) saveAction::saveAs);
+        actions.put(Actions.SAVE_AS, (BaseAction) saveAction::saveAs);
 
-        actions.put("saveSelectedAs", new SaveSelectedAction(FileActions.DatabaseSaveType.DEFAULT));
+        actions.put(Actions.SAVE_SELECTED_AS, new SaveSelectedAction(FileActions.DatabaseSaveType.DEFAULT));
 
-        actions.put("saveSelectedAsPlain", new SaveSelectedAction(FileActions.DatabaseSaveType.PLAIN_BIBTEX));
+        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(FileActions.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
-        actions.put("copy", (BaseAction) () -> {
+        actions.put(Actions.COPY, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
 
             if (bes != null && bes.length > 0) {
@@ -328,7 +329,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("cut", (BaseAction) () -> {
+        actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand("copy");
             BibtexEntry[] bes = mainTable.getSelectedEntries();
             //int row0 = mainTable.getSelectedRow();
@@ -354,7 +355,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("delete", (BaseAction) () -> {
+        actions.put(Actions.DELETE, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
             if (bes != null && bes.length > 0) {
 
@@ -387,7 +388,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put("paste", (BaseAction) () -> {
+        actions.put(Actions.PASTE, (BaseAction) () -> {
             // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
             Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
             if (content != null) {
@@ -472,10 +473,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         });
 
-        actions.put("selectAll", (BaseAction) mainTable::selectAll);
+        actions.put(Actions.SELECT_ALL, (BaseAction) mainTable::selectAll);
 
         // The action for opening the preamble editor
-        actions.put("editPreamble", (BaseAction) () -> {
+        actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
                 PreambleEditor form = new PreambleEditor
                         (frame, BasePanel.this, database, Globals.prefs);
@@ -489,7 +490,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for opening the string editor
-        actions.put("editStrings", (BaseAction) () -> {
+        actions.put(Actions.EDIT_STRINGS, (BaseAction) () -> {
             if (stringDialog == null) {
                 StringDialog form = new StringDialog
                         (frame, BasePanel.this, database, Globals.prefs);
@@ -503,19 +504,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for toggling the groups interface
-        actions.put("toggleGroups", (BaseAction) () -> {
+        actions.put(Actions.TOGGLE_GROUPS, (BaseAction) () -> {
             sidePaneManager.toggle("groups");
             frame.groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
         });
 
         // The action for toggling the visibility of the toolbar
-        actions.put("toggleToolbar", (BaseAction) () -> frame.tlb.setVisible(!frame.tlb.isVisible()));
+        actions.put(Actions.TOGGLE_TOOLBAR, (BaseAction) () -> frame.tlb.setVisible(!frame.tlb.isVisible()));
 
         // action for collecting database strings from user
-        actions.put("dbConnect", new DbConnectAction(this));
+        actions.put(Actions.DB_CONNECT, new DbConnectAction(this));
 
         // action for exporting database to external SQL database
-        actions.put("dbExport", new AbstractWorker() {
+        actions.put(Actions.DB_EXPORT, new AbstractWorker() {
 
             String errorMessage;
             boolean connectToDB;
@@ -613,7 +614,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for auto-generating keys.
-        actions.put("makeKey", new AbstractWorker() {
+        actions.put(Actions.MAKE_KEY, new AbstractWorker() {
 
             //int[] rows;
             List<BibtexEntry> entries;
@@ -732,7 +733,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for cleaning up entry.
-        actions.put("Cleanup", cleanUpAction);
+        actions.put(Actions.CLEANUP, cleanUpAction);
 
         actions.put("mergeEntries", (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
