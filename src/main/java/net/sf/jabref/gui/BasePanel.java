@@ -823,7 +823,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             BibtexEntry[] bes = mainTable.getSelectedEntries();
             if (bes != null && bes.length > 0) {
                 storeCurrentEdit();
-                Vector<Object> keys = new Vector<Object>();
+                List<String> keys = new ArrayList<>(bes.length);
                 // Collect all non-null keys.
                 for (BibtexEntry be : bes) {
                     if (be.getField(BibtexEntry.KEY_FIELD) != null) {
@@ -834,10 +834,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     output("None of the selected entries have BibTeX keys.");
                     return;
                 }
-                StringBuilder sb = new StringBuilder((String) keys.elementAt(0));
+                StringBuilder sb = new StringBuilder(keys.get(0));
                 for (int i = 1; i < keys.size(); i++) {
                     sb.append(',');
-                    sb.append((String) keys.elementAt(i));
+                    sb.append(keys.get(i));
                 }
 
                 StringSelection ss = new StringSelection(sb.toString());
@@ -864,8 +864,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 BibtexEntry[] bes = mainTable.getSelectedEntries();
                 if (bes != null && bes.length > 0) {
                     storeCurrentEdit();
-                    //String[] keys = new String[bes.length];
-                    Vector<Object> keys = new Vector<Object>();
+                    List<String> keys = new ArrayList<>(bes.length);
                     // Collect all non-null keys.
                     for (BibtexEntry be : bes) {
                         if (be.getField(BibtexEntry.KEY_FIELD) != null) {
@@ -876,10 +875,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         output("None of the selected entries have BibTeX keys.");
                         return;
                     }
-                    StringBuilder sb = new StringBuilder((String) keys.elementAt(0));
+                    StringBuilder sb = new StringBuilder(keys.get(0));
                     for (int i = 1; i < keys.size(); i++) {
                         sb.append(',');
-                        sb.append((String) keys.elementAt(i));
+                        sb.append(keys.get(i));
                     }
 
                     StringSelection ss = new StringSelection
