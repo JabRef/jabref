@@ -157,7 +157,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private MainTableSelectionListener selectionListener;
     private ListEventListener<BibtexEntry> groupsHighlightListener;
-    JSplitPane contentPane = new JSplitPane();
 
     private JSplitPane splitPane;
 
