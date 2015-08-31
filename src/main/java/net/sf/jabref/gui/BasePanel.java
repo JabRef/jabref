@@ -1073,7 +1073,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             }
 
                             if (filepath != null) {
-                                //output(Globals.lang("Calling external viewer..."));
                                 try {
                                     JabRefDesktop.openExternalViewer(metaData(), filepath, field);
                                     output(Localization.lang("External viewer called") + '.');
@@ -1166,7 +1165,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         field = "url";
                     }
                     if (link != null) {
-                        //output(Globals.lang("Calling external viewer..."));
                         try {
                             JabRefDesktop.openExternalViewer(metaData(), link.toString(), field);
                             output(Localization.lang("External viewer called") + '.');
@@ -1218,7 +1216,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         link = SPIRESFetcher.constructUrlFromSlaccitation(bes[0].getField("slaccitation"));
                     }
                     if (link != null) {
-                        //output(Globals.lang("Calling external viewer..."));
                         try {
                             JabRefDesktop.openExternalViewer(metaData(), link.toString(), "url");
                             output(Localization.lang("External viewer called") + '.');
@@ -1718,10 +1715,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
         groupFilterList = new FilterList<>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
         searchFilterList = new FilterList<>(groupFilterList, NoSearchMatcher.INSTANCE);
-        //final SortedList sortedList = new SortedList(searchFilterList, null);
         tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
-        //EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
         mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
 
         selectionListener = new MainTableSelectionListener(this, mainTable);
@@ -2831,7 +2826,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 nextEntries.add(showing);
             }
             backOrForwardInProgress = true; // to avoid the history getting updated erroneously
-            //showEntry(toShow);
             highlightEntry(toShow);
         }
     }
@@ -2845,7 +2839,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 previousEntries.add(showing);
             }
             backOrForwardInProgress = true; // to avoid the history getting updated erroneously
-            //showEntry(toShow);
             highlightEntry(toShow);
         }
     }
@@ -2880,7 +2873,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 == JOptionPane.OK_OPTION) {
 
                     saveDatabase(expFile, true, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), saveType);
-                    //runCommand("save");
                     frame.getFileHistory().newFile(expFile.getPath());
                     frame.output(Localization.lang("Saved selected to") + " '"
                             + expFile.getPath() + "'.");
