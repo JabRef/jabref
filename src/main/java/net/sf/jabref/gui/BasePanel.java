@@ -182,8 +182,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
 
-    private final List<BibtexEntry> previousEntries = new ArrayList<BibtexEntry>();
-    private final List<BibtexEntry> nextEntries = new ArrayList<BibtexEntry>();
+    private final List<BibtexEntry> previousEntries = new ArrayList<>();
+    private final List<BibtexEntry> nextEntries = new ArrayList<>();
 
     private boolean baseChanged;
     private boolean nonUndoableChange;
@@ -203,7 +203,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private boolean backOrForwardInProgress;
 
     // To indicate which entry is currently shown.
-    public final HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
+    public final HashMap<String, EntryEditor> entryEditors = new HashMap<>();
     // To contain instantiated entry editors. This is to save time
     // in switching between entries.
 
@@ -237,7 +237,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // MetaData parses, keeps and writes meta data.
     public final MetaData metaData;
 
-    private final HashMap<String, Object> actions = new HashMap<String, Object>();
+    private final HashMap<String, Object> actions = new HashMap<>();
     private SidePaneManager sidePaneManager;
 
     public ContentAutoCompleters getAutoCompleters() {
@@ -1003,7 +1003,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                         of stuff below. It is now disabled by default. */
 
                                     // see if we can fall back to a filename based on the bibtex key
-                                    final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+                                    final Collection<BibtexEntry> entries = new ArrayList<>();
                                     entries.add(bes[0]);
                                     ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                                     ArrayList<File> dirs = new ArrayList<>();
