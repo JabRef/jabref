@@ -2859,7 +2859,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         @Override
-        public void action() throws Throwable {
+        public void action() throws SaveException {
 
             String chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     JFileChooser.SAVE_DIALOG, false);
