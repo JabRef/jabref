@@ -36,7 +36,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -851,7 +850,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Ask here if the user really wants to close, if the base
         // has not been saved since last save.
         boolean close = true;
-        Vector<String> filenames = new Vector<String>();
+        Vector<String> filenames = new Vector<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).isBaseChanged()) {
@@ -1411,7 +1410,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
             } else {
-                List<BibtexEntry> entries = new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
+                List<BibtexEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, "", false);
             }
         } else {
@@ -1558,12 +1557,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    private List<Object> openDatabaseOnlyActions = new LinkedList<Object>();
-    private List<Object> severalDatabasesOnlyActions = new LinkedList<Object>();
+    private List<Object> openDatabaseOnlyActions = new LinkedList<>();
+    private List<Object> severalDatabasesOnlyActions = new LinkedList<>();
 
 
     private void initActions() {
-        openDatabaseOnlyActions = new LinkedList<Object>();
+        openDatabaseOnlyActions = new LinkedList<>();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors,
                 mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
@@ -1583,7 +1582,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
-        severalDatabasesOnlyActions = new LinkedList<Object>();
+        severalDatabasesOnlyActions = new LinkedList<>();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
@@ -1722,7 +1721,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeyBindingsDialog d = new KeyBindingsDialog(new HashMap<String, String>(prefs.getKeyBindings()), prefs.getDefaultKeys());
+            KeyBindingsDialog d = new KeyBindingsDialog(new HashMap<>(prefs.getKeyBindings()), prefs.getDefaultKeys());
             d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
             Util.placeDialog(d, JabRefFrame.this);
@@ -2178,7 +2177,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
             // previously stored file name.
-            Vector<String> filenames = new Vector<String>();
+            Vector<String> filenames = new Vector<>();
             if (tabbedPane.getTabCount() > 0) {
                 for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                     if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
@@ -2244,7 +2243,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 @Override
                 public void run() {
-                    HashSet<String> currentFiles = new HashSet<String>();
+                    HashSet<String> currentFiles = new HashSet<>();
                     if (tabbedPane.getTabCount() > 0) {
                         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                             if (baseAt(i).getFile() != null) {
