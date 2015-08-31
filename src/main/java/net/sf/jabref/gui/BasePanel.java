@@ -685,8 +685,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run first, in EDT:
             @Override
             public void init() {
-                entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
-                //rows = entryTable.getSelectedRows() ;
+                entries = new ArrayList<>(Arrays.asList(getSelectedEntries()));
                 numSelected = entries.size();
 
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
@@ -735,7 +734,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
-                HashMap<BibtexEntry, Object> oldvals = new HashMap<BibtexEntry, Object>();
+                HashMap<BibtexEntry, Object> oldvals = new HashMap<>();
                 // Iterate again, removing already set keys. This is skipped if overwriting
                 // is disabled, since all entries with keys set will have been removed.
                 if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -1008,7 +1007,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
                                     entries.add(bes[0]);
                                     ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-                                    ArrayList<File> dirs = new ArrayList<File>();
+                                    ArrayList<File> dirs = new ArrayList<>();
                                     if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD).length > 0) {
                                         String[] mdDirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
                                         for (String mdDir : mdDirs) {
@@ -1016,7 +1015,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                                         }
                                     }
-                                    Collection<String> extensions = new ArrayList<String>();
+                                    Collection<String> extensions = new ArrayList<>();
                                     for (final ExternalFileType type : types) {
                                         extensions.add(type.getExtension());
                                     }
@@ -1577,7 +1576,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 database.insertEntry(be);
                 // Set owner/timestamp if options are enabled:
-                ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
+                ArrayList<BibtexEntry> list = new ArrayList<>();
                 list.add(be);
                 Util.setAutomaticFields(list, true, true, false);
 
@@ -1718,8 +1717,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         database.addDatabaseChangeListener(eventList);
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
-        groupFilterList = new FilterList<BibtexEntry>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
-        searchFilterList = new FilterList<BibtexEntry>(groupFilterList, NoSearchMatcher.INSTANCE);
+        groupFilterList = new FilterList<>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
+        searchFilterList = new FilterList<>(groupFilterList, NoSearchMatcher.INSTANCE);
         //final SortedList sortedList = new SortedList(searchFilterList, null);
         tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
