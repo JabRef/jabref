@@ -49,6 +49,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.fieldeditors.*;
+import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -341,23 +342,23 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         ActionMap actionMap = toolBar.getActionMap();
         InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        inputMap.put(prefs.getKey("Close entry editor"), "close");
+        inputMap.put(prefs.getKey(KeyBinds.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(prefs.getKey("Entry editor, store field"), "store");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_STORE_FIELD), "store");
         actionMap.put("store", storeFieldAction);
-        inputMap.put(prefs.getKey("Autogenerate BibTeX keys"), "generateKey");
+        inputMap.put(prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS), "generateKey");
         actionMap.put("generateKey", generateKeyAction);
-        inputMap.put(prefs.getKey("Automatically link files"), "autoLink");
+        inputMap.put(prefs.getKey(KeyBinds.AUTOMATICALLY_LINK_FILES), "autoLink");
         actionMap.put("autoLink", autoLinkAction);
-        inputMap.put(prefs.getKey("Entry editor, previous entry"), "prev");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", prevEntryAction);
-        inputMap.put(prefs.getKey("Entry editor, next entry"), "next");
+        inputMap.put(prefs.getKey(KeyBinds.ENTRY_EDITOR_NEXT_ENTRY), "next");
         actionMap.put("next", nextEntryAction);
-        inputMap.put(prefs.getKey("Undo"), "undo");
+        inputMap.put(prefs.getKey(KeyBinds.UNDO), "undo");
         actionMap.put("undo", undoAction);
-        inputMap.put(prefs.getKey("Redo"), "redo");
+        inputMap.put(prefs.getKey(KeyBinds.REDO), "redo");
         actionMap.put("redo", redoAction);
-        inputMap.put(prefs.getKey("Help"), "help");
+        inputMap.put(prefs.getKey(KeyBinds.HELP), "help");
         actionMap.put("help", helpAction);
 
         toolBar.setFloatable(false);
