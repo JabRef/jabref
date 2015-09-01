@@ -509,9 +509,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             frame.groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
         });
 
-        // The action for toggling the visibility of the toolbar
-        actions.put(Actions.TOGGLE_TOOLBAR, (BaseAction) () -> frame.tlb.setVisible(!frame.tlb.isVisible()));
-
         // action for collecting database strings from user
         actions.put(Actions.DB_CONNECT, new DbConnectAction(this));
 

@@ -313,9 +313,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS, "Edit strings",
             Localization.lang("Edit strings"),
             prefs.getKey(KeyBinds.EDIT_STRINGS));
-    private final AbstractAction toggleToolbar = new GeneralAction(Actions.TOGGLE_TOOLBAR, "Hide/show toolbar",
-            Localization.lang("Hide/show toolbar"),
-            prefs.getKey(KeyBinds.HIDE_SHOW_TOOLBAR));
+    private final AbstractAction toggleToolbar = new AbstractAction("Hide/show toolbar") {
+        {
+            putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.HIDE_SHOW_TOOLBAR));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            tlb.setVisible(!tlb.isVisible());
+        }};
     private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
             "Toggle groups interface",
             Localization.lang("Toggle groups interface"),
@@ -1155,13 +1161,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     ex.printStackTrace();
                 }
             } else {
-                // QUICK HACK to solve bug #1277
-                if (e.getActionCommand().equals("Hide/show toolbar")) {
-                    // code copied from BasePanel.java, action "toggleToolbar"
-                    tlb.setVisible(!tlb.isVisible());
-                } else {
                     LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
-                }
             }
         }
     }
