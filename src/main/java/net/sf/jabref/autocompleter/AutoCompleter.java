@@ -16,7 +16,7 @@ public interface AutoCompleter<E> {
 
     /**
      * States whether the field consists of multiple values (false) or of a single value (true)
-	 * 
+     *
      * Symptom: if false, net.sf.jabref.gui.AutoCompleteListener#getCurrentWord(JTextComponent comp)
      * returns current word only, if true, it returns the text beginning from the buffer
      */
@@ -29,10 +29,10 @@ public interface AutoCompleter<E> {
     /**
 	 * Returns one or more possible completions for a given String. The returned
 	 * completion depends on which informations were stored while adding
-	 * BibtexEntries by the used implementation of {@link AbstractAutoCompleter}
+	 * BibtexEntries by the used implementation of {@link AutoCompleter}
 	 * .
 	 * 
-	 * @see AbstractAutoCompleter#addBibtexEntry(BibtexEntry)
+	 * @see AutoCompleter#addBibtexEntry(BibtexEntry)
 	 */
     E[] complete(String str);
 

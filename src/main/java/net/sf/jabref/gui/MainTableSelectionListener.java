@@ -97,8 +97,6 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
 		panel.frame().getSearchBar().addSearchListener(previewPanel[0]);
 		panel.frame().getSearchBar().addSearchListener(previewPanel[1]);
-        //panel.frame().getSearchManager().addSearchListener(previewPanel[0]);
-        //panel.frame().getSearchManager().addSearchListener(previewPanel[1]);
     }
 
     public void updatePreviews() {

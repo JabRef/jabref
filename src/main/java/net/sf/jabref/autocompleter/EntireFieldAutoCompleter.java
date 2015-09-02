@@ -39,11 +39,6 @@ class EntireFieldAutoCompleter extends AbstractAutoCompleter {
     }
 
     @Override
-    public String[] complete(String s) {
-		return super.complete(s);
-	}
-    
-    @Override
     public void addBibtexEntry(BibtexEntry entry) {
         if (entry == null) {
             return;

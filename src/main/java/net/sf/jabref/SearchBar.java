@@ -54,6 +54,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.autocompleter.FuzzyTextSearchStrategy;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.SearchResultsDialog;
@@ -909,7 +910,7 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 			// popup.add(list);
 		}
 
-		public void setAutoCompleter(AbstractAutoCompleter searchCompleter) {
+		public void setAutoCompleter(AutoCompleter<String> searchCompleter) {
 			autoCompleteSupport.setAutoCompleter(searchCompleter);
 		}
 
@@ -984,7 +985,7 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 
 	}
 
-	public void setAutoCompleter(AbstractAutoCompleter searchCompleter) {
+	public void setAutoCompleter(AutoCompleter<String> searchCompleter) {
 		this.searchField.setAutoCompleter(searchCompleter);
 		updateKeyListeners(); // Should I really call this here?
 	}

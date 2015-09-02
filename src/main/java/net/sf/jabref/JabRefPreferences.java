@@ -34,8 +34,6 @@ import java.net.UnknownHostException;
 
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.text.StyledEditorKit.BoldAction;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

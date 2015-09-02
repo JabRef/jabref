@@ -28,7 +28,6 @@ import java.util.Map;
 
 import javax.swing.*;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.FileListEditor;
@@ -141,8 +140,7 @@ class EntryEditorTab {
             }
             else {
                 ta = new FieldTextArea(fields[i], null);
-                frame.getSearchBar().addSearchListener((FieldTextArea)ta);
-                //frame.getSearchManager().addSearchListener((FieldTextArea) ta);
+                frame.getSearchBar().addSearchListener((FieldTextArea) ta);
                 defaultHeight = ta.getPane().getPreferredSize().height;
             }
             //ta.addUndoableEditListener(bPanel.undoListener);

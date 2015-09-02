@@ -26,7 +26,7 @@ import net.sf.jabref.JabRefPreferences;
  *
  * @author kahlert, cordes
  */
-public class NameFieldAutoCompleter extends AbstractAutoCompleter {
+class NameFieldAutoCompleter extends AbstractAutoCompleter {
 
     private final String[] fieldNames;
     private final boolean lastNameOnlyAndSeparationBySpace; // true if only last names should be completed and there is NO separation by " and ", but by " "

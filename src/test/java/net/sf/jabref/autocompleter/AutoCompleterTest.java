@@ -36,7 +36,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testDefaultAutoCompleter() {
-    	AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.OTHER_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }
@@ -53,7 +53,7 @@ public class AutoCompleterTest {
 
     @Test
     public void testCrossRefCompleter() {
-    	AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
+        AutoCompleter autoCompleter = AutoCompleterFactory.getFor(AutoCompleterTest.CROSSREF_FIELD);
         for (BibtexEntry entry : getDatabase().getEntries()) {
             autoCompleter.addBibtexEntry(entry);
         }

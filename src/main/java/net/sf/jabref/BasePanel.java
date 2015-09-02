@@ -57,11 +57,9 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.autocompleter.ContentAutoCompleters;
-import net.sf.jabref.autocompleter.NameFieldAutoCompleter;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
@@ -83,7 +81,6 @@ import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.FileListEntry;
@@ -134,7 +131,6 @@ import ca.odell.glazedlists.matchers.Matcher;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -176,18 +172,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    // Hashtable indexing the only search auto completer
-    // required for the SearchAutoCompleterUpdater
-    private AutoCompleter searchAutoCompleter;
-
-
-    private ContentAutoCompleters autoCompleters = null; //= new HashMap<String, AbstractAutoCompleter>();
-    // Hashtable that holds as keys the names of the fields where
-    // autocomplete is active, and references to the autocompleter objects.
-
-    private NameFieldAutoCompleter searchCompleter = null;
-
-    //private AutoCompleteListener searchCompleteListener = null;
+    // AutoCompleter used in the search bar
+    private AutoCompleter<String> searchAutoCompleter;
 
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -261,11 +247,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;
 
+    // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
     }
 
-    //private ContentAutoCompleters autoCompleters;
+    private ContentAutoCompleters autoCompleters;
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
             MetaData metaData, String encoding) {
@@ -982,6 +969,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put("search", new BaseAction() {
+        	
         	@Override
             public void action() {
                 frame.setSearchBarVisible(true);
@@ -990,23 +978,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
         
         actions.put("toggleSearch", new BaseAction() {
+        	
         	@Override
             public void action() {
-	        	frame.setSearchBarVisible(! frame.searchBar.isVisible());
-	            boolean on = frame.searchBar.isVisible();
-	            if (on)
-	              frame.getSearchBar().startSearch();
+        		frame.setSearchBarVisible(! frame.searchBar.isVisible());
+	            if (frame.searchBar.isVisible()) {
+	            	frame.getSearchBar().startSearch();
+	            }
             }
         });
 
         actions.put("incSearch", new BaseAction() {
-			@Override    
+			
+        	@Override    
 			public void action() {
-            	frame.setSearchBarVisible(true);
-                frame.getSearchBar().startIncrementalSearch();
+				frame.setSearchBarVisible(true);
+				frame.getSearchBar().startIncrementalSearch();
             }
         });
-
 
         // The action for copying the selected entry's key.
         actions.put("copyKey", new BaseAction() {
@@ -2239,8 +2228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        //frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
-        frame.getSearchBar().setAutoCompleter(searchCompleter);
+        frame.getSearchBar().setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {
@@ -2248,9 +2236,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }
-        
-        //searchCompleteListener = new AutoCompleteListener(searchAutoCompleter);
-        //searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
 
     /*

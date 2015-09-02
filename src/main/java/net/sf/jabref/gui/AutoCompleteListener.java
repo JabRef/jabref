@@ -18,9 +18,7 @@ package net.sf.jabref.gui;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +33,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private static final Log LOGGER = LogFactory.getLog(AutoCompleteListener.class);
 
 	private final AutoCompleter<String> completer;
-    //private final AutoCompleter completer;
 
     // These variables keep track of the situation from time to time.
     private String toSetIn = null; // null indicates that there are no completions available
@@ -51,7 +48,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private FocusListener nextFocusListener = null;
 
 
-    public AutoCompleteListener(AutoCompleter completer) {
+    public AutoCompleteListener(AutoCompleter<String> completer) {
         //    	if (logger.getHandlers().length == 0) {
         //	    	logger.setLevel(Level.FINEST);
         //	    	ConsoleHandler ch = new ConsoleHandler();

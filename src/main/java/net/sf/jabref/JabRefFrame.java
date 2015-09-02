@@ -616,11 +616,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
-        
-       
-        
-        //JLabel label = new JLabel ( "Close X" );
-        //add ( label, , 0 );
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -636,7 +631,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = basePanel();
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                    searchToggle.setSelected(searchBar.isVisible());
+					searchToggle.setSelected(searchBar.isVisible());
 					previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
                     highlightAny
                             .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
@@ -834,7 +829,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState() == Frame.MAXIMIZED_BOTH));
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
-        //prefs.putBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE, sidePaneManager.isComponentVisible("search"));
         // Store divider location for side pane:
         int width = contentPane.getDividerLocation();
         if (width > 0) {
@@ -867,6 +861,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.autoSaveManager.clearAutoSaves();
         }
 
+		// Let the search interface store changes to prefs.
+		searchBar.updatePrefs();
+		        
+		prefs.flush();
+		
         // hide systray because the JVM can only shut down when no systray icon is shown
         if(sysTray != null) {
             sysTray.hide();
@@ -941,12 +940,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
 
-		// Let the search interface store changes to prefs.
-		searchBar.updatePrefs();
-		        
-		prefs.flush();
-
-		if (close) {
+        if (close) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
@@ -1034,26 +1028,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tabbedPane.setAlignmentY(0.0f);
         main.add(tabbedPane);
         
-        //UIManager.put("TabbedPane.tabAreaInsets", new Insets(2, 20, 0, 6) );
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
-        
-        /* tabbedPane.setUI(new BasicTabbedPaneUI() {  
-            @Override 
-            protected int calculateTabAreaHeight(int tab_placement, int run_count, int max_tab_height) {  
-                //if (tabbedPane.getTabCount() > 1)
-                    return super.calculateTabAreaHeight(tab_placement, run_count, max_tab_height);  
-                //else  
-                //    return 0;  
-            }
-            @Override  
-            protected int calculateTabAreaWidth(int tabPlacement, int vertRunCount, int maxTabWidth) {  
-                //if (tabbedPane.getTabCount() > 1)
-                //    return super.calculateTabAreaWidth(tabPlacement, vertRunCount, maxTabWidth) + 2000;  
-                //else  
-                //    return 0;  
-            }  
-        });  
-        */
         
         contentPane.setRightComponent(main);
         contentPane.setLeftComponent(sidePaneManager.getPanel());
@@ -1103,7 +1078,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void showBaseAt(int i) {
         tabbedPane.setSelectedIndex(i);
     }
-    
+
     public void showBasePanel(BasePanel bp) {
         tabbedPane.setSelectedComponent(bp);
     }
@@ -1894,15 +1869,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
                 // This also happens internally at basepanel to ensure consistency
-                title = title + '*';
+                title = title + '*'; 
             }
         } else {
             title = file.getName();
         }
-        // idea: "<html><div style='padding:2px 5px;'>" + title + "</div></html>" instead of "title" to get some space around.
-        // However, this causes https://sourceforge.net/p/jabref/bugs/1293/
-        // Therefore, plain "title" is used
-        tabbedPane.add(title, bp);
+        
+        // We use html here to get some padding around the title
+        // There are no closing tags since we would otherwise run in a bug 
+        // see https://sourceforge.net/p/jabref/bugs/1293/
+        tabbedPane.add("<html><div style='padding:2px 5px;'>" + title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
@@ -2901,7 +2877,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
   // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
   // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321
-  // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not a support a setter for this
+  // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not provide an easier way to set this
   private void setTabAreaInsets(JTabbedPane tabbedPane, Insets tabAreaInsets) {
 	  TabbedPaneUI ui = tabbedPane.getUI();
 	  if (ui instanceof BasicTabbedPaneUI) {

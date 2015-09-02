@@ -49,7 +49,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
@@ -68,7 +67,6 @@ import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.util.Util;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -566,8 +564,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
         frame.getSearchBar().addSearchListener((SearchTextListener)source);
-        //frame.getSearchManager().addSearchListener((SearchTextListener) source);
-
+        
         /* {
             private boolean antialias = Globals.prefs.getBoolean("antialias");
 
