@@ -22,7 +22,6 @@ import java.util.Vector;
 
 import net.sf.jabref.Globals;
 
-
 /**
  * Helper class to get a Layout object.
  * 
@@ -44,14 +43,15 @@ public class LayoutHelper {
     public static final int IS_ENCODING_NAME = 8;
     public static final int IS_FILENAME = 9;
     public static final int IS_FILEPATH = 10;
-    
+
     private static String currentGroup = null;
-    
-    private PushbackReader _in;
-    private Vector<StringInt> parsedEntries = new Vector<StringInt>();
+
+    private final PushbackReader _in;
+    private final Vector<StringInt> parsedEntries = new Vector<StringInt>();
 
     private boolean _eof = false;
     private int line = 1;
+
 
     public LayoutHelper(Reader in)
     {
@@ -64,35 +64,32 @@ public class LayoutHelper {
     }
 
     public Layout getLayoutFromText(String classPrefix) throws Exception
-    {    	
-    	parse();
+    {
+        parse();
 
         StringInt si;
 
         for (StringInt parsedEntry : parsedEntries) {
             si = parsedEntry;
 
-            if ((si.i == IS_SIMPLE_FIELD) || (si.i == IS_FIELD_START) ||
-                    (si.i == IS_FIELD_END) || (si.i == IS_GROUP_START) ||
-                    (si.i == IS_GROUP_END)) {
+            if ((si.i == LayoutHelper.IS_SIMPLE_FIELD) || (si.i == LayoutHelper.IS_FIELD_START) ||
+                    (si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_START) ||
+                    (si.i == LayoutHelper.IS_GROUP_END)) {
                 si.s = si.s.trim().toLowerCase();
             }
         }
-        
-        Layout layout = new Layout(parsedEntries, classPrefix);
 
-        return layout;
+        return new Layout(parsedEntries, classPrefix);
     }
 
-    
     public static String getCurrentGroup() {
-        return currentGroup;
+        return LayoutHelper.currentGroup;
     }
-    
+
     public static void setCurrentGroup(String newGroup) {
-        currentGroup = newGroup;
+        LayoutHelper.currentGroup = newGroup;
     }
-    
+
     private String getBracketedField(int _field) throws IOException
     {
         StringBuffer buffer = null;
@@ -167,7 +164,7 @@ public class LayoutHelper {
      *
      */
     private String getBracketedOptionField(int _field)
-        throws IOException
+            throws IOException
     {
         StringBuffer buffer = null;
         int c;
@@ -191,14 +188,14 @@ public class LayoutHelper {
                     //myStrings.add(buffer.toString());
                     if (option != null)
                     {
-                        tmp = buffer.toString() + "\n" + option;
+                        tmp = buffer.toString() + '\n' + option;
                     }
                     else
                     {
                         tmp = buffer.toString();
                     }
 
-                    parsedEntries.add(new StringInt(tmp, IS_OPTION_FIELD));
+                    parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
 
                     //System.out.println("\nbracketedOptionEOF: " + buffer.toString());
                 }
@@ -214,44 +211,44 @@ public class LayoutHelper {
                     // buffer may be null for parameters
                     //if (buffer != null)
                     //{
-                        if (c == ']' && buffer != null)
-                        {
-                    // changed section end - arudert
-                            option = buffer.toString();
-                            buffer = null;
-                            start = false;
-                            doneWithOptions = true;
-                        }
-
-                        //myStrings.add(buffer.toString());
-                        //System.out.println("\nbracketedOption: " + buffer.toString());
-                        
-                        // changed section begin - arudert
-                        // bracketed option must be followed by an (optionally empty) parameter
-                        // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
-                        // splits the string later on ignores the empty parameter)
-                        //if (buffer != null)
-                        else if (c == '}')
-                        {
-                           String parameter = buffer == null ? " " : buffer.toString();
-                           if (option != null)
-                            {
-                                tmp = parameter + "\n" + option;
-                            }
-                            else
-                            {
-                                tmp = parameter;
-                            }
-
-                            //System.out.println("FORMAT: '"+tmp+"'");
-                            parsedEntries.add(new StringInt(tmp, IS_OPTION_FIELD));
-
-                            return null;
-                        }
+                    if ((c == ']') && (buffer != null))
+                    {
                         // changed section end - arudert
-                     // changed section start - arudert
-                     // }
-                     // changed section end - arudert
+                        option = buffer.toString();
+                        buffer = null;
+                        start = false;
+                        doneWithOptions = true;
+                    }
+
+                    //myStrings.add(buffer.toString());
+                    //System.out.println("\nbracketedOption: " + buffer.toString());
+
+                    // changed section begin - arudert
+                    // bracketed option must be followed by an (optionally empty) parameter
+                    // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
+                    // splits the string later on ignores the empty parameter)
+                    //if (buffer != null)
+                    else if (c == '}')
+                    {
+                        String parameter = buffer == null ? " " : buffer.toString();
+                        if (option != null)
+                        {
+                            tmp = parameter + '\n' + option;
+                        }
+                        else
+                        {
+                            tmp = parameter;
+                        }
+
+                        //System.out.println("FORMAT: '"+tmp+"'");
+                        parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
+
+                        return null;
+                    }
+                    // changed section end - arudert
+                    // changed section start - arudert
+                    // }
+                    // changed section end - arudert
                 }
                 else
                 {
@@ -261,8 +258,9 @@ public class LayoutHelper {
             else if (c == '"') {
                 inQuotes = !inQuotes;
 
-                if (buffer == null)
+                if (buffer == null) {
                     buffer = new StringBuffer(100);
+                }
                 buffer.append('"');
             }
             else
@@ -291,66 +289,67 @@ public class LayoutHelper {
     }
 
     private Object parse() throws IOException, StringIndexOutOfBoundsException {
-		skipWhitespace();
+        skipWhitespace();
 
-		int c;
+        int c;
 
-		StringBuffer buffer = null;
-		boolean escaped = false;
+        StringBuffer buffer = null;
+        boolean escaped = false;
 
-		while (!_eof) {
-			c = read();
+        while (!_eof) {
+            c = read();
 
-			if (c == -1) {
-				_eof = true;
+            if (c == -1) {
+                _eof = true;
 
-				/*
-				 * CO 2006-11-11: Added check for null, otherwise a Layout that
-				 * finishs with a curly brace throws a NPE
-				 */
-				if (buffer != null)
-					parsedEntries.add(new StringInt(buffer.toString(), IS_LAYOUT_TEXT));
+                /*
+                 * CO 2006-11-11: Added check for null, otherwise a Layout that
+                 * finishs with a curly brace throws a NPE
+                 */
+                if (buffer != null) {
+                    parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
+                }
 
-				return null;
-			}
+                return null;
+            }
 
-			if ((c == '\\') && (peek() != '\\') && !escaped) {
-				if (buffer != null) {
-					parsedEntries.add(new StringInt(buffer.toString(), IS_LAYOUT_TEXT));
+            if ((c == '\\') && (peek() != '\\') && !escaped) {
+                if (buffer != null) {
+                    parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
 
-					buffer = null;
-				}
+                    buffer = null;
+                }
 
-				parseField();
+                parseField();
 
-				// To make sure the next character, if it is a backslash,
-				// doesn't get ignored, since "previous" now holds a backslash:
-				escaped = false;
-			} else {
-				if (buffer == null) {
-					buffer = new StringBuffer(100);
-				}
+                // To make sure the next character, if it is a backslash,
+                // doesn't get ignored, since "previous" now holds a backslash:
+                escaped = false;
+            } else {
+                if (buffer == null) {
+                    buffer = new StringBuffer(100);
+                }
 
-				if ((c != '\\') || escaped)// (previous == '\\')))
-				{
-					buffer.append((char) c);
-				}
+                if ((c != '\\') || escaped)// (previous == '\\')))
+                {
+                    buffer.append((char) c);
+                }
 
-				escaped = (c == '\\') && !escaped;
-			}
-		}
+                escaped = (c == '\\') && !escaped;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
     /**
-	 * 
-	 */
+     * 
+     */
     private void parseField() throws IOException, StringIndexOutOfBoundsException
     {
         int c;
         StringBuffer buffer = null;
-        char firstLetter = ' ';
+        char firstLetter;
         String name;
 
         while (!_eof)
@@ -368,34 +367,33 @@ public class LayoutHelper {
 
                 //System.out.println("\n#" + (char) c);
                 name = buffer != null ? buffer.toString() : "";
-                
+
                 try {
-                	firstLetter = name.charAt(0);
+                    firstLetter = name.charAt(0);
                 } catch (StringIndexOutOfBoundsException ex) {
-                	StringBuilder lastFive = new StringBuilder(10); 
-                	for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size()-6), parsedEntries.size()-1)) {
-                		lastFive.append(entry.s);
-                	}
-                	throw new StringIndexOutOfBoundsException(Globals.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") +  "\'");
+                    StringBuilder lastFive = new StringBuilder(10);
+                    for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6), parsedEntries.size() - 1)) {
+                        lastFive.append(entry.s);
+                    }
+                    throw new StringIndexOutOfBoundsException(Globals.lang("Backslash parsing error near") + " \'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
-                
+
                 //System.out.println("NAME:" + name);
-                buffer = null;
-                
+
                 if (firstLetter == 'b')
                 {
                     if (name.equalsIgnoreCase("begin"))
                     {
                         // get field name
-                        getBracketedField(IS_FIELD_START);
+                        getBracketedField(LayoutHelper.IS_FIELD_START);
 
                         return;
                     }
                     else if (name.equalsIgnoreCase("begingroup"))
                     {
                         // get field name
-                        getBracketedField(IS_GROUP_START);
-                        return;                    
+                        getBracketedField(LayoutHelper.IS_GROUP_START);
+                        return;
                     }
                 }
                 else if (firstLetter == 'f')
@@ -406,14 +404,14 @@ public class LayoutHelper {
                         {
                             // get format parameter
                             // get field name
-                            getBracketedOptionField(IS_OPTION_FIELD);
+                            getBracketedOptionField(LayoutHelper.IS_OPTION_FIELD);
 
                             return;
                         }
                         else
                         {
                             // get field name
-                            getBracketedField(IS_OPTION_FIELD);
+                            getBracketedField(LayoutHelper.IS_OPTION_FIELD);
 
                             return;
                         }
@@ -423,7 +421,7 @@ public class LayoutHelper {
                         // Print the name of the database bib file.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
-                        parsedEntries.add(new StringInt(name, IS_FILENAME));
+                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                         return;
                     }
                     else if (name.equalsIgnoreCase("filepath"))
@@ -431,7 +429,7 @@ public class LayoutHelper {
                         // Print the full path of the database bib file.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
-                        parsedEntries.add(new StringInt(name, IS_FILEPATH));
+                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));
                         return;
                     }
                 }
@@ -440,13 +438,13 @@ public class LayoutHelper {
                     if (name.equalsIgnoreCase("end"))
                     {
                         // get field name
-                        getBracketedField(IS_FIELD_END);
+                        getBracketedField(LayoutHelper.IS_FIELD_END);
                         return;
                     }
                     else if (name.equalsIgnoreCase("endgroup"))
                     {
                         // get field name
-                        getBracketedField(IS_GROUP_END);
+                        getBracketedField(LayoutHelper.IS_GROUP_END);
                         return;
                     }
                     else if (name.equalsIgnoreCase("encoding"))
@@ -454,13 +452,13 @@ public class LayoutHelper {
                         // Print the name of the current encoding used for export.
                         // This is only supported in begin/end layouts, not in
                         // entry layouts.
-                        parsedEntries.add(new StringInt(name, IS_ENCODING_NAME));
+                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));
                         return;
                     }
                 }
 
                 // for all other cases
-                parsedEntries.add(new StringInt(name, IS_SIMPLE_FIELD));
+                parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_FIELD));
 
                 //System.out.println(name);
                 return;

@@ -28,24 +28,28 @@ import net.sf.jabref.export.layout.AbstractParamLayoutFormatter;
  */
 public class WrapContent extends AbstractParamLayoutFormatter {
 
-    
     private String before = null, after = null;
 
 
+    @Override
     public void setArgument(String arg) {
-	String[] parts = parseArgument(arg);
-        if (parts.length < 2)
-	   return;
+        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        if (parts.length < 2) {
+            return;
+        }
         before = parts[0];
         after = parts[1];
     }
 
+    @Override
     public String format(String fieldText) {
-	if (before == null)
-	    return "";
-    	if (fieldText.length() == 0)
-	    return "";
-	else
-	    return before + fieldText + after;
+        if (before == null) {
+            return "";
+        }
+        if (fieldText.isEmpty()) {
+            return "";
+        } else {
+            return before + fieldText + after;
+        }
     }
 }

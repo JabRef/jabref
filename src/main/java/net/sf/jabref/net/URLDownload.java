@@ -16,8 +16,10 @@
 package net.sf.jabref.net;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.*;
 import java.net.CookieHandler;
@@ -34,6 +36,7 @@ public class URLDownload {
 
     public static URLDownload buildMonitoredDownload(final Component component, URL source) {
         return new URLDownload(source) {
+
             @Override
             protected InputStream monitorInputStream(InputStream in) {
                 return new ProgressMonitorInputStream(component, "Downloading " + this.getSource().toString(), in);
@@ -41,7 +44,9 @@ public class URLDownload {
         };
     }
 
+
     private final URL source;
+
 
     /**
      * URL download to a string.
@@ -57,10 +62,10 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
 
-        setCookieHandler();
+        URLDownload.setCookieHandler();
     }
 
-    public URL getSource() {
+    URL getSource() {
         return source;
     }
 
@@ -90,7 +95,7 @@ public class URLDownload {
         }
     }
 
-    protected URLConnection openConnection() throws IOException {
+    private URLConnection openConnection() throws IOException {
         URLConnection connection = source.openConnection();
         connection.setRequestProperty("User-Agent", "JabRef");
         // this does network i/o: GET + read returned headers
@@ -99,13 +104,13 @@ public class URLDownload {
     }
 
     /**
-     * Encoding will be determined from "defaultEncoding"
+     * Encoding will be determined from JabRefPreferences.DEFAULT_ENCODING
      *
      * @return the downloaded string
      * @throws IOException
      */
     public String downloadToString() throws IOException {
-        return downloadToString(Globals.prefs.get("defaultEncoding"));
+        return downloadToString(Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
     }
 
     public String downloadToString(String encoding) throws IOException {
@@ -167,7 +172,9 @@ public class URLDownload {
         byte[] buffer = new byte[512];
         while (true) {
             int bytesRead = monitorInputStream.read(buffer);
-            if (bytesRead == -1) break;
+            if (bytesRead == -1) {
+                break;
+            }
             out.write(buffer, 0, bytesRead);
         }
     }

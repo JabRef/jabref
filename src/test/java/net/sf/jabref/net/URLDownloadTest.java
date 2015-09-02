@@ -2,21 +2,21 @@ package net.sf.jabref.net;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import static org.junit.Assert.assertTrue;
-
 public class URLDownloadTest {
 
     @Test
-     public void testStringDownloadWithSetEncoding() throws IOException {
+    public void testStringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        assertTrue("google.com should contain google", dl.downloadToString("UTF8").contains("Google"));
+        Assert.assertTrue("google.com should contain google", dl.downloadToString("UTF8").contains("Google"));
     }
 
     @Test
@@ -25,7 +25,7 @@ public class URLDownloadTest {
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-            assertTrue("google.com should contain google", dl.downloadToString().contains("Google"));
+            Assert.assertTrue("google.com should contain google", dl.downloadToString().contains("Google"));
         } finally {
             Globals.prefs = null;
         }
@@ -37,7 +37,7 @@ public class URLDownloadTest {
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
             dl.downloadToFile(destination);
-            assertTrue("file must exist", destination.exists());
+            Assert.assertTrue("file must exist", destination.exists());
         } finally {
             // cleanup
             destination.delete();
@@ -48,7 +48,7 @@ public class URLDownloadTest {
     public void testDetermineMimeType() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        assertTrue(dl.determineMimeType().startsWith("text/html"));
+        Assert.assertTrue(dl.determineMimeType().startsWith("text/html"));
     }
 
 }

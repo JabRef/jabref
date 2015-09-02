@@ -20,10 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import net.sf.jabref.Globals;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.JabRef;
 import net.sf.jabref.Worker;
 import net.sf.jabref.net.URLDownload;
+
 /**
  * This class performs the somewhat weird action of extracting a file from within the running JabRef jar,
  * and storing it to the given File. It may prove useful e.g. for extracting Endnote export/import filters which
@@ -35,25 +38,29 @@ import net.sf.jabref.net.URLDownload;
  * @author alver
  */
 public class ResourceExtractor implements Worker {
+
+    private final URL resource;
+    private final Component parent;
+    private final File destination;
     
-    final URL resource;
-    final Component parent;
-    final File destination;
-    
+    private static final Log LOGGER = LogFactory.getLog(ResourceExtractor.class);
+
+
     /** Creates a new instance of ResourceExtractor */
     public ResourceExtractor(final Component parent, final String filename, File destination) {
-         resource = JabRef.class.getResource(filename);
-         //System.out.println(filename+"\n"+resource);
-         this.parent = parent;
-         this.destination = destination;
+        resource = JabRef.class.getResource(filename);
+        //System.out.println(filename+"\n"+resource);
+        this.parent = parent;
+        this.destination = destination;
     }
-    
+
+    @Override
     public void run() {
         URLDownload ud = URLDownload.buildMonitoredDownload(parent, resource);
         try {
             ud.downloadToFile(destination);
         } catch (IOException ex) {
-            Globals.logger("Error extracting resource: "+ex.getMessage());            
+            LOGGER.info("Error extracting resource: " + ex.getMessage());
         }
     }
 }

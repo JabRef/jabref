@@ -25,13 +25,17 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  */
 public class FirstPage implements LayoutFormatter {
 
+    @Override
     public String format(String s) {
-        if (s == null)
-			return "";
-		String[] pageParts = s.split("[ \\-]+");
-		if (pageParts.length == 2)
+        if (s == null) {
+            return "";
+        }
+        String[] pageParts = s.split("[ \\-]+");
+        if (pageParts.length == 2) {
             return pageParts[0];
-        else return s;
+        } else {
+            return s;
+        }
 
     }
 }

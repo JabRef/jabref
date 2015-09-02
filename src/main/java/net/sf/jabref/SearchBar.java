@@ -58,17 +58,18 @@ import net.sf.jabref.autocompleter.FuzzyTextSearchStrategy;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.help.HelpAction;
-import net.sf.jabref.search.BasicSearch;
-import net.sf.jabref.search.SearchExpression;
-import net.sf.jabref.search.SearchExpressionParser;
-import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.search.SearchRules;
+import net.sf.jabref.search.matchers.SearchMatcher;
+import net.sf.jabref.search.rules.GrammarBasedSearchRule;
+import net.sf.jabref.search.rules.sets.SearchRuleSet;
 
 import org.gpl.JSplitButton.JSplitButton;
 import org.gpl.JSplitButton.action.SplitButtonActionListener;
 
 import ca.odell.glazedlists.impl.filter.TextSearchStrategy;
 
-public class SearchBar extends JPanel implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
+public class SearchBar extends JPanel implements ActionListener, KeyListener, ItemListener, CaretListener {
 
 	private JabRefFrame frame;
 
@@ -580,32 +581,16 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 			// TODO I disabled this
 
 			// Setup search parameters common to both normal and float.
-			Hashtable<String, String> searchOptions = new Hashtable<String, String>();
-			searchOptions.put("option", searchField.getText().toString());
-			// TODO I disabled this
-			SearchRuleSet searchRules = new SearchRuleSet();
-			SearchRule rule1;
+			SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchField.getText(),
+                    Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
+                    Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
 
-			rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"), Globals.prefs.getBoolean("regExpSearch"));
-
-			try {
-				// this searches specified fields if specified,
-				// and all fields otherwise
-				rule1 = new SearchExpression(Globals.prefs, searchOptions);
-			} catch (Exception ex) {
-				// we'll do a search in all fields
-			}
-
-			searchRules.addRule(rule1);
-
-			// TODO: Reneable these
-
-			if (!searchRules.validateSearchStrings(searchOptions)) {
-				frame.basePanel().output(Globals.lang("Search failed: illegal search expression"));
-				frame.basePanel().stopShowingSearchResults();
-				return;
-			}
-			SearchWorker worker = new SearchWorker(searchRules, searchOptions);
+            if (!searchRule.validateSearchStrings(searchField.getText())) {
+            	frame.basePanel().output(Globals.lang("Search failed: illegal search expression"));
+            	frame.basePanel().stopShowingSearchResults();
+                return;
+            }
+			SearchWorker worker = new SearchWorker(searchRule, searchField.getText().toString());
 			worker.getWorker().run();
 			worker.getCallBack().update();
 			// escape.setEnabled(true);
@@ -616,28 +601,31 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 	}
 
 	class SearchWorker extends AbstractWorker {
-		private SearchRuleSet rules;
-		Hashtable<String, String> searchTerm;
+		
+		private final SearchRule rule;
+        private final String searchTerm;
 		int hits = 0;
 
-		public SearchWorker(SearchRuleSet rules, Hashtable<String, String> searchTerm) {
-			this.rules = rules;
-			this.searchTerm = searchTerm;
-		}
-
+		public SearchWorker(SearchRule rule, String searchTerm) {
+            this.rule = rule;
+            this.searchTerm = searchTerm;
+        }
+		
 		public int getHits() {
 			return hits;
 		}
 
+		@Override
 		public void run() {
 			if (!searchAllBases.isSelected()) {
 				// Search only the current database:
 				for (BibtexEntry entry : frame.basePanel().getDatabase().getEntries()) {
 
-					boolean hit = rules.applyRule(searchTerm, entry) > 0;
+					boolean hit = rule.applyRule(searchTerm, entry);
 					entry.setSearchHit(hit);
-					if (hit)
+					if (hit) {
 						hits++;
+					}
 				}
 			} else {
 				// Search all databases:
@@ -645,7 +633,7 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 					BasePanel p = frame.baseAt(i);
 					for (BibtexEntry entry : p.getDatabase().getEntries()) {
 
-						boolean hit = rules.applyRule(searchTerm, entry) > 0;
+						boolean hit = rule.applyRule(searchTerm, entry);
 						entry.setSearchHit(hit);
 						if (hit)
 							hits++;
@@ -710,7 +698,7 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 					startedFloatSearch = false;
 				}
 				startedFilterSearch = true;
-				frame.basePanel().setSearchMatcher(SearchMatcher.INSTANCE);
+				frame.basePanel().setSearchMatcher(new SearchMatcher());
 
 			} else {
 				// Float search - floats hits to the top of the table:
@@ -719,7 +707,7 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 					startedFilterSearch = false;
 				}
 				startedFloatSearch = true;
-				frame.basePanel().mainTable.showFloatSearch(SearchMatcher.INSTANCE);
+				frame.basePanel().mainTable.showFloatSearch(new SearchMatcher());
 
 			}
 
@@ -852,10 +840,14 @@ public class SearchBar extends JPanel implements ActionListener, KeyListener, It
 	private void updateSearchButtonText() {
 		// TODO: add search mode description
 		
-		searchButton.setToolTipText(!increment.isSelected() && SearchExpressionParser.checkSyntax(searchField.getText(), caseSensitive.isSelected(), regExpSearch.isSelected()) != null ? Globals
+		searchButton.setToolTipText(isSpecificSearch() ? Globals
 				.lang("Search specified field(s)") : Globals.lang("Search all fields"));
 	}
 
+    private boolean isSpecificSearch() {
+        return !increment.isSelected() && GrammarBasedSearchRule.isValid(caseSensitive.isSelected(), regExpSearch.isSelected(), searchField.getText());
+    }
+	
 	/**
 	 * This method is required by the ErrorMessageDisplay interface, and lets
 	 * this class serve as a callback for regular expression exceptions

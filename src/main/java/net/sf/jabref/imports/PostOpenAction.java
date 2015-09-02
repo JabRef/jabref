@@ -34,7 +34,7 @@ public interface PostOpenAction {
      * @param pr The result of the bib parse operation.
      * @return true if the action should be called, false otherwise.
      */
-    public boolean isActionNecessary(ParserResult pr);
+    boolean isActionNecessary(ParserResult pr);
 
     /**
      * This method is called after the new database has been added to the GUI, if
@@ -48,5 +48,5 @@ public interface PostOpenAction {
      * @param panel The BasePanel where the database is shown.
      * @param pr The result of the bib parse operation.
      */
-    public void performAction(BasePanel panel, ParserResult pr);
+    void performAction(BasePanel panel, ParserResult pr);
 }

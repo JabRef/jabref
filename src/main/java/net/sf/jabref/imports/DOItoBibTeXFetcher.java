@@ -14,78 +14,71 @@
 */
 package net.sf.jabref.imports;
 
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import javax.swing.JOptionPane;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
-
+import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
-	
-    private static final String URL_PATTERN = "http://dx.doi.org/%s"; 
-    final CaseKeeper caseKeeper = new CaseKeeper();
-    final UnitFormatter unitFormatter = new UnitFormatter();
-    
-	@Override
+
+    private static final String URL_PATTERN = "http://dx.doi.org/%s";
+    private final CaseKeeper caseKeeper = new CaseKeeper();
+    private final UnitFormatter unitFormatter = new UnitFormatter();
+
+
+    @Override
     public void stopFetching() {
-		// nothing needed as the fetching is a single HTTP GET
+        // nothing needed as the fetching is a single HTTP GET
     }
 
-	@Override
+    @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
 
-       BibtexEntry entry = getEntryFromDOI(query, status);
-       if (entry != null)
-       {
+        BibtexEntry entry = getEntryFromDOI(query, status);
+        if (entry != null)
+        {
             inspector.addEntry(entry);
-	    return true;
+            return true;
         } else {
             return false;
         }
-        
+
     }
 
-	@Override
+    @Override
     public String getTitle() {
-	    return "DOI to BibTeX";
+        return "DOI to BibTeX";
     }
 
-	@Override
+    @Override
     public String getKeyName() {
-	    return "DOItoBibTeX";
+        return "DOItoBibTeX";
     }
 
-	@Override
-    public URL getIcon() {
-		// no special icon for this fetcher available.
-		// Therefore, we return some kind of default icon
-	    return GUIGlobals.getIconUrl("www");
-    }
-
-	@Override
+    @Override
     public String getHelpPage() {
-	    return "DOItoBibTeXHelp.html";
+        return "DOItoBibTeXHelp.html";
     }
 
-	@Override
+    @Override
     public JPanel getOptionsPanel() {
-		// no additional options available
-	    return null;
+        // no additional options available
+        return null;
     }
 
-    public BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
+    private BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
         String q;
         try {
             q = URLEncoder.encode(doi, "UTF-8");
@@ -95,7 +88,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        String urlString = String.format(URL_PATTERN, q);
+        String urlString = String.format(DOItoBibTeXFetcher.URL_PATTERN, q);
 
         // Send the request
         URL url;
@@ -116,7 +109,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         conn.setRequestProperty("Accept", "application/x-bibtex");
 
-
         String bibtexString;
         try {
             bibtexString = Util.getResultsWithEncoding(conn, "UTF8");
@@ -133,7 +125,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-
         //Usually includes an en-dash in the page range. Char is in cp1252 but not 
         // ISO 8859-1 (which is what latex expects). For convenience replace here.
         bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
@@ -145,12 +136,12 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             if (title != null) {
 
                 // Unit formatting
-                if (Globals.prefs.getBoolean("useUnitFormatterOnSearch")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
                 }
 
                 // Case keeping
-                if (Globals.prefs.getBoolean("useCaseKeeperOnSearch")) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);

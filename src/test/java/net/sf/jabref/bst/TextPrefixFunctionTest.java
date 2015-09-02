@@ -1,9 +1,7 @@
 package net.sf.jabref.bst;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class TextPrefixFunctionTest {
 
@@ -21,9 +19,11 @@ public class TextPrefixFunctionTest {
     }
 
     private void assertPrefix(final String string, final String string2) {
-        assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, new Warn() {
+        Assert.assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, new Warn() {
+
+            @Override
             public void warn(String s) {
-                fail("Should not Warn! text.prefix$ should be " + string + " for (5) " + string2);
+                Assert.fail("Should not Warn! text.prefix$ should be " + string + " for (5) " + string2);
             }
         }));
     }

@@ -40,12 +40,14 @@ import ca.odell.glazedlists.SortedList;
  * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
  *
  */
-public class OpenDocumentRepresentation {
-    protected Collection<BibtexEntry> entries;
-    private BibtexDatabase database;
+class OpenDocumentRepresentation {
+
+    private final Collection<BibtexEntry> entries;
+    private final BibtexDatabase database;
+
 
     @SuppressWarnings("unchecked")
-	public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
+    public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
         this.database = database;
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
@@ -57,15 +59,17 @@ public class OpenDocumentRepresentation {
 
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
-        if (keySet == null)
+        if (keySet == null) {
             entryList.addAll(database.getEntries());
-        else {
-            for (String key : keySet)
+        } else {
+            for (String key : keySet) {
                 entryList.add(database.getEntryById(key));
+            }
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
     }
+
     public Document getDOMrepresentation() {
         Document result = null;
         try {
@@ -104,9 +108,7 @@ public class OpenDocumentRepresentation {
             el.appendChild(el2);
             collection.appendChild(el);
 
-            Element body = result.createElement("office:body"),
-                    spreadsheet = result.createElement("office:spreadsheet"),
-                    table = result.createElement("table:table");
+            Element body = result.createElement("office:body"), spreadsheet = result.createElement("office:spreadsheet"), table = result.createElement("table:table");
             table.setAttribute("table:name", "biblio");
             table.setAttribute("table.style-name", "ta1");
 
@@ -153,7 +155,7 @@ public class OpenDocumentRepresentation {
             addTableCell(result, row, "ISBN");
             table.appendChild(row);
 
-            for(BibtexEntry e : entries){
+            for (BibtexEntry e : entries) {
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, getField(e, BibtexFields.KEY_FIELD));
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
@@ -209,16 +211,15 @@ public class OpenDocumentRepresentation {
         return result;
     }
 
-    protected String getField(BibtexEntry e, String field) {
+    private String getField(BibtexEntry e, String field) {
         String s = BibtexDatabase.getResolvedField(field, e, database);
         return s == null ? "" : s;
     }
 
-    protected void addTableCell(Document doc, Element parent, String content) {
-        Element cell = doc.createElement("table:table-cell"),
-                text = doc.createElement("text:p");
-    Text textNode = doc.createTextNode(content);
-    text.appendChild(textNode);
+    private void addTableCell(Document doc, Element parent, String content) {
+        Element cell = doc.createElement("table:table-cell"), text = doc.createElement("text:p");
+        Text textNode = doc.createTextNode(content);
+        text.appendChild(textNode);
         //text.setTextContent(content);
         cell.appendChild(text);
         parent.appendChild(cell);

@@ -24,16 +24,12 @@ import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.FileListEditor;
 
@@ -43,94 +39,94 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-public class EntryEditorTab {
+class EntryEditorTab {
 
-	private JPanel panel = new JPanel();
+    private final JPanel panel = new JPanel();
 
-	private JScrollPane scrollPane = new JScrollPane(panel,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    private final JScrollPane scrollPane = new JScrollPane(panel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-	private String[] fields;
+    private final String[] fields;
 
-	private EntryEditor parent;
+    private final EntryEditor parent;
 
-	private HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
+    private final HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
-	private FieldEditor activeField = null;
+    private FieldEditor activeField = null;
 
-   // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
     public FileListEditor fileListEditor = null;
 
-	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
-                          boolean addKeyField, boolean compressed, String name) {
-		if (fields != null)
-			this.fields = fields.toArray(new String[fields.size()]);
-		else
-			this.fields = new String[] {};
 
-		this.parent = parent;
+    public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
+            boolean addKeyField, boolean compressed, String name) {
+        if (fields != null) {
+            this.fields = fields.toArray(new String[fields.size()]);
+        } else {
+            this.fields = new String[] {};
+        }
 
-		setupPanel(frame, panel, addKeyField, compressed, name);
+        this.parent = parent;
 
-		/*
-		 * The following line makes sure focus cycles inside tab instead of
-		 * being lost to other parts of the frame:
-		 */
-		scrollPane.setFocusCycleRoot(true);
-	}
+        setupPanel(frame, panel, addKeyField, compressed, name);
 
+        /*
+         * The following line makes sure focus cycles inside tab instead of
+         * being lost to other parts of the frame:
+         */
+        scrollPane.setFocusCycleRoot(true);
+    }
 
-    void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
-	    boolean compressed, String title) {
-    	
-    	InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
-		ActionMap am = panel.getActionMap();
+    private void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
+                            boolean compressed, String title) {
 
-		im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
-		am.put("prev", parent.prevEntryAction);
-		im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
-		am.put("next", parent.nextEntryAction);
+        InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap am = panel.getActionMap();
 
-		im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
-		am.put("store", parent.storeFieldAction);
-		im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
-		im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
-		am.put("left", parent.switchLeftAction);
-		im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
-		im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
-		am.put("right", parent.switchRightAction);
-		im.put(Globals.prefs.getKey("Help"), "help");
-		am.put("help", parent.helpAction);
-		im.put(Globals.prefs.getKey("Save database"), "save");
-		am.put("save", parent.saveDatabaseAction);
-		im.put(Globals.prefs.getKey("Next tab"), "nexttab");
-		am.put("nexttab", parent.frame.nextTab);
-		im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
-		am.put("prevtab", parent.frame.prevTab);
-    	
-    	  	
+        im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+        am.put("prev", parent.prevEntryAction);
+        im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+        am.put("next", parent.nextEntryAction);
+
+        im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
+        am.put("store", parent.storeFieldAction);
+        im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
+        im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
+        am.put("left", parent.switchLeftAction);
+        im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
+        im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
+        am.put("right", parent.switchRightAction);
+        im.put(Globals.prefs.getKey("Help"), "help");
+        am.put("help", parent.helpAction);
+        im.put(Globals.prefs.getKey("Save database"), "save");
+        am.put("save", parent.saveDatabaseAction);
+        im.put(Globals.prefs.getKey("Next tab"), "nexttab");
+        am.put("nexttab", parent.frame.nextTab);
+        im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
+        am.put("prevtab", parent.frame.prevTab);
+
         panel.setName(title);
 
         int fieldsPerRow = compressed ? 2 : 1;
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
         String colSpec = compressed ? "fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref, "
-                                        +"8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref"
-                                    : "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
-        StringBuffer sb = new StringBuffer();
-        int rows = (int)Math.ceil((double)fields.length/fieldsPerRow);
+                + "8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref"
+                : "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
+        StringBuilder sb = new StringBuilder();
+        int rows = (int) Math.ceil((double) fields.length / fieldsPerRow);
         for (int i = 0; i < rows; i++) {
             sb.append("fill:pref:grow, ");
         }
-        if (addKeyField)
+        if (addKeyField) {
             sb.append("4dlu, fill:pref");
-        else
-            if (sb.length() >= 2)
-                sb.delete(sb.length() - 2, sb.length());
+        } else if (sb.length() >= 2) {
+            sb.delete(sb.length() - 2, sb.length());
+        }
         String rowSpec = sb.toString();
 
         DefaultFormBuilder builder = new DefaultFormBuilder
                 (new FormLayout(colSpec, rowSpec), panel);
-        
+
         for (int i = 0; i < fields.length; i++) {
             // Create the text area:
             int editorType = BibtexFields.getEditorType(fields[i]);
@@ -146,15 +142,15 @@ public class EntryEditorTab {
             else {
                 ta = new FieldTextArea(fields[i], null);
                 frame.getSearchBar().addSearchListener((FieldTextArea)ta);
-                //frame.getSearchManager().addSearchListener((FieldTextArea)ta);
+                //frame.getSearchManager().addSearchListener((FieldTextArea) ta);
                 defaultHeight = ta.getPane().getPreferredSize().height;
             }
             //ta.addUndoableEditListener(bPanel.undoListener);
-            
+
             JComponent ex = parent.getExtra(fields[i], ta);
 
             // Add autocompleter listener, if required for this field:
-            AbstractAutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
+            AutoCompleter autoComp = bPanel.getAutoCompleters().get(fields[i]);
             AutoCompleteListener acl = null;
             if (autoComp != null) {
                 acl = new AutoCompleteListener(autoComp);
@@ -164,168 +160,178 @@ public class EntryEditorTab {
 
             // Store the editor for later reference:
             editors.put(fields[i], ta);
-            if (i == 0)
+            if (i == 0) {
                 activeField = ta;
+            }
             //System.out.println(fields[i]+": "+BibtexFields.getFieldWeight(fields[i]));
-            if (!compressed)
+            if (!compressed) {
                 ta.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
+            }
             builder.append(ta.getLabel());
-            if (ex == null)
+            if (ex == null) {
                 builder.append(ta.getPane(), 3);
-            else {
+            } else {
                 builder.append(ta.getPane());
                 JPanel pan = new JPanel();
                 pan.setLayout(new BorderLayout());
                 pan.add(ex, BorderLayout.NORTH);
                 builder.append(pan);
             }
-            if ((i+1) % fieldsPerRow == 0)
+            if (((i + 1) % fieldsPerRow) == 0) {
                 builder.nextLine();
+            }
         }
 
         // Add the edit field for Bibtex-key.
-		if (addKeyField) {
-			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, parent
-				.getEntry().getField(BibtexFields.KEY_FIELD), true);
+        if (addKeyField) {
+            final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, parent
+                    .getEntry().getField(BibtexFields.KEY_FIELD), true);
             //tf.addUndoableEditListener(bPanel.undoListener);
-			setupJTextComponent(tf, null);
-            
-			editors.put("bibtexkey", tf);
-			/*
-			 * If the key field is the only field, we should have only one
-			 * editor, and this one should be set as active initially:
-			 */
-			if (editors.size() == 1)
-				activeField = tf;
+            setupJTextComponent(tf, null);
+
+            editors.put("bibtexkey", tf);
+            /*
+             * If the key field is the only field, we should have only one
+             * editor, and this one should be set as active initially:
+             */
+            if (editors.size() == 1) {
+                activeField = tf;
+            }
             builder.nextLine();
-			builder.append(tf.getLabel());
-			builder.append(tf, 3);
-		}
+            builder.append(tf.getLabel());
+            builder.append(tf, 3);
+        }
     }
 
 
-	BibtexEntry entry;
+    private BibtexEntry entry;
 
-	public BibtexEntry getEntry() {
-		return entry;
-	}
 
-	boolean isFieldModified(FieldEditor f) {
-		String text = f.getText().trim();
+    private BibtexEntry getEntry() {
+        return entry;
+    }
 
-		if (text.length() == 0) {
-			return getEntry().getField(f.getFieldName()) != null;
-		} else {
-			Object entryValue = getEntry().getField(f.getFieldName());
-			return entryValue == null || !entryValue.toString().equals(text);
-		}
-	}
+    private boolean isFieldModified(FieldEditor f) {
+        String text = f.getText().trim();
 
-	public void markIfModified(FieldEditor f) {
-		// Only mark as changed if not already is and the field was indeed
-		// modified
-		if (!updating && !parent.panel.isBaseChanged() && isFieldModified(f)) {
-			markBaseChanged();
-		}
-	}
+        if (text.isEmpty()) {
+            return getEntry().getField(f.getFieldName()) != null;
+        } else {
+            Object entryValue = getEntry().getField(f.getFieldName());
+            return (entryValue == null) || !entryValue.toString().equals(text);
+        }
+    }
 
-	void markBaseChanged() {
-		parent.panel.markBaseChanged();
-	}
+    public void markIfModified(FieldEditor f) {
+        // Only mark as changed if not already is and the field was indeed
+        // modified
+        if (!updating && !parent.panel.isBaseChanged() && isFieldModified(f)) {
+            markBaseChanged();
+        }
+    }
 
-	/**
-	 * Only sets the activeField variable but does not focus it.
-	 * 
-	 * Call activate afterwards.
-	 * 
-	 * @param c
-	 */
-	public void setActive(FieldEditor c) {
-		activeField = c;
-	}
+    private void markBaseChanged() {
+        parent.panel.markBaseChanged();
+    }
 
-	public FieldEditor getActive() {
-		return activeField;
-	}
+    /**
+     * Only sets the activeField variable but does not focus it.
+     * 
+     * Call activate afterwards.
+     * 
+     * @param c
+     */
+    public void setActive(FieldEditor c) {
+        activeField = c;
+    }
 
-	public List<String> getFields() {
-		return java.util.Arrays.asList(fields);
-	}
+    public FieldEditor getActive() {
+        return activeField;
+    }
 
-	public void activate() {
-		if (activeField != null){
-			/**
-			 * Corrected to fix [ 1594169 ] Entry editor: navigation between panels
-			 */
-			new FocusRequester(activeField.getTextComponent());
-		}
-	}
+    public List<String> getFields() {
+        return java.util.Arrays.asList(fields);
+    }
 
-	/**
-	 * Reset all fields from the data in the BibtexEntry.
-	 * 
-	 */
-	public void updateAll() {
-    	setEntry(getEntry());
-	}
+    public void activate() {
+        if (activeField != null) {
+            /**
+             * Corrected to fix [ 1594169 ] Entry editor: navigation between panels
+             */
+            new FocusRequester(activeField.getTextComponent());
+        }
+    }
 
-	protected boolean updating = false;
+    /**
+     * Reset all fields from the data in the BibtexEntry.
+     * 
+     */
+    public void updateAll() {
+        setEntry(getEntry());
+    }
 
-	public void setEntry(BibtexEntry entry) {
-		try {
-			updating = true;
+
+    private boolean updating = false;
+
+
+    public void setEntry(BibtexEntry entry) {
+        try {
+            updating = true;
             for (FieldEditor editor : editors.values()) {
                 Object content = entry.getField(editor.getFieldName());
                 String toSet = (content == null) ? "" : content.toString();
-                if (!toSet.equals(editor.getText()))
+                if (!toSet.equals(editor.getText())) {
                     editor.setText(toSet);
+                }
             }
-			this.entry = entry;
-		} finally {
-			updating = false;
-		}
-	}
+            this.entry = entry;
+        } finally {
+            updating = false;
+        }
+    }
 
-	public boolean updateField(String field, String content) {
-		if (!editors.containsKey(field))
-			return false;
-		FieldEditor ed = editors.get(field);
-		ed.setText(content);
-		return true;
-	}
+    public boolean updateField(String field, String content) {
+        if (!editors.containsKey(field)) {
+            return false;
+        }
+        FieldEditor ed = editors.get(field);
+        ed.setText(content);
+        return true;
+    }
 
-	public void validateAllFields() {
-        for (String field : editors.keySet()) {
-            FieldEditor ed = editors.get(field);
+    public void validateAllFields() {
+        for (Map.Entry<String, FieldEditor> stringFieldEditorEntry : editors.entrySet()) {
+            FieldEditor ed = stringFieldEditorEntry.getValue();
             ed.updateFontColor();
             ed.setEnabled(true);
-            if (((Component) ed).hasFocus())
+            if (((Component) ed).hasFocus()) {
                 ed.setActiveBackgroundColor();
-            else
+            } else {
                 ed.setValidBackgroundColor();
+            }
         }
-	}
+    }
 
-	public void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) {
         for (FieldEditor editor : editors.values()) {
             editor.setEnabled(enabled);
         }
-	}
+    }
 
-	public Component getPane() {
-		return scrollPane;
-	}
+    public Component getPane() {
+        return scrollPane;
+    }
 
-	public EntryEditor getParent() {
-	    return parent;
-	}
+    public EntryEditor getParent() {
+        return parent;
+    }
 
-	/**
-	 * Set up key bindings and focus listener for the FieldEditor.
-	 * 
-	 * @param component
-	 */
-	public void setupJTextComponent(final JComponent component, final AutoCompleteListener acl) {
+    /**
+     * Set up key bindings and focus listener for the FieldEditor.
+     * 
+     * @param component
+     */
+    private void setupJTextComponent(final JComponent component, final AutoCompleteListener acl) {
 
         // Here we add focus listeners to the component. The funny code is because we need
         // to guarantee that the AutoCompleteListener - if used - is called before fieldListener
@@ -339,52 +345,53 @@ public class EntryEditorTab {
             component.addKeyListener(acl);
             component.addFocusListener(acl);
             acl.setNextFocusListener(fieldListener);
+        } else {
+            component.addFocusListener(fieldListener);
         }
-        else
-		    component.addFocusListener(fieldListener);
 
-		InputMap im = component.getInputMap(JComponent.WHEN_FOCUSED);
-		ActionMap am = component.getActionMap();
+        InputMap im = component.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap am = component.getActionMap();
 
-		im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
-		am.put("prev", parent.prevEntryAction);
-		im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
-		am.put("next", parent.nextEntryAction);
+        im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+        am.put("prev", parent.prevEntryAction);
+        im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+        am.put("next", parent.nextEntryAction);
 
-		im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
-		am.put("store", parent.storeFieldAction);
-		im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
-		im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
-		am.put("left", parent.switchLeftAction);
-		im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
-		im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
-		am.put("right", parent.switchRightAction);
-		im.put(Globals.prefs.getKey("Help"), "help");
-		am.put("help", parent.helpAction);
-		im.put(Globals.prefs.getKey("Save database"), "save");
-		am.put("save", parent.saveDatabaseAction);
-		im.put(Globals.prefs.getKey("Next tab"), "nexttab");
-		am.put("nexttab", parent.frame.nextTab);
-		im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
-		am.put("prevtab", parent.frame.prevTab);
+        im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
+        am.put("store", parent.storeFieldAction);
+        im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
+        im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
+        am.put("left", parent.switchLeftAction);
+        im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
+        im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
+        am.put("right", parent.switchRightAction);
+        im.put(Globals.prefs.getKey("Help"), "help");
+        am.put("help", parent.helpAction);
+        im.put(Globals.prefs.getKey("Save database"), "save");
+        am.put("save", parent.saveDatabaseAction);
+        im.put(Globals.prefs.getKey("Next tab"), "nexttab");
+        am.put("nexttab", parent.frame.nextTab);
+        im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
+        am.put("prevtab", parent.frame.prevTab);
 
-		try {
-			HashSet<AWTKeyStroke> keys = new HashSet<AWTKeyStroke>(component
-				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-			keys.clear();
-			keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
-			component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-			keys = new HashSet<AWTKeyStroke>(component
-				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-			keys.clear();
-			keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
-			component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
-		} catch (Throwable t) {
-			System.err.println(t);
-		}
+        try {
+            HashSet<AWTKeyStroke> keys = new HashSet<AWTKeyStroke>(component
+                    .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+            keys.clear();
+            keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
+            component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
+            keys = new HashSet<AWTKeyStroke>(component
+                    .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+            keys.clear();
+            keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
+            component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
+        } catch (Throwable t) {
+            System.err.println(t);
+        }
 
     }
 
-	FocusListener fieldListener = new EntryEditorTabFocusListener(this);
+
+    private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
 
 }

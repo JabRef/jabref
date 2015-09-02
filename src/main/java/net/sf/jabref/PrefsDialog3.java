@@ -43,6 +43,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.util.Util;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -53,170 +54,183 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * With this design, it should be very easy to add new tabs later.
  * 
  */
-public class PrefsDialog3 extends JDialog {
+class PrefsDialog3 extends JDialog {
 
-	JPanel main;
+    private final JPanel main;
 
-	JabRefFrame frame;
+    private final JabRefFrame frame;
+    private final JabRef jabRef;
 
-	public PrefsDialog3(JabRefFrame parent) {
-		super(parent, Globals.lang("JabRef preferences"), false);
-		final JabRefPreferences prefs = JabRefPreferences.getInstance();
-		frame = parent;
 
-		final JList chooser;
+    public PrefsDialog3(JabRefFrame parent, JabRef jabRef) {
+        super(parent, Globals.lang("JabRef preferences"), false);
+        this.jabRef = jabRef;
+        final JabRefPreferences prefs = JabRefPreferences.getInstance();
+        frame = parent;
 
-		JButton importPrefs = new JButton(Globals.lang("Import preferences"));
-		JButton exportPrefs = new JButton(Globals.lang("Export preferences"));
+        final JList chooser;
 
-		main = new JPanel();
-		JPanel upper = new JPanel();
-		JPanel lower = new JPanel();
+        JButton importPrefs = new JButton(Globals.lang("Import preferences"));
+        JButton exportPrefs = new JButton(Globals.lang("Export preferences"));
 
-		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(upper, BorderLayout.CENTER);
-		getContentPane().add(lower, BorderLayout.SOUTH);
+        main = new JPanel();
+        JPanel upper = new JPanel();
+        JPanel lower = new JPanel();
 
-		final CardLayout cardLayout = new CardLayout();
-		main.setLayout(cardLayout);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(upper, BorderLayout.CENTER);
+        getContentPane().add(lower, BorderLayout.SOUTH);
 
-		// ----------------------------------------------------------------
-		// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
-		// ----------------------------------------------------------------
-		ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
-		tabs.add(new GeneralTab(frame, prefs));
-		tabs.add(new NetworkTab(frame, prefs));
+        final CardLayout cardLayout = new CardLayout();
+        main.setLayout(cardLayout);
+
+        // ----------------------------------------------------------------
+        // Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
+        // ----------------------------------------------------------------
+        ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
+        tabs.add(new GeneralTab(frame, prefs));
+        tabs.add(new NetworkTab(frame, prefs));
         tabs.add(new FileTab(frame, prefs));
         tabs.add(new FileSortTab(frame, prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
-		tabs.add(new AppearancePrefsTab(prefs));
-		tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
-		tabs.add(new TablePrefsTab(prefs, parent));
-		tabs.add(new TableColumnsTab(prefs, parent));
-		tabs.add(new TabLabelPattern(prefs, parent.helpDiag));
-		tabs.add(new PreviewPrefsTab(prefs));
-		tabs.add(new NameFormatterTab(parent.helpDiag));
-		tabs.add(new ImportSettingsTab());
-		tabs.add(new XmpPrefsTab());
-        tabs.add(new AdvancedTab(prefs, parent.helpDiag));
-		
-		Iterator<PrefsTab> it = tabs.iterator();
-		String[] names = new String[tabs.size()];
-		int i = 0;
+        tabs.add(new AppearancePrefsTab(prefs));
+        tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
+        tabs.add(new TablePrefsTab(prefs, parent));
+        tabs.add(new TableColumnsTab(prefs, parent));
+        tabs.add(new TabLabelPattern(prefs, parent.helpDiag));
+        tabs.add(new PreviewPrefsTab(prefs));
+        tabs.add(new NameFormatterTab(parent.helpDiag));
+        tabs.add(new ImportSettingsTab());
+        tabs.add(new XmpPrefsTab());
+        tabs.add(new AdvancedTab(prefs, parent.helpDiag, jabRef));
+
+        Iterator<PrefsTab> it = tabs.iterator();
+        String[] names = new String[tabs.size()];
+        int i = 0;
         //ArrayList<Component> comps = new ArrayList<Component>();
         while (it.hasNext()) {
-			PrefsTab tab = it.next();
-			names[i++] = tab.getTabName(); 
-			main.add((Component) tab, tab.getTabName());
+            PrefsTab tab = it.next();
+            names[i] = tab.getTabName();
+            i++;
+            main.add((Component) tab, tab.getTabName());
         }
 
-		upper.setBorder(BorderFactory.createEtchedBorder());
+        upper.setBorder(BorderFactory.createEtchedBorder());
 
-		chooser = new JList(names);
-		chooser.setBorder(BorderFactory.createEtchedBorder());
-		// Set a prototype value to control the width of the list:
-		chooser.setPrototypeCellValue("This should be wide enough");
-		chooser.setSelectedIndex(0);
-		chooser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        chooser = new JList(names);
+        chooser.setBorder(BorderFactory.createEtchedBorder());
+        // Set a prototype value to control the width of the list:
+        chooser.setPrototypeCellValue("This should be wide enough");
+        chooser.setSelectedIndex(0);
+        chooser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		// Add the selection listener that will show the correct panel when
-		// selection changes:
-		chooser.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting())
-					return;
-				String o = (String) chooser.getSelectedValue();
-				cardLayout.show(main, o);
-			}
-		});
+        // Add the selection listener that will show the correct panel when
+        // selection changes:
+        chooser.addListSelectionListener(new ListSelectionListener() {
 
-		JPanel one = new JPanel(), two = new JPanel();
-		one.setLayout(new BorderLayout());
-		two.setLayout(new BorderLayout());
-		one.add(chooser, BorderLayout.CENTER);
-		one.add(importPrefs, BorderLayout.SOUTH);
-		two.add(one, BorderLayout.CENTER);
-		two.add(exportPrefs, BorderLayout.SOUTH);
-		upper.setLayout(new BorderLayout());
-		upper.add(two, BorderLayout.WEST);
-		upper.add(main, BorderLayout.CENTER);
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) {
+                    return;
+                }
+                String o = (String) chooser.getSelectedValue();
+                cardLayout.show(main, o);
+            }
+        });
 
-		JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals.lang("Cancel"));
-		ok.addActionListener(new OkAction());
-		CancelAction cancelAction = new CancelAction();
-		cancel.addActionListener(cancelAction);
-		lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		ButtonBarBuilder bb = new ButtonBarBuilder(lower);
-		bb.addGlue();
+        JPanel one = new JPanel(), two = new JPanel();
+        one.setLayout(new BorderLayout());
+        two.setLayout(new BorderLayout());
+        one.add(chooser, BorderLayout.CENTER);
+        one.add(importPrefs, BorderLayout.SOUTH);
+        two.add(one, BorderLayout.CENTER);
+        two.add(exportPrefs, BorderLayout.SOUTH);
+        upper.setLayout(new BorderLayout());
+        upper.add(two, BorderLayout.WEST);
+        upper.add(main, BorderLayout.CENTER);
+
+        JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals.lang("Cancel"));
+        ok.addActionListener(new OkAction());
+        CancelAction cancelAction = new CancelAction();
+        cancel.addActionListener(cancelAction);
+        lower.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        ButtonBarBuilder bb = new ButtonBarBuilder(lower);
+        bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
-		//bb.addButton(ok);
-		//bb.addButton(cancel);
-		bb.addGlue();
-		// lower.add(ok);
-		// lower.add(cancel);
+        //bb.addButton(ok);
+        //bb.addButton(cancel);
+        bb.addGlue();
+        // lower.add(ok);
+        // lower.add(cancel);
 
-		// Key bindings:
-		Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
+        // Key bindings:
+        Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 
-		// Import and export actions:
-		exportPrefs.setToolTipText(Globals.lang("Export preferences to file"));
-		importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
-		exportPrefs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String filename = FileDialogs.getNewFile(frame, new File(System
-					.getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
-				if (filename == null)
-					return;
-				File file = new File(filename);
-				if (!file.exists()
-					|| (JOptionPane.showConfirmDialog(PrefsDialog3.this, "'" + file.getName()
-						+ "' " + Globals.lang("exists. Overwrite file?"),
-                                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+        // Import and export actions:
+        exportPrefs.setToolTipText(Globals.lang("Export preferences to file"));
+        importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
+        exportPrefs.addActionListener(new ActionListener() {
 
-					try {
-						prefs.exportPreferences(filename);
-					} catch (IOException ex) {
-						JOptionPane.showMessageDialog(PrefsDialog3.this,
-                                                        Globals.lang("Could not export preferences")
-							+ ": " + ex.getMessage(), Globals.lang("Export preferences"),
-							JOptionPane.ERROR_MESSAGE);
-						// ex.printStackTrace();
-					}
-				}
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String filename = FileDialogs.getNewFile(frame, new File(System
+                        .getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
+                if (filename == null) {
+                    return;
+                }
+                File file = new File(filename);
+                if (!file.exists()
+                        || (JOptionPane.showConfirmDialog(PrefsDialog3.this, '\'' + file.getName()
+                                + "' " + Globals.lang("exists. Overwrite file?"),
+                                Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
-			}
-		});
+                    try {
+                        prefs.exportPreferences(filename);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(PrefsDialog3.this,
+                                Globals.lang("Could not export preferences")
+                                        + ": " + ex.getMessage(), Globals.lang("Export preferences"),
+                                JOptionPane.ERROR_MESSAGE);
+                        // ex.printStackTrace();
+                    }
+                }
 
-		importPrefs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String filename = FileDialogs.getNewFile(frame, new File(System
-					.getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
-				if (filename == null)
-					return;
+            }
+        });
 
-				try {
-					prefs.importPreferences(filename);
-					setValues();
-					BibtexEntryType.loadCustomEntryTypes(prefs);
+        importPrefs.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String filename = FileDialogs.getNewFile(frame, new File(System
+                        .getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
+                if (filename == null) {
+                    return;
+                }
+
+                try {
+                    prefs.importPreferences(filename);
+                    setValues();
+                    BibtexEntryType.loadCustomEntryTypes(prefs);
                     ExportFormats.initAllExports();
-					frame.removeCachedEntryEditors();
+                    frame.removeCachedEntryEditors();
                     Globals.prefs.updateEntryEditorTabList();
                 } catch (IOException ex) {
-					JOptionPane.showMessageDialog(PrefsDialog3.this,
-                                                Globals.lang("Could not import preferences")
-						+ ": " + ex.getMessage(), Globals.lang("Import preferences"),
-						JOptionPane.ERROR_MESSAGE);
-					// ex.printStackTrace();
-				}
-			}
+                    JOptionPane.showMessageDialog(PrefsDialog3.this,
+                            Globals.lang("Could not import preferences")
+                                    + ": " + ex.getMessage(), Globals.lang("Import preferences"),
+                            JOptionPane.ERROR_MESSAGE);
+                    // ex.printStackTrace();
+                }
+            }
 
-		});
+        });
 
-		setValues();
+        setValues();
 
-		pack(); // setSize(440, 500);
+        pack(); // setSize(440, 500);
 
         /** Look through component sizes to find which tab is to blame
          *  when the dialog grows too large:
@@ -225,68 +239,80 @@ public class PrefsDialog3 extends JDialog {
         }*/
     }
 
-	class OkAction extends AbstractAction {
-		public OkAction() {
-			super("Ok");
-		}
 
-		public void actionPerformed(ActionEvent e) {
+    class OkAction extends AbstractAction {
 
-			AbstractWorker worker = new AbstractWorker() {
-				boolean ready = true;
+        public OkAction() {
+            super("Ok");
+        }
 
-				public void run() {
-					// First check that all tabs are ready to close:
-					int count = main.getComponentCount();
-					Component[] comps = main.getComponents();
-					for (int i = 0; i < count; i++) {
-						if (!((PrefsTab) comps[i]).readyToClose()) {
-							ready = false;
-							return; // If not, break off.
-						}
-					}
-					// Then store settings and close:
-					for (int i = 0; i < count; i++) {
-						((PrefsTab) comps[i]).storeSettings();
-					}
-					Globals.prefs.flush();
-				}
+        @Override
+        public void actionPerformed(ActionEvent e) {
 
-				public void update() {
-					if (!ready)
-						return;
-					setVisible(false);
-					MainTable.updateRenderers();
+            AbstractWorker worker = new AbstractWorker() {
+
+                boolean ready = true;
+
+
+                @Override
+                public void run() {
+                    // First check that all tabs are ready to close:
+                    int count = main.getComponentCount();
+                    Component[] comps = main.getComponents();
+                    for (int i = 0; i < count; i++) {
+                        if (!((PrefsTab) comps[i]).readyToClose()) {
+                            ready = false;
+                            return; // If not, break off.
+                        }
+                    }
+                    // Then store settings and close:
+                    for (int i = 0; i < count; i++) {
+                        ((PrefsTab) comps[i]).storeSettings();
+                    }
+                    Globals.prefs.flush();
+                }
+
+                @Override
+                public void update() {
+                    if (!ready) {
+                        return;
+                    }
+                    setVisible(false);
+                    MainTable.updateRenderers();
                     GUIGlobals.updateEntryEditorColors();
-					frame.setupAllTables();
-					frame.groupSelector.revalidateGroups(); // icons may have
-					// changed
-					frame.output(Globals.lang("Preferences recorded."));
-				}
-			};
-			worker.getWorker().run();
-			worker.getCallBack().update();
+                    frame.setupAllTables();
+                    frame.groupSelector.revalidateGroups(); // icons may have
+                    // changed
+                    frame.output(Globals.lang("Preferences recorded."));
+                }
+            };
+            worker.getWorker().run();
+            worker.getCallBack().update();
 
-		}
-	}
+        }
+    }
 
-	public void setValues() {
-		// Update all field values in the tabs:
-		int count = main.getComponentCount();
-		Component[] comps = main.getComponents();
-		for (int i = 0; i < count; i++) {
-			((PrefsTab) comps[i]).setValues();
-		}
-	}
 
-	class CancelAction extends AbstractAction {
-		public CancelAction() {
-			super("Cancel");
-		}
+    public void setValues() {
+        // Update all field values in the tabs:
+        int count = main.getComponentCount();
+        Component[] comps = main.getComponents();
+        for (int i = 0; i < count; i++) {
+            ((PrefsTab) comps[i]).setValues();
+        }
+    }
 
-		public void actionPerformed(ActionEvent e) {
-			setVisible(false);
-		}
-	}
+
+    class CancelAction extends AbstractAction {
+
+        public CancelAction() {
+            super("Cancel");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+        }
+    }
 
 }

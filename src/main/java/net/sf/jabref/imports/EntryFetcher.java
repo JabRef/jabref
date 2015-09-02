@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.imports;
 
-import java.net.URL;
-
 import javax.swing.JPanel;
 
 import net.sf.jabref.OutputPrinter;
@@ -53,14 +51,14 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @return True if the query was completed successfully, false if an error
      *         occurred.
      */
-    public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status);
+    boolean processQuery(String query, ImportInspector inspector, OutputPrinter status);
 
     /**
      * The title for this activeFetcher, displayed in the menu and in the side pane.
      * 
      * @return The title
      */
-    public String getTitle();
+    String getTitle();
 
     /**
      * Get the name of the key binding for this activeFetcher, if any.
@@ -68,14 +66,7 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @return The name of the key binding or null, if no keybinding should be
      *         created.
      */
-    public String getKeyName();
-
-    /**
-     * Get the appropriate icon URL for this activeFetcher.
-     * 
-     * @return The icon URL
-     */
-    public URL getIcon();
+    String getKeyName();
 
     /**
      * Get the name of the help page for this activeFetcher.
@@ -86,7 +77,7 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @return The name of the help file or null if this activeFetcher does not have
      *         any help.
      */
-    public String getHelpPage();
+    String getHelpPage();
 
     /**
      * If this activeFetcher requires additional options, a panel for setting up these
@@ -96,5 +87,5 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @return Options panel for this activeFetcher or null if this activeFetcher does not
      *         have any options.
      */
-    public JPanel getOptionsPanel();
+    JPanel getOptionsPanel();
 }

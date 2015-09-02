@@ -18,6 +18,9 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexString;
 import net.sf.jabref.Globals;
@@ -25,44 +28,50 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveString;
 
-public class StringRemoveChange extends Change {
+class StringRemoveChange extends Change {
 
-  BibtexString string, inMem;
 
-  InfoPane tp = new InfoPane();
-  JScrollPane sp = new JScrollPane(tp);
-    private BibtexString tmpString;
+    private static final long serialVersionUID = 1L;
+    
+    private final BibtexString string;
+    private final BibtexString inMem;
+
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
+    private final BibtexString tmpString;
+    
+    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
         this.tmpString = tmpString;
-        name = Globals.lang("Removed string")+": '"+string.getName()+"'";
-    this.string = string;
-    this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
+        name = Globals.lang("Removed string") + ": '" + string.getName() + '\'';
+        this.string = string;
+        this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
         tp.setText("<HTML><H2>" + Globals.lang("Removed string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
-  }
-
-  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-
-    try {
-      panel.database().removeString(inMem.getId());
-      undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
-    } catch (Exception ex) {
-      Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
     }
 
-      // Update tmp database:
-      secondary.removeString(tmpString.getId());
+    @Override
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
 
-      return true;
-  }
+        try {
+            panel.database().removeString(inMem.getId());
+            undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
+        } catch (Exception ex) {
+            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
+        }
 
+        // Update tmp database:
+        secondary.removeString(tmpString.getId());
 
-  JComponent description() {
-    return sp;
-  }
+        return true;
+    }
 
+    @Override
+    JComponent description() {
+        return sp;
+    }
 
 }

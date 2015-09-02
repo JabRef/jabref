@@ -38,17 +38,13 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.AuthorList;
 
-
 /**
  * Create DocBook editors formatter.
- *
- * @author $author$
- * @version $Revision$
  */
 public class CreateDocBookEditors extends CreateDocBookAuthors
 {
-    //~ Methods ////////////////////////////////////////////////////////////////
 
+    @Override
     public String format(String fieldText)
     {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
@@ -56,10 +52,7 @@ public class CreateDocBookEditors extends CreateDocBookAuthors
         AuthorList al = AuthorList.getAuthorList(fieldText);
         addBody(sb, al, "editor");
         return sb.toString();
-        
+
     }
 
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

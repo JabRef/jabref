@@ -22,14 +22,16 @@ import net.sf.jabref.Globals;
 
 public class NamedCompound extends CompoundEdit {
 
-    String name;
-    boolean hasEdits = false;
+    private final String name;
+    private boolean hasEdits = false;
+
 
     public NamedCompound(String name) {
-	super();
-	this.name = name;
+        super();
+        this.name = name;
     }
 
+    @Override
     public boolean addEdit(UndoableEdit undoableEdit) {
         hasEdits = true;
         return super.addEdit(undoableEdit);
@@ -39,18 +41,20 @@ public class NamedCompound extends CompoundEdit {
         return hasEdits;
     }
 
+    @Override
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+name;
+        return Globals.lang("Undo") + ": " + name;
     }
 
+    @Override
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+name;
+        return Globals.lang("Redo") + ": " + name;
     }
 
     /**
      * Returns the name of this compound, without the Undo or Redo prefix.
      */
     public String getNameOnly() {
-      return name;
+        return name;
     }
 }

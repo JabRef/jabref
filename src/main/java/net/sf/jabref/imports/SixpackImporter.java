@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.OutputPrinter;
-import net.sf.jabref.Util;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.*;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -35,130 +35,153 @@ import net.sf.jabref.Util;
  */
 public class SixpackImporter extends ImportFormat {
 
-    final String SEPARATOR = new String(new char[] { 0, 48 });
+    private final String SEPARATOR = new String(new char[] {0, 48});
+    
+    private static final Log LOGGER = LogFactory.getLog(SixpackImporter.class);
+
 
     /**
      * Return the name of this import format.
      */
+    @Override
     public String getFormatName() {
-	return "Sixpack";
+        return "Sixpack";
     }
 
     /*
      *  (non-Javadoc)
      * @see net.sf.jabref.imports.ImportFormat#getCLIId()
      */
+    @Override
     public String getCLIId() {
-      return "sixpack";
+        return "sixpack";
     }
-    
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
+    @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
-	    BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
-        int i=0;
+        int i = 0;
         while (((str = in.readLine()) != null) && (i < 50)) {
 
-			if (str.contains(SEPARATOR))
-				return true;
+            if (str.contains(SEPARATOR)) {
+                return true;
+            }
 
             i++;
         }
 
-		return false;
+        return false;
     }
 
     /**
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
+    @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
+        HashMap<String, String> fI = new HashMap<String, String>();
+        fI.put("id", "bibtexkey");
+        fI.put("au", "author");
+        fI.put("ti", "title");
+        fI.put("jo", "journal");
+        fI.put("vo", "volume");
+        fI.put("nu", "number");
+        fI.put("pa", "pages");
+        fI.put("mo", "month");
+        fI.put("yr", "year");
+        fI.put("kw", "keywords");
+        fI.put("ab", "abstract");
+        fI.put("no", "note");
+        fI.put("ed", "editor");
+        fI.put("pu", "publisher");
+        fI.put("se", "series");
+        fI.put("ad", "address");
+        fI.put("en", "edition");
+        fI.put("ch", "chapter");
+        fI.put("hp", "howpublished");
+        fI.put("tb", "booktitle");
+        fI.put("or", "organization");
+        fI.put("sc", "school");
+        fI.put("in", "institution");
+        fI.put("ty", "type");
+        fI.put("url", "url");
+        fI.put("cr", "crossref");
+        fI.put("fi", "file");
 
-	HashMap<String, String> fI = new HashMap<String, String>();
-	fI.put("id", "bibtexkey");
-	fI.put("au", "author");
-	fI.put("ti", "title");
-	fI.put("jo", "journal");
-	fI.put("vo", "volume");
-	fI.put("nu", "number");
-	fI.put("pa", "pages");
-	fI.put("mo", "month");
-	fI.put("yr", "year");
-	fI.put("kw", "keywords");
-	fI.put("ab", "abstract");
-	fI.put("no", "note");
-	fI.put("ed", "editor");
-	fI.put("pu", "publisher");
-	fI.put("se", "series");
-	fI.put("ad", "address");
-	fI.put("en", "edition");
-	fI.put("ch", "chapter");
-	fI.put("hp", "howpublished");
-	fI.put("tb", "booktitle");
-	fI.put("or", "organization");
-	fI.put("sc", "school");
-	fI.put("in", "institution");
-	fI.put("ty", "type");
-	fI.put("url", "url");
-	fI.put("cr", "crossref");
-    fI.put("fi", "file");
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        in.readLine();
+        String ln = in.readLine();
+        if (ln == null) {
+            return null;
+        }
+        String[] fieldDef = ln.split(",");
 
-	ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-	in.readLine();
-    String ln = in.readLine();
-    if (ln == null)
-        return null;
-    String[] fieldDef = ln.split(",");
-
-    String s = null;
-	BibtexEntry entry = null;
+        String s;
+        BibtexEntry entry;
         while ((s = in.readLine()) != null) {
             try {
                 s = s.replaceAll("<par>", ""); // What is <par> ????
                 String[] fields = s.split(SEPARATOR);
                 // Check type and create entry:
                 if (fields.length < 2)
+                 {
                     continue; // Avoid ArrayIndexOutOfBoundsException
+                }
                 BibtexEntryType typ = BibtexEntryType
                         .getType(fields[1].toLowerCase());
                 if (typ == null) {
                     String type = "";
-                    if (fields[1].equals("Masterthesis")) type = "mastersthesis";
-                    if (fields[1].equals("PhD-Thesis")) type = "phdthesis";
-                    if (fields[1].equals("miscellaneous")) type = "misc";
-                    if (fields[1].equals("Conference")) type = "proceedings";
+                    if (fields[1].equals("Masterthesis")) {
+                        type = "mastersthesis";
+                    }
+                    if (fields[1].equals("PhD-Thesis")) {
+                        type = "phdthesis";
+                    }
+                    if (fields[1].equals("miscellaneous")) {
+                        type = "misc";
+                    }
+                    if (fields[1].equals("Conference")) {
+                        type = "proceedings";
+                    }
                     typ = BibtexEntryType.getType(type.toLowerCase());
                 }
-                entry = new BibtexEntry(Util.createNeutralId(), typ);
+                entry = new BibtexEntry(IdGenerator.next(), typ);
                 String fld;
                 for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++) {
                     fld = fI.get(fieldDef[i]);
                     if (fld != null) {
-                        if (fld.equals("author") || fld.equals("editor")) ImportFormatReader.setIfNecessary(entry,
-                                fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
-                                " and "));
-                        else if (fld.equals("pages")) ImportFormatReader.setIfNecessary(entry, fld, fields[i]
-                                .replaceAll("-", "--"));
-                        else if (fld.equals("file")) {
+                        if (fld.equals("author") || fld.equals("editor")) {
+                            ImportFormatReader.setIfNecessary(entry,
+                                    fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",
+                                            " and "));
+                        } else if (fld.equals("pages")) {
+                            ImportFormatReader.setIfNecessary(entry, fld, fields[i]
+                                    .replaceAll("-", "--"));
+                        } else if (fld.equals("file")) {
                             String fieldName = "pdf"; // We set pdf as default.
-                            if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz"))
+                            if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz")) {
                                 fieldName = "ps";
-                            else if (fields[i].endsWith("html"))
+                            } else if (fields[i].endsWith("html")) {
                                 fieldName = "url";
+                            }
                             ImportFormatReader.setIfNecessary(entry, fieldName, fields[i]);
-                        } else ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
+                        } else {
+                            ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
+                        }
                     }
                 }
                 bibitems.add(entry);
             } catch (NullPointerException ex) {
-                Globals.logger("Problem parsing Sixpack entry, ignoring entry.");
+                LOGGER.info("Problem parsing Sixpack entry, ignoring entry.", ex);
             }
         }
 
-	return bibitems;
+        return bibitems;
     }
 }

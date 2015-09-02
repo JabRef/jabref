@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.util.StringUtil;
 
 import java.awt.*;
 import java.util.regex.Pattern;
@@ -26,164 +27,180 @@ import javax.swing.event.UndoableEditListener;
 /**
  * An implementation of the FieldEditor backed by a JTextArea. Used for
  * multi-line input.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class FieldTextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
-	Dimension PREFERRED_SIZE;
+    Dimension PREFERRED_SIZE;
 
-	JScrollPane sp;
+    private final JScrollPane sp;
 
-	FieldNameLabel label;
+    private final FieldNameLabel label;
 
-	String fieldName;
+    private String fieldName;
 
-	final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
+    final static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
 
-	final static Pattern indent = Pattern.compile("\\s+.*");
+    final static Pattern indent = Pattern.compile("\\s+.*");
 
-	private AutoCompleteListener autoCompleteListener = null;
+    private AutoCompleteListener autoCompleteListener = null;
+
 
     // protected UndoManager undo = new UndoManager();
 
-	public FieldTextArea(String fieldName_, String content) {
-		super(content);
+    public FieldTextArea(String fieldName_, String content) {
+        super(content);
 
-		// Listen for undo and redo events
-		/*
-		 * getDocument().addUndoableEditListener(new UndoableEditListener() {
-		 * public void undoableEditHappened(UndoableEditEvent evt) {
-		 * undo.addEdit(evt.getEdit()); } });
-		 */
+        // Listen for undo and redo events
+        /*
+         * getDocument().addUndoableEditListener(new UndoableEditListener() {
+         * public void undoableEditHappened(UndoableEditEvent evt) {
+         * undo.addEdit(evt.getEdit()); } });
+         */
 
-		updateFont();
+        updateFont();
 
-		// Add the global focus listener, so a menu item can see if this field
-		// was focused when an action was called.
-		addFocusListener(Globals.focusListener);
-		addFocusListener(new FieldEditorFocusListener());
-		sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		sp.setMinimumSize(new Dimension(200, 1));
+        // Add the global focus listener, so a menu item can see if this field
+        // was focused when an action was called.
+        addFocusListener(Globals.focusListener);
+        addFocusListener(new FieldEditorFocusListener());
+        sp = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        sp.setMinimumSize(new Dimension(200, 1));
 
-		setLineWrap(true);
-		setWrapStyleWord(true);
-		fieldName = fieldName_;
+        setLineWrap(true);
+        setWrapStyleWord(true);
+        fieldName = fieldName_;
 
-		label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
-		setBackground(GUIGlobals.validFieldBackgroundColor);
-		setForeground(GUIGlobals.editorTextColor);
+        label = new FieldNameLabel(' ' + StringUtil.nCase(fieldName) + ' ');
+        setBackground(GUIGlobals.validFieldBackgroundColor);
+        setForeground(GUIGlobals.editorTextColor);
 
-		// setFont(new Font("Times", Font.PLAIN, 10));
+        // setFont(new Font("Times", Font.PLAIN, 10));
 
-		FieldTextMenu popMenu = new FieldTextMenu(this);
-		this.addMouseListener(popMenu);
-		label.addMouseListener(popMenu);
+        FieldTextMenu popMenu = new FieldTextMenu(this);
+        this.addMouseListener(popMenu);
+        label.addMouseListener(popMenu);
 
     }
 
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
 
-	/*
-	 * public void paint(Graphics g) { Graphics2D g2 = (Graphics2D) g; if
-	 * (antialias) g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-	 * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
-	 */
+    /*
+     * public void paint(Graphics g) { Graphics2D g2 = (Graphics2D) g; if
+     * (antialias) g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+     * RenderingHints.VALUE_ANTIALIAS_ON); super.paint(g2); }
+     */
 
+    @Override
     public String getFieldName() {
-		return fieldName;
-	}
+        return fieldName;
+    }
 
-	public void setFieldName(String newName) {
-		fieldName = newName;
-	}
+    public void setFieldName(String newName) {
+        fieldName = newName;
+    }
 
-	public JLabel getLabel() {
-		return label;
-	}
+    @Override
+    public JLabel getLabel() {
+        return label;
+    }
 
-	public void setLabelColor(Color c) {
-		label.setForeground(c);
-	}
+    @Override
+    public void setLabelColor(Color c) {
+        label.setForeground(c);
+    }
 
-	public JComponent getPane() {
-		return sp;
-	}
+    @Override
+    public JComponent getPane() {
+        return sp;
+    }
 
-	public JComponent getTextComponent() {
-		return this;
-	}
+    @Override
+    public JComponent getTextComponent() {
+        return this;
+    }
 
-	public void setActiveBackgroundColor() {
-		setBackground(GUIGlobals.activeBackground);
-	}
+    @Override
+    public void setActiveBackgroundColor() {
+        setBackground(GUIGlobals.activeBackground);
+    }
 
-	public void setValidBackgroundColor() {
-		setBackground(GUIGlobals.validFieldBackgroundColor);
-	}
+    @Override
+    public void setValidBackgroundColor() {
+        setBackground(GUIGlobals.validFieldBackgroundColor);
+    }
 
-	public void setInvalidBackgroundColor() {
-		setBackground(GUIGlobals.invalidFieldBackgroundColor);
-	}
+    @Override
+    public void setInvalidBackgroundColor() {
+        setBackground(GUIGlobals.invalidFieldBackgroundColor);
+    }
 
-	public void updateFontColor() {
-		setForeground(GUIGlobals.editorTextColor);
-	}
+    @Override
+    public void updateFontColor() {
+        setForeground(GUIGlobals.editorTextColor);
+    }
 
-	public void updateFont() {
-		setFont(GUIGlobals.CURRENTFONT);
-	}
+    @Override
+    public void updateFont() {
+        setFont(GUIGlobals.CURRENTFONT);
+    }
 
-	public void paste(String textToInsert) {
-		int sel = getSelectionEnd() - getSelectionStart();
-		if (sel > 0) // selected text available
-			replaceSelection(textToInsert);
-		else {
-			int cPos = this.getCaretPosition();
-			this.insert(textToInsert, cPos);
-		}
-	}
+    @Override
+    public void paste(String textToInsert) {
+        int sel = getSelectionEnd() - getSelectionStart();
+        if (sel > 0) {
+            replaceSelection(textToInsert);
+        } else {
+            int cPos = this.getCaretPosition();
+            this.insert(textToInsert, cPos);
+        }
+    }
 
-	public boolean hasUndoInformation() {
-		return false;// undo.canUndo();
-	}
+    @Override
+    public boolean hasUndoInformation() {
+        return false;// undo.canUndo();
+    }
 
-	public void undo() {
-		/*
-		 * try { if (undo.canUndo()) { undo.undo(); } } catch
-		 * (CannotUndoException e) { }
-		 */
+    @Override
+    public void undo() {
+        /*
+         * try { if (undo.canUndo()) { undo.undo(); } } catch
+         * (CannotUndoException e) { }
+         */
 
-	}
+    }
 
-	public boolean hasRedoInformation() {
-		return false;// undo.canRedo();
-	}
+    @Override
+    public boolean hasRedoInformation() {
+        return false;// undo.canRedo();
+    }
 
-	public void redo() {
-		/*
-		 * try { if (undo.canRedo()) { undo.redo(); } } catch
-		 * (CannotUndoException e) { }
-		 */
+    @Override
+    public void redo() {
+        /*
+         * try { if (undo.canRedo()) { undo.redo(); } } catch
+         * (CannotUndoException e) { }
+         */
 
-	}
+    }
 
-	public void addUndoableEditListener(UndoableEditListener listener) {
-		getDocument().addUndoableEditListener(listener);
-	}
+    @Override
+    public void addUndoableEditListener(UndoableEditListener listener) {
+        getDocument().addUndoableEditListener(listener);
+    }
 
-	public void setAutoCompleteListener(AutoCompleteListener listener) {
-		autoCompleteListener = listener;
-	}
+    @Override
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+        autoCompleteListener = listener;
+    }
 
-	public void clearAutoCompleteSuggestion() {
-		if (autoCompleteListener != null) {
-			autoCompleteListener.clearCurrentSuggestion(this);
-		}
-	}
+    @Override
+    public void clearAutoCompleteSuggestion() {
+        if (autoCompleteListener != null) {
+            autoCompleteListener.clearCurrentSuggestion(this);
+        }
+    }
 }

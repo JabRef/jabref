@@ -19,24 +19,26 @@ import java.io.*;
 import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.VersionHandling;
+import net.sf.jabref.groups.migrations.VersionHandling;
 import net.sf.jabref.labelPattern.LabelPattern;
 
 import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.util.StringUtil;
 
 public class MetaData implements Iterable<String> {
+
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
 
-    private HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
-    private StringReader data;
+    private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
     private boolean groupTreeValid = true;
-    
+
     private LabelPattern labelPattern = null;
 
     private DBStrings dbStrings = new DBStrings();
+
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -51,40 +53,43 @@ public class MetaData implements Iterable<String> {
         // The first version (0) lacked a version specification, 
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
-        
-        if (inData != null) 
-        	for (String key : inData.keySet()){
-            data = new StringReader(inData.get(key));
-            String unit;
-            Vector<String> orderedData = new Vector<String>();
-            // We must allow for ; and \ in escape sequences.
-            try {
-                while ((unit = getNextUnit(data)) != null) {
-                    orderedData.add(unit);
+
+        if (inData != null) {
+            for (String key : inData.keySet()) {
+                StringReader data = new StringReader(inData.get(key));
+                String unit;
+                Vector<String> orderedData = new Vector<String>();
+                // We must allow for ; and \ in escape sequences.
+                try {
+                    while ((unit = getNextUnit(data)) != null) {
+                        orderedData.add(unit);
+                    }
+                } catch (IOException ex) {
+                    System.err.println("Weird error while parsing meta data.");
                 }
-            } catch (IOException ex) {
-                System.err.println("Weird error while parsing meta data.");
-            }
-            if (key.equals("groupsversion")) {
-                if (orderedData.size() >= 1)
-                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
-            } else if (key.equals("groupstree")) {
-                groupsTreePresent = true;
-                treeGroupsData = orderedData; // save for later user
-                // actual import operation is handled later because "groupsversion"
-                // tag might not yet have been read
-            } else if (key.equals("groups")) {
-                flatGroupsData = orderedData;
-            } else {
-                putData(key, orderedData);
+                if (key.equals("groupsversion")) {
+                    if (orderedData.size() >= 1) {
+                        groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement());
+                    }
+                } else if (key.equals("groupstree")) {
+                    groupsTreePresent = true;
+                    treeGroupsData = orderedData; // save for later user
+                    // actual import operation is handled later because "groupsversion"
+                    // tag might not yet have been read
+                } else if (key.equals("groups")) {
+                    flatGroupsData = orderedData;
+                } else {
+                    putData(key, orderedData);
+                }
             }
         }
-        
+
         // this possibly handles import of a previous groups version
-        if (groupsTreePresent)
+        if (groupsTreePresent) {
             putGroups(treeGroupsData, db, groupsVersionOnDisk);
-        
-        if (!groupsTreePresent && flatGroupsData != null) {
+        }
+
+        if (!groupsTreePresent && (flatGroupsData != null)) {
             try {
                 groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
                 groupTreeValid = true;
@@ -115,6 +120,7 @@ public class MetaData implements Iterable<String> {
     /**
      * @return Iterator on all keys stored in the metadata
      */
+    @Override
     public Iterator<String> iterator() {
         return metaData.keySet().iterator();
     }
@@ -161,12 +167,12 @@ public class MetaData implements Iterable<String> {
         // the preferences can specify one. The settings are prioritized in the following
         // order and the first defined setting is used: metadata user-specific directory,
         // metadata general directory, preferences directory.
-        String key = Globals.prefs.get("userFileDirIndividual");
+        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
         List<String> dirs = new ArrayList<String>();
 
         Vector<String> vec = getData(key);
         if (vec == null) {
-            key = Globals.prefs.get("userFileDir");
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
         if ((vec != null) && (vec.size() > 0)) {
@@ -184,24 +190,27 @@ public class MetaData implements Iterable<String> {
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
-                if ((new File(relDir)).exists())
+                if ((new File(relDir)).exists()) {
                     dir = relDir;
+                }
             }
             dirs.add(dir);
         }
         else {
             String dir = Globals.prefs.get(fieldName + "Directory");
-            if (dir != null)
+            if (dir != null) {
                 dirs.add(dir);
+            }
         }
 
         // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && getFile() != null) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && (getFile() != null)) {
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean("bibLocAsPrimaryDir"))
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
                 dirs.add(0, getFile().getParent());
-            else
+            } else {
                 dirs.add(getFile().getParent());
+            }
         }
 
         return dirs.toArray(new String[dirs.size()]);
@@ -216,7 +225,7 @@ public class MetaData implements Iterable<String> {
      */
     private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
         try {
-            groupsRoot = VersionHandling.importGroups(orderedData, db, 
+            groupsRoot = VersionHandling.importGroups(orderedData, db,
                     version);
             groupTreeValid = true;
         } catch (Exception e) {
@@ -229,7 +238,7 @@ public class MetaData implements Iterable<String> {
     public GroupTreeNode getGroups() {
         return groupsRoot;
     }
-    
+
     /**
      * Sets a new group root node. <b>WARNING </b>: This invalidates everything
      * returned by getGroups() so far!!!
@@ -245,16 +254,15 @@ public class MetaData implements Iterable<String> {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        for (String key : metaData.keySet()) {
+        SortedSet<String> sortedKeys = new TreeSet<String>(metaData.keySet());
+        for (String key : sortedKeys) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
-            if (orderedData.size() >= 0) {
-                sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
-                for (int j = 0; j < orderedData.size(); j++) {
-                    sb.append(Util.quote(orderedData.elementAt(j), ";", '\\')).append(";");
-                }
-                sb.append("}");
+            sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
+            for (int j = 0; j < orderedData.size(); j++) {
+                sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
+            sb.append("}");
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
@@ -263,25 +271,25 @@ public class MetaData implements Iterable<String> {
         }
         // write groups if present. skip this if only the root node exists 
         // (which is always the AllEntriesGroup).
-        if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
+        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
-            sb.append(""+VersionHandling.CURRENT_VERSION+";");
+            sb.append("" + VersionHandling.CURRENT_VERSION + ";");
             sb.append("}");
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
             out.write(sb.toString());
-            
+
             // now write actual groups
             sb = new StringBuffer();
             sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupstree:");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(),Globals.NEWLINE);
+            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
-                StringBuffer s = 
-                    new StringBuffer(Util.quote(tok.nextToken(), ";", '\\') + ";");
+                StringBuffer s =
+                        new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
                 wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
@@ -294,32 +302,33 @@ public class MetaData implements Iterable<String> {
     }
 
     private void wrapStringBuffer(StringBuffer sb, int lineLength) {
-        for (int i=lineLength; i<sb.length(); i+=lineLength+Globals.NEWLINE_LENGTH) {
+        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE_LENGTH) {
             sb.insert(i, Globals.NEWLINE);
         }
     }
-    
+
     /**
      * Reads the next unit. Units are delimited by ';'. 
      */
     private String getNextUnit(Reader reader) throws IOException {
         int c;
         boolean escape = false;
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         while ((c = reader.read()) != -1) {
             if (escape) {
-                res.append((char)c);
+                res.append((char) c);
                 escape = false;
             } else if (c == '\\') {
                 escape = true;
             } else if (c == ';') {
                 break;
             } else {
-                res.append((char)c);
+                res.append((char) c);
             }
         }
-        if (res.length() > 0)
+        if (res.length() > 0) {
             return res.toString();
+        }
         return null;
     }
 
@@ -342,7 +351,7 @@ public class MetaData implements Iterable<String> {
     public boolean isGroupTreeValid() {
         return groupTreeValid;
     }
-    
+
     /**
      * @return the stored label patterns
      */
@@ -350,25 +359,25 @@ public class MetaData implements Iterable<String> {
         if (labelPattern != null) {
             return labelPattern;
         }
-        
+
         labelPattern = new LabelPattern();
-        
+
         // the parent label pattern of a BibTeX data base is the global pattern stored in the preferences
         labelPattern.setParent(Globals.prefs.getKeyPattern());
 
         for (String key : this) {
-            if (key.startsWith(PREFIX_KEYPATTERN)) {
+            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 Vector<String> value = getData(key);
-                String type = key.substring(PREFIX_KEYPATTERN.length());
+                String type = key.substring(MetaData.PREFIX_KEYPATTERN.length());
                 labelPattern.addLabelPattern(type, value.get(0));
             }
         }
-        
-        Vector<String> defaultPattern = getData(KEYPATTERNDEFAULT);
+
+        Vector<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
             labelPattern.setDefaultValue(defaultPattern.get(0));
         }
-        
+
         return labelPattern;
     }
 
@@ -383,14 +392,14 @@ public class MetaData implements Iterable<String> {
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {
             String key = iterator.next();
-            if (key.startsWith(PREFIX_KEYPATTERN)) {
+            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 iterator.remove();
             }
         }
 
         // set new value if it is not a default value
         for (String key : labelPattern.keySet()) {
-            String metaDataKey = PREFIX_KEYPATTERN + key;
+            String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
             ArrayList<String> value = labelPattern.get(key);
             if (value != null) {
                 Vector<String> data = new Vector<String>();
@@ -401,13 +410,13 @@ public class MetaData implements Iterable<String> {
 
         // store default pattern
         if (labelPattern.getDefaultValue() == null) {
-            this.remove(KEYPATTERNDEFAULT);
+            this.remove(MetaData.KEYPATTERNDEFAULT);
         } else {
             Vector<String> data = new Vector<String>();
             data.add(labelPattern.getDefaultValue().get(0));
-            this.putData(KEYPATTERNDEFAULT, data);
+            this.putData(MetaData.KEYPATTERNDEFAULT, data);
         }
-        
+
         this.labelPattern = labelPattern;
     }
 

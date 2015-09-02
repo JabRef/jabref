@@ -30,11 +30,11 @@ import javax.swing.*;
  */
 public interface SidePanePlugin {
 
-    public void init(JabRefFrame frame, SidePaneManager manager);
-    
-    public SidePaneComponent getSidePaneComponent();
+    void init(JabRefFrame frame, SidePaneManager manager);
 
-    public JMenuItem getMenuItem();
+    SidePaneComponent getSidePaneComponent();
 
-    public String getShortcutKey();
+    JMenuItem getMenuItem();
+
+    String getShortcutKey();
 }

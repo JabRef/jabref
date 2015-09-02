@@ -36,12 +36,13 @@ import net.sf.jabref.OutputPrinter;
 public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     private boolean isCustomImporter;
-    
+
+
     /**
      * Constructor for custom importers.
      */
     public ImportFormat() {
-      this.isCustomImporter = false;
+        this.isCustomImporter = false;
     }
 
     /**
@@ -66,7 +67,6 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      */
     public abstract List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException;
 
-
     /**
      * Name of this import format.
      * 
@@ -75,33 +75,33 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * @return format name, must be unique and not <code>null</code>
      */
     public abstract String getFormatName();
-    
+
     /**
      * Extensions that this importer can read.
      * 
      * @return comma separated list of extensions or <code>null</code> for the default
      */
     public String getExtensions() {
-      return null;
+        return null;
     }
-    
+
     /**
      * Short, one token ID to identify the format from the command line.
      * 
      * @return command line ID
      */
     public String getCLIId() {
-      String id = getFormatName();
-      StringBuffer result = new StringBuffer(id.length());
-      for (int i = 0; i < id.length(); i++) {
-        char c = id.charAt(i);
-        if (Character.isLetterOrDigit(c)) {
-          result.append(Character.toLowerCase(c));
+        String id = getFormatName();
+        StringBuilder result = new StringBuilder(id.length());
+        for (int i = 0; i < id.length(); i++) {
+            char c = id.charAt(i);
+            if (Character.isLetterOrDigit(c)) {
+                result.append(Character.toLowerCase(c));
+            }
         }
-      }
-      return result.toString();
+        return result.toString();
     }
-    
+
     /**
      * Description  of the ImportFormat.
      * 
@@ -115,9 +115,9 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * @return description of the import format
      */
     public String getDescription() {
-      return "No description available for " + getFormatName() + ".";
+        return "No description available for " + getFormatName() + ".";
     }
-    
+
     /**
      * Sets if this is a custom importer.
      * 
@@ -127,9 +127,9 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * @param isCustomImporter if this is a custom importer
      */
     public final void setIsCustomImporter(boolean isCustomImporter) {
-      this.isCustomImporter = isCustomImporter;
+        this.isCustomImporter = isCustomImporter;
     }
-    
+
     /**
      * Wether this importer is a custom importer.
      * 
@@ -138,47 +138,51 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * @return  wether this is a custom importer
      */
     public final boolean getIsCustomImporter() {
-      return this.isCustomImporter; 
+        return this.isCustomImporter;
     }
-        
+
     /*
      *  (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
-      return getFormatName().hashCode();
+        return getFormatName().hashCode();
     }
-    
+
     /*
      *  (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object o) {
-      return o != null 
-          && o instanceof ImportFormat
-          && ((ImportFormat)o).getIsCustomImporter() == getIsCustomImporter() 
-          && ((ImportFormat)o).getFormatName().equals(getFormatName());
+        return (o != null)
+                && (o instanceof ImportFormat)
+                && (((ImportFormat) o).getIsCustomImporter() == getIsCustomImporter())
+                && ((ImportFormat) o).getFormatName().equals(getFormatName());
     }
-    
+
     /*
      *  (non-Javadoc)
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
-      return getFormatName();
+        return getFormatName();
     }
-    
+
     /*
      *  (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
+    @Override
     public int compareTo(ImportFormat importer) {
-      int result = 0;
-      if (getIsCustomImporter() == importer.getIsCustomImporter()) {
-        result = getFormatName().compareTo(importer.getFormatName());
-      } else {
-        result = getIsCustomImporter() ? 1 : -1;
-      }
-      return result;
+        int result;
+        if (getIsCustomImporter() == importer.getIsCustomImporter()) {
+            result = getFormatName().compareTo(importer.getFormatName());
+        } else {
+            result = getIsCustomImporter() ? 1 : -1;
+        }
+        return result;
     }
 }

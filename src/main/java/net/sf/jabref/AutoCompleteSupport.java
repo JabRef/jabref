@@ -36,6 +36,7 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.autocompleter.AbstractAutoCompleter;
+import net.sf.jabref.autocompleter.AutoCompleter;
 
 /**
  * Based on code by 
@@ -45,7 +46,7 @@ import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 public class AutoCompleteSupport<E> {
 	AutoCompleteRenderer<E> renderer;
 	AutoCompleteFormater<E> formater;
-	AbstractAutoCompleter<E> autoCompleter;
+	AutoCompleter<E> autoCompleter;
 	JTextComponent textComp;
 	JPopupMenu popup = new JPopupMenu();
 
@@ -61,7 +62,7 @@ public class AutoCompleteSupport<E> {
 	private final FocusListener selectTextOnFocusGainHandler = new ComboBoxEditorFocusHandler();
 
 	public AutoCompleteSupport(JTextComponent textComp,
-			AbstractAutoCompleter<E> autoCompleter,
+			AutoCompleter<E> autoCompleter,
 			AutoCompleteRenderer<E> renderer, AutoCompleteFormater<E> formater) {
 		this.renderer = renderer;
 		this.formater = formater;
@@ -75,7 +76,7 @@ public class AutoCompleteSupport<E> {
 	}
 
 	public AutoCompleteSupport(JTextComponent textComp,
-			AbstractAutoCompleter<E> autoCompleter) {
+			AutoCompleter<E> autoCompleter) {
 		this(textComp, autoCompleter, new DefaultAutoCompletRenderer<E>(), new ToStringAutoCompleteFormater<E>());
 	}
 
@@ -278,7 +279,7 @@ public class AutoCompleteSupport<E> {
 		}
 	}
 
-	public void setAutoCompleter(AbstractAutoCompleter autoCompleter) {
+	public void setAutoCompleter(AutoCompleter<E> autoCompleter) {
 		this.autoCompleter = autoCompleter;
 	}
 }

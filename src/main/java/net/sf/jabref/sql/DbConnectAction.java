@@ -17,7 +17,7 @@ package net.sf.jabref.sql;
 
 import net.sf.jabref.BaseAction;
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.sql.exporter.DBExporter;
 
@@ -32,70 +32,77 @@ import java.awt.event.ActionEvent;
  * Jan 20th Adjusted to accomodate changes on SQL Exporter module by ifsteinm
  * 
  */
-public class DbConnectAction extends BaseAction {
-	private BasePanel panel;
+public class DbConnectAction implements BaseAction {
 
-	public DbConnectAction(BasePanel panel) {
-		this.panel = panel;
-	}
+    private final BasePanel panel;
 
-	public AbstractAction getAction() {
-		return new DbImpAction();
-	}
 
-	class DbImpAction extends AbstractAction {
-		public void actionPerformed(ActionEvent e) {
-			action();
+    public DbConnectAction(BasePanel panel) {
+        this.panel = panel;
+    }
 
-		}
-	}
+    public AbstractAction getAction() {
+        return new DbImpAction();
+    }
 
-	public void action() {
 
-		DBStrings dbs = panel.metaData().getDBStrings();
+    private class DbImpAction extends AbstractAction {
 
-		// init DB strings if necessary
-		if (!dbs.isInitialized()) {
-			dbs.initialize();
-		}
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            action();
 
-		// show connection dialog
-		DBConnectDialog dbd = new DBConnectDialog(panel.frame(), dbs);
-		Util.placeDialog(dbd, panel);
-		dbd.setVisible(true);
+        }
+    }
 
-		// connnect to database to test DBStrings
-		if (dbd.getConnectToDB()) {
 
-			dbs = dbd.getDBStrings();
+    @Override
+    public void action() {
 
-			try {
+        DBStrings dbs = panel.metaData().getDBStrings();
 
-				panel.frame().output(
-						Globals.lang("Establishing SQL connection..."));
-				DBExporter exporter = (new DBExporterAndImporterFactory())
-						.getExporter(dbs.getServerType());
-				Connection conn = exporter.connectToDB(dbs);
-				conn.close();
-				dbs.isConfigValid(true);
-				panel.frame().output(
-						Globals.lang("SQL connection established."));
-			} catch (Exception ex) {
-				String errorMessage = SQLUtil.getExceptionMessage(ex);
-				dbs.isConfigValid(false);
+        // init DB strings if necessary
+        if (!dbs.isInitialized()) {
+            dbs.initialize();
+        }
 
-				String preamble = "Could not connect to SQL database for the following reason:";
-				panel.frame().output(
-						Globals.lang(preamble) + "  " + errorMessage);
+        // show connection dialog
+        DBConnectDialog dbd = new DBConnectDialog(panel.frame(), dbs);
+        Util.placeDialog(dbd, panel);
+        dbd.setVisible(true);
 
-				JOptionPane.showMessageDialog(panel.frame(),
-						Globals.lang(preamble) + "\n" + errorMessage,
-						Globals.lang("Connect to SQL database"),
-						JOptionPane.ERROR_MESSAGE);
-			} finally {
-				panel.metaData().setDBStrings(dbs);
-				dbd.dispose();
-			}
-		}
-	}
+        // connnect to database to test DBStrings
+        if (dbd.getConnectToDB()) {
+
+            dbs = dbd.getDBStrings();
+
+            try {
+
+                panel.frame().output(
+                        Globals.lang("Establishing SQL connection..."));
+                DBExporter exporter = (new DBExporterAndImporterFactory())
+                        .getExporter(dbs.getServerType());
+                Connection conn = exporter.connectToDB(dbs);
+                conn.close();
+                dbs.isConfigValid(true);
+                panel.frame().output(
+                        Globals.lang("SQL connection established."));
+            } catch (Exception ex) {
+                String errorMessage = SQLUtil.getExceptionMessage(ex);
+                dbs.isConfigValid(false);
+
+                String preamble = "Could not connect to SQL database for the following reason:";
+                panel.frame().output(
+                        Globals.lang(preamble) + "  " + errorMessage);
+
+                JOptionPane.showMessageDialog(panel.frame(),
+                        Globals.lang(preamble) + '\n' + errorMessage,
+                        Globals.lang("Connect to SQL database"),
+                        JOptionPane.ERROR_MESSAGE);
+            } finally {
+                panel.metaData().setDBStrings(dbs);
+                dbd.dispose();
+            }
+        }
+    }
 }

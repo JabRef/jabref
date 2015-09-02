@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.CustomEntryType;
 import net.sf.jabref.Globals;
 
 /**
@@ -30,16 +31,19 @@ import net.sf.jabref.Globals;
  */
 public class CheckForNewEntryTypesAction implements PostOpenAction {
 
+    @Override
     public boolean isActionNecessary(ParserResult pr) {
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
             String typeName = (i.next()).toLowerCase();
-            if (BibtexEntryType.ALL_TYPES.get(typeName) != null)
+            if (BibtexEntryType.getType(typeName) != null) {
                 i.remove();
+            }
         }
         return pr.getEntryTypes().size() > 0;
     }
 
+    @Override
     public void performAction(BasePanel panel, ParserResult pr) {
 
         StringBuilder sb = new StringBuilder(Globals.lang("Custom entry types found in file") + ": ");
@@ -55,14 +59,12 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
                 Globals.lang("Custom entry types"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
-        
+
         if (answer == JOptionPane.YES_OPTION) {
             // Import
-            for (BibtexEntryType typ : pr.getEntryTypes().values()){
-                BibtexEntryType.ALL_TYPES.put(typ.getName().toLowerCase(), typ);
+            for (BibtexEntryType typ : pr.getEntryTypes().values()) {
+                BibtexEntryType.addOrModifyCustomEntryType((CustomEntryType) typ);
             }
-
         }
     }
-
 }

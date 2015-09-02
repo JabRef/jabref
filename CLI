@@ -1,27 +1,25 @@
-jabref [options] [bibtex-file]
+usage: jabref [OPTIONS] [BIBTEX_FILE]
 
-JabRef  @optionfile :module: OPTIONS ... :module: OPTIONS
-
-Use --menu to invoke the interactive built-in menu.
-
-Option Name     Type       Description
-
--m, --menu      <NOTIFY>   Displays the built-in interactive menu.
--f, --fetch     <STRING>   Run Fetcher, e.g. "--fetch=Medline:cancer"
--o, --output    <STRING>   Output or export file: filename[,export format]
--p, --primp     <STRING>   Import preferences from file
--n, --nogui     <BOOLEAN>  No GUI. Only process command line options.
--a, --aux       <STRING>   Subdatabase from aux: file[.aux],new[.bib]
--h, --help      <BOOLEAN>  Display help on command line options
-    --importToO <STRING>   Import to open tab
--b, --blank     <BOOLEAN>  Do not open any files at startup
--i, --import    <STRING>   Import file: filename[,import format]
--s, --nosplash  <BOOLEAN>  Do not show splash window at startup
--x, --prexp     <STRING>   Export preferences to file
--d, --prdef     <STRING>   Reset preferences (key1,key2,... or 'all')
--v, --version   <BOOLEAN>  Display version
--m, --exportMat <STRING>   [field]searchTerm,outputFile: file[,exportFormat
--l, --loads     <BOOLEAN>  Load session
+Options: [-a <FILE>] [-b] [-d <FILE>] [-f <FILE>] [-h] [-i <FILE>]
+       [--importToOpen <FILE>] [-l] [-m <FILE>] [-n] [-o <FILE>] [-p
+       <FILE>] [-s] [-v] [-x <FILE>]
+ -a,--aux <FILE>             Subdatabase from aux: file[.aux],new[.bib]
+ -b,--blank                  Do not open any files at startup
+ -d,--prdef <FILE>           Reset preferences (key1,key2,... or 'all')
+ -f,--fetch <FILE>           Run Fetcher, e.g. "--fetch=Medline:cancer"
+ -h,--help                   Display help on command line options
+ -i,--import <FILE>          Import file: filename[,import format]
+    --importToOpen <FILE>    Import to open tab
+ -l,--loads                  Load session
+ -m,--exportMatches <FILE>   [field]searchTerm,outputFile:
+                             file[,exportFormat]
+ -n,--nogui                  No GUI. Only process command line options.
+ -o,--output <FILE>          Output or export file: filename[,export
+                             format]
+ -p,--primp <FILE>           Import preferences from file
+ -s,--nosplash               Do not show splash window at startup
+ -v,--version                Display version
+ -x,--prexp <FILE>           Export preferences to file
 
 Available import formats:
   BibTeX         : bibtex
@@ -35,6 +33,7 @@ Available import formats:
   JStor (tab delimited) : jstor
   MSBib          : msbib
   Medline        : medline
+  MedlinePlain   : medlineplain
   Ovid           : ovid
   REPEC New Economic Papers (NEP) : repecnep
   RIS            : ris
@@ -45,6 +44,8 @@ Available import formats:
   XMP-annotated PDF : xmpannotatedpdf
 
 Available export formats: MSBib, bibordf, bibtexml, din1505, docbook,
-	endnote, harvard, html, iso690rtf, iso690txt, listrefs, misq, mods,
-	mysql, ods, oocalc, oocsv, postgresql, ris, simplehtml, tablerefs,
-	tablerefsabsbib.
+endnote, harvard, html, iso690rtf, iso690txt, listrefs, misq, mods,
+mysql, ods, oocalc, oocsv, postgresql, ris, simplehtml, tablerefs,
+tablerefsabsbib
+
+Please report issues at http://sourceforge.net/p/jabref/bugs/

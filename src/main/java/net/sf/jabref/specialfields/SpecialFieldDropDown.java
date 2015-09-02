@@ -32,74 +32,81 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 
 public class SpecialFieldDropDown {
-	
-	public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
-		Dimension buttonDim = new Dimension(23,23);
-		JButton button = new JButton(field.getRepresentingIcon());
-		button.setToolTipText(field.getToolTip());
-		button.setPreferredSize(buttonDim);
-		if (!Globals.ON_MAC)
-			button.setMargin(new Insets(1, 0, 2, 0));
-		button.setBorder(null);
-		button.setBorderPainted(false);
-		button.setRolloverEnabled(true);
-		button.setOpaque(false);
-		button.setBounds(0, 0, buttonDim.width, buttonDim.height);
-		button.setSize(buttonDim);
-		button.setMinimumSize(buttonDim);
-		button.setMaximumSize(buttonDim);
-		button.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
-		button.addActionListener(new MenuButtonActionListener(field, frame, button, buttonDim));
-		return button;
-	}
-	
-	private static class MenuButtonActionListener implements ActionListener {
 
-		private JPopupMenu popup;
-		private Dimension dim;
-		private JabRefFrame frame;
-		private SpecialField field;
-		private JButton button;
+    public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
+        Dimension buttonDim = new Dimension(23, 23);
+        JButton button = new JButton(field.getRepresentingIcon());
+        button.setToolTipText(field.getToolTip());
+        button.setPreferredSize(buttonDim);
+        if (!Globals.ON_MAC) {
+            button.setMargin(new Insets(1, 0, 2, 0));
+        }
+        button.setBorder(null);
+        button.setBorderPainted(false);
+        button.setRolloverEnabled(true);
+        button.setOpaque(false);
+        button.setBounds(0, 0, buttonDim.width, buttonDim.height);
+        button.setSize(buttonDim);
+        button.setMinimumSize(buttonDim);
+        button.setMaximumSize(buttonDim);
+        button.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+        button.addActionListener(new MenuButtonActionListener(field, frame, button, buttonDim));
+        return button;
+    }
 
-		public MenuButtonActionListener(SpecialField field, JabRefFrame frame, JButton button, Dimension dim) {
-			this.field = field;
-			this.dim = dim;
-			this.frame = frame;
-			this.button = button;
-		}
 
-		public void actionPerformed(ActionEvent e) {
-			if (popup == null) {
-				popup = new JPopupMenu();
-				for (SpecialFieldValue val: field.getValues()) {
-					JMenuItem item = new JMenuItem(val.getIcon());
-					item.setText(val.getMenuString());
-					item.setToolTipText(val.getToolTipText());
-					item.addActionListener(new PopupitemActionListener(frame.basePanel(), val.getActionName()));
-					item.setMargin(new Insets(0,0,0,0));
-					popup.add(item);
-				}
-			}
-			popup.show(button, 0, dim.height);
-		}
+    private static class MenuButtonActionListener implements ActionListener {
 
-		private class PopupitemActionListener implements ActionListener {
+        private JPopupMenu popup;
+        private final Dimension dim;
+        private final JabRefFrame frame;
+        private final SpecialField field;
+        private final JButton button;
 
-			private BasePanel panel;
-			private String actionName;
 
-			public PopupitemActionListener(BasePanel panel, String actionName) {
-				this.panel = panel;
-				this.actionName = actionName;
-			}
+        public MenuButtonActionListener(SpecialField field, JabRefFrame frame, JButton button, Dimension dim) {
+            this.field = field;
+            this.dim = dim;
+            this.frame = frame;
+            this.button = button;
+        }
 
-			public void actionPerformed(ActionEvent e) {
-				panel.runCommand(actionName);
-				popup.setVisible(false);
-			}
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (popup == null) {
+                popup = new JPopupMenu();
+                for (SpecialFieldValue val : field.getValues()) {
+                    JMenuItem item = new JMenuItem(val.getIcon());
+                    item.setText(val.getMenuString());
+                    item.setToolTipText(val.getToolTipText());
+                    item.addActionListener(new PopupitemActionListener(frame.basePanel(), val.getActionName()));
+                    item.setMargin(new Insets(0, 0, 0, 0));
+                    popup.add(item);
+                }
+            }
+            popup.show(button, 0, dim.height);
+        }
 
-		}
 
-	}
+        private class PopupitemActionListener implements ActionListener {
+
+            private final BasePanel panel;
+            private final String actionName;
+
+
+            public PopupitemActionListener(BasePanel panel, String actionName) {
+                this.panel = panel;
+                this.actionName = actionName;
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.runCommand(actionName);
+                popup.setVisible(false);
+            }
+
+        }
+
+    }
 
 }

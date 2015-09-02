@@ -15,12 +15,16 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.OpenFileFilter;
-import net.sf.jabref.Globals;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.FilenameFilter;
+
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.OpenFileFilter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,15 +48,16 @@ public class FileDialogs {
      * @return an array of selected file paths, or an empty array if no selection is made.
      */
     public static String[] getMultipleFiles(JFrame owner, File directory, String extension,
-                                            boolean updateWorkingdirectory) {
+            boolean updateWorkingdirectory) {
 
         OpenFileFilter off = null;
-        if (extension == null)
+        if (extension == null) {
             off = new OpenFileFilter();
-        else if (!extension.equals(Globals.NONE))
+        } else if (!extension.equals(Globals.NONE)) {
             off = new OpenFileFilter(extension);
+        }
 
-        Object files = getNewFileImpl(owner, directory, extension, null, off,
+        Object files = FileDialogs.getNewFileImpl(owner, directory, extension, null, off,
                 JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true, null);
 
         if (files instanceof String[]) {
@@ -61,80 +66,82 @@ public class FileDialogs {
         // Fix for:
         // http://sourceforge.net/tracker/index.php?func=detail&aid=1538769&group_id=92314&atid=600306
         if (files != null) {
-            return new String[] { (String) files };
+            return new String[] {(String) files};
         }
         return new String[0];
     }
 
     public static String getNewFile(JFrame owner, File directory, String extension, int dialogType,
-                                    boolean updateWorkingDirectory) {
-        return getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
+            boolean updateWorkingDirectory) {
+        return FileDialogs.getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
                 false, null);
     }
 
     public static String getNewFile(JFrame owner, File directory, String extension, int dialogType,
-                                    boolean updateWorkingDirectory, JComponent accessory) {
-        return getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
+            boolean updateWorkingDirectory, JComponent accessory) {
+        return FileDialogs.getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
                 false, accessory);
     }
 
     public static String getNewFile(JFrame owner, File directory, String extension,
-                                    String description, int dialogType, boolean updateWorkingDirectory) {
-        return getNewFile(owner, directory, extension, description, dialogType,
+            String description, int dialogType, boolean updateWorkingDirectory) {
+        return FileDialogs.getNewFile(owner, directory, extension, description, dialogType,
                 updateWorkingDirectory, false, null);
     }
 
     public static String getNewDir(JFrame owner, File directory, String extension, int dialogType,
-                                   boolean updateWorkingDirectory) {
-        return getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
+            boolean updateWorkingDirectory) {
+        return FileDialogs.getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
                 true, null);
     }
 
     public static String getNewDir(JFrame owner, File directory, String extension,
-                                   String description, int dialogType, boolean updateWorkingDirectory) {
-        return getNewFile(owner, directory, extension, description, dialogType,
+            String description, int dialogType, boolean updateWorkingDirectory) {
+        return FileDialogs.getNewFile(owner, directory, extension, description, dialogType,
                 updateWorkingDirectory, true, null);
     }
 
-    public static String getNewFile(JFrame owner, File directory, String extension,
-                                    String description, int dialogType, boolean updateWorkingDirectory, boolean dirOnly,
-                                    JComponent accessory) {
+    private static String getNewFile(JFrame owner, File directory, String extension,
+                                     String description, int dialogType, boolean updateWorkingDirectory, boolean dirOnly,
+                                     JComponent accessory) {
 
         OpenFileFilter off = null;
 
-        if (extension == null)
+        if (extension == null) {
             off = new OpenFileFilter();
-        else if (!extension.equals(Globals.NONE))
+        } else if (!extension.equals(Globals.NONE)) {
             off = new OpenFileFilter(extension);
+        }
 
-        return (String) getNewFileImpl(owner, directory, extension, description, off, dialogType,
+        return (String) FileDialogs.getNewFileImpl(owner, directory, extension, description, off, dialogType,
                 updateWorkingDirectory, dirOnly, false, accessory);
     }
 
-    public static Object getNewFileImpl(JFrame owner, File directory, String extension,
-                                        String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
-                                        boolean dirOnly, boolean multipleSelection, JComponent accessory) {
+    private static Object getNewFileImpl(JFrame owner, File directory, String extension,
+                                         String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
+                                         boolean dirOnly, boolean multipleSelection, JComponent accessory) {
 
-// Added the !dirOnly condition below as a workaround to the native file dialog
-// not supporting directory selection:
-        if (!dirOnly && Globals.prefs.getBoolean("useNativeFileDialogOnMac")) {
+        // Added the !dirOnly condition below as a workaround to the native file dialog
+        // not supporting directory selection:
+        if (!dirOnly && Globals.prefs.getBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC)) {
 
-            return getNewFileForMac(owner, directory, extension, dialogType,
+            return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType,
                     updateWorkingDirectory, dirOnly, off);
         }
 
         JFileChooser fc;
         try {
             fc = new JFileChooser(directory);//JabRefFileChooser(directory);
-            if (accessory != null)
+            if (accessory != null) {
                 fc.setAccessory(accessory);
+            }
         } catch (InternalError errl) {
             // This try/catch clause was added because a user reported an
             // InternalError getting thrown on WinNT, presumably because of a
             // bug in JGoodies Windows PLAF. This clause can be removed if the
             // bug is fixed, but for now we just resort to the native file
             // dialog, using the same method as is always used on Mac:
-            return getNewFileForMac(owner, directory, extension, dialogType,
+            return FileDialogs.getNewFileForMac(owner, directory, extension, dialogType,
                     updateWorkingDirectory, dirOnly, off);
         }
 
@@ -158,8 +165,9 @@ public class FileDialogs {
 
         // the getSelectedFile method returns a valid fileselection
         // (if something is selected) indepentently from dialog return status
-        if (dialogResult != JFileChooser.APPROVE_OPTION)
+        if (dialogResult != JFileChooser.APPROVE_OPTION) {
             return null;
+        }
 
         // okay button
         File selectedFile = fc.getSelectedFile();
@@ -178,22 +186,23 @@ public class FileDialogs {
         }
 
         if (updateWorkingDirectory) {
-            Globals.prefs.put("workingDirectory", selectedFile.getPath());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, selectedFile.getPath());
         }
 
-        if (!multipleSelection)
+        if (!multipleSelection) {
             return selectedFile.getAbsolutePath();
-        else {
+        } else {
             File[] files = fc.getSelectedFiles();
             String[] filenames = new String[files.length];
-            for (int i = 0; i < files.length; i++)
+            for (int i = 0; i < files.length; i++) {
                 filenames[i] = files[i].getAbsolutePath();
+            }
             return filenames;
         }
     }
 
-    public static String getNewFileForMac(JFrame owner, File directory, String extensions,
-                                          int dialogType, boolean updateWorkingDirectory, boolean dirOnly, FilenameFilter filter) {
+    private static String getNewFileForMac(JFrame owner, File directory, String extensions,
+                                           int dialogType, boolean updateWorkingDirectory, boolean dirOnly, FilenameFilter filter) {
 
         java.awt.FileDialog fc = new java.awt.FileDialog(owner);
 
@@ -211,7 +220,7 @@ public class FileDialogs {
 
         if (fc.getFile() != null) {
             if (updateWorkingDirectory) {
-                Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fc.getDirectory() + fc.getFile());
             }
             return fc.getDirectory() + fc.getFile();
         } else {

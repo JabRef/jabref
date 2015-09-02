@@ -37,285 +37,310 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.util.Util;
 
 public class GroupsTree extends JTree implements DragSourceListener,
-		DropTargetListener, DragGestureListener {
-	/** distance from component borders from which on autoscrolling starts. */
-	private static final int dragScrollActivationMargin = 10;
+        DropTargetListener, DragGestureListener {
 
-	/** number of pixels to scroll each time handler is called. */
-	private static final int dragScrollDistance = 5;
+    /** distance from component borders from which on autoscrolling starts. */
+    private static final int dragScrollActivationMargin = 10;
 
-	/** time of last autoscroll event (for limiting speed). */
-	private static long lastDragAutoscroll = 0L;
+    /** number of pixels to scroll each time handler is called. */
+    private static final int dragScrollDistance = 5;
 
-	/** minimum interval between two autoscroll events (for limiting speed). */
-	private static final long minAutoscrollInterval = 50L;
+    /** time of last autoscroll event (for limiting speed). */
+    private static long lastDragAutoscroll = 0L;
 
-	/**
-	 * the point on which the cursor is currently idling during a drag
-	 * operation.
-	 */
-	private Point idlePoint;
+    /** minimum interval between two autoscroll events (for limiting speed). */
+    private static final long minAutoscrollInterval = 50L;
 
-	/** time since which cursor is idling. */
-	private long idleStartTime = 0L;
+    /**
+     * the point on which the cursor is currently idling during a drag
+     * operation.
+     */
+    private Point idlePoint;
 
-	/** max. distance cursor may move in x or y direction while idling. */
-	private static final int idleMargin = 1;
+    /** time since which cursor is idling. */
+    private long idleStartTime = 0L;
 
-	/** idle time after which the node below is expanded. */
-	private static final long idleTimeToExpandNode = 1000L;
+    /** max. distance cursor may move in x or y direction while idling. */
+    private static final int idleMargin = 1;
 
-	private GroupSelector groupSelector;
+    /** idle time after which the node below is expanded. */
+    private static final long idleTimeToExpandNode = 1000L;
 
-	private GroupTreeNode dragNode = null;
+    private final GroupSelector groupSelector;
 
-	private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
+    private GroupTreeNode dragNode = null;
 
-	/**
-	 * @param groupSelector the parent UI component
-	 */
-	public GroupsTree(GroupSelector groupSelector) {
-	    // Adjust height according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
-	    FontMetrics metrics = getFontMetrics(getFont());
-	    setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
+    private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
 
-		this.groupSelector = groupSelector;
-		DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
-				.createDefaultDragGestureRecognizer(this,
-						DnDConstants.ACTION_MOVE, this);
-		// Eliminates right mouse clicks as valid actions
-		dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
-		new DropTarget(this, this);
-		setCellRenderer(cellRenderer);
-		setFocusable(false);
-		setToggleClickCount(0);
-		ToolTipManager.sharedInstance().registerComponent(this);
-		setShowsRootHandles(false);
-		setVisibleRowCount(Globals.prefs.getInt("groupsVisibleRows"));
-		getSelectionModel().setSelectionMode(
-				TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-	}
 
-	public void dragEnter(DragSourceDragEvent dsde) {
-		// ignore
-	}
+    /**
+     * @param groupSelector the parent UI component
+     */
+    public GroupsTree(GroupSelector groupSelector) {
+        // Adjust height according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
+        FontMetrics metrics = getFontMetrics(getFont());
+        setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
 
-	/** This is for moving of nodes within myself */
-	public void dragOver(DragSourceDragEvent dsde) {
-		final Point p = dsde.getLocation(); // screen coordinates!
-		SwingUtilities.convertPointFromScreen(p, this);
-		final TreePath path = getPathForLocation(p.x, p.y);
-		if (path == null) {
-			dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-			return;
-		}
-		final GroupTreeNode target = (GroupTreeNode) path
-				.getLastPathComponent();
-		if (target == null || dragNode.isNodeDescendant(target)
-				|| dragNode == target) {
-			dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-			return;
-		}
-		dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
-	}
+        this.groupSelector = groupSelector;
+        DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
+                .createDefaultDragGestureRecognizer(this,
+                        DnDConstants.ACTION_MOVE, this);
+        // Eliminates right mouse clicks as valid actions
+        dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
+        new DropTarget(this, this);
+        setCellRenderer(cellRenderer);
+        setFocusable(false);
+        setToggleClickCount(0);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        setShowsRootHandles(false);
+        setVisibleRowCount(Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS));
+        getSelectionModel().setSelectionMode(
+                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+    }
 
-	public void dropActionChanged(DragSourceDragEvent dsde) {
-		// ignore
-	}
+    @Override
+    public void dragEnter(DragSourceDragEvent dsde) {
+        // ignore
+    }
 
-	public void dragDropEnd(DragSourceDropEvent dsde) {
-		dragNode = null;
-	}
+    /** This is for moving of nodes within myself */
+    @Override
+    public void dragOver(DragSourceDragEvent dsde) {
+        final Point p = dsde.getLocation(); // screen coordinates!
+        SwingUtilities.convertPointFromScreen(p, this);
+        final TreePath path = getPathForLocation(p.x, p.y);
+        if (path == null) {
+            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+            return;
+        }
+        final GroupTreeNode target = (GroupTreeNode) path
+                .getLastPathComponent();
+        if ((target == null) || dragNode.isNodeDescendant(target)
+                || (dragNode == target)) {
+            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+            return;
+        }
+        dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
+    }
 
-	public void dragExit(DragSourceEvent dse) {
-		// ignore
-	}
+    @Override
+    public void dropActionChanged(DragSourceDragEvent dsde) {
+        // ignore
+    }
 
-	public void dragEnter(DropTargetDragEvent dtde) {
-		// ignore
-	}
+    @Override
+    public void dragDropEnd(DragSourceDropEvent dsde) {
+        dragNode = null;
+    }
 
-	/** This handles dragging of nodes (from myself) or entries (from the table) */
-	public void dragOver(DropTargetDragEvent dtde) {
-		final Point cursor = dtde.getLocation();
-		final long currentTime = System.currentTimeMillis();
-		if (idlePoint == null)
-			idlePoint = cursor;
+    @Override
+    public void dragExit(DragSourceEvent dse) {
+        // ignore
+    }
 
-		// determine node over which the user is dragging
-		final TreePath path = getPathForLocation(cursor.x, cursor.y);
-		final GroupTreeNode target = path == null ? null : (GroupTreeNode) path
-				.getLastPathComponent();
-		setHighlight1Cell(target);
+    @Override
+    public void dragEnter(DropTargetDragEvent dtde) {
+        // ignore
+    }
 
-		// accept or reject
-		if (dtde.isDataFlavorSupported(GroupTreeNode.flavor)) {
-			// accept: move nodes within tree
-			dtde.acceptDrag(DnDConstants.ACTION_MOVE);
-		} else if (dtde
-				.isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
-			// check if node accepts explicit assignment
-			if (path == null) {
-				dtde.rejectDrag();
-			} else {
-				// this would be the place to check if the dragging entries
-				// maybe are in this group already, but I think that's not
-				// worth the bother (DropTargetDragEvent does not provide
-				// access to the drag object)...
-				// it might even be irritating to the user.
-				if (target.getGroup().supportsAdd()) {
-					// accept: assignment from EntryTable
-					dtde.acceptDrag(DnDConstants.ACTION_LINK);
-				} else {
-					dtde.rejectDrag();
-				}
-			}
-		} else {
-			dtde.rejectDrag();
-		}
+    /** This handles dragging of nodes (from myself) or entries (from the table) */
+    @Override
+    public void dragOver(DropTargetDragEvent dtde) {
+        final Point cursor = dtde.getLocation();
+        final long currentTime = System.currentTimeMillis();
+        if (idlePoint == null) {
+            idlePoint = cursor;
+        }
 
-		// auto open
-		if (Math.abs(cursor.x - idlePoint.x) < idleMargin
-				&& Math.abs(cursor.y - idlePoint.y) < idleMargin) {
-			if (currentTime - idleStartTime >= idleTimeToExpandNode) {
-				if (path != null) {
-					expandPath(path);
-				}
-			}
-		} else {
-			idlePoint = cursor;
-			idleStartTime = currentTime;
-		}
+        // determine node over which the user is dragging
+        final TreePath path = getPathForLocation(cursor.x, cursor.y);
+        final GroupTreeNode target = path == null ? null : (GroupTreeNode) path
+                .getLastPathComponent();
+        setHighlight1Cell(target);
 
-		// autoscrolling
-		if (currentTime - lastDragAutoscroll < minAutoscrollInterval)
-			return;
-		final Rectangle r = getVisibleRect();
-		final boolean scrollUp = cursor.y - r.y < dragScrollActivationMargin;
-		final boolean scrollDown = r.y + r.height - cursor.y < dragScrollActivationMargin;
-		final boolean scrollLeft = cursor.x - r.x < dragScrollActivationMargin;
-		final boolean scrollRight = r.x + r.width - cursor.x < dragScrollActivationMargin;
-		if (scrollUp)
-			r.translate(0, -dragScrollDistance);
-		else if (scrollDown)
-			r.translate(0, +dragScrollDistance);
-		if (scrollLeft)
-			r.translate(-dragScrollDistance, 0);
-		else if (scrollRight)
-			r.translate(+dragScrollDistance, 0);
-		scrollRectToVisible(r);
-		lastDragAutoscroll = currentTime;
-	}
+        // accept or reject
+        if (dtde.isDataFlavorSupported(GroupTreeNode.flavor)) {
+            // accept: move nodes within tree
+            dtde.acceptDrag(DnDConstants.ACTION_MOVE);
+        } else if (dtde
+                .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
+            // check if node accepts explicit assignment
+            if (path == null) {
+                dtde.rejectDrag();
+            } else {
+                // this would be the place to check if the dragging entries
+                // maybe are in this group already, but I think that's not
+                // worth the bother (DropTargetDragEvent does not provide
+                // access to the drag object)...
+                // it might even be irritating to the user.
+                if (target.getGroup().supportsAdd()) {
+                    // accept: assignment from EntryTable
+                    dtde.acceptDrag(DnDConstants.ACTION_LINK);
+                } else {
+                    dtde.rejectDrag();
+                }
+            }
+        } else {
+            dtde.rejectDrag();
+        }
 
-	public void dropActionChanged(DropTargetDragEvent dtde) {
-		// ignore
-	}
+        // auto open
+        if ((Math.abs(cursor.x - idlePoint.x) < GroupsTree.idleMargin)
+                && (Math.abs(cursor.y - idlePoint.y) < GroupsTree.idleMargin)) {
+            if ((currentTime - idleStartTime) >= GroupsTree.idleTimeToExpandNode) {
+                if (path != null) {
+                    expandPath(path);
+                }
+            }
+        } else {
+            idlePoint = cursor;
+            idleStartTime = currentTime;
+        }
 
-	public void drop(DropTargetDropEvent dtde) {
-		setHighlight1Cell(null);
-		try {
-			// initializations common to all flavors
-			final Transferable transferable = dtde.getTransferable();
-			final Point p = dtde.getLocation();
-			final TreePath path = getPathForLocation(p.x, p.y);
-			if (path == null) {
-				dtde.rejectDrop();
-				return;
-			}
-			final GroupTreeNode target = (GroupTreeNode) path
-					.getLastPathComponent();
-			// check supported flavors
-			if (transferable.isDataFlavorSupported(GroupTreeNode.flavor)) {
-				GroupTreeNode source = (GroupTreeNode) transferable
-						.getTransferData(GroupTreeNode.flavor);
-				if (source == target) {
-					dtde.rejectDrop(); // ignore this
-					return;
-				}
-				if (source.isNodeDescendant(target)) {
-					dtde.rejectDrop();
-					return;
-				}
-				Enumeration<TreePath> expandedPaths = groupSelector.getExpandedPaths();
-				UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
-						groupSelector.getGroupTreeRoot(), source, target,
-						target.getChildCount());
-				target.add(source);
-				dtde.getDropTargetContext().dropComplete(true);
-				// update selection/expansion state
-				groupSelector.revalidateGroups(new TreePath[] { new TreePath(
-						source.getPath()) }, refreshPaths(expandedPaths));
-				groupSelector.concludeMoveGroup(undo, source);
-			} else if (transferable
-					.isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
-				final AbstractGroup group = target.getGroup();
-				if (!group.supportsAdd()) {
-					// this should never happen, because the same condition
-					// is checked in dragOver already
-					dtde.rejectDrop();
-					return;
-				}
-				final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
-						.getTransferData(TransferableEntrySelection.flavorInternal);
-				final BibtexEntry[] entries = selection.getSelection();
-				int assignedEntries = 0;
+        // autoscrolling
+        if ((currentTime - GroupsTree.lastDragAutoscroll) < GroupsTree.minAutoscrollInterval) {
+            return;
+        }
+        final Rectangle r = getVisibleRect();
+        final boolean scrollUp = (cursor.y - r.y) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollDown = ((r.y + r.height) - cursor.y) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollLeft = (cursor.x - r.x) < GroupsTree.dragScrollActivationMargin;
+        final boolean scrollRight = ((r.x + r.width) - cursor.x) < GroupsTree.dragScrollActivationMargin;
+        if (scrollUp) {
+            r.translate(0, -GroupsTree.dragScrollDistance);
+        } else if (scrollDown) {
+            r.translate(0, +GroupsTree.dragScrollDistance);
+        }
+        if (scrollLeft) {
+            r.translate(-GroupsTree.dragScrollDistance, 0);
+        } else if (scrollRight) {
+            r.translate(+GroupsTree.dragScrollDistance, 0);
+        }
+        scrollRectToVisible(r);
+        GroupsTree.lastDragAutoscroll = currentTime;
+    }
+
+    @Override
+    public void dropActionChanged(DropTargetDragEvent dtde) {
+        // ignore
+    }
+
+    @Override
+    public void drop(DropTargetDropEvent dtde) {
+        setHighlight1Cell(null);
+        try {
+            // initializations common to all flavors
+            final Transferable transferable = dtde.getTransferable();
+            final Point p = dtde.getLocation();
+            final TreePath path = getPathForLocation(p.x, p.y);
+            if (path == null) {
+                dtde.rejectDrop();
+                return;
+            }
+            final GroupTreeNode target = (GroupTreeNode) path
+                    .getLastPathComponent();
+            // check supported flavors
+            if (transferable.isDataFlavorSupported(GroupTreeNode.flavor)) {
+                GroupTreeNode source = (GroupTreeNode) transferable
+                        .getTransferData(GroupTreeNode.flavor);
+                if (source == target) {
+                    dtde.rejectDrop(); // ignore this
+                    return;
+                }
+                if (source.isNodeDescendant(target)) {
+                    dtde.rejectDrop();
+                    return;
+                }
+                Enumeration<TreePath> expandedPaths = groupSelector.getExpandedPaths();
+                UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
+                        groupSelector.getGroupTreeRoot(), source, target,
+                        target.getChildCount());
+                target.add(source);
+                dtde.getDropTargetContext().dropComplete(true);
+                // update selection/expansion state
+                groupSelector.revalidateGroups(new TreePath[] {new TreePath(
+                        source.getPath())}, refreshPaths(expandedPaths));
+                groupSelector.concludeMoveGroup(undo, source);
+            } else if (transferable
+                    .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
+                final AbstractGroup group = target.getGroup();
+                if (!group.supportsAdd()) {
+                    // this should never happen, because the same condition
+                    // is checked in dragOver already
+                    dtde.rejectDrop();
+                    return;
+                }
+                final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
+                        .getTransferData(TransferableEntrySelection.flavorInternal);
+                final BibtexEntry[] entries = selection.getSelection();
+                int assignedEntries = 0;
                 for (BibtexEntry entry : entries) {
-                    if (!target.getGroup().contains(entry))
+                    if (!target.getGroup().contains(entry)) {
                         ++assignedEntries;
+                    }
                 }
 
-				// warn if assignment has undesired side effects (modifies a
-				// field != keywords)
-				if (!Util.warnAssignmentSideEffects(
-						new AbstractGroup[] { group },
-						selection.getSelection(), groupSelector
-								.getActiveBasePanel().getDatabase(),
-						groupSelector.frame))
-					return; // user aborted operation
+                // warn if assignment has undesired side effects (modifies a
+                // field != keywords)
+                if (!Util.warnAssignmentSideEffects(
+                        new AbstractGroup[] {group},
+                        selection.getSelection(), groupSelector
+                                .getActiveBasePanel().getDatabase(),
+                        groupSelector.frame))
+                 {
+                    return; // user aborted operation
+                }
 
-				// if an editor is showing, its fields must be updated
-				// after the assignment, and before that, the current
-				// edit has to be stored:
-				groupSelector.getActiveBasePanel().storeCurrentEdit();
+                // if an editor is showing, its fields must be updated
+                // after the assignment, and before that, the current
+                // edit has to be stored:
+                groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-				AbstractUndoableEdit undo = group.add(selection.getSelection());
-				if (undo instanceof UndoableChangeAssignment)
-					((UndoableChangeAssignment) undo).setEditedNode(target);
-				dtde.getDropTargetContext().dropComplete(true);
-				groupSelector.revalidateGroups();
-				groupSelector.concludeAssignment(undo, target, assignedEntries);
-			} else {
-				dtde.rejectDrop();
+                AbstractUndoableEdit undo = group.add(selection.getSelection());
+                if (undo instanceof UndoableChangeAssignment) {
+                    ((UndoableChangeAssignment) undo).setEditedNode(target);
+                }
+                dtde.getDropTargetContext().dropComplete(true);
+                groupSelector.revalidateGroups();
+                groupSelector.concludeAssignment(undo, target, assignedEntries);
+            } else {
+                dtde.rejectDrop();
             }
-		} catch (IOException ioe) {
-			// ignore
-		} catch (UnsupportedFlavorException e) {
-			// ignore
-		}
-	}
+        } catch (IOException ioe) {
+            // ignore
+        } catch (UnsupportedFlavorException e) {
+            // ignore
+        }
+    }
 
-	public void dragExit(DropTargetEvent dte) {
-		setHighlight1Cell(null);
-	}
+    @Override
+    public void dragExit(DropTargetEvent dte) {
+        setHighlight1Cell(null);
+    }
 
-	public void dragGestureRecognized(DragGestureEvent dge) {
-		GroupTreeNode selectedNode = getSelectedNode();
-		if (selectedNode == null)
-			return; // nothing to transfer (select manually?)
-		Cursor cursor = DragSource.DefaultMoveDrop;
-		dragNode = selectedNode;
-		dge.getDragSource().startDrag(dge, cursor, selectedNode, this);
-	}
+    @Override
+    public void dragGestureRecognized(DragGestureEvent dge) {
+        GroupTreeNode selectedNode = getSelectedNode();
+        if (selectedNode == null)
+         {
+            return; // nothing to transfer (select manually?)
+        }
+        Cursor cursor = DragSource.DefaultMoveDrop;
+        dragNode = selectedNode;
+        dge.getDragSource().startDrag(dge, cursor, selectedNode, this);
+    }
 
-	/** Returns the first selected node, or null if nothing is selected. */
-	public GroupTreeNode getSelectedNode() {
-		TreePath selectionPath = getSelectionPath();
-		return selectionPath != null ? (GroupTreeNode) selectionPath
-				.getLastPathComponent() : null;
-	}
+    /** Returns the first selected node, or null if nothing is selected. */
+    private GroupTreeNode getSelectedNode() {
+        TreePath selectionPath = getSelectionPath();
+        return selectionPath != null ? (GroupTreeNode) selectionPath
+                .getLastPathComponent() : null;
+    }
 
     /**
      * Refresh paths that may have become invalid due to node movements within
@@ -330,7 +355,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         Vector<TreePath> freshPaths = new Vector<TreePath>();
         while (paths.hasMoreElements()) {
             freshPaths.add(new TreePath(
-                    ((DefaultMutableTreeNode)paths.nextElement()
+                    ((DefaultMutableTreeNode) paths.nextElement()
                             .getLastPathComponent()).getPath()));
         }
         return freshPaths.elements();
@@ -349,113 +374,123 @@ public class GroupsTree extends JTree implements DragSourceListener,
         TreePath[] freshPaths = new TreePath[paths.length];
         for (int i = 0; i < paths.length; ++i) {
             freshPaths[i] = new TreePath(((DefaultMutableTreeNode) paths[i]
-                            .getLastPathComponent()).getPath());
+                    .getLastPathComponent()).getPath());
         }
         return freshPaths;
     }
 
-	/** Highlights the specified cell or disables highlight if cell == null */
-	public void setHighlight1Cell(Object cell) {
-		cellRenderer.setHighlight1Cell(cell);
-		repaint();
-	}
+    /** Highlights the specified cell or disables highlight if cell == null */
+    private void setHighlight1Cell(Object cell) {
+        cellRenderer.setHighlight1Cell(cell);
+        repaint();
+    }
 
-	/** Highlights the specified cells or disables highlight if cells == null */
-	public void setHighlight2Cells(Object[] cells) {
-		cellRenderer.setHighlight2Cells(cells);
-		repaint();
-	}
+    /** Highlights the specified cells or disables highlight if cells == null */
+    public void setHighlight2Cells(Object[] cells) {
+        cellRenderer.setHighlight2Cells(cells);
+        repaint();
+    }
 
-	/** Highlights the specified cells or disables highlight if cells == null */
-	public void setHighlight3Cells(Object[] cells) {
-		cellRenderer.setHighlight3Cells(cells);
-		repaint();
-	}
-    
+    /** Highlights the specified cells or disables highlight if cells == null */
+    public void setHighlight3Cells(Object[] cells) {
+        cellRenderer.setHighlight3Cells(cells);
+        repaint();
+    }
+
     /** Highlights the specified cell or disables highlight if cell == null */
     public void setHighlightBorderCell(GroupTreeNode node) {
         cellRenderer.setHighlightBorderCell(node);
         repaint();
     }
 
-	/** Sort immediate children of the specified node alphabetically. */
-	public void sort(GroupTreeNode node, boolean recursive) {
-		sortWithoutRevalidate(node, recursive);
-		groupSelector.revalidateGroups();
-	}
+    /** Sort immediate children of the specified node alphabetically. */
+    public void sort(GroupTreeNode node, boolean recursive) {
+        sortWithoutRevalidate(node, recursive);
+        groupSelector.revalidateGroups();
+    }
 
-	/** This sorts without revalidation of groups */
-	protected void sortWithoutRevalidate(GroupTreeNode node, boolean recursive) {
-		if (node.isLeaf())
-			return; // nothing to sort
-		GroupTreeNode child1, child2;
-		int j = node.getChildCount() - 1;
-		int lastModified;
-		while (j > 0) {
-			lastModified = j + 1;
-			j = -1;
-			for (int i = 1; i < lastModified; ++i) {
-				child1 = (GroupTreeNode) node.getChildAt(i - 1);
-				child2 = (GroupTreeNode) node.getChildAt(i);
-				if (child2.getGroup().getName().compareToIgnoreCase(
-						child1.getGroup().getName()) < 0) {
-					node.remove(child1);
-					node.insert(child1, i);
-					j = i;
-				}
-			}
-		}
-		if (recursive) {
-			for (int i = 0; i < node.getChildCount(); ++i) {
-				sortWithoutRevalidate((GroupTreeNode) node.getChildAt(i), true);
-			}
-		}
-	}
+    /** This sorts without revalidation of groups */
+    private void sortWithoutRevalidate(GroupTreeNode node, boolean recursive) {
+        if (node.isLeaf())
+         {
+            return; // nothing to sort
+        }
+        GroupTreeNode child1, child2;
+        int j = node.getChildCount() - 1;
+        int lastModified;
+        while (j > 0) {
+            lastModified = j + 1;
+            j = -1;
+            for (int i = 1; i < lastModified; ++i) {
+                child1 = (GroupTreeNode) node.getChildAt(i - 1);
+                child2 = (GroupTreeNode) node.getChildAt(i);
+                if (child2.getGroup().getName().compareToIgnoreCase(
+                        child1.getGroup().getName()) < 0) {
+                    node.remove(child1);
+                    node.insert(child1, i);
+                    j = i;
+                }
+            }
+        }
+        if (recursive) {
+            for (int i = 0; i < node.getChildCount(); ++i) {
+                sortWithoutRevalidate((GroupTreeNode) node.getChildAt(i), true);
+            }
+        }
+    }
 
-	/** Expand this node and all its children. */
-	public void expandSubtree(GroupTreeNode node) {
-		for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();)
-			expandPath(new TreePath(e.nextElement().getPath()));
-	}
+    /** Expand this node and all its children. */
+    public void expandSubtree(GroupTreeNode node) {
+        for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();) {
+            expandPath(new TreePath(e.nextElement().getPath()));
+        }
+    }
 
-	/** Collapse this node and all its children. */
-	public void collapseSubtree(GroupTreeNode node) {
-		for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();)
-			collapsePath(new TreePath((e.nextElement())
-					.getPath()));
-	}
+    /** Collapse this node and all its children. */
+    public void collapseSubtree(GroupTreeNode node) {
+        for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();) {
+            collapsePath(new TreePath((e.nextElement())
+                    .getPath()));
+        }
+    }
 
-	/**
-	 * Returns true if the node specified by path has at least one descendant
-	 * that is currently expanded.
-	 */
-	public boolean hasExpandedDescendant(TreePath path) {
-		GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-		for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
-			GroupTreeNode child = e.nextElement();
-			if (child.isLeaf())
-				continue; // don't care about this case
-			TreePath pathToChild = path.pathByAddingChild(child);
-			if (isExpanded(pathToChild) || hasExpandedDescendant(pathToChild))
-				return true;
-		}
-		return false;
-	}
+    /**
+     * Returns true if the node specified by path has at least one descendant
+     * that is currently expanded.
+     */
+    public boolean hasExpandedDescendant(TreePath path) {
+        GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+        for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
+            GroupTreeNode child = e.nextElement();
+            if (child.isLeaf())
+             {
+                continue; // don't care about this case
+            }
+            TreePath pathToChild = path.pathByAddingChild(child);
+            if (isExpanded(pathToChild) || hasExpandedDescendant(pathToChild)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Returns true if the node specified by path has at least one descendant
-	 * that is currently collapsed.
-	 */
-	public boolean hasCollapsedDescendant(TreePath path) {
-		GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-		for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
-			GroupTreeNode child = e.nextElement();
-			if (child.isLeaf())
-				continue; // don't care about this case
-			TreePath pathToChild = path.pathByAddingChild(child);
-			if (isCollapsed(pathToChild) || hasCollapsedDescendant(pathToChild))
-				return true;
-		}
-		return false;
-	}
+    /**
+     * Returns true if the node specified by path has at least one descendant
+     * that is currently collapsed.
+     */
+    public boolean hasCollapsedDescendant(TreePath path) {
+        GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+        for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
+            GroupTreeNode child = e.nextElement();
+            if (child.isLeaf())
+             {
+                continue; // don't care about this case
+            }
+            TreePath pathToChild = path.pathByAddingChild(child);
+            if (isCollapsed(pathToChild) || hasCollapsedDescendant(pathToChild)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

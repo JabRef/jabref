@@ -27,13 +27,14 @@ import net.sf.jabref.AuthorList;
  */
 public class AuthorAbbreviator implements LayoutFormatter {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-	 */
-	public String format(String fieldText) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
+     */
+    @Override
+    public String format(String fieldText) {
         AuthorList list = AuthorList.getAuthorList(fieldText);
         return list.getAuthorsLastFirstAnds(true);
-	}
+    }
 }

@@ -22,12 +22,12 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.plugin.util.Util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginManager;
 import org.java.plugin.PluginManager.PluginLocation;
@@ -52,13 +52,16 @@ import org.java.plugin.util.ExtendedProperties;
  */
 public class PluginCore {
 
-    static PluginManager singleton;
+    private static PluginManager singleton;
 
-    static File userPluginDir = new File(System.getProperty("user.home")+"/.jabref/plugins");
+    static final File userPluginDir = new File(System.getProperty("user.home") + "/.jabref/plugins");
 
-    static PluginLocation getLocationInsideJar(String context, String manifest) {
+    private static final Log LOGGER = LogFactory.getLog(PluginCore.class);
+
+
+    private static PluginLocation getLocationInsideJar(String context, String manifest) {
         URL jar = PluginCore.class
-            .getResource(Util.joinPath(context, manifest));
+                .getResource(Util.joinPath(context, manifest));
 
         if (jar == null) {
             return null;
@@ -67,7 +70,7 @@ public class PluginCore {
         try {
             if (protocol.startsWith("jar")) {
                 return new StandardPluginLocation(new URL(jar.toExternalForm()
-                    .replaceFirst("!(.*?)$", Util.joinPath("!", context))), jar);
+                        .replaceFirst("!(.*?)$", Util.joinPath("!", context))), jar);
             } else if (protocol.startsWith("file")) {
                 File f = new File(jar.toURI());
                 return new StandardPluginLocation(f.getParentFile(), manifest);
@@ -80,17 +83,12 @@ public class PluginCore {
         return null;
     }
 
-    static PluginManager initialize() {
-        // We do not want info messages from JPF.
-        Logger.getLogger("org.java.plugin").setLevel(Level.WARNING);
-
-        Logger log = Logger.getLogger(PluginCore.class.getName());
+    private static PluginManager initialize() {
 
         ObjectFactory objectFactory = ObjectFactory.newInstance();
 
         PluginManager result = objectFactory.createManager();
 
-        
         /*
          * Now find plug-ins! Check directories and jar.
          */
@@ -98,18 +96,17 @@ public class PluginCore {
             DefaultPluginsCollector collector = new DefaultPluginsCollector();
             ExtendedProperties ep = new ExtendedProperties();
 
-
             List<File> directoriesToSearch = new LinkedList<File>();
             directoriesToSearch.add(new File("./src/resources/plugins"));
             directoriesToSearch.add(new File("./plugins"));
-            directoriesToSearch.add(userPluginDir);
+            directoriesToSearch.add(PluginCore.userPluginDir);
 
             try {
                 File parent = new File(PluginCore.class.getProtectionDomain()
-                    .getCodeSource().getLocation().toURI()).getParentFile();
-            
+                        .getCodeSource().getLocation().toURI()).getParentFile();
+
                 if (!parent.getCanonicalFile().equals(
-                    new File(".").getCanonicalFile())) {
+                        new File(".").getCanonicalFile())) {
                     directoriesToSearch.add(new File(parent, "/src/resources/plugins"));
                     directoriesToSearch.add(new File(parent, "/plugins"));
                 }
@@ -122,81 +119,81 @@ public class PluginCore {
                 // We don't want warnings if the default plug-in paths don't
                 // exist, we do that below
                 if (directory.exists()) {
-                    if (sb.length() > 0)
+                    if (sb.length() > 0) {
                         sb.append(',');
+                    }
                     sb.append(directory.getPath());
                 }
             }
 
             ep.setProperty("org.java.plugin.boot.pluginsRepositories", sb
-                .toString());
+                    .toString());
             collector.configure(ep);
 
             Collection<PluginLocation> plugins = collector
-                .collectPluginLocations();
+                    .collectPluginLocations();
 
             /**
              * I know the following is really, really ugly, but I have found no
              * way to automatically discover multiple plugin.xmls in JARs
              */
             String[] jarLocationsToSearch = new String[] {
-                "/plugins/net.sf.jabref.core/",
-                "/plugins/net.sf.jabref.export.misq/"};
-                
+                    "/plugins/net.sf.jabref.core/",
+                    "/plugins/net.sf.jabref.export.misq/"};
+
             // Collection locations
             for (String jarLocation : jarLocationsToSearch) {
-                PluginLocation location = getLocationInsideJar(jarLocation,
-                    "plugin.xml");
-                if (location != null)
+                PluginLocation location = PluginCore.getLocationInsideJar(jarLocation,
+                        "plugin.xml");
+                if (location != null) {
                     plugins.add(location);
+                }
             }
 
             if (plugins.size() <= 0) {
-                log
-                    .warning(
+                LOGGER.warn(
                         Globals.lang("No plugins were found in the following folders:") +
-                        "\n  " +
-                        Util.join(directoriesToSearch
-                            .toArray(new String[directoriesToSearch.size()]),
-                            "\n  ", 0, directoriesToSearch.size()) +
-                        "\n" +
-                        Globals.lang("and inside the JabRef-jar:") +
-                        "\n  " +
-                        Util.join(jarLocationsToSearch, "\n  ", 0,
-                            jarLocationsToSearch.length) +
-                        "\n" +
-                        Globals.lang("At least the plug-in 'net.sf.jabref.core' should be there."));
+                                "\n  " +
+                                Util.join(directoriesToSearch
+                                        .toArray(new String[directoriesToSearch.size()]),
+                                        "\n  ", 0, directoriesToSearch.size()) +
+                                "\n" +
+                                Globals.lang("and inside the JabRef-jar:") +
+                                "\n  " +
+                                Util.join(jarLocationsToSearch, "\n  ", 0,
+                                        jarLocationsToSearch.length) +
+                                "\n" +
+                                Globals.lang("At least the plug-in 'net.sf.jabref.core' should be there."));
             } else {
                 result.publishPlugins(plugins.toArray(new PluginLocation[plugins.size()]));
 
                 Collection<PluginDescriptor> descs = result.getRegistry()
-                    .getPluginDescriptors();
+                        .getPluginDescriptors();
 
                 sb = new StringBuilder();
                 sb.append(Globals.lang("Found %0 plugin(s)", String
                         .valueOf(descs.size()))).append(":\n");
 
                 for (PluginDescriptor p : result.getRegistry()
-                    .getPluginDescriptors()) {
+                        .getPluginDescriptors()) {
                     sb.append("  - ").append(p.getId()).append(" (").append(
-                        p.getLocation()).append(")\n");
+                            p.getLocation()).append(")\n");
                 }
-                log.info(sb.toString());
+                LOGGER.info(sb.toString());
             }
 
         } catch (Exception e) {
-            log
-                .severe(Globals.lang("Error in starting plug-in system. Starting without, but some functionality may be missing.") +
-                    "\n" + e.getLocalizedMessage());
+            LOGGER.error(Globals.lang("Error in starting plug-in system. Starting without, but some functionality may be missing.") +
+                            "\n" + e.getLocalizedMessage());
         }
         return result;
     }
 
     public static PluginManager getManager() {
-        if (singleton == null) {
-            singleton = PluginCore.initialize();
+        if (PluginCore.singleton == null) {
+            PluginCore.singleton = PluginCore.initialize();
         }
 
-        return singleton;
+        return PluginCore.singleton;
     }
 }

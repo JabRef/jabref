@@ -26,40 +26,38 @@ import net.sf.jabref.util.XMPUtil;
 
 /**
  * Wraps the XMPUtility function to be used as an ImportFormat.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class PdfXmpImporter extends ImportFormat {
 
-	public String getFormatName() {
-		return Globals.lang("XMP-annotated PDF");
-	}
-
-	/**
-	 * Returns a list of all BibtexEntries found in the inputstream.
-	 */
-	public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-		return XMPUtil.readXMP(in);
-	}
-
-	/**
-	 * Returns whether the given stream contains data that is a.) a pdf and b.)
-	 * contains at least one BibtexEntry.
-	 */
     @Override
-	public boolean isRecognizedFormat(InputStream in) throws IOException {
-		return XMPUtil.hasMetadata(in);
-	}
+    public String getFormatName() {
+        return Globals.lang("XMP-annotated PDF");
+    }
 
-	/**
-	 * String used to identify this import filter on the command line.
-	 * 
-	 * @return "xmp"
-	 */
-	public String getCLIid() {
-		return "xmp";
-	}
+    /**
+     * Returns a list of all BibtexEntries found in the inputstream.
+     */
+    @Override
+    public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+        return XMPUtil.readXMP(in);
+    }
+
+    /**
+     * Returns whether the given stream contains data that is a.) a pdf and b.)
+     * contains at least one BibtexEntry.
+     */
+    @Override
+    public boolean isRecognizedFormat(InputStream in) throws IOException {
+        return XMPUtil.hasMetadata(in);
+    }
+
+    /**
+     * String used to identify this import filter on the command line.
+     * 
+     * @return "xmp"
+     */
+    public String getCommandLineId() {
+        return "xmp";
+    }
 
 }

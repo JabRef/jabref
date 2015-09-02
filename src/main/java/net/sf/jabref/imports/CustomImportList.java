@@ -44,151 +44,159 @@ import net.sf.jabref.JabRefPreferences;
  */
 public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
-  /**
-   * Object with data for a custom importer.
-   * 
-   * <p>Is also responsible for instantiating the class loader.</p>
-   */
-  public class Importer implements Comparable<Importer> {
-    
-    private String name;
-    private String cliId;
-    private String className;
-    private String basePath;
-    
-    public Importer() {
-      super();
-    }
-    
-    public Importer(String[] data) {
-      super();
-      this.name = data[0];
-      this.cliId = data[1];
-      this.className = data[2];
-      this.basePath = data[3];
-    }
-    
-    public String getName() {
-      return this.name;
-    }
-    
-    public void setName(String name) {
-      this.name = name;
-    }
-    
-    public String getClidId() {
-      return this.cliId;
-    }
-    
-    public void setCliId(String cliId) {
-      this.cliId = cliId;
-    }
-    
-    public String getClassName() {
-      return this.className;
-    }
-    
-    public void setClassName(String className) {
-      this.className = className;
-    }
-    
-    public void setBasePath(String basePath) {
-      this.basePath = basePath;
-    }
-    public String getBasePath() {
-        return basePath;
-      }
-    public File getFileFromBasePath() {
-      return new File(basePath);
-    }
-    
-    public URL getBasePathUrl() throws MalformedURLException {
-      return getFileFromBasePath().toURI().toURL();
-    }
-    
-    public String[] getAsStringArray() {
-      return new String[] {name, cliId, className, basePath};
-    }
-    
-    public boolean equals(Object o) {
-      return o != null && o instanceof Importer && this.getName().equals(((Importer)o).getName());
-    }
-    
-    public int hashCode() {
-      return name.hashCode();
-    }
-    
-    public int compareTo(Importer o) {
-      return this.getName().compareTo( o.getName() );
-    }
-    
-    public String toString() {
-      return this.name;
-    }
-    
-    public ImportFormat getInstance() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-      URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()});
-      Class<?> clazz = Class.forName(className, true, cl);
-      ImportFormat importFormat = (ImportFormat)clazz.newInstance();
-      importFormat.setIsCustomImporter(true);
-      return importFormat;
-    }
-  }
-  
-  private JabRefPreferences prefs;
+    /**
+     * Object with data for a custom importer.
+     * 
+     * <p>Is also responsible for instantiating the class loader.</p>
+     */
+    public class Importer implements Comparable<Importer> {
 
-  public CustomImportList(JabRefPreferences prefs) {
-    super();
-    this.prefs = prefs;
-    readPrefs();
-  }
+        private String name;
+        private String cliId;
+        private String className;
+        private String basePath;
 
 
-  private void readPrefs() {
-    int i=0;
-    String[] s = null;
-    while ((s = prefs.getStringArray("customImportFormat"+i)) != null) {
-      try {
-        super.add(new Importer(s));
-      } catch (Exception e) {
-        System.err.println("Warning! Could not load " + s[0] + " from preferences. Will ignore.");
-        // Globals.prefs.remove("customImportFormat"+i);
-      }
-      i++;
-    }
-  }
+        public Importer() {
+            super();
+        }
 
-  public void addImporter(Importer customImporter) {
-    super.add(customImporter);
-  }
-  
-  /**
-   * Adds an importer.
-   * 
-   * <p>If an old one equal to the new one was contained, the old
-   * one is replaced.</p>
-   * 
-   * @param customImporter new (version of an) importer
-   * @return  if the importer was contained
-   */
-  public boolean replaceImporter(Importer customImporter) {
-    boolean wasContained = this.remove(customImporter);
-    this.addImporter(customImporter);
-    return wasContained;
-  }
+        public Importer(String[] data) {
+            super();
+            this.name = data[0];
+            this.cliId = data[1];
+            this.className = data[2];
+            this.basePath = data[3];
+        }
 
-  public void store() {
-    purgeAll();
-    Importer[] importers = this.toArray(new Importer[this.size()]);
-    for (int i = 0; i < importers.length; i++) {
-      Globals.prefs.putStringArray("customImportFormat"+i, importers[i].getAsStringArray());
-    }
-  }
+        public String getName() {
+            return this.name;
+        }
 
-  private void purgeAll() {
-    for (int i = 0; Globals.prefs.getStringArray("customImportFormat"+i) != null; i++) {
-      Globals.prefs.remove("customImportFormat"+i);
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getClidId() {
+            return this.cliId;
+        }
+
+        public void setCliId(String cliId) {
+            this.cliId = cliId;
+        }
+
+        public String getClassName() {
+            return this.className;
+        }
+
+        public void setClassName(String className) {
+            this.className = className;
+        }
+
+        public void setBasePath(String basePath) {
+            this.basePath = basePath;
+        }
+
+        public String getBasePath() {
+            return basePath;
+        }
+
+        public File getFileFromBasePath() {
+            return new File(basePath);
+        }
+
+        public URL getBasePathUrl() throws MalformedURLException {
+            return getFileFromBasePath().toURI().toURL();
+        }
+
+        public String[] getAsStringArray() {
+            return new String[] {name, cliId, className, basePath};
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return (o != null) && (o instanceof Importer) && this.getName().equals(((Importer) o).getName());
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
+
+        @Override
+        public int compareTo(Importer o) {
+            return this.getName().compareTo(o.getName());
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+
+        public ImportFormat getInstance() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+            URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()});
+            Class<?> clazz = Class.forName(className, true, cl);
+            ImportFormat importFormat = (ImportFormat) clazz.newInstance();
+            importFormat.setIsCustomImporter(true);
+            return importFormat;
+        }
     }
-  }
+
+
+    private final JabRefPreferences prefs;
+
+
+    public CustomImportList(JabRefPreferences prefs) {
+        super();
+        this.prefs = prefs;
+        readPrefs();
+    }
+
+    private void readPrefs() {
+        int i = 0;
+        String[] s;
+        while ((s = prefs.getStringArray("customImportFormat" + i)) != null) {
+            try {
+                super.add(new Importer(s));
+            } catch (Exception e) {
+                System.err.println("Warning! Could not load " + s[0] + " from preferences. Will ignore.");
+                // Globals.prefs.remove("customImportFormat"+i);
+            }
+            i++;
+        }
+    }
+
+    private void addImporter(Importer customImporter) {
+        super.add(customImporter);
+    }
+
+    /**
+     * Adds an importer.
+     * 
+     * <p>If an old one equal to the new one was contained, the old
+     * one is replaced.</p>
+     * 
+     * @param customImporter new (version of an) importer
+     * @return  if the importer was contained
+     */
+    public boolean replaceImporter(Importer customImporter) {
+        boolean wasContained = this.remove(customImporter);
+        this.addImporter(customImporter);
+        return wasContained;
+    }
+
+    public void store() {
+        purgeAll();
+        Importer[] importers = this.toArray(new Importer[this.size()]);
+        for (int i = 0; i < importers.length; i++) {
+            Globals.prefs.putStringArray("customImportFormat" + i, importers[i].getAsStringArray());
+        }
+    }
+
+    private void purgeAll() {
+        for (int i = 0; Globals.prefs.getStringArray("customImportFormat" + i) != null; i++) {
+            Globals.prefs.remove("customImportFormat" + i);
+        }
+    }
 
 }

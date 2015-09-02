@@ -33,7 +33,7 @@
 
 	<!-- some version information -->
 	<property name="jabref.version" value="2.11dev" />
-	<property name="jabref.version.full" value="2.11.3.0" /> <!-- a version number with 4 places. Required by launch4j -->
+	<property name="jabref.version.full" value="2.11.4.0" /> <!-- a version number with 4 places. Required by launch4j -->
 	<property name="jabref.year" value="2015" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<property name="jabref.placeholder.year" value="@year@" />
@@ -91,58 +91,18 @@
 	  </and>
 	</condition>
 
-	<fileset id="jarsFileset" dir="${lib.dir}">
-		<include name="antlr.jar" />
-		<include name="antlr-3.4-complete.jar" />
-        <include name="jgoodies-common-1.4.0.jar" />
-		<include name="jgoodies-looks-2.5.2.jar" />
-		<include name="jgoodies-forms-1.6.0.jar" />
-        <include name="jgoodies/com.jgoodies.uif_lite-2.1.4.jar" />
-        <include name="jna-4.1.0.jar" />
-	<include name="jsplitbutton.jar" />
-        <include name="ritopt/ritopt-0.2.1-bin.jar" />
-		<include name="spin.jar" />
-		<include name="glazedlists-1.8.0_java15.jar" />
-		<include name="microba.jar" />
-		<include name="pdfbox-1.7.1.jar" />
-		<include name="jempbox-1.7.1.jar" />
-		<include name="fontbox-1.7.1.jar" />
-		<include name="zoom-java.jar" />
-    	<include name="mysql-connector-java-5.0.7-bin.jar" />
-		<include name="postgresql-9.2-1002.jdbc4.jar" />
-        <!-- Plugin runtime dependencies -->
-		<include name="plugin/JPFCodeGenerator-rt.jar" />
-		<include name="plugin/jpf.jar" />
-		<include name="plugin/jpf-boot.jar" />
-		<include name="plugin/commons-logging.jar" />
-	</fileset>
-
-    <!-- Openoffice connection dependencies. Compile-time only -->
-    <fileset id="ooFileset" dir="${lib.dir}">
-        <include name="oo/unoil.jar" />
-        <include name="oo/ridl.jar" />
-        <include name="oo/juh.jar" />
-        <include name="oo/jurt.jar" />
-    </fileset>
-
     <!-- Done by MrDlib -->
-    <fileset id="splJars" dir="${lib.dir}">
-        <include name="spl/**/*.jar" />
-    </fileset>
 	<fileset id="deletableMeta-InfFiles" dir="${build.tmp}/META-INF">
 	        <exclude name="services/**/*" />
 	</fileset>
     <!-- Done by MrDlib -->
 
 	<!-- Build classpath -->
+	<filelist id="jars" />
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
 		<pathelement path="${build.dir}" />
-        <!-- Done by MrDlib -->
-        <fileset refid="splJars" />
-        <!-- Done by MrDlib -->
-		<fileset refid="jarsFileset" />
-        <fileset refid="ooFileset" />
+		<filelist refid="jars" />
 	</path>
 
 	<target name="run" depends="build">
@@ -364,8 +324,7 @@ version=${jabref.version}</echo>
 	<target name="unjarlib" description="Unpacks jars from lib directory into temp directory">
 		<mkdir dir="${build.tmp}" />
 		<unjar dest="${build.tmp}">
-			<fileset refid="jarsFileset" />
-			<fileset refid="splJars" />
+			<filelist refid="jars" />
 		</unjar>
 		<!-- done by MrDlib -->
 		<delete includeEmptyDirs="true">

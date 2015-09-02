@@ -27,10 +27,11 @@ import java.awt.event.ActionListener;
  */
 public class MarkEntriesAction extends AbstractWorker implements ActionListener {
 
-    private JabRefFrame frame;
-    final int level;
-    private JMenuItem menuItem;
+    private final JabRefFrame frame;
+    private final int level;
+    private final JMenuItem menuItem;
     private int besLength = 0;
+
 
     public MarkEntriesAction(JabRefFrame frame, int level) {
         this.frame = frame;
@@ -38,8 +39,8 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
 
         //menuItem = new JMenuItem(Globals.menuTitle("Mark entries").replaceAll("&",""));
         menuItem = new JMenuItem("               ");
-        menuItem.setMnemonic(String.valueOf(level+1).charAt(0));
-        menuItem.setBackground(Globals.prefs.getColor("markedEntryBackground"+this.level));
+        menuItem.setMnemonic(String.valueOf(level + 1).charAt(0));
+        menuItem.setBackground(Globals.prefs.getColor("markedEntryBackground" + this.level));
         menuItem.setOpaque(true);
         menuItem.addActionListener(this);
     }
@@ -48,6 +49,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         return menuItem;
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         try {
             this.init();
@@ -58,6 +60,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         }
     }
 
+    @Override
     public void run() {
         BasePanel panel = frame.basePanel();
         BibtexEntry[] bes = panel.getSelectedEntries();
@@ -68,7 +71,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         if (bes.length != 0) {
             NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
             for (BibtexEntry be : bes) {
-                Util.markEntry(be, level + 1, false, ce);
+                EntryMarker.markEntry(be, level + 1, false, ce);
             }
             ce.end();
             panel.undoManager.addEdit(ce);

@@ -1,0 +1,167 @@
+This document lists the libraries used by JabRef.
+This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
+
+Legend
+------
+License:
+ * GPLv2+ means "GPLv2 or later"
+ * GPLv2! means "exactly version 2.0 of GPL"
+ * GPLv2  means, we haven't checked whether later options are allowed
+ * similar for LGPL and other version of GPL
+
+
+Id:      antlr:antlr
+Project: ANTLR
+URL:     http://www.antlr.org/
+License: BSD
+
+Id:      org.antlr:antlr
+Project: ANTLR
+URL:     http://www.antlr.org/
+License: BSD
+
+Id:      commons-cli:commons-cli
+Project: Apache Commons CLI
+URL:     http://commons.apache.org/cli/
+License: Apache 2.0
+
+Id:      commons-logging:commons-logging
+Project: Apache Commongs Logging
+URL:     http://commons.apache.org/logging/
+License: Apache 2.0
+
+Id:      com.jgoodies:jgoodies-common
+Project: JGoodies Common
+URL:     http://www.jgoodies.com/downloads/libraries/
+License: BSD
+
+Id:      com.jgoodies:jgoodies-forms
+Project: JGoodies Forms
+URL:     http://www.jgoodies.com/downloads/libraries/
+License: BSD
+
+Id:      com.jgoodies:jgoodies-looks
+Project: JGoodies Looks
+URL:     http://www.jgoodies.com/downloads/libraries/
+License: BSD
+
+Id:      com.sun.jersey:jersey-client
+Project: Jersey
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+Id:      com.sun.jersey:jersey-core
+Project: Jersey
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+Id:      com.sun.jersey.contribs:jersey-multipart
+Project: Jersey
+URL:     http://jersey.java.net/
+License: GPLv2 with classpath exception (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+Note:    This should fetch org.jvnet.mimepull:mimepull; maybe that version is broken. Only 1.9.4 is reported to work correctly
+
+Id:      mysql:mysql-connector-java
+Project: MySQL Connector/J
+URL:     http://www.mysql.de/downloads/connector/j/
+License: GPLv2! and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
+
+Id:      net.java.dev.glazedlists:glazedlists_java15
+Project: Glazed Lists
+URL:     http://www.glazedlists.com/
+License: LPGL 2.1! (not explicitly, but no comments in the source header) and MPL
+
+Id:      net.java.dev.jna:jna
+Project: Java Native Access (JNA)
+URL:     https://github.com/twall/jna
+License: LGPL 2.1+ and Apache 2.0
+
+Id:      org.apache.pdfbox:fontbox
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Id:      org.apache.pdfbox:jempbox
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Id:      org.apache.pdfbox:pdfbox
+Project: Apache PDFBox
+URL:     http://pdfbox.apache.org
+License: Apache 2.0
+
+Id:      org.openoffice:juh
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Id:      org.openoffice:jurt
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Id:      org.openoffice:ridl
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Id:      org.openoffice:unoil
+Project: OpenOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: LGPL 3.0
+
+Id:      org.swinglabs:swingx
+Project: SwingX
+URL:     https://swingx.java.net/
+License: LGPL 3.0
+
+Path:    org.postgresql:postgresql
+Project: PostgreSQL JDBC Driver
+URL:     http://jdbc.postgresql.org/download.html
+License: BSD
+
+Path:    lib/microba.jar
+Project: Microba
+URL:     https://github.com/tdbear/microba
+License: BSD
+
+Path:    lib/plugin/jpf-boot.jar
+Project: Java Plugin Framework
+URL:     http://jpf.sourceforge.net/
+License: LGPL 2.1+
+
+Path:    lib/plugin/jpf.jar
+Project: Java Plugin Framework
+URL:     http://jpf.sourceforge.net/
+License: LGPL 2.1+
+
+Path:    lib/plugin/JPFCodeGenerator-rt.jar
+Project: Part of JabRef
+URL:     jabref-git-repo:jpfcodegen
+License: LGPL 3.0
+
+Path:    lib/plugin/JPFCodeGenerator.jar
+Project: Part of JabRef
+URL:     jabref-git-repo:jpfcodegen
+License: LGPL 3.0
+
+Path:    lib/plugin/velocity-dep-1.5.jar
+Project: Apache Velocity
+URL:     http://velocity.apache.org/engine/releases/velocity-1.5/
+License: Apache 2.0
+
+Path:    lib/spl/sciplore/mrDlib-serialization-api.jar
+Project: Mr. DLib
+URL:     http://mr-dlib.org/
+License: Source not yet available
+
+Path:    lib/spl/sciplore/xstream-1.4.1.jar
+Project: XStream
+URL:     http://xstream.codehaus.org/
+License: BSD (http://xstream.codehaus.org/license.html)
+
+Path:    lib/spin.jar
+Project: Spin
+URL:     http://spin.sourceforge.net/
+License: LGPL 2.1+

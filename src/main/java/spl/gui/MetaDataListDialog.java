@@ -1,6 +1,5 @@
 package spl.gui;
 
-
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -22,7 +21,7 @@ import javax.swing.table.DefaultTableModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.util.Util;
 
 import org.sciplore.beans.Document;
 
@@ -34,6 +33,7 @@ import spl.localization.LocalizationSupport;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class MetaDataListDialog extends JDialog {
+
     private JPanel contentPane;
     private JTable tableMetadata;
     private JButton buttonOK;
@@ -47,11 +47,12 @@ public class MetaDataListDialog extends JDialog {
     private DefaultTableModel tableModel;
     private int result;
     private Document xmlDocuments;
-    private String fileName;
+    private final String fileName;
     private SplWebClient.WebServiceStatus webserviceStatus;
-    private Component thisDialog;
-    private boolean showBlankButton;
-    private CardLayout cardLayou = new CardLayout();
+    private final Component thisDialog;
+    private final boolean showBlankButton;
+    private final CardLayout cardLayou = new CardLayout();
+
 
     public MetaDataListDialog(String fileName, boolean showBlankButton) {
         $$$setupUI$$$();
@@ -67,37 +68,49 @@ public class MetaDataListDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
         });
 
         buttonCancel.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
 
         blankButton.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onBlank();
             }
         });
 
         moreInformationButton.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onInfo();
             }
         });
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+
+            @Override
             public void windowClosing(WindowEvent e) {
                 onCancel();
             }
         });
 
         contentPane.registerKeyboardAction(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -135,6 +148,7 @@ public class MetaDataListDialog extends JDialog {
 
     public void showDialog() {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
             @Override
             public Void doInBackground() {
                 System.out.println("Starting Webclient...");
@@ -233,7 +247,6 @@ public class MetaDataListDialog extends JDialog {
         panelMetadata = new JPanel();
         panelMetadata.setLayout(cardLayou);
 
-
         panelMetadata.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
@@ -279,14 +292,14 @@ public class MetaDataListDialog extends JDialog {
         contentPane.add(bb.getPanel(), BorderLayout.SOUTH);
         iconLabel.setLabelFor(scrollPane);
 
-
     }
 
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
 
-    public static class MyTableModel extends DefaultTableModel {
+
+    private static class MyTableModel extends DefaultTableModel {
 
         @Override
         public boolean isCellEditable(int row, int column) {

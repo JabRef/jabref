@@ -33,62 +33,67 @@ import net.sf.jabref.Globals;
  * Code inspired by http://forums.devx.com/showthread.php?t=151270
  */
 public class DragDropPopupPane extends DragDropPane {
-	
-	private JPopupMenu popupMenu = null;
 
-	public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
-		super();
-		
-		addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				tabClicked(e);
-			}
-		});
-		
-		initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction);
-	}
-	
-	private void initPopupMenu(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
-		popupMenu = new JPopupMenu();
-		
-		JMenuItem databasePropertiesBtn = new JMenuItem(Globals.lang("Database properties"));
-		databasePropertiesBtn.addActionListener(databasePropertiesAction);
-		popupMenu.add(databasePropertiesBtn);
-		
-		JMenuItem bibtexKeyPatternBtn = new JMenuItem(Globals.lang("Bibtex key patterns"));
-		bibtexKeyPatternBtn.addActionListener(bibtexKeyPatternAction);
-		popupMenu.add(bibtexKeyPatternBtn);
+    private JPopupMenu popupMenu = null;
 
-		JMenuItem manageSelectorsBtn = new JMenuItem(Globals.lang("Manage content selectors"));
-		manageSelectorsBtn.addActionListener(manageSelectorsAction);
-		popupMenu.add(manageSelectorsBtn);
-		
-		JMenuItem closeBtn = new JMenuItem(Globals.lang("Close"), GUIGlobals.getImage("close"));
-		closeBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						closeSelectedTab();
-					}
-				});
-			}
-		});		
-		popupMenu.add(closeBtn);
-	}
-	
-	
-	private void tabClicked(MouseEvent e) {
-		if (e.getButton() != MouseEvent.BUTTON1 && e.getClickCount() == 1) {   // if is right-click
-    	  
-			// display popup near location of mouse click
-			popupMenu.show(e.getComponent(), e.getX(), e.getY() - 10);
-		}
+
+    public DragDropPopupPane(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
+        super();
+
+        addMouseListener(new java.awt.event.MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                tabClicked(e);
+            }
+        });
+
+        initPopupMenu(manageSelectorsAction, databasePropertiesAction, bibtexKeyPatternAction);
     }
-    
+
+    private void initPopupMenu(AbstractAction manageSelectorsAction, AbstractAction databasePropertiesAction, AbstractAction bibtexKeyPatternAction) {
+        popupMenu = new JPopupMenu();
+
+        JMenuItem databasePropertiesBtn = new JMenuItem(Globals.lang("Database properties"));
+        databasePropertiesBtn.addActionListener(databasePropertiesAction);
+        popupMenu.add(databasePropertiesBtn);
+
+        JMenuItem bibtexKeyPatternBtn = new JMenuItem(Globals.lang("Bibtex key patterns"));
+        bibtexKeyPatternBtn.addActionListener(bibtexKeyPatternAction);
+        popupMenu.add(bibtexKeyPatternBtn);
+
+        JMenuItem manageSelectorsBtn = new JMenuItem(Globals.lang("Manage content selectors"));
+        manageSelectorsBtn.addActionListener(manageSelectorsAction);
+        popupMenu.add(manageSelectorsBtn);
+
+        JMenuItem closeBtn = new JMenuItem(Globals.lang("Close"), GUIGlobals.getImage("close"));
+        closeBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        closeSelectedTab();
+                    }
+                });
+            }
+        });
+        popupMenu.add(closeBtn);
+    }
+
+    private void tabClicked(MouseEvent e) {
+        if ((e.getButton() != MouseEvent.BUTTON1) && (e.getClickCount() == 1)) { // if is right-click
+
+            // display popup near location of mouse click
+            popupMenu.show(e.getComponent(), e.getX(), e.getY() - 10);
+        }
+    }
+
     private void closeSelectedTab() {
-    	// remove selected tab
-    	remove( getSelectedIndex() );  
+        // remove selected tab
+        remove(getSelectedIndex());
     }
-    
 
 }

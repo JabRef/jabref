@@ -28,16 +28,21 @@ import java.awt.event.MouseEvent;
 
 public class SysTray {
 
-    private JabRefFrame frame;
-    private TrayIcon icon;
+    private final JabRefFrame frame;
+    private final TrayIcon icon;
     private SystemTray tray = null;
+
 
     public SysTray(JabRefFrame frame) {
         this.frame = frame;
 
         final ActionListener showJabref = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
                     public void run() {
                         SysTray.this.frame.showIfMinimizedToSysTray();
                     }
@@ -53,6 +58,7 @@ public class SysTray {
         icon = new TrayIcon(imic.getImage(), "JabRef", popup);
         icon.setImageAutoSize(true);
         icon.addMouseListener(new MouseAdapter() {
+
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
                 showJabref.actionPerformed(new ActionEvent(mouseEvent.getSource(), 0, ""));
@@ -60,32 +66,34 @@ public class SysTray {
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                super.mousePressed(mouseEvent);    //To change body of overridden methods use File | Settings | File Templates.
+                super.mousePressed(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
-                super.mouseReleased(mouseEvent);    //To change body of overridden methods use File | Settings | File Templates.
+                super.mouseReleased(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
         });
-        if (SystemTray.isSupported())
+        if (SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
+        }
     }
 
-    public void setTrayIconVisible(boolean visible) {
-        if (tray == null)
+    public void show() {
+        if (tray == null) {
             return;
+        }
         try {
-            if (visible)
-                tray.add(icon);
-            else
-                tray.remove(icon);
+            tray.add(icon);
         } catch (AWTException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(SystemTray.isSupported());
+    public void hide() {
+        if (tray == null) {
+            return;
+        }
+        tray.remove(icon);
     }
 }

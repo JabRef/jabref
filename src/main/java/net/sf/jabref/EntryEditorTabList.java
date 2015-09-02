@@ -27,6 +27,7 @@ public final class EntryEditorTabList {
     private List<List<String>> list = null;
     private List<String> names = null;
 
+
     public EntryEditorTabList() {
         init();
     }
@@ -49,7 +50,7 @@ public final class EntryEditorTabList {
             }
         } else {
             // Nothing set, so we use the default values:
-            while (Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def"+i) != null) {
+            while (Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i) != null) {
                 name = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
                 fields = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i).split(";");
                 List<String> entry = Arrays.asList(fields);

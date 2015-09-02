@@ -23,6 +23,7 @@ import net.sf.jabref.AuthorList;
  */
 public class AuthorLF_FF implements LayoutFormatter {
 
+    @Override
     public String format(String fieldText) {
         AuthorList al = AuthorList.getAuthorList(fieldText);
 

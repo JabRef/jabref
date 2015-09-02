@@ -51,19 +51,25 @@ public class Replace extends AbstractParamLayoutFormatter {
     private String regex = null, replaceWith = null;
 
 
+    @Override
     public void setArgument(String arg) {
-        String[] parts = parseArgument(arg);
+        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
 
         if (parts.length < 2)
+         {
             return; // TODO: too few arguments. Print an error message here?
+        }
         regex = parts[0];
         replaceWith = parts[1];
 
     }
 
+    @Override
     public String format(String fieldText) {
         if (regex == null)
+         {
             return fieldText; // TODO: argument missing or invalid. Print an error message here?
+        }
         return fieldText.replaceAll(regex, replaceWith);
     }
 }

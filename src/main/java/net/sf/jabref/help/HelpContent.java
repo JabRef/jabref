@@ -30,139 +30,147 @@ import net.sf.jabref.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class HelpContent extends JTextPane {
+class HelpContent extends JTextPane {
 
-	static Log log = LogFactory.getLog(HelpContent.class);
-	
-	JScrollPane pane;
+    private static final Log log = LogFactory.getLog(HelpContent.class);
 
-	private Stack<URL> history, forw;
+    private final JScrollPane pane;
 
-	JabRefPreferences prefs;
+    private final Stack<URL> history;
+    private final Stack<URL> forw;
 
-	public HelpContent(JabRefPreferences prefs_) {
-		super();
-		pane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		pane.setDoubleBuffered(true);
-		prefs = prefs_;
-		history = new Stack<URL>();
-		forw = new Stack<URL>();
-		setEditorKitForContentType("text/html", new MyEditorKit());
-		setContentType("text/html");
-		setText("");
-		setEditable(false);
-		
-		// Handles Anchors
-		final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
-			public void hyperlinkUpdate(final HyperlinkEvent e) {
-				if (e.getDescription().startsWith("#")) {
-					scrollToReference(e.getDescription().substring(1));
-				}
-			}
-		};
-		addHyperlinkListener(hyperLinkListener);
-	}
+    private final JabRefPreferences prefs;
 
-	public boolean back() {
-		if (!history.empty()) {
-			URL prev = (history.pop());
-			forw.push(getPage());
-			setPageOnly(prev);
-		}
-		return !history.empty();
-	}
 
-	public boolean forward() {
-		if (!forw.empty()) {
-			URL next = (forw.pop());
-			history.push(getPage());
-			setPageOnly(next);
-		}
-		return !forw.empty();
-	}
+    public HelpContent(JabRefPreferences prefs_) {
+        super();
+        pane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane.setDoubleBuffered(true);
+        prefs = prefs_;
+        history = new Stack<URL>();
+        forw = new Stack<URL>();
+        setEditorKitForContentType("text/html", new MyEditorKit());
+        setContentType("text/html");
+        setText("");
+        setEditable(false);
 
-	public void reset() {
-		forw.removeAllElements();
-		history.removeAllElements();
-	}
+        // Handles Anchors
+        final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
 
-	public void setPage(String filename, Class resourceOwner) {
-		
-		// Check for anchor
-		int indexOf = filename.indexOf('#');
-		String file;
-		String reference;
-		
-		if (indexOf != -1) {
-			file = filename.substring(0, indexOf);
-			reference = filename.substring(indexOf + 1);
-		} else {
-			file = filename;
-			reference = "";
-		}
-		
-		String middle = prefs.get("language") + "/";
-		if (middle.equals("en/"))
-			middle = ""; // english in base help dir.
+            @Override
+            public void hyperlinkUpdate(final HyperlinkEvent e) {
+                if (e.getDescription().startsWith("#")) {
+                    scrollToReference(e.getDescription().substring(1));
+                }
+            }
+        };
+        addHyperlinkListener(hyperLinkListener);
+    }
+
+    public boolean back() {
+        if (!history.empty()) {
+            URL prev = (history.pop());
+            forw.push(getPage());
+            setPageOnly(prev);
+        }
+        return !history.empty();
+    }
+
+    public boolean forward() {
+        if (!forw.empty()) {
+            URL next = (forw.pop());
+            history.push(getPage());
+            setPageOnly(next);
+        }
+        return !forw.empty();
+    }
+
+    public void reset() {
+        forw.removeAllElements();
+        history.removeAllElements();
+    }
+
+    public void setPage(String filename, Class resourceOwner) {
+
+        // Check for anchor
+        int indexOf = filename.indexOf('#');
+        String file;
+        String reference;
+
+        if (indexOf != -1) {
+            file = filename.substring(0, indexOf);
+            reference = filename.substring(indexOf + 1);
+        } else {
+            file = filename;
+            reference = "";
+        }
+
+        String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
+        if (middle.equals("en/"))
+         {
+            middle = ""; // english in base help dir.
+        }
 
         URL old = getPage();
-		try {
-			// First check in specified language
-			URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
-            
-			// If not available fallback to english
-			if (resource == null) {
-            	resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
+        try {
+            // First check in specified language
+            URL resource = resourceOwner.getResource(GUIGlobals.helpPre + middle + file);
+
+            // If not available fallback to english
+            if (resource == null) {
+                resource = resourceOwner.getResource(GUIGlobals.helpPre + file);
             }
-			
-			// If still not available print a warning
-            if (resource == null){
-            	// TODO show warning to user
-            	log.error("Could not find html-help for file '" + file + "'.");
-            	return;
+
+            // If still not available print a warning
+            if (resource == null) {
+                // TODO show warning to user
+                HelpContent.log.error("Could not find html-help for file '" + file + "'.");
+                return;
             }
-            setPageOnly(new URL(resource.toString() + "#" + reference));
-            
+            setPageOnly(new URL(resource.toString() + '#' + reference));
+
         } catch (IOException ex) {
             ex.printStackTrace();
-		}
+        }
 
-		forw.removeAllElements();
-		if (old != null)
-			history.push(old);
+        forw.removeAllElements();
+        if (old != null) {
+            history.push(old);
+        }
 
-	}
+    }
 
-	/**
-	 * Convenience method for setPage(String)
-	 */
-	public void setPage(URL url) {
-		File f = new File(url.getPath());
-		setPage(f.getName(), JabRef.class);
-	}
+    /**
+     * Convenience method for setPage(String)
+     */
+    @Override
+    public void setPage(URL url) {
+        File f = new File(url.getPath());
+        setPage(f.getName(), JabRef.class);
+    }
 
-	private void setPageOnly(URL url) {
-		try {
-			super.setPage(url);
-		} catch (IOException ex) {
-			if (url == null) {
-				System.out.println("Error: Help file not set");
-			} else {
-				System.out.println("Error: Help file not found '" + url.getFile() + "'");
-			}
-		}
-	}
+    private void setPageOnly(URL url) {
+        try {
+            super.setPage(url);
+        } catch (IOException ex) {
+            if (url == null) {
+                System.out.println("Error: Help file not set");
+            } else {
+                System.out.println("Error: Help file not found '" + url.getFile() + '\'');
+            }
+        }
+    }
 
-	public JComponent getPane() {
-		return pane;
-	}
+    public JComponent getPane() {
+        return pane;
+    }
 
-	/*public void paintComponent(Graphics g) {
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		super.paintComponent(g2);
-	}*/
+    /*public void paintComponent(Graphics g) {
+    	Graphics2D g2 = (Graphics2D) g;
+    	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    	g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    	super.paintComponent(g2);
+    }*/
 
 }

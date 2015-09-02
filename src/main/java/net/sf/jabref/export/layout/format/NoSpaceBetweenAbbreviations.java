@@ -31,22 +31,19 @@ import net.sf.jabref.export.layout.LayoutFormatter;
  * <p>
  * See Testcase for more examples.
  * <p>
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class NoSpaceBetweenAbbreviations implements LayoutFormatter {
 
-	/*
-	 * Match '.' followed by spaces followed by uppercase char followed by '.'
-	 * but don't include the last dot into the capturing group.
-	 * 
-	 * Replace the match by removing the spaces.
-	 * 
-	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-	 */
-	public String format(String fieldText) {
-		return fieldText.replaceAll("\\.\\s+(\\p{Lu})(?=\\.)", "\\.$1");
-	}
+    /*
+     * Match '.' followed by spaces followed by uppercase char followed by '.'
+     * but don't include the last dot into the capturing group.
+     * 
+     * Replace the match by removing the spaces.
+     * 
+     * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
+     */
+    @Override
+    public String format(String fieldText) {
+        return fieldText.replaceAll("\\.\\s+(\\p{Lu})(?=\\.)", "\\.$1");
+    }
 }

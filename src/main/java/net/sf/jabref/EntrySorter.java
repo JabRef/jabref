@@ -20,26 +20,27 @@ import java.util.*;
 public class EntrySorter implements DatabaseChangeListener {
 
     //TreeSet set;
-    final ArrayList<BibtexEntry> set;
-    Comparator<BibtexEntry> comp;
-    String[] idArray;
-    BibtexEntry[] entryArray;
+    private final ArrayList<BibtexEntry> set;
+    private final Comparator<BibtexEntry> comp;
+    private String[] idArray;
+    private BibtexEntry[] entryArray;
     private boolean changed = false;
 
+
     public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {
-	    //set = new TreeSet(comp);
+        //set = new TreeSet(comp);
         set = new ArrayList<BibtexEntry>();
         this.comp = comp;
         Set<String> keySet = entries.keySet();
-        for (String aKeySet : keySet) {
-            set.add(entries.get(aKeySet));
+        for (Map.Entry<String, BibtexEntry> stringBibtexEntryEntry : entries.entrySet()) {
+            set.add(stringBibtexEntryEntry.getValue());
         }
         //Collections.sort(set, comp);
         changed = true;
         index();
     }
 
-    public void index() {
+    private void index() {
 
         /*  Old version, from when set was a TreeSet.
 
@@ -52,8 +53,7 @@ public class EntrySorter implements DatabaseChangeListener {
             return;
         */
 
-
-        synchronized(set) {
+        synchronized (set) {
 
             // Resort if necessary:
             if (changed) {
@@ -64,10 +64,10 @@ public class EntrySorter implements DatabaseChangeListener {
             // Create an array of IDs for quick access, since getIdAt() is called by
             // getValueAt() in EntryTableModel, which *has* to be efficient.
 
-	        int count = set.size();
+            int count = set.size();
             idArray = new String[count];
             entryArray = new BibtexEntry[count];
-	        int piv = 0;
+            int piv = 0;
             for (BibtexEntry entry : set) {
                 //        for (int i=0; i<idArray.length; i++) {
                 idArray[piv] = entry.getId();
@@ -78,37 +78,38 @@ public class EntrySorter implements DatabaseChangeListener {
     }
 
     public boolean isOutdated() {
-        boolean outdated = false;
-        return outdated;
+        return false;
     }
 
     public String getIdAt(int pos) {
-        synchronized(set) {
+        synchronized (set) {
             return idArray[pos];
         }
-	//return ((BibtexEntry)(entryArray[pos])).getId();
+        //return ((BibtexEntry)(entryArray[pos])).getId();
     }
 
     public BibtexEntry getEntryAt(int pos) {
-        synchronized(set) {
+        synchronized (set) {
             return entryArray[pos];
         }
     }
 
     public int getEntryCount() {
-        synchronized(set) {
-	        if (entryArray != null)
-	            return entryArray.length;
-	        else
-	        return 0;
+        synchronized (set) {
+            if (entryArray != null) {
+                return entryArray.length;
+            } else {
+                return 0;
+            }
         }
     }
 
+    @Override
     public void databaseChanged(DatabaseChangeEvent e) {
-        synchronized(set) {
-        	int pos;
-        	switch (e.getType()) {
-        	case ADDED_ENTRY:
+        synchronized (set) {
+            int pos;
+            switch (e.getType()) {
+            case ADDED_ENTRY:
                 pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
                 set.add(pos, e.getEntry());
                 //addEntry(e.getEntry());
@@ -116,8 +117,8 @@ public class EntrySorter implements DatabaseChangeListener {
                 //changed = true;
                 //Collections.sort(set, comp);
                 break;
-        	case REMOVED_ENTRY:
-	            set.remove(e.getEntry());
+            case REMOVED_ENTRY:
+                set.remove(e.getEntry());
                 changed = true;
                 break;
             case CHANGED_ENTRY:
@@ -127,13 +128,13 @@ public class EntrySorter implements DatabaseChangeListener {
                 int posOld = set.indexOf(e.getEntry());
                 if (pos < 0) {
                     set.remove(posOld);
-                    set.add(-pos-1, e.getEntry());
+                    set.add(-pos - 1, e.getEntry());
                 }
                 //changed = true;
                 break;
             }
 
-    	}
+        }
 
     }
 }

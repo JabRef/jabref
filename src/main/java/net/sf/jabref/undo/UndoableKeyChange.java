@@ -27,16 +27,18 @@ import net.sf.jabref.Globals;
  */
 public class UndoableKeyChange extends AbstractUndoableEdit {
 
-    private String entryId;
-    private BibtexDatabase base;
-    private String oldValue, newValue;
+    private final String entryId;
+    private final BibtexDatabase base;
+    private final String oldValue;
+    private final String newValue;
+
 
     public UndoableKeyChange(BibtexDatabase base, String entryId,
-			     String oldValue, String newValue) {
-	this.base = base;
-	this.entryId = entryId;
-	this.oldValue = oldValue;
-	this.newValue = newValue;
+            String oldValue, String newValue) {
+        this.base = base;
+        this.entryId = entryId;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
     }
 
     @Override
@@ -46,30 +48,32 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-	return Globals.lang("Undo")+": "+Globals.lang("change key");
+        return Globals.lang("Undo") + ": " + Globals.lang("change key");
     }
 
     @Override
     public String getRedoPresentationName() {
-	return Globals.lang("Redo")+": "+Globals.lang("change key");
+        return Globals.lang("Redo") + ": " + Globals.lang("change key");
     }
 
+    @Override
     public void undo() {
-	super.undo();
-	
-	// Revert the change.
-	set(oldValue);
+        super.undo();
+
+        // Revert the change.
+        set(oldValue);
     }
 
+    @Override
     public void redo() {
-	super.redo();
+        super.redo();
 
-	// Redo the change.
-	set(newValue);
+        // Redo the change.
+        set(newValue);
     }
 
     private void set(String to) {
-	base.setCiteKeyForEntry(entryId, to);
+        base.setCiteKeyForEntry(entryId, to);
     }
 
 }
