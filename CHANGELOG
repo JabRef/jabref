@@ -1,5 +1,4 @@
 [dev_2.11]
-    - Search bar is now at the top
     - Add of Persian localization (by Behrouz Javanmardi)
     - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
     - Backport from 2.80: Fixes Bug#1297: No console message on closing.
