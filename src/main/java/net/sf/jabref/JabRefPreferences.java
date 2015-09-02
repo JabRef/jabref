@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.text.StyledEditorKit.BoldAction;
 
 import net.sf.jabref.export.CustomExportList;
 import net.sf.jabref.export.ExportComparator;
@@ -343,6 +344,7 @@ public class JabRefPreferences {
         defaults.put("searchGen", Boolean.TRUE);
         defaults.put("searchAll", Boolean.FALSE);
         defaults.put("incrementS", Boolean.FALSE);
+        defaults.put("searchModeLiveFilter", Boolean.TRUE);
         defaults.put("searchAutoComplete", Boolean.TRUE);
 
         defaults.put("selectS", Boolean.FALSE);
@@ -356,7 +358,7 @@ public class JabRefPreferences {
         defaults.put("autoCompleteFields", "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put("autoCompFF", Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put("autoCompLF", Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, 2);
+        defaults.put(SHORTEST_TO_COMPLETE, 0);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
@@ -377,7 +379,7 @@ public class JabRefPreferences {
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("toolbarVisible", Boolean.TRUE);
-        defaults.put("searchPanelVisible", Boolean.FALSE);
+        defaults.put("searchBarVisible", Boolean.TRUE);
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("groupsVisibleRows", 8);
         defaults.put("defaultOwner", System.getProperty("user.name"));

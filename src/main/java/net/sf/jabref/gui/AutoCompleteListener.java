@@ -34,7 +34,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
 	private static Logger logger = Logger.getLogger(AutoCompleteListener.class.getName());
 
-    AbstractAutoCompleter completer;
+    AbstractAutoCompleter<String> completer;
 
     // These variables keep track of the situation from time to time.
     protected String toSetIn = null; // null indicates that there are no completions available

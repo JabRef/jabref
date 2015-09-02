@@ -80,6 +80,8 @@ dependencies {
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
+    compile files('lib/jsplitbutton.jar')
+
     compile 'commons-logging:commons-logging:1.0.2'
     // not available in maven repository
     compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])

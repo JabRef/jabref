@@ -492,6 +492,7 @@ public class MainTable extends JTable {
      * @param row the row to select
      */
     public void setSelected(int row) {
+    	
     	selectionModel.setSelectionInterval(row, row);
     }
 

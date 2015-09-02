@@ -27,7 +27,7 @@ import net.sf.jabref.Globals;
  * @author kahlert, cordes
  * 
  */
-public class DefaultAutoCompleter extends AbstractAutoCompleter {
+public class DefaultAutoCompleter extends StringAbstractAutoCompleter {
 
 	public String _fieldName;
 

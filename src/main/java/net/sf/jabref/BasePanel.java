@@ -163,7 +163,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // autocomplete is active, and references to the autocompleter objects.
 
     NameFieldAutoCompleter searchCompleter = null;
-    AutoCompleteListener searchCompleteListener = null;
+    //AutoCompleteListener searchCompleteListener = null;
 
     // The undo manager.
     public CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -935,30 +935,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("search", new BaseAction() {
                 public void action() {
-                    //sidePaneManager.togglePanel("search");
-                    sidePaneManager.show("search");
-                    //boolean on = sidePaneManager.isPanelVisible("search");
-                    frame.searchToggle.setSelected(true);
-                    frame.getSearchManager().startSearch();
+                    frame.setSearchBarVisible(true);
+                    frame.getSearchBar().startSearch();
                 }
             });
         
         actions.put("toggleSearch", new BaseAction() {
                 public void action() {
-                    //sidePaneManager.togglePanel("search");
-                    sidePaneManager.toggle("search");
-                    boolean on = sidePaneManager.isComponentVisible("search");
-                    frame.searchToggle.setSelected(on);
+                	frame.setSearchBarVisible(! frame.searchBar.isVisible());
+                    boolean on = frame.searchBar.isVisible();
                     if (on)
-                      frame.getSearchManager().startSearch();
+                      frame.getSearchBar().startSearch();
                 }
             });
 
         actions.put("incSearch", new BaseAction() {
                 public void action() {
-                    sidePaneManager.show("search");
-                    frame.searchToggle.setSelected(true);
-                    frame.getSearchManager().startIncrementalSearch();
+                	frame.setSearchBarVisible(true);
+                    frame.getSearchBar().startIncrementalSearch();
                 }
             });
 
@@ -2105,7 +2099,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
+        //frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
+        frame.getSearchBar().setAutoCompleter(searchCompleter);
     }
 
     public HashMap<String, AbstractAutoCompleter> getAutoCompleters() {
@@ -2122,8 +2117,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry entry : database.getEntries()){
             Util.updateCompletersForEntry(searchAutoCompleterHM, entry);
         }
-        searchCompleteListener = new AutoCompleteListener(searchCompleter);
-        searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
+        //searchCompleteListener = new AutoCompleteListener(searchCompleter);
+        //searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
 
     private void instantiateAutoCompleters() {

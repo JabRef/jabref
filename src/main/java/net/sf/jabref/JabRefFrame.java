@@ -24,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.TabbedPaneUI;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
@@ -100,6 +103,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // The sidepane manager takes care of populating the sidepane. 
     public SidePaneManager sidePaneManager;
+    
+    public SearchBar searchBar;
 
     JTabbedPane tabbedPane; // initialized at constructor
     
@@ -147,8 +152,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
   /* References to the toggle buttons in the toolbar */
   // the groups interface
   public JToggleButton groupToggle;
-  public JToggleButton searchToggle, previewToggle, highlightAny, highlightAll;
-
+  private JToggleButton searchToggle;
+  public JToggleButton previewToggle, highlightAny, highlightAll;
+  
   OpenDatabaseAction
       open = new OpenDatabaseAction(this, true);
   AbstractAction
@@ -402,8 +408,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
     List<Action> fetcherActions = new LinkedList<Action>();
 
-    private SearchManager2 searchManager;
-
 	public GroupSelector groupSelector;
 
   // The menus for importing/appending other formats
@@ -549,6 +553,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
+        
+       
+        
+        //JLabel label = new JLabel ( "Close X" );
+        //add ( label, , 0 );
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -562,7 +571,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BasePanel bp = basePanel();
                 if (bp != null) {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                    searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
+                    searchToggle.setSelected(searchBar.isVisible());
                     previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
                     highlightAny
                         .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
@@ -634,14 +643,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     	}
         
         groupSelector = new GroupSelector(this, sidePaneManager);
-        searchManager = new SearchManager2(this, sidePaneManager);
 
         sidePaneManager.register("groups", groupSelector);
-        sidePaneManager.register("search", searchManager);
-
-        // Show the search panel if it was visible at last shutdown:
-        if (Globals.prefs.getBoolean("searchPanelVisible"))
-            sidePaneManager.show("search");
     }
 
     // The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
@@ -827,7 +830,8 @@ public JabRefPreferences prefs() {
       prefs.putBoolean("windowMaximised", (getExtendedState() == Frame.MAXIMIZED_BOTH));
       
       prefs.putBoolean("toolbarVisible", tlb.isVisible());
-      prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
+      prefs.putBoolean("searchBarVisible", searchBar.isVisible());
+      
       // Store divider location for side pane:
       int width = contentPane.getDividerLocation();
       if (width > 0) 
@@ -859,11 +863,8 @@ public JabRefPreferences prefs() {
         Globals.autoSaveManager.clearAutoSaves();
 
       // Let the search interface store changes to prefs.
-      // But which one? Let's use the one that is visible.
-      if (basePanel() != null) {
-        (searchManager).updatePrefs();
-      }
-      
+      searchBar.updatePrefs();
+            
       prefs.flush();
 
       return true;
@@ -927,7 +928,42 @@ public JabRefPreferences prefs() {
     con.weighty = 1;
     gbl.setConstraints(contentPane, con);
     getContentPane().add(contentPane);
-    contentPane.setRightComponent(tabbedPane);
+    
+    JPanel main = new JPanel();
+    main.setLayout( new OverlayLayout(main) );
+    searchBar = new SearchBar(this);
+    searchBar.setAlignmentX(1.0f);
+    searchBar.setAlignmentY(0.0f);  
+    searchBar.setMaximumSize(new Dimension(200, 25));
+    main.add(searchBar);
+    setSearchBarVisible(Globals.prefs.getBoolean("searchBarVisible"));
+
+    tabbedPane.setAlignmentX(1.0f);
+    tabbedPane.setAlignmentY(0.0f);
+    main.add(tabbedPane);
+    
+    //UIManager.put("TabbedPane.tabAreaInsets", new Insets(2, 20, 0, 6) );
+    UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
+    
+    /* tabbedPane.setUI(new BasicTabbedPaneUI() {  
+        @Override 
+        protected int calculateTabAreaHeight(int tab_placement, int run_count, int max_tab_height) {  
+            //if (tabbedPane.getTabCount() > 1)
+                return super.calculateTabAreaHeight(tab_placement, run_count, max_tab_height);  
+            //else  
+            //    return 0;  
+        }
+        @Override  
+        protected int calculateTabAreaWidth(int tabPlacement, int vertRunCount, int maxTabWidth) {  
+            //if (tabbedPane.getTabCount() > 1)
+            //    return super.calculateTabAreaWidth(tabPlacement, vertRunCount, maxTabWidth) + 2000;  
+            //else  
+            //    return 0;  
+        }  
+    });  
+    */
+    
+    contentPane.setRightComponent(main);
     contentPane.setLeftComponent(sidePaneManager.getPanel());
     sidePaneManager.updateView();
 
@@ -965,6 +1001,14 @@ public JabRefPreferences prefs() {
       sidePaneManager.getPanel().setTransferHandler(xfer);
   }
 
+  private class NullComponent extends JPanel {
+	  public NullComponent() {
+	      setLayout(null);
+	      // set width long enough to accommodate tabs
+	      setPreferredSize(new Dimension(120,0));
+	  }
+	}
+  
   private void initLabelMaker() {
     // initialize the labelMaker
     labelMaker = new LabelMaker();
@@ -2658,9 +2702,44 @@ class SaveSessionAction
   public void showMessage(String message){
 	  JOptionPane.showMessageDialog(this, message);
   }
+   
+  public SearchBar getSearchBar() {
+	  return searchBar;
+  }
   
-  public SearchManager2 getSearchManager() {
-		return searchManager;
-	}
+  public void setSearchBarVisible(boolean visible) {
+	  searchBar.setVisible(visible);
+	  searchToggle.setSelected(visible);
+	  if(visible)
+		  setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 250));
+	  else
+		  setTabAreaInsets(tabbedPane, new Insets(3, 2, 2, 2));
+  }
 
+  // Copied from org.pushingpixels.lafwidget.LafWidgetSupport
+  // http://jarvis.cs.ucdavis.edu/code_essence/functions/5829321
+  // We need to use reflection to change the tabAreaInsets since a TappedPaneUI does not a support a setter for this
+  private void setTabAreaInsets(JTabbedPane tabbedPane, Insets tabAreaInsets) {
+	  TabbedPaneUI ui = tabbedPane.getUI();
+	  if (ui instanceof BasicTabbedPaneUI) {
+		  try {
+			  Class<?> clazz = ui.getClass();
+			  while (clazz != null) {
+				  try {
+					  Field fld = clazz.getDeclaredField("tabAreaInsets");
+					  if (fld != null) {
+						  fld.setAccessible(true);
+						  fld.set(ui, tabAreaInsets);
+						  return;
+					  }
+				  } catch (NoSuchFieldException nsfe) {
+				  }
+				  clazz = clazz.getSuperclass();
+			  }
+		  } catch (Throwable t) {
+			  // ignore all fall through
+		  }
+	  }
+	  throw new UnsupportedOperationException();
+  }
 }

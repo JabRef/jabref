@@ -23,7 +23,7 @@ import net.sf.jabref.BibtexEntry;
  * @author kahlert, cordes
  * 
  */
-public class EntireFieldAutoCompleter extends AbstractAutoCompleter {
+public class EntireFieldAutoCompleter extends StringAbstractAutoCompleter {
 
 	public String _fieldName;
 
