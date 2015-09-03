@@ -1190,6 +1190,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
                 TextField textField = (TextField) event.getSource();
+                // get current caret position to restore current editing position after saving
+                int initialCaretPosition = textField.getCaretPosition();
                 String oldValue = entry.getCiteKey();
                 String newValue = textField.getText();
 
@@ -1241,9 +1243,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
                 updateSource();
                 panel.markBaseChanged();
+                // set cursor back to the initial position
+                textField.setCaretPosition(initialCaretPosition);
             } else if (event.getSource() instanceof FieldEditor) {
                 String toSet = null;
                 FieldEditor fieldEditor = (FieldEditor) event.getSource();
+                // get current caret position to restore current editing position after saving
+                // (is only possible if fieldEditor is an instance of JTextComponent)
+                int initialCaretPosition = 0;
+                if(fieldEditor instanceof JTextComponent) {
+                    initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
+                }
                 boolean set;
                 // Trim the whitespace off this value
                 String currentText = fieldEditor.getText();
@@ -1298,6 +1308,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         }
                         updateSource();
                         panel.markBaseChanged();
+                        // set caret back to initial edit position
+                        if(fieldEditor instanceof JTextComponent) {
+                            ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
+                        }
                     } catch (IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                 Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
