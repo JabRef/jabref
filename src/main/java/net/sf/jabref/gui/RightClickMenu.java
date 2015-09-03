@@ -27,6 +27,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -78,7 +79,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("copy");
+                    panel.runCommand(Actions.COPY);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute copy", ex);
                 }
@@ -89,7 +90,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("paste");
+                    panel.runCommand(Actions.PASTE);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute paste", ex);
                 }
@@ -100,7 +101,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("cut");
+                    panel.runCommand(Actions.CUT);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute cut", ex);
                 }
@@ -114,7 +115,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 /*SwingUtilities.invokeLater(new Runnable () {
                 public void run() {*/
                 try {
-                    panel.runCommand("delete");
+                    panel.runCommand(Actions.DELETE);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute delete", ex);
                 }
@@ -129,7 +130,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("exportToClipboard");
+                    panel.runCommand(Actions.EXPORT_TO_CLIPBOARD);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute exportToClipboard", ex);
                 }
@@ -140,7 +141,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("sendAsEmail");
+                    panel.runCommand(Actions.SEND_AS_EMAIL);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute sendAsEmail", ex);
                 }
@@ -160,7 +161,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        panel.runCommand("markEntries");
+                        panel.runCommand(Actions.MARK_ENTRIES);
                     } catch (Throwable ex) {
                         LOGGER.warn("Could not execute markEntries", ex);
                     }
@@ -174,7 +175,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        panel.runCommand("unmarkEntries");
+                        panel.runCommand(Actions.UNMARK_ENTRIES);
                     } catch (Throwable ex) {
                         LOGGER.warn("Could not execute unmarkEntries", ex);
                     }
@@ -190,7 +191,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
-                            panel.runCommand("markEntries");
+                            panel.runCommand(Actions.MARK_ENTRIES);
                         } catch (Throwable ex) {
                             LOGGER.warn("Could not execute markEntries", ex);
                         }
@@ -205,7 +206,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
-                            panel.runCommand("unmarkEntries");
+                            panel.runCommand(Actions.UNMARK_ENTRIES);
                         } catch (Throwable ex) {
                             LOGGER.warn("Could not execute unmarkEntries", ex);
                         }
@@ -255,7 +256,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("openFolder");
+                    panel.runCommand(Actions.OPEN_FOLDER);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not open folder", ex);
                 }
@@ -267,7 +268,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("openExternalFile");
+                    panel.runCommand(Actions.OPEN_EXTERNAL_FILE);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not open external file", ex);
                 }
@@ -279,7 +280,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("addFileLink");
+                    panel.runCommand(Actions.ADD_FILE_LINK);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not attach file", ex);
                 }
@@ -298,7 +299,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("openUrl");
+                    panel.runCommand(Actions.OPEN_URL);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not execute open URL", ex);
                 }
@@ -310,7 +311,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("copyKey");
+                    panel.runCommand(Actions.COPY_KEY);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not copy BibTex key", ex);
                 }
@@ -322,7 +323,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("copyCiteKey");
+                    panel.runCommand(Actions.COPY_CITE_KEY);
                 } catch (Throwable ex) {
                     LOGGER.warn("Could not copy cite key", ex);
                 }
@@ -339,7 +340,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("importPlainText");
+                    panel.runCommand(Actions.PLAIN_TEXT_IMPORT);
                 } catch (Throwable ex) {
                     LOGGER.debug("Could not import plain text", ex);
                 }
@@ -357,7 +358,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("addToGroup");
+                    panel.runCommand(Actions.ADD_TO_GROUP);
 
                     //BibtexEntry[] bes = panel.getSelectedEntries();
                     //JMenu groupMenu = buildGroupMenu(bes, true, false);
@@ -374,7 +375,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("removeFromGroup");
+                    panel.runCommand(Actions.REMOVE_FROM_GROUP);
                 } catch (Throwable ex) {
                     LOGGER.debug("Could not remove from group", ex);
                 }
@@ -387,7 +388,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    panel.runCommand("moveToGroup");
+                    panel.runCommand(Actions.MOVE_TO_GROUP);
                 } catch (Throwable ex) {
                     LOGGER.debug("Could not execute move to group", ex);
                 }
