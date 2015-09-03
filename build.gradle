@@ -101,7 +101,7 @@ dependencies {
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
-    compile files('lib/jsplitbutton.jar')
+    compile files('lib/JSplitButton_1.2.jar')
 
     compile 'com.google.guava:guava:18.0'
 

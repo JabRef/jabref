@@ -5,24 +5,48 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Action;
 
-public interface AutoCompleteRenderer<E> { 
-    boolean updateListData(E[] strings);
-
-	Component init();
-
-	 /**
-     * This method will attempt to locate a reasonable autocomplete item
-     * from all combo box items and select it. It will also populate the
-     * combo box editor with the remaining text which matches the
-     * autocomplete item and select it. If the selection changes and the
-     * JComboBox is not a Table Cell Editor, an ActionEvent will be
-     * broadcast from the combo box.
+/**
+ * Renders the list of possible autocomplete items. Also takes care of the currently selected item.
+ * @param <E> the type of the items
+ */
+public abstract class AutoCompleteRenderer<E> { 
+    /**
+     * Refreshes the list of possible autocomplete items. Clears the currently selected item.
+     * @param items list of possible autocomplete items
      */
-	void selectAutoCompleteTerm(String text);
+    public abstract void update(E[] items);
 
-	void selectNewItem(int offset);
+	/**
+	 * Creates the control which will be shown in the autocomplete popup.
+	 * @param acceptAction the action to be performed if the current selection is chosen as the autocompletion
+	 * @return the control to be added to the autocomplete popup
+	 */
+	public abstract Component init(ActionListener acceptAction);
 
-	E getSelectedItem();
+	/**
+	 * Selects the item at the given position. If the specified index is not valid, then the selection will be cleared.
+	 * @param index position of the item
+	 */
+	public abstract void selectItem(int index);
+	
+	/**
+	 * Selects the item relative to the currently selected item. If the specified offset is not valid, then the selection will be cleared.
+	 * @param offset offset of the item
+	 */
+	public void selectItemRelative(int offset) {
+	    int newIndex = getSelectedIndex() + offset;
+	    selectItem(newIndex);
+	}
 
-	void registerAcceptAction(ActionListener acceptAction);
+	/**
+	 * Returns the index of the currently selected item.
+	 * @return index of the selected item
+	 */
+	public abstract int getSelectedIndex();
+
+    /**
+     * Returns the currently selected item.
+     * @return selected item
+     */
+    public abstract E getSelectedItem();
 }

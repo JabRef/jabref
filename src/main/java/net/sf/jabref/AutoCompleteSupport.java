@@ -45,7 +45,6 @@ import net.sf.jabref.autocompleter.AutoCompleter;
  */
 public class AutoCompleteSupport<E> {
 	AutoCompleteRenderer<E> renderer;
-	AutoCompleteFormater<E> formater;
 	AutoCompleter<E> autoCompleter;
 	JTextComponent textComp;
 	JPopupMenu popup = new JPopupMenu();
@@ -63,34 +62,23 @@ public class AutoCompleteSupport<E> {
 
 	public AutoCompleteSupport(JTextComponent textComp,
 			AutoCompleter<E> autoCompleter,
-			AutoCompleteRenderer<E> renderer, AutoCompleteFormater<E> formater) {
+			AutoCompleteRenderer<E> renderer) {
 		this.renderer = renderer;
-		this.formater = formater;
 		this.textComp = textComp;
 		this.autoCompleter = autoCompleter;
 
 	}
 
 	public AutoCompleteSupport(JTextComponent textComp) {
-		this(textComp, null, new DefaultAutoCompletRenderer<E>(), new ToStringAutoCompleteFormater<E>());
+		this(textComp, null, new ListAutoCompleteRenderer<E>());
 	}
 
 	public AutoCompleteSupport(JTextComponent textComp,
 			AutoCompleter<E> autoCompleter) {
-		this(textComp, autoCompleter, new DefaultAutoCompletRenderer<E>(), new ToStringAutoCompleteFormater<E>());
+		this(textComp, autoCompleter, new ListAutoCompleteRenderer<E>());
 	}
 
 	public void install() {
-		popup.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
-				Color.LIGHT_GRAY));
-		popup.setPopupSize(textComp.getWidth(), 200);
-		popup.setLayout(new BorderLayout());
-		popup.setFocusable(false);
-		popup.setRequestFocusEnabled(false);
-		popup.add(renderer.init());
-
-		textComp.getDocument().addDocumentListener(documentListener);
-
 		final Action upAction = new MoveAction(-1);
 		final Action downAction = new MoveAction(1);
 		final Action hidePopupAction = new AbstractAction() {
@@ -104,12 +92,12 @@ public class AutoCompleteSupport<E> {
 				if(itemToInsert == null)
 					return;
 				
-				String toInsert = formater.formatItemToString(itemToInsert);
+				String toInsert = autoCompleter.getAutoCompleteText(itemToInsert);
 				
 				// In most fields, we are only interested in the currently edited word, so we
 	            // seek from the caret backward to the closest space:
 	            if (!autoCompleter.isSingleUnitField()) {        	
-	            	// Get position of last word seperator (whitespace or comma)
+	            	// Get position of last word separator (whitespace or comma)
 	                int piv = textComp.getText().length() - 1;
 	                while ((piv >= 0) && !Character.isWhitespace(textComp.getText().charAt(piv)) && textComp.getText().charAt(piv) != ',') {
 	                    piv--;
@@ -126,7 +114,15 @@ public class AutoCompleteSupport<E> {
 	            popup.setVisible(false);
 			}
 		};
-		renderer.registerAcceptAction(acceptAction);
+		popup.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+                Color.LIGHT_GRAY));
+        popup.setPopupSize(textComp.getWidth(), 200);
+        popup.setLayout(new BorderLayout());
+        popup.setFocusable(false);
+        popup.setRequestFocusEnabled(false);
+        popup.add(renderer.init(acceptAction));
+
+        textComp.getDocument().addDocumentListener(documentListener);
 
 		textComp.registerKeyboardAction(downAction,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
@@ -204,9 +200,11 @@ public class AutoCompleteSupport<E> {
 		popup.setPopupSize(textComp.getWidth(), 200);
 		if (autoCompleter == null)
 			return;
-		if (textComp.isEnabled()
-				&& renderer.updateListData(autoCompleter.complete(text))) {
-			renderer.selectAutoCompleteTerm(text);
+		
+		E[] candidates = autoCompleter.complete(text);
+		renderer.update(candidates);		
+		if (textComp.isEnabled() && candidates.length > 0) {
+		    renderer.selectItem(0);
 
 			// popup.repaint();
 
@@ -232,7 +230,7 @@ public class AutoCompleteSupport<E> {
 		public void actionPerformed(ActionEvent e) {
 
 			if (popup.isVisible()) {
-				renderer.selectNewItem(offset);
+				renderer.selectItemRelative(offset);
 			} else {
 				popup.show(textComp, 0, textComp.getHeight());
 			}

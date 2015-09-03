@@ -3,10 +3,19 @@ package net.sf.jabref.autocompleter;
 import net.sf.jabref.BibtexEntry;
 
 /**
- * An AutoCompleter delivers possible completions for a given string.
+ * Delivers possible completions for a given string.
  */
 public interface AutoCompleter<E> {
 
+    /**
+     * Formats the specified item. This method is called when an item is selected by the user and we need to determine
+     * the text to be inserted in the textbox.
+     * 
+     * @param item the item to format
+     * @return formated string representation of the item
+     */
+    String getAutoCompleteText(E item);
+    
     /**
      * Add a BibtexEntry to this AutoCompleter. The AutoCompleter (respectively
      * to the concrete implementations of {@link AutoCompleter}) itself
@@ -27,7 +36,7 @@ public interface AutoCompleter<E> {
     String getPrefix();
 
     /**
-	 * Returns one or more possible completions for a given String. The returned
+	 * Returns one or more possible completions for a given string. The returned
 	 * completion depends on which informations were stored while adding
 	 * BibtexEntries by the used implementation of {@link AutoCompleter}
 	 * .
