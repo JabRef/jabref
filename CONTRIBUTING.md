@@ -71,6 +71,11 @@ Nevertheless, we rely on our test cases to ensure that a bug fix or a feature im
 In case you do not have time to add a test case, we nevertheless ask you to run `gradlew check` to ensure that your change doesn't break anything else.
 
 
+### When adding a library
+Please try to use a version available at jCenter and add it to `build.gradle`.
+In any case, describe the library at [external-libraries.txt](external-libraries.txt).
+We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
+
 ### Create a pull request
 Create a pull request on GitHub.
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
