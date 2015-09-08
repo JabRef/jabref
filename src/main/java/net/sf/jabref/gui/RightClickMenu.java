@@ -253,6 +253,12 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new AbstractAction(Localization.lang("Open folder"), GUIGlobals.getImage("openFolder")) {
 
+            {
+                if (!isFieldSetForSelectedEntry("file")) {
+                    this.setEnabled(false);
+                }
+            }
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -264,6 +270,12 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         });
 
         add(new AbstractAction(Localization.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
+
+            {
+                if(!isFieldSetForSelectedEntry("file")) {
+                    this.setEnabled(false);
+                }
+            }
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -295,6 +307,12 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         });*/
 
         add(new AbstractAction(Localization.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
+
+            {
+                if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
+                    this.setEnabled(false);
+                }
+            }
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -404,6 +422,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 panel.mainTable.refreshSorting(); // Bad remote access
             }
         });
+
+
     }
 
     /**
@@ -579,6 +599,19 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuCanceled(PopupMenuEvent e) {
         // nothing to do
+    }
+
+    private boolean isFieldSetForSelectedEntry(String fieldname) {
+        if (panel.mainTable.getSelectedRowCount() == 1) {
+            BibtexEntry entry = panel.mainTable.getSelected().get(0);
+            if (entry.getAllFields().contains(fieldname)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
 
