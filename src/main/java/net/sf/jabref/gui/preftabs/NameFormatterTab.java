@@ -30,6 +30,7 @@ import javax.swing.table.TableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 
@@ -198,7 +199,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         toolBar.add(new AddRowAction());
         toolBar.add(new DeleteRowAction());
         toolBar.add(new HelpAction(helpDialog, GUIGlobals.nameFormatterHelp,
-                "Help on Name Formatting", GUIGlobals.getIconUrl("helpSmall")));
+                "Help on Name Formatting", IconTheme.getIconUrl("helpSmall")));
 
         tabPanel.add(toolBar, BorderLayout.EAST);
 
@@ -240,7 +241,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", GUIGlobals.getImage("remove"));
+            super("Delete row", IconTheme.getImage("remove"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -273,7 +274,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", GUIGlobals.getImage("add"));
+            super("Add row", IconTheme.getImage("add"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 

@@ -18,14 +18,8 @@ package net.sf.jabref.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
@@ -85,13 +79,11 @@ public class GUIGlobals {
     public static String pre = "/images/";
     public static final String helpPre = "/help/";
 
-    private static final HashMap<String, JLabel> tableIcons = new HashMap<>(); // Contains table icon mappings. Set up
+    private static final Map<String, JLabel> tableIcons = new HashMap<>(); // Contains table icon mappings. Set up
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
     public static SidePaneManager sidePaneManager;
     public static HelpDialog helpDiag;
-
-    private static HashMap<String, String> iconMap;
 
     //Help files (in HTML format):
     public static final String baseFrameHelp = "BaseFrameHelp.html";
@@ -223,131 +215,6 @@ public class GUIGlobals {
     }
 
     /**
-     * Read either the default icon theme, or a custom one. If loading of the custom theme
-     * fails, try to fall back on the default theme.
-     */
-    public static void setUpIconTheme() {
-        String defaultPrefix = "/images/crystal_16/";
-        String prefix = defaultPrefix;
-
-        URL defaultResource = GUIGlobals.class.getResource(prefix + "Icons.properties");
-        URL resource = defaultResource;
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CUSTOM_ICON_THEME)) {
-            String filename = Globals.prefs.get(JabRefPreferences.CUSTOM_ICON_THEME_FILE);
-            if (filename != null) {
-                try {
-                    File file = new File(filename);
-                    String parent = file.getParentFile().getAbsolutePath();
-                    prefix = "file://" + parent + System.getProperty("file.separator");
-                    resource = new URL("file://" + file.getAbsolutePath());
-                } catch (MalformedURLException e) {
-                    LOGGER.warn("Could not read " + resource, e);
-                }
-            }
-        }
-        try {
-            GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(resource, prefix);
-        } catch (IOException e) {
-            System.err.println(Localization.lang("Unable to read icon theme file") + " '" +
-                    resource + '\'');
-            // If we were trying to load a custom theme, try the default one as a fallback:
-            if (resource != defaultResource) {
-                try {
-                    GUIGlobals.iconMap = GUIGlobals.readIconThemeFile(defaultResource, defaultPrefix);
-                } catch (IOException e2) {
-                    LOGGER.warn(Localization.lang("Unable to read default icon theme."), e2);
-                }
-            }
-
-        }
-
-    }
-
-    /**
-     * Looks up the URL for the image representing the given function, in the resource
-     * file listing images.
-     *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The URL to the actual image to use.
-     */
-    public static URL getIconUrl(String name) {
-        if (GUIGlobals.iconMap.containsKey(name)) {
-            String path = GUIGlobals.iconMap.get(name);
-            URL url = GUIGlobals.class.getResource(path);
-            if (url == null) {
-                // This may be a resource outside of the jar file, so we try a general URL:
-                try {
-                    url = new URL(path);
-                } catch (MalformedURLException ignored) {
-                }
-            }
-            if (url == null) {
-                LOGGER.warn(Localization.lang("Could not find image file") + " '" + path + '\'');
-            }
-            return url;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Constructs an ImageIcon for the given function, using the image specified in
-     * the resource files resource/Icons_en.properties.
-     *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The ImageIcon for the function.
-     */
-    public static ImageIcon getImage(String name) {
-        URL imageUrl = GUIGlobals.getIconUrl(name);
-        return imageUrl != null ? new ImageIcon(GUIGlobals.getIconUrl(name)) : null;
-    }
-
-    /**
-     * Get a Map of all application icons mapped from their keys.
-     *
-     * @return A Map containing all icons used in the application.
-     */
-    public static Map<String, String> getAllIcons() {
-        return Collections.unmodifiableMap(GUIGlobals.iconMap);
-    }
-
-    /**
-     * Read a typical java property file into a HashMap. Currently doesn't support escaping
-     * of the '=' character - it simply looks for the first '=' to determine where the key ends.
-     * Both the key and the value is trimmed for whitespace at the ends.
-     *
-     * @param file   The URL to read information from.
-     * @param prefix A String to prefix to all values read. Can represent e.g. the directory
-     *               where icon files are to be found.
-     * @return A HashMap containing all key-value pairs found.
-     * @throws IOException
-     */
-    private static HashMap<String, String> readIconThemeFile(URL file, String prefix) throws IOException {
-        HashMap<String, String> map = new HashMap<>();
-
-        try (InputStream in = file.openStream()) {
-
-            StringBuilder buffer = new StringBuilder();
-            int c;
-            while ((c = in.read()) != -1) {
-                buffer.append((char) c);
-            }
-            String[] lines = buffer.toString().split("\n");
-            for (String line1 : lines) {
-                String line = line1.trim();
-                int index = line.indexOf("=");
-                if (index >= 0) {
-                    String key = line.substring(0, index).trim();
-                    String value = prefix + line.substring(index + 1).trim();
-                    map.put(key, value);
-                }
-            }
-        }
-        return map;
-    }
-
-    /**
      * returns the path to language independent help files
      */
     public static String getLocaleHelpPath() {
@@ -368,28 +235,28 @@ public class GUIGlobals {
     public static void init() {
         GUIGlobals.typeNameFont = new Font("dialog", Font.ITALIC + Font.BOLD, 18);
         JLabel label;
-        label = new JLabel(GUIGlobals.getImage("pdfSmall"));
+        label = new JLabel(IconTheme.getImage("pdfSmall"));
         label.setToolTipText(Localization.lang("Open") + " PDF");
         GUIGlobals.tableIcons.put("pdf", label);
-        label = new JLabel(GUIGlobals.getImage("wwwSmall"));
+        label = new JLabel(IconTheme.getImage("wwwSmall"));
         label.setToolTipText(Localization.lang("Open") + " URL");
         GUIGlobals.tableIcons.put("url", label);
-        label = new JLabel(GUIGlobals.getImage("citeseer"));
+        label = new JLabel(IconTheme.getImage("citeseer"));
         label.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
         GUIGlobals.tableIcons.put("citeseerurl", label);
-        label = new JLabel(GUIGlobals.getImage("arxiv"));
+        label = new JLabel(IconTheme.getImage("arxiv"));
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
         GUIGlobals.tableIcons.put("eprint", label);
-        label = new JLabel(GUIGlobals.getImage("doiSmall"));
+        label = new JLabel(IconTheme.getImage("doiSmall"));
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.tableIcons.put("doi", label);
-        label = new JLabel(GUIGlobals.getImage("psSmall"));
+        label = new JLabel(IconTheme.getImage("psSmall"));
         label.setToolTipText(Localization.lang("Open") + " PS");
         GUIGlobals.tableIcons.put("ps", label);
-        label = new JLabel(GUIGlobals.getImage("psSmall"));
+        label = new JLabel(IconTheme.getImage("psSmall"));
         label.setToolTipText(Localization.lang("Open folder"));
         GUIGlobals.tableIcons.put(GUIGlobals.FOLDER_FIELD, label);
-        label = new JLabel(GUIGlobals.getImage("psSmall"));
+        label = new JLabel(IconTheme.getImage("psSmall"));
         label.setToolTipText(Localization.lang("Open file"));
         GUIGlobals.tableIcons.put(GUIGlobals.FILE_FIELD, label);
 

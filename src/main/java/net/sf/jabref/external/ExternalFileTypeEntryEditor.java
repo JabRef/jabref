@@ -25,7 +25,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
@@ -33,6 +32,7 @@ import net.sf.jabref.gui.FileDialogs;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 
@@ -49,7 +49,7 @@ public class ExternalFileTypeEntryEditor {
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
     private String selectedIcon;
-    private final JButton icon = new JButton(GUIGlobals.getImage("picture"));
+    private final JButton icon = new JButton(IconTheme.getImage("picture"));
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
@@ -150,7 +150,7 @@ public class ExternalFileTypeEntryEditor {
                 ic.setVisible(true);
                 if (ic.isOkPressed()) {
                     selectedIcon = ic.getSelectedIconKey();
-                    icon.setIcon(GUIGlobals.getImage(selectedIcon));
+                    icon.setIcon(IconTheme.getImage(selectedIcon));
                 }
                 //JOptionPane.showMessageDialog(null, "Sorry, the icon can unfortunately not be changed in this version of JabRef");
             }

@@ -1,6 +1,6 @@
 package net.sf.jabref;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,9 +15,7 @@ public class SearchTextListenerTest {
 
     @Before
     public void setUp() throws Exception {
-
         Globals.prefs = JabRefPreferences.getInstance();
-        GUIGlobals.setUpIconTheme();
     }
 
     @Test

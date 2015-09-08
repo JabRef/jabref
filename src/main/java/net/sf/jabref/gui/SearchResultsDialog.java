@@ -80,8 +80,8 @@ public class SearchResultsDialog {
     private final int FILE_COL = 0;
     private final int URL_COL = 1;
     private final int PAD = 2;
-    private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
-    private final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
+    private final JLabel fileLabel = new JLabel(IconTheme.getImage("psSmall"));
+    private final JLabel urlLabel = new JLabel(IconTheme.getImage("wwwSmall"));
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 

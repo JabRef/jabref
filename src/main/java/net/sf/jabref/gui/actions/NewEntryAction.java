@@ -20,7 +20,7 @@ public class NewEntryAction extends MnemonicAwareAction {
 
     public NewEntryAction(JabRefFrame jabRefFrame, KeyStroke key) {
         // This action leads to a dialog asking for entry type.
-        super(GUIGlobals.getImage("add"));
+        super(IconTheme.getImage("add"));
         this.jabRefFrame = jabRefFrame;
         putValue(Action.NAME, "New entry");
         putValue(Action.ACCELERATOR_KEY, key);

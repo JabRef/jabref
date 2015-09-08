@@ -9,7 +9,7 @@ import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -50,7 +50,7 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public Icon getIcon() {
-        return GUIGlobals.getImage("texstudio");
+        return IconTheme.getImage("texstudio");
     }
 
     @Override

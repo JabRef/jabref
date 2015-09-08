@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ public class CopyAction extends AbstractAction {
 
         putValue(Action.NAME, Localization.lang("Copy to clipboard"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy to clipboard"));
-        putValue(Action.SMALL_ICON, GUIGlobals.getImage("copy"));
+        putValue(Action.SMALL_ICON, IconTheme.getImage("copy"));
     }
 
     @Override

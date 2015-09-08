@@ -19,24 +19,24 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class ReadStatus extends SpecialField {
 
     private static ReadStatus INSTANCE;
 
-    private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
+    private final ImageIcon icon = new ImageIcon(IconTheme.getIconUrl("readstatus"));
 
 
     private ReadStatus() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
         ImageIcon icon;
-        icon = GUIGlobals.getImage("readStatusRead");
+        icon = IconTheme.getImage("readStatusRead");
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Localization.lang("Set read status to read"), icon, Localization.lang("Read status read")));
-        icon = GUIGlobals.getImage("readStatusSkimmed");
+        icon = IconTheme.getImage("readStatusSkimmed");
         values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), icon, Localization.lang("Read status skimmed")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";

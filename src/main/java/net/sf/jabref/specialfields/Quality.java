@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class Quality extends SpecialField {
@@ -30,7 +30,7 @@ public class Quality extends SpecialField {
     private Quality() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         // DO NOT TRANSLATE "qualityAssured" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Localization.lang("Toogle quality assured"), GUIGlobals.getImage("qualityAssured"), Localization.lang("Toogle quality assured")));
+        values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Localization.lang("Toogle quality assured"), IconTheme.getImage("qualityAssured"), Localization.lang("Toogle quality assured")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled quality for %0 entries";
     }

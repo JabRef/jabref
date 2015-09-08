@@ -15,16 +15,13 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FileListEntry;
 
 import javax.swing.*;
 
@@ -47,7 +44,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         this.panel = panel;
         this.editor = editor;
         putValue(Action.NAME, Localization.lang("Write XMP")); // normally, this call should be without "Globals.lang". However, the string "Write XMP" is also used in non-menu places and therefore, the translation must be also available at Globals.lang()
-        putValue(Action.SMALL_ICON, GUIGlobals.getImage("pdfSmall"));
+        putValue(Action.SMALL_ICON, IconTheme.getImage("pdfSmall"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
     }
 

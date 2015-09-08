@@ -55,9 +55,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.integrity.IntegrityCheck;
@@ -225,10 +225,10 @@ public class IntegrityMessagePanel
     class IntegrityListRenderer extends DefaultListCellRenderer
     {
 
-        final ImageIcon warnIcon = GUIGlobals.getImage("integrityWarn");
-        final ImageIcon infoIcon = GUIGlobals.getImage("integrityInfo");
-        final ImageIcon failIcon = GUIGlobals.getImage("integrityFail");
-        final ImageIcon fixedIcon = GUIGlobals.getImage("complete");
+        final ImageIcon warnIcon = IconTheme.getImage("integrityWarn");
+        final ImageIcon infoIcon = IconTheme.getImage("integrityInfo");
+        final ImageIcon failIcon = IconTheme.getImage("integrityFail");
+        final ImageIcon fixedIcon = IconTheme.getImage("complete");
 
 
         @Override

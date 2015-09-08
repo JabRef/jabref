@@ -20,10 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;
@@ -41,7 +38,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
 
     /** Creates a new instance of SaveAllAction */
     public SaveAllAction(JabRefFrame frame) {
-        super(GUIGlobals.getImage("saveAll"));
+        super(IconTheme.getImage("saveAll"));
         this.frame = frame;
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Save all"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open databases"));

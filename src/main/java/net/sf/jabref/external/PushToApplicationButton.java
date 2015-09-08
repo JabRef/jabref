@@ -17,8 +17,8 @@ package net.sf.jabref.external;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
@@ -57,7 +57,7 @@ public class PushToApplicationButton implements ActionListener {
     private JPopupMenu popup;
     private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
     private final Dimension buttonDim = new Dimension(23, 23);
-    private static final URL ARROW_ICON = GUIGlobals.getIconUrl("secondary_sorted_reverse");
+    private static final URL ARROW_ICON = IconTheme.getIconUrl("secondary_sorted_reverse");
     private final MenuAction mAction = new MenuAction();
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));

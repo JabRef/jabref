@@ -17,7 +17,7 @@ package net.sf.jabref.external;
 
 import javax.swing.*;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.
@@ -141,7 +141,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     public void setIconName(String name) {
         this.iconName = name;
         try {
-            this.icon = GUIGlobals.getImage(iconName);
+            this.icon = IconTheme.getImage(iconName);
         } catch (NullPointerException ex) {
             // Loading the icon failed. This could be because the icons have not been
             // initialized, which will be the case if we are operating from the command

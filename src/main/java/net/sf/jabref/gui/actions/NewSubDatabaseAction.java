@@ -3,10 +3,7 @@ package net.sf.jabref.gui.actions;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
@@ -22,7 +19,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
     private JabRefFrame jabRefFrame;
 
     public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
-        super(GUIGlobals.getImage("new"));
+        super(IconTheme.getImage("new"));
         this.jabRefFrame = jabRefFrame;
         putValue(Action.NAME, "New subdatabase based on AUX file");
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX subdatabase"));

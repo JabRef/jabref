@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.id.IdGenerator;
@@ -141,7 +142,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         { // Help Button
             HelpAction helpAction = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.previewHelp,
-                    Localization.lang("Help on Preview Settings"), GUIGlobals.getIconUrl("helpSmall"));
+                    Localization.lang("Help on Preview Settings"), IconTheme.getIconUrl("helpSmall"));
             JButton help = helpAction.getIconButton();
             pdfPreviewPanel.add(help, BorderLayout.EAST);
         }

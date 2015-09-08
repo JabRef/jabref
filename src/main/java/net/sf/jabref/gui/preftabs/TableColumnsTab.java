@@ -35,6 +35,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
@@ -283,7 +284,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** begin: special table columns and special fields ***/
 
         HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
-        JButton helpButton = new JButton(GUIGlobals.getImage("helpSmall"));
+        JButton helpButton = new JButton(IconTheme.getImage("helpSmall"));
         helpButton.setToolTipText(Localization.lang("Help on special fields"));
         helpButton.addActionListener(help);
 
@@ -472,7 +473,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", GUIGlobals.getImage("remove"));
+            super("Delete row", IconTheme.getImage("remove"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -502,7 +503,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", GUIGlobals.getImage("add"));
+            super("Add row", IconTheme.getImage("add"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
@@ -553,7 +554,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowUpAction extends AbstractMoveRowAction {
 
         public MoveRowUpAction() {
-            super("Up", GUIGlobals.getImage("up"));
+            super("Up", IconTheme.getImage("up"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
         }
 
@@ -586,7 +587,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowDownAction extends AbstractMoveRowAction {
 
         public MoveRowDownAction() {
-            super("Down", GUIGlobals.getImage("down"));
+            super("Down", IconTheme.getImage("down"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
         }
 

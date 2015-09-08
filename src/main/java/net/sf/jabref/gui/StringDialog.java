@@ -388,7 +388,7 @@ class StringDialog extends JDialog {
 
         public NewStringAction(StringDialog parent) {
             super("New string",
-                    GUIGlobals.getImage("add"));
+                    IconTheme.getImage("add"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("New string"));
             this.parent = parent;
         }
@@ -459,7 +459,7 @@ class StringDialog extends JDialog {
 
         public StoreContentAction(StringDialog parent) {
             super("Store string",
-                    GUIGlobals.getImage("add"));
+                    IconTheme.getImage("add"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Store string"));
             this.parent = parent;
         }
@@ -477,7 +477,7 @@ class StringDialog extends JDialog {
 
         public RemoveStringAction(StringDialog parent) {
             super("Remove selected strings",
-                    GUIGlobals.getImage("remove"));
+                    IconTheme.getImage("remove"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Remove selected strings"));
             this.parent = parent;
         }
@@ -598,7 +598,7 @@ class StringDialog extends JDialog {
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", GUIGlobals.getImage("undo"));
+            super("Undo", IconTheme.getImage("undo"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Undo"));
         }
 
@@ -615,7 +615,7 @@ class StringDialog extends JDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Undo", GUIGlobals.getImage("redo"));
+            super("Undo", IconTheme.getImage("redo"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Redo"));
         }
 

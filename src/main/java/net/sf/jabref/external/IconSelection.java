@@ -36,9 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.gui.GUIGlobals;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -90,10 +89,10 @@ class IconSelection extends JDialog {
     private void init(String initialSelection) {
         int initSelIndex = -1;
         iconKeys = new ArrayList<String>();
-        Map<String, String> icns = GUIGlobals.getAllIcons();
+        Map<String, String> icns = IconTheme.getAllIcons();
         HashSet<ImageIcon> iconSet = new LinkedHashSet<ImageIcon>();
         for (String key : icns.keySet()) {
-            ImageIcon icon = GUIGlobals.getImage(key);
+            ImageIcon icon = IconTheme.getImage(key);
             if (!iconSet.contains(icon)) {
                 iconKeys.add(key);
                 if (key.equals(initialSelection)) {

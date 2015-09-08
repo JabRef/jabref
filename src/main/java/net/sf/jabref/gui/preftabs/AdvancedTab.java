@@ -33,6 +33,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -74,7 +75,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         this.remotePreferences = new RemotePreferences(preferences);
 
         HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
-                GUIGlobals.getIconUrl("helpSmall"));
+                IconTheme.getIconUrl("helpSmall"));
         useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useNativeFileDialogOnMac = new JCheckBox(Localization.lang("Use native file dialog"));

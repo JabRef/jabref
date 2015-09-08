@@ -56,7 +56,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
     private final JTextField tf = new JTextField();
     private final JButton helpBut = new JButton(
-            GUIGlobals.getImage("helpSmall"));
+            IconTheme.getImage("helpSmall"));
     private final JComboBox fetcherChoice;
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
@@ -71,7 +71,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
-        super(p0, GUIGlobals.getIconUrl("www"), Localization.lang("Web search"));
+        super(p0, IconTheme.getIconUrl("www"), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
         List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
@@ -305,7 +305,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     class FetcherAction extends AbstractAction {
 
         public FetcherAction() {
-            super(Localization.lang("Web search"), GUIGlobals.getImage("www"));
+            super(Localization.lang("Web search"), IconTheme.getImage("www"));
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
         }

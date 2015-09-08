@@ -25,7 +25,7 @@ import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -67,7 +67,7 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public Icon getIcon() {
-        return GUIGlobals.getImage("emacs");
+        return IconTheme.getImage("emacs");
     }
 
     @Override

@@ -28,6 +28,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
@@ -141,7 +142,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(regExpTextField);
 
         HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-                Localization.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
+                Localization.lang("Help on Regular Expression Search"), IconTheme.getIconUrl("helpSmall"));
         builder.append(helpAction.getIconButton());
         builder.nextLine();
         builder.append(new JPanel());

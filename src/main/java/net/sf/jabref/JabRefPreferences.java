@@ -227,8 +227,6 @@ public class JabRefPreferences {
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String HISTORY_SIZE = "historySize";
-    public static final String CUSTOM_ICON_THEME_FILE = "customIconThemeFile";
-    public static final String USE_CUSTOM_ICON_THEME = "useCustomIconTheme";
     public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -635,9 +633,6 @@ public class JabRefPreferences {
         // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
         defaults.put(GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;"
                 + "pdf;comment;owner");
-
-        defaults.put(USE_CUSTOM_ICON_THEME, Boolean.FALSE);
-        defaults.put(CUSTOM_ICON_THEME_FILE, "/home/alver/div/crystaltheme_16/Icons.properties");
 
         defaults.put(HISTORY_SIZE, 8);
         defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
