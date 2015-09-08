@@ -261,7 +261,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction cut = new EditAction(Actions.CUT, GUIGlobals.getIconUrl("cut"));
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, "Mark entries",
             Localization.lang("Mark entries"),
-            prefs.getKey(Actions.MARK_ENTRIES));
+            prefs.getKey(KeyBinds.MARK_ENTRIES));
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES, "Unmark entries",
             Localization.lang("Unmark entries"),
             prefs.getKey(KeyBinds.UNMARK_ENTRIES));
