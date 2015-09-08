@@ -234,11 +234,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
             "Save selected as ...",
             Localization.lang("Save selected as ..."),
-            IconTheme.getIconUrl("saveAs"));
+            IconTheme.getImage("saveAs"));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             "Save selected as plain BibTeX ...",
             Localization.lang("Save selected as plain BibTeX ..."),
-            IconTheme.getIconUrl("saveAs"));
+            IconTheme.getImage("saveAs"));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
@@ -251,9 +251,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction redo = new GeneralAction(Actions.REDO, "Redo", Localization.lang("Redo"),
             prefs.getKey(KeyBinds.REDO));
     final AbstractAction forward = new GeneralAction(Actions.FORWARD, "Forward", Localization.lang("Forward"),
-            "right", prefs.getKey(KeyBinds.FORWARD));
+            IconTheme.getImage("right"), prefs.getKey(KeyBinds.FORWARD));
     final AbstractAction back = new GeneralAction(Actions.BACK, "Back", Localization.lang("Back"),
-            "left", prefs.getKey(KeyBinds.BACK));
+            IconTheme.getImage("left"), prefs.getKey(KeyBinds.BACK));
     private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", Localization.lang("Delete"),
             prefs.getKey(KeyBinds.DELETE));
     private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.getIconUrl("copy"));
@@ -301,7 +301,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
             "Append database",
             Localization.lang("Append contents from a BibTeX database into the currently viewed database"),
-            IconTheme.getIconUrl("open"));
+            IconTheme.getImage("open"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, "Select all",
             prefs.getKey(KeyBinds.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL, "Replace string",
@@ -333,11 +333,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             "Highlight groups matching any selected entry",
             Localization.lang("Highlight groups matching any selected entry"),
-            IconTheme.getIconUrl("groupsHighlightAny"));
+            IconTheme.getImage("groupsHighlightAny"));
     private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             "Highlight groups matching all selected entries",
             Localization.lang("Highlight groups matching all selected entries"),
-            IconTheme.getIconUrl("groupsHighlightAll"));
+            IconTheme.getImage("groupsHighlightAll"));
     final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             "Switch preview layout",
             prefs.getKey(KeyBinds.SWITCH_PREVIEW_LAYOUT));
@@ -399,20 +399,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT, "Connect to external SQL database",
             Localization.lang("Connect to external SQL database"),
-            IconTheme.getIconUrl("dbConnect"));
+            IconTheme.getImage("dbConnect"));
 
     private final AbstractAction dbExport = new GeneralAction(Actions.DB_EXPORT, "Export to external SQL database",
             Localization.lang("Export to external SQL database"),
-            IconTheme.getIconUrl("dbExport"));
+            IconTheme.getImage("dbExport"));
 
     private final AbstractAction Cleanup = new GeneralAction(Actions.CLEANUP, "Cleanup entries",
             Localization.lang("Cleanup entries"),
             prefs.getKey(KeyBinds.CLEANUP),
-            "cleanupentries");
+            IconTheme.getImage("cleanupentries"));
 
     private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES, "Merge entries",
             Localization.lang("Merge entries"),
-            IconTheme.getIconUrl("mergeentries"));
+            IconTheme.getImage("mergeentries"));
 
     private final AbstractAction dbImport = new DbImportAction(this).getAction();
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
@@ -428,7 +428,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_TITLE,
             FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
-            FindUnlinkedFilesDialog.ACTION_ICON,
+            IconTheme.getImage(FindUnlinkedFilesDialog.ACTION_ICON),
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION)
     );
 
@@ -1091,17 +1091,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         private final String command;
 
         public GeneralAction(String command, String text,
-                             String description, URL icon) {
-            super(new ImageIcon(icon));
+                             String description, ImageIcon icon) {
+            super(icon);
             this.command = command;
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
         public GeneralAction(String command, String text,
-                             String description, String imageName,
+                             String description, ImageIcon icon,
                              KeyStroke key) {
-            super(IconTheme.getImage(imageName));
+            super(icon);
             this.command = command;
             putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);
@@ -1120,32 +1120,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         public GeneralAction(String command, String text, String description) {
+            super(IconTheme.getImage(command));
             this.command = command;
-            ImageIcon icon = IconTheme.getImage(command);
-            if (icon != null) {
-                putValue(Action.SMALL_ICON, icon);
-            }
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
         public GeneralAction(String command, String text, String description, KeyStroke key) {
+            super(IconTheme.getImage(command));
             this.command = command;
-            ImageIcon icon = IconTheme.getImage(command);
-            if (icon != null) {
-                putValue(Action.SMALL_ICON, icon);
-            }
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
-        public GeneralAction(String command, String text, String description, KeyStroke key, String imageUrl) {
+        public GeneralAction(String command, String text, String description, KeyStroke key, ImageIcon icon) {
+            super(icon);
             this.command = command;
-            ImageIcon icon = IconTheme.getImage(imageUrl);
-            if (icon != null) {
-                putValue(Action.SMALL_ICON, icon);
-            }
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
             putValue(Action.ACCELERATOR_KEY, key);
