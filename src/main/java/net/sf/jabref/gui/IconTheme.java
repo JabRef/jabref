@@ -5,8 +5,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -19,8 +21,7 @@ public class IconTheme {
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/crystal_16/Icons.properties"), "/images/crystal_16/");
-    private static final URL DEFAULT_ICON_URL = IconTheme.class.getResource("/images/crystal_16/red.png");
-
+    private static final String DEFAULT_ICON_PATH = "/images/crystal_16/red.png";
 
     /**
      * Looks up the URL for the image representing the given function, in the resource
@@ -30,18 +31,8 @@ public class IconTheme {
      * @return The URL to the actual image to use.
      */
     public static URL getIconUrl(String name) {
-        if (KEY_TO_ICON.containsKey(name)) {
-            String path = KEY_TO_ICON.get(name);
-            URL url = IconTheme.class.getResource(path);
-            if (url == null) {
-                LOGGER.warn(Localization.lang("Could not find image file") + " '" + path + '\'');
-                return DEFAULT_ICON_URL;
-            } else {
-                return url;
-            }
-        } else {
-            return DEFAULT_ICON_URL;
-        }
+        String path = KEY_TO_ICON.getOrDefault(Objects.requireNonNull(name, "icon name"), DEFAULT_ICON_PATH);
+        return Objects.requireNonNull(IconTheme.class.getResource(path), "url");
     }
 
     /**
@@ -65,35 +56,32 @@ public class IconTheme {
     }
 
     /**
-     * Read a typical java property file into a Map. Currently doesn't support escaping
+     * Read a typical java property url into a Map. Currently doesn't support escaping
      * of the '=' character - it simply looks for the first '=' to determine where the key ends.
      * Both the key and the value is trimmed for whitespace at the ends.
      *
-     * @param file   The URL to read information from.
+     * @param url   The URL to read information from.
      * @param prefix A String to prefix to all values read. Can represent e.g. the directory
      *               where icon files are to be found.
      * @return A Map containing all key-value pairs found.
      */
-    private static Map<String, String> readIconThemeFile(URL file, String prefix) {
-        Objects.requireNonNull(file, "passed URL to file must be not null");
+    private static Map<String, String> readIconThemeFile(URL url, String prefix) {
+        Objects.requireNonNull(url, "url");
+        Objects.requireNonNull(prefix, "prefix");
 
         Map<String, String> result = new HashMap<>();
 
-        try (InputStream in = file.openStream()) {
-            StringBuilder buffer = new StringBuilder();
-            int c;
-            while ((c = in.read()) != -1) {
-                buffer.append((char) c);
-            }
-            String[] lines = buffer.toString().split("\n");
-            for (String line1 : lines) {
-                String line = line1.trim();
-                int index = line.indexOf("=");
-                if (index >= 0) {
-                    String key = line.substring(0, index).trim();
-                    String value = prefix + line.substring(index + 1).trim();
-                    result.put(key, value);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            String line;
+            while((line = in.readLine()) != null) {
+                if(!line.contains("=")) {
+                    continue;
                 }
+
+                int index = line.indexOf("=");
+                String key = line.substring(0, index).trim();
+                String value = prefix + line.substring(index + 1).trim();
+                result.put(key, value);
             }
         } catch (IOException e) {
             LOGGER.warn(Localization.lang("Unable to read default icon theme."), e);
