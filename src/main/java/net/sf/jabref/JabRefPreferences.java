@@ -36,8 +36,7 @@ import java.net.UnknownHostException;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
@@ -54,8 +53,6 @@ import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
-import net.sf.jabref.gui.CleanUpAction;
-import net.sf.jabref.gui.PersistenceTableColumnListener;
 import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -376,7 +373,7 @@ public class JabRefPreferences {
     // Map containing all registered external file types:
     private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
-    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www");
+    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.getImage("www"));
 
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
@@ -1389,29 +1386,29 @@ public class JabRefPreferences {
 
     public List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<ExternalFileType>();
-        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall"));
-        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall"));
-        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice"));
-        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice"));
-        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice"));
-        list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice"));
-        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice"));
-        list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture"));
-        list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture"));
-        list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture"));
-        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall"));
-        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs"));
-        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs"));
-        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www"));
-        list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture"));
-        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www"));
-        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www"));
-        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www"));
+        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.getImage("pdfSmall")));
+        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.getImage("psSmall")));
+        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture", IconTheme.getImage("picture")));
+        list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture", IconTheme.getImage("picture")));
+        list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture", IconTheme.getImage("picture")));
+        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.getImage("psSmall")));
+        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.getImage("emacs")));
+        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.getImage("emacs")));
+        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.getImage("www")));
+        list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture", IconTheme.getImage("picture")));
+        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.getImage("www")));
+        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.getImage("www")));
+        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.getImage("www")));
 
         // On all OSes there is a generic application available to handle file opening,
         // so we don't need the default application settings anymore:

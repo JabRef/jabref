@@ -246,6 +246,7 @@ public class ExternalFileTypeEntryEditor {
 
         if (selectedIcon != null) {
             entry.setIconName(selectedIcon);
+            entry.setIcon(IconTheme.getImage(entry.getIconName()));
         }
         if (!OS.WINDOWS) {
             entry.setOpenWith(application.getText().trim());

@@ -221,7 +221,7 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new");
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.getImage("new"));
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
