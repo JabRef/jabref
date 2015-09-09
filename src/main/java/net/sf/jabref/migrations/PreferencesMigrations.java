@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 public class PreferencesMigrations {
+
     /**
      * This method is called at startup, and makes necessary adaptations to
      * preferences for users from an earlier version of Jabref.
