@@ -8,24 +8,24 @@
 
 LicenseLangString JabRefLicenseData ${JabRef_LANG} "${PRODUCT_LICENSE_FILE}"
 
-LangString WelcomePageText "${JabRef_LANG}" "Р’Р°СЃ РїСЂРёРІРµС‚СЃС‚РІСѓРµС‚ РјР°СЃС‚РµСЂ СѓСЃС‚Р°РЅРѕРІРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ JabRef!\r\n\
+LangString WelcomePageText "${JabRef_LANG}" "Вас приветствует мастер установки приложения JabRef!\r\n\
 					     \r\n\
 					     $_CLICK"
 
-LangString SecAssociateBibTitle "${JabRef_LANG}" "РЎРІСЏР·Р°С‚СЊ СЃ С„Р°Р№Р»Р°РјРё BibTeX"
-LangString SecDesktopTitle "${JabRef_LANG}" "Р—РЅР°С‡РѕРє РЅР° СЂР°Р±РѕС‡РµРј СЃС‚РѕР»Рµ"
+LangString SecAssociateBibTitle "${JabRef_LANG}" "Связать с файлами BibTeX"
+LangString SecDesktopTitle "${JabRef_LANG}" "Значок на рабочем столе"
 
-LangString SecAssociateBibDescription "${JabRef_LANG}" "Р¤Р°Р№Р»С‹ СЃ СЂР°СЃС€РёСЂРµРЅРёРµРј .bib Р±СѓРґСѓС‚ РѕС‚РєСЂС‹РІР°С‚СЊСЃСЏ СЃ РїРѕРјРѕС‰СЊСЋ РїСЂРёР»РѕР¶РµРЅРёСЏ JabRef РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ."
-LangString SecDesktopDescription "${JabRef_LANG}" "РџРѕРјРµСЃС‚РёС‚СЊ Р·РЅР°С‡РѕРє РїСЂРёР»РѕР¶РµРЅРёСЏ JabRef РЅР° СЂР°Р±РѕС‡РёР№ СЃС‚РѕР»."
+LangString SecAssociateBibDescription "${JabRef_LANG}" "Файлы с расширением .bib будут открываться с помощью приложения JabRef по умолчанию."
+LangString SecDesktopDescription "${JabRef_LANG}" "Поместить значок приложения JabRef на рабочий стол."
 
-LangString StillInstalled "${JabRef_LANG}" "РЎСѓС‰РµСЃС‚РІСѓРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ СЌРєР·РµРјРїР»СЏСЂ РїСЂРёР»РѕР¶РµРЅРёСЏ JabRef ${Version}!"
+LangString StillInstalled "${JabRef_LANG}" "Существует установленный экземпляр приложения JabRef ${Version}!"
 
-LangString FinishPageMessage "${JabRef_LANG}" "РџРѕР·РґСЂР°РІР»СЏРµРј! РџСЂРёР»РѕР¶РµРЅРёРµ JabRef СѓСЃРїРµС€РЅРѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ."
-LangString FinishPageRun "${JabRef_LANG}" "Р—Р°РїСѓСЃС‚РёС‚СЊ JabRef"
+LangString FinishPageMessage "${JabRef_LANG}" "Поздравляем! Приложение JabRef успешно установлено."
+LangString FinishPageRun "${JabRef_LANG}" "Запустить JabRef"
 
-LangString UnNotAdminLabel "${JabRef_LANG}" "Р”Р»СЏ СѓРґР°Р»РµРЅРёСЏ РїСЂРёР»РѕР¶РµРЅРёСЏ JabRef РІС‹ РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РїСЂР°РІР° Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°!"
-LangString UnReallyRemoveLabel "${JabRef_LANG}" "РџСЂРёР»РѕР¶РµРЅРёРµ JabRef Р±СѓРґРµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ СѓРґР°Р»РµРЅРѕ. РџСЂРѕРґРѕР»Р¶РёС‚СЊ?"
-LangString UnRemoveSuccessLabel "${JabRef_LANG}" "РџСЂРёР»РѕР¶РµРЅРёРµ JabRef СѓСЃРїРµС€РЅРѕ СѓРґР°Р»РµРЅРѕ."
+LangString UnNotAdminLabel "${JabRef_LANG}" "Для удаления приложения JabRef вы должны иметь права администратора!"
+LangString UnReallyRemoveLabel "${JabRef_LANG}" "Приложение JabRef будет полностью удалено. Продолжить?"
+LangString UnRemoveSuccessLabel "${JabRef_LANG}" "Приложение JabRef успешно удалено."
 
 
 !undef JabRef_LANG
