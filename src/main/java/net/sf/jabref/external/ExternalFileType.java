@@ -140,15 +140,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      */
     public void setIconName(String name) {
         this.iconName = name;
-        try {
-            this.icon = IconTheme.getImage(iconName);
-        } catch (NullPointerException ex) {
-            // Loading the icon failed. This could be because the icons have not been
-            // initialized, which will be the case if we are operating from the command
-            // line and the graphical interface hasn't been initialized. In that case
-            // we will do without the icon:
-            this.icon = null;
-        }
+        this.icon = IconTheme.getImage(iconName);
         label.setIcon(this.icon);
     }
 
