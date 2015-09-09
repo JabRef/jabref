@@ -24,19 +24,12 @@ public class IconTheme {
     private static final String DEFAULT_ICON_PATH = "/images/crystal_16/red.png";
 
     /**
-     * Looks up the URL for the image representing the given function, in the resource
-     * file listing images.
+     * Get a Map of all application icons mapped from their keys.
      *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The URL to the actual image to use.
+     * @return A Map containing all icons used in the application.
      */
-    public static URL getIconUrl(String name) {
-        String key = Objects.requireNonNull(name, "icon name");
-        if(!KEY_TO_ICON.containsKey(key)) {
-            LOGGER.warn("could not find icon url by name " + name + ", so falling back on default icon " + DEFAULT_ICON_PATH);
-        }
-        String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
-        return Objects.requireNonNull(IconTheme.class.getResource(path), "url");
+    public static Map<String, String> getAllIcons() {
+        return Collections.unmodifiableMap(KEY_TO_ICON);
     }
 
     /**
@@ -51,12 +44,19 @@ public class IconTheme {
     }
 
     /**
-     * Get a Map of all application icons mapped from their keys.
+     * Looks up the URL for the image representing the given function, in the resource
+     * file listing images.
      *
-     * @return A Map containing all icons used in the application.
+     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
+     * @return The URL to the actual image to use.
      */
-    public static Map<String, String> getAllIcons() {
-        return Collections.unmodifiableMap(KEY_TO_ICON);
+    private static URL getIconUrl(String name) {
+        String key = Objects.requireNonNull(name, "icon name");
+        if(!KEY_TO_ICON.containsKey(key)) {
+            LOGGER.warn("could not find icon url by name " + name + ", so falling back on default icon " + DEFAULT_ICON_PATH);
+        }
+        String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
+        return Objects.requireNonNull(IconTheme.class.getResource(path), "url");
     }
 
     /**

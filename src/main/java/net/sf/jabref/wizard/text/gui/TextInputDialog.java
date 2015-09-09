@@ -570,7 +570,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            super("Paste", "Paste from clipboard", IconTheme.getIconUrl("paste"));
+            super("Paste", "Paste from clipboard", IconTheme.getImage("paste"));
         }
 
         @Override
@@ -592,7 +592,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            super("Open", "Open_file", IconTheme.getIconUrl("open"));
+            super("Open", "Open_file", IconTheme.getImage("open"));
         }
 
         @Override
@@ -616,7 +616,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            super("Clear", "Clear_inputarea", IconTheme.getIconUrl("new"));
+            super("Clear", "Clear_inputarea", IconTheme.getImage("new"));
         }
 
         @Override
@@ -744,8 +744,8 @@ class PopupListener extends MouseAdapter {
 }
 
 abstract class BasicAction extends AbstractAction {
-    public BasicAction(String text, String description, URL icon) {
-        super(Localization.lang(text), new ImageIcon(icon));
+    public BasicAction(String text, String description, ImageIcon icon) {
+        super(Localization.lang(text), icon);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }
 

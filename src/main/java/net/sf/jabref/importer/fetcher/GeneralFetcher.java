@@ -71,7 +71,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
-        super(p0, IconTheme.getIconUrl("www"), Localization.lang("Web search"));
+        super(p0, IconTheme.getImage("www"), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
         List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();

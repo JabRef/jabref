@@ -168,7 +168,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     public void init(JabRefFrame frame, SidePaneManager manager) {
         OpenOfficePanel.frame = frame;
         this.manager = manager;
-        comp = new OOPanel(manager, IconTheme.getIconUrl("openoffice"), Localization.lang("OpenOffice"));
+        comp = new OOPanel(manager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"));
         try {
             initPanel();
             manager.register(getName(), comp);
@@ -1069,7 +1069,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     class OOPanel extends SidePaneComponent {
 
-        public OOPanel(SidePaneManager sidePaneManager, URL url, String s) {
+        public OOPanel(SidePaneManager sidePaneManager, ImageIcon url, String s) {
             super(sidePaneManager, url, s);
         }
 

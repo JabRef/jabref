@@ -42,9 +42,9 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     protected BasePanel panel;
 
 
-    public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
+    public SidePaneComponent(SidePaneManager manager, ImageIcon icon, String title) {
         super(title);
-        this.add(new JLabel(new ImageIcon(icon)));
+        this.add(new JLabel(icon));
         this.manager = manager;
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));

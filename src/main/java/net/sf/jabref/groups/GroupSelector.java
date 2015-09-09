@@ -121,7 +121,7 @@ public class GroupSelector extends SidePaneComponent implements
      * quicksearch. The next two define the name and regexp for the group.
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.getIconUrl("toggleGroups"), Localization.lang("Groups"));
+        super(manager, IconTheme.getImage("toggleGroups"), Localization.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
 
         this.frame = frame;

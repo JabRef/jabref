@@ -214,10 +214,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey("Help"));
     private final AbstractAction contents = new HelpAction("Help contents", helpDiag,
             GUIGlobals.helpContents, Localization.lang("Help contents"),
-            IconTheme.getIconUrl("helpContents"));
+            IconTheme.getImage("helpContents"));
     private final AbstractAction about = new HelpAction("About JabRef", helpDiag,
             GUIGlobals.aboutPage, Localization.lang("About JabRef"),
-            IconTheme.getIconUrl("about"));
+            IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, "Edit entry",
             Localization.lang("Edit entry"),
             prefs.getKey(KeyBinds.EDIT_ENTRY),
@@ -262,9 +262,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", Localization.lang("Delete"),
             prefs.getKey(KeyBinds.DELETE),
             IconTheme.getImage("delete"));
-    private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.getIconUrl("copy"));
-    private final AbstractAction paste = new EditAction(Actions.PASTE, IconTheme.getIconUrl("paste"));
-    private final AbstractAction cut = new EditAction(Actions.CUT, IconTheme.getIconUrl("cut"));
+    private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.getImage("copy"));
+    private final AbstractAction paste = new EditAction(Actions.PASTE, IconTheme.getImage("paste"));
+    private final AbstractAction cut = new EditAction(Actions.CUT, IconTheme.getImage("cut"));
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, "Mark entries",
             Localization.lang("Mark entries"),
             prefs.getKey(KeyBinds.MARK_ENTRIES),
@@ -2308,8 +2308,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class EditAction extends MnemonicAwareAction {
         private final String command;
 
-        public EditAction(String command, URL icon) {
-            super(new ImageIcon(icon));
+        public EditAction(String command, ImageIcon icon) {
+            super(icon);
             this.command = command;
             String nName = StringUtil.capitalizeFirst(command);
             putValue(Action.NAME, nName);

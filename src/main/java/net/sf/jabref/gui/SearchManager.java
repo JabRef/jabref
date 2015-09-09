@@ -86,7 +86,7 @@ public class SearchManager extends SidePaneComponent
     // that the search is inactive.
 
     public SearchManager(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.getIconUrl("search"), Localization.lang("Search"));
+        super(manager, IconTheme.getImage("search"), Localization.lang("Search"));
 
         this.frame = frame;
         incSearcher = new IncrementalSearcher(Globals.prefs);
