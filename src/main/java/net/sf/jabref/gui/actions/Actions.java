@@ -4,6 +4,7 @@ package net.sf.jabref.gui.actions;
  * Global String constants for GUI actions
  */
 public class Actions {
+
     public static final String ABBREVIATE_ISO = "abbreviateIso";
     public static final String ABBREVIATE_MEDLINE = "abbreviateMedline";
     public static final String ADD_FILE_LINK = "addFileLink";
@@ -30,7 +31,7 @@ public class Actions {
     public static final String FORWARD = "forward";
     public static final String INC_SEARCH = "incSearch";
     public static final String MAKE_KEY = "makeKey";
-    public static final String MANAGE_SELECTORS= "manageSelectors";
+    public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";

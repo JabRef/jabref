@@ -25,15 +25,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibtexDatabase;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.sql.DBConnectDialog;
@@ -72,7 +69,7 @@ public class DbImportAction extends AbstractWorker {
     class DbImpAction extends MnemonicAwareAction {
 
         public DbImpAction() {
-            super(GUIGlobals.getImage("dbImport"));
+            super(IconTheme.getImage("dbImport"));
             putValue(Action.NAME, "Import from external SQL database");
 
         }

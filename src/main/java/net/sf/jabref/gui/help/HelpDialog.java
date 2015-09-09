@@ -24,6 +24,7 @@ import javax.swing.event.HyperlinkListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
@@ -129,7 +130,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class BackAction extends AbstractAction {
 
         public BackAction() {
-            super("Back", GUIGlobals.getImage("left"));
+            super("Back", IconTheme.getImage("left"));
             // putValue(SHORT_DESCRIPTION, "Show the previous page");
         }
 
@@ -143,7 +144,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class ForwardAction extends AbstractAction {
 
         public ForwardAction() {
-            super("Forward", GUIGlobals.getImage("right"));
+            super("Forward", IconTheme.getImage("right"));
         }
 
         @Override
@@ -156,7 +157,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class ContentsAction extends AbstractAction {
 
         public ContentsAction() {
-            super("Contents", GUIGlobals.getImage("helpContents"));
+            super("Contents", IconTheme.getImage("helpContents"));
         }
 
         @Override

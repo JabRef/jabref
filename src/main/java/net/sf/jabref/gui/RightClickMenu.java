@@ -74,7 +74,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
-        add(new AbstractAction(Localization.lang("Copy"), GUIGlobals.getImage("copy")) {
+        add(new AbstractAction(Localization.lang("Copy"), IconTheme.getImage("copy")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -85,7 +85,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-        add(new AbstractAction(Localization.lang("Paste"), GUIGlobals.getImage("paste")) {
+        add(new AbstractAction(Localization.lang("Paste"), IconTheme.getImage("paste")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,7 +96,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-        add(new AbstractAction(Localization.lang("Cut"), GUIGlobals.getImage("cut")) {
+        add(new AbstractAction(Localization.lang("Cut"), IconTheme.getImage("cut")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +108,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Delete"), GUIGlobals.getImage("delete")) {
+        add(new AbstractAction(Localization.lang("Delete"), IconTheme.getImage("delete")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -156,7 +156,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
 
         if (multiple) {
-            add(new AbstractAction(Localization.lang("Mark entries"), GUIGlobals.getImage("markEntries")) {
+            add(new AbstractAction(Localization.lang("Mark entries"), IconTheme.getImage("markEntries")) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -170,7 +170,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
             add(markSpecific);
 
-            add(new AbstractAction(Localization.lang("Unmark entries"), GUIGlobals.getImage("unmarkEntries")) {
+            add(new AbstractAction(Localization.lang("Unmark entries"), IconTheme.getImage("unmarkEntries")) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -186,7 +186,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             String marked = be.getField(BibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
             if (marked == null || marked.isEmpty()) {
-                add(new AbstractAction(Localization.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
+                add(new AbstractAction(Localization.lang("Mark entry"), IconTheme.getImage("markEntries")) {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -201,7 +201,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 add(markSpecific);
             } else {
                 add(markSpecific);
-                add(new AbstractAction(Localization.lang("Unmark entry"), GUIGlobals.getImage("unmarkEntries")) {
+                add(new AbstractAction(Localization.lang("Unmark entry"), IconTheme.getImage("unmarkEntries")) {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -251,7 +251,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             addSeparator();
         }
 
-        add(new AbstractAction(Localization.lang("Open folder"), GUIGlobals.getImage("openFolder")) {
+        add(new AbstractAction(Localization.lang("Open folder"), IconTheme.getImage("openFolder")) {
 
             {
                 if (!isFieldSetForSelectedEntry("file")) {
@@ -269,7 +269,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Open file"), GUIGlobals.getImage("openExternalFile")) {
+        add(new AbstractAction(Localization.lang("Open file"), IconTheme.getImage("openExternalFile")) {
 
             {
                 if(!isFieldSetForSelectedEntry("file")) {
@@ -287,7 +287,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Attach file"), GUIGlobals.getImage("open")) {
+        add(new AbstractAction(Localization.lang("Attach file"), IconTheme.getImage("open")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -306,7 +306,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });*/
 
-        add(new AbstractAction(Localization.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
+        add(new AbstractAction(Localization.lang("Open URL or DOI"), IconTheme.getImage("www")) {
 
             {
                 if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
@@ -560,13 +560,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case INCLUDING:
-                menuItem.setIcon(GUIGlobals.getImage("groupIncluding"));
+                menuItem.setIcon(IconTheme.getImage("groupIncluding"));
                 break;
             case REFINING:
-                menuItem.setIcon(GUIGlobals.getImage("groupRefining"));
+                menuItem.setIcon(IconTheme.getImage("groupRefining"));
                 break;
             default:
-                menuItem.setIcon(GUIGlobals.getImage("groupRegular"));
+                menuItem.setIcon(IconTheme.getImage("groupRegular"));
                 break;
             }
         }

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
+import net.sf.jabref.gui.IconTheme;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
@@ -36,7 +37,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     private static ExternalFileType getPDFExternalFileType() {
         ExternalFileType pdfFileType = JabRefPreferences.getInstance().getExternalFileTypeByExt("pdf");
         if (pdfFileType == null) {
-            return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall");
+            return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.getImage("pdfSmall"));
         }
         return pdfFileType;
     }

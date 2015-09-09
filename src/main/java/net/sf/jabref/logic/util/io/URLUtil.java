@@ -22,7 +22,9 @@ import java.net.URLDecoder;
 import java.util.Objects;
 
 public class URLUtil {
+
     private static final String URL_EXP = "^(https?|ftp)://.+";
+
 
     /**
      * Cleans URLs returned by Google search.

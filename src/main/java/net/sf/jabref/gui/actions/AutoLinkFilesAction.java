@@ -9,11 +9,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
@@ -25,7 +25,7 @@ import net.sf.jabref.util.Util;
 public class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
-        putValue(Action.SMALL_ICON, GUIGlobals.getImage("autoGroup"));
+        putValue(Action.SMALL_ICON, IconTheme.getImage("autoGroup"));
         putValue(Action.NAME, Localization.lang("Automatically set file links"));
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Automatically link files"));
     }

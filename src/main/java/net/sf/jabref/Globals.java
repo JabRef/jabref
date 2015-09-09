@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class Globals {
+
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
 
     // JabRef version info
@@ -51,6 +52,7 @@ public class Globals {
     public static final String JOURNALS_IEEE_INTERNAL_LIST = "/journals/IEEEJournalList.txt";
 
     public static JournalAbbreviationRepository journalAbbrev;
+
 
     public static void initializeJournalNames() {
         // Read internal lists:
@@ -79,12 +81,12 @@ public class Globals {
             try {
                 Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
             } catch (FileNotFoundException e) {
-                LOGGER.info("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)
-                        + "' not found.", e);
+                LOGGER.info("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST) + "' not found.", e);
             }
         }
 
     }
+
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
@@ -107,6 +109,7 @@ public class Globals {
     public static FileUpdateMonitor fileUpdateMonitor;
     public static StreamEavesdropper streamEavesdropper;
 
+
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
 
@@ -116,8 +119,10 @@ public class Globals {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
     }
 
+
     // Autosave manager
     public static AutoSaveManager autoSaveManager;
+
 
     public static void startAutoSaveManager(JabRefFrame frame) {
         Globals.autoSaveManager = new AutoSaveManager(frame);

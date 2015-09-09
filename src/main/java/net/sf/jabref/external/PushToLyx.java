@@ -24,7 +24,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -98,7 +98,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public Icon getIcon() {
-        return GUIGlobals.getImage("lyx");
+        return IconTheme.getImage("lyx");
     }
 
     @Override

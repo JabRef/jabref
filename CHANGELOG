@@ -9,6 +9,7 @@
     - BREAKING: Remove plugin functionality.
     - Fixes Bug#1297: No console message on closing.
     - Fix bug #1285: Editing position is not lost on saving
+    - Remove support for custom icon themes. The user has to use the default one.
 [dev_2.11]
     - Add of Persian localization (by Behrouz Javanmardi)
     - Backport from 2.80: Fixes #115: Remove whitespaces in serialization

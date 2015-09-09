@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.URLUtil;
 
@@ -18,7 +18,7 @@ public class PasteAction extends AbstractAction {
 
         putValue(Action.NAME, Localization.lang("Paste from clipboard"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
-        putValue(Action.SMALL_ICON, GUIGlobals.getImage("paste"));
+        putValue(Action.SMALL_ICON, IconTheme.getImage("paste"));
     }
 
     @Override

@@ -111,18 +111,13 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
@@ -575,7 +570,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            super("Paste", "Paste from clipboard", GUIGlobals.getIconUrl("paste"));
+            super("Paste", "Paste from clipboard", IconTheme.getImage("paste"));
         }
 
         @Override
@@ -597,7 +592,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            super("Open", "Open_file", GUIGlobals.getIconUrl("open"));
+            super("Open", "Open_file", IconTheme.getImage("open"));
         }
 
         @Override
@@ -621,7 +616,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            super("Clear", "Clear_inputarea", GUIGlobals.getIconUrl("new"));
+            super("Clear", "Clear_inputarea", IconTheme.getImage("new"));
         }
 
         @Override
@@ -671,8 +666,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
     class SimpleCellRenderer extends DefaultListCellRenderer {
         private final Font baseFont;
         private final Font usedFont;
-        private final ImageIcon okIcon = GUIGlobals.getImage("complete");
-        private final ImageIcon needIcon = GUIGlobals.getImage("wrong");
+        private final ImageIcon okIcon = IconTheme.getImage("complete");
+        private final ImageIcon needIcon = IconTheme.getImage("wrong");
 
         public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;
@@ -749,8 +744,8 @@ class PopupListener extends MouseAdapter {
 }
 
 abstract class BasicAction extends AbstractAction {
-    public BasicAction(String text, String description, URL icon) {
-        super(Localization.lang(text), new ImageIcon(icon));
+    public BasicAction(String text, String description, ImageIcon icon) {
+        super(Localization.lang(text), icon);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }
 

@@ -33,6 +33,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -109,9 +110,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
         HelpAction ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
-                "Help", GUIGlobals.getIconUrl("helpSmall"));
+                "Help", IconTheme.getImage("helpSmall"));
         HelpAction timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
-                GUIGlobals.getIconUrl("helpSmall"));
+                IconTheme.getImage("helpSmall"));
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
         Insets marg = new Insets(0, 12, 3, 0);

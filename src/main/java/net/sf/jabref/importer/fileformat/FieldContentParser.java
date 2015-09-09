@@ -24,6 +24,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  * writing the same fields.
  */
 class FieldContentParser {
+
     /**
      * Performs the reformatting
      * @param content StringBuffer containing the field to format. key contains field name according to field

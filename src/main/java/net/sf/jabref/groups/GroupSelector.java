@@ -59,12 +59,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.AbstractGroup;
@@ -72,8 +70,6 @@ import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.InvertSearchRule;
 import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.gui.SidePaneComponent;
-import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
 import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
@@ -89,10 +85,10 @@ public class GroupSelector extends SidePaneComponent implements
 
     private static final Log LOGGER = LogFactory.getLog(GroupSelector.class);
 
-    private final JButton newButton = new JButton(GUIGlobals.getImage("new"));
+    private final JButton newButton = new JButton(IconTheme.getImage("new"));
     private final JButton refresh = new JButton(
-            GUIGlobals.getImage("refresh"));
-    private final JButton autoGroup = new JButton(GUIGlobals.getImage("autoGroup"));
+            IconTheme.getImage("refresh"));
+    private final JButton autoGroup = new JButton(IconTheme.getImage("autoGroup"));
     private final JButton openset = new JButton(Localization.lang("Settings"));
     Color bgColor = Color.white;
     private GroupsTree groupsTree;
@@ -125,7 +121,7 @@ public class GroupSelector extends SidePaneComponent implements
      * quicksearch. The next two define the name and regexp for the group.
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, GUIGlobals.getIconUrl("toggleGroups"), Localization.lang("Groups"));
+        super(manager, IconTheme.getImage("toggleGroups"), Localization.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
 
         this.frame = frame;
@@ -266,7 +262,7 @@ public class GroupSelector extends SidePaneComponent implements
                 }
             }
         });
-        JButton expand = new JButton(GUIGlobals.getImage("down"));
+        JButton expand = new JButton(IconTheme.getImage("down"));
         expand.addActionListener(new ActionListener() {
 
             @Override
@@ -281,7 +277,7 @@ public class GroupSelector extends SidePaneComponent implements
                 LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: " + GroupSelector.this.getPreferredSize().getHeight());
             }
         });
-        JButton reduce = new JButton(GUIGlobals.getImage("up"));
+        JButton reduce = new JButton(IconTheme.getImage("up"));
         reduce.addActionListener(new ActionListener() {
 
             @Override
@@ -319,7 +315,7 @@ public class GroupSelector extends SidePaneComponent implements
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
         JButton helpButton = new JButton(
-                GUIGlobals.getImage("help"));
+                IconTheme.getImage("help"));
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);

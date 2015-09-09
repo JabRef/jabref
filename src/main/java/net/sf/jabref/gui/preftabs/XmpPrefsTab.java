@@ -28,9 +28,9 @@ import javax.swing.table.TableModel;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -155,7 +155,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", GUIGlobals.getImage("remove"));
+            super("Delete row", IconTheme.getImage("remove"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -184,7 +184,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", GUIGlobals.getImage("add"));
+            super("Add row", IconTheme.getImage("add"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 

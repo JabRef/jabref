@@ -24,7 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -42,22 +42,22 @@ public class HelpAction extends MnemonicAwareAction {
 
 
     public HelpAction(HelpDialog diag, String helpFile) {
-        super(GUIGlobals.getImage("help"));
+        super(IconTheme.getImage("help"));
         putValue(Action.NAME, "Help");
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
-        super(GUIGlobals.getImage("help"));
+        super(IconTheme.getImage("help"));
         putValue(Action.NAME, "Help");
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
-    public HelpAction(HelpDialog diag, String helpFile, String tooltip, URL iconFile) {
-        super(new ImageIcon(iconFile));
+    public HelpAction(HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
+        super(iconFile);
         putValue(Action.NAME, "Help");
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
         this.diag = diag;
@@ -65,7 +65,7 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
-        super(GUIGlobals.getImage("help"));
+        super(IconTheme.getImage("help"));
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
         this.diag = diag;
@@ -73,7 +73,7 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, KeyStroke key) {
-        super(GUIGlobals.getImage("help"));
+        super(IconTheme.getImage("help"));
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
         putValue(Action.ACCELERATOR_KEY, key);
@@ -81,8 +81,8 @@ public class HelpAction extends MnemonicAwareAction {
         this.helpFile = helpFile;
     }
 
-    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, URL iconFile) {
-        super(new ImageIcon(iconFile));
+    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
+        super(iconFile);
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
         this.diag = diag;

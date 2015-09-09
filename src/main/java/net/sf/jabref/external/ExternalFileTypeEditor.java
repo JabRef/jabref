@@ -28,8 +28,8 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MnemonicAwareAction;
 
@@ -50,9 +50,9 @@ public class ExternalFileTypeEditor extends JDialog {
     private FileTypeTableModel tableModel;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final JButton add = new JButton(GUIGlobals.getImage("add"));
-    private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
-    private final JButton edit = new JButton(GUIGlobals.getImage("edit"));
+    private final JButton add = new JButton(IconTheme.getImage("add"));
+    private final JButton remove = new JButton(IconTheme.getImage("remove"));
+    private final JButton edit = new JButton(IconTheme.getImage("edit"));
     private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
@@ -221,7 +221,7 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new");
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.getImage("new"));
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {

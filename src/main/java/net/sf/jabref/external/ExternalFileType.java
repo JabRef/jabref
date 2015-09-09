@@ -17,7 +17,7 @@ package net.sf.jabref.external;
 
 import javax.swing.*;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.
@@ -34,16 +34,17 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     private ImageIcon icon;
     private final JLabel label = new JLabel();
 
-
     public ExternalFileType(String name, String extension, String mimeType,
-            String openWith, String iconName) {
+            String openWith, String iconName, ImageIcon icon) {
         label.setText(null);
         this.name = name;
         label.setToolTipText(this.name);
         this.extension = extension;
         this.mimeType = mimeType;
         this.openWith = openWith;
+
         setIconName(iconName);
+        setIcon(icon);
     }
 
     /**
@@ -61,7 +62,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      */
     public ExternalFileType(String[] val) {
         if (val == null || val.length < 4) {
-            throw new IllegalArgumentException("Cannot contruct ExternalFileType without four elements in String[] argument.");
+            throw new IllegalArgumentException("Cannot construct ExternalFileType without four elements in String[] argument.");
         }
         this.name = val[0];
         label.setToolTipText(this.name);
@@ -71,12 +72,14 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         if (val.length == 4) {
             this.openWith = val[2];
             setIconName(val[3]);
+            setIcon(IconTheme.getImage(getIconName()));
         }
         // When mime type is included, the array length should be 5:
         else if (val.length == 5) {
             this.mimeType = val[2];
             this.openWith = val[3];
             setIconName(val[4]);
+            setIcon(IconTheme.getImage(getIconName()));
         }
     }
 
@@ -134,22 +137,12 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     /**
-     * Set the string associated with this file type's icon. The string is used
-     * to get the actual icon by the method GUIGlobals.getIcon(String)
+     * Set the string associated with this file type's icon.
+     *
      * @param name The icon name to use.
      */
     public void setIconName(String name) {
         this.iconName = name;
-        try {
-            this.icon = GUIGlobals.getImage(iconName);
-        } catch (NullPointerException ex) {
-            // Loading the icon failed. This could be because the icons have not been
-            // initialized, which will be the case if we are operating from the command
-            // line and the graphical interface hasn't been initialized. In that case
-            // we will do without the icon:
-            this.icon = null;
-        }
-        label.setIcon(this.icon);
     }
 
     /**
@@ -162,8 +155,8 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     /**
-     * Get the string associated with this file type's icon. The string is used
-     * to get the actual icon by the method GUIGlobals.getIcon(String)
+     * Get the string associated with this file type's icon.
+     *
      * @return The icon name.
      */
     public String getIconName() {
@@ -176,6 +169,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     public void setIcon(ImageIcon icon) {
         this.icon = icon;
+        label.setIcon(this.icon);
     }
 
     @Override
@@ -189,7 +183,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public ExternalFileType copy() {
-        return new ExternalFileType(name, extension, mimeType, openWith, iconName);
+        return new ExternalFileType(name, extension, mimeType, openWith, iconName, icon);
     }
 
     @Override
