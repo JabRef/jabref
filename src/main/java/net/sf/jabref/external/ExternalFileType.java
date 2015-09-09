@@ -135,7 +135,8 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     /**
      * Set the string associated with this file type's icon. The string is used
-     * to get the actual icon by the method GUIGlobals.getIcon(String)
+     * to get the actual icon.
+     *
      * @param name The icon name to use.
      */
     public void setIconName(String name) {

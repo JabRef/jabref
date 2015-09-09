@@ -450,7 +450,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             FindUnlinkedFilesDialog.ACTION_TITLE,
             FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION),
-            IconTheme.getImage(FindUnlinkedFilesDialog.ACTION_ICON)
+            IconTheme.getImage("toggleSearch")
     );
 
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
