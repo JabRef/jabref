@@ -521,56 +521,32 @@ version=${jabref.version}</echo>
 
 	<taskdef name="jarbundler" classpath="${buildlib.dir}/jarbundler-2.2.0.jar" classname="net.sourceforge.jarbundler.JarBundler" />
 
-	<macrodef name="compresssrc">
-        <attribute name="git-core-autocrlf" />
-        <attribute name="temp-dir" />
-        <attribute name="base-dir" />
-
-        <sequential>
-            <!-- clone current repo into tmp dir. Reason: we want to have a clean src.zip, but do not want to execute "git clean -xdf" to allow developers having some temporary files (and user.properties) -->
-            <mkdir dir="@{temp-dir}"/>
-            <echo message="@{temp-dir}" />
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull">
-                <arg value="clone" />
-                <arg value="@{base-dir}" />
-                <arg value="@{temp-dir}" />
-            </exec>
-
-            <!-- ensure correct line endings -->
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="@{temp-dir}">
-                <arg value="config" />
-                <arg value="core.autocrlf" />
-                <arg value="@{git-core-autocrlf}" />
-            </exec>
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="@{temp-dir}">
-                <arg value="rm" />
-                <arg value="--cached" />
-                <arg value="-r" />
-                <arg value="." />
-            </exec>
-            <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" dir="@{temp-dir}">
-                <arg value="reset" />
-                <arg value="--hard" />
-            </exec>
-        </sequential>
-	</macrodef>
-
 	<target name="zipsrc">
-		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc" />
-		<compresssrc git-core-autocrlf="true" temp-dir="${temp.dir}/jabref-${jabref.version}" base-dir="${basedir}" />
-		<zip destfile="${build.lib}/JabRef-${jabref.version}-src.zip" basedir="${temp.dir}" level="9" />
-		<delete dir="${temp.dir}" failonerror="no"/>
+        <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" output="${build.lib}/JabRef-${jabref.version}-src.zip">
+            <arg value="-c" />
+            <arg value="core.autocrlf=false" />
+            <arg value="-c" />
+            <arg value="core.eol=lf" />
+            <arg value="archive" />
+            <arg value="HEAD" />
+            <arg value="--format=zip" />
+        </exec>
 	</target>
 
-	<target name="bzip2src">
-		<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="jabrefsrc" />
-        <compresssrc git-core-autocrlf="false" temp-dir="${temp.dir}/jabref-${jabref.version}" base-dir="${basedir}" />
-		<tar destfile="${build.lib}/JabRef-${jabref.version}-src.tar.bz2" basedir="${temp.dir}" excludes=".git/" compression="bzip2" />
-		<delete dir="${temp.dir}" failonerror="no"/>
+	<target name="targzsrc">
+        <exec executable="git" searchpath="true" failifexecutionfails="true" outputproperty="devnull" errorproperty="devnull" output="${build.lib}/JabRef-${jabref.version}-src.tar.gz">
+            <arg value="-c" />
+            <arg value="core.autocrlf=false" />
+            <arg value="-c" />
+            <arg value="core.eol=lf" />
+            <arg value="archive" />
+            <arg value="HEAD" />
+            <arg value="--format=zip" />
+        </exec>
 	</target>
 
 	<target name="devsnapshot" depends="clean, addgitinfo, non_osx, win.installer, macbundle_java16, macbundle" description="creates development snapshot binaries" />
 
-	<target name="release" depends="clean, non_osx, win.installer, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
-	<target name="release.linux" depends="clean, non_osx, win.installer.linux, macbundle_java16, macbundle, bzip2src, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
+	<target name="release" depends="clean, non_osx, win.installer, macbundle_java16, macbundle, targzsrc, zipsrc" description="Do a release on Windows. Creates all distribution files in ${build.lib}"/>
+	<target name="release.linux" depends="clean, non_osx, win.installer.linux, macbundle_java16, macbundle, targzsrc, zipsrc" description="Do a release on Linux. Creates all distribution files in ${build.lib}" />
 </project>
