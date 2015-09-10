@@ -76,11 +76,8 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
     }
 
     @Override
-    public void firePropertyChange(String propertyName, boolean old, boolean newV) {
-    }
-
-    @Override
     public void firePropertyChange(String propertyName, Object old, Object newV) {
+        // disable super.firePropertyChange
     }
 
     /* For enabling the renderer to handle icons. */
@@ -97,6 +94,7 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
                 setText(null);
             }
         } else {
+            // this is plain text
             setIcon(null);
             setToolTipText(null);
             if (value != null) {
