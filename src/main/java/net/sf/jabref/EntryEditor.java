@@ -563,8 +563,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        frame.getSearchManager().addSearchListener((SearchTextListener) source);
-
+        frame.getSearchBar().addSearchListener((SearchTextListener)source);
+        
         /* {
             private boolean antialias = Globals.prefs.getBoolean("antialias");
 

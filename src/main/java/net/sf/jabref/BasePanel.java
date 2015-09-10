@@ -81,7 +81,6 @@ import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.gui.CleanUpAction;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.FileListEntry;
@@ -173,11 +172,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    // Hashtable indexing the only search auto completer
-    // required for the SearchAutoCompleterUpdater
-    private AutoCompleter searchAutoCompleter;
-
-    private AutoCompleteListener searchCompleteListener = null;
+    // AutoCompleter used in the search bar
+    private AutoCompleter<String> searchAutoCompleter;
 
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
@@ -251,6 +247,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;
 
+    // Returns a collection of AutoCompleters, which are populated from the current database
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
     }
@@ -972,38 +969,31 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put("search", new BaseAction() {
-
-            @Override
+        	
+        	@Override
             public void action() {
-                //sidePaneManager.togglePanel("search");
-                sidePaneManager.show("search");
-                //boolean on = sidePaneManager.isPanelVisible("search");
-                frame.searchToggle.setSelected(true);
-                frame.getSearchManager().startSearch();
+                frame.setSearchBarVisible(true);
+                frame.getSearchBar().startSearch();
             }
         });
-
+        
         actions.put("toggleSearch", new BaseAction() {
-
-            @Override
+        	
+        	@Override
             public void action() {
-                //sidePaneManager.togglePanel("search");
-                sidePaneManager.toggle("search");
-                boolean on = sidePaneManager.isComponentVisible("search");
-                frame.searchToggle.setSelected(on);
-                if (on) {
-                    frame.getSearchManager().startSearch();
-                }
+        		frame.setSearchBarVisible(! frame.searchBar.isVisible());
+	            if (frame.searchBar.isVisible()) {
+	            	frame.getSearchBar().startSearch();
+	            }
             }
         });
 
         actions.put("incSearch", new BaseAction() {
-
-            @Override
-            public void action() {
-                sidePaneManager.show("search");
-                frame.searchToggle.setSelected(true);
-                frame.getSearchManager().startIncrementalSearch();
+			
+        	@Override    
+			public void action() {
+				frame.setSearchBarVisible(true);
+				frame.getSearchBar().startIncrementalSearch();
             }
         });
 
@@ -2238,7 +2228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        frame.getSearchManager().setAutoCompleteListener(searchCompleteListener);
+        frame.getSearchBar().setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {
@@ -2246,8 +2236,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);
         }
-        searchCompleteListener = new AutoCompleteListener(searchAutoCompleter);
-        searchCompleteListener.setConsumeEnterKey(false); // So you don't have to press Enter twice
     }
 
     /*

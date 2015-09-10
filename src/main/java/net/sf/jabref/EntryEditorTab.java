@@ -140,7 +140,7 @@ class EntryEditorTab {
             }
             else {
                 ta = new FieldTextArea(fields[i], null);
-                frame.getSearchManager().addSearchListener((FieldTextArea) ta);
+                frame.getSearchBar().addSearchListener((FieldTextArea) ta);
                 defaultHeight = ta.getPane().getPreferredSize().height;
             }
             //ta.addUndoableEditListener(bPanel.undoListener);

@@ -34,7 +34,6 @@ import java.net.UnknownHostException;
 
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -125,6 +124,7 @@ public class JabRefPreferences {
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String SEARCH_AUTO_COMPLETE = "searchAutoComplete";
+    public static final String SEARCH_MODE_LIVE_FILTER = "searchModeLiveFilter";
     public static final String INCREMENT_S = "incrementS";
     public static final String SEARCH_ALL = "searchAll";
     public static final String SEARCH_GEN = "searchGen";
@@ -228,7 +228,7 @@ public class JabRefPreferences {
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String GROUPS_VISIBLE_ROWS = "groupsVisibleRows";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
-    public static final String SEARCH_PANEL_VISIBLE = "searchPanelVisible";
+    public static final String SEARCH_BAR_VISIBLE = "searchBarVisible";
     public static final String TOOLBAR_VISIBLE = "toolbarVisible";
     public static final String HIGHLIGHT_GROUPS_MATCHING_ALL = "highlightGroupsMatchingAll";
     public static final String HIGHLIGHT_GROUPS_MATCHING_ANY = "highlightGroupsMatchingAny";
@@ -580,6 +580,7 @@ public class JabRefPreferences {
         defaults.put(SEARCH_GEN, Boolean.TRUE);
         defaults.put(SEARCH_ALL, Boolean.FALSE);
         defaults.put(INCREMENT_S, Boolean.FALSE);
+        defaults.put(SEARCH_MODE_LIVE_FILTER, Boolean.TRUE);
         defaults.put(SEARCH_AUTO_COMPLETE, Boolean.TRUE);
 
         defaults.put(SELECT_S, Boolean.FALSE);
@@ -594,7 +595,7 @@ public class JabRefPreferences {
         defaults.put(AUTO_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put(AUTO_COMP_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, 2);
+        defaults.put(SHORTEST_TO_COMPLETE, 0);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put(GROUP_SELECTOR_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
@@ -615,7 +616,7 @@ public class JabRefPreferences {
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ANY, Boolean.FALSE);
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
-        defaults.put(SEARCH_PANEL_VISIBLE, Boolean.FALSE);
+        defaults.put(SEARCH_BAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, System.getProperty("file.encoding"));
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));

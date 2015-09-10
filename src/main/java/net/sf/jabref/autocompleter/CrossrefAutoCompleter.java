@@ -28,7 +28,7 @@ class CrossrefAutoCompleter extends AbstractAutoCompleter {
     public boolean isSingleUnitField() {
         return false;
     }
-
+    
     @Override
     public void addBibtexEntry(BibtexEntry entry) {
         if (entry == null) {
