@@ -1,3 +1,4 @@
+[dev_2.11]
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
     - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
