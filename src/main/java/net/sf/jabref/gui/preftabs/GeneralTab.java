@@ -40,6 +40,7 @@ import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
 class GeneralTab extends JPanel implements PrefsTab {
@@ -68,7 +69,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[GUIGlobals.LANGUAGES.keySet().size()]));
-    private final JComboBox encodings = new JComboBox(Localization.ENCODINGS);
+    private final JComboBox encodings = new JComboBox(Encodings.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -231,8 +232,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
         String enc = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
-        for (int i = 0; i < Localization.ENCODINGS.length; i++) {
-            if (Localization.ENCODINGS[i].equalsIgnoreCase(enc)) {
+        for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
+            if (Encodings.ENCODINGS[i].equalsIgnoreCase(enc)) {
                 encodings.setSelectedIndex(i);
                 break;
             }

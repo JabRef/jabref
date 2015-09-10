@@ -25,6 +25,7 @@ import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 
@@ -285,7 +286,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"), Localization.lang("Save database"),
-                        JOptionPane.QUESTION_MESSAGE, null, Localization.ENCODINGS, encoding);
+                        JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS, encoding);
                 if (choice != null) {
                     String newEncoding = (String) choice;
                     return saveDatabase(file, selectedOnly, newEncoding);

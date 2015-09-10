@@ -60,6 +60,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.matchers.NoSearchMatcher;
@@ -1463,7 +1464,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"), Localization.lang("Save database"),
-                        JOptionPane.QUESTION_MESSAGE, null, Localization.ENCODINGS, encoding);
+                        JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS, encoding);
                 if (choice != null) {
                     String newEncoding = (String) choice;
                     return saveDatabase(file, selectedOnly, newEncoding, saveType);

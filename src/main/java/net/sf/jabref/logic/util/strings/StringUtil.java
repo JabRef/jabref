@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.l10n.Encodings;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -381,10 +381,10 @@ public class StringUtil {
      */
     public static List<String> findEncodingsForString(String characters) {
         List<String> encodings = new ArrayList<String>();
-        for (int i = 0; i < Localization.ENCODINGS.length; i++) {
-            CharsetEncoder encoder = Charset.forName(Localization.ENCODINGS[i]).newEncoder();
+        for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
+            CharsetEncoder encoder = Charset.forName(Encodings.ENCODINGS[i]).newEncoder();
             if (encoder.canEncode(characters)) {
-                encodings.add(Localization.ENCODINGS[i]);
+                encodings.add(Encodings.ENCODINGS[i]);
             }
         }
         return encodings;
