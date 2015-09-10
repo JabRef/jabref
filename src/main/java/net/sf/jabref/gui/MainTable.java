@@ -30,8 +30,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.gui.renderer.CompleteRenderer;
+import net.sf.jabref.gui.renderer.GeneralRenderer;
+import net.sf.jabref.gui.renderer.IncompleteRenderer;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
@@ -676,41 +678,6 @@ public class MainTable extends JTable {
         return new Color((one.getRed() + two.getRed()) / 2, (one.getGreen() + two.getGreen()) / 2,
                 (one.getBlue() + two.getBlue()) / 2);
     }
-
-
-    static class IncompleteRenderer extends GeneralRenderer {
-
-        public IncompleteRenderer() {
-            super(Globals.prefs.getColor(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND));
-            super.setToolTipText(Localization.lang("This entry is incomplete"));
-        }
-
-        void setNumber(int number) {
-            super.setValue(String.valueOf(number + 1));
-        }
-
-        @Override
-        protected void setValue(Object value) {
-
-        }
-    }
-
-    static class CompleteRenderer extends GeneralRenderer {
-
-        public CompleteRenderer(Color color) {
-            super(color);
-        }
-
-        void setNumber(int number) {
-            super.setValue(String.valueOf(number + 1));
-        }
-
-        @Override
-        protected void setValue(Object value) {
-
-        }
-    }
-
 
     private TableComparatorChooser<BibtexEntry> createTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
                                                                              Object sortingStrategy) {
