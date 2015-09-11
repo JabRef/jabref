@@ -17,7 +17,7 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * @author jzieren
@@ -58,14 +58,14 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": "
-                + Globals.lang("move group");
+        return Localization.lang("Undo") + ": "
+                + Localization.lang("move group");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": "
-                + Globals.lang("move group");
+        return Localization.lang("Redo") + ": "
+                + Localization.lang("move group");
     }
 
     @Override

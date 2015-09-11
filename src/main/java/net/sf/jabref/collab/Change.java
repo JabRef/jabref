@@ -15,13 +15,13 @@
 */
 package net.sf.jabref.collab;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.BibtexDatabase;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 abstract class Change extends DefaultMutableTreeNode {
 
@@ -34,7 +34,7 @@ abstract class Change extends DefaultMutableTreeNode {
     }
 
     Change(String name) {
-        this.name = Globals.lang(name);
+        this.name = Localization.lang(name);
     }
 
     private String getName() {
@@ -60,7 +60,7 @@ abstract class Change extends DefaultMutableTreeNode {
      * @return boolean false if the parent overrides by not being accepted.
      */
     public boolean isAcceptable() {
-        if ((getParent() != null) && (getParent() instanceof Change)) {
+        if (getParent() != null && getParent() instanceof Change) {
             return ((Change) getParent()).isAccepted();
         } else {
             return true;

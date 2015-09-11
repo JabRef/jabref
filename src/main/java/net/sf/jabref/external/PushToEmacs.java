@@ -24,6 +24,13 @@ import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,18 +40,19 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class PushToEmacs implements PushToApplication {
 
-    private JPanel settings = null;
+    private JPanel settings;
     private final JTextField citeCommand = new JTextField(30);
     private final JTextField emacsPath = new JTextField(30);
     private final JTextField additionalParams = new JTextField(30);
     private final JCheckBox useEmacs23 = new JCheckBox();
 
-    private boolean couldNotConnect = false, couldNotRunClient = false;
+    private boolean couldNotConnect;
+    private boolean couldNotRunClient;
 
 
     @Override
     public String getName() {
-        return Globals.menuTitle("Insert selected citations into Emacs");
+        return Localization.menuTitle("Insert selected citations into Emacs");
     }
 
     @Override
@@ -54,7 +62,7 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Globals.lang("Push selection to Emacs");
+        return Localization.lang("Push selection to Emacs");
     }
 
     @Override
@@ -90,20 +98,20 @@ public class PushToEmacs implements PushToApplication {
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Globals.lang("Path to gnuclient or emacsclient").concat(":")));
+        builder.append(new JLabel(Localization.lang("Path to gnuclient or emacsclient").concat(":")));
         builder.append(emacsPath);
         BrowseAction action = BrowseAction.buildForFile(emacsPath);
-        JButton browse = new JButton(Globals.lang("Browse"));
+        JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
         builder.nextLine();
-        builder.append(Globals.lang("Additional parameters").concat(":"));
+        builder.append(Localization.lang("Additional parameters").concat(":"));
         builder.append(additionalParams);
         builder.nextLine();
-        builder.append(Globals.lang("Use EMACS 23 insertion string").concat(":"));
+        builder.append(Localization.lang("Use EMACS 23 insertion string").concat(":"));
         builder.append(useEmacs23);
         builder.nextLine();
-        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(Localization.lang("Cite command") + ":");
         builder.append(citeCommand);
         settings = builder.getPanel();
     }
@@ -114,7 +122,7 @@ public class PushToEmacs implements PushToApplication {
         couldNotConnect = false;
         couldNotRunClient = false;
         String command = Globals.prefs.get(JabRefPreferences.EMACS_PATH);
-        String addParams[] = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
+        String[] addParams = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
         try {
             String[] com = new String[addParams.length + 2];
             com[0] = command;
@@ -129,7 +137,7 @@ public class PushToEmacs implements PushToApplication {
                 suffix = ")";
             }
 
-            com[com.length - 1] = Globals.ON_WIN ?
+            com[com.length - 1] = OS.WINDOWS ?
                     // Windows gnuclient escaping:
                     // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                     // so cmd receives: (insert \"\\cite{Blah2001}\")
@@ -166,8 +174,8 @@ public class PushToEmacs implements PushToApplication {
                         e.printStackTrace();
                     }
                     // Error stream has been closed. See if there were any errors:
-                    if (sb.toString().trim().length() > 0) {
-                        System.out.println(sb.toString());
+                    if (!sb.toString().trim().isEmpty()) {
+                        System.out.println(sb);
                         couldNotConnect = true;
                     }
                 }
@@ -185,19 +193,19 @@ public class PushToEmacs implements PushToApplication {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "<HTML>" +
-                            Globals.lang("Could not connect to a running gnuserv process. Make sure that "
+                            Localization.lang("Could not connect to a running gnuserv process. Make sure that "
                                     + "Emacs or XEmacs is running,<BR>and that the server has been started "
                                     + "(by running the command 'server-start'/'gnuserv-start').")
                             + "</HTML>",
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (couldNotRunClient) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
-                    Globals.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
+                    Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."),
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
-            panel.output(Globals.lang("Pushed citations to Emacs"));
+            panel.output(Localization.lang("Pushed citations to Emacs"));
         }
     }
 

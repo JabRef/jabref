@@ -18,7 +18,7 @@ package net.sf.jabref.gui;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
 
-import net.sf.jabref.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,17 +35,17 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 	private final AutoCompleter<String> completer;
 
     // These variables keep track of the situation from time to time.
-    private String toSetIn = null; // null indicates that there are no completions available
-    private String lastBeginning = null; // the letters, the user has typed until know
+    private String toSetIn; // null indicates that there are no completions available
+    private String lastBeginning; // the letters, the user has typed until know
     private int lastCaretPosition = -1;
-    private String[] lastCompletions = null;
-    private int lastShownCompletion = 0;
+    private String[] lastCompletions;
+    private int lastShownCompletion;
     private boolean consumeEnterKey = true;
 
     // This field is set if the focus listener should call another focus listener
     // after finishing. This is needed because the autocomplete listener must
     // run before the focus listener responsible for storing the current edit.
-    private FocusListener nextFocusListener = null;
+    private FocusListener nextFocusListener;
 
 
     public AutoCompleteListener(AutoCompleter<String> completer) {
@@ -458,9 +458,9 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
 
-    private final static int ANY_NAME = 0;
-    private final static int FIRST_NAME = 1;
-    final static int LAST_NAME = 2;
+    private static final int ANY_NAME = 0;
+    private static final int FIRST_NAME = 1;
+    static final int LAST_NAME = 2;
 
 
     protected int findNamePositionStatus(JTextComponent comp) {

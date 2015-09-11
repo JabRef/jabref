@@ -35,7 +35,7 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class MySQLImporter extends DBImporter {
 
-    private static MySQLImporter instance = null;
+    private static MySQLImporter instance;
 
 
     private MySQLImporter() {

@@ -22,7 +22,8 @@ import java.io.File;
 
 import javax.swing.*;
 
-import net.sf.jabref.*;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener,
         ChangeScanner.DisplayResultCallback {
@@ -38,7 +39,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     public FileUpdatePanel(JabRefFrame frame, BasePanel panel, SidePaneManager manager, File file,
             ChangeScanner scanner) {
-        super(manager, GUIGlobals.getIconUrl("save"), Globals.lang("File changed"));
+        super(manager, GUIGlobals.getIconUrl("save"), Localization.lang("File changed"));
         close.setEnabled(false);
         this.panel = panel;
         this.manager = manager;
@@ -48,11 +49,11 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
         main.setLayout(new BorderLayout());
 
         JLabel message = new JLabel("<html><center>"
-                + Globals.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
+                + Localization.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
                 + "</center></html>", SwingConstants.CENTER);
 
         main.add(message, BorderLayout.CENTER);
-        JButton test = new JButton(Globals.lang("Review changes"));
+        JButton test = new JButton(Localization.lang("Review changes"));
         main.add(test, BorderLayout.SOUTH);
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 

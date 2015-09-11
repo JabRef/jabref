@@ -18,13 +18,13 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableModifySubtree;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 class GroupChange extends Change {
 
@@ -44,7 +44,7 @@ class GroupChange extends Change {
         final GroupTreeNode root = panel.metaData().getGroups();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
                 panel.getGroupSelector(), panel.metaData().getGroups(),
-                root, Globals.lang("Modified groups"));
+                root, Localization.lang("Modified groups"));
         root.removeAllChildren();
         if (changedGroups == null) {
             // I think setting root to null is not possible

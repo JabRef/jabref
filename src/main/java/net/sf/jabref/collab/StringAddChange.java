@@ -18,12 +18,17 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertString;
 
 class StringAddChange extends Change {
 
@@ -38,10 +43,10 @@ class StringAddChange extends Change {
 
 
     public StringAddChange(BibtexString string) {
-        name = Globals.lang("Added string") + ": '" + string.getName() + '\'';
+        name = Localization.lang("Added string") + ": '" + string.getName() + '\'';
         this.string = string;
 
-        tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+        tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" + Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
     }
 

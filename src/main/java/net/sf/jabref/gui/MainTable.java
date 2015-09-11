@@ -30,12 +30,16 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
-import net.sf.jabref.search.HitOrMissComparator;
+import net.sf.jabref.logic.search.HitOrMissComparator;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -64,15 +68,16 @@ public class MainTable extends JTable {
     private final SortedList<BibtexEntry> sortedForSearch;
     private final SortedList<BibtexEntry> sortedForGrouping;
     private final boolean tableColorCodes;
-    private boolean showingFloatSearch = false;
-    private boolean showingFloatGrouping = false;
+    private boolean showingFloatSearch;
+    private boolean showingFloatGrouping;
     private final EventSelectionModel<BibtexEntry> selectionModel;
     private final TableComparatorChooser<BibtexEntry> comparatorChooser;
     private final JScrollPane pane;
     private Comparator<BibtexEntry> searchComparator;
     private Comparator<BibtexEntry> groupComparator;
     private final Comparator<BibtexEntry> markingComparator = new IsMarkedComparator();
-    private Matcher<BibtexEntry> searchMatcher, groupMatcher;
+    private Matcher<BibtexEntry> searchMatcher;
+    private Matcher<BibtexEntry> groupMatcher;
 
     // needed to activate/deactivate the listener
     private final PersistenceTableColumnListener tableColumnListener;
@@ -483,7 +488,7 @@ public class MainTable extends JTable {
             BibtexEntry be = sortedForGrouping.get(row);
             BibtexEntryType type = be.getType();
             String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibtexFields.KEY_FIELD) || type.isRequired(columnName)) {
+            if (columnName.equals(BibtexEntry.KEY_FIELD) || type.isRequired(columnName)) {
                 return MainTable.REQUIRED;
             }
             if (type.isOptional(columnName)) {
@@ -620,16 +625,19 @@ public class MainTable extends JTable {
     }
 
 
-    private static GeneralRenderer defRenderer, reqRenderer, optRenderer, grayedOutRenderer,
-            veryGrayedOutRenderer;
+    private static GeneralRenderer defRenderer;
+    private static GeneralRenderer reqRenderer;
+    private static GeneralRenderer optRenderer;
+    private static GeneralRenderer grayedOutRenderer;
+    private static GeneralRenderer veryGrayedOutRenderer;
 
     private static GeneralRenderer[] markedRenderers;
 
     private static IncompleteRenderer incRenderer;
     private static CompleteRenderer
-            compRenderer,
-            grayedOutNumberRenderer,
-            veryGrayedOutNumberRenderer;
+            compRenderer;
+    private static CompleteRenderer grayedOutNumberRenderer;
+    private static CompleteRenderer veryGrayedOutNumberRenderer;
 
     private static CompleteRenderer[] markedNumberRenderers;
 
@@ -674,7 +682,7 @@ public class MainTable extends JTable {
 
         public IncompleteRenderer() {
             super(Globals.prefs.getColor(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND));
-            super.setToolTipText(Globals.lang("This entry is incomplete"));
+            super.setToolTipText(Localization.lang("This entry is incomplete"));
         }
 
         void setNumber(int number) {
@@ -742,7 +750,7 @@ public class MainTable extends JTable {
     @SuppressWarnings("unchecked")
     public Comparator<BibtexEntry> getComparatorForColumn(int index) {
         List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
-        return l.size() == 0 ? null : l.get(0);
+        return l.isEmpty() ? null : l.get(0);
     }
 
     /**

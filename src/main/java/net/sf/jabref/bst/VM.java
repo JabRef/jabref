@@ -29,9 +29,9 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -85,8 +85,7 @@ public class VM implements Warn {
     }
 
     public interface BstFunction {
-
-        public void execute(BstEntry context);
+        void execute(BstEntry context);
     }
 
 
@@ -266,7 +265,7 @@ public class VM implements Warn {
                     throw new VMException("Can only concatenate two String with *");
                 }
 
-                stack.push(o1.toString() + o2.toString());
+                stack.push(o1.toString() + o2);
             }
         });
 
@@ -1130,44 +1129,41 @@ public class VM implements Warn {
      * these variables has a value for each entry on the list.
      */
     private void entry(Tree child) {
+        // Fields first
+        Tree t = child.getChild(0);
+        // assert t.getType() == Bst.IDLIST;
 
-        { // Fields first
-            Tree t = child.getChild(0);
-            // assert t.getType() == Bst.IDLIST;
+        for (int i = 0; i < t.getChildCount(); i++) {
+            String name = t.getChild(i).getText();
 
-            for (int i = 0; i < t.getChildCount(); i++) {
-                String name = t.getChild(i).getText();
-
-                for (BstEntry entry : entries) {
-                    entry.fields.put(name, null);
-                }
-            }
-        }
-        { // Integers
-            Tree t = child.getChild(1);
-            // assert t.getType() == Bst.IDLIST;
-
-            for (int i = 0; i < t.getChildCount(); i++) {
-                String name = t.getChild(i).getText();
-
-                for (BstEntry entry : entries) {
-                    entry.integers.put(name, 0);
-                }
-            }
-        }
-        { // Strings
-            Tree t = child.getChild(2);
-            // assert t.getType() == Bst.IDLIST;
-
-            for (int i = 0; i < t.getChildCount(); i++) {
-                String name = t.getChild(i).getText();
-                for (BstEntry entry : entries) {
-                    entry.strings.put(name, null);
-                }
-            }
             for (BstEntry entry : entries) {
-                entry.strings.put("sort.key$", null);
+                entry.fields.put(name, null);
             }
+        }
+
+        // Integers
+        t = child.getChild(1);
+        // assert t.getType() == Bst.IDLIST;
+
+        for (int i = 0; i < t.getChildCount(); i++) {
+            String name = t.getChild(i).getText();
+
+            for (BstEntry entry : entries) {
+                entry.integers.put(name, 0);
+            }
+        }
+        // Strings
+        t = child.getChild(2);
+        // assert t.getType() == Bst.IDLIST;
+
+        for (int i = 0; i < t.getChildCount(); i++) {
+            String name = t.getChild(i).getText();
+            for (BstEntry entry : entries) {
+                entry.strings.put(name, null);
+            }
+        }
+        for (BstEntry entry : entries) {
+            entry.strings.put("sort.key$", null);
         }
     }
 
@@ -1243,10 +1239,9 @@ public class VM implements Warn {
                 try {
 
                     switch (c.getType()) {
-                    case BstParser.STRING: {
+                    case BstParser.STRING:
                         String s = c.getText();
                         push(s.substring(1, s.length() - 1));
-                    }
                         break;
                     case BstParser.INTEGER:
                         push(Integer.parseInt(c.getText().substring(1)));

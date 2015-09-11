@@ -17,7 +17,7 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
 
@@ -80,24 +80,24 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + getName();
+        return Localization.lang("Undo") + ": " + getName();
     }
 
     private String getName() {
         switch (m_editType) {
         case ADD_NODE:
-            return Globals.lang("add group");
+            return Localization.lang("add group");
         case REMOVE_NODE_KEEP_CHILDREN:
-            return Globals.lang("remove group (keep subgroups)");
+            return Localization.lang("remove group (keep subgroups)");
         case REMOVE_NODE_AND_CHILDREN:
-            return Globals.lang("remove group and subgroups");
+            return Localization.lang("remove group and subgroups");
         }
-        return "? (" + Globals.lang("unknown edit") + ")";
+        return "? (" + Localization.lang("unknown edit") + ")";
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + getName();
+        return Localization.lang("Redo") + ": " + getName();
     }
 
     @Override
@@ -116,7 +116,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         GroupTreeNode cursor = m_groupsRootHandle;
         final int childIndex = m_pathToNode[m_pathToNode.length - 1];
         // traverse path up to butlast element
-        for (int i = 0; i < (m_pathToNode.length - 1); ++i) {
+        for (int i = 0; i < m_pathToNode.length - 1; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(m_pathToNode[i]);
         }
         if (undo) {
@@ -127,8 +127,8 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
             case REMOVE_NODE_KEEP_CHILDREN:
                 // move all children to newNode, then add newNode
                 GroupTreeNode newNode = m_subtreeBackup.deepCopy();
-                for (int i = childIndex; i < (childIndex
-                        + m_subtreeRootChildCount); ++i) {
+                for (int i = childIndex; i < childIndex
+                        + m_subtreeRootChildCount; ++i) {
                     newNode.add((GroupTreeNode) cursor.getChildAt(childIndex));
                 }
                 cursor.insert(newNode, childIndex);

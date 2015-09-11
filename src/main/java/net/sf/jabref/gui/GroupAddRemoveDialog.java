@@ -1,12 +1,11 @@
 package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.BaseAction;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -31,8 +30,8 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     private final BasePanel panel;
     private final boolean add;
-    private boolean move = false;
-    private BibtexEntry[] selection = null;
+    private boolean move;
+    private BibtexEntry[] selection;
     private JTree tree;
     private JButton ok;
 
@@ -53,10 +52,10 @@ public class GroupAddRemoveDialog implements BaseAction {
         selection = panel.getSelectedEntries();
 
         final JDialog diag = new JDialog(panel.frame(),
-                Globals.lang(add ? (move ? "Move to group" : "Add to group")
+                Localization.lang(add ? (move ? "Move to group" : "Add to group")
                         : "Remove from group"), true);
-        ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(groups);
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());
         tree.setVisibleRowCount(22);

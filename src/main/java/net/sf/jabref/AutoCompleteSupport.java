@@ -34,8 +34,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.autocompleter.AbstractAutoCompleter;
-import net.sf.jabref.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
 
 /**
  * Endows a textbox with the ability to autocomplete the input.

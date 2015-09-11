@@ -18,13 +18,18 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertString;
-import net.sf.jabref.undo.UndoableStringChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.gui.undo.UndoableStringChange;
 
 class StringChange extends Change {
 
@@ -44,7 +49,7 @@ class StringChange extends Change {
     public StringChange(BibtexString string, BibtexString tmpString, String label,
             String mem, String tmp, String disk) {
         this.tmpString = tmpString;
-        name = Globals.lang("Modified string") + ": '" + label + '\'';
+        name = Localization.lang("Modified string") + ": '" + label + '\'';
         this.string = string;
         this.label = label;
         this.mem = mem;
@@ -52,21 +57,21 @@ class StringChange extends Change {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<HTML><H2>");
-        sb.append(Globals.lang("Modified string"));
+        sb.append(Localization.lang("Modified string"));
         sb.append("</H2><H3>");
-        sb.append(Globals.lang("Label")).append(":</H3>");
+        sb.append(Localization.lang("Label")).append(":</H3>");
         sb.append(label);
         sb.append("<H3>");
-        sb.append(Globals.lang("New content")).append(":</H3>");
+        sb.append(Localization.lang("New content")).append(":</H3>");
         sb.append(disk);
         if (string != null) {
             sb.append("<H3>");
-            sb.append(Globals.lang("Current content")).append(":</H3>");
+            sb.append(Localization.lang("Current content")).append(":</H3>");
             sb.append(string.getContent());
         } else {
             sb.append("<P><I>");
-            sb.append(Globals.lang("Cannot merge this change")).append(": ");
-            sb.append(Globals.lang("The string has been removed locally")).append("</I>");
+            sb.append(Localization.lang("Cannot merge this change")).append(": ");
+            sb.append(Localization.lang("The string has been removed locally")).append("</I>");
         }
         sb.append("</HTML>");
         tp.setText(sb.toString());

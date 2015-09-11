@@ -18,8 +18,13 @@ package net.sf.jabref.external;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileUtil;
 
 import javax.swing.*;
 
@@ -49,9 +54,9 @@ public class DownloadExternalFile {
     private final MetaData metaData;
     private final String bibtexKey;
     private FileListEntryEditor editor;
-    private boolean downloadFinished = false;
-    private boolean dontShowDialog = false;
-    
+    private boolean downloadFinished;
+    private boolean dontShowDialog;
+
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
 
@@ -70,10 +75,9 @@ public class DownloadExternalFile {
      */
     public void download(final DownloadCallback callback) throws IOException {
         dontShowDialog = false;
-        final String res = JOptionPane.showInputDialog(frame,
-                Globals.lang("Enter URL to download"));
+        final String res = JOptionPane.showInputDialog(frame, Localization.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().length() == 0)) {
+        if (res == null || res.trim().isEmpty()) {
             return;
         }
 
@@ -81,8 +85,7 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL"),
-                    Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"), Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -105,7 +108,7 @@ public class DownloadExternalFile {
         final File tmp = File.createTempFile("jabref_download", "tmp");
         tmp.deleteOnExit();
 
-        URLDownload udl = URLDownload.buildMonitoredDownload(frame, url);
+        URLDownload udl = MonitoredURLDownload.buildMonitoredDownload(frame, url);
 
         //long time = System.currentTimeMillis();
         try {
@@ -113,8 +116,8 @@ public class DownloadExternalFile {
             // TODO: stop editor dialog if this results in an error:
             mimeType = udl.determineMimeType(); // Read MIME type
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                    + ex.getMessage(), Globals.lang("Download file"),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
+                    + ex.getMessage(), Localization.lang("Download file"),
                     JOptionPane.ERROR_MESSAGE);
             LOGGER.info("Error while downloading " + "'" + res + "'", ex);
             return;
@@ -131,13 +134,13 @@ public class DownloadExternalFile {
                     udlF.downloadToFile(tmp);
                 } catch (IOException e2) {
                     dontShowDialog = true;
-                    if ((editor != null) && (editor.isVisible())) {
+                    if (editor != null && editor.isVisible()) {
                         editor.setVisible(false, false);
                     }
-                    JOptionPane.showMessageDialog(frame, Globals.lang("Invalid URL") + ": "
-                                    + e2.getMessage(), Globals.lang("Download file"),
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
+                                    + e2.getMessage(), Localization.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while downloading " + "'" + urlF.toString() + "'", e2);
+                    LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
                     return;
                 }
 
@@ -192,14 +195,14 @@ public class DownloadExternalFile {
                         : new File(entry.getLink());
                 if (f.isDirectory()) {
                     JOptionPane.showMessageDialog(frame,
-                            Globals.lang("Target file cannot be a directory."), Globals.lang("Download file"),
+                            Localization.lang("Target file cannot be a directory."), Localization.lang("Download file"),
                             JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
                 if (f.exists()) {
                     return JOptionPane.showConfirmDialog
-                            (frame, "'" + f.getName() + "' " + Globals.lang("exists. Overwrite file?"),
-                                    Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
+                            (frame, "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
+                                    Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
                     == JOptionPane.OK_OPTION;
                 } else {
                     return true;
@@ -235,8 +238,8 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && entry.getLink().startsWith(directory) &&
-                        (entry.getLink().length() > dirPrefix.length())) {
+                if (directory != null && entry.getLink().startsWith(directory) &&
+                        entry.getLink().length() > dirPrefix.length()) {
                     entry.setLink(entry.getLink().substring(dirPrefix.length()));
                 }
 
@@ -287,7 +290,7 @@ public class DownloadExternalFile {
     private String getSuggestedFileName(String suffix) {
 
         String plannedName = bibtexKey;
-        if (suffix.length() > 0) {
+        if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
         }
 
@@ -297,10 +300,9 @@ public class DownloadExternalFile {
         * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
         *
         */
-        if (Globals.ON_WIN) {
-            plannedName = plannedName.replaceAll(
-                    "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
-        } else if (Globals.ON_MAC) {
+        if (OS.WINDOWS) {
+            plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
+        } else if (OS.OS_X) {
             plannedName = plannedName.replaceAll(":", "");
         }
 
@@ -319,7 +321,7 @@ public class DownloadExternalFile {
         try {
             // Try to strip the query string, if any, to get the correct suffix:
             URL url = new URL(link);
-            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
+            if (url.getQuery() != null && url.getQuery().length() < link.length() - 1) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
         } catch (MalformedURLException e) {
@@ -329,7 +331,7 @@ public class DownloadExternalFile {
         // First see if the stripped link gives a reasonable suffix:
         String suffix;
         int index = strippedLink.lastIndexOf('.');
-        if ((index <= 0) || (index == (strippedLink.length() - 1))) {
+        if (index <= 0 || index == strippedLink.length() - 1) {
             suffix = null;
         } else {
             suffix = strippedLink.substring(index + 1);
@@ -340,14 +342,13 @@ public class DownloadExternalFile {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == (strippedLink.length() - 1))) {
+            if (index <= 0 || index == strippedLink.length() - 1) {
                 // No occurence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
                 if (suffix.indexOf('/') > 0) {
                     return "";
-                }
-                else {
+                } else {
                     return suffix; // return the first one we found, anyway.
                 }
             } else {

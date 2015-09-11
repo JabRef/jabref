@@ -15,15 +15,16 @@
 */
 package net.sf.jabref.groups.structure;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.SearchRules;
-import net.sf.jabref.search.describer.SearchDescribers;
-import net.sf.jabref.util.QuotedStringTokenizer;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.SearchRules;
+import net.sf.jabref.logic.search.describer.SearchDescribers;
+import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -161,9 +162,9 @@ public class SearchGroup extends AbstractGroup {
         SearchGroup other = (SearchGroup) o;
         return name.equals(other.name)
                 && searchExpression.equals(other.searchExpression)
-                && (caseSensitive == other.caseSensitive)
-                && (regExp == other.regExp)
-                && (getHierarchicalContext() == other.getHierarchicalContext());
+                && caseSensitive == other.caseSensitive
+                && regExp == other.regExp
+                && getHierarchicalContext() == other.getHierarchicalContext();
     }
 
     /*
@@ -225,17 +226,17 @@ public class SearchGroup extends AbstractGroup {
             sb.append(StringUtil.quoteForHTML(getName()));
         }
         sb.append("</b> - ");
-        sb.append(Globals.lang("dynamic group"));
+        sb.append(Localization.lang("dynamic group"));
         sb.append(" (");
-        sb.append(Globals.lang("search expression"));
+        sb.append(Localization.lang("search expression"));
         sb.append(" <b>").
                 append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
         switch (getHierarchicalContext()) {
         case INCLUDING:
-            sb.append(", ").append(Globals.lang("includes subgroups"));
+            sb.append(", ").append(Localization.lang("includes subgroups"));
             break;
         case REFINING:
-            sb.append(", ").append(Globals.lang("refines supergroup"));
+            sb.append(", ").append(Localization.lang("refines supergroup"));
             break;
         default:
             break;

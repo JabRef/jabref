@@ -11,7 +11,6 @@ import java.awt.event.FocusListener;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import net.sf.jabref.autocompleter.AutoCompleter;
 
 /**
  * A text field which displays a predefined text (e.g. "Search") if it has not the focus and no text is entered.

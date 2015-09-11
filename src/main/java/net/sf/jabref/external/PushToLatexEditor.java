@@ -22,22 +22,28 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Class for pushing entries into LatexEditor.
  */
 public class PushToLatexEditor implements PushToApplication {
 
-    private boolean couldNotCall = false;
-    private boolean notDefined = false;
-    private JPanel settings = null;
+    private boolean couldNotCall;
+    private boolean notDefined;
+    private JPanel settings;
     private final JTextField ledPath = new JTextField(30);
     private final JTextField citeCommand = new JTextField(30);
 
 
     @Override
     public String getName() {
-        return Globals.menuTitle("Insert selected citations into LatexEditor");
+        return Localization.menuTitle("Insert selected citations into LatexEditor");
     }
 
     @Override
@@ -47,7 +53,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Globals.lang("Push to LatexEditor");
+        return Localization.lang("Push to LatexEditor");
     }
 
     @Override
@@ -68,7 +74,7 @@ public class PushToLatexEditor implements PushToApplication {
 
         String led = Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH);
 
-        if ((led == null) || (led.trim().length() == 0)) {
+        if (led == null || led.trim().isEmpty()) {
             notDefined = true;
             return;
         }
@@ -87,14 +93,14 @@ public class PushToLatexEditor implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
-            panel.output(Globals.lang("Error") + ": " +
-                    Globals.lang("Path to %0 not defined", getApplicationName()) + ".");
+            panel.output(Localization.lang("Error") + ": " +
+                    Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
         }
         else if (couldNotCall) {
-            panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
+            panel.output(Localization.lang("Error") + ": " + Localization.lang("Could not call executable") + " '"
                     + Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH) + "'.");
         } else {
-            Globals.lang("Pushed citations to %0", "LatexEditor");
+            Localization.lang("Pushed citations to %0", "LatexEditor");
         }
     }
 
@@ -116,14 +122,14 @@ public class PushToLatexEditor implements PushToApplication {
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Globals.lang("Path to LatexEditor (LEd.exe)") + ":"));
+        builder.append(new JLabel(Localization.lang("Path to LatexEditor (LEd.exe)") + ":"));
         builder.append(ledPath);
         BrowseAction action = BrowseAction.buildForFile(ledPath);
-        JButton browse = new JButton(Globals.lang("Browse"));
+        JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
         builder.nextLine();
-        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(Localization.lang("Cite command") + ":");
         builder.append(citeCommand);
         settings = builder.getPanel();
     }

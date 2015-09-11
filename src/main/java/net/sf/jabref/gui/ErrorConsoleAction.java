@@ -1,8 +1,8 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.util.error.StreamEavesdropper;
-import net.sf.jabref.util.logging.CacheableHandler;
+import net.sf.jabref.logic.error.StreamEavesdropper;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.logging.CacheableHandler;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -28,10 +28,10 @@ public class ErrorConsoleAction extends AbstractAction {
     private final CacheableHandler logHandler;
 
     public ErrorConsoleAction(JFrame frame, StreamEavesdropper streamEavesdropper, CacheableHandler logHandler) {
-        super(Globals.menuTitle("Show error console"));
+        super(Localization.menuTitle("Show error console"));
         this.streamEavesdropper = streamEavesdropper;
         this.logHandler = logHandler;
-        putValue(Action.SHORT_DESCRIPTION, Globals.lang("Display all error messages"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Display all error messages"));
         this.frame = frame;
     }
 
@@ -43,15 +43,15 @@ public class ErrorConsoleAction extends AbstractAction {
     private void displayErrorConsole(JFrame parent) {
         JTabbedPane tabbed = new JTabbedPane();
 
-        addTextArea(tabbed, Globals.lang("Output"), streamEavesdropper.getOutput());
-        addTextArea(tabbed, Globals.lang("Exceptions"), streamEavesdropper.getErrorMessages(),
-                Globals.lang("No exceptions have ocurred."));
-        addTextArea(tabbed, Globals.lang("Log"), logHandler.getLog());
+        addTextArea(tabbed, Localization.lang("Output"), streamEavesdropper.getOutput());
+        addTextArea(tabbed, Localization.lang("Exceptions"), streamEavesdropper.getErrorMessages(),
+                Localization.lang("No exceptions have ocurred."));
+        addTextArea(tabbed, Localization.lang("Log"), logHandler.getLog());
 
         tabbed.setPreferredSize(new Dimension(500, 500));
 
         JOptionPane.showMessageDialog(parent, tabbed,
-                Globals.lang("Program output"), JOptionPane.ERROR_MESSAGE);
+                Localization.lang("Program output"), JOptionPane.ERROR_MESSAGE);
     }
 
     /**

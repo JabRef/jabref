@@ -28,14 +28,14 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -49,20 +49,21 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JTextField remove = new JTextField(60);
     private final JTextField field = new JTextField(60);
     private final JTextField deliminator = new JTextField(60);
-    JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
-            nr = new JLabel(Globals.lang("Characters to ignore") + ":");
+    JLabel nf = new JLabel(Localization.lang("Field to group by") + ":");
+    JLabel nr = new JLabel(Localization.lang("Characters to ignore") + ":");
     private final JRadioButton
-            keywords = new JRadioButton(Globals.lang("Generate groups from keywords in a BibTeX field"));
-    private final JRadioButton authors = new JRadioButton(Globals.lang("Generate groups for author last names"));
-    private final JRadioButton editors = new JRadioButton(Globals.lang("Generate groups for editor last names"));
-    private final JCheckBox nd = new JCheckBox(Globals.lang("Use the following delimiter character(s):"));
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private boolean ok_pressed = false;
+            keywords = new JRadioButton(Localization.lang("Generate groups from keywords in a BibTeX field"));
+    private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
+    private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
+    private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private boolean ok_pressed;
     private final GroupTreeNode m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final GroupSelector gs;
-    private String oldRemove, oldField;
+    private String oldRemove;
+    private String oldField;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
@@ -75,7 +76,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     public AutoGroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
             GroupSelector groupSelector, GroupTreeNode groupsRoot,
             String defaultField, String defaultRemove, String defaultDeliminator) {
-        super(jabrefFrame, Globals.lang("Automatically create groups"), true);
+        super(jabrefFrame, Localization.lang("Automatically create groups"), true);
         frame = jabrefFrame;
         gs = groupSelector;
         panel = basePanel;
@@ -92,7 +93,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 dispose();
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                        new ExplicitGroup(Globals.lang("Automatically created groups"),
+                        new ExplicitGroup(Localization.lang("Automatically created groups"),
                                 GroupHierarchyType.INCLUDING));
                 Set<String> hs = null;
                 String field = field();
@@ -128,7 +129,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 }
 
                 m_groupsRoot.add(autoGroupsRoot);
-                NamedCompound ce = new NamedCompound(Globals.lang("Autogenerate groups"));
+                NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                         gs, m_groupsRoot, autoGroupsRoot,
                         UndoableAddOrRemoveGroup.ADD_NODE);
@@ -137,7 +138,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 panel.markBaseChanged(); // a change always occurs
                 gs.revalidateGroups();
-                frame.output(Globals.lang("Created groups."));
+                frame.output(Localization.lang("Created groups."));
                 ce.end();
                 panel.undoManager.addEdit(ce);
             }
@@ -152,7 +153,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 dispose();
             }
         };
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(cancelAction);
         ok.addActionListener(okListener);
         // Key bindings:
@@ -172,11 +173,11 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.append(keywords, 5);
         b.nextLine();
         b.append(new JPanel());
-        b.append(Globals.lang("Field to group by") + ":");
+        b.append(Localization.lang("Field to group by") + ":");
         b.append(field);
         b.nextLine();
         b.append(new JPanel());
-        b.append(Globals.lang("Characters to ignore") + ":");
+        b.append(Localization.lang("Characters to ignore") + ":");
         b.append(remove);
         b.nextLine();
         b.append(new JPanel());

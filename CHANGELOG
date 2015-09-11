@@ -1,4 +1,13 @@
-﻿[dev_2.11]
+[master]
+    - Feature: When pasting a Google search URL, meta data will be automatically stripped before insertion.
+    - No longer write JabRef version to BibTex file header.
+    - No longer add blank lines inside a bibtex entry
+    - Perform syntax improvements enabled by Java 1.7+ (diamond operator, try-with-resources)
+    - List of authors is now auto generated `scripts/generate-authors.sh` and inserted into L10N About.html
+    - Remove Mr.DLib support as MR.DLib will be shut down in 2015
+    - Streamline logging API: Replace usages of java.util.logging with commons.logging
+    - BREAKING: Remove plugin functionality.
+    - Fixes Bug#1297: No console message on closing.
     - Improvements to search:
     	- Search bar is now at the top
     	- Autocompletion suggestions are shown in a popup
@@ -7,6 +16,7 @@
     	- In incremental search mode: next result is selected by pressing enter (instead of Control + F as previously)
     	- Incremental search now uses the same search engine as the other search modes
     	- Added a new search mode (Live filter) which filters the table as soon as the search text is changed 
+[dev_2.11]
     - Add of Persian localization (by Behrouz Javanmardi)
     - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
     - Backport from 2.80: Fixes Bug#1297: No console message on closing.

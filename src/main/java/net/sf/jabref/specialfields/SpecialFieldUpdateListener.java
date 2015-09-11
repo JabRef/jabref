@@ -21,7 +21,7 @@ import java.beans.VetoableChangeListener;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.JabRef;
 
 /**
@@ -31,7 +31,7 @@ import net.sf.jabref.JabRef;
  */
 public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
-    private static SpecialFieldUpdateListener INSTANCE = null;
+    private static SpecialFieldUpdateListener INSTANCE;
 
 
     @Override

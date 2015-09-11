@@ -1,14 +1,13 @@
 package net.sf.jabref.util;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.NameFormatterTab;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.ParserResult;
-
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.gui.preftabs.NameFormatterTab;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,10 +24,10 @@ public class UtilTest {
 
     @Test
     public void testNCase() {
-        Assert.assertEquals("", StringUtil.nCase(""));
-        Assert.assertEquals("Hello world", StringUtil.nCase("Hello World"));
-        Assert.assertEquals("A", StringUtil.nCase("a"));
-        Assert.assertEquals("Aa", StringUtil.nCase("AA"));
+        Assert.assertEquals("", StringUtil.capitalizeFirst(""));
+        Assert.assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
+        Assert.assertEquals("A", StringUtil.capitalizeFirst("a"));
+        Assert.assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
     }
 
     @Test
@@ -204,29 +203,29 @@ public class UtilTest {
     public void testParseMethodCalls() {
 
         Assert.assertEquals(1, Util.parseMethodsCalls("bla").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla").get(0)))[0]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla").get(0))[0]);
 
         Assert.assertEquals(1, Util.parseMethodsCalls("bla,").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla,").get(0)))[0]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla,").get(0))[0]);
 
         Assert.assertEquals(1, Util.parseMethodsCalls("_bla.bla.blub,").size());
-        Assert.assertEquals("_bla.bla.blub", ((Util.parseMethodsCalls("_bla.bla.blub,").get(0)))[0]);
+        Assert.assertEquals("_bla.bla.blub", (Util.parseMethodsCalls("_bla.bla.blub,").get(0))[0]);
 
         Assert.assertEquals(2, Util.parseMethodsCalls("bla,foo").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla,foo").get(0)))[0]);
-        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla,foo").get(1)))[0]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla,foo").get(0))[0]);
+        Assert.assertEquals("foo", (Util.parseMethodsCalls("bla,foo").get(1))[0]);
 
         Assert.assertEquals(2, Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[0]);
-        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[0]);
-        Assert.assertEquals("test", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[1]);
-        Assert.assertEquals("fark", ((Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[1]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[0]);
+        Assert.assertEquals("foo", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[0]);
+        Assert.assertEquals("test", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[1]);
+        Assert.assertEquals("fark", (Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[1]);
 
         Assert.assertEquals(2, Util.parseMethodsCalls("bla(test),foo(fark)").size());
-        Assert.assertEquals("bla", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[0]);
-        Assert.assertEquals("foo", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[0]);
-        Assert.assertEquals("test", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[1]);
-        Assert.assertEquals("fark", ((Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[1]);
+        Assert.assertEquals("bla", (Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[0]);
+        Assert.assertEquals("foo", (Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[0]);
+        Assert.assertEquals("test", (Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[1]);
+        Assert.assertEquals("fark", (Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[1]);
     }
 
     @Test
@@ -309,23 +308,19 @@ public class UtilTest {
     public void testSanitizeUrl() {
 
         Assert.assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("http://www.vg.no/fil e.html"));
-        Assert.assertEquals("http://www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
-        Assert.assertEquals("www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("www.vg.no/fil%20e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", Util.sanitizeUrl("http://www.vg.no/fil e.html"));
+        Assert.assertEquals("http://www.vg.no/fil%20e.html", Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", Util.sanitizeUrl("www.vg.no/fil%20e.html"));
 
-        Assert.assertEquals("www.vg.no/fil%20e.html",
-                Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
+        Assert.assertEquals("www.vg.no/fil%20e.html", Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
 
         /**
-         * DOI Test cases
+         * Doi Test cases
          */
-        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
-        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
-        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
-        Assert.assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
+        Assert.assertEquals(DOI.RESOLVER.resolve("/10.1109/VLHCC.2004.20").toASCIIString(), Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
 
         /**
          * Additional testcases provided by Hannes Restel and Micha Beckmann.

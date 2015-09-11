@@ -27,20 +27,19 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -55,12 +54,12 @@ import com.jgoodies.forms.layout.ColumnSpec;
 public class MergeEntriesDialog extends JDialog {
 
     // private String [] preferedOrder = {"author", "title", "journal", "booktitle", "volume", "number", "pages", "year", "month"};
-    private final String[] columnHeadings = {Globals.lang("Field"),
-            Globals.lang("First entry"),
-            Globals.lang("Use 1st"),
-            Globals.lang("None"),
-            Globals.lang("Use 2nd"),
-            Globals.lang("Second entry")};
+    private final String[] columnHeadings = {Localization.lang("Field"),
+            Localization.lang("First entry"),
+            Localization.lang("Use 1st"),
+            Localization.lang("None"),
+            Localization.lang("Use 2nd"),
+            Localization.lang("Second entry")};
     private final Dimension DIM = new Dimension(800, 800);
     private PreviewPanel preview;
     private final BasePanel panel;
@@ -80,7 +79,7 @@ public class MergeEntriesDialog extends JDialog {
 
 
     public MergeEntriesDialog(BasePanel panel) {
-        super(panel.frame(), Globals.lang("Merge entries"), true);
+        super(panel.frame(), Localization.lang("Merge entries"), true);
 
         this.panel = panel;
         this.frame = panel.frame();
@@ -94,8 +93,8 @@ public class MergeEntriesDialog extends JDialog {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(frame, Globals.lang("You have to choose exactly two entries to merge."),
-                    Globals.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("You have to choose exactly two entries to merge."),
+                    Localization.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
@@ -105,7 +104,7 @@ public class MergeEntriesDialog extends JDialog {
         two = selected[1];
 
         // Create undo-compound
-        ce = new NamedCompound(Globals.lang("Merge entries"));
+        ce = new NamedCompound(Localization.lang("Merge entries"));
 
         joint = new TreeSet<String>(one.getAllFields());
         joint.addAll(two.getAllFields());
@@ -156,7 +155,7 @@ public class MergeEntriesDialog extends JDialog {
         BibtexEntryType type2 = two.getType();
 
         mergedEntry.setType(type1);
-        JLabel label = new JLabel(Globals.lang("Entry type"));
+        JLabel label = new JLabel(Localization.lang("Entry type"));
         Font font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         this.add(label, cc.xy(1, 3));
@@ -273,7 +272,7 @@ public class MergeEntriesDialog extends JDialog {
         row++;
 
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
-        label = new JLabel(Globals.lang("Merged entry"));
+        label = new JLabel(Localization.lang("Merged entry"));
         font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         this.add(label, cc.xy(1, row));
@@ -290,9 +289,9 @@ public class MergeEntriesDialog extends JDialog {
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
-            mergedEntry.write(sw, new LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
-            System.err.println(Globals.lang("Error in entry" + ": " + ex.getMessage()));
+            System.err.println(Localization.lang("Error in entry" + ": " + ex.getMessage()));
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
@@ -303,7 +302,7 @@ public class MergeEntriesDialog extends JDialog {
         // Create buttons
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.setActionCommand("cancel");
         cancel.addActionListener(new ActionListener() {
 
@@ -313,7 +312,7 @@ public class MergeEntriesDialog extends JDialog {
             }
         });
 
-        JButton newentry = new JButton(Globals.lang("Add new entry and keep both old entries"));
+        JButton newentry = new JButton(Localization.lang("Add new entry and keep both old entries"));
         newentry.setActionCommand("newentry");
         newentry.addActionListener(new ActionListener() {
 
@@ -323,7 +322,7 @@ public class MergeEntriesDialog extends JDialog {
             }
         });
 
-        JButton replaceentries = new JButton(Globals.lang("Replace old entries with new entry"));
+        JButton replaceentries = new JButton(Localization.lang("Replace old entries with new entry"));
         replaceentries.setActionCommand("replace");
         replaceentries.addActionListener(new ActionListener() {
 
@@ -362,7 +361,7 @@ public class MergeEntriesDialog extends JDialog {
     private void buttonPressed(String button) {
         if (button.equals("cancel")) {
             // Cancelled, throw it away
-            panel.output(Globals.lang("Cancelled merging entries"));
+            panel.output(Localization.lang("Cancelled merging entries"));
 
             dispose();
         } else if (button.equals("newentry")) {
@@ -372,7 +371,7 @@ public class MergeEntriesDialog extends JDialog {
             ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
             ce.end();
             panel.undoManager.addEdit(ce);
-            panel.output(Globals.lang("Merged entries into a new and kept the old"));
+            panel.output(Localization.lang("Merged entries into a new and kept the old"));
             dispose();
         } else if (button.equals("replace")) {
             // Create a new entry and add it to the undo stack
@@ -385,7 +384,7 @@ public class MergeEntriesDialog extends JDialog {
             panel.database().removeEntry(two.getId());
             ce.end();
             panel.undoManager.addEdit(ce);
-            panel.output(Globals.lang("Merged entries into a new and removed the old"));
+            panel.output(Localization.lang("Merged entries into a new and removed the old"));
             dispose();
         }
     }
@@ -423,9 +422,9 @@ public class MergeEntriesDialog extends JDialog {
         // Update the Bibtex source view
         StringWriter sw = new StringWriter();
         try {
-            mergedEntry.write(sw, new LatexFieldFormatter(), false);
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
-            System.err.println(Globals.lang("Error in entry" + ": " + ex.getMessage()));
+            System.err.println(Localization.lang("Error in entry" + ": " + ex.getMessage()));
         }
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);

@@ -1,6 +1,8 @@
 package net.sf.jabref.util;
 
 import static org.junit.Assert.assertEquals;
+
+import net.sf.jabref.logic.util.strings.NameListNormalizer;
 import org.junit.Test;
 
 public class NameListNormalizerTest {

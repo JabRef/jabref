@@ -22,19 +22,25 @@ import javax.swing.*;
 import net.sf.jabref.*;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 public class PushToWinEdt implements PushToApplication {
 
-    private boolean couldNotCall = false;
-    private boolean notDefined = false;
-    private JPanel settings = null;
+    private boolean couldNotCall;
+    private boolean notDefined;
+    private JPanel settings;
     private final JTextField winEdtPath = new JTextField(30);
     private final JTextField citeCommand = new JTextField(30);
 
 
     @Override
     public String getName() {
-        return Globals.lang("Insert selected citations into WinEdt");
+        return Localization.lang("Insert selected citations into WinEdt");
     }
 
     @Override
@@ -44,7 +50,7 @@ public class PushToWinEdt implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Globals.lang("Push selection to WinEdt");
+        return Localization.lang("Push selection to WinEdt");
     }
 
     @Override
@@ -64,7 +70,7 @@ public class PushToWinEdt implements PushToApplication {
         notDefined = false;
 
         String winEdt = Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH);
-        if ((winEdt == null) || (winEdt.trim().length() == 0)) {
+        if (winEdt == null || winEdt.trim().isEmpty()) {
             notDefined = true;
             return;
         }
@@ -84,14 +90,14 @@ public class PushToWinEdt implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
-            panel.output(Globals.lang("Error") + ": " +
-                    Globals.lang("Path to %0 not defined", getApplicationName()) + ".");
+            panel.output(Localization.lang("Error") + ": " +
+                    Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
         }
         else if (couldNotCall) {
-            panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
+            panel.output(Localization.lang("Error") + ": " + Localization.lang("Could not call executable") + " '"
                     + Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH) + "'.");
         } else {
-            Globals.lang("Pushed citations to WinEdt");
+            Localization.lang("Pushed citations to WinEdt");
         }
     }
 
@@ -113,14 +119,14 @@ public class PushToWinEdt implements PushToApplication {
     private void initSettingsPanel() {
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Globals.lang("Path to WinEdt.exe") + ":"));
+        builder.append(new JLabel(Localization.lang("Path to WinEdt.exe") + ":"));
         builder.append(winEdtPath);
         BrowseAction action = BrowseAction.buildForFile(winEdtPath);
-        JButton browse = new JButton(Globals.lang("Browse"));
+        JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
         builder.append(browse);
         builder.nextLine();
-        builder.append(Globals.lang("Cite command") + ":");
+        builder.append(Localization.lang("Cite command") + ":");
         builder.append(citeCommand);
         settings = builder.getPanel();
     }

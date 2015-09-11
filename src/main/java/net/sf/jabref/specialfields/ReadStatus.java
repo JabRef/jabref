@@ -19,25 +19,25 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class ReadStatus extends SpecialField {
 
-    private static ReadStatus INSTANCE = null;
+    private static ReadStatus INSTANCE;
 
     private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("readstatus"));
 
 
     private ReadStatus() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-        values.add(new SpecialFieldValue(this, null, "clearReadStatus", Globals.lang("Clear read status"), null, Globals.lang("No read status information")));
+        values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
         ImageIcon icon;
         icon = GUIGlobals.getImage("readStatusRead");
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Globals.lang("Set read status to read"), icon, Globals.lang("Read status read")));
+        values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Localization.lang("Set read status to read"), icon, Localization.lang("Read status read")));
         icon = GUIGlobals.getImage("readStatusSkimmed");
-        values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Globals.lang("Set read status to skimmed"), icon, Globals.lang("Read status skimmed")));
+        values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), icon, Localization.lang("Read status skimmed")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
     }
@@ -61,11 +61,11 @@ public class ReadStatus extends SpecialField {
 
     @Override
     public String getToolTip() {
-        return Globals.lang("Read status");
+        return Localization.lang("Read status");
     }
 
     @Override
     public String getMenuString() {
-        return Globals.lang("Read status");
+        return Localization.lang("Read status");
     }
 }

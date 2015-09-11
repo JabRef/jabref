@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.fieldeditors.TextArea;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +27,7 @@ public class SearchTextListenerTest {
         String contentToHighlight1 = "Word";
         String contentToHighlight2 = "Content";
 
-        FieldTextArea ta = new FieldTextArea("", content);
+        TextArea ta = new TextArea("", content);
 
         Highlighter highlighter = ta.getHighlighter();
         Highlight[] highlight = highlighter.getHighlights();
@@ -80,7 +82,7 @@ public class SearchTextListenerTest {
         String content = "Test Word Content";
         String contentToHighlight1 = "Word";
 
-        FieldTextArea ta = new FieldTextArea("", content);
+        TextArea ta = new TextArea("", content);
 
         String textOne = ta.getText();
 
@@ -106,7 +108,7 @@ public class SearchTextListenerTest {
 
         String content = "Test Word Content";
 
-        FieldTextArea ta = new FieldTextArea("", content);
+        TextArea ta = new TextArea("", content);
 
         //should not matter at all
         ta.searchText(null);

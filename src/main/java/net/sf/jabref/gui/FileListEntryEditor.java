@@ -30,12 +30,12 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.sf.jabref.util.FileUtil;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
@@ -59,17 +59,19 @@ public class FileListEntryEditor {
     private JDialog diag;
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
-    private final JButton ok = new JButton(Globals.lang("Ok"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
 
     private final JComboBox types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
-    private final JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
-    private ConfirmCloseFileListEntryEditor externalConfirm = null;
+    private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
+    private ConfirmCloseFileListEntryEditor externalConfirm;
 
     private FileListEntry entry;
     private final MetaData metaData;
-    private boolean okPressed = false, okDisabledExternally = false,
-            openBrowseWhenShown = false, dontOpenBrowseUntilDisposed = false;
+    private boolean okPressed;
+    private boolean okDisabledExternally;
+    private boolean openBrowseWhenShown;
+    private boolean dontOpenBrowseUntilDisposed;
 
     private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
 
@@ -114,22 +116,22 @@ public class FileListEntryEditor {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(Globals.lang("Link"));
+        builder.append(Localization.lang("Link"));
         builder.append(link);
         final BrowseListener browse = new BrowseListener(frame, link);
-        final JButton browseBut = new JButton(Globals.lang("Browse"));
+        final JButton browseBut = new JButton(Localization.lang("Browse"));
         browseBut.addActionListener(browse);
         builder.append(browseBut);
-        JButton open = new JButton(Globals.lang("Open"));
+        JButton open = new JButton(Localization.lang("Open"));
         if (showOpenButton) {
             builder.append(open);
         }
         builder.nextLine();
-        builder.append(Globals.lang("Description"));
+        builder.append(Localization.lang("Description"));
         builder.append(description, 3);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.nextLine();
-        builder.append(Globals.lang("File type"));
+        builder.append(Localization.lang("File type"));
         builder.append(types, 3);
         if (showProgressBar) {
             builder.nextLine();
@@ -143,7 +145,7 @@ public class FileListEntryEditor {
         //bb.addRelatedGap();
         bb.addRelatedGap();
         bb.addButton(ok);
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
 
@@ -193,7 +195,7 @@ public class FileListEntryEditor {
 
         });
 
-        diag = new JDialog(frame, Globals.lang("Edit file link"), true);
+        diag = new JDialog(frame, Localization.lang("Edit file link"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
@@ -248,7 +250,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
         if (type != null) {
             try {
-                Util.openExternalFileAnyFormat(metaData, link.getText(), type);
+                JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), type);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -42,8 +42,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 /**
@@ -54,18 +53,18 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
     private final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
     final JList list;
-    private JScrollPane sp = null;
+    private JScrollPane sp;
     DefaultListModel listModel;
     private JComboBox sel;
     private JTextField input;
     private final JButton add;
     final JButton remove;
-    private JButton up = null;
-    private JButton down = null;
+    private JButton up;
+    private JButton down;
     final GridBagLayout gbl = new GridBagLayout();
     final GridBagConstraints con = new GridBagConstraints();
     final boolean forceLowerCase;
-    boolean changesMade = false;
+    boolean changesMade;
     private final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
 
 
@@ -88,8 +87,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
     private FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText,
                               boolean arrows, boolean forceLowerCase) {
         this.forceLowerCase = forceLowerCase;
-        add = new JButton(Globals.lang(addText));
-        remove = new JButton(Globals.lang(removeText));
+        add = new JButton(Localization.lang(addText));
+        remove = new JButton(Localization.lang(removeText));
         listModel = new DefaultListModel();
         JLabel title1 = null;
         if (title != null) {
@@ -127,8 +126,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
             down = new JButton(GUIGlobals.getImage("down"));
             up.addActionListener(this);
             down.addActionListener(this);
-            up.setToolTipText(Globals.lang("Move up"));
-            down.setToolTipText(Globals.lang("Move down"));
+            up.setToolTipText(Localization.lang("Move up"));
+            down.setToolTipText(Localization.lang("Move down"));
             gbl.setConstraints(up, con);
             add(up);
             gbl.setConstraints(down, con);
@@ -241,11 +240,11 @@ class FieldSetComponent extends JPanel implements ActionListener {
         }
 
         String testString = Util.checkLegalKey(s);
-        if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
+        if (!testString.equals(s) || s.indexOf('&') >= 0) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
-                    + "characters") + ": # { } ~ , ^ &",
-                    Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
+                            + "characters") + ": # { } ~ , ^ &",
+                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
             return;
         }
@@ -346,10 +345,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         if (src == add) {
             // Selection has been made, or add button pressed:
-            if ((sel != null) && (sel.getSelectedItem() != null)) {
+            if (sel != null && sel.getSelectedItem() != null) {
                 String s = sel.getSelectedItem().toString();
                 addField(s);
-            } else if ((input != null) && !input.getText().equals("")) {
+            } else if (input != null && !input.getText().equals("")) {
                 addField(input.getText());
             }
         }
@@ -361,7 +360,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             removeSelected();
         }
         else if (src == sel) {
-            if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0)) {
+            if (e.getActionCommand().equals("comboBoxChanged") && e.getModifiers() == 0) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
                 // everywhere.

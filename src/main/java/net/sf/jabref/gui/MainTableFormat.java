@@ -18,14 +18,11 @@ package net.sf.jabref.gui;
 import java.util.HashMap;
 import java.util.Vector;
 
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
@@ -75,7 +72,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
     private final HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
-    private int[][] nameCols = null;
+    private int[][] nameCols;
     private boolean namesAsIs;
     private boolean abbr_names;
     private boolean namesNatbib;
@@ -118,7 +115,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                 if (disName != null) {
                     sb.append(disName);
                 } else {
-                    sb.append(StringUtil.nCase(fld[i]));
+                    sb.append(StringUtil.capitalizeFirst(fld[i]));
                 }
             }
             return sb.toString();
@@ -128,7 +125,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
               return disName ;
             } */
         }
-        //return Util.nCase(columns[col - padleft]);
+        //return Util.capitalizeFirst(columns[col - padleft]);
     }
 
     /**
@@ -271,7 +268,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             // Go through the fields until we find one with content:
             int j = 0;
             for (int i = 0; i < fld.length; i++) {
-                if (fld[i].equals(GUIGlobals.TYPE_HEADER)) {
+                if (fld[i].equals(BibtexEntry.TYPE_HEADER)) {
                     o = be.getType().getName();
                 } else {
                     o = be.getFieldOrAlias(fld[i]);
@@ -355,7 +352,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
                     return new int[]{0, fileList.getRowCount()};
                 }
             }
-            int lastLinkPosition = -1, countLinks = 0;
+            int lastLinkPosition = -1;
+            int countLinks = 0;
             for (int i = 1; i < field.length; i++) {
                 // Count the number of links of correct type.
                 for (int j = 0; j < fileList.getRowCount(); j++) {

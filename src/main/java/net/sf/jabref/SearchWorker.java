@@ -2,9 +2,14 @@ package net.sf.jabref;
 
 import org.apache.commons.logging.LogFactory;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SearchResultsDialog;
-import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.matchers.SearchMatcher;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.matchers.SearchMatcher;
 
 class SearchWorker extends AbstractWorker {
 
@@ -158,12 +163,12 @@ class SearchWorker extends AbstractWorker {
     private void updateIncremental() {
         int entryCount = frame.basePanel().getDatabase().getEntryCount();
         if ((incSearchPos >= entryCount) || (incSearchPos < 0)) {
-            frame.basePanel().output('\'' + query + "' : " + Globals.lang("Incremental search failed. Repeat to search from top.") + '.');
+            frame.basePanel().output('\'' + query + "' : " + Localization.lang("Incremental search failed. Repeat to search from top.") + '.');
             return;
         }
 
         frame.basePanel().selectSingleEntry(incSearchPos);
-        frame.basePanel().output('\'' + query + "' " + Globals.lang("found") + '.');
+        frame.basePanel().output('\'' + query + "' " + Localization.lang("found") + '.');
     }
 
     /* (non-Javadoc)
@@ -194,7 +199,7 @@ class SearchWorker extends AbstractWorker {
         }
 
         if (mode != SearchMode.Incremental) {
-            frame.basePanel().output(Globals.lang("Searched database. Number of hits") + ": " + hits);
+            frame.basePanel().output(Localization.lang("Searched database. Number of hits") + ": " + hits);
         }
     }
 
@@ -261,7 +266,7 @@ class SearchWorker extends AbstractWorker {
     private void initSearchDialog() {
         // TODO: Move search dialog to main table and make it non-search specific (similar to filter/float by SearchMatcher
         if (searchDialog == null) {
-            searchDialog = new SearchResultsDialog(frame, Globals.lang("Search results"));
+            searchDialog = new SearchResultsDialog(frame, Localization.lang("Search results"));
         }
     }
 }

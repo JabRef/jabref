@@ -23,30 +23,13 @@ package net.sf.jabref.util;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.net.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,40 +53,45 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.*;
+import net.sf.jabref.logic.util.date.MonthUtil;
+import net.sf.jabref.logic.util.date.YearUtil;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.util.io.FileNameCleaner;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.strings.UnicodeCharMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.CallBack;
-import net.sf.jabref.EasyDateFormat;
-import net.sf.jabref.EntryMarker;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.worker.CallBack;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.ImportSettingsTab;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.OpenFileFilter;
-import net.sf.jabref.Worker;
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
+import net.sf.jabref.gui.OpenFileFilter;
+import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.exporter.layout.Layout;
+import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -112,12 +100,17 @@ import com.jgoodies.forms.layout.FormLayout;
  * utility functions
  */
 public class Util {
+    private static final Log LOGGER = LogFactory.getLog(Util.class);
 
-    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
+    public static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     
     private static final EasyDateFormat dateFormatter = new EasyDateFormat();
     
-    private static final Log LOGGER = LogFactory.getLog(Util.class);
+    public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
+    
+    private static final String SEPARATING_CHARS_NOSPACE = ";,\n";
+    
+    private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
 
     /**
      * This method sets the location of a Dialog such that it is centered with
@@ -135,7 +128,7 @@ public class Util {
      * references are enclosed in a pair of '#' characters.
      */
     public static String parseField(String content) {
-        if (content.length() == 0) {
+        if (content.isEmpty()) {
             return content;
         }
 
@@ -143,33 +136,26 @@ public class Util {
         StringBuilder result = new StringBuilder();
         for (String string : strings) {
             String s = string.trim();
-            if (s.length() > 0) {
+            if (!s.isEmpty()) {
                 char c = s.charAt(0);
                 // String reference or not?
-                if ((c == '{') || (c == '"')) {
+                if (c == '{' || c == '"') {
                     result.append(StringUtil.shaveString(string));
                 } else {
                     // This part should normally be a string reference, but if it's
                     // a pure number, it is not.
                     String s2 = StringUtil.shaveString(s);
-                    if(isInteger(s2)) {
+
+                    try {
+                        Integer.parseInt(s2);
                         result.append(s2);
-                    } else {
+                    } catch (NumberFormatException e) {
                         result.append('#').append(s2).append('#');
                     }
                 }
             }
         }
         return result.toString();
-    }
-
-    private static boolean isInteger(String s) {
-        try {
-            Integer.parseInt(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
     /**
@@ -180,6 +166,7 @@ public class Util {
      * @return will return the publication date of the entry or null if no year
      *         was found.
      */
+    // TODO: Should be instance method of BibTexEntry
     public static String getPublicationDate(BibtexEntry entry) {
 
         Object o = entry.getField("year");
@@ -219,8 +206,8 @@ public class Util {
             StringBuilder newKey = new StringBuilder();
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"')
-                        && (c != '}') && (c != ',')) {
+                if (!Character.isWhitespace(c) && c != '{' && c != '\\' && c != '"'
+                        && c != '}' && c != ',') {
                     newKey.append(c);
                 }
             }
@@ -230,8 +217,8 @@ public class Util {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"')
-                    && (c != '}') && (c != '~') && (c != ',') && (c != '^') && (c != '\'')) {
+            if (!Character.isWhitespace(c) && c != '#' && c != '{' && c != '\\' && c != '"'
+                    && c != '}' && c != '~' && c != ',' && c != '^' && c != '\'') {
                 newKey.append(c);
             }
         }
@@ -245,10 +232,10 @@ public class Util {
     /**
      * Replace non-english characters like umlauts etc. with a sensible letter
      * or letter combination that bibtex can accept. The basis for replacement
-     * is the HashMap GLobals.UNICODE_CHARS.
+     * is the HashMap Globals.UNICODE_CHARS.
      */
     public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : Globals.UNICODE_CHARS.entrySet()) {
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
         return s;
@@ -265,7 +252,7 @@ public class Util {
                 String fieldValue = o.toString().trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.nCase(tok.nextToken().trim()));
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -293,7 +280,7 @@ public class Util {
             if (o != null) {
                 tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(StringUtil.nCase(tok.nextToken().trim()));
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             }
         }
@@ -312,12 +299,12 @@ public class Util {
             BibtexEntry be = db.getEntryById(s);
             for (String field : fields) {
                 String val = be.getField(field);
-                if ((val != null) && (val.length() > 0)) {
+                if (val != null && !val.isEmpty()) {
                     AuthorList al = AuthorList.getAuthorList(val);
                     for (int i = 0; i < al.size(); i++) {
                         AuthorList.Author a = al.getAuthor(i);
                         String lastName = a.getLast();
-                        if ((lastName != null) && (lastName.length() > 0)) {
+                        if (lastName != null && !lastName.isEmpty()) {
                             res.add(lastName);
                         }
                     }
@@ -330,375 +317,10 @@ public class Util {
     }
 
     /**
-     * Open a http/pdf/ps viewer for the given link string.
-     */
-    public static void openExternalViewer(MetaData metaData, String link, String fieldName)
-            throws IOException {
-
-        if (fieldName.equals("ps") || fieldName.equals("pdf")) {
-
-            // Find the default directory for this field type:
-            String[] dir = metaData.getFileDirectory(fieldName);
-
-            File file = FileUtil.expandFilename(link, dir);
-
-            // Check that the file exists:
-            if ((file == null) || !file.exists()) {
-                throw new IOException(Globals.lang("File not found") + " (" + fieldName + "): '"
-                        + link + "'.");
-            }
-            link = file.getCanonicalPath();
-
-            // Use the correct viewer even if pdf and ps are mixed up:
-            String[] split = file.getName().split("\\.");
-            if (split.length >= 2) {
-                if (split[split.length - 1].equalsIgnoreCase("pdf")) {
-                    fieldName = "pdf";
-                } else if (split[split.length - 1].equalsIgnoreCase("ps")
-                        || ((split.length >= 3) && split[split.length - 2].equalsIgnoreCase("ps"))) {
-                    fieldName = "ps";
-                }
-            }
-
-        } else if (fieldName.equals("doi")) {
-            fieldName = "url";
-
-            // sanitizing is done below at the treatment of "URL"
-            // in sanatizeUrl a doi-link is correctly treated
-
-        } else if (fieldName.equals("eprint")) {
-            fieldName = "url";
-
-            link = Util.sanitizeUrl(link);
-
-            // Check to see if link field already contains a well formated URL
-            if (!link.startsWith("http://")) {
-                link = Globals.ARXIV_LOOKUP_PREFIX + link;
-            }
-        }
-
-        if (fieldName.equals("url")) { // html
-            try {
-                Util.openBrowser(link);
-            } catch (IOException e) {
-                System.err.println(Globals.lang("Error_opening_file_'%0'.", link));
-                e.printStackTrace();
-            }
-        } else if (fieldName.equals("ps")) {
-            try {
-                if (Globals.ON_MAC) {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
-                    String[] cmd = {"/usr/bin/open", "-a", viewer, link};
-                    Runtime.getRuntime().exec(cmd);
-                } else if (Globals.ON_WIN) {
-                    Util.openFileOnWindows(link, true);
-                    /*
-                     * cmdArray[0] = Globals.prefs.get("psviewer"); cmdArray[1] =
-                     * link; Process child = Runtime.getRuntime().exec(
-                     * cmdArray[0] + " " + cmdArray[1]);
-                     */
-                } else {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("ps");
-                    String viewer = type != null ? type.getOpenWith() : "xdg-open";
-                    String[] cmdArray = new String[2];
-                    cmdArray[0] = viewer;
-                    cmdArray[1] = link;
-                    Runtime.getRuntime().exec(cmdArray);
-                }
-            } catch (IOException e) {
-                System.err.println("An error occured on the command: "
-                        + Globals.prefs.get("psviewer") + " " + link);
-            }
-        } else if (fieldName.equals("pdf")) {
-            try {
-                if (Globals.ON_MAC) {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
-                    String[] cmd = {"/usr/bin/open", "-a", viewer, link};
-                    Runtime.getRuntime().exec(cmd);
-                } else if (Globals.ON_WIN) {
-                    Util.openFileOnWindows(link, true);
-                    /*
-                     * String[] spl = link.split("\\\\"); StringBuffer sb = new
-                     * StringBuffer(); for (int i = 0; i < spl.length; i++) { if
-                     * (i > 0) sb.append("\\"); if (spl[i].indexOf(" ") >= 0)
-                     * spl[i] = "\"" + spl[i] + "\""; sb.append(spl[i]); }
-                     * //pr(sb.toString()); link = sb.toString();
-                     * 
-                     * String cmd = "cmd.exe /c start " + link;
-                     * 
-                     * Process child = Runtime.getRuntime().exec(cmd);
-                     */
-                } else {
-                    ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("pdf");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get("psviewer");
-                    String[] cmdArray = new String[2];
-                    cmdArray[0] = viewer;
-                    cmdArray[1] = link;
-                    // Process child = Runtime.getRuntime().exec(cmdArray[0]+"
-                    // "+cmdArray[1]);
-                    Runtime.getRuntime().exec(cmdArray);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("An error occured on the command: "
-                        + Globals.prefs.get("pdfviewer") + " #" + link);
-                System.err.println(e.getMessage());
-            }
-        } else {
-            System.err
-                    .println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
-        }
-    }
-
-    /**
-     * Opens a file on a Windows system, using its default viewer.
-     * 
-     * @param link
-     *            The file name.
-     * @param localFile
-     *            true if it is a local file, not an URL.
-     * @throws IOException
-     */
-    private static void openFileOnWindows(String link, boolean localFile) throws IOException {
-        /*
-         * if (localFile) { String[] spl = link.split("\\\\"); StringBuffer sb =
-         * new StringBuffer(); for (int i = 0; i < spl.length; i++) { if (i > 0)
-         * sb.append("\\"); if (spl[i].indexOf(" ") >= 0) spl[i] = "\"" + spl[i] +
-         * "\""; sb.append(spl[i]); } link = sb.toString(); }
-         */
-        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
-
-        // Bug fix for:
-        // http://sourceforge.net/tracker/index.php?func=detail&aid=1489454&group_id=92314&atid=600306
-        String cmd;
-        if (Globals.osName.startsWith("Windows 9")) {
-            cmd = "command.com /c start " + link;
-        } else {
-            cmd = "cmd.exe /c start " + link;
-        }
-
-        Runtime.getRuntime().exec(cmd);
-    }
-
-    /**
-     * Opens a file on a Windows system, using the given application.
-     *
-     * @param link The file name.
-     * @param application Link to the app that opens the file.
-     * @throws IOException
-     */
-    private static void openFileWithApplicationOnWindows(String link, String application)
-            throws IOException {
-
-        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
-
-        Runtime.getRuntime().exec(application + " " + link);
-    }
-
-    /**
-     * Open an external file, attempting to use the correct viewer for it.
-     * 
-     * @param metaData
-     *            The MetaData for the database this file belongs to.
-     * @param link
-     *            The file name.
-     * @return false if the link couldn't be resolved, true otherwise.
-     */
-    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link,
-            final ExternalFileType fileType) throws IOException {
-
-        boolean httpLink = false;
-
-        if (Util.REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
-            httpLink = true;
-        }
-        /*if (link.toLowerCase().startsWith("file://")) {
-            link = link.substring(7);
-        }
-        final String ln = link;
-        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
-            (new Thread(new Runnable() {
-                public void run() {
-                    openRemoteExternalFile(metaData, ln, fileType);
-                }
-            })).start();
-
-            return true;
-        }*/
-
-        //boolean httpLink = link.toLowerCase().startsWith("http:")
-        //        || link.toLowerCase().startsWith("ftp:");
-
-        // For other platforms we'll try to find the file type:
-        File file = new File(link);
-
-        if (!httpLink) {
-            File tmp = FileUtil.expandFilename(metaData, link);
-            if (tmp != null) {
-                file = tmp;
-            }
-        }
-
-        // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && (fileType != null)) {
-            // Open the file:
-            String filePath = httpLink ? link : file.getPath();
-            Util.openExternalFilePlatformIndependent(fileType, filePath);
-            return true;
-
-        } else {
-
-            return false;
-            // No file matched the name, or we didn't know the file type.
-
-        }
-
-    }
-
-    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
-        // For URLs, other solutions are
-        //  * https://github.com/rajing/browserlauncher2, but it is not available in maven
-        //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
-        if (Globals.ON_MAC) {
-            // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-            String[] cmd = ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) ?
-                    new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
-                    new String[] {"/usr/bin/open", filePath};
-            Runtime.getRuntime().exec(cmd);
-        } else if (Globals.ON_WIN) {
-            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                // Application is specified. Use it:
-                Util.openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-            } else {
-                Util.openFileOnWindows(filePath, true);
-            }
-        } else {
-            // Use the given app if specified, and the universal "xdg-open" otherwise:
-            String[] openWith;
-            if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                openWith = fileType.getOpenWith().split(" ");
-            } else {
-                openWith = new String[] {"xdg-open"};
-            }
-
-            String[] cmdArray = new String[openWith.length + 1];
-            System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-            cmdArray[cmdArray.length - 1] = filePath;
-            Runtime.getRuntime().exec(cmdArray);
-        }
-    }
-
-    public static void openRemoteExternalFile(final MetaData metaData,
-            final String link, final ExternalFileType fileType) {
-        File temp = null;
-        try {
-            temp = File.createTempFile("jabref-link", "." + fileType.getExtension());
-            temp.deleteOnExit();
-            System.out.println("Downloading to '" + temp.getPath() + "'");
-            new URLDownload(new URL(link)).downloadToFile(temp);
-            System.out.println("Done");
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        final String ln = temp.getPath();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    Util.openExternalFileAnyFormat(metaData, ln, fileType);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-    }
-
-    public static boolean openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
-            String link, UnknownExternalFileType fileType) throws IOException {
-
-        String cancelMessage = Globals.lang("Unable to open file.");
-        String[] options = new String[] {Globals.lang("Define '%0'", fileType.getName()),
-                Globals.lang("Change file type"), Globals.lang("Cancel")};
-        String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(frame, Globals.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
-                fileType.getName()),
-                Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, options, defOption);
-        if (answer == JOptionPane.CANCEL_OPTION) {
-            frame.output(cancelMessage);
-            return false;
-        }
-        else if (answer == JOptionPane.YES_OPTION) {
-            // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new");
-            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
-            editor.setVisible(true);
-            if (editor.okPressed()) {
-                // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
-                ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
-                Collections.addAll(fileTypes, oldTypes);
-                fileTypes.add(newType);
-                Collections.sort(fileTypes);
-                Globals.prefs.setExternalFileTypes(fileTypes);
-                // Finally, open the file:
-                return Util.openExternalFileAnyFormat(metaData, link, newType);
-            } else {
-                // Cancelled:
-                frame.output(cancelMessage);
-                return false;
-            }
-        }
-        else {
-            // User wants to change the type of this link.
-            // First get a model of all file links for this entry:
-            FileListTableModel tModel = new FileListTableModel();
-            String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
-            tModel.setContent(oldValue);
-            FileListEntry flEntry = null;
-            // Then find which one we are looking at:
-            for (int i = 0; i < tModel.getRowCount(); i++) {
-                FileListEntry iEntry = tModel.getEntry(i);
-                if (iEntry.getLink().equals(link)) {
-                    flEntry = iEntry;
-                    break;
-                }
-            }
-            if (flEntry == null) {
-                // This shouldn't happen, so I'm not sure what to put in here:
-                throw new RuntimeException("Could not find the file list entry " + link + " in " + entry.toString());
-            }
-
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
-            editor.setVisible(true, false);
-            if (editor.okPressed()) {
-                // Store the changes and add an undo edit:
-                String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD,
-                        oldValue, newValue);
-                entry.setField(GUIGlobals.FILE_FIELD, newValue);
-                frame.basePanel().undoManager.addEdit(ce);
-                frame.basePanel().markBaseChanged();
-                // Finally, open the link:
-                return Util.openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
-            } else {
-                // Cancelled:
-                frame.output(cancelMessage);
-                return false;
-            }
-        }
-    }
-
-    /**
      * Make sure an URL is "portable", in that it doesn't contain bad characters
      * that break the open command in some OSes.
      * 
-     * A call to this method will also remove \\url{} enclosings and clean DOI links.
+     * A call to this method will also remove \\url{} enclosings and clean Doi links.
 	 * 
 	 * @param link :the URL to sanitize.
 	 * @return Sanitized URL
@@ -706,28 +328,31 @@ public class Util {
     public static String sanitizeUrl(String link) {
         link = link.trim();
 
-        // First check if it is enclosed in \\url{}. If so, remove
-// the wrapper.
+        // First check if it is enclosed in \\url{}. If so, remove the wrapper.
         if (link.startsWith("\\url{") && link.endsWith("}")) {
             link = link.substring(5, link.length() - 1);
         }
 
+        // DOI cleanup
+        // converts doi-only link to full http address
+        // Morten Alver 6 Nov 2012: this extracts a nonfunctional Doi from some complete
+        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
+        // the trailing "/abstract" is included but doesn't lead to a resolvable Doi).
+        // To prevent mangling of working URLs I'm disabling this check if the link is already
+        // a full http link:
+        // TODO: not sure if this is allowed
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
             link = link.replaceFirst("^doi:/*", "");
-            link = Globals.DOI_LOOKUP_PREFIX + link;
+            link = new DOI(link).getURL();
         }
 
-        // converts doi-only link to full http address
-        // Morten Alver 6 Nov 2012: this extracts a nonfunctional DOI from some complete
-        // http addresses (e.g. http://onlinelibrary.wiley.com/doi/10.1002/rra.999/abstract, where
-        // the trailing "/abstract" is included but doesn't lead to a resolvable DOI).
-        // To prevent mangling of working URLs I'm disabling this check if the link is already
-        // a full http link:
-        if (DOIUtil.checkForPlainDOI(link) && !link.startsWith("http://")) {
-            link = Globals.DOI_LOOKUP_PREFIX + DOIUtil.getDOI(link);
+        Optional<DOI> doi = DOI.build(link);
+        if (doi.isPresent() && !link.matches("^https?://.*")) {
+            link = doi.get().getURL();
         }
 
+        // FIXME: everything below is really flawed atm
         link = link.replaceAll("\\+", "%2B");
 
         try {
@@ -760,10 +385,10 @@ public class Util {
             int start = i;
             if (Character.isJavaIdentifierStart(c[i])) {
                 i++;
-                while ((i < c.length) && (Character.isJavaIdentifierPart(c[i]) || (c[i] == '.'))) {
+                while (i < c.length && (Character.isJavaIdentifierPart(c[i]) || c[i] == '.')) {
                     i++;
                 }
-                if ((i < c.length) && (c[i] == '(')) {
+                if (i < c.length && c[i] == '(') {
 
                     String method = calls.substring(start, i);
 
@@ -780,8 +405,8 @@ public class Util {
                             int startParam = i;
                             i++;
                             boolean escaped = false;
-                            while (((i + 1) < c.length) &&
-                                    !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
+                            while (i + 1 < c.length &&
+                                    !(!escaped && c[i] == '"' && c[i + 1] == ')')) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
                                 } else {
@@ -799,7 +424,7 @@ public class Util {
 
                             int startParam = i;
 
-                            while ((i < c.length) && (c[i] != ')')) {
+                            while (i < c.length && c[i] != ')') {
                                 i++;
                             }
 
@@ -824,9 +449,6 @@ public class Util {
     }
 
 
-    private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
-
-
     /**
      * Takes a string that contains bracketed expression and expands each of
      * these using getFieldAndFormat.
@@ -838,6 +460,8 @@ public class Util {
      * @param database
      * @return
      */
+    private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
+
     public static String expandBrackets(String bracketString, BibtexEntry entry,
             BibtexDatabase database) {
         Matcher m = Util.squareBracketsPattern.matcher(bracketString);
@@ -869,7 +493,8 @@ public class Util {
 
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
         String timestamp = dateFormatter.getCurrentDate();
-        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER), globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
+        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
+        boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp || markEntries)) {
@@ -879,9 +504,9 @@ public class Util {
         // Iterate through all entries
         for (BibtexEntry curEntry : bibs) {
             boolean setOwner = globalSetOwner &&
-                    (overwriteOwner || (curEntry.getField(BibtexFields.OWNER) == null));
+                    (overwriteOwner || curEntry.getField(BibtexFields.OWNER) == null);
             boolean setTimeStamp = globalSetTimeStamp &&
-                    (overwriteTimestamp || (curEntry.getField(timeStampField) == null));
+                    (overwriteTimestamp || curEntry.getField(timeStampField) == null);
             Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
                     timestamp);
             if (markEntries) {
@@ -908,9 +533,9 @@ public class Util {
         String timestamp = dateFormatter.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER) &&
-                (overwriteOwner || (entry.getField(BibtexFields.OWNER) == null));
+                (overwriteOwner || entry.getField(BibtexFields.OWNER) == null);
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) &&
-                (overwriteTimestamp || (entry.getField(timeStampField) == null));
+                (overwriteTimestamp || entry.getField(timeStampField) == null);
 
         Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
@@ -934,36 +559,6 @@ public class Util {
     }
 
     /**
-     * This method is called at startup, and makes necessary adaptations to
-     * preferences for users from an earlier version of Jabref.
-     */
-    public static void performCompatibilityUpdate() {
-
-        // Make sure "abstract" is not in General fields, because
-        // Jabref 1.55 moves the abstract to its own tab.
-        String genFields = Globals.prefs.get(JabRefPreferences.GENERAL_FIELDS);
-        // pr(genFields+"\t"+genFields.indexOf("abstract"));
-        if (genFields.contains("abstract")) {
-            // pr(genFields+"\t"+genFields.indexOf("abstract"));
-            String newGen;
-            if (genFields.equals("abstract")) {
-                newGen = "";
-            } else if (genFields.contains(";abstract;")) {
-                newGen = genFields.replaceAll(";abstract;", ";");
-            } else if (genFields.indexOf("abstract;") == 0) {
-                newGen = genFields.replaceAll("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
-                newGen = genFields.replaceAll(";abstract", "");
-            } else {
-                newGen = genFields;
-            }
-            // pr(newGen);
-            Globals.prefs.put(JabRefPreferences.GENERAL_FIELDS, newGen);
-        }
-
-    }
-
-    /**
      * Collect file links from the given set of fields, and add them to the list contained
      * in the field GUIGlobals.FILE_FIELD.
      * @param database The database to modify.
@@ -982,7 +577,7 @@ public class Util {
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     public static NamedCompound upgradePdfPsToFile(Collection<BibtexEntry> entries, String[] fields) {
-        NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
         for (BibtexEntry entry : entries) {
             FileListTableModel tableModel = new FileListTableModel();
@@ -995,7 +590,7 @@ public class Util {
             for (String field : fields) {
                 String o = entry.getField(field);
                 if (o != null) {
-                    if (o.trim().length() > 0) {
+                    if (!o.trim().isEmpty()) {
                         File f = new File(o);
                         FileListEntry flEntry = new FileListEntry(f.getName(), o,
                                 Globals.prefs.getExternalFileTypeByExt(field));
@@ -1051,7 +646,7 @@ public class Util {
                 }
             }
         }
-        if (affectedFields.size() == 0)
+        if (affectedFields.isEmpty())
          {
             return true; // no side effects
         }
@@ -1067,7 +662,7 @@ public class Util {
                 + "your entries, so it is\nrecommended that you change the grouping field "
                 + "in your group\ndefinition to \"keywords\" or a non-standard name."
                 + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Globals.lang("Warning"),
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
 
@@ -1096,112 +691,6 @@ public class Util {
         // }
         // }
         // return true; // found no side effects
-    }
-
-    /**
-     * Wrap all uppercase letters, or sequences of uppercase letters, in curly
-     * braces. Ignore letters within a pair of # character, as these are part of
-     * a string label that should not be modified.
-     * 
-     * @param s
-     *            The string to modify.
-     * @return The resulting string after wrapping capitals.
-     */
-    public static String putBracesAroundCapitals(String s) {
-
-        boolean inString = false, isBracing = false, escaped = false;
-        int inBrace = 0;
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            // Update variables based on special characters:
-            int c = s.charAt(i);
-            if (c == '{') {
-                inBrace++;
-            } else if (c == '}') {
-                inBrace--;
-            } else if (!escaped && (c == '#')) {
-                inString = !inString;
-            }
-
-            // See if we should start bracing:
-            if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
-                    && Character.isUpperCase((char) c)) {
-
-                buf.append('{');
-                isBracing = true;
-            }
-
-            // See if we should close a brace set:
-            if (isBracing && !(Character.isLetter((char) c) && Character.isUpperCase((char) c))) {
-
-                buf.append('}');
-                isBracing = false;
-            }
-
-            // Add the current character:
-            buf.append((char) c);
-
-            // Check if we are entering an escape sequence:
-            escaped = (c == '\\') && !escaped;
-
-        }
-        // Check if we have an unclosed brace:
-        if (isBracing) {
-            buf.append('}');
-        }
-
-        return buf.toString();
-
-        /*
-         * if (s.length() == 0) return s; // Protect against ArrayIndexOutOf....
-         * StringBuffer buf = new StringBuffer();
-         * 
-         * Matcher mcr = titleCapitalPattern.matcher(s.substring(1)); while
-         * (mcr.find()) { String replaceStr = mcr.group();
-         * mcr.appendReplacement(buf, "{" + replaceStr + "}"); }
-         * mcr.appendTail(buf); return s.substring(0, 1) + buf.toString();
-         */
-    }
-
-
-    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
-
-
-    /**
-     * This method looks for occurences of capital letters enclosed in an
-     * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
-     * pairs of braces are removed.
-     * 
-     * @param s
-     *            The String to analyze.
-     * @return A new String with braces removed.
-     */
-    public static String removeBracesAroundCapitals(String s) {
-        String previous = s;
-        while ((s = Util.removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
-            previous = s;
-        }
-        return s;
-    }
-
-    /**
-     * This method looks for occurences of capital letters enclosed in one pair
-     * of braces, e.g. "{AB}". All these are replaced by only the capitals in
-     * between the braces.
-     * 
-     * @param s
-     *            The String to analyze.
-     * @return A new String with braces removed.
-     */
-    private static String removeSingleBracesAroundCapitals(String s) {
-        Matcher mcr = Util.BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
-        StringBuffer buf = new StringBuffer();
-        while (mcr.find()) {
-            String replaceStr = mcr.group();
-            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
-        }
-        mcr.appendTail(buf);
-        return buf.toString();
     }
 
     /**
@@ -1234,7 +723,8 @@ public class Util {
      */
     public static void showQuickErrorDialog(JFrame parent, String title, Exception e) {
         // create and configure a text area - fill it with exception text.
-        final JPanel pan = new JPanel(), details = new JPanel();
+        final JPanel pan = new JPanel();
+        final JPanel details = new JPanel();
         final CardLayout crd = new CardLayout();
         pan.setLayout(crd);
         final JTextArea textArea = new JTextArea();
@@ -1244,7 +734,7 @@ public class Util {
         e.printStackTrace(new PrintWriter(writer));
         textArea.setText(writer.toString());
         JLabel lab = new JLabel(e.getMessage());
-        JButton flip = new JButton(Globals.lang("Details"));
+        JButton flip = new JButton(Localization.lang("Details"));
 
         FormLayout layout = new FormLayout("left:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
@@ -1294,13 +784,13 @@ public class Util {
     public static UndoableEdit massSetField(Collection<BibtexEntry> entries, String field, String text,
             boolean overwriteValues) {
 
-        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         for (BibtexEntry entry : entries) {
             String oldVal = entry.getField(field);
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && ((oldVal).length() > 0)) {
+            if (!overwriteValues && oldVal != null && !oldVal.isEmpty()) {
                 continue;
             }
             if (text != null) {
@@ -1325,17 +815,17 @@ public class Util {
      */
     public static UndoableEdit massRenameField(Collection<BibtexEntry> entries, String field,
             String newField, boolean overwriteValues) {
-        NamedCompound ce = new NamedCompound(Globals.lang("Rename field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
         for (BibtexEntry entry : entries) {
             String valToMove = entry.getField(field);
             // If there is no value, do nothing:
-            if ((valToMove == null) || (valToMove.length() == 0)) {
+            if (valToMove == null || valToMove.isEmpty()) {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
             // nonempy value already for this entry for the new field:
             String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && (valInNewField.length() > 0)) {
+            if (!overwriteValues && valInNewField != null && !valInNewField.isEmpty()) {
                 continue;
             }
 
@@ -1349,39 +839,24 @@ public class Util {
     }
 
     /**
-     * Make a list of supported character encodings that can encode all
-     * characters in the given String.
-     * 
-     * @param characters
-     *            A String of characters that should be supported by the
-     *            encodings.
-     * @return A List of character encodings
-     */
-    public static List<String> findEncodingsForString(String characters) {
-        List<String> encodings = new ArrayList<String>();
-        for (int i = 0; i < Globals.ENCODINGS.length; i++) {
-            CharsetEncoder encoder = Charset.forName(Globals.ENCODINGS[i]).newEncoder();
-            if (encoder.canEncode(characters)) {
-                encodings.add(Globals.ENCODINGS[i]);
-            }
-        }
-        return encodings;
-    }
-
-    /**
+     * Optimized method for converting a String into an Integer
+     *
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
-     * @param str
-     * @return
+     * @param str the String holding an Integer value
+     * @throws NumberFormatException if str cannot be parsed to an int
+     * @return the int value of str
      */
     public static int intValueOf(String str) {
-        int ival = 0, idx = 0, end;
+        int ival = 0;
+        int idx = 0;
+        int end;
         boolean sign = false;
         char ch;
 
-        if ((str == null) || ((end = str.length()) == 0) ||
-                ((((ch = str.charAt(0)) < '0') || (ch > '9'))
-                && (!(sign = ch == '-') || (++idx == end) || (((ch = str.charAt(idx)) < '0') || (ch > '9'))))) {
+        if (str == null || (end = str.length()) == 0 ||
+                ((ch = str.charAt(0)) < '0' || ch > '9')
+                && (!(sign = ch == '-') || ++idx == end || (ch = str.charAt(idx)) < '0' || ch > '9')) {
             throw new NumberFormatException(str);
         }
 
@@ -1391,110 +866,10 @@ public class Util {
             if (++idx == end) {
                 return sign ? ival : -ival;
             }
-            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+            if ((ch = str.charAt(idx)) < '0' || ch > '9') {
                 throw new NumberFormatException(str);
             }
         }
-    }
-
-    /**
-     * Encodes a two-dimensional String array into a single string, using ':' and
-     * ';' as separators. The characters ':' and ';' are escaped with '\'.
-     * @param values The String array.
-     * @return The encoded String.
-     */
-    public static String encodeStringArray(String[][] values) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(Util.encodeStringArray(values[i]));
-            if (i < (values.length - 1)) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Encodes a String array into a single string, using ':' as separator.
-     * The characters ':' and ';' are escaped with '\'.
-     * @param entry The String array.
-     * @return The encoded String.
-     */
-    private static String encodeStringArray(String[] entry) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entry.length; i++) {
-            sb.append(Util.encodeString(entry[i]));
-            if (i < (entry.length - 1)) {
-                sb.append(':');
-            }
-
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Decodes an encoded double String array back into array form. The array
-     * is assumed to be square, and delimited by the characters ';' (first dim) and
-     * ':' (second dim).
-     * @param value The encoded String to be decoded.
-     * @return The decoded String array.
-     */
-    public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<ArrayList<String>>();
-        StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<String>();
-        boolean escaped = false;
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!escaped && (c == '\\')) {
-                escaped = true;
-                continue;
-            }
-            else if (!escaped && (c == ':')) {
-                thisEntry.add(sb.toString());
-                sb = new StringBuilder();
-            }
-            else if (!escaped && (c == ';')) {
-                thisEntry.add(sb.toString());
-                sb = new StringBuilder();
-                newList.add(thisEntry);
-                thisEntry = new ArrayList<String>();
-            } else {
-                sb.append(c);
-            }
-            escaped = false;
-        }
-        if (sb.length() > 0) {
-            thisEntry.add(sb.toString());
-        }
-        if (thisEntry.size() > 0) {
-            newList.add(thisEntry);
-        }
-
-        // Convert to String[][]:
-        String[][] res = new String[newList.size()][];
-        for (int i = 0; i < res.length; i++) {
-            res[i] = new String[newList.get(i).size()];
-            for (int j = 0; j < res[i].length; j++) {
-                res[i][j] = newList.get(i).get(j);
-            }
-        }
-        return res;
-    }
-
-    public static String encodeString(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\')) {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
     }
 
     /**
@@ -1539,55 +914,6 @@ public class Util {
     }
 
     /**
-     * Build a String array containing all those elements of all that are not
-     * in subset.
-     * @param all The array of all values.
-     * @param subset The subset of values.
-     * @return The remainder that is not part of the subset.
-     */
-    public static String[] getRemainder(String[] all, String[] subset) {
-    	if (subset.length == 0) {
-    		return all;
-    	}
-    	if (all.equals(subset)) {
-    		return new String[0];
-    	}
-    	
-        ArrayList<String> al = new ArrayList<String>();
-        for (String anAll : all) {
-            boolean found = false;
-            for (String aSubset : subset) {
-                if (aSubset.equals(anAll)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                al.add(anAll);
-            }
-        }
-        return al.toArray(new String[al.size()]);
-    }
-    
-	/**
-	 * Concatenate two String arrays
-	 * 
-	 * @param array1
-	 *            the first string array
-	 * @param array2
-	 *            the second string array
-	 * @return The concatenation of array1 and array2
-	 */
-	public static String[] arrayConcat(String[] array1, String[] array2) {
-		int len1 = array1.length;
-		int len2 = array2.length;
-		String[] union = new String[len1 + len2];
-		System.arraycopy(array1, 0, union, 0, len1);
-		System.arraycopy(array2, 0, union, len1, len2);
-		return union;
-	}
-
-    /**
      * Determines filename provided by an entry in a database
      *
      * @param database the database, where the entry is located
@@ -1601,7 +927,7 @@ public class Util {
         try {
             layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
         } catch (Exception e) {
-            LOGGER.info(Globals.lang("Wrong Format").concat(" ").concat(e.toString()), e);
+            LOGGER.info(Localization.lang("Wrong Format").concat(" ").concat(e.toString()), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
@@ -1620,7 +946,7 @@ public class Util {
         // a more intelligent algorithm would check for the separator chosen (SEPARATING_CHARS_NOSPACE)
         // if nothing is found, " " is likely to be the separating char.
         // solution by RisKeywords.java: s.split(",[ ]*")
-        StringTokenizer tok = new StringTokenizer(keywords, Globals.SEPARATING_CHARS_NOSPACE);
+        StringTokenizer tok = new StringTokenizer(keywords, SEPARATING_CHARS_NOSPACE);
         while (tok.hasMoreTokens()) {
             String word = tok.nextToken().trim();
             res.add(word);
@@ -1636,7 +962,7 @@ public class Util {
         // Set Keyword Field
         String oldValue = entry.getField("keywords");
         String newValue;
-        if (keywords.size() > 0) {
+        if (!keywords.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (String keyword : keywords) {
                 sb.append(keyword);
@@ -1647,10 +973,10 @@ public class Util {
         } else {
             newValue = null;
         }
-        if ((oldValue == null) && (newValue == null)) {
+        if (oldValue == null && newValue == null) {
             return;
         }
-        if ((oldValue == null) || (!oldValue.equals(newValue))) {
+        if (oldValue == null || !oldValue.equals(newValue)) {
             entry.setField("keywords", newValue);
             if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(entry, "keywords", oldValue, newValue));
@@ -1670,14 +996,14 @@ public class Util {
      */
     public static void updateField(BibtexEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
         String oldValue = be.getField(field);
-        if (nullFieldIfValueIsTheSame && (oldValue != null) && (oldValue.equals(newValue))) {
+        if (nullFieldIfValueIsTheSame && oldValue != null && oldValue.equals(newValue)) {
             // if oldValue == newValue then reset field if required by parameter
             newValue = null;
         }
-        if ((oldValue == null) && (newValue == null)) {
+        if (oldValue == null && newValue == null) {
             return;
         }
-        if ((oldValue == null) || (!oldValue.equals(newValue))) {
+        if (oldValue == null || !oldValue.equals(newValue)) {
             be.setField(field, newValue);
             if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
@@ -1690,6 +1016,7 @@ public class Util {
      * @param rootPane the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
      * @param cancelAction the action to bind
      */
+    // TODO: move to GUI
     public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane,
             Action cancelAction) {
         InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -1737,7 +1064,7 @@ public class Util {
     }
 
     public static boolean updateTimeStampIsSet() {
-        return (Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
     }
 
     /**
@@ -1787,10 +1114,10 @@ public class Util {
         final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
-            final JLabel label = new JLabel(Globals.lang("Searching for files"));
+            final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            diag.setTitle(Globals.lang("Autosetting links"));
+            diag.setTitle(Localization.lang("Autosetting links"));
             diag.getContentPane().add(prog, BorderLayout.CENTER);
             diag.getContentPane().add(label, BorderLayout.SOUTH);
 
@@ -1799,10 +1126,8 @@ public class Util {
         }
 
         Runnable r = new Runnable() {
-
             @Override
             public void run() {
-
                 // determine directories to search in
                 ArrayList<File> dirs = new ArrayList<File>();
                 String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
@@ -1815,6 +1140,7 @@ public class Util {
                 for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }
+
                 // Run the search operation:
                 Map<BibtexEntry, java.util.List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
@@ -1825,7 +1151,6 @@ public class Util {
                 }
 
                 boolean foundAny = false;
-
                 // Iterate over the entries:
                 for (BibtexEntry anEntry : result.keySet()) {
                     FileListTableModel tableModel;
@@ -1836,7 +1161,7 @@ public class Util {
                             tableModel.setContent(oldVal);
                         }
                     } else {
-                        assert (entries.size() == 1);
+                        assert entries.size() == 1;
                         tableModel = singleTableModel;
                     }
                     List<File> files = result.get(anEntry);
@@ -1856,7 +1181,7 @@ public class Util {
                             foundAny = true;
                             ExternalFileType type;
                             int index = f.getPath().lastIndexOf('.');
-                            if ((index >= 0) && (index < (f.getPath().length() - 1))) {
+                            if (index >= 0 && index < f.getPath().length() - 1) {
                                 type = Globals.prefs.getExternalFileTypeByExt
                                         (f.getPath().substring(index + 1).toLowerCase());
                             } else {
@@ -1866,7 +1191,7 @@ public class Util {
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
                             String newVal = tableModel.getStringRepresentation();
-                            if (newVal.length() == 0) {
+                            if (newVal.isEmpty()) {
                                 newVal = null;
                             }
                             if (ce != null) {
@@ -1887,9 +1212,9 @@ public class Util {
                 }
 
                 // handle callbacks and dialog
+                // FIXME: The ID signals if action was successful :/
                 final int id = foundAny ? 1 : 0;
                 SwingUtilities.invokeLater(new Runnable() {
-
                     @Override
                     public void run() {
                         if (diag != null) {
@@ -1902,10 +1227,13 @@ public class Util {
                 });
             }
         };
+        // FIXME: workaround so that dialog doesn't block run()?
+        Thread t = new Thread(r);
+        t.start();
         if (diag != null) {
             diag.setVisible(true);
         }
-        return r;
+        return t;
     }
 
     /**
@@ -1937,50 +1265,6 @@ public class Util {
     }
 
     /**
-     * Opens a file browser of the folder of the given file. If possible, the file is selected
-     * @param fileLink the location of the file
-     * @throws IOException
-     */
-    public static void openFolderAndSelectFile(String fileLink) throws IOException {
-        if (Globals.ON_WIN) {
-            Util.openFolderAndSelectFileOnWindows(fileLink);
-        } else if (Globals.ON_LINUX) {
-            Util.openFolderAndSelectFileOnLinux(fileLink);
-        } else {
-            Util.openFolderAndSelectFileGeneric(fileLink);
-        }
-    }
-
-    private static void openFolderAndSelectFileOnLinux(String fileLink) throws IOException {
-        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
-
-        String cmd;
-
-        if (desktopSession.contains("gnome")) {
-            cmd = "nautilus " + fileLink;
-        } else if (desktopSession.contains("kde")) {
-            cmd = "dolphin --select " + fileLink;
-        } else {
-            cmd = "xdg-open " + fileLink.substring(0, fileLink.lastIndexOf(File.separator));
-        }
-
-        Runtime.getRuntime().exec(cmd);
-    }
-
-    private static void openFolderAndSelectFileGeneric(String fileLink) throws IOException {
-        File f = new File(fileLink);
-        Desktop.getDesktop().open(f.getParentFile());
-    }
-
-    private static void openFolderAndSelectFileOnWindows(String link) throws IOException {
-        link = link.replace("&", "\"&\"");
-
-        String cmd = "explorer.exe /select,\"" + link + "\"";
-
-        Runtime.getRuntime().exec(cmd);
-    }
-
-    /**
      * Returns the list of linked files. The files have the absolute filename
      * 
      * @param bes list of BibTeX entries
@@ -2009,7 +1293,7 @@ public class Util {
         HashMap<BibtexEntry, List<File>> result = new HashMap<BibtexEntry, List<File>>();
 
         // First scan directories
-        Set<File> filesWithExtension = UtilFindFiles.findFiles(extensions, directories);
+        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
 
         // Initialize Result-Set
         for (BibtexEntry entry : entries) {
@@ -2025,7 +1309,7 @@ public class Util {
             // First, look for exact matches:
             for (BibtexEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && (citeKey.length() > 0)) {
+                if (citeKey != null && !citeKey.isEmpty()) {
                     if (dot > 0) {
                         if (name.substring(0, dot).equals(citeKey)) {
                             result.get(entry).add(file);
@@ -2039,7 +1323,7 @@ public class Util {
             if (!exactOnly) {
                 for (BibtexEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && (citeKey.length() > 0)) {
+                    if (citeKey != null && !citeKey.isEmpty()) {
                         if (name.startsWith(citeKey)) {
                             result.get(entry).add(file);
                             continue nextFile;
@@ -2062,14 +1346,14 @@ public class Util {
      * @param database
      * @return
      */
-    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry,
-            BibtexDatabase database) {
+    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry, BibtexDatabase database) {
 
         fieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 
         int colon = fieldAndFormat.indexOf(':');
 
-        String beforeColon, afterColon;
+        String beforeColon;
+        String afterColon;
         if (colon == -1) {
             beforeColon = fieldAndFormat;
             afterColon = null;
@@ -2079,7 +1363,7 @@ public class Util {
         }
         beforeColon = beforeColon.trim();
 
-        if (beforeColon.length() == 0) {
+        if (beforeColon.isEmpty()) {
             return null;
         }
 
@@ -2094,7 +1378,7 @@ public class Util {
             return null;
         }
 
-        if ((afterColon == null) || (afterColon.length() == 0)) {
+        if (afterColon == null || afterColon.isEmpty()) {
             return fieldValue;
         }
 
@@ -2104,16 +1388,27 @@ public class Util {
         return fieldValue;
     }
 
-    /**
-     * Opens the given URL using the system browser
-     * 
-     * @param url the URL to open
-     * @throws IOException
-     */
-    public static void openBrowser(String url) throws IOException {
-        url = Util.sanitizeUrl(url);
-        ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt("html");
-        Util.openExternalFilePlatformIndependent(fileType, url);
-    }
+    // Returns a reg exp pattern in the form (w1)|(w2)| ... wi are escaped if no regex search is enabled
+    public static Pattern getPatternForWords(List<String> wordsToHighlight) {
+        if (wordsToHighlight == null || wordsToHighlight.isEmpty() || wordsToHighlight.get(0).isEmpty()) {
+            return Pattern.compile("");
+        }
 
+        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP);
+
+        // compile the words to a regex in the form (w1) | (w2) | (w3)
+        String searchPattern = "(".concat(regExSearch ? wordsToHighlight.get(0) : Pattern.quote(wordsToHighlight.get(0))).concat(")");
+        for (int i = 1; i < wordsToHighlight.size(); i++) {
+            searchPattern = searchPattern.concat("|(").concat(regExSearch ? wordsToHighlight.get(i) : Pattern.quote(wordsToHighlight.get(i))).concat(")");
+        }
+
+        Pattern pattern;
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)) {
+            pattern = Pattern.compile(searchPattern);
+        } else {
+            pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);
+        }
+
+        return pattern;
+    }
 }

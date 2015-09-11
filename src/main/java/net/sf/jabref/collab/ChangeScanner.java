@@ -27,12 +27,21 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sf.jabref.*;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.export.SaveException;
-import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.exporter.FileActions;
+import net.sf.jabref.exporter.SaveException;
+import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.imports.OpenDatabaseAction;
-import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.logic.bibtex.EntrySorter;
+import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.util.Util;
 
 public class ChangeScanner implements Runnable {
@@ -46,7 +55,7 @@ public class ChangeScanner implements Runnable {
     private final BasePanel panel;
     private final JabRefFrame frame;
 
-    private BibtexDatabase inTemp = null;
+    private BibtexDatabase inTemp;
     private MetaData mdInTemp;
 
 
@@ -56,7 +65,7 @@ public class ChangeScanner implements Runnable {
      * can be reproduced in memory by calling redo() on them. REDO, not UNDO!
      */
     //ArrayList changes = new ArrayList();
-    private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
+    private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Localization.lang("External changes"));
 
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
@@ -135,8 +144,8 @@ public class ChangeScanner implements Runnable {
             });
 
         } else {
-            JOptionPane.showMessageDialog(frame, Globals.lang("No actual changes found."),
-                    Globals.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("No actual changes found."),
+                    Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
             fup.scanResultsResolved(true);
         }
     }
@@ -197,7 +206,8 @@ public class ChangeScanner implements Runnable {
         // Create pointers that are incremented as the entries of each base are used in
         // successive order from the beginning. Entries "further down" in the "disk" base
         // can also be matched.
-        int piv1, piv2 = 0;
+        int piv1;
+        int piv2 = 0;
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
@@ -213,7 +223,7 @@ public class ChangeScanner implements Runnable {
             double comp = -1;
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
-            if (!used.contains("" + piv2) && (piv2 < disk.getEntryCount())) {
+            if (!used.contains("" + piv2) && piv2 < disk.getEntryCount()) {
                 comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
             }
             if (comp > 1) {
@@ -223,7 +233,7 @@ public class ChangeScanner implements Runnable {
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < (disk.getEntryCount() - 1)) {
+            if (piv2 < disk.getEntryCount() - 1) {
                 for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
                     if (!used.contains("" + i)) {
                         comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
@@ -256,7 +266,7 @@ public class ChangeScanner implements Runnable {
                 double bestMatch = 0;
                 double comp;
 
-                if (piv2 < (disk.getEntryCount() - 1)) {
+                if (piv2 < disk.getEntryCount() - 1) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
                         if (!used.contains("" + i)) {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
@@ -361,20 +371,23 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanPreamble(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        String mem = inMem.getPreamble(), tmp = onTmp.getPreamble(), disk = onDisk.getPreamble();
+        String mem = inMem.getPreamble();
+        String tmp = onTmp.getPreamble();
+        String disk = onDisk.getPreamble();
         if (tmp != null) {
-            if ((disk == null) || !tmp.equals(disk)) {
+            if (disk == null || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(tmp, mem, disk));
             }
         }
-        else if ((disk != null) && !disk.isEmpty()) {
+        else if (disk != null && !disk.isEmpty()) {
             changes.add(new PreambleChange(tmp, mem, disk));
         }
     }
 
     private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        int nTmp = onTmp.getStringCount(), nDisk = onDisk.getStringCount();
-        if ((nTmp == 0) && (nDisk == 0)) {
+        int nTmp = onTmp.getStringCount();
+        int nDisk = onDisk.getStringCount();
+        if (nTmp == 0 && nDisk == 0) {
             return;
         }
 
@@ -393,7 +406,7 @@ public class ChangeScanner implements Runnable {
                     BibtexString disk = onDisk.getString(diskId);
                     if (disk.getName().equals(tmp.getName())) {
                         // We have found a string with a matching name.
-                        if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
+                        if (tmp.getContent() != null && !tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
                             BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                             if (mem != null) {
@@ -502,10 +515,10 @@ public class ChangeScanner implements Runnable {
     private void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
-        if ((groupsTmp == null) && (groupsDisk == null)) {
+        if (groupsTmp == null && groupsDisk == null) {
             return;
         }
-        if (((groupsTmp != null) && (groupsDisk == null)) || (groupsTmp == null)) {
+        if (groupsTmp != null && groupsDisk == null || groupsTmp == null) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }

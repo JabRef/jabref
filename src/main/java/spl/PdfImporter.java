@@ -10,24 +10,28 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.imports.PdfContentImporter;
-import net.sf.jabref.imports.PdfXmpImporter;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.util.FileUtil;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.PdfContentImporter;
+import net.sf.jabref.importer.fileformat.PdfXmpImporter;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.util.XMPUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sciplore.beans.Document;
 
 import spl.filter.PdfFileFilter;
 import spl.gui.ImportDialog;
-import spl.gui.MetaDataListDialog;
 
 /**
  * Created by IntelliJ IDEA.
@@ -124,7 +128,7 @@ public class PdfImporter {
         fileNameLoop: for (String fileName : fileNames) {
             List<BibtexEntry> xmpEntriesInFile = readXmpEntries(fileName);
             if (!neverShow && !doNotShowAgain) {
-                importDialog = new ImportDialog((dropRow >= 0), fileName);
+                importDialog = new ImportDialog(dropRow >= 0, fileName);
                 if (!hasXmpEntries(xmpEntriesInFile)) {
                     importDialog.disableXMPChoice();
                 }
@@ -132,14 +136,13 @@ public class PdfImporter {
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.getDoNotShowAgain();
             }
-            if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
-                int choice = (neverShow ? globalChoice : importDialog.getChoice());
+            if (neverShow || importDialog.getResult() == JOptionPane.OK_OPTION) {
+                int choice = neverShow ? globalChoice : importDialog.getChoice();
                 DroppedFileHandler dfh;
                 BibtexEntry entry;
                 BibtexEntryType type;
                 InputStream in = null;
                 List<BibtexEntry> localRes = null;
-                MetaDataListDialog metaDataListDialog;
                 switch (choice) {
                 case ImportDialog.XMP:
                     //SplDatabaseChangeListener dataListener = new SplDatabaseChangeListener(frame, panel, entryTable, fileName);
@@ -159,9 +162,9 @@ public class PdfImporter {
                         }
                     }
 
-                    if ((localRes == null) || (localRes.size() == 0)) {
+                    if (localRes == null || localRes.isEmpty()) {
                         // import failed -> generate default entry
-                        LOGGER.info(Globals.lang("Import failed"));
+                        LOGGER.info(Localization.lang("Import failed"));
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -191,7 +194,7 @@ public class PdfImporter {
                         in = new FileInputStream(file);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Globals.lang("Import failed"), e);
+                        LOGGER.info(Localization.lang("Import failed"), e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -201,7 +204,7 @@ public class PdfImporter {
                         localRes = contentImporter.importEntries(in, status);
                     } catch (Exception e) {
                         // import failed -> generate default entry
-                        LOGGER.info(Globals.lang("Import failed"), e);
+                        LOGGER.info(Localization.lang("Import failed"), e);
                         e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
@@ -214,7 +217,7 @@ public class PdfImporter {
                     }
 
                     // import failed -> generate default entry
-                    if ((localRes == null) || (localRes.size() == 0)) {
+                    if (localRes == null || localRes.isEmpty()) {
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
@@ -238,83 +241,9 @@ public class PdfImporter {
                     }
                     res.add(entry);
                     break;
-                case ImportDialog.MRDLIB:
-                    metaDataListDialog = new MetaDataListDialog(fileName, true);
-                    Tools.centerRelativeToWindow(metaDataListDialog, frame);
-                    metaDataListDialog.showDialog();
-                    Document document = metaDataListDialog.getXmlDocuments();
-                    entry = null; // to satisfy the Java compiler
-                    if ((document != null /*&& documents.getDocuments() != null && documents.getDocuments().size() > 0*/)&& (metaDataListDialog.getResult() == JOptionPane.OK_OPTION)) {
-                        int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
-                        if (selected > -1 /*&& selected < documents.getDocuments().size()*/) {
-                            //Document document = documents/*.getDocuments().get(selected)*/;
-                            String id = IdGenerator.next();
-                            entry = new BibtexEntry(id);
-                            if (fieldExists(document.getType())) {
-                                type = BibtexEntryType.getStandardType(document.getType());
-                                if (type == null) {
-                                    type = BibtexEntryTypes.ARTICLE;
-                                }
-                                entry.setType(type);
-                            }
-                            else {
-                                entry.setType(BibtexEntryTypes.ARTICLE);
-                            }
-                            ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
-                            list.add(entry);
-                            Util.setAutomaticFields(list, true, true, false);
-                            //insertFields(entry.getRequiredFields(), entry, document);
-                            insertFields(BibtexFields.getAllFieldNames(), entry, document);
-                            //insertFields(entry.getOptionalFields(), entry, document);
-                            panel.database().insertEntry(entry);
-                            dfh = new DroppedFileHandler(frame, panel);
-                            dfh.linkPdfToEntry(fileName, entryTable, entry);
-                            LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
-                        }
-                        else {
-                            entry = createNewBlankEntry(fileName);
-                        }
-                    }
-                    else if (metaDataListDialog.getResult() == JOptionPane.CANCEL_OPTION) {
-                        continue;
-                    }
-                    else if (metaDataListDialog.getResult() == JOptionPane.NO_OPTION) {
-                        entry = createNewBlankEntry(fileName);
-                    }
-                    else if ((document == null /*|| document.getDocuments() == null || document.getDocuments().size() <= 0*/)&& (metaDataListDialog.getResult() == JOptionPane.OK_OPTION)) {
-                        entry = createNewBlankEntry(fileName);
-                    }
-                    assert (entry != null);
-                    res.add(entry);
-                    break;
                 case ImportDialog.NOMETA:
                     entry = createNewBlankEntry(fileName);
                     res.add(entry);
-                    break;
-                case ImportDialog.UPDATEEMPTYFIELDS:
-                    metaDataListDialog = new MetaDataListDialog(fileName, false);
-                    Tools.centerRelativeToWindow(metaDataListDialog, frame);
-                    metaDataListDialog.showDialog();
-                    document = metaDataListDialog.getXmlDocuments();
-                    if ((document != null /*&& document.getDocuments() != null && document.getDocuments().size() > 0*/)&& (metaDataListDialog.getResult() == JOptionPane.OK_OPTION)) {
-                        int selected = metaDataListDialog.getTableMetadata().getSelectedRow();
-                        if (selected > -1 /*&& selected < document.getDocuments().size()*/) {
-                            //XmlDocument document = documents.getDocuments().get(selected);
-                            entry = entryTable.getEntryAt(dropRow);
-                            if (fieldExists(document.getType())) {
-                                type = BibtexEntryType.getStandardType(document.getType());
-                                if (type != null) {
-                                    entry.setType(type);
-                                }
-                            }
-                            //insertFields(entry.getRequiredFields(), entry, document);
-                            insertFields(BibtexFields.getAllFieldNames(), entry, document);
-                            //insertFields(entry.getOptionalFields(), entry, document);
-
-                            dfh = new DroppedFileHandler(frame, panel);
-                            dfh.linkPdfToEntry(fileName, entryTable, dropRow);
-                        }
-                    }
                     break;
                 case ImportDialog.ONLYATTACH:
                     dfh = new DroppedFileHandler(frame, panel);
@@ -336,56 +265,8 @@ public class PdfImporter {
         return newEntry;
     }
 
-    private void insertFields(String[] fields, BibtexEntry entry, Document xmlDocument) {
-        DocumentWrapper document = new DocumentWrapper(xmlDocument);
-        for (String field : fields) {
-            if (entry.getField(field) != null) {
-                continue;
-            }
-            if (field.equalsIgnoreCase("author")) {
-                entry.setField(field, document.getAuthors("and"));
-            }
-            if (field.equalsIgnoreCase("title")) {
-                entry.setField(field, document.getTitle());
-            }
-            if (field.equalsIgnoreCase("abstract")) {
-                entry.setField(field, document.getAbstract());
-            }
-            /*if(field.equalsIgnoreCase("keywords")){
-                entry.setField(field, document.getKeyWords());
-            }*/
-            if (field.equalsIgnoreCase("doi")) {
-                entry.setField(field, document.getDoi());
-            }
-            /*if(field.equalsIgnoreCase("pages")){
-                entry.setField(field, document.getPages());
-            }
-            if(field.equalsIgnoreCase("volume")){
-                entry.setField(field, document.getVolume());
-            }
-            if(field.equalsIgnoreCase("number")){
-                entry.setField(field, document.getNumber());
-            }*/
-            if (field.equalsIgnoreCase("year")) {
-                entry.setField(field, document.getYear());
-            }
-            /*if(field.equalsIgnoreCase("month")){
-                entry.setField(field, document.getMonth());
-            }
-            if(field.equalsIgnoreCase("day")){
-                entry.setField(field, document.getDay());
-            }
-            if(field.equalsIgnoreCase("booktitle")){
-                entry.setField(field, document.getVenue());
-            }
-            if(field.equalsIgnoreCase("journal")){
-                entry.setField(field, document.getVenue());
-            }*/
-        }
-    }
-
     private boolean fieldExists(String string) {
-        return (string != null) && !string.isEmpty();
+        return string != null && !string.isEmpty();
     }
 
     private BibtexEntry createNewEntry() {
@@ -410,8 +291,8 @@ public class PdfImporter {
 
                 // Create an UndoableInsertEntry object.
                 panel.undoManager.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
-                panel.output(Globals.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
-                        + Globals.lang("entry") + ".");
+                panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
+                        + Localization.lang("entry") + ".");
 
                 // We are going to select the new entry. Before that, make sure that we are in
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
@@ -461,7 +342,7 @@ public class PdfImporter {
     }
 
     private boolean hasXmpEntries(List<BibtexEntry> xmpEntriesInFile) {
-        return !((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0));
+        return !(xmpEntriesInFile == null || xmpEntriesInFile.isEmpty());
     }
 
     public MainTable getEntryTable() {

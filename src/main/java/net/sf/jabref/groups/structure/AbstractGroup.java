@@ -17,9 +17,9 @@ package net.sf.jabref.groups.structure;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.search.SearchRule;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * A group of BibtexEntries.
@@ -182,7 +182,7 @@ public abstract class AbstractGroup {
      * value, the call is ignored.
      */
     public void setHierarchicalContext(GroupHierarchyType context) {
-        if(context == null) {
+        if (context == null) {
             return;
         }
         this.context = context;

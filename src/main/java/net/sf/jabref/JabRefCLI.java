@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
-import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.cli.*;
 
 public class JabRefCLI {
@@ -15,10 +16,6 @@ public class JabRefCLI {
 
     public boolean isShowVersion() {
         return cl.hasOption("version");
-    }
-
-    public boolean isDisableSplash() {
-        return cl.hasOption("nosplash");
     }
 
     public boolean isBlank() {
@@ -124,63 +121,63 @@ public class JabRefCLI {
         Options options = new Options();
 
         // boolean options
-        options.addOption("v", "version", false, Globals.lang("Display version"));
-        options.addOption("n", "nogui", false, Globals.lang("No GUI. Only process command line options."));
-        options.addOption("s", "nosplash", false, Globals.lang("Do not show splash window at startup"));
-        options.addOption("h", "help", false, Globals.lang("Display help on command line options"));
-        options.addOption("l", "loads", false, Globals.lang("Load session"));
-        options.addOption("b", "blank", false, Globals.lang("Do not open any files at startup"));
+        options.addOption("v", "version", false, Localization.lang("Display version"));
+        options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options."));
+        options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
+        options.addOption("l", "loads", false, Localization.lang("Load session"));
+        options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
 
+        // @formatter:off
         options.addOption(Option.builder("i").
                 longOpt("import").
-                desc(String.format("%s: %s[,import format]", Globals.lang("Import file"), Globals.lang("filename"))).
+                desc(String.format("%s: %s[,import format]", Localization.lang("Import file"), Localization.lang("filename"))).
                 hasArg().
                 argName("FILE").build());
 
         options.addOption(Option.builder("o").
                 longOpt("output").
-                desc(String.format("%s: %s[,export format]", Globals.lang("Output or export file"), Globals.lang("filename"))).
+                desc(String.format("%s: %s[,export format]", Localization.lang("Output or export file"), Localization.lang("filename"))).
                 hasArg().
                 argName("FILE").
                 build());
 
         options.addOption(Option.builder("x").
                 longOpt("prexp").
-                desc(Globals.lang("Export preferences to file")).
+                desc(Localization.lang("Export preferences to file")).
                 hasArg().
                 argName("FILE").
                 build());
 
         options.addOption(Option.builder("p").
                 longOpt("primp").
-                desc(Globals.lang("Import preferences from file")).
+                desc(Localization.lang("Import preferences from file")).
                 hasArg().
                 argName("FILE").
                 build());
         options.addOption(Option.builder("d").
                 longOpt("prdef").
-                desc(Globals.lang("Reset preferences (key1,key2,... or 'all')")).
+                desc(Localization.lang("Reset preferences (key1,key2,... or 'all')")).
                 hasArg().
                 argName("FILE").
                 build());
 
         options.addOption(Option.builder("a").
                 longOpt("aux").
-                desc(String.format("%s: %s[.aux],%s[.bib]", Globals.lang("Subdatabase from aux"), Globals.lang("file"), Globals.lang("new"))).
+                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from aux"), Localization.lang("file"), Localization.lang("new"))).
                 hasArg().
                 argName("FILE").
                 build());
 
         options.addOption(Option.builder().
                 longOpt("importToOpen").
-                desc(Globals.lang("Import to open tab")).
+                desc(Localization.lang("Import to open tab")).
                 hasArg().
                 argName("FILE").
                 build());
 
         options.addOption(Option.builder("f").
                 longOpt("fetch").
-                desc(Globals.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\"")).
+                desc(Localization.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\"")).
                 hasArg().
                 argName("FILE").
                 build());
@@ -191,6 +188,7 @@ public class JabRefCLI {
                 hasArg().
                 argName("FILE").
                 build());
+        // @formatter:on
 
         return options;
     }
@@ -203,10 +201,10 @@ public class JabRefCLI {
         String header = "";
 
         String importFormats = Globals.importFormatReader.getImportFormatList();
-        String importFormatsList = String.format("%s:%n%s%n", Globals.lang("Available import formats"), importFormats);
+        String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
         String outFormats = ExportFormats.getConsoleExportList(70, 20, "");
-        String outFormatsList = String.format("%s: %s%n", Globals.lang("Available export formats"), outFormats);
+        String outFormatsList = String.format("%s: %s%n", Localization.lang("Available export formats"), outFormats);
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at http://sourceforge.net/p/jabref/bugs/";
 
@@ -223,6 +221,6 @@ public class JabRefCLI {
     }
 
     public static String getExportMatchesSyntax() {
-        return String.format("[%s]searchTerm,outputFile: %s[,%s]", Globals.lang("field"), Globals.lang("file"), Globals.lang("exportFormat"));
+        return String.format("[%s]searchTerm,outputFile: %s[,%s]", Localization.lang("field"), Localization.lang("file"), Localization.lang("exportFormat"));
     }
 }

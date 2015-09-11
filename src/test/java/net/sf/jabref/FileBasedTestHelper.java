@@ -3,6 +3,7 @@ package net.sf.jabref;
 import java.io.File;
 
 public class FileBasedTestHelper {
+
     /**
      * Creates a temp directory in the System temp directory.
      * <p/>

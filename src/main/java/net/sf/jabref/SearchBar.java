@@ -36,12 +36,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.sf.jabref.autocompleter.AutoCompleter;
-import net.sf.jabref.help.HelpAction;
-import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.SearchRules;
-import net.sf.jabref.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.search.rules.util.SentenceAnalyzer;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.SearchTextListener;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.SearchRules;
+import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
+import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
 import org.apache.commons.logging.LogFactory;
 import org.gpl.JSplitButton.JSplitButton;
@@ -126,7 +131,7 @@ public class SearchBar extends JPanel {
         // Populate popup menu and add it to search button
         popupMenu = new JPopupMenu("");
 
-        clearSearch = new JMenuItem(Globals.lang("Clear search"));
+        clearSearch = new JMenuItem(Localization.lang("Clear search"));
         clearSearch.addActionListener(e -> clearSearch());
         popupMenu.add(clearSearch);
         popupMenu.addSeparator();
@@ -140,8 +145,8 @@ public class SearchBar extends JPanel {
         initSearchSettingsMenu();
         popupMenu.add(settings);
 
-        JMenuItem help = new JMenuItem(Globals.lang("Help"), GUIGlobals.getImage("help"));
-        help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.searchHelp, Globals.lang("Help")));
+        JMenuItem help = new JMenuItem(Localization.lang("Help"), GUIGlobals.getImage("help"));
+        help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
         popupMenu.add(help);
 
         searchButton.setPopupMenu(popupMenu);
@@ -154,16 +159,16 @@ public class SearchBar extends JPanel {
      */
     private void initSearchSettingsMenu() {
         // Create menu items
-        settings = new JMenu(Globals.lang("Settings"));
-        selectMatches = new JCheckBoxMenuItem(Globals.lang("Select matches"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_SELECT_MATCHES));
+        settings = new JMenu(Localization.lang("Settings"));
+        selectMatches = new JCheckBoxMenuItem(Localization.lang("Select matches"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_SELECT_MATCHES));
         selectMatches.addActionListener(ae -> updatePrefs());
-        caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
+        caseSensitive = new JCheckBoxMenuItem(Localization.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.addActionListener(ae -> updatePrefs());
-        regularExp = new JCheckBoxMenuItem(Globals.lang("Use regular expressions"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        regularExp = new JCheckBoxMenuItem(Localization.lang("Use regular expressions"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.addActionListener(ae -> updatePrefs());
-        highlightWords = new JCheckBoxMenuItem(Globals.lang("Highlight Words"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS));
+        highlightWords = new JCheckBoxMenuItem(Localization.lang("Highlight Words"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS));
         highlightWords.addActionListener(ae -> updatePrefs());
-        autoComplete = new JCheckBoxMenuItem(Globals.lang("Autocomplete names"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
+        autoComplete = new JCheckBoxMenuItem(Localization.lang("Autocomplete names"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_AUTO_COMPLETE));
         autoComplete.addActionListener(ae -> updatePrefs());
 
         // Add them to the menu
@@ -221,7 +226,7 @@ public class SearchBar extends JPanel {
      */
     private void initSearchField() {
         searchField = new JSearchTextField();
-        searchField.setTextWhenNotFocused(Globals.lang("Search..."));
+        searchField.setTextWhenNotFocused(Localization.lang("Search..."));
         searchField.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
 
         // Add autocompleter
@@ -504,7 +509,7 @@ public class SearchBar extends JPanel {
         SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchText, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
         if (!searchRule.validateSearchStrings(searchText)) {
-            frame.basePanel().output(Globals.lang("Search failed: illegal search expression"));
+            frame.basePanel().output(Localization.lang("Search failed: illegal search expression"));
             clearSearch();
             return;
         }
@@ -520,9 +525,9 @@ public class SearchBar extends JPanel {
      */
     private void updateSearchButtonText() {
         if (GrammarBasedSearchRule.isValid(caseSensitive.isSelected(), regularExp.isSelected(), searchField.getText())) {
-            searchButton.setToolTipText(Globals.lang("Search specified field(s)"));
+            searchButton.setToolTipText(Localization.lang("Search specified field(s)"));
         } else {
-            searchButton.setToolTipText(Globals.lang("Search all fields"));
+            searchButton.setToolTipText(Localization.lang("Search all fields"));
         }
     }
 

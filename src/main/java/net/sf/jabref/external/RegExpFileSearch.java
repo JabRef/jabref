@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
 
 import java.io.File;
@@ -35,7 +36,7 @@ import java.util.*;
  */
 public class RegExpFileSearch {
 
-    private final static String EXT_MARKER = "__EXTENSION__";
+    private static final String EXT_MARKER = "__EXTENSION__";
 
     /**
      * Search for file links for a set of entries using regexp. Lists of extensions and directories
@@ -163,7 +164,7 @@ public class RegExpFileSearch {
                     // Changed by M. Alver 2007.01.04:
                     // Remove first character if it is a directory separator character:
                     String tmp = res.get(i).getCanonicalPath().substring(root.getCanonicalPath().length());
-                    if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
+                    if (tmp.length() > 1 && tmp.charAt(0) == File.separatorChar) {
                         tmp = tmp.substring(1);
                     }
                     res.set(i, new File(tmp));
@@ -206,7 +207,7 @@ public class RegExpFileSearch {
 
         if (fileParts.length > 1) {
 
-            for (int i = 0; i < (fileParts.length - 1); i++) {
+            for (int i = 0; i < fileParts.length - 1; i++) {
 
                 String dirToProcess = fileParts[i];
                 dirToProcess = Util.expandBrackets(dirToProcess, entry, database);
@@ -280,7 +281,7 @@ public class RegExpFileSearch {
                 return toMatch.matcher(arg1).matches();
             }
         });
-        if ((matches != null) && (matches.length > 0)) {
+        if (matches != null && matches.length > 0) {
             Collections.addAll(res, matches);
         }
         return res;

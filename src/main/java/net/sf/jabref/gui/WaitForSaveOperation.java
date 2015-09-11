@@ -16,8 +16,7 @@
 package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,17 +31,17 @@ public class WaitForSaveOperation implements ActionListener {
     private final JabRefFrame frame;
     private final JDialog diag;
     private final Timer t = new Timer(500, this);
-    private boolean cancelled = false;
+    private boolean cancelled;
 
 
     public WaitForSaveOperation(JabRefFrame frame) {
         this.frame = frame;
 
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         JProgressBar prog = new JProgressBar(0);
         prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        diag = new JDialog(frame, Globals.lang("Please wait..."), true);
+        diag = new JDialog(frame, Localization.lang("Please wait..."), true);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -58,7 +57,7 @@ public class WaitForSaveOperation implements ActionListener {
             }
         });
 
-        JLabel message = new JLabel(Globals.lang("Waiting for save operation to finish") + "...");
+        JLabel message = new JLabel(Localization.lang("Waiting for save operation to finish") + "...");
         message.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         diag.getContentPane().add(message, BorderLayout.NORTH);

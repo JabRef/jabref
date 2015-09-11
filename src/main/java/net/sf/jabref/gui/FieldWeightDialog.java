@@ -23,14 +23,10 @@ import java.util.TreeSet;
 
 import javax.swing.*;
 
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,8 +39,8 @@ public class FieldWeightDialog extends JDialog {
 
     private final JabRefFrame frame;
     private final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
     public static void main(String[] args) {
@@ -66,7 +62,7 @@ public class FieldWeightDialog extends JDialog {
                 "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.appendSeparator(Globals.lang("Field sizes"));
+        builder.appendSeparator(Localization.lang("Field sizes"));
 
         // We use this list to build an alphabetical list of field names:
         TreeSet<String> fields = new TreeSet<String>();
@@ -83,7 +79,7 @@ public class FieldWeightDialog extends JDialog {
 
         for (String field : fields) {
             builder.append(field);
-            int weight = (int) ((100 * BibtexFields.getFieldWeight(field)) / GUIGlobals.MAX_FIELD_WEIGHT);
+            int weight = (int) (100 * BibtexFields.getFieldWeight(field) / GUIGlobals.MAX_FIELD_WEIGHT);
             //System.out.println(weight);
             JSlider slider = new JSlider(0, 100, weight);//,);
             sliders.put(slider, new SliderInfo(field, weight));
@@ -126,7 +122,7 @@ public class FieldWeightDialog extends JDialog {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
-                double weight = (GUIGlobals.MAX_FIELD_WEIGHT * (slider.getValue())) / 100d;
+                double weight = GUIGlobals.MAX_FIELD_WEIGHT * slider.getValue() / 100d;
                 BibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }

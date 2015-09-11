@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -35,7 +35,7 @@ import net.sf.jabref.sql.SQLUtil;
 
 public class MySQLExporter extends DBExporter {
 
-    private static MySQLExporter instance = null;
+    private static MySQLExporter instance;
 
 
     private MySQLExporter() {

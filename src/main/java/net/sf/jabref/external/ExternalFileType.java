@@ -17,7 +17,7 @@ package net.sf.jabref.external;
 
 import javax.swing.*;
 
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.
@@ -60,7 +60,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @param val Constructor arguments.
      */
     public ExternalFileType(String[] val) {
-        if ((val == null) || (val.length < 4)) {
+        if (val == null || val.length < 4) {
             throw new IllegalArgumentException("Cannot contruct ExternalFileType without four elements in String[] argument.");
         }
         this.name = val[0];

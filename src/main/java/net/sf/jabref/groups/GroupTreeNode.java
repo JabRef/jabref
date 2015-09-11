@@ -26,14 +26,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.search.SearchRule;
-import net.sf.jabref.search.rules.sets.SearchRuleSets;
-import net.sf.jabref.search.rules.sets.SearchRuleSet;
+import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
+import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -91,7 +91,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
             cursor = e.nextElement();
-            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup().toString()).append("\n");
+            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup()).append("\n");
         }
         return sb.toString();
     }
@@ -163,7 +163,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      */
     public GroupTreeNode getDescendant(int[] indexedPath) {
         GroupTreeNode cursor = this;
-        for (int i = 0; (i < indexedPath.length) && (cursor != null); ++i) {
+        for (int i = 0; i < indexedPath.length && cursor != null; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
         }
         return cursor;
@@ -189,14 +189,14 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         }
         SearchRuleSet searchRule = SearchRuleSets.build(context == GroupHierarchyType.REFINING ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
         searchRule.addRule(getGroup().getSearchRule());
-        if ((context == GroupHierarchyType.INCLUDING)
-                && (originalContext != GroupHierarchyType.REFINING)) {
+        if (context == GroupHierarchyType.INCLUDING
+                && originalContext != GroupHierarchyType.REFINING) {
             for (int i = 0; i < getChildCount(); ++i) {
                 searchRule.addRule(((GroupTreeNode) getChildAt(i))
                         .getSearchRule(originalContext));
             }
-        } else if ((context == GroupHierarchyType.REFINING) && !isRoot()
-                && (originalContext != GroupHierarchyType.INCLUDING)) {
+        } else if (context == GroupHierarchyType.REFINING && !isRoot()
+                && originalContext != GroupHierarchyType.INCLUDING) {
             searchRule.addRule(((GroupTreeNode) getParent())
                     .getSearchRule(originalContext));
         }
@@ -237,7 +237,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         Enumeration<GroupTreeNode> e = preorderEnumeration();
         AbstractGroup group;
         while (e.hasMoreElements()) {
-            group = (e.nextElement()).getGroup();
+            group = e.nextElement().getGroup();
             if (group.contains(null, entry)) {
                 matchingGroups.add(group);
             }
@@ -248,12 +248,12 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     public boolean canMoveUp() {
-        return (getPreviousSibling() != null)
+        return getPreviousSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
-        return (getNextSibling() != null)
+        return getNextSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
@@ -263,7 +263,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     public boolean canMoveRight() {
-        return (getPreviousSibling() != null)
+        return getPreviousSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
@@ -282,7 +282,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     public AbstractUndoableEdit moveDown(GroupSelector groupSelector) {
         final GroupTreeNode myParent = (GroupTreeNode) getParent();
         final int index = myParent.getIndex(this);
-        if (index < (parent.getChildCount() - 1)) {
+        if (index < parent.getChildCount() - 1) {
             UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                     groupSelector.getGroupTreeRoot(), this, myParent, index + 1);
             myParent.insert(this, index + 1);
@@ -328,7 +328,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      */
     public GroupTreeNode getChildAt(int[] path) {
         GroupTreeNode cursor = this;
-        for (int i = 0; (i < path.length) && (cursor != null); ++i) {
+        for (int i = 0; i < path.length && cursor != null; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(path[i]);
         }
         return cursor;
@@ -395,10 +395,10 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         }
         AbstractGroup g1 = getGroup();
         AbstractGroup g2 = otherNode.getGroup();
-        if (((g1 == null) && (g2 != null)) || ((g1 != null) && (g2 == null))) {
+        if (g1 == null && g2 != null || g1 != null && g2 == null) {
             return false;
         }
-        if ((g1 != null) && (g2 != null) && !g1.equals(g2)) {
+        if (g1 != null && g2 != null && !g1.equals(g2)) {
             return false;
         }
         for (int i = 0; i < getChildCount(); ++i) {

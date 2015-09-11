@@ -1,7 +1,9 @@
 package net.sf.jabref.util;
 
 import net.sf.jabref.AssertUtil;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.FileBasedTestCase;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -23,7 +25,7 @@ import java.util.Map;
 public class UtilFindFileTest extends FileBasedTestCase {
 
     String findFile(String dir, String file) {
-        return UtilFindFiles.findFile(entry, database, dir, file, true);
+        return FileFinder.findFile(entry, database, dir, file, true);
     }
 
     /**
@@ -49,7 +51,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
                 root.getAbsolutePath() + "/test/" + "[bibtexkey].pdf"));
 
         // No relative paths
-        AssertUtil.assertEqualPaths(new File(root, "test/HipKro03.pdf").getCanonicalPath(), UtilFindFiles.findFile(
+        AssertUtil.assertEqualPaths(new File(root, "test/HipKro03.pdf").getCanonicalPath(), FileFinder.findFile(
                 entry, database, root.getAbsolutePath() + "/test/" + "[bibtexkey].pdf"));
 
     }
@@ -57,7 +59,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
     @Test
     @Ignore(value = "works on windows but not on linux")
     public void testFindPdf() throws IOException {
-        String pdf = UtilFindFiles.findPdf(entry, "pdf", root.getAbsolutePath());
+        String pdf = FileFinder.findPdf(entry, "pdf", root.getAbsolutePath());
         AssertUtil.assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
         File fullPath = FileUtil.expandFilename(pdf, root.getAbsolutePath());
@@ -68,7 +70,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
     @Test
     @Ignore(value = "works on windows but not on linux")
     public void testFindPdfInSubfolder() {
-        String pdf = UtilFindFiles.findPdf(entry, "pdf", root.getAbsolutePath() + "/pdfs/");
+        String pdf = FileFinder.findPdf(entry, "pdf", root.getAbsolutePath() + "/pdfs/");
 
         AssertUtil.assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
 
@@ -98,7 +100,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
         {
             String[] dirsToSearch = new String[]{root.getAbsolutePath(),
                     root.getAbsolutePath() + "/pdfs/"};
-            String pdf = UtilFindFiles.findPdf(entry, "pdf", dirsToSearch);
+            String pdf = FileFinder.findPdf(entry, "pdf", dirsToSearch);
             AssertUtil.assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
             File fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
@@ -127,37 +129,35 @@ public class UtilFindFileTest extends FileBasedTestCase {
                     .getAbsolutePath());
         }
 
-        {
-            String[] dirsToSearch = new String[]{root.getAbsolutePath() + "/pdfs/",
-                    root.getAbsolutePath()};
-            String pdf = UtilFindFiles.findPdf(entry, "pdf", dirsToSearch);
-            AssertUtil.assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
+        String[] dirsToSearch = new String[]{root.getAbsolutePath() + "/pdfs/",
+                root.getAbsolutePath()};
+        String pdf = FileFinder.findPdf(entry, "pdf", dirsToSearch);
+        AssertUtil.assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
 
-            File fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
-            Assert.assertNotNull(fullPath);
-            Assert.assertTrue(fullPath.exists());
-            AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
-                    .getAbsolutePath());
+        File fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
+        Assert.assertNotNull(fullPath);
+        Assert.assertTrue(fullPath.exists());
+        AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
+                .getAbsolutePath());
 
-            String tmp = dirsToSearch[1];
-            dirsToSearch[1] = dirsToSearch[0];
-            dirsToSearch[0] = tmp;
+        String tmp = dirsToSearch[1];
+        dirsToSearch[1] = dirsToSearch[0];
+        dirsToSearch[0] = tmp;
 
-            fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
-            Assert.assertNotNull(fullPath);
-            Assert.assertTrue(fullPath.exists());
-            AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
-                    .getAbsolutePath());
+        fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
+        Assert.assertNotNull(fullPath);
+        Assert.assertTrue(fullPath.exists());
+        AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
+                .getAbsolutePath());
 
-            fullPath = FileUtil.expandFilename(pdf, new String[]{dirsToSearch[0]});
-            Assert.assertNull(fullPath);
+        fullPath = FileUtil.expandFilename(pdf, new String[]{dirsToSearch[0]});
+        Assert.assertNull(fullPath);
 
-            fullPath = FileUtil.expandFilename(pdf, new String[]{dirsToSearch[1]});
-            Assert.assertNotNull(fullPath);
-            Assert.assertTrue(fullPath.exists());
-            AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
-                    .getAbsolutePath());
-        }
+        fullPath = FileUtil.expandFilename(pdf, new String[]{dirsToSearch[1]});
+        Assert.assertNotNull(fullPath);
+        Assert.assertTrue(fullPath.exists());
+        AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
+                .getAbsolutePath());
 
     }
 
@@ -166,55 +166,55 @@ public class UtilFindFileTest extends FileBasedTestCase {
     public void testFindFile() throws IOException {
 
         // Simple case
-        AssertUtil.assertEqualPaths("HipKro03.pdf", UtilFindFiles.findFile(entry, database, root.getAbsolutePath()
+        AssertUtil.assertEqualPaths("HipKro03.pdf", FileFinder.findFile(entry, database, root.getAbsolutePath()
                 + "/test/", "[bibtexkey].pdf", true));
 
         // Not found
-        Assert.assertNull(UtilFindFiles.findFile(entry, database, root.getAbsolutePath() + "/test/",
+        Assert.assertNull(FileFinder.findFile(entry, database, root.getAbsolutePath() + "/test/",
                 "Not there [bibtexkey].pdf", true));
 
         // Test current dir
-        AssertUtil.assertEqualPaths(new File(new File("."), "build.xml").getCanonicalPath(), UtilFindFiles.findFile(
+        AssertUtil.assertEqualPaths(new File(new File("."), "build.xml").getCanonicalPath(), FileFinder.findFile(
                 entry, database, "./build.xml"));
-        AssertUtil.assertEqualPaths("build.xml", UtilFindFiles.findFile(entry, database, ".", "build.xml", true));
+        AssertUtil.assertEqualPaths("build.xml", FileFinder.findFile(entry, database, ".", "build.xml", true));
 
         // Test keys in path and regular expression in file
-        AssertUtil.assertEqualPaths(new File(root, "/2003/Paper by HipKro03.pdf").getCanonicalPath(), UtilFindFiles
+        AssertUtil.assertEqualPaths(new File(root, "/2003/Paper by HipKro03.pdf").getCanonicalPath(), FileFinder
                 .findFile(entry, database, root.getAbsolutePath() + "/[year]/.*[bibtexkey].pdf"));
 
         // Test . and ..
         AssertUtil.assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf")
-                .getCanonicalPath(), UtilFindFiles.findFile(entry, database, root.getAbsolutePath()
+                .getCanonicalPath(), FileFinder.findFile(entry, database, root.getAbsolutePath()
                 + "/[year]/../2003/.././././[journal]\\" + ".*[bibtexkey].*.pdf"));
 
         // Test Escape
         AssertUtil.assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf")
-                .getCanonicalPath(), UtilFindFiles.findFile(entry, database, root.getAbsolutePath() + "/*/"
+                .getCanonicalPath(), FileFinder.findFile(entry, database, root.getAbsolutePath() + "/*/"
                 + "[bibtexkey] - Hello\\\\.pdf"));
 
-        AssertUtil.assertEqualPaths("TE.ST", UtilFindFiles.findFile(entry, database, root.getAbsolutePath() + "/test/",
+        AssertUtil.assertEqualPaths("TE.ST", FileFinder.findFile(entry, database, root.getAbsolutePath() + "/test/",
                 "TE\\\\.ST", true));
-        AssertUtil.assertEqualPaths(".TEST", UtilFindFiles.findFile(entry, database, root.getAbsolutePath() + "/test/",
+        AssertUtil.assertEqualPaths(".TEST", FileFinder.findFile(entry, database, root.getAbsolutePath() + "/test/",
                 "\\\\.TEST", true));
-        AssertUtil.assertEqualPaths("TEST[", UtilFindFiles.findFile(entry, database, root.getAbsolutePath() + "/test/",
+        AssertUtil.assertEqualPaths("TEST[", FileFinder.findFile(entry, database, root.getAbsolutePath() + "/test/",
                 "TEST\\\\[", true));
 
         // Test *
         AssertUtil.assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf")
-                .getCanonicalPath(), UtilFindFiles.findFile(entry, database, root.getAbsolutePath() + "/*/"
+                .getCanonicalPath(), FileFinder.findFile(entry, database, root.getAbsolutePath() + "/*/"
                 + "[bibtexkey].+?.pdf"));
 
         // Test **
-        AssertUtil.assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(), UtilFindFiles
+        AssertUtil.assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(), FileFinder
                 .findFile(entry, database, root.getAbsolutePath() + "/**/" + "[bibtexkey]-sub.pdf"));
 
         // Test ** - Find in level itself too
-        AssertUtil.assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(), UtilFindFiles
+        AssertUtil.assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(), FileFinder
                 .findFile(entry, database, root.getAbsolutePath() + "/pdfs/sub/**/"
                         + "[bibtexkey]-sub.pdf"));
 
         // Test ** - Find lowest level first (Rest is Depth first)
-        AssertUtil.assertEqualPaths(new File(root, "/HipKro03 - Hello.pdf").getCanonicalPath(), UtilFindFiles.findFile(
+        AssertUtil.assertEqualPaths(new File(root, "/HipKro03 - Hello.pdf").getCanonicalPath(), FileFinder.findFile(
                 entry, database, root.getAbsolutePath() + "/**/" + "[bibtexkey].*Hello.pdf"));
     }
 }

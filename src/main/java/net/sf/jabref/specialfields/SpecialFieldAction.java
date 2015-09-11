@@ -15,11 +15,11 @@
 */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.BaseAction;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.BaseAction;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class SpecialFieldAction implements BaseAction {
 
@@ -70,9 +70,9 @@ public class SpecialFieldAction implements BaseAction {
                 frame.basePanel().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame) {
-                    outText = Globals.lang(doneTextPattern, Integer.toString(bes.length));
+                    outText = Localization.lang(doneTextPattern, Integer.toString(bes.length));
                 } else {
-                    outText = Globals.lang(doneTextPattern, value, Integer.toString(bes.length));
+                    outText = Localization.lang(doneTextPattern, value, Integer.toString(bes.length));
                 }
                 frame.output(outText);
             } else {

@@ -40,14 +40,15 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.autocompleter.AutoCompleter;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -55,7 +56,7 @@ import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -73,7 +74,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
 
-    private JDialog diag = null;
+    private JDialog diag;
 
     // keyword to add
     private JTextField keyword;
@@ -81,7 +82,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private DefaultListModel keywordListModel;
     private JList keywordList;
 
-    private JRadioButton intersectKeywords, mergeKeywords;
+    private JRadioButton intersectKeywords;
+    private JRadioButton mergeKeywords;
 
     private boolean cancelled;
 
@@ -101,12 +103,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
-        diag = new JDialog(frame, Globals.lang("Manage keywords"), true);
+        diag = new JDialog(frame, Localization.lang("Manage keywords"), true);
 
-        JButton ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
-        JButton add = new JButton(Globals.lang("Add"));
-        JButton remove = new JButton(Globals.lang("Remove"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+        JButton add = new JButton(Localization.lang("Add"));
+        JButton remove = new JButton(Localization.lang("Remove"));
 
         keywordList.setVisibleRowCount(10);
 
@@ -128,7 +130,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("fill:200dlu, 4dlu, left:pref, 4dlu, left:pref", ""));
-        builder.appendSeparator(Globals.lang("Keywords of selected entries"));
+        builder.appendSeparator(Localization.lang("Keywords of selected entries"));
         builder.append(intersectKeywords, 5);
         builder.nextLine();
         builder.append(mergeKeywords, 5);
@@ -181,8 +183,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 } else {
                     int idx = 0;
                     String element = (String) keywordListModel.getElementAt(idx);
-                    while ((idx < keywordListModel.size()) &&
-                            (element.compareTo(text) < 0)) {
+                    while (idx < keywordListModel.size() &&
+                            element.compareTo(text) < 0) {
                         idx++;
                     }
                     if (idx == keywordListModel.size()) {
@@ -368,7 +370,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
 
         BibtexEntry[] entries = bp.getSelectedEntries();
-        NamedCompound ce = new NamedCompound(Globals.lang("Update keywords"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibtexEntry entry : entries) {
             ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
 
@@ -415,7 +417,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
-            assert (intersectKeywords.isSelected());
+            assert intersectKeywords.isSelected();
 
             // all keywords from first entry have to be added
             BibtexEntry firstEntry = entries[0];

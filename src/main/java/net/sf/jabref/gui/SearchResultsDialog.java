@@ -42,22 +42,16 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.EntryComparator;
-import net.sf.jabref.FieldComparator;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.GeneralRenderer;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.PreviewPanel;
-import net.sf.jabref.TransferableBibtexEntry;
 import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.util.StringUtil;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -162,9 +156,9 @@ public class SearchResultsDialog {
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.basePanel());
-                    frame.output(Globals.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
-                            + Globals.lang("entries")
-                            : "1 " + Globals.lang("entry") + '.'));
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
+                            + Localization.lang("entries")
+                            : "1 " + Localization.lang("entry") + '.'));
                 }
             }
         });
@@ -348,7 +342,8 @@ public class SearchResultsDialog {
                 return;
             }
             //if (e.)
-            final int col = entryTable.columnAtPoint(e.getPoint()), row = entryTable.rowAtPoint(e.getPoint());
+            final int col = entryTable.columnAtPoint(e.getPoint());
+            final int row = entryTable.rowAtPoint(e.getPoint());
             if (col < PAD) {
                 BibtexEntry entry = sortedEntries.get(row);
                 BasePanel p = entryHome.get(entry);
@@ -370,7 +365,7 @@ public class SearchResultsDialog {
                     Object link = entry.getField("url");
                     try {
                         if (link != null) {
-                            Util.openExternalViewer(p.metaData(), (String) link, "url");
+                            JabRefDesktop.openExternalViewer(p.metaData(), (String) link, "url");
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -463,7 +458,7 @@ public class SearchResultsDialog {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return StringUtil.nCase(fields[column - PAD]);
+                return StringUtil.capitalizeFirst(fields[column - PAD]);
             } else {
                 return "";
             }

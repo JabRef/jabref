@@ -27,23 +27,22 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.util.DOIUtil;
-import net.sf.jabref.Globals;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.net.URLDownload;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FindFullText {
 
-    private final static int
+    private static final int
             FOUND_PDF = 0;
-    public final static int WRONG_MIME_TYPE = 1;
-    public final static int UNKNOWN_DOMAIN = 2;
-    public final static int LINK_NOT_FOUND = 3;
-    public final static int IO_EXCEPTION = 4;
-    public final static int NO_URLS_DEFINED = 5;
+    public static final int WRONG_MIME_TYPE = 1;
+    public static final int UNKNOWN_DOMAIN = 2;
+    public static final int LINK_NOT_FOUND = 3;
+    public static final int IO_EXCEPTION = 4;
+    public static final int NO_URLS_DEFINED = 5;
 
     private final List<FullTextFinder> finders = new ArrayList<FullTextFinder>();
 
@@ -57,26 +56,25 @@ public class FindFullText {
     public FindResult findFullText(BibtexEntry entry) {
         String urlText = entry.getField("url");
         String doiText = entry.getField("doi");
-        // First try the DOI link, if defined:
-        if ((doiText != null) && (doiText.trim().length() > 0)) {
-            doiText = DOIUtil.getDOI(doiText);
-            FindResult resDoi = lookForFullTextAtURL(Globals.DOI_LOOKUP_PREFIX + doiText);
+        // First try the Doi link, if defined:
+        if (doiText != null && !doiText.trim().isEmpty()) {
+            FindResult resDoi = lookForFullTextAtURL(new DOI(doiText).getURL());
             if (resDoi.status == FindFullText.FOUND_PDF) {
                 return resDoi;
-            } else if ((urlText != null) && (urlText.trim().length() > 0)) {
+            } else if (urlText != null && !urlText.trim().isEmpty()) {
                 FindResult resUrl = lookForFullTextAtURL(urlText);
                 if (resUrl.status == FindFullText.FOUND_PDF) {
                     return resUrl;
                 } else {
-                    return resDoi; // If both URL and DOI fail, we assume that the error code for DOI is
+                    return resDoi; // If both URL and Doi fail, we assume that the error code for Doi is
                                    // probably the most relevant.
                 }
             } else {
                 return resDoi;
             }
         }
-        // No DOI? Try URL:
-        else if ((urlText != null) && (urlText.trim().length() > 0)) {
+        // No Doi? Try URL:
+        else if (urlText != null && !urlText.trim().isEmpty()) {
             return lookForFullTextAtURL(urlText);
         }
         // No URL either? Return error code.
@@ -100,7 +98,7 @@ public class FindFullText {
                         // it could be because the user doesn't have access:
                         try {
                             String mimeType = new URLDownload(result).determineMimeType();
-                            if ((mimeType != null) && (mimeType.toLowerCase().equals("application/pdf"))) {
+                            if (mimeType != null && mimeType.toLowerCase().equals("application/pdf")) {
                                 return new FindResult(result, url);
                             }
                             else {
@@ -131,7 +129,7 @@ public class FindFullText {
     }
 
     /**
-     * Follow redirects until the final location is reached. This is necessary to handle DOI links, which
+     * Follow redirects until the final location is reached. This is necessary to handle Doi links, which
      * redirect to publishers' web sites. We need to know the publisher's domain name in order to choose
      * which FullTextFinder to use.
      * @param url The url to start with.
@@ -148,7 +146,7 @@ public class FindFullText {
             int responseCode = huc.getResponseCode();
             String location = huc.getHeaderField("location");
             huc.disconnect();
-            if ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP) && (redirectCount < 5)) {
+            if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP && redirectCount < 5) {
                 //System.out.println(responseCode);
                 //System.out.println(location);
                 try {
@@ -210,7 +208,7 @@ public class FindFullText {
     public static class FindResult {
 
         public final URL url;
-        public String host = null;
+        public String host;
         public final int status;
 
 

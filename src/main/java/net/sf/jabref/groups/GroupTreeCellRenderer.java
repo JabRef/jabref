@@ -23,13 +23,13 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.util.StringUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its
@@ -42,10 +42,10 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final int MAX_DISPLAYED_LETTERS = 35;
 
     /** The cell over which the user is currently dragging */
-    private Object highlight1Cell = null;
-    private Object[] highlight2Cells = null;
-    private Object[] highlight3Cells = null;
-    private Object highlightBorderCell = null;
+    private Object highlight1Cell;
+    private Object[] highlight2Cells;
+    private Object[] highlight3Cells;
+    private Object highlightBorderCell;
 
     private static final ImageIcon
             groupRefiningIcon = GUIGlobals.getImage("groupRefining");
@@ -69,13 +69,13 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             return c;
         }
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
-        if ((group == null) || !(c instanceof JLabel))
+        if (group == null || !(c instanceof JLabel))
          {
             return c; // sanity check
         }
         JLabel label = (JLabel) c;
 
-        if ((highlightBorderCell != null) && (highlightBorderCell == value)) {
+        if (highlightBorderCell != null && highlightBorderCell == value) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());
@@ -120,7 +120,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
             if (group instanceof ExplicitGroup) {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append("]");
-            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+            } else if (group instanceof KeywordGroup || group instanceof SearchGroup) {
                 int hits = 0;
                 for (BibtexEntry entry : JabRef.jrf.basePanel().getDatabase().getEntries()) {
                     if (group.contains(entry)) {

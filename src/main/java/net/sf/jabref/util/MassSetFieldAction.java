@@ -26,11 +26,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * An Action for launching mass field.
@@ -44,8 +49,14 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
     private JDialog diag;
-    private JRadioButton all, selected, clear, set, rename;
-    private JTextField field, text, renameTo;
+    private JRadioButton all;
+    private JRadioButton selected;
+    private JRadioButton clear;
+    private JRadioButton set;
+    private JRadioButton rename;
+    private JTextField field;
+    private JTextField text;
+    private JTextField renameTo;
     private boolean cancelled = true;
     private JCheckBox overwrite;
 
@@ -56,7 +67,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Globals.lang("Set/clear/rename fields"), true);
+        diag = new JDialog(frame, Localization.lang("Set/clear/rename fields"), true);
 
         field = new JTextField();
         text = new JTextField();
@@ -64,15 +75,15 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
-        JButton ok = new JButton(Globals.lang("Ok"));
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
 
-        all = new JRadioButton(Globals.lang("All entries"));
-        selected = new JRadioButton(Globals.lang("Selected entries"));
-        clear = new JRadioButton(Globals.lang("Clear fields"));
-        set = new JRadioButton(Globals.lang("Set fields"));
-        rename = new JRadioButton(Globals.lang("Rename field to:"));
-        rename.setToolTipText(Globals.lang("Move contents of a field into a field with a different name"));
+        all = new JRadioButton(Localization.lang("All entries"));
+        selected = new JRadioButton(Localization.lang("Selected entries"));
+        clear = new JRadioButton(Localization.lang("Clear fields"));
+        set = new JRadioButton(Localization.lang("Set fields"));
+        rename = new JRadioButton(Localization.lang("Rename field to:"));
+        rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
         set.addChangeListener(new ChangeListener() {
 
             @Override
@@ -97,7 +108,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
                 renameTo.setEnabled(rename.isSelected());
             }
         });
-        overwrite = new JCheckBox(Globals.lang("Overwrite existing field values"), true);
+        overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
         bg.add(all);
         bg.add(selected);
@@ -107,16 +118,16 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         bg.add(rename);
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 4dlu, fill:100dlu", ""));
-        builder.appendSeparator(Globals.lang("Field name"));
-        builder.append(Globals.lang("Field name"));
+        builder.appendSeparator(Localization.lang("Field name"));
+        builder.append(Localization.lang("Field name"));
         builder.append(field);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Include entries"));
+        builder.appendSeparator(Localization.lang("Include entries"));
         builder.append(all, 3);
         builder.nextLine();
         builder.append(selected, 3);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("New field value"));
+        builder.appendSeparator(Localization.lang("New field value"));
         builder.append(set);
         builder.append(text);
         builder.nextLine();
@@ -146,7 +157,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
                 if (rename.isSelected()) {
                     String[] fields = getFieldNames(field.getText());
                     if (fields.length > 1) {
-                        JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
+                        JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
                                 "", JOptionPane.ERROR_MESSAGE);
                         return; // Do not close the dialog.
                     }
@@ -217,7 +228,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             toSet = null;
         }
         String[] fields = getFieldNames(field.getText().trim().toLowerCase());
-        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
                 // TODO: message: can only rename a single field

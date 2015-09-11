@@ -1,84 +1,53 @@
-// must appear before any plugins blocks - see http://gradle.org/docs/2.4/userguide/plugins.html#sec:plugins_block
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2'
-    }
-}
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    //The format plugin requires Java 1.8. As JabRef currently supports Java 1.6, the formatter plugin is disabled.
-    //id "com.github.youribonnaffe.gradle.format" version "1.2"
-
-    // Version 0.3 requires Java 1.7, therefore we use version 0.2
-    // This version, however, is not available as plugin directly from gradle
-    // id "eu.appsatori.fatjar" version "0.3"
+    id "eu.appsatori.fatjar" version "0.3"
+    id "edu.sc.seis.launch4j" version "1.1.4"
+    id "com.github.kt3k.coveralls" version "2.4.0"
+    id "edu.sc.seis.macAppBundle" version "2.1.1"
+    id "com.github.youribonnaffe.gradle.format" version "1.2"
 }
 
-apply plugin: "fatjar"
 apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "sonar-runner"
+apply plugin: "maven"
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
 
-/* disabled, because plugin requires Java 1.8
-format {
-    configurationFile = file('formatter_settings.xml')
-    // default: reformat main and test
-    //files = sourceSets.main.java
+group = "net.sf.jabref"
+version = "2.80dev"
+project.ext.threeDotVersion = "2.80.0.0"
+project.ext.nsisExec = hasProperty("nsisExec") ? getProperty("nsisExec") : "C:/Program Files/NSIS/makensis.exe"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+mainClassName = "net.sf.jabref.JabRefMain"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
 }
-*/
-
-fatJar {
-    classifier 'fat'
-    manifest {
-        attributes 'Main-Class': "net.sf.jabref.JabRefMain"
-    }
-}
-
-test {
-    testLogging {
-        exceptionFormat "full" // default is "short"
-    }
-}
-
-version = "2.11dev"
 
 repositories {
     jcenter()
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ["src/main/java", "src/main/gen"]
-        }
-    }
-}
-
 configurations {
-    generateClasspath
     antlr3
     antlr4
 }
 
 dependencies {
+    compile 'com.jgoodies:jgoodies-common:1.8.1'
+    compile 'com.jgoodies:jgoodies-forms:1.9.0'
+    compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
-    // jgoodies
-    compile 'com.jgoodies:jgoodies-common:1.7.0'
-    compile 'com.jgoodies:jgoodies-forms:1.7.2'
-    compile 'com.jgoodies:jgoodies-looks:2.5.3'
-    
-    compile 'org.swinglabs:swingx:1.6.1'
+    compile 'org.swinglabs.swingx:swingx-core:1.6.5-1'
 
-    compile 'org.apache.pdfbox:pdfbox:1.8.9'
-    compile 'org.apache.pdfbox:fontbox:1.8.9'
-    compile 'org.apache.pdfbox:jempbox:1.8.9'
+    compile 'org.apache.pdfbox:pdfbox:1.8.10'
+    compile 'org.apache.pdfbox:fontbox:1.8.10'
+    compile 'org.apache.pdfbox:jempbox:1.8.10'
 
     compile 'commons-cli:commons-cli:1.3.1'
 
@@ -90,14 +59,14 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.5.1'
-    compile 'org.antlr:antlr4-runtime:4.5.1'
+    antlr4 'org.antlr:antlr4:4.5.1-1'
+    compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
     compile 'mysql:mysql-connector-java:5.1.36'
     compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
-    compile fileTree(dir: 'lib', includes: ['microba.jar', 'spin.jar'])
+    compile fileTree(dir: 'lib', includes: ['*.jar'])
 
     compile 'net.java.dev.jna:jna:4.1.0'
 
@@ -106,77 +75,37 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
 
     compile 'commons-logging:commons-logging:1.2'
-    // not available in maven repository
-    compile fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator-rt.jar'])
-
-    compile 'com.sun.jersey:jersey-client:1.19'
-    compile 'com.sun.jersey:jersey-core:1.19'
-    compile 'com.sun.jersey.contribs:jersey-multipart:1.19'
-
-    compile fileTree(dir: 'lib/spl/sciplore', includes: ['*.jar'])
 
     compile 'junit:junit:4.12'
-
-    generateClasspath fileTree(dir: 'lib/plugin', includes: ['jpf.jar', 'jpf-boot.jar', 'JPFCodeGenerator.jar', 'velocity-dep-1.5.jar'])
 }
 
-// use ant targets with prefix antTargets.XXXXX
-ant.importBuild "build-wrapper.xml"
-// add jars from this classpath to the classpath for the ant build
-if (org.gradle.internal.os.OperatingSystem.current().windows) {
-    // according to the discussion at https://github.com/JabRef/jabref/pull/58, the separators are different on Windows and Linux
-    ant.references.jars.setFiles(configurations.compile.asPath.replace(";"," "))
-} else {
-    ant.references.jars.setFiles(configurations.compile.asPath.replace(":"," "))
-}
-
-sourceCompatibility = 1.6
-mainClassName = "net.sf.jabref.JabRefMain"
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
-}
-
-compileJava {
-    // files are all encoded using UTF-8
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:none"
-}
-
-compileTestJava {
-    // files are all encoded using UTF-8
-    options.encoding = 'UTF-8'
-}
-
-javadoc {
-    options {
-        // files are all encoded using UTF-8
-        encoding = 'UTF-8'
-        version = true
-        author = true
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", "src/main/gen"]
+        }
     }
 }
 
-// jabref specific tasks
-compileJava.dependsOn "generateSource"
+processResources {
+    filesMatching("help/**/About.html") {
+        expand ("version": project.version,
+                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
+                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "))
+    }
 
-task generateSource(dependsOn: ["generatePluginSource", "generateBstGrammarSource", "generateSearchGrammarSource"]) {
-    group = 'JabRef'
-    description 'Generates all Java source files.'
+    filesMatching("resource/build.properties") {
+        expand version: project.version
+    }
+
+    filesMatching("resource/**/meta.xml") {
+        expand version: project.version
+    }
 }
 
-task generatePluginSource(type: JavaExec) {
-    group 'JabRef'
-    description 'Generates _JabRefPlugin.java with JPF.'
-
-    ext.pluginsDir = "src/main/resources/plugins"
-
-    inputs.dir file(ext.pluginsDir)
-    outputs.file file("src/main/gen/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java")
-
-    main = "net.sf.jabref.plugin.util.CodeGenerator"
-    args = [ext.pluginsDir]
-    classpath = configurations.generateClasspath
+task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
+    group = 'JabRef'
+    description 'Generates all Java source files.'
 }
 
 task generateBstGrammarSource(type: JavaExec) {
@@ -220,8 +149,29 @@ task generateSearchGrammarSource(type: JavaExec) {
     args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
 }
 
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:none"
+}
+compileJava.dependsOn "generateSource"
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        version = true
+        author = true
+    }
+}
+
+test {
+    testLogging {
+        exceptionFormat "full" // default is "short"
+    }
+}
 
 jacocoTestReport {
     reports {
@@ -229,3 +179,161 @@ jacocoTestReport {
         html.enabled = true
     }
 }
+
+// enables `gradlew format`. Currently `LabelPatternUtil.java` is destroyed. Use with care!
+format {
+    configurationFile = file('ide-settings/formatter_settings.xml')
+    // default: reformat main and test
+    //files = sourceSets.main.java
+}
+
+fatJar {
+    classifier 'fat'
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+
+
+/*
+ * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
+ */
+if (hasProperty('dev')) {
+    String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
+    String result = ""
+    if (OperatingSystem.current().isWindows()) {
+        result = "cmd /c $command".execute().in.text
+    } else {
+        result = command.execute().in.text
+    }
+
+    // remove enclosing ' of result
+    project.version += "--snapshot--" + result.substring(1, result.length() - 1)
+}
+
+task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "releaseSourceZip", "releaseSourceTar"]) {
+    group = 'JabRef - Release'
+    description 'Creates a release for all target platforms.'
+}
+
+launch4j {
+    mainClassName = project.mainClassName
+    version = project.ext.threeDotVersion
+    textVersion = project.version
+    jar = "../libs/JabRef-${project.version}-fat.jar"
+    icon = "${projectDir}/src/main/resources/images/icons/JabRef.ico"
+    copyright = "JabRef developers"
+    initialHeapSize = 32
+    maxHeapSize = 512
+}
+createExe.dependsOn "fatJar"
+
+task releaseJar(dependsOn: "fatJar") {
+    group = 'JabRef - Release'
+    description "Creates a Jar release."
+
+    doLast {
+        copy {
+            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
+            into("$buildDir/releases")
+
+            rename { String fileName ->
+                fileName.replace('-fat', '')
+            }
+        }
+    }
+}
+
+task releaseWindows(dependsOn: "launch4j") {
+    group = 'JabRef - Release'
+    description "Creates a Windows release."
+
+    doLast {
+        copy {
+            from("$projectDir/LICENSE")
+            from("$projectDir/README.md")
+            from("$buildDir/launch4j/JabRef.exe")
+            into("$buildDir/nsis")
+        }
+        if (OperatingSystem.current().isWindows()) {
+            exec {
+               commandLine project.ext.nsisExec, "/DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+            }
+        } else {
+            exec {
+                commandLine project.ext.nsisExec, "-DVERSION=${version}", "${projectDir}/buildres/nsis/setup.nsi"
+            }
+        }
+        copy {
+            from("$buildDir/nsis/JabRefSetup.exe")
+            from("$buildDir/nsis/JabRef.exe")
+            into("$buildDir/releases")
+        }
+    }
+}
+
+if(!OperatingSystem.current().isMacOsX()) {
+    // disable this task as it requires a command line tool only available on Mac OS X
+    createDmg.enabled = false
+}
+
+task releaseMac(dependsOn: "createAppZip") {
+    group = 'JabRef - Release'
+    description "Creates an OSX release."
+
+    doLast {
+        copy {
+            from "$buildDir/distributions/JabRef-${project.version}.zip"
+            into "$buildDir/releases"
+            rename { String fileName ->
+                fileName.replace('.zip', '-OSX.zip')
+            }
+        }
+    }
+}
+
+macAppBundle {
+    mainClassName = project.mainClassName
+    icon = "src/main/resources/images/icons/JabRef-Logo.icns"
+    highResolutionCapable = true
+
+    def map = [
+            "CFBundleTypeName"      : "BibTeX file",
+            "CFBundleTypeRole"      : "Editor",
+            "CFBundleTypeIconFile"  : "JabRef-Logo.icns",
+            "CFBundleTypeExtensions": ["bib"]
+    ]
+    bundleExtras.put("CFBundleDocumentTypes", [map])
+}
+
+task releaseSourceZip(type: Exec) {
+    group = 'JabRef - Release'
+    description "Creates a zip archive of the source code."
+
+    if (OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
+    } else {
+        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
+    }
+
+    doFirst {
+        mkdir("$buildDir/releases")
+    }
+}
+
+task releaseSourceTar(type: Exec) {
+    group = 'JabRef - Release'
+    description "Creates a tar archive of the source code."
+
+    if (OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
+    } else {
+        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
+    }
+
+    doFirst {
+        mkdir("$buildDir/releases")
+    }
+}
+

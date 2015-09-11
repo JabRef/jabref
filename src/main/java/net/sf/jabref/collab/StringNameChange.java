@@ -18,13 +18,18 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertString;
-import net.sf.jabref.undo.UndoableStringChange;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.gui.undo.UndoableStringChange;
 
 class StringNameChange extends Change {
 
@@ -42,7 +47,7 @@ class StringNameChange extends Change {
     public StringNameChange(BibtexString string, BibtexString tmpString,
             String mem, String tmp, String disk, String content) {
         this.tmpString = tmpString;
-        name = Globals.lang("Renamed string") + ": '" + tmp + '\'';
+        name = Localization.lang("Renamed string") + ": '" + tmp + '\'';
         this.string = string;
         this.content = content;
         this.mem = mem;
