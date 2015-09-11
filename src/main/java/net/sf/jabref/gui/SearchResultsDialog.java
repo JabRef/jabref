@@ -42,6 +42,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
@@ -80,8 +81,8 @@ public class SearchResultsDialog {
     private final int FILE_COL = 0;
     private final int URL_COL = 1;
     private final int PAD = 2;
-    private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
-    private final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
+    private final JLabel fileLabel = new JLabel(IconTheme.getImage("psSmall"));
+    private final JLabel urlLabel = new JLabel(IconTheme.getImage("wwwSmall"));
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 

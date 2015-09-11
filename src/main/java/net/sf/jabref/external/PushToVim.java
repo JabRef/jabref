@@ -19,7 +19,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -64,7 +64,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public Icon getIcon() {
-        return GUIGlobals.getImage("vim");
+        return IconTheme.getImage("vim");
     }
 
     @Override

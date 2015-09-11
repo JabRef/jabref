@@ -288,10 +288,6 @@ public class JabRef {
             }
         }
 
-        // Set up custom or default icon theme
-        // Has to be done here as openBibFile requires an initialized icon theme (due to the implementation of special fields)
-        GUIGlobals.setUpIconTheme();
-
         // Vector to put imported/loaded database(s) in.
         Vector<ParserResult> loaded = new Vector<ParserResult>();
         Vector<String> toImport = new Vector<String>();

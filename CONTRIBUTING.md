@@ -6,13 +6,12 @@ Take a look at GitHub's excellent [help documentation] for a detailed explanatio
 We also have [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
-It contains steps to get start with JabRef development.
+It contains steps to get started with JabRef development.
 
 In case you have any questions, you can use our [GITTER channel](https://gitter.im/JabRef/jabref) or use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
 
 
 ## Formal requirements for a pull request
-
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
 Nevertheless we aim to keep the code consistently formatted, therefore we additionally have a requirement regarding the source formatter.
 
@@ -71,9 +70,17 @@ Nevertheless, we rely on our test cases to ensure that a bug fix or a feature im
 In case you do not have time to add a test case, we nevertheless ask you to run `gradlew check` to ensure that your change doesn't break anything else.
 
 
+### When adding a library
+Please try to use a version available at jCenter and add it to `build.gradle`.
+In any case, describe the library at [external-libraries.txt](external-libraries.txt).
+We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
+
+
 ### Create a pull request
 Create a pull request on GitHub.
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
+
+You can add the prefix `[WIP]` to indicate that the pull request is not yet complete, but you want to discuss something or inform about the current state of affairs.
 
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines

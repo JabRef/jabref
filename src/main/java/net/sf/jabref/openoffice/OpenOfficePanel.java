@@ -88,7 +88,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private static final JButton merge = new JButton(Localization.lang("Merge citations"));
     private static final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private static final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private static final JButton help = new JButton(GUIGlobals.getImage("help"));
+    private static final JButton help = new JButton(IconTheme.getImage("help"));
     private static final JButton test = new JButton("Test");
     private JRadioButton inPar;
     private JRadioButton inText;
@@ -117,15 +117,15 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private OpenOfficePanel() {
-        ImageIcon connectImage = GUIGlobals.getImage("connect_no");
+        ImageIcon connectImage = IconTheme.getImage("connect_no");
 
         OpenOfficePanel.connect = new JButton(connectImage);
         OpenOfficePanel.manualConnect = new JButton(connectImage);
         OpenOfficePanel.connect.setToolTipText(Localization.lang("Connect"));
         OpenOfficePanel.manualConnect.setToolTipText(Localization.lang("Manual connect"));
-        OpenOfficePanel.selectDocument = new JButton(GUIGlobals.getImage("open"));
+        OpenOfficePanel.selectDocument = new JButton(IconTheme.getImage("open"));
         OpenOfficePanel.selectDocument.setToolTipText(Localization.lang("Select Writer document"));
-        OpenOfficePanel.update = new JButton(GUIGlobals.getImage("refresh"));
+        OpenOfficePanel.update = new JButton(IconTheme.getImage("refresh"));
         OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
         String defExecutable;
         String defJarsDir;
@@ -168,7 +168,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     public void init(JabRefFrame frame, SidePaneManager manager) {
         OpenOfficePanel.frame = frame;
         this.manager = manager;
-        comp = new OOPanel(manager, GUIGlobals.getIconUrl("openoffice"), Localization.lang("OpenOffice"));
+        comp = new OOPanel(manager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"));
         try {
             initPanel();
             manager.register(getName(), comp);
@@ -181,7 +181,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
         if (Globals.prefs.getBoolean("showOOPanel")) {
             manager.show(getName());
         }
-        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"), GUIGlobals.getImage("openoffice"));
+        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"), IconTheme.getImage("openoffice"));
         item.addActionListener(new ActionListener() {
 
             @Override
@@ -1003,7 +1003,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     @Override
     public Icon getIcon() {
-        return GUIGlobals.getImage("openoffice");
+        return IconTheme.getImage("openoffice");
     }
 
     @Override
@@ -1069,7 +1069,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     class OOPanel extends SidePaneComponent {
 
-        public OOPanel(SidePaneManager sidePaneManager, URL url, String s) {
+        public OOPanel(SidePaneManager sidePaneManager, ImageIcon url, String s) {
             super(sidePaneManager, url, s);
         }
 

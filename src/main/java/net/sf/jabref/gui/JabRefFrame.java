@@ -221,31 +221,34 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey("Help"));
     private final AbstractAction contents = new HelpAction("Help contents", helpDiag,
             GUIGlobals.helpContents, Localization.lang("Help contents"),
-            GUIGlobals.getIconUrl("helpContents"));
+            IconTheme.getImage("helpContents"));
     private final AbstractAction about = new HelpAction("About JabRef", helpDiag,
             GUIGlobals.aboutPage, Localization.lang("About JabRef"),
-            GUIGlobals.getIconUrl("about"));
+            IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, "Edit entry",
             Localization.lang("Edit entry"),
-            prefs.getKey(KeyBinds.EDIT_ENTRY));
+            prefs.getKey(KeyBinds.EDIT_ENTRY),
+            IconTheme.getImage("edit"));
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE, "Focus entry table",
             Localization.lang("Move the keyboard focus to the entry table"),
             prefs.getKey(KeyBinds.FOCUS_ENTRY_TABLE));
     private final AbstractAction save = new GeneralAction(Actions.SAVE, "Save database",
             Localization.lang("Save database"),
-            prefs.getKey(KeyBinds.SAVE_DATABASE));
+            prefs.getKey(KeyBinds.SAVE_DATABASE),
+            IconTheme.getImage("save"));
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS, "Save database as ...",
             Localization.lang("Save database as ..."),
-            prefs.getKey(KeyBinds.SAVE_DATABASE_AS));
+            prefs.getKey(KeyBinds.SAVE_DATABASE_AS),
+            IconTheme.getImage("saveAs"));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
             "Save selected as ...",
             Localization.lang("Save selected as ..."),
-            GUIGlobals.getIconUrl("saveAs"));
+            IconTheme.getImage("saveAs"));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             "Save selected as plain BibTeX ...",
             Localization.lang("Save selected as plain BibTeX ..."),
-            GUIGlobals.getIconUrl("saveAs"));
+            IconTheme.getImage("saveAs"));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
@@ -254,47 +257,57 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public final AbstractAction prevTab = new ChangeTabAction(false);
     private final AbstractAction sortTabs = new SortTabsAction(this);
     private final AbstractAction undo = new GeneralAction(Actions.UNDO, "Undo", Localization.lang("Undo"),
-            prefs.getKey(KeyBinds.UNDO));
+            prefs.getKey(KeyBinds.UNDO),
+            IconTheme.getImage("undo"));
     private final AbstractAction redo = new GeneralAction(Actions.REDO, "Redo", Localization.lang("Redo"),
-            prefs.getKey(KeyBinds.REDO));
+            prefs.getKey(KeyBinds.REDO),
+            IconTheme.getImage("redo"));
     final AbstractAction forward = new GeneralAction(Actions.FORWARD, "Forward", Localization.lang("Forward"),
-            "right", prefs.getKey(KeyBinds.FORWARD));
+            prefs.getKey(KeyBinds.FORWARD), IconTheme.getImage("right"));
     final AbstractAction back = new GeneralAction(Actions.BACK, "Back", Localization.lang("Back"),
-            "left", prefs.getKey(KeyBinds.BACK));
+            prefs.getKey(KeyBinds.BACK), IconTheme.getImage("left"));
     private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", Localization.lang("Delete"),
-            prefs.getKey(KeyBinds.DELETE));
-    private final AbstractAction copy = new EditAction(Actions.COPY, GUIGlobals.getIconUrl("copy"));
-    private final AbstractAction paste = new EditAction(Actions.PASTE, GUIGlobals.getIconUrl("paste"));
-    private final AbstractAction cut = new EditAction(Actions.CUT, GUIGlobals.getIconUrl("cut"));
+            prefs.getKey(KeyBinds.DELETE),
+            IconTheme.getImage("delete"));
+    private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.getImage("copy"));
+    private final AbstractAction paste = new EditAction(Actions.PASTE, IconTheme.getImage("paste"));
+    private final AbstractAction cut = new EditAction(Actions.CUT, IconTheme.getImage("cut"));
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, "Mark entries",
             Localization.lang("Mark entries"),
-            prefs.getKey(Actions.MARK_ENTRIES));
+            prefs.getKey(KeyBinds.MARK_ENTRIES),
+            IconTheme.getImage("markEntries"));
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES, "Unmark entries",
             Localization.lang("Unmark entries"),
-            prefs.getKey(KeyBinds.UNMARK_ENTRIES));
+            prefs.getKey(KeyBinds.UNMARK_ENTRIES),
+            IconTheme.getImage("unmarkEntries"));
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, "Unmark all");
     private final AbstractAction toggleRelevance = new GeneralAction(
             Relevance.getInstance().getValues().get(0).getActionName(),
             Relevance.getInstance().getValues().get(0).getMenuString(),
-            Relevance.getInstance().getValues().get(0).getToolTipText());
+            Relevance.getInstance().getValues().get(0).getToolTipText(),
+            IconTheme.getImage(Relevance.getInstance().getValues().get(0).getActionName()));
     private final AbstractAction toggleQualityAssured = new GeneralAction(
             Quality.getInstance().getValues().get(0).getActionName(),
             Quality.getInstance().getValues().get(0).getMenuString(),
-            Quality.getInstance().getValues().get(0).getToolTipText());
+            Quality.getInstance().getValues().get(0).getToolTipText(),
+            IconTheme.getImage(Quality.getInstance().getValues().get(0).getActionName()));
     private final AbstractAction togglePrinted = new GeneralAction(
             Printed.getInstance().getValues().get(0).getActionName(),
             Printed.getInstance().getValues().get(0).getMenuString(),
-            Printed.getInstance().getValues().get(0).getToolTipText());
+            Printed.getInstance().getValues().get(0).getToolTipText(),
+            IconTheme.getImage(Printed.getInstance().getValues().get(0).getActionName()));
     private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS, "Manage content selectors");
     private final AbstractAction saveSessionAction = new SaveSessionAction();
     public final AbstractAction loadSessionAction = new LoadSessionAction();
     private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH, "Incremental search",
             Localization.lang("Start incremental search"),
-            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH));
+            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH),
+            IconTheme.getImage("incSearch"));
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, "Search", Localization.lang("Search"),
-            prefs.getKey(KeyBinds.SEARCH));
+            prefs.getKey(KeyBinds.SEARCH),
+            IconTheme.getImage("search"));
     private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH, "Search",
-            Localization.lang("Toggle search panel"));
+            Localization.lang("Toggle search panel"),IconTheme.getImage("toggleSearch"));
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, "Copy BibTeX key",
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
@@ -308,7 +321,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
             "Append database",
             Localization.lang("Append contents from a BibTeX database into the currently viewed database"),
-            GUIGlobals.getIconUrl("open"));
+            IconTheme.getImage("open"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, "Select all",
             prefs.getKey(KeyBinds.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL, "Replace string",
@@ -316,10 +329,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE, "Edit preamble",
             Localization.lang("Edit preamble"),
-            prefs.getKey(KeyBinds.EDIT_PREAMBLE));
+            prefs.getKey(KeyBinds.EDIT_PREAMBLE),
+            IconTheme.getImage("editPreamble"));
     private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS, "Edit strings",
             Localization.lang("Edit strings"),
-            prefs.getKey(KeyBinds.EDIT_STRINGS));
+            prefs.getKey(KeyBinds.EDIT_STRINGS),
+            IconTheme.getImage("editStrings"));
     private final AbstractAction toggleToolbar = new AbstractAction("Hide/show toolbar") {
         {
             putValue(Action.ACCELERATOR_KEY, prefs.getKey(KeyBinds.HIDE_SHOW_TOOLBAR));
@@ -332,25 +347,28 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
             "Toggle groups interface",
             Localization.lang("Toggle groups interface"),
-            prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE));
+            prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
+            IconTheme.getImage("toggleGroups"));
     private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
             "Toggle entry preview",
             Localization.lang("Toggle entry preview"),
-            prefs.getKey(KeyBinds.TOGGLE_ENTRY_PREVIEW));
+            prefs.getKey(KeyBinds.TOGGLE_ENTRY_PREVIEW),
+            IconTheme.getImage("togglePreview"));
     private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             "Highlight groups matching any selected entry",
             Localization.lang("Highlight groups matching any selected entry"),
-            GUIGlobals.getIconUrl("groupsHighlightAny"));
+            IconTheme.getImage("groupsHighlightAny"));
     private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             "Highlight groups matching all selected entries",
             Localization.lang("Highlight groups matching all selected entries"),
-            GUIGlobals.getIconUrl("groupsHighlightAll"));
+            IconTheme.getImage("groupsHighlightAll"));
     final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             "Switch preview layout",
             prefs.getKey(KeyBinds.SWITCH_PREVIEW_LAYOUT));
     private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY, "Autogenerate BibTeX keys",
             Localization.lang("Autogenerate BibTeX keys"),
-            prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS));
+            prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS),
+            IconTheme.getImage("makeKey"));
 
     private final AbstractAction writeXmpAction = new GeneralAction(Actions.WRITE_XMP, "Write XMP-metadata to PDFs",
             Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
@@ -361,13 +379,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.OPEN_FOLDER));
     private final AbstractAction openFile = new GeneralAction(Actions.OPEN_EXTERNAL_FILE, "Open file",
             Localization.lang("Open file"),
-            prefs.getKey(KeyBinds.OPEN_FILE));
+            prefs.getKey(KeyBinds.OPEN_FILE),
+            IconTheme.getImage("openExternalFile"));
     private final AbstractAction openPdf = new GeneralAction(Actions.OPEN_FILE, "Open PDF or PS",
             Localization.lang("Open PDF or PS"),
-            prefs.getKey(KeyBinds.OPEN_PDF_OR_PS));
+            prefs.getKey(KeyBinds.OPEN_PDF_OR_PS),
+            IconTheme.getImage("openFile"));
     private final AbstractAction openUrl = new GeneralAction(Actions.OPEN_URL, "Open URL or DOI",
             Localization.lang("Open URL or DOI"),
-            prefs.getKey(KeyBinds.OPEN_URL_OR_DOI));
+            prefs.getKey(KeyBinds.OPEN_URL_OR_DOI),
+            IconTheme.getImage("openUrl"));
     private final AbstractAction openSpires = new GeneralAction(Actions.OPEN_SPIRES, "Open SPIRES entry",
             Localization.lang("Open SPIRES entry"),
             prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
@@ -406,20 +427,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT, "Connect to external SQL database",
             Localization.lang("Connect to external SQL database"),
-            GUIGlobals.getIconUrl("dbConnect"));
+            IconTheme.getImage("dbConnect"));
 
     private final AbstractAction dbExport = new GeneralAction(Actions.DB_EXPORT, "Export to external SQL database",
             Localization.lang("Export to external SQL database"),
-            GUIGlobals.getIconUrl("dbExport"));
+            IconTheme.getImage("dbExport"));
 
     private final AbstractAction Cleanup = new GeneralAction(Actions.CLEANUP, "Cleanup entries",
             Localization.lang("Cleanup entries"),
             prefs.getKey(KeyBinds.CLEANUP),
-            "cleanupentries");
+            IconTheme.getImage("cleanupentries"));
 
     private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES, "Merge entries",
             Localization.lang("Merge entries"),
-            GUIGlobals.getIconUrl("mergeentries"));
+            IconTheme.getImage("mergeentries"));
 
     private final AbstractAction dbImport = new DbImportAction(this).getAction();
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
@@ -435,8 +456,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_TITLE,
             FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
-            FindUnlinkedFilesDialog.ACTION_ICON,
-            prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION)
+            prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION),
+            IconTheme.getImage("toggleSearch")
     );
 
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
@@ -497,7 +518,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // glassPane.setVisible(true);
 
         setTitle(GUIGlobals.frameTitle);
-        setIconImage(GUIGlobals.getImage("jabrefIcon48").getImage());
+        setIconImage(IconTheme.getImage("jabrefIcon48").getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
@@ -1098,27 +1119,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         private final String command;
 
-        public GeneralAction(String command, String text,
-                             String description, URL icon) {
-            super(new ImageIcon(icon));
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-        }
-
-        public GeneralAction(String command, String text,
-                             String description, String imageName,
-                             KeyStroke key) {
-            super(GUIGlobals.getImage(imageName));
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-        }
-
         public GeneralAction(String command, String text) {
-            putValue(Action.NAME, text);
             this.command = command;
+            putValue(Action.NAME, text);
+        }
+
+        public GeneralAction(String command, String text, String description) {
+            this.command = command;
+            putValue(Action.NAME, text);
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+        }
+
+        public GeneralAction(String command, String text, String description, ImageIcon icon) {
+            super(icon);
+
+            this.command = command;
+            putValue(Action.NAME, text);
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
         }
 
         public GeneralAction(String command, String text, KeyStroke key) {
@@ -1127,33 +1144,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
-        public GeneralAction(String command, String text, String description) {
-            this.command = command;
-            ImageIcon icon = GUIGlobals.getImage(command);
-            if (icon != null) {
-                putValue(Action.SMALL_ICON, icon);
-            }
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
-        }
-
         public GeneralAction(String command, String text, String description, KeyStroke key) {
             this.command = command;
-            ImageIcon icon = GUIGlobals.getImage(command);
-            if (icon != null) {
-                putValue(Action.SMALL_ICON, icon);
-            }
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
-        public GeneralAction(String command, String text, String description, KeyStroke key, String imageUrl) {
+        public GeneralAction(String command, String text, String description, KeyStroke key, ImageIcon icon) {
+            super(icon);
+
             this.command = command;
-            ImageIcon icon = GUIGlobals.getImage(imageUrl);
-            if (icon != null) {
-                putValue(Action.SMALL_ICON, icon);
-            }
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
             putValue(Action.ACCELERATOR_KEY, key);
@@ -1769,7 +1770,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class CloseDatabaseAction extends MnemonicAwareAction {
         public CloseDatabaseAction() {
-            super(GUIGlobals.getImage("close"));
+            super(IconTheme.getImage("close"));
             putValue(Action.NAME, "Close database");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Close database"));
@@ -1839,7 +1840,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
-            super(GUIGlobals.getImage("preferences"));
+            super(IconTheme.getImage("preferences"));
             putValue(Action.NAME, "Preferences");
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Preferences"));
         }
@@ -2176,7 +2177,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             extends MnemonicAwareAction {
 
         public SaveSessionAction() {
-            super(GUIGlobals.getImage("save"));
+            super(IconTheme.getImage("save"));
             putValue(Action.NAME, "Save session");
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Save session"));
         }
@@ -2230,7 +2231,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         volatile boolean running;
 
         public LoadSessionAction() {
-            super(GUIGlobals.getImage("loadSession"));
+            super(IconTheme.getImage("loadSession"));
             putValue(Action.NAME, "Load session");
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Load session"));
         }
@@ -2316,8 +2317,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class EditAction extends MnemonicAwareAction {
         private final String command;
 
-        public EditAction(String command, URL icon) {
-            super(new ImageIcon(icon));
+        public EditAction(String command, ImageIcon icon) {
+            super(icon);
             this.command = command;
             String nName = StringUtil.capitalizeFirst(command);
             putValue(Action.NAME, nName);

@@ -1,7 +1,7 @@
 package net.sf.jabref.importer;
 
-import junit.framework.Assert;
 import net.sf.jabref.model.database.BibtexDatabase;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;

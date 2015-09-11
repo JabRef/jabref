@@ -33,7 +33,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     private static final long serialVersionUID = 1L;
 
-    protected final JButton close = new JButton(GUIGlobals.getImage("close"));
+    protected final JButton close = new JButton(IconTheme.getImage("close"));
 
     private boolean visible;
 
@@ -42,16 +42,16 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     protected BasePanel panel;
 
 
-    public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
+    public SidePaneComponent(SidePaneManager manager, ImageIcon icon, String title) {
         super(title);
-        this.add(new JLabel(new ImageIcon(icon)));
+        this.add(new JLabel(icon));
         this.manager = manager;
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0, 0, 0, 0));
         close.setBorder(null);
-        JButton up = new JButton(GUIGlobals.getImage("up"));
+        JButton up = new JButton(IconTheme.getImage("up"));
         up.setMargin(new Insets(0, 0, 0, 0));
-        JButton down = new JButton(GUIGlobals.getImage("down"));
+        JButton down = new JButton(IconTheme.getImage("down"));
         down.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
         down.setBorder(null);

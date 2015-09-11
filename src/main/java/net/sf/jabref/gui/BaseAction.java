@@ -21,5 +21,6 @@ package net.sf.jabref.gui;
  * appropriate BaseAction object, and runs its action() method.
  */
 public interface BaseAction {
+
     void action() throws Throwable;
 }

@@ -23,8 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
@@ -48,8 +48,8 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private Object highlightBorderCell;
 
     private static final ImageIcon
-            groupRefiningIcon = GUIGlobals.getImage("groupRefining");
-    private static final ImageIcon groupIncludingIcon = GUIGlobals.getImage("groupIncluding");
+            groupRefiningIcon = IconTheme.getImage("groupRefining");
+    private static final ImageIcon groupIncludingIcon = IconTheme.getImage("groupIncluding");
     private static final ImageIcon groupRegularIcon = null;
 
 

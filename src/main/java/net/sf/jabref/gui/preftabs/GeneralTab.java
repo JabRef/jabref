@@ -33,12 +33,14 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
 class GeneralTab extends JPanel implements PrefsTab {
@@ -67,7 +69,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray(new String[GUIGlobals.LANGUAGES.keySet().size()]));
-    private final JComboBox encodings = new JComboBox(Localization.ENCODINGS);
+    private final JComboBox encodings = new JComboBox(Encodings.ENCODINGS);
 
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -109,9 +111,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
         HelpAction ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
-                "Help", GUIGlobals.getIconUrl("helpSmall"));
+                "Help", IconTheme.getImage("helpSmall"));
         HelpAction timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
-                GUIGlobals.getIconUrl("helpSmall"));
+                IconTheme.getImage("helpSmall"));
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
         Insets marg = new Insets(0, 12, 3, 0);
@@ -230,8 +232,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
 
         String enc = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
-        for (int i = 0; i < Localization.ENCODINGS.length; i++) {
-            if (Localization.ENCODINGS[i].equalsIgnoreCase(enc)) {
+        for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
+            if (Encodings.ENCODINGS[i].equalsIgnoreCase(enc)) {
                 encodings.setSelectedIndex(i);
                 break;
             }

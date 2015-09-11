@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class BuildInfo {
+
     private final String version;
+
 
     public BuildInfo() {
         this("/resource/build.properties");

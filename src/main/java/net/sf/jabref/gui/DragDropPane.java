@@ -147,8 +147,9 @@ class DragDropPane extends JTabbedPane {
 
         public MarkerPane() {
             setOpaque(false);
-            markerImg = Toolkit.getDefaultToolkit().getImage(
-                    GUIGlobals.getIconUrl("dragNdropArrow")); // Sets the marker image
+
+            // Sets the marker image
+            markerImg = IconTheme.getImage("dragNdropArrow").getImage();
         }
 
         @Override

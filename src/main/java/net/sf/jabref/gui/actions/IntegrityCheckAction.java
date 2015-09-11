@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -20,7 +20,7 @@ public class IntegrityCheckAction extends AbstractAction {
 
     public IntegrityCheckAction(JabRefFrame jabRefFrame) {
         super(Localization.menuTitle("Integrity check"),
-                GUIGlobals.getImage("integrityCheck"));
+                IconTheme.getImage("integrityCheck"));
         this.jabRefFrame = jabRefFrame;
         //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
         //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
