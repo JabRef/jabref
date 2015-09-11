@@ -46,8 +46,8 @@ class SearchManagerNoGUI {
         }
 
         SearchRule searchRule = SearchRules.getSearchRuleByQuery(searchTerm,
-                Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH),
-                Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH));
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
 
         if (!searchRule.validateSearchStrings(searchTerm)) {
             System.out.println(Globals.lang("Search failed: illegal search expression"));

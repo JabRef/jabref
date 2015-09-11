@@ -16,6 +16,7 @@
 package net.sf.jabref;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Every Listener that wants to receive events from a search needs to
@@ -31,5 +32,5 @@ interface SearchTextListener {
      * 
      * @param words null if nothing is searched for
      */
-    void searchText(ArrayList<String> words);
+    void searchText(List<String> words);
 }

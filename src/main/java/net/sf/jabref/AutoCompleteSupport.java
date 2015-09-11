@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -39,27 +38,26 @@ import net.sf.jabref.autocompleter.AbstractAutoCompleter;
 import net.sf.jabref.autocompleter.AutoCompleter;
 
 /**
+ * Endows a textbox with the ability to autocomplete the input.
  * Based on code by 
  * 	Santhosh Kumar (http://www.jroller.com/santhosh/date/20050620)
  * 	James Lemieux (Glazed Lists AutoCompleteSupport)
+ * 
+ * @param <E> type of items displayed in the autocomplete popup
  */
 public class AutoCompleteSupport<E> {
 	AutoCompleteRenderer<E> renderer;
 	AutoCompleter<E> autoCompleter;
 	JTextComponent textComp;
 	JPopupMenu popup = new JPopupMenu();
-
-	/**
-	 * <tt>true</tt> if the text in the combobox editor is selected when the
-	 * editor gains focus; <tt>false</tt> otherwise.
-	 */
 	private boolean selectsTextOnFocusGain = true;
+	
 	/**
-	 * Handles selecting the text in the comboBoxEditorComponent when it gains
-	 * focus.
+	 * Constructs a new AutoCompleteSupport for the textbox using the autocompleter and a renderer.
+	 * @param textComp the textbox component for which autocompletion should be enabled
+	 * @param autoCompleter the autocompleter providing the data
+	 * @param renderer the renderer displaying the popup
 	 */
-	private final FocusListener selectTextOnFocusGainHandler = new ComboBoxEditorFocusHandler();
-
 	public AutoCompleteSupport(JTextComponent textComp,
 			AutoCompleter<E> autoCompleter,
 			AutoCompleteRenderer<E> renderer) {
@@ -69,23 +67,38 @@ public class AutoCompleteSupport<E> {
 
 	}
 
+	/**
+	 * Constructs a new AutoCompleteSupport for the textbox. The possible autocomplete items are displayed as a simple list. The autocompletion items are provided by an AutoCompleter which has to be specified later using {@link setAutoCompleter}. 
+	 * @param textComp the textbox component for which autocompletion should be enabled
+	 */
 	public AutoCompleteSupport(JTextComponent textComp) {
 		this(textComp, null, new ListAutoCompleteRenderer<E>());
 	}
 
+	/**
+	 * Constructs a new AutoCompleteSupport for the textbox using the autocompleter and a renderer. The possible autocomplete items are displayed as a simple list.
+	 * @param textComp the textbox component for which autocompletion should be enabled
+	 * @param autoCompleter the autocompleter providing the data
+	 */
 	public AutoCompleteSupport(JTextComponent textComp,
 			AutoCompleter<E> autoCompleter) {
 		this(textComp, autoCompleter, new ListAutoCompleteRenderer<E>());
 	}
 
+	/**
+	 * Inits the autocompletion popup. After this method is called, further input in the specified textbox will be autocompleted. 
+	 */
 	public void install() {
+	    // Actions for navigating the suggested autocomplete items with the arrow keys
 		final Action upAction = new MoveAction(-1);
 		final Action downAction = new MoveAction(1);
+		// Action hiding the autocomplete popup
 		final Action hidePopupAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				popup.setVisible(false);
 			}
 		};
+		// Action accepting the currently selected item as the autocompletion
 		final Action acceptAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				E itemToInsert = renderer.getSelectedItem();
@@ -94,17 +107,18 @@ public class AutoCompleteSupport<E> {
 				
 				String toInsert = autoCompleter.getAutoCompleteText(itemToInsert);
 				
+				// TODO: The following should be refactored. For example, the autocompleter shouldn't know whether we want to complete one word or multiple.
 				// In most fields, we are only interested in the currently edited word, so we
 	            // seek from the caret backward to the closest space:
 	            if (!autoCompleter.isSingleUnitField()) {        	
 	            	// Get position of last word separator (whitespace or comma)
-	                int piv = textComp.getText().length() - 1;
-	                while ((piv >= 0) && !Character.isWhitespace(textComp.getText().charAt(piv)) && textComp.getText().charAt(piv) != ',') {
-	                    piv--;
+	                int priv = textComp.getText().length() - 1;
+	                while ((priv >= 0) && !Character.isWhitespace(textComp.getText().charAt(priv)) && textComp.getText().charAt(priv) != ',') {
+	                    priv--;
 	                }
 	                // priv points to whitespace char or priv is -1
 	                // copy everything from the next char up to the end of "upToCaret" 
-	                textComp.setText(textComp.getText().substring(0, piv + 1) + toInsert);
+	                textComp.setText(textComp.getText().substring(0, priv + 1) + toInsert);
 	            } else {
 		            // For fields such as "journal" it is more reasonable to try to complete on the entire
 		            // text field content, so we skip the searching and keep the entire part up to the caret:
@@ -112,8 +126,12 @@ public class AutoCompleteSupport<E> {
 	            }
 	            textComp.setCaretPosition(textComp.getText().length());
 	            popup.setVisible(false);
+	            
+	         
 			}
 		};
+		
+		// Create popup 
 		popup.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
                 Color.LIGHT_GRAY));
         popup.setPopupSize(textComp.getWidth(), 200);
@@ -122,8 +140,24 @@ public class AutoCompleteSupport<E> {
         popup.setRequestFocusEnabled(false);
         popup.add(renderer.init(acceptAction));
 
-        textComp.getDocument().addDocumentListener(documentListener);
+        // Listen for changes to the text -> update autocomplete suggestions
+        textComp.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                postProcessTextChange();
+            }
 
+            public void removeUpdate(DocumentEvent e) {
+                postProcessTextChange();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+
+        // Listen for up/down arrow keys -> move currently selected item up or down
+        // We have to reimplement this function here since we cannot be sure that a simple list will be used to display the items
+        // So better let the renderer decide what to do. 
+        // (Moreover, the list does not have the focus so probably would not recognize the keystrokes in the first place.)
 		textComp.registerKeyboardAction(downAction,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
 				JComponent.WHEN_FOCUSED);
@@ -132,14 +166,15 @@ public class AutoCompleteSupport<E> {
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
 				JComponent.WHEN_FOCUSED);
 
-		// add a FocusListener to the ComboBoxEditor which selects all text when
-		// focus is gained
-		this.textComp.addFocusListener(selectTextOnFocusGainHandler);
+		// Listen for ESC key -> hide popup
+        textComp.registerKeyboardAction(hidePopupAction,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+		// Listen to focus events -> select all the text on gaining the focus
+		this.textComp.addFocusListener(new ComboBoxEditorFocusHandler());
 
-		textComp.registerKeyboardAction(hidePopupAction,
-				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-				JComponent.WHEN_IN_FOCUSED_WINDOW);
-
+		// Listen for ENTER key if popup is visible -> accept current autocomplete suggestion
 		popup.addPopupMenuListener(new PopupMenuListener() {
 			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 				textComp.registerKeyboardAction(acceptAction,
@@ -159,66 +194,48 @@ public class AutoCompleteSupport<E> {
 	}
 
 	/**
-	 * Returns <tt>true</tt> if the combo box editor text is selected when it
-	 * gains focus; <tt>false</tt> otherwise.
+	 * Returns whether the text in the textbox is selected when the textbox gains focus. Defaults to true. 
+	 * @return 
 	 */
 	public boolean getSelectsTextOnFocusGain() {
 		return selectsTextOnFocusGain;
 	}
 
 	/**
-	 * If <code>selectsTextOnFocusGain</code> is <tt>true</tt>, all text in the
-	 * editor is selected when the combo box editor gains focus. If it is
-	 * <tt>false</tt> the selection state of the editor is not effected by focus
-	 * changes.
-	 *
-	 * @throws IllegalStateException
-	 *             if this method is called from any Thread other than the Swing
-	 *             Event Dispatch Thread
+	 * Sets whether the text in the textbox is selected when the textbox gains focus. Default is true.
+	 * @param selectsTextOnFocusGain new value
 	 */
 	public void setSelectsTextOnFocusGain(boolean selectsTextOnFocusGain) {
 		this.selectsTextOnFocusGain = selectsTextOnFocusGain;
 	}
 
-	DocumentListener documentListener = new DocumentListener() {
-		public void insertUpdate(DocumentEvent e) {
-			postProcessDocumentChange();
+	/**
+	 * The text changed so update autocomplete suggestions accordingly.
+	 */
+	private void postProcessTextChange() {
+		if (autoCompleter == null) {
+		    popup.setVisible(false);
+		    return;
 		}
-
-		public void removeUpdate(DocumentEvent e) {
-			postProcessDocumentChange();
-		}
-
-		public void changedUpdate(DocumentEvent e) {
-		}
-	};
-
-	private void postProcessDocumentChange() {
-		String text = textComp.getText();
-
-		popup.setVisible(false);
-		popup.setPopupSize(textComp.getWidth(), 200);
-		if (autoCompleter == null)
-			return;
 		
+		String text = textComp.getText();
 		E[] candidates = autoCompleter.complete(text);
 		renderer.update(candidates);		
 		if (textComp.isEnabled() && candidates.length > 0) {
 		    renderer.selectItem(0);
-
-			// popup.repaint();
-
-			// Hide and show then, to recalculate height
-			// popup.hide();
+		    
+		    popup.setPopupSize(textComp.getWidth(), 200);
 			popup.show(textComp, 0, textComp.getHeight());
 		} else
 			popup.setVisible(false);
+		
 		if (!textComp.hasFocus())
 			textComp.requestFocusInWindow();
 	}
 
 	/**
 	 * The action invoked by hitting the up or down arrow key.
+	 * If the popup is currently shown, that the action is relayed to it. Otherwise the arrow keys trigger the popup.
 	 */
 	private class MoveAction extends AbstractAction {
 		private final int offset;
@@ -239,31 +256,8 @@ public class AutoCompleteSupport<E> {
 	}
 
 	/**
-	 * When the user selects a value from the popup with the mouse, we want to
-	 * honour their selection *without* attempting to autocomplete it to a new
-	 * term. Otherwise, it is possible that selections which are prefixes for
-	 * values that appear higher in the ComboBoxModel cannot be selected by the
-	 * mouse since they can always be successfully autocompleted to another
-	 * term.
-	 */
-	/*
-	 * private class PopupMouseHandler extends MouseAdapter {
-	 * 
-	 * @Override public void mousePressed(MouseEvent e) { doNotAutoComplete =
-	 * true; }
-	 * 
-	 * @Override public void mouseReleased(MouseEvent e) { doNotAutoComplete =
-	 * false; } }
-	 */
-
-	/**
-	 * To emulate Firefox behaviour, all text in the ComboBoxEditor is selected
-	 * from beginning to end when the ComboBoxEditor gains focus if the value
-	 * returned from {@link AutoCompleteSupport#getSelectsTextOnFocusGain()}
-	 * allows this behaviour. In addition, the JPopupMenu is hidden when the
-	 * ComboBoxEditor loses focus if the value returned from
-	 * {@link AutoCompleteSupport#getHidesPopupOnFocusLost()} allows this
-	 * behaviour.
+	 * Selects all text when the textbox gains focus. The behavior is controlled by the value
+	 * returned from {@link AutoCompleteSupport#getSelectsTextOnFocusGain()}.
 	 */
 	private class ComboBoxEditorFocusHandler extends FocusAdapter {
 		@Override
@@ -277,6 +271,10 @@ public class AutoCompleteSupport<E> {
 		}
 	}
 
+	/**
+	 * Sets the autocompleter used to present autocomplete suggestions.
+     * @param autoCompleter the autocompleter providing the data
+	 */
 	public void setAutoCompleter(AutoCompleter<E> autoCompleter) {
 		this.autoCompleter = autoCompleter;
 	}

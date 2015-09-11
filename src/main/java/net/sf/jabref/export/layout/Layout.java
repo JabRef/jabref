@@ -17,6 +17,7 @@ package net.sf.jabref.export.layout;
 
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
@@ -119,7 +120,7 @@ public class Layout
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, ArrayList<String> wordsToHighlight)
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database, List<String> wordsToHighlight)
     {
         StringBuilder sb = new StringBuilder(100);
 

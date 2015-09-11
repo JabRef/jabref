@@ -973,7 +973,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         	@Override
             public void action() {
                 frame.setSearchBarVisible(true);
-                frame.getSearchBar().startSearch();
+                frame.getSearchBar().focus();
             }
         });
         
@@ -983,7 +983,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void action() {
         		frame.setSearchBarVisible(! frame.searchBar.isVisible());
 	            if (frame.searchBar.isVisible()) {
-	            	frame.getSearchBar().startSearch();
+	            	frame.getSearchBar().focus();
 	            }
             }
         });

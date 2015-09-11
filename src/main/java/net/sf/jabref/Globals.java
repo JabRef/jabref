@@ -1302,21 +1302,21 @@ Globals.RTFCHARS.put("ae", "{\\u230a}"); // "aelig" \\u230e6
      * Returns a reg exp pattern in the form (w1)|(w2)| ...
      * wi are escaped if no regex search is enabled
      */
-    public static Pattern getPatternForWords(ArrayList<String> words) {
-        if ((words == null) || (words.isEmpty()) || (words.get(0).isEmpty())) {
+    public static Pattern getPatternForWords(List<String> wordsToHighlight2) {
+        if ((wordsToHighlight2 == null) || (wordsToHighlight2.isEmpty()) || (wordsToHighlight2.get(0).isEmpty())) {
             return Pattern.compile("");
         }
 
-        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.REG_EXP_SEARCH);
+        boolean regExSearch = Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP);
 
         // compile the words to a regex in the form (w1) | (w2) | (w3)
-        String searchPattern = "(".concat(regExSearch ? words.get(0) : Pattern.quote(words.get(0))).concat(")");
-        for (int i = 1; i < words.size(); i++) {
-            searchPattern = searchPattern.concat("|(").concat(regExSearch ? words.get(i) : Pattern.quote(words.get(i))).concat(")");
+        String searchPattern = "(".concat(regExSearch ? wordsToHighlight2.get(0) : Pattern.quote(wordsToHighlight2.get(0))).concat(")");
+        for (int i = 1; i < wordsToHighlight2.size(); i++) {
+            searchPattern = searchPattern.concat("|(").concat(regExSearch ? wordsToHighlight2.get(i) : Pattern.quote(wordsToHighlight2.get(i))).concat(")");
         }
 
         Pattern pattern;
-        if (Globals.prefs.getBoolean(JabRefPreferences.CASE_SENSITIVE_SEARCH)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE)) {
             pattern = Pattern.compile(searchPattern);
         } else {
             pattern = Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE);

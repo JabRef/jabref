@@ -24,6 +24,7 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
@@ -263,7 +264,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private Action closeAction;
 
-    private ArrayList<String> wordsToHighlight = null;
+    private List<String> wordsToHighlight = null;
 
 
     private Action getCloseAction() {
@@ -448,8 +449,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     @Override
-    public void searchText(ArrayList<String> words) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.HIGH_LIGHT_WORDS)) {
+    public void searchText(java.util.List<String> words) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_HIGHLIGHT_WORDS)) {
             this.wordsToHighlight = words;
             update();
         } else {

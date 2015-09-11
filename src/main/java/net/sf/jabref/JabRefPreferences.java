@@ -125,12 +125,8 @@ public class JabRefPreferences {
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String SEARCH_AUTO_COMPLETE = "searchAutoComplete";
     public static final String SEARCH_MODE_LIVE_FILTER = "searchModeLiveFilter";
-    public static final String INCREMENT_S = "incrementS";
-    public static final String SEARCH_ALL = "searchAll";
-    public static final String SEARCH_GEN = "searchGen";
-    public static final String SEARCH_OPT = "searchOpt";
-    public static final String SEARCH_REQ = "searchReq";
-    public static final String CASE_SENSITIVE_SEARCH = "caseSensitiveSearch";
+    public static final String SEARCH_MODE_INCREMENTAL = "incrementS";
+    public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
     public static final String SHOW_SOURCE = "showSource";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
@@ -158,9 +154,9 @@ public class JabRefPreferences {
     public static final String AUTO_COMPLETE = "autoComplete";
     public static final String SEARCH_PANE_POS_Y = "searchPanePosY";
     public static final String SEARCH_PANE_POS_X = "searchPanePosX";
-    public static final String HIGH_LIGHT_WORDS = "highLightWords";
-    public static final String REG_EXP_SEARCH = "regExpSearch";
-    public static final String SELECT_S = "selectS";
+    public static final String SEARCH_HIGHLIGHT_WORDS = "highLightWords";
+    public static final String SEARCH_REG_EXP = "regExpSearch";
+    public static final String SEARCH_SELECT_MATCHES = "selectS";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -255,9 +251,9 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
-    public static final String SEARCH_ALL_BASES = "searchAllBases";
-    public static final String SHOW_SEARCH_IN_DIALOG = "showSearchInDialog";
-    public static final String FLOAT_SEARCH = "floatSearch";
+    public static final String SEARCH_MODE_GLOBAL = "searchAllBases";
+    public static final String SEARCH_MODE_RESULTS_IN_DIALOG = "showSearchInDialog";
+    public static final String SEARCH_MODE_FLOAT = "floatSearch";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -574,18 +570,14 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(SHOW_SOURCE, Boolean.TRUE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
-        defaults.put(CASE_SENSITIVE_SEARCH, Boolean.FALSE);
-        defaults.put(SEARCH_REQ, Boolean.TRUE);
-        defaults.put(SEARCH_OPT, Boolean.TRUE);
-        defaults.put(SEARCH_GEN, Boolean.TRUE);
-        defaults.put(SEARCH_ALL, Boolean.FALSE);
-        defaults.put(INCREMENT_S, Boolean.FALSE);
+        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
+        defaults.put(SEARCH_MODE_INCREMENTAL, Boolean.FALSE);
         defaults.put(SEARCH_MODE_LIVE_FILTER, Boolean.TRUE);
         defaults.put(SEARCH_AUTO_COMPLETE, Boolean.TRUE);
 
-        defaults.put(SELECT_S, Boolean.FALSE);
-        defaults.put(REG_EXP_SEARCH, Boolean.TRUE);
-        defaults.put(HIGH_LIGHT_WORDS, Boolean.TRUE);
+        defaults.put(SEARCH_SELECT_MATCHES, Boolean.FALSE);
+        defaults.put(SEARCH_REG_EXP, Boolean.TRUE);
+        defaults.put(SEARCH_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(SEARCH_PANE_POS_Y, 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
@@ -595,7 +587,7 @@ public class JabRefPreferences {
         defaults.put(AUTO_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
         defaults.put(AUTO_COMP_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(SHORTEST_TO_COMPLETE, 0);
+        defaults.put(SHORTEST_TO_COMPLETE, 1);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
         defaults.put(GROUP_SELECTOR_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
@@ -698,9 +690,9 @@ public class JabRefPreferences {
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
-        defaults.put(FLOAT_SEARCH, Boolean.TRUE);
-        defaults.put(SHOW_SEARCH_IN_DIALOG, Boolean.FALSE);
-        defaults.put(SEARCH_ALL_BASES, Boolean.FALSE);
+        defaults.put(SEARCH_MODE_FLOAT, Boolean.TRUE);
+        defaults.put(SEARCH_MODE_RESULTS_IN_DIALOG, Boolean.FALSE);
+        defaults.put(SEARCH_MODE_GLOBAL, Boolean.FALSE);
         defaults.put(DEFAULT_LABEL_PATTERN, "[auth][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);

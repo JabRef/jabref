@@ -161,7 +161,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public SearchBar searchBar;
 
     JTabbedPane tabbedPane; // initialized at constructor
-
+    final String htmlPadding = "<html><div style='padding:2px 5px;'>";
+    
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
     
@@ -1136,7 +1137,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void setTabTitle(JComponent comp, String title, String toolTip) {
         int index = getTabIndex(comp);
-        tabbedPane.setTitleAt(index, title);
+        tabbedPane.setTitleAt(index, htmlPadding + title);
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
 
@@ -1878,7 +1879,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // We use html here to get some padding around the title
         // There are no closing tags since we would otherwise run in a bug 
         // see https://sourceforge.net/p/jabref/bugs/1293/
-        tabbedPane.add("<html><div style='padding:2px 5px;'>" + title, bp);
+        tabbedPane.add(htmlPadding + title, bp);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1,
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
