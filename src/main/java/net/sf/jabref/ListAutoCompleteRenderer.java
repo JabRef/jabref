@@ -19,7 +19,8 @@ import javax.swing.event.ListSelectionListener;
  */
 public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 	
-	JList<E> list = new JList<E>(new DefaultListModel<E>());
+    DefaultListModel<E> model = new DefaultListModel<E>();
+	JList<E> list = new JList<E>(model);
 	ActionListener acceptAction;
 
 	/**
@@ -37,8 +38,7 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
         }
 		else
 		{
-		    DefaultListModel<E> listModel = (DefaultListModel<E>) list.getModel();
-	        listModel.removeAllElements();
+		    model.removeAllElements();
 		}
 		   
     }

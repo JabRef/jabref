@@ -220,7 +220,7 @@ public class AutoCompleteSupport<E> {
 		String text = textComp.getText();
 		E[] candidates = autoCompleter.complete(text);
 		renderer.update(candidates);		
-		if (textComp.isEnabled() && candidates.length > 0) {
+		if (textComp.isEnabled() && candidates != null && candidates.length > 0) {
 		    renderer.selectItem(0);
 		    
 		    popup.setPopupSize(textComp.getWidth(), 200);
