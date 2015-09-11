@@ -39,6 +39,7 @@ import javax.swing.event.DocumentListener;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SearchTextListener;
 import net.sf.jabref.gui.help.HelpAction;
@@ -111,7 +112,7 @@ public class SearchBar extends JPanel {
      */
     private void initSearchButton() {
         // Create search button
-        searchButton = new JSplitButton(GUIGlobals.getImage("search"));
+        searchButton = new JSplitButton(IconTheme.getImage("search"));
         searchButton.setMinimumSize(new Dimension(50, 25));
         searchButton.setBackground(searchField.getBackground());
         searchButton.setContentAreaFilled(false);
@@ -145,7 +146,7 @@ public class SearchBar extends JPanel {
         initSearchSettingsMenu();
         popupMenu.add(settings);
 
-        JMenuItem help = new JMenuItem(Localization.lang("Help"), GUIGlobals.getImage("help"));
+        JMenuItem help = new JMenuItem(Localization.lang("Help"), IconTheme.getImage("help"));
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
         popupMenu.add(help);
 
