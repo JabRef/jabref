@@ -118,3 +118,8 @@ Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
 License: LGPL 2.1+
+
+Path:    lib/JSplitButton_1.2.jar
+Project: jsplitbutton
+URL:     https://code.google.com/p/jsplitbutton/
+License: LGPL
