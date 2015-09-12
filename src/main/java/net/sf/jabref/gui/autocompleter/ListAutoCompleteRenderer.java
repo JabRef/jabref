@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.autocompleter;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

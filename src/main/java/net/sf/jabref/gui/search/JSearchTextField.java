@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.search;
 
 import java.awt.Color;
 import java.awt.Font;

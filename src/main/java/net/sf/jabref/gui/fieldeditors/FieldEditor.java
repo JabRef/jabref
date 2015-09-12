@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import net.sf.jabref.gui.AutoCompleteListener;
-
 import java.awt.Color;
 import java.awt.Container;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.event.UndoableEditListener;
+
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 
 /**
  * FieldEditors is a common interface between the TextField and TextArea.

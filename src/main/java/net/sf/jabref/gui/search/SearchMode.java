@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.search;
 
 import net.sf.jabref.logic.l10n.Localization;
 

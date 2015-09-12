@@ -1,10 +1,9 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.search;
 
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.SearchResultsDialog;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
