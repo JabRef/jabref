@@ -59,7 +59,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class JabRefPreferences {
-
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**
@@ -345,11 +344,11 @@ public class JabRefPreferences {
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
 
-    private static final char[][] VALUE_DELIMITERS = new char[][] {{'"', '"'}, {'{', '}'}};
+    private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
-
+    
     private int SHORTCUT_MASK = -1;
 
     private final Preferences prefs;
@@ -460,7 +459,7 @@ public class JabRefPreferences {
                 importPreferences("jabref.xml");
             }
         } catch (IOException e) {
-            JabRefPreferences.LOGGER.info("Could not import preferences from jabref.xml:" + e.getLocalizedMessage(), e);
+            LOGGER.info("Could not import preferences from jabref.xml:" + e.getLocalizedMessage(), e);
         }
 
         // load user preferences 
@@ -471,208 +470,210 @@ public class JabRefPreferences {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
             //defaults.put("htmlviewer", "/Applications/Safari.app");
-            defaults.put(JabRefPreferences.EMACS_PATH, "emacsclient");
-            defaults.put(JabRefPreferences.EMACS_23, true);
-            defaults.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-            defaults.put(JabRefPreferences.FONT_FAMILY, "SansSerif");
+            defaults.put(EMACS_PATH, "emacsclient");
+            defaults.put(EMACS_23, true);
+            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+            defaults.put(FONT_FAMILY, "SansSerif");
 
         } else if (OS.WINDOWS) {
             //defaults.put("pdfviewer", "cmd.exe /c start /b");
             //defaults.put("psviewer", "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
-            defaults.put(JabRefPreferences.WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
-            defaults.put(JabRefPreferences.WIN_EDT_PATH, "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
-            defaults.put(JabRefPreferences.LATEX_EDITOR_PATH, "C:\\Program Files\\LEd\\LEd.exe");
-            defaults.put(JabRefPreferences.EMACS_PATH, "emacsclient.exe");
-            defaults.put(JabRefPreferences.EMACS_23, true);
-            defaults.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-            defaults.put(JabRefPreferences.FONT_FAMILY, "Arial");
+            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
+            defaults.put(WIN_EDT_PATH, "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
+            defaults.put(LATEX_EDITOR_PATH, "C:\\Program Files\\LEd\\LEd.exe");
+            defaults.put(EMACS_PATH, "emacsclient.exe");
+            defaults.put(EMACS_23, true);
+            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+            defaults.put(FONT_FAMILY, "Arial");
 
         } else {
             //defaults.put("pdfviewer", "evince");
             //defaults.put("psviewer", "gv");
             //defaults.put("htmlviewer", "firefox");
-            defaults.put(JabRefPreferences.WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
-            defaults.put(JabRefPreferences.FONT_FAMILY, "SansSerif");
+            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+            defaults.put(FONT_FAMILY, "SansSerif");
 
             // linux
-            defaults.put(JabRefPreferences.EMACS_PATH, "gnuclient");
-            defaults.put(JabRefPreferences.EMACS_23, false);
-            defaults.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
+            defaults.put(EMACS_PATH, "gnuclient");
+            defaults.put(EMACS_23, false);
+            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
         }
-        defaults.put(JabRefPreferences.USE_PROXY, Boolean.FALSE);
-        defaults.put(JabRefPreferences.PROXY_HOSTNAME, "my proxy host");
-        defaults.put(JabRefPreferences.PROXY_PORT, "my proxy port");
-        defaults.put(JabRefPreferences.PDF_PREVIEW, Boolean.FALSE);
-        defaults.put(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
-        defaults.put(JabRefPreferences.LYXPIPE, System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
-        defaults.put(JabRefPreferences.VIM, "vim");
-        defaults.put(JabRefPreferences.VIM_SERVER, "vim");
-        defaults.put(JabRefPreferences.POS_X, 0);
-        defaults.put(JabRefPreferences.POS_Y, 0);
-        defaults.put(JabRefPreferences.SIZE_X, 840);
-        defaults.put(JabRefPreferences.SIZE_Y, 680);
-        defaults.put(JabRefPreferences.WINDOW_MAXIMISED, Boolean.FALSE);
-        defaults.put(JabRefPreferences.AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
-        defaults.put(JabRefPreferences.PREVIEW_PANEL_HEIGHT, 200);
-        defaults.put(JabRefPreferences.ENTRY_EDITOR_HEIGHT, 400);
-        defaults.put(JabRefPreferences.TABLE_COLOR_CODES_ON, Boolean.TRUE);
-        defaults.put(JabRefPreferences.NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
-        defaults.put(JabRefPreferences.NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(JabRefPreferences.NAMES_LAST_FIRST, Boolean.FALSE); // "Show 'Lastname, Firstname'"
-        defaults.put(JabRefPreferences.NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
-        defaults.put(JabRefPreferences.ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
-        defaults.put(JabRefPreferences.NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
-        defaults.put(JabRefPreferences.LANGUAGE, "en");
-        defaults.put(JabRefPreferences.SHOW_SHORT, Boolean.TRUE);
+        defaults.put(USE_PROXY, Boolean.FALSE);
+        defaults.put(PROXY_HOSTNAME, "my proxy host");
+        defaults.put(PROXY_PORT, "my proxy port");
+        defaults.put(PDF_PREVIEW, Boolean.FALSE);
+        defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
+        defaults.put(LYXPIPE, System.getProperty("user.home") + File.separator + ".lyx/lyxpipe");
+        defaults.put(VIM, "vim");
+        defaults.put(VIM_SERVER, "vim");
+        defaults.put(POS_X, 0);
+        defaults.put(POS_Y, 0);
+        defaults.put(SIZE_X, 840);
+        defaults.put(SIZE_Y, 680);
+        defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
+        defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
+        defaults.put(PREVIEW_PANEL_HEIGHT, 200);
+        defaults.put(ENTRY_EDITOR_HEIGHT, 400);
+        defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
+        defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
+        defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
+        defaults.put(NAMES_LAST_FIRST, Boolean.FALSE); // "Show 'Lastname, Firstname'"
+        defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
+        defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
+        defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
+        defaults.put(LANGUAGE, "en");
+        defaults.put(SHOW_SHORT, Boolean.TRUE);
 
         // Sorting preferences
-        defaults.put(JabRefPreferences.PRIMARY_SORT_FIELD, "author");
-        defaults.put(JabRefPreferences.PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SECONDARY_SORT_FIELD, "year");
-        defaults.put(JabRefPreferences.SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(JabRefPreferences.TERTIARY_SORT_FIELD, "author");
-        defaults.put(JabRefPreferences.TERTIARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
-        defaults.put(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "author");
-        defaults.put(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "");
-        defaults.put(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
-        defaults.put(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "author");
-        defaults.put(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "");
-        defaults.put(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(PRIMARY_SORT_FIELD, "author");
+        defaults.put(PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SECONDARY_SORT_FIELD, "year");
+        defaults.put(SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(TERTIARY_SORT_FIELD, "author");
+        defaults.put(TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
+        defaults.put(SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SAVE_SECONDARY_SORT_FIELD, "author");
+        defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(SAVE_TERTIARY_SORT_FIELD, "");
+        defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
+        defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
+        defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(EXPORT_SECONDARY_SORT_FIELD, "author");
+        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(EXPORT_TERTIARY_SORT_FIELD, "");
+        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
-        defaults.put(JabRefPreferences.NEWLINE, System.lineSeparator());
+        defaults.put(NEWLINE, System.lineSeparator());
 
-        defaults.put(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES, "");
-        defaults.put(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
+        defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
+        defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(JabRefPreferences.COLUMN_NAMES, "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
-        defaults.put(JabRefPreferences.COLUMN_WIDTHS, "75;280;400;60;100;100;100;100");
-        defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY, PersistenceTableColumnListener.DEFAULT_ENABLED);
-        defaults.put(JabRefPreferences.XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
-        defaults.put(JabRefPreferences.USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
-        defaults.put(JabRefPreferences.WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(JabRefPreferences.FILE_WORKING_DIRECTORY, System.getProperty("user.home"));
-        defaults.put(JabRefPreferences.AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(JabRefPreferences.ENTRY_TYPE_FORM_HEIGHT_FACTOR, 1);
-        defaults.put(JabRefPreferences.ENTRY_TYPE_FORM_WIDTH, 1);
-        defaults.put(JabRefPreferences.BACKUP, Boolean.TRUE);
-        defaults.put(JabRefPreferences.OPEN_LAST_EDITED, Boolean.TRUE);
-        defaults.put(JabRefPreferences.LAST_EDITED, null);
-        defaults.put(JabRefPreferences.STRINGS_POS_X, 0);
-        defaults.put(JabRefPreferences.STRINGS_POS_Y, 0);
-        defaults.put(JabRefPreferences.STRINGS_SIZE_X, 600);
-        defaults.put(JabRefPreferences.STRINGS_SIZE_Y, 400);
-        defaults.put(JabRefPreferences.DEFAULT_SHOW_SOURCE, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SHOW_SOURCE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.DEFAULT_AUTO_SORT, Boolean.FALSE);
-        defaults.put(JabRefPreferences.CASE_SENSITIVE_SEARCH, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SEARCH_REQ, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SEARCH_OPT, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SEARCH_GEN, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SEARCH_ALL, Boolean.FALSE);
-        defaults.put(JabRefPreferences.INCREMENT_S, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SEARCH_AUTO_COMPLETE, Boolean.TRUE);
+        defaults.put(COLUMN_NAMES, "entrytype;author;title;year;journal;timestamp;bibtexkey");
+        defaults.put(COLUMN_WIDTHS, "75;280;450;60;100;100;100");
+        defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
+                PersistenceTableColumnListener.DEFAULT_ENABLED);
+        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
+        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
+        defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
+        defaults.put(WORKING_DIRECTORY, System.getProperty("user.home"));
+        defaults.put(EXPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
+        defaults.put(IMPORT_WORKING_DIRECTORY, System.getProperty("user.home"));
+        defaults.put(FILE_WORKING_DIRECTORY, System.getProperty("user.home"));
+        defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
+        defaults.put(ENTRY_TYPE_FORM_HEIGHT_FACTOR, 1);
+        defaults.put(ENTRY_TYPE_FORM_WIDTH, 1);
+        defaults.put(BACKUP, Boolean.TRUE);
+        defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
+        defaults.put(LAST_EDITED, null);
+        defaults.put(STRINGS_POS_X, 0);
+        defaults.put(STRINGS_POS_Y, 0);
+        defaults.put(STRINGS_SIZE_X, 600);
+        defaults.put(STRINGS_SIZE_Y, 400);
+        defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
+        defaults.put(SHOW_SOURCE, Boolean.TRUE);
+        defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
+        defaults.put(CASE_SENSITIVE_SEARCH, Boolean.FALSE);
+        defaults.put(SEARCH_REQ, Boolean.TRUE);
+        defaults.put(SEARCH_OPT, Boolean.TRUE);
+        defaults.put(SEARCH_GEN, Boolean.TRUE);
+        defaults.put(SEARCH_ALL, Boolean.FALSE);
+        defaults.put(INCREMENT_S, Boolean.FALSE);
+        defaults.put(SEARCH_AUTO_COMPLETE, Boolean.TRUE);
 
-        defaults.put(JabRefPreferences.SELECT_S, Boolean.FALSE);
-        defaults.put(JabRefPreferences.REG_EXP_SEARCH, Boolean.TRUE);
-        defaults.put(JabRefPreferences.HIGH_LIGHT_WORDS, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SEARCH_PANE_POS_X, 0);
-        defaults.put(JabRefPreferences.SEARCH_PANE_POS_Y, 0);
-        defaults.put(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
-        defaults.put(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
-        defaults.put(JabRefPreferences.AUTO_COMPLETE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.AUTO_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
-        defaults.put(JabRefPreferences.AUTO_COMP_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(JabRefPreferences.AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(JabRefPreferences.SHORTEST_TO_COMPLETE, 2);
-        defaults.put(JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
-        defaults.put(JabRefPreferences.GROUP_SELECTOR_VISIBLE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_INVERT_SELECTIONS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.GROUP_SHOW_OVERLAPPING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.GROUP_SELECT_MATCHES, Boolean.FALSE);
-        defaults.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, "keywords");
-        defaults.put(JabRefPreferences.GROUP_SHOW_ICONS, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_SHOW_DYNAMIC, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_EXPAND_TREE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_AUTO_SHOW, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_AUTO_HIDE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.AUTO_ASSIGN_GROUP, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GROUP_KEYWORD_SEPARATOR, ", ");
-        defaults.put(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
-        defaults.put(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, Boolean.FALSE);
-        defaults.put(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
-        defaults.put(JabRefPreferences.TOOLBAR_VISIBLE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SEARCH_PANEL_VISIBLE, Boolean.FALSE);
-        defaults.put(JabRefPreferences.DEFAULT_ENCODING, System.getProperty("file.encoding"));
-        defaults.put(JabRefPreferences.GROUPS_VISIBLE_ROWS, 8);
-        defaults.put(JabRefPreferences.DEFAULT_OWNER, System.getProperty("user.name"));
-        defaults.put(JabRefPreferences.PRESERVE_FIELD_FORMATTING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.MEMORY_STICK_MODE, Boolean.FALSE);
-        defaults.put(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
+        defaults.put(SELECT_S, Boolean.FALSE);
+        defaults.put(REG_EXP_SEARCH, Boolean.TRUE);
+        defaults.put(HIGH_LIGHT_WORDS, Boolean.TRUE);
+        defaults.put(SEARCH_PANE_POS_X, 0);
+        defaults.put(SEARCH_PANE_POS_Y, 0);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
+        defaults.put(AUTO_COMPLETE, Boolean.TRUE);
+        defaults.put(AUTO_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
+        defaults.put(AUTO_COMP_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
+        defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
+        defaults.put(SHORTEST_TO_COMPLETE, 2);
+        defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
+        defaults.put(GROUP_SELECTOR_VISIBLE, Boolean.TRUE);
+        defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
+        defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
+        defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
+        defaults.put(GROUP_SHOW_OVERLAPPING, Boolean.FALSE);
+        defaults.put(GROUP_SELECT_MATCHES, Boolean.FALSE);
+        defaults.put(GROUPS_DEFAULT_FIELD, "keywords");
+        defaults.put(GROUP_SHOW_ICONS, Boolean.TRUE);
+        defaults.put(GROUP_SHOW_DYNAMIC, Boolean.TRUE);
+        defaults.put(GROUP_EXPAND_TREE, Boolean.TRUE);
+        defaults.put(GROUP_AUTO_SHOW, Boolean.TRUE);
+        defaults.put(GROUP_AUTO_HIDE, Boolean.TRUE);
+        defaults.put(GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
+        defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
+        defaults.put(GROUP_KEYWORD_SEPARATOR, ", ");
+        defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
+        defaults.put(HIGHLIGHT_GROUPS_MATCHING_ANY, Boolean.FALSE);
+        defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
+        defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
+        defaults.put(SEARCH_PANEL_VISIBLE, Boolean.FALSE);
+        defaults.put(DEFAULT_ENCODING, System.getProperty("file.encoding"));
+        defaults.put(GROUPS_VISIBLE_ROWS, 8);
+        defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
+        defaults.put(PRESERVE_FIELD_FORMATTING, Boolean.FALSE);
+        defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
+        defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
         // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
-        defaults.put(JabRefPreferences.GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;" + "pdf;comment;owner");
+        defaults.put(GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;"
+                + "pdf;comment;owner");
 
-        defaults.put(JabRefPreferences.HISTORY_SIZE, 8);
-        defaults.put(JabRefPreferences.FONT_STYLE, java.awt.Font.PLAIN);
-        defaults.put(JabRefPreferences.FONT_SIZE, 12);
-        defaults.put(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.MENU_FONT_FAMILY, "Times");
-        defaults.put(JabRefPreferences.MENU_FONT_STYLE, java.awt.Font.PLAIN);
-        defaults.put(JabRefPreferences.MENU_FONT_SIZE, 11);
-        defaults.put(JabRefPreferences.TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
-        defaults.put(JabRefPreferences.TABLE_SHOW_GRID, Boolean.FALSE);
+        defaults.put(HISTORY_SIZE, 8);
+        defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
+        defaults.put(FONT_SIZE, 12);
+        defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
+        defaults.put(MENU_FONT_FAMILY, "Times");
+        defaults.put(MENU_FONT_STYLE, java.awt.Font.PLAIN);
+        defaults.put(MENU_FONT_SIZE, 11);
+        defaults.put(TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
+        defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
-        defaults.put(JabRefPreferences.TABLE_BACKGROUND, "255:255:255");
-        defaults.put(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND, "230:235:255");
-        defaults.put(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND, "230:255:230");
-        defaults.put(JabRefPreferences.TABLE_TEXT, "0:0:0");
-        defaults.put(JabRefPreferences.GRID_COLOR, "210:210:210");
-        defaults.put(JabRefPreferences.GRAYED_OUT_BACKGROUND, "210:210:210");
-        defaults.put(JabRefPreferences.GRAYED_OUT_TEXT, "40:40:40");
-        defaults.put(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND, "180:180:180");
-        defaults.put(JabRefPreferences.VERY_GRAYED_OUT_TEXT, "40:40:40");
-        defaults.put(JabRefPreferences.MARKED_ENTRY_BACKGROUND0, "255:255:180");
-        defaults.put(JabRefPreferences.MARKED_ENTRY_BACKGROUND1, "255:220:180");
-        defaults.put(JabRefPreferences.MARKED_ENTRY_BACKGROUND2, "255:180:160");
-        defaults.put(JabRefPreferences.MARKED_ENTRY_BACKGROUND3, "255:120:120");
-        defaults.put(JabRefPreferences.MARKED_ENTRY_BACKGROUND4, "255:75:75");
-        defaults.put(JabRefPreferences.MARKED_ENTRY_BACKGROUND5, "220:255:220");
-        defaults.put(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
-        defaults.put(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
-        defaults.put(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
-        defaults.put(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR, "0:0:0");
+        defaults.put(TABLE_BACKGROUND, "255:255:255");
+        defaults.put(TABLE_REQ_FIELD_BACKGROUND, "230:235:255");
+        defaults.put(TABLE_OPT_FIELD_BACKGROUND, "230:255:230");
+        defaults.put(TABLE_TEXT, "0:0:0");
+        defaults.put(GRID_COLOR, "210:210:210");
+        defaults.put(GRAYED_OUT_BACKGROUND, "210:210:210");
+        defaults.put(GRAYED_OUT_TEXT, "40:40:40");
+        defaults.put(VERY_GRAYED_OUT_BACKGROUND, "180:180:180");
+        defaults.put(VERY_GRAYED_OUT_TEXT, "40:40:40");
+        defaults.put(MARKED_ENTRY_BACKGROUND0, "255:255:180");
+        defaults.put(MARKED_ENTRY_BACKGROUND1, "255:220:180");
+        defaults.put(MARKED_ENTRY_BACKGROUND2, "255:180:160");
+        defaults.put(MARKED_ENTRY_BACKGROUND3, "255:120:120");
+        defaults.put(MARKED_ENTRY_BACKGROUND4, "255:75:75");
+        defaults.put(MARKED_ENTRY_BACKGROUND5, "220:255:220");
+        defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
+        defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
+        defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
+        defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
 
-        defaults.put(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
+        defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 
-        defaults.put(JabRefPreferences.ANTIALIAS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.CTRL_CLICK, Boolean.FALSE);
-        defaults.put(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION, Boolean.FALSE);
-        defaults.put(JabRefPreferences.PDF_COLUMN, Boolean.FALSE);
-        defaults.put(JabRefPreferences.URL_COLUMN, Boolean.TRUE);
-        defaults.put(JabRefPreferences.PREFER_URL_DOI, Boolean.FALSE);
-        defaults.put(JabRefPreferences.FILE_COLUMN, Boolean.TRUE);
-        defaults.put(JabRefPreferences.ARXIV_COLUMN, Boolean.FALSE);
+        defaults.put(ANTIALIAS, Boolean.FALSE);
+        defaults.put(CTRL_CLICK, Boolean.FALSE);
+        defaults.put(DISABLE_ON_MULTIPLE_SELECTION, Boolean.FALSE);
+        defaults.put(PDF_COLUMN, Boolean.FALSE);
+        defaults.put(URL_COLUMN, Boolean.TRUE);
+        defaults.put(PREFER_URL_DOI, Boolean.FALSE);
+        defaults.put(FILE_COLUMN, Boolean.TRUE);
+        defaults.put(ARXIV_COLUMN, Boolean.FALSE);
 
-        defaults.put(JabRefPreferences.EXTRA_FILE_COLUMNS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.LIST_OF_FILE_COLUMNS, "");
+        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
+        defaults.put(LIST_OF_FILE_COLUMNS, "");
 
         defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
@@ -685,110 +686,140 @@ public class JabRefPreferences {
         defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
 
-        defaults.put(JabRefPreferences.SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, Boolean.FALSE);
+        defaults.put(SHOW_ONE_LETTER_HEADING_FOR_ICON_COLUMNS, Boolean.FALSE);
 
-        defaults.put(JabRefPreferences.USE_OWNER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.OVERWRITE_OWNER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.ALLOW_TABLE_EDITING, Boolean.FALSE);
-        defaults.put(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY, Boolean.TRUE);
-        defaults.put(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, Boolean.TRUE);
-        defaults.put(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP, Boolean.TRUE);
-        defaults.put(JabRefPreferences.AVOID_OVERWRITING_KEY, Boolean.FALSE);
-        defaults.put(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
-        defaults.put(JabRefPreferences.CONFIRM_DELETE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GRAY_OUT_NON_HITS, Boolean.TRUE);
-        defaults.put(JabRefPreferences.FLOAT_SEARCH, Boolean.TRUE);
-        defaults.put(JabRefPreferences.SHOW_SEARCH_IN_DIALOG, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SEARCH_ALL_BASES, Boolean.FALSE);
-        defaults.put(JabRefPreferences.DEFAULT_LABEL_PATTERN, "[auth][year]");
-        defaults.put(JabRefPreferences.PREVIEW_ENABLED, Boolean.TRUE);
-        defaults.put(JabRefPreferences.ACTIVE_PREVIEW, 0);
-        defaults.put(JabRefPreferences.PREVIEW_0, "<font face=\"arial\">" + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>" + "\\end{bibtexkey}</b><br>__NEWLINE__" + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__" + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} " + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__" + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__" + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__" + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-        // Include the booktitle field for @inproceedings, @proceedings, etc.
-        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__" + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__" + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__" + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}" + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__" + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}" + "</dd>__NEWLINE__<p></p></font>");
-        defaults.put(JabRefPreferences.PREVIEW_1, "<font face=\"arial\">" + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>" + "\\end{bibtexkey}</b><br>__NEWLINE__" + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__" + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} " + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__" + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__" + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__" + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-        // Include the booktitle field for @inproceedings, @proceedings, etc.
-        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__" + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__" + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__" + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}" + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}" + "</dd>__NEWLINE__<p></p></font>");
+        defaults.put(USE_OWNER, Boolean.FALSE);
+        defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
+        defaults.put(ALLOW_TABLE_EDITING, Boolean.FALSE);
+        defaults.put(DIALOG_WARNING_FOR_DUPLICATE_KEY, Boolean.TRUE);
+        defaults.put(DIALOG_WARNING_FOR_EMPTY_KEY, Boolean.TRUE);
+        defaults.put(DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP, Boolean.TRUE);
+        defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
+        defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
+        defaults.put(CONFIRM_DELETE, Boolean.TRUE);
+        defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
+        defaults.put(FLOAT_SEARCH, Boolean.TRUE);
+        defaults.put(SHOW_SEARCH_IN_DIALOG, Boolean.FALSE);
+        defaults.put(SEARCH_ALL_BASES, Boolean.FALSE);
+        defaults.put(DEFAULT_LABEL_PATTERN, "[auth][year]");
+        defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
+        defaults.put(ACTIVE_PREVIEW, 0);
+        defaults.put(PREVIEW_0, "<font face=\"arial\">"
+                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                // Include the booktitle field for @inproceedings, @proceedings, etc.
+                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
+                + "</dd>__NEWLINE__<p></p></font>");
+        defaults.put(PREVIEW_1, "<font face=\"arial\">"
+                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                // Include the booktitle field for @inproceedings, @proceedings, etc.
+                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
+                + "</dd>__NEWLINE__<p></p></font>");
 
         // TODO: Currently not possible to edit this setting:
-        defaults.put(JabRefPreferences.PREVIEW_PRINT_BUTTON, Boolean.FALSE);
-        defaults.put(JabRefPreferences.AUTO_DOUBLE_BRACES, Boolean.FALSE);
-        defaults.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, "url");
-        defaults.put(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
-        defaults.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
-        defaults.put(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG, Boolean.TRUE);
-        defaults.put(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
-        defaults.put(JabRefPreferences.MARK_IMPORTED_ENTRIES, Boolean.TRUE);
-        defaults.put(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, Boolean.TRUE);
-        defaults.put(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-        defaults.put(JabRefPreferences.USE_TIME_STAMP, Boolean.FALSE);
-        defaults.put(JabRefPreferences.OVERWRITE_TIME_STAMP, Boolean.FALSE);
-        defaults.put(JabRefPreferences.TIME_STAMP_FORMAT, "yyyy.MM.dd");
-        defaults.put(JabRefPreferences.TIME_STAMP_FIELD, BibtexFields.TIMESTAMP);
-        defaults.put(JabRefPreferences.UPDATE_TIMESTAMP, Boolean.FALSE);
-        defaults.put(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
+        defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
+        defaults.put(AUTO_DOUBLE_BRACES, Boolean.FALSE);
+        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, "url");
+        defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
+        defaults.put(PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
+        defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
+        defaults.put(USE_IMPORT_INSPECTION_DIALOG, Boolean.TRUE);
+        defaults.put(USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, Boolean.TRUE);
+        defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
+        defaults.put(MARK_IMPORTED_ENTRIES, Boolean.TRUE);
+        defaults.put(UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, Boolean.TRUE);
+        defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
+        defaults.put(USE_TIME_STAMP, Boolean.FALSE);
+        defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
+        defaults.put(TIME_STAMP_FORMAT, "yyyy.MM.dd");
+        defaults.put(TIME_STAMP_FIELD, BibtexFields.TIMESTAMP);
+        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
+        defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
         // behavior of JabRef before 2.10: both: false
-        defaults.put(JabRefPreferences.WRITEFIELD_ADDSPACES, Boolean.TRUE);
-        defaults.put(JabRefPreferences.WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
+        defaults.put(WRITEFIELD_ADDSPACES, Boolean.TRUE);
+        defaults.put(WRITEFIELD_CAMELCASENAME, Boolean.TRUE);
 
         //behavior of JabRef before LWang_AdjustableFieldOrder 1
         //0 sorted order (2.10 default), 1 unsorted order (2.9.2 default), 2 user defined
-        defaults.put(JabRefPreferences.WRITEFIELD_SORTSTYLE, 0);
-        defaults.put(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
-        defaults.put(JabRefPreferences.WRITEFIELD_WRAPFIELD, Boolean.FALSE);
+        defaults.put(WRITEFIELD_SORTSTYLE, 0);
+        defaults.put(WRITEFIELD_USERDEFINEDORDER, "author;title;journal;year;volume;number;pages;month;note;volume;pages;part;eid");
+        defaults.put(WRITEFIELD_WRAPFIELD, Boolean.FALSE);
 
         defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.FALSE);
         defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
 
-        defaults.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, null);
-        defaults.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, null);
-        defaults.put(JabRefPreferences.CITE_COMMAND, "cite"); // obsoleted by the app-specific ones
-        defaults.put(JabRefPreferences.CITE_COMMAND_VIM, "\\cite");
-        defaults.put(JabRefPreferences.CITE_COMMAND_EMACS, "\\cite");
-        defaults.put(JabRefPreferences.CITE_COMMAND_WIN_EDT, "\\cite");
-        defaults.put(JabRefPreferences.CITE_COMMAND_LED, "\\cite");
-        defaults.put(JabRefPreferences.FLOAT_MARKED_ENTRIES, Boolean.TRUE);
+        defaults.put(PERSONAL_JOURNAL_LIST, null);
+        defaults.put(EXTERNAL_JOURNAL_LISTS, null);
+        defaults.put(CITE_COMMAND, "cite"); // obsoleted by the app-specific ones
+        defaults.put(CITE_COMMAND_VIM, "\\cite");
+        defaults.put(CITE_COMMAND_EMACS, "\\cite");
+        defaults.put(CITE_COMMAND_WIN_EDT, "\\cite");
+        defaults.put(CITE_COMMAND_LED, "\\cite");
+        defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
-        defaults.put(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
-        defaults.put(JabRefPreferences.FILECHOOSER_DISABLE_RENAME, Boolean.TRUE);
+        defaults.put(USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
+        defaults.put(FILECHOOSER_DISABLE_RENAME, Boolean.TRUE);
 
-        defaults.put(JabRefPreferences.LAST_USED_EXPORT, null);
-        defaults.put(JabRefPreferences.SIDE_PANE_WIDTH, -1);
+        defaults.put(LAST_USED_EXPORT, null);
+        defaults.put(SIDE_PANE_WIDTH, -1);
 
-        defaults.put(JabRefPreferences.IMPORT_INSPECTION_DIALOG_WIDTH, 650);
-        defaults.put(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
-        defaults.put(JabRefPreferences.SEARCH_DIALOG_WIDTH, 650);
-        defaults.put(JabRefPreferences.SEARCH_DIALOG_HEIGHT, 500);
-        defaults.put(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
-        defaults.put(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
-        defaults.put(JabRefPreferences.NUMERIC_FIELDS, "mittnum;author");
-        defaults.put(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
-        defaults.put(JabRefPreferences.USE_LOCK_FILES, Boolean.TRUE);
-        defaults.put(JabRefPreferences.AUTO_SAVE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.AUTO_SAVE_INTERVAL, 5);
-        defaults.put(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
-        defaults.put(JabRefPreferences.BIBLATEX_MODE, Boolean.FALSE);
+        defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
+        defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
+        defaults.put(SEARCH_DIALOG_WIDTH, 650);
+        defaults.put(SEARCH_DIALOG_HEIGHT, 500);
+        defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
+        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
+        defaults.put(NUMERIC_FIELDS, "mittnum;author");
+        defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
+        defaults.put(USE_LOCK_FILES, Boolean.TRUE);
+        defaults.put(AUTO_SAVE, Boolean.TRUE);
+        defaults.put(AUTO_SAVE_INTERVAL, 5);
+        defaults.put(PROMPT_BEFORE_USING_AUTOSAVE, Boolean.TRUE);
+        defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
+        defaults.put(BIBLATEX_MODE, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
-        defaults.put(JabRefPreferences.VALUE_DELIMITERS2, 1);
-        defaults.put(JabRefPreferences.INCLUDE_EMPTY_FIELDS, Boolean.FALSE);
-        defaults.put(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
-        defaults.put(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        defaults.put(JabRefPreferences.EMAIL_SUBJECT, Localization.lang("References"));
-        defaults.put(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
-        defaults.put(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
-        defaults.put(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
-        defaults.put(JabRefPreferences.SELECTED_FETCHER_INDEX, 0);
-        defaults.put(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, Boolean.TRUE);
-        defaults.put(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
-        defaults.put(JabRefPreferences.DB_CONNECT_SERVER_TYPE, "MySQL");
-        defaults.put(JabRefPreferences.DB_CONNECT_HOSTNAME, "localhost");
-        defaults.put(JabRefPreferences.DB_CONNECT_DATABASE, "jabref");
-        defaults.put(JabRefPreferences.DB_CONNECT_USERNAME, "root");
+        defaults.put(VALUE_DELIMITERS2, 1);
+        defaults.put(INCLUDE_EMPTY_FIELDS, Boolean.FALSE);
+        defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
+        defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
+        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+        defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
+        defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
+        defaults.put(SELECTED_FETCHER_INDEX, 0);
+        defaults.put(BIB_LOCATION_AS_FILE_DIR, Boolean.TRUE);
+        defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
+        defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
+        defaults.put(DB_CONNECT_HOSTNAME, "localhost");
+        defaults.put(DB_CONNECT_DATABASE, "jabref");
+        defaults.put(DB_CONNECT_USERNAME, "root");
         CleanUpAction.putDefaults(defaults);
 
         // defaults for DroppedFileHandler UI
@@ -816,41 +847,42 @@ public class JabRefPreferences {
 
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
-        WRAPPED_USERNAME = '[' + get(JabRefPreferences.DEFAULT_OWNER) + ']';
-        MARKING_WITH_NUMBER_PATTERN = "\\[" + get(JabRefPreferences.DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
+        WRAPPED_USERNAME = '[' + get(DEFAULT_OWNER) + ']';
+        MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
-        defaults.put(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-        defaults.put(JabRefPreferences.USE_IEEE_ABRV, Boolean.FALSE);
-        defaults.put(JabRefPreferences.USE_CONVERT_TO_EQUATION, Boolean.FALSE);
-        defaults.put(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
-        defaults.put(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
+        defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
+        defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
+        defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
+        defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
+        defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(JabRefPreferences.USER_FILE_DIR, GUIGlobals.FILE_FIELD + "Directory");
+        defaults.put(USER_FILE_DIR, GUIGlobals.FILE_FIELD + "Directory");
         try {
-            defaults.put(JabRefPreferences.USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(JabRefPreferences.DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(JabRefPreferences.DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
-            JabRefPreferences.LOGGER.info("Hostname not found.", ex);
-            defaults.put(JabRefPreferences.USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(JabRefPreferences.DEFAULT_OWNER));
-            defaults.put(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(JabRefPreferences.DEFAULT_OWNER));
+            LOGGER.info("Hostname not found.", ex);
+            defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
         }
     }
 
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
-        defaults.put(JabRefPreferences.CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        defaults.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;" + "comment;owner;timestamp");
+        defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
+        defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
+                + "comment;owner;timestamp");
 
         // Entry editor tab 1:
-        defaults.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def1", "abstract");
-        defaults.put(JabRefPreferences.CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
+        defaults.put(CUSTOM_TAB_FIELDS + "_def1", "abstract");
+        defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
         // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def2", "review");
-        defaults.put(JabRefPreferences.CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", "review");
+        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
 
     }
 
@@ -860,7 +892,7 @@ public class JabRefPreferences {
 
     public void updateSpecialFieldHandling() {
         putBracesAroundCapitalsFields.clear();
-        String fieldString = get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS);
+        String fieldString = get(PUT_BRACES_AROUND_CAPITALS);
         if (!fieldString.isEmpty()) {
             String[] fields = fieldString.split(";");
             for (String field : fields) {
@@ -868,7 +900,7 @@ public class JabRefPreferences {
             }
         }
         nonWrappableFields.clear();
-        fieldString = get(JabRefPreferences.NON_WRAPPABLE_FIELDS);
+        fieldString = get(NON_WRAPPABLE_FIELDS);
         if (!fieldString.isEmpty()) {
             String[] fields = fieldString.split(";");
             for (String field : fields) {
@@ -883,7 +915,7 @@ public class JabRefPreferences {
     }
 
     private char[] getValueDelimiters() {
-        return JabRefPreferences.VALUE_DELIMITERS[getInt(JabRefPreferences.VALUE_DELIMITERS2)];
+        return JabRefPreferences.VALUE_DELIMITERS[getInt(VALUE_DELIMITERS2)];
     }
 
     /**
@@ -972,7 +1004,7 @@ public class JabRefPreferences {
 
         if (value.length > 0) {
             StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.length - 1); i++) {
+            for (int i = 0; i < value.length - 1; i++) {
                 linked.append(makeEscape(value[i]));
                 linked.append(';');
             }
@@ -1079,7 +1111,7 @@ public class JabRefPreferences {
             if (s == null) {
                 // there isn't even a default value
                 // Output error
-                JabRefPreferences.LOGGER.info("Could not get key binding for \"" + bindName + '"');
+                LOGGER.info("Could not get key binding for \"" + bindName + '"');
                 // fall back to a default value
                 s = "Not associated";
             }
@@ -1098,8 +1130,8 @@ public class JabRefPreferences {
 
     /**
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
-     * users, with the Command key preferred instead of Control. TODO: Move to OS.java? Or replace with portable Java
-     * key codes, i.e. KeyEvent
+     * users, with the Command key preferred instead of Control.
+     * TODO: Move to OS.java? Or replace with portable Java key codes, i.e. KeyEvent
      */
     private KeyStroke getKeyForMac(KeyStroke ks) {
         if (ks == null) {
@@ -1160,11 +1192,11 @@ public class JabRefPreferences {
      * Calling this method will write all preferences into the preference store.
      */
     public void flush() {
-        if (getBoolean(JabRefPreferences.MEMORY_STICK_MODE)) {
+        if (getBoolean(MEMORY_STICK_MODE)) {
             try {
                 exportPreferences("jabref.xml");
             } catch (IOException e) {
-                JabRefPreferences.LOGGER.info("Could not save preferences for memory stick mode: " + e.getLocalizedMessage(), e);
+                LOGGER.info("Could not save preferences for memory stick mode: " + e.getLocalizedMessage(), e);
             }
         }
         try {
@@ -1211,7 +1243,7 @@ public class JabRefPreferences {
                 }
             }
         } catch (BackingStoreException ex) {
-            JabRefPreferences.LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
+            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
         return JabRefPreferences.keyPattern;
     }
@@ -1229,7 +1261,7 @@ public class JabRefPreferences {
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
-            JabRefPreferences.LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
+            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
         for (Map.Entry<String, ArrayList<String>> stringArrayListEntry : pattern.entrySet()) {
@@ -1252,7 +1284,8 @@ public class JabRefPreferences {
         String[] bindings = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
-        if ((bindNames == null) || (bindings == null) || (bindNames.length != bindings.length)) {
+        if (bindNames == null || bindings == null
+                || bindNames.length != bindings.length) {
             // Nothing defined in Preferences, or something is wrong.
             keyBinds = new KeyBinds();
             return;
@@ -1276,7 +1309,7 @@ public class JabRefPreferences {
         boolean done = false;
 
         StringBuilder res = new StringBuilder();
-        while (!done && ((c = data.read()) != -1)) {
+        while (!done && (c = data.read()) != -1) {
             if (c == '\\') {
                 if (!escape) {
                     escape = true;
@@ -1312,7 +1345,7 @@ public class JabRefPreferences {
         int c;
         for (int i = 0; i < s.length(); i++) {
             c = s.charAt(i);
-            if ((c == '\\') || (c == ';')) {
+            if (c == '\\' || c == ';') {
                 sb.append('\\');
             }
             sb.append((char) c);
@@ -1337,8 +1370,8 @@ public class JabRefPreferences {
     public CustomEntryType getCustomEntryType(int number) {
         String nr = "" + number;
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
-        String[] req = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
-        String[] opt = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
+        String[] req    = getStringArray(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
+        String[] opt    = getStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
         String[] priOpt = getStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (name == null) {
             return null;
@@ -1414,7 +1447,7 @@ public class JabRefPreferences {
      */
     public ExternalFileType getExternalFileTypeByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
+            if (type.getExtension() != null && type.getExtension().equalsIgnoreCase(extension)) {
                 return type;
             }
         }
@@ -1431,7 +1464,8 @@ public class JabRefPreferences {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())) {
+            if (type.getExtension() != null && filename.toLowerCase().
+                    endsWith(type.getExtension().toLowerCase())) {
                 if (type.getExtension().length() > longestFound) {
                     longestFound = type.getExtension().length();
                     foundType = type;
@@ -1450,7 +1484,7 @@ public class JabRefPreferences {
      */
     public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
+            if (type.getMimeType() != null && type.getMimeType().equals(mimeType)) {
                 return type;
             }
         }
@@ -1535,7 +1569,7 @@ public class JabRefPreferences {
         // Read the prefs information for file types:
         String[][] vals = StringUtil.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
         for (String[] val : vals) {
-            if ((val.length == 2) && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
+            if (val.length == 2 && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {

@@ -64,7 +64,7 @@ public class GUIGlobals {
     // Divider size for BaseFrame split pane. 0 means non-resizable.
     public static final int SPLIT_PANE_DIVIDER_SIZE = 4;
     public static final int SPLIT_PANE_DIVIDER_LOCATION = 145 + 15; // + 15 for possible scrollbar.
-    public static final int TABLE_ROW_PADDING = 8;
+    public static final int TABLE_ROW_PADDING = 9;
     public static final int KEYBIND_COL_0 = 200;
     public static final int KEYBIND_COL_1 = 80; // Added to the font size when determining table
     public static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
