@@ -554,8 +554,8 @@ public class JabRefPreferences {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "entrytype;author;title;year;journal;timestamp;bibtexkey");
-        defaults.put(COLUMN_WIDTHS, "75;280;450;60;100;100;100");
+        defaults.put(COLUMN_NAMES, "entrytype;author;title;year;journal;bibtexkey");
+        defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
         defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
