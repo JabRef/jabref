@@ -23,8 +23,8 @@ import java.util.TreeSet;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
- * An autocompleter delivers possible completions for a given String. There are
- * different types of autocompleters for different use cases.
+ * An autocompleter delivers possible completions for a given String. There are different types of autocompleters for
+ * different use cases.
  * 
  * Example: {@link NameFieldAutoCompleter}, {@link EntireFieldAutoCompleter}
  * 
@@ -45,17 +45,16 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
     private final HashMap<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
 
 
-
+    @Override
     public abstract void addBibtexEntry(BibtexEntry entry);
 
     /**
-     * Returns one or more possible completions for a given String. The returned
-     * completion depends on which informations were stored while adding
-     * BibtexEntries by the used implementation of {@link AbstractAutoCompleter}
-     * .
+     * Returns one or more possible completions for a given String. The returned completion depends on which
+     * informations were stored while adding BibtexEntries by the used implementation of {@link AbstractAutoCompleter} .
      * 
      * @see AbstractAutoCompleter#addBibtexEntry(BibtexEntry)
      */
+    @Override
     public String[] complete(String toComplete) {
         if (AbstractAutoCompleter.stringMinLength(toComplete)) {
             return null;
@@ -97,6 +96,7 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
         return toCheck.length() < AutoCompleterFactory.SHORTEST_TO_COMPLETE;
     }
 
+    @Override
     public void addWordToIndex(String word) {
         if (word.length() >= AbstractAutoCompleter.SHORTEST_WORD) {
             indexCaseSensitive.add(word);
@@ -115,10 +115,12 @@ abstract class AbstractAutoCompleter implements AutoCompleter {
         }
     }
 
+    @Override
     public boolean indexContainsWord(String word) {
         return indexCaseInsensitive.contains(word.toLowerCase());
     }
 
+    @Override
     public String getPrefix() {
         return "";
     }
