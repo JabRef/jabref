@@ -209,13 +209,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction integrityCheckAction = new IntegrityCheckAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
-    private final AbstractAction help = new HelpAction("JabRef help", helpDiag, GUIGlobals.baseFrameHelp, "JabRef help",
+    private final AbstractAction help = new HelpAction("JabRef help", helpDiag,
+            GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
             prefs.getKey("Help"));
     private final AbstractAction contents = new HelpAction("Help contents", helpDiag,
-            GUIGlobals.helpContents, "Help contents",
+            GUIGlobals.helpContents, Localization.lang("Help contents"),
             IconTheme.getImage("helpContents"));
     private final AbstractAction about = new HelpAction("About JabRef", helpDiag,
-            GUIGlobals.aboutPage,"About JabRef",
+            GUIGlobals.aboutPage, Localization.lang("About JabRef"),
             IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, "Edit entry",
             Localization.lang("Edit entry"),
