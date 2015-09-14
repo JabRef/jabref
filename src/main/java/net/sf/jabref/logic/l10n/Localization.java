@@ -107,6 +107,7 @@ public class Localization {
             }
         } catch (MissingResourceException ex) {
             translation = key;
+            LOGGER.warn("Warning: could not get menu item translation for \"" + key + "\"");
         }
         if (translation != null && !translation.isEmpty()) {
             return translation.replaceAll("_", " ");
@@ -124,7 +125,7 @@ public class Localization {
         } catch (MissingResourceException ex) {
             translation = key;
 
-            LOGGER.warn("Warning: could not get menu item translation for \"" + key + "\"");
+            LOGGER.warn("Warning: could not get translation for integrity message \"" + key + "\"");
         }
         if (translation != null && !translation.isEmpty()) {
             return translation;
