@@ -87,10 +87,10 @@ class FileTab extends JPanel implements PrefsTab {
                 IconTheme.getImage("helpSmall"));
         openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Localization.lang("Backup old file when saving"));
-        autoSave = new JCheckBox(Localization.lang(JabRefPreferences.AUTO_SAVE));
+        autoSave = new JCheckBox(Localization.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Localization.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox(new String[] {
+        valueDelimiter = new JComboBox<>(new String[] {
                 Localization.lang("Quotes") + ": \", \"",
                 Localization.lang("Curly Brackets") + ": {, }"});
         includeEmptyFields = new JCheckBox(Localization.lang("Include empty fields"));
@@ -105,7 +105,7 @@ class FileTab extends JPanel implements PrefsTab {
         userDefinedFieldOrder = new JTextField(this.prefs.get(JabRefPreferences.WRITEFIELD_USERDEFINEDORDER)); //need to use JcomboBox in the future
 
         // This is sort of a quick hack
-        newlineSeparator = new JComboBox(new String[] {"CR", "CR/LF", "LF"});
+        newlineSeparator = new JComboBox<>(new String[] {"CR", "CR/LF", "LF"});
 
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
@@ -183,7 +183,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
         //for LWang_AdjustableFieldOrder
         String[] _rbs0 = {"Save fields sorted in alphabetic order (as in versions 2.10+)", "Save fields in unsorted order (as until version 2.9.2)", "Save fields in user-defined order"};
-        ArrayList<String> _rbs = new ArrayList<String>();
+        ArrayList<String> _rbs = new ArrayList<>();
         for (String _rb : _rbs0) {
             _rbs.add(Localization.lang(_rb));
         }
