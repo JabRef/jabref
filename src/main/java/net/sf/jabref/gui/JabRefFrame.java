@@ -218,28 +218,28 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             GUIGlobals.aboutPage,"About JabRef",
             IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, "Edit entry",
-            "Edit entry",
+            Localization.lang("Edit entry"),
             prefs.getKey(KeyBinds.EDIT_ENTRY),
             IconTheme.getImage("edit"));
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE, "Focus entry table",
-            "Move the keyboard focus to the entry table",
+            Localization.lang("Move the keyboard focus to the entry table"),
             prefs.getKey(KeyBinds.FOCUS_ENTRY_TABLE));
     private final AbstractAction save = new GeneralAction(Actions.SAVE, "Save database",
-            "Save database",
+            Localization.lang("Save database"),
             prefs.getKey(KeyBinds.SAVE_DATABASE),
             IconTheme.getImage("save"));
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS, "Save database as ...",
-            "Save database as ...",
+            Localization.lang("Save database as ..."),
             prefs.getKey(KeyBinds.SAVE_DATABASE_AS),
             IconTheme.getImage("saveAs"));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
             "Save selected as ...",
-            "Save selected as ...",
+            Localization.lang("Save selected as ..."),
             IconTheme.getImage("saveAs"));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             "Save selected as plain BibTeX ...",
-            "Save selected as plain BibTeX ...",
+            Localization.lang("Save selected as plain BibTeX ..."),
             IconTheme.getImage("saveAs"));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
@@ -248,28 +248,28 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public final AbstractAction nextTab = new ChangeTabAction(true);
     public final AbstractAction prevTab = new ChangeTabAction(false);
     private final AbstractAction sortTabs = new SortTabsAction(this);
-    private final AbstractAction undo = new GeneralAction(Actions.UNDO, "Undo", "Undo",
+    private final AbstractAction undo = new GeneralAction(Actions.UNDO, "Undo", Localization.lang("Undo"),
             prefs.getKey(KeyBinds.UNDO),
             IconTheme.getImage("undo"));
-    private final AbstractAction redo = new GeneralAction(Actions.REDO, "Redo", "Redo",
+    private final AbstractAction redo = new GeneralAction(Actions.REDO, "Redo", Localization.lang("Redo"),
             prefs.getKey(KeyBinds.REDO),
             IconTheme.getImage("redo"));
-    final AbstractAction forward = new GeneralAction(Actions.FORWARD, "Forward", "Forward",
+    final AbstractAction forward = new GeneralAction(Actions.FORWARD, "Forward", Localization.lang("Forward"),
             prefs.getKey(KeyBinds.FORWARD), IconTheme.getImage("right"));
-    final AbstractAction back = new GeneralAction(Actions.BACK, "Back", "Back",
+    final AbstractAction back = new GeneralAction(Actions.BACK, "Back", Localization.lang("Back"),
             prefs.getKey(KeyBinds.BACK), IconTheme.getImage("left"));
-    private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", "Delete",
+    private final AbstractAction delete = new GeneralAction(Actions.DELETE, "Delete", Localization.lang("Delete"),
             prefs.getKey(KeyBinds.DELETE),
             IconTheme.getImage("delete"));
     private final AbstractAction copy = new EditAction(Actions.COPY, IconTheme.getImage("copy"));
     private final AbstractAction paste = new EditAction(Actions.PASTE, IconTheme.getImage("paste"));
     private final AbstractAction cut = new EditAction(Actions.CUT, IconTheme.getImage("cut"));
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, "Mark entries",
-            "Mark entries",
+            Localization.lang("Mark entries"),
             prefs.getKey(KeyBinds.MARK_ENTRIES),
             IconTheme.getImage("markEntries"));
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES, "Unmark entries",
-            "Unmark entries",
+            Localization.lang("Unmark entries"),
             prefs.getKey(KeyBinds.UNMARK_ENTRIES),
             IconTheme.getImage("unmarkEntries"));
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, "Unmark all");
@@ -292,14 +292,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction saveSessionAction = new SaveSessionAction();
     public final AbstractAction loadSessionAction = new LoadSessionAction();
     private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH, "Incremental search",
-            "Start incremental search",
+            Localization.lang("Start incremental search"),
             prefs.getKey(KeyBinds.INCREMENTAL_SEARCH),
             IconTheme.getImage("incSearch"));
-    private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, "Search", "Search",
+    private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, "Search", Localization.lang("Search"),
             prefs.getKey(KeyBinds.SEARCH),
             IconTheme.getImage("search"));
     private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH, "Search",
-            "Toggle search panel",IconTheme.getImage("toggleSearch"));
+            Localization.lang("Toggle search panel"),IconTheme.getImage("toggleSearch"));
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, "Copy BibTeX key",
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
@@ -312,7 +312,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY_AND_TITLE));
     private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
             "Append database",
-            "Append contents from a BibTeX database into the currently viewed database",
+            Localization.lang("Append contents from a BibTeX database into the currently viewed database"),
             IconTheme.getImage("open"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, "Select all",
             prefs.getKey(KeyBinds.SELECT_ALL));
@@ -320,11 +320,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.REPLACE_STRING));
 
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE, "Edit preamble",
-            "Edit preamble",
+            Localization.lang("Edit preamble"),
             prefs.getKey(KeyBinds.EDIT_PREAMBLE),
             IconTheme.getImage("editPreamble"));
     private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS, "Edit strings",
-            "Edit strings",
+            Localization.lang("Edit strings"),
             prefs.getKey(KeyBinds.EDIT_STRINGS),
             IconTheme.getImage("editStrings"));
     private final AbstractAction toggleToolbar = new AbstractAction("Hide/show toolbar") {
@@ -338,51 +338,51 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }};
     private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
             "Toggle groups interface",
-            "Toggle groups interface",
+            Localization.lang("Toggle groups interface"),
             prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
             IconTheme.getImage("toggleGroups"));
     private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
             "Toggle entry preview",
-            "Toggle entry preview",
+            Localization.lang("Toggle entry preview"),
             prefs.getKey(KeyBinds.TOGGLE_ENTRY_PREVIEW),
             IconTheme.getImage("togglePreview"));
     private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             "Highlight groups matching any selected entry",
-            "Highlight groups matching any selected entry",
+            Localization.lang("Highlight groups matching any selected entry"),
             IconTheme.getImage("groupsHighlightAny"));
     private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             "Highlight groups matching all selected entries",
-            "Highlight groups matching all selected entries",
+            Localization.lang("Highlight groups matching all selected entries"),
             IconTheme.getImage("groupsHighlightAll"));
     final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             "Switch preview layout",
             prefs.getKey(KeyBinds.SWITCH_PREVIEW_LAYOUT));
     private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY, "Autogenerate BibTeX keys",
-            "Autogenerate BibTeX keys",
+            Localization.lang("Autogenerate BibTeX keys"),
             prefs.getKey(KeyBinds.AUTOGENERATE_BIB_TE_X_KEYS),
             IconTheme.getImage("makeKey"));
 
     private final AbstractAction writeXmpAction = new GeneralAction(Actions.WRITE_XMP, "Write XMP-metadata to PDFs",
-            "Will write XMP-metadata to the PDFs linked from selected entries.",
+            Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
             prefs.getKey(KeyBinds.WRITE_XMP));
 
     private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER, "Open folder",
-            "Open folder",
+            Localization.lang("Open folder"),
             prefs.getKey(KeyBinds.OPEN_FOLDER));
     private final AbstractAction openFile = new GeneralAction(Actions.OPEN_EXTERNAL_FILE, "Open file",
-            "Open file",
+            Localization.lang("Open file"),
             prefs.getKey(KeyBinds.OPEN_FILE),
             IconTheme.getImage("openExternalFile"));
     private final AbstractAction openPdf = new GeneralAction(Actions.OPEN_FILE, "Open PDF or PS",
-            "Open PDF or PS",
+            Localization.lang("Open PDF or PS"),
             prefs.getKey(KeyBinds.OPEN_PDF_OR_PS),
             IconTheme.getImage("openFile"));
     private final AbstractAction openUrl = new GeneralAction(Actions.OPEN_URL, "Open URL or DOI",
-            "Open URL or DOI",
+            Localization.lang("Open URL or DOI"),
             prefs.getKey(KeyBinds.OPEN_URL_OR_DOI),
             IconTheme.getImage("openUrl"));
     private final AbstractAction openSpires = new GeneralAction(Actions.OPEN_SPIRES, "Open SPIRES entry",
-            "Open SPIRES entry",
+            Localization.lang("Open SPIRES entry"),
             prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK, "Find duplicates");
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
@@ -400,17 +400,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Synchronize %0 links", "PS"),
             prefs.getKey(KeyBinds.SYNCHRONIZE_PS));
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
-            "Synchronize file links",
+            Localization.lang("Synchronize file links"),
             Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
 
     private final AbstractAction abbreviateMedline = new GeneralAction(Actions.ABBREVIATE_MEDLINE, "Abbreviate journal names (MEDLINE)",
-            "Abbreviate journal names of the selected entries (MEDLINE abbreviation)");
+            Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)"));
     private final AbstractAction abbreviateIso = new GeneralAction(Actions.ABBREVIATE_ISO, "Abbreviate journal names (ISO)",
-            "Abbreviate journal names of the selected entries (ISO abbreviation)",
+            Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"),
             Globals.prefs.getKey(KeyBinds.ABBREVIATE));
 
     private final AbstractAction unabbreviate = new GeneralAction(Actions.UNABBREVIATE, "Unabbreviate journal names",
-            "Unabbreviate journal names of the selected entries",
+            Localization.lang("Unabbreviate journal names of the selected entries"),
             Globals.prefs.getKey(KeyBinds.UNABBREVIATE));
     private final AbstractAction manageJournals = new ManageJournalsAction(this);
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
@@ -418,27 +418,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, Globals.handler);
 
     private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT, "Connect to external SQL database",
-            "Connect to external SQL database",
+            Localization.lang("Connect to external SQL database"),
             IconTheme.getImage("dbConnect"));
 
     private final AbstractAction dbExport = new GeneralAction(Actions.DB_EXPORT, "Export to external SQL database",
-            "Export to external SQL database",
+            Localization.lang("Export to external SQL database"),
             IconTheme.getImage("dbExport"));
 
     private final AbstractAction Cleanup = new GeneralAction(Actions.CLEANUP, "Cleanup entries",
-            "Cleanup entries",
+            Localization.lang("Cleanup entries"),
             prefs.getKey(KeyBinds.CLEANUP),
             IconTheme.getImage("cleanupentries"));
 
     private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES, "Merge entries",
-            "Merge entries",
+            Localization.lang("Merge entries"),
             IconTheme.getImage("mergeentries"));
 
     private final AbstractAction dbImport = new DbImportAction(this).getAction();
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS, "Resolve duplicate BibTeX keys",
-            "Find and remove duplicate BibTeX keys",
+            Localization.lang("Find and remove duplicate BibTeX keys"),
             prefs.getKey(KeyBinds.RESOLVE_DUPLICATE_BIB_TE_X_KEYS));
 
     final MassSetFieldAction massSetField = new MassSetFieldAction(this);
