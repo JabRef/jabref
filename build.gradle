@@ -264,7 +264,7 @@ task releaseWindows(dependsOn: "launch4j") {
             }
         }
         copy {
-            from("$buildDir/nsis/JabRefSetup.exe")
+            from("$buildDir/nsis/JabRefSetup-${version}.exe")
             from("$buildDir/nsis/JabRef.exe")
             into("$buildDir/releases")
         }
@@ -334,4 +334,3 @@ task releaseSourceTar(type: Exec) {
         mkdir("$buildDir/releases")
     }
 }
-
