@@ -1227,13 +1227,16 @@ public class Util {
                 });
             }
         };
-        // FIXME: workaround so that dialog doesn't block run()?
-        Thread t = new Thread(r);
-        t.start();
-        if (diag != null) {
-            diag.setVisible(true);
-        }
-        return t;
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                // show dialog which will be hidden when the task is done
+                if (diag != null) {
+                    diag.setVisible(true);
+                }
+            }
+        });
+        return r;
     }
 
     /**
