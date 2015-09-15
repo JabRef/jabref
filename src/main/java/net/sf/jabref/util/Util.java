@@ -1902,9 +1902,18 @@ public class Util {
                 });
             }
         };
-        if (diag != null) {
-            diag.setVisible(true);
-        }
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (diag != null) {
+                    diag.setVisible(true);
+                }
+            }
+            
+        });
+
         return r;
     }
 
