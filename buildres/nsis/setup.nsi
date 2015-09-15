@@ -133,7 +133,7 @@ Var InstDestination
 
 
 # Installer attributes
-OutFile ..\..\build\nsis\JabRefSetup.exe
+OutFile ..\..\build\nsis\JabRefSetup-${VERSION}.exe
 InstallDir "$PROGRAMFILES\JabRef"
 BrandingText "$(^Name) installer" ; appear at the bottom of the installer windows
 XPStyle on ; use XP style for installer windows
@@ -199,7 +199,7 @@ Section "-Installation actions" SecInstallation
    WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "Publisher" "${COMPANY}"
    WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${URL}"
    WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\${PRODUCT_EXE}"
-   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"   
+   WriteRegStr HKLM "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
    WriteRegDWORD HKLM "${PRODUCT_UNINST_KEY}" "NoModify" 0x00000001
    WriteRegDWORD HKLM "${PRODUCT_UNINST_KEY}" "NoRepair" 0x00000001
   ${endif}
@@ -271,7 +271,7 @@ Function un.onInit
   ${else}
    SetShellVarContext current
   ${endif}
-  
+
   ; ask if it should really be removed
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UnReallyRemoveLabel)" IDYES +2
   Abort
@@ -284,4 +284,3 @@ Function un.onUninstSuccess
   MessageBox MB_ICONINFORMATION|MB_OK "$(UnRemoveSuccessLabel)"
 
 FunctionEnd
-
