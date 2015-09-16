@@ -35,7 +35,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1119,7 +1118,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public GeneralAction(String command, String text, String description) {
             this.command = command;
             putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+            putValue(Action.SHORT_DESCRIPTION, description);
         }
 
         public GeneralAction(String command, String text, String description, ImageIcon icon) {
@@ -1127,7 +1126,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             this.command = command;
             putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+            putValue(Action.SHORT_DESCRIPTION, description);
         }
 
         public GeneralAction(String command, String text, KeyStroke key) {
@@ -1139,7 +1138,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public GeneralAction(String command, String text, String description, KeyStroke key) {
             this.command = command;
             putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+            putValue(Action.SHORT_DESCRIPTION, description);
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
@@ -1148,7 +1147,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             this.command = command;
             putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
+            putValue(Action.SHORT_DESCRIPTION, description);
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
