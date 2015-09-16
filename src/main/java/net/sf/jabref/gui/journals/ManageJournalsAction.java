@@ -17,27 +17,19 @@ package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MnemonicAwareAction;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Sep 22, 2005
- * Time: 10:45:02 PM
- * To browseOld this template use File | Settings | File Templates.
- */
 public class ManageJournalsAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
 
     public ManageJournalsAction(JabRefFrame frame) {
         super();
-        putValue(Action.NAME, Localization.menuTitle("Manage journal abbreviations"));
+        putValue(Action.NAME, "Manage journal abbreviations");
         this.frame = frame;
     }
 
