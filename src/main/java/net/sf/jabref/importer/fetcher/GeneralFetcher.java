@@ -142,7 +142,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         action = new FetcherAction();
 
-        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage(), "Help");
+        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage(), Localization.lang("Help"));
 
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0, 0, 0, 0));

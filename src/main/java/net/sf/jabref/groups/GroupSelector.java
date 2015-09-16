@@ -389,7 +389,7 @@ public class GroupSelector extends SidePaneComponent implements
         con.gridx = 3;
         con.gridwidth = GridBagConstraints.REMAINDER;
         HelpAction helpAction = new HelpAction(frame.helpDiag,
-                GUIGlobals.groupsHelp, "Help on groups");
+                GUIGlobals.groupsHelp, Localization.lang("Help on groups"));
         helpButton.addActionListener(helpAction);
         helpButton.setToolTipText(Localization.lang("Help on groups"));
         gbl.setConstraints(helpButton, con);

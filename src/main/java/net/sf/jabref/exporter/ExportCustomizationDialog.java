@@ -127,7 +127,7 @@ public class ExportCustomizationDialog extends JDialog {
 
         JButton help = new JButton(Localization.lang("Help"));
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
-                "Help"));
+                Localization.lang("Help")));
 
         EventTableModel<String[]> tableModel = new EventTableModel<String[]>(Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         table = new JTable(tableModel);

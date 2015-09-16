@@ -245,7 +245,7 @@ public class SearchManager extends SidePaneComponent
         help.setPreferredSize(butDim);
         help.setMinimumSize(butDim);
         help.setMargin(margin);
-        help.addActionListener(new HelpAction(GUIGlobals.helpDiag, GUIGlobals.searchHelp, "Help"));
+        help.addActionListener(new HelpAction(GUIGlobals.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
 
         // Select the last used mode of search:
         if (Globals.prefs.getBoolean(JabRefPreferences.INCREMENT_S)) {

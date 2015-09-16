@@ -51,7 +51,7 @@ public class HelpAction extends MnemonicAwareAction {
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
         super(IconTheme.getImage("help"));
         putValue(Action.NAME, "Help");
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION,tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
     }
@@ -59,7 +59,7 @@ public class HelpAction extends MnemonicAwareAction {
     public HelpAction(HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
         super(iconFile);
         putValue(Action.NAME, "Help");
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
     }
@@ -67,7 +67,7 @@ public class HelpAction extends MnemonicAwareAction {
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
         super(IconTheme.getImage("help"));
         putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
     }
@@ -75,7 +75,7 @@ public class HelpAction extends MnemonicAwareAction {
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, KeyStroke key) {
         super(IconTheme.getImage("help"));
         putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         putValue(Action.ACCELERATOR_KEY, key);
         this.diag = diag;
         this.helpFile = helpFile;
@@ -84,7 +84,7 @@ public class HelpAction extends MnemonicAwareAction {
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
         super(iconFile);
         putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang(tooltip));
+        putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
     }
