@@ -394,10 +394,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
     AbstractAction exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard");
     private final AbstractAction autoSetPdf = new GeneralAction(Actions.AUTO_SET_PDF,
-            Localization.lang("Synchronize %0 links", "PDF"),
+            "Synchronize PDF links",
             prefs.getKey(KeyBinds.SYNCHRONIZE_PDF));
     private final AbstractAction autoSetPs = new GeneralAction(Actions.AUTO_SET_PS,
-            Localization.lang("Synchronize %0 links", "PS"),
+            "Synchronize PS links",
             prefs.getKey(KeyBinds.SYNCHRONIZE_PS));
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links"),
@@ -446,8 +446,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             FindUnlinkedFilesDialog.ACTION_COMMAND,
-            FindUnlinkedFilesDialog.ACTION_TITLE,
-            FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
+            FindUnlinkedFilesDialog.ACTION_MENU_TITLE,
+            Localization.lang(FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION),
             prefs.getKey(FindUnlinkedFilesDialog.ACTION_KEYBINDING_ACTION),
             IconTheme.getImage("toggleSearch")
     );
