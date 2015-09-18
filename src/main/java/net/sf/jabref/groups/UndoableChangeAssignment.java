@@ -20,8 +20,9 @@ import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.groups.structure.ExplicitGroup;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * @author jzieren
@@ -32,9 +33,9 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     private final Set<BibtexEntry> m_previousAssignmentBackup;
     private final Set<BibtexEntry> m_newAssignmentBackup;
     /** The path to the edited node */
-    private int[] m_pathToNode = null;
+    private int[] m_pathToNode;
     /** The root of the global groups tree */
-    private GroupTreeNode m_groupsRootHandle = null;
+    private GroupTreeNode m_groupsRootHandle;
 
 
     /**
@@ -72,14 +73,14 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": "
-                + Globals.lang("change assignment of entries");
+        return Localization.lang("Undo") + ": "
+                + Localization.lang("change assignment of entries");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": "
-                + Globals.lang("change assignment of entries");
+        return Localization.lang("Redo") + ": "
+                + Localization.lang("change assignment of entries");
     }
 
     @Override

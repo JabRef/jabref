@@ -15,7 +15,11 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,23 +29,40 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
-import net.sf.jabref.*;
+import net.sf.jabref.gui.renderer.GeneralRenderer;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-
-import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -60,8 +81,8 @@ public class SearchResultsDialog {
     private final int FILE_COL = 0;
     private final int URL_COL = 1;
     private final int PAD = 2;
-    private final JLabel fileLabel = new JLabel(GUIGlobals.getImage("psSmall"));
-    private final JLabel urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
+    private final JLabel fileLabel = new JLabel(IconTheme.getImage("psSmall"));
+    private final JLabel urlLabel = new JLabel(IconTheme.getImage("wwwSmall"));
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
@@ -71,7 +92,7 @@ public class SearchResultsDialog {
     private final HashMap<BibtexEntry, BasePanel> entryHome = new HashMap<BibtexEntry, BasePanel>();
 
     private JTable entryTable;
-    private final UIFSplitPane contentPane = new UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
+    private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private PreviewPanel preview;
 
 
@@ -85,9 +106,9 @@ public class SearchResultsDialog {
     private void init(String title) {
         diag = new JDialog(frame, title, false);
 
-        int activePreview = Globals.prefs.getInt("activePreview");
+        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get("preview0") : Globals.prefs.get("preview1"));
+                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
 
         sortedEntries = new SortedList<BibtexEntry>(entries, new EntryComparator(false, true, "author"));
         model = new EventTableModel<BibtexEntry>(sortedEntries,
@@ -136,9 +157,9 @@ public class SearchResultsDialog {
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.basePanel());
-                    frame.output(Globals.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
-                            + Globals.lang("entries")
-                            : "1 " + Globals.lang("entry") + '.'));
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
+                            + Localization.lang("entries")
+                            : "1 " + Localization.lang("entry") + '.'));
                 }
             }
         });
@@ -152,15 +173,15 @@ public class SearchResultsDialog {
 
             @Override
             public void windowClosing(WindowEvent event) {
-                Globals.prefs.putInt("searchDialogWidth", diag.getSize().width);
-                Globals.prefs.putInt("searchDialogHeight", diag.getSize().height);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_WIDTH, diag.getSize().width);
+                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT, diag.getSize().height);
             }
         });
 
         diag.getContentPane().add(contentPane, BorderLayout.CENTER);
         // Remember and default to last size:
-        diag.setSize(new Dimension(Globals.prefs.getInt("searchDialogWidth"), Globals.prefs
-                .getInt("searchDialogHeight")));
+        diag.setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.SEARCH_DIALOG_WIDTH), Globals.prefs
+                .getInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT)));
         diag.setLocationRelativeTo(frame);
     }
 
@@ -322,7 +343,8 @@ public class SearchResultsDialog {
                 return;
             }
             //if (e.)
-            final int col = entryTable.columnAtPoint(e.getPoint()), row = entryTable.rowAtPoint(e.getPoint());
+            final int col = entryTable.columnAtPoint(e.getPoint());
+            final int row = entryTable.rowAtPoint(e.getPoint());
             if (col < PAD) {
                 BibtexEntry entry = sortedEntries.get(row);
                 BasePanel p = entryHome.get(entry);
@@ -344,7 +366,7 @@ public class SearchResultsDialog {
                     Object link = entry.getField("url");
                     try {
                         if (link != null) {
-                            Util.openExternalViewer(p.metaData(), (String) link, "url");
+                            JabRefDesktop.openExternalViewer(p.metaData(), (String) link, "url");
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -437,7 +459,7 @@ public class SearchResultsDialog {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return StringUtil.nCase(fields[column - PAD]);
+                return StringUtil.capitalizeFirst(fields[column - PAD]);
             } else {
                 return "";
             }

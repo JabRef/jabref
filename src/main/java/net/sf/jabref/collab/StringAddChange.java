@@ -18,23 +18,35 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexString;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertString;
 
 class StringAddChange extends Change {
+
+    private static final long serialVersionUID = 1L;
 
     private final BibtexString string;
 
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
+    
+    private static final Log LOGGER = LogFactory.getLog(StringAddChange.class);
 
 
     public StringAddChange(BibtexString string) {
-        name = Globals.lang("Added string") + ": '" + string.getName() + '\'';
+        name = Localization.lang("Added string") + ": '" + string.getName() + '\'';
         this.string = string;
 
-        tp.setText("<HTML><H2>" + Globals.lang("Added string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+        tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" + Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
     }
 
@@ -43,7 +55,7 @@ class StringAddChange extends Change {
 
         if (panel.database().hasStringLabel(string.getName())) {
             // The name to change to is already in the database, so we can't comply.
-            Globals.logger("Cannot add string '" + string.getName() + "' because the name "
+            LOGGER.info("Cannot add string '" + string.getName() + "' because the name "
                     + "is already in use.");
         }
 
@@ -51,13 +63,13 @@ class StringAddChange extends Change {
             panel.database().addString(string);
             undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
         } catch (KeyCollisionException ex) {
-            Globals.logger("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
         try {
             secondary.addString(new BibtexString(IdGenerator.next(), string.getName(),
                     string.getContent()));
         } catch (KeyCollisionException ex) {
-            Globals.logger("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage());
+            LOGGER.info("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage(), ex);
         }
         return true;
     }

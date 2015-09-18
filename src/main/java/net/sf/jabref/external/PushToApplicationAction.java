@@ -23,6 +23,10 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
@@ -58,7 +62,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // Check if any entries are selected:
         entries = panel.getSelectedEntries();
         if (entries.length == 0) {
-            JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires one or more entries to be selected."),
+            JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires one or more entries to be selected."),
                     (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -66,8 +70,8 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
             for (BibtexEntry entry : entries) {
-                if ((entry.getCiteKey() == null) || (entry.getCiteKey().trim().length() == 0)) {
-                    JOptionPane.showMessageDialog(frame, Globals.lang("This operation requires all selected entries to have BibTex keys defined."),
+                if (entry.getCiteKey() == null || entry.getCiteKey().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."),
                             (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -98,9 +102,9 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         String citeKey;//, message = "";
         boolean first = true;
         for (BibtexEntry bes : entries) {
-            citeKey = bes.getField(BibtexFields.KEY_FIELD);
+            citeKey = bes.getField(BibtexEntry.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
-            if ((citeKey == null) || citeKey.equals("")) {
+            if (citeKey == null || citeKey.equals("")) {
                 continue;
             }
             if (first) {

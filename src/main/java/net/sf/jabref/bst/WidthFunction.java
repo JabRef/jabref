@@ -29,10 +29,6 @@ import net.sf.jabref.bst.VM.BstFunction;
  * characters (even without their |right_brace|s) are handled specially. If the
  * literal isn't a string, it complains and pushes~0.
  * 
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class WidthFunction implements BstFunction {
 

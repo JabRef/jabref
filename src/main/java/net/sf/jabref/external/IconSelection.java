@@ -36,10 +36,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Dialog box for choosing an icon for an external file type.
@@ -48,15 +47,15 @@ class IconSelection extends JDialog {
 
     private JList icons;
     private List<String> iconKeys;
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private boolean okPressed = false;
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private boolean okPressed;
     private int selected = -1;
     private final JDialog parent;
 
 
     public IconSelection(JDialog parent, String initialSelection) {
-        super(parent, Globals.lang("Select icon"), true);
+        super(parent, Localization.lang("Select icon"), true);
         this.parent = parent;
         init(initialSelection);
     }
@@ -90,10 +89,10 @@ class IconSelection extends JDialog {
     private void init(String initialSelection) {
         int initSelIndex = -1;
         iconKeys = new ArrayList<String>();
-        Map<String, String> icns = GUIGlobals.getAllIcons();
+        Map<String, String> icns = IconTheme.getAllIcons();
         HashSet<ImageIcon> iconSet = new LinkedHashSet<ImageIcon>();
         for (String key : icns.keySet()) {
-            ImageIcon icon = GUIGlobals.getImage(key);
+            ImageIcon icon = IconTheme.getImage(key);
             if (!iconSet.contains(icon)) {
                 iconKeys.add(key);
                 if (key.equals(initialSelection)) {

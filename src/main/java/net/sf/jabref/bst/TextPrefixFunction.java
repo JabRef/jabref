@@ -34,9 +34,6 @@ import net.sf.jabref.bst.VM.BstFunction;
  |right_brace|s.  If any of the types is incorrect, it complains and
  pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class TextPrefixFunction implements BstFunction {
 

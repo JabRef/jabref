@@ -12,6 +12,7 @@ public class TestUtils {
 
     public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
 
+
     /**
      * Initialize JabRef. Can be cleaned up with
      * {@link TestUtils#closeJabRef()}

@@ -19,8 +19,13 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 class EntryAddChange extends Change {
 
@@ -32,7 +37,7 @@ class EntryAddChange extends Change {
         super("Added entry");
         this.diskEntry = diskEntry;
 
-        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get("preview0"));
+        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(), Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);
     }
 

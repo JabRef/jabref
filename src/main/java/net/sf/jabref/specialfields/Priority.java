@@ -19,26 +19,27 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class Priority extends SpecialField {
 
-    private static Priority INSTANCE = null;
+    private static Priority INSTANCE;
 
-    private final ImageIcon icon = new ImageIcon(GUIGlobals.getIconUrl("priority"));
+    private final ImageIcon icon = IconTheme.getImage("priority");
 
 
     private Priority() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
-        values.add(new SpecialFieldValue(this, Globals.lang("null"), "clearPriority", Globals.lang("Clear priority"), null, Globals.lang("No priority information")));
+        values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null, Localization.lang("No priority information")));
         ImageIcon icon;
-        icon = GUIGlobals.getImage("red");
-        values.add(new SpecialFieldValue(this, Globals.lang("prio1"), "setPriority1", Globals.lang("Set priority to high"), icon, Globals.lang("Priority high")));
-        icon = GUIGlobals.getImage("orange");
-        values.add(new SpecialFieldValue(this, Globals.lang("prio2"), "setPriority2", Globals.lang("Set priority to medium"), icon, Globals.lang("Priority medium")));
-        icon = GUIGlobals.getImage("green");
-        values.add(new SpecialFieldValue(this, Globals.lang("prio3"), "setPriority3", Globals.lang("Set priority to low"), icon, Globals.lang("Priority low")));
+        icon = IconTheme.getImage("red");
+        // DO NOT TRANSLATE "prio1" etc. as this makes the .bib files non portable
+        values.add(new SpecialFieldValue(this, "prio1", "setPriority1", Localization.lang("Set priority to high"), icon, Localization.lang("Priority high")));
+        icon = IconTheme.getImage("orange");
+        values.add(new SpecialFieldValue(this, "prio2", "setPriority2", Localization.lang("Set priority to medium"), icon, Localization.lang("Priority medium")));
+        icon = IconTheme.getImage("green");
+        values.add(new SpecialFieldValue(this, "prio3", "setPriority3", Localization.lang("Set priority to low"), icon, Localization.lang("Priority low")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set priority to '%0' for %1 entries";
     }
@@ -62,11 +63,11 @@ public class Priority extends SpecialField {
 
     @Override
     public String getToolTip() {
-        return Globals.lang("Priority");
+        return Localization.lang("Priority");
     }
 
     @Override
     public String getMenuString() {
-        return Globals.lang("Priority");
+        return Localization.lang("Priority");
     }
 }

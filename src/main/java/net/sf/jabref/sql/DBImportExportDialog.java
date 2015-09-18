@@ -17,8 +17,8 @@ package net.sf.jabref.sql;
  */
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -55,11 +55,11 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
     // IMPORT
     public final List<String> listOfDBs = new ArrayList<String>();
-    public boolean moreThanOne = false;
+    public boolean moreThanOne;
     // EXPORT
     public String selectedDB = "";
-    public boolean hasDBSelected = false;
-    public boolean removeAction = false;
+    public boolean hasDBSelected;
+    public boolean removeAction;
     public int selectedInt = -1;
     private final DialogType dialogType;
 
@@ -90,8 +90,8 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         String dialogTopMessage;
         int tableSelectionModel;
         if (isExporter()) {
-            dialogTitle = Globals.lang("SQL Database Exporter");
-            dialogTopMessage = Globals.lang("Select target SQL database:");
+            dialogTitle = Localization.lang("SQL Database Exporter");
+            dialogTopMessage = Localization.lang("Select target SQL database:");
             tableSelectionModel = ListSelectionModel.SINGLE_SELECTION;
             table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "exportAction");
             table.getActionMap().put("exportAction", new AbstractAction() {
@@ -102,8 +102,8 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
                 }
             });
         } else {
-            dialogTitle = Globals.lang("SQL Database Importer");
-            dialogTopMessage = Globals.lang("Please select which JabRef databases do you want to import:");
+            dialogTitle = Localization.lang("SQL Database Importer");
+            dialogTopMessage = Localization.lang("Please select which JabRef databases do you want to import:");
             tableSelectionModel = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
             table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), "importAction");
             table.getActionMap().put("importAction", new AbstractAction() {
@@ -137,8 +137,8 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
 
         ButtonBarBuilder b = new ButtonBarBuilder();
         b.addGlue();
-        JButton importButton = new JButton(Globals.lang("Import"));
-        JButton exportButton = new JButton(Globals.lang("Export"));
+        JButton importButton = new JButton(Localization.lang("Import"));
+        JButton exportButton = new JButton(Localization.lang("Export"));
         if (isImporter()) {
             b.addButton(importButton);
         } else {
@@ -146,10 +146,10 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         }
 
         b.addRelatedGap();
-        JButton cancelButton = new JButton(Globals.lang("Cancel"));
+        JButton cancelButton = new JButton(Localization.lang("Cancel"));
         b.addButton(cancelButton);
         b.addRelatedGap();
-        JButton removeButton = new JButton(Globals.lang("Remove Selected"));
+        JButton removeButton = new JButton(Localization.lang("Remove Selected"));
         b.addButton(removeButton);
 
         b.addGlue();
@@ -204,11 +204,11 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
     }
 
     private boolean isImporter() {
-        return this.dialogType.equals(DialogType.IMPORTER);
+        return this.dialogType == DialogType.IMPORTER;
     }
 
     public boolean isExporter() {
-        return this.dialogType.equals(DialogType.EXPORTER);
+        return this.dialogType == DialogType.EXPORTER;
     }
 
     public JDialog getDiag() {

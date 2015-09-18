@@ -17,7 +17,8 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.logic.l10n.Localization;
 
 class UndoableResetGroups extends AbstractUndoableEdit {
 
@@ -38,14 +39,14 @@ class UndoableResetGroups extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": "
-                + Globals.lang("clear all groups");
+        return Localization.lang("Undo") + ": "
+                + Localization.lang("clear all groups");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": "
-                + Globals.lang("clear all groups");
+        return Localization.lang("Redo") + ": "
+                + Localization.lang("clear all groups");
     }
 
     @Override

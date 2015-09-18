@@ -44,6 +44,11 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
 
 public class IntegrityWizard extends JDialog implements ActionListener {
 
@@ -76,7 +81,7 @@ public class IntegrityWizard extends JDialog implements ActionListener {
         this.setResizable(false);
 
         // messages
-        this.setTitle(Globals.lang("Integrity_check"));//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
+        this.setTitle(Localization.lang("Integrity_check"));//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
         //warnPanel = new IntegrityMessagePanel() ;
         //this.setTitle( "Experimental feature - Integrity Check") ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
         warnPanel = new IntegrityMessagePanel(basePanel);
@@ -90,9 +95,9 @@ public class IntegrityWizard extends JDialog implements ActionListener {
         con.fill = GridBagConstraints.HORIZONTAL;
 
         // Buttons
-        startButton = new JButton(Globals.lang("Scan"));
+        startButton = new JButton(Localization.lang("Scan"));
         startButton.addActionListener(this);
-        closeButton = new JButton(Globals.lang("Close"));
+        closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(this);
 
         // insert Buttons

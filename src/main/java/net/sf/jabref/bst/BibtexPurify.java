@@ -25,9 +25,6 @@ package net.sf.jabref.bst;
  * pushes the resulting string. If the literal isn't a string, it complains and
  * pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class BibtexPurify {
 

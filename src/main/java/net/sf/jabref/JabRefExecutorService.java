@@ -42,16 +42,40 @@ public class JabRefExecutorService implements Executor {
             try {
                 future.get();
                 return;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
+
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void executeWithLowPriorityInOwnThread(Runnable runnable, String name) {
-        Thread thread = new Thread(runnable);
+    private static class AutoCleanupRunnable implements Runnable {
+
+        private final Runnable runnable;
+        private final ConcurrentLinkedQueue<Thread> startedThreads;
+
+        public Thread thread;
+
+        private AutoCleanupRunnable(Runnable runnable, ConcurrentLinkedQueue<Thread> startedThreads) {
+            this.runnable = runnable;
+            this.startedThreads = startedThreads;
+        }
+
+        @Override
+        public void run() {
+            try {
+                runnable.run();
+            } finally {
+                startedThreads.remove(thread);
+            }
+        }
+    }
+
+    public void executeWithLowPriorityInOwnThread(final Runnable runnable, String name) {
+        AutoCleanupRunnable target = new AutoCleanupRunnable(runnable, startedThreads);
+        final Thread thread = new Thread(target);
+        target.thread = thread;
         thread.setName("JabRef - " + name + " - low prio");
         startedThreads.add(thread);
         thread.setPriority(Thread.MIN_PRIORITY);
@@ -62,6 +86,7 @@ public class JabRefExecutorService implements Executor {
         // this is a special case method for Threads that cannot be interrupted so easily
         // this method should normally not be used
         startedThreads.add(thread);
+        // TODO memory leak when thread is finished
         thread.start();
     }
 
@@ -79,9 +104,10 @@ public class JabRefExecutorService implements Executor {
         while(true) {
             try {
                 thread.join();
+                startedThreads.remove(thread);
                 return;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
+
             }
         }
     }
@@ -91,6 +117,7 @@ public class JabRefExecutorService implements Executor {
         for(Thread thread : startedThreads) {
             thread.interrupt();
         }
+        startedThreads.clear();
     }
 
 }

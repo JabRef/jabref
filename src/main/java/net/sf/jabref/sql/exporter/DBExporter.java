@@ -32,21 +32,17 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.StringUtil;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.exporter.FileActions;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.groups.SearchGroup;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
@@ -68,7 +64,7 @@ import net.sf.jabref.sql.SQLUtil;
 public abstract class DBExporter extends DBImporterExporter {
 
     private final String fieldStr = SQLUtil.getFieldStr();
-    DBStrings dbStrings = null;
+    DBStrings dbStrings;
     private final ArrayList<String> dbNames = new ArrayList<String>();
 
 
@@ -230,7 +226,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 existentTypes.add(rs.getString(1));
             }
         }
-        for (BibtexEntryType val : BibtexEntryType.ALL_TYPES.values()) {
+        for (BibtexEntryType val : BibtexEntryType.getAllValues()) {
             fieldRequirement.clear();
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 fieldRequirement.add(i, "gen");
@@ -287,8 +283,11 @@ public abstract class DBExporter extends DBImporterExporter {
             int currentID, Object out, int database_id) throws SQLException {
 
         AbstractGroup group = cursor.getGroup();
-        String searchField = null, searchExpr = null, caseSens = null, reg_exp = null;
-        int hierContext = group.getHierarchicalContext();
+        String searchField = null;
+        String searchExpr = null;
+        String caseSens = null;
+        String reg_exp = null;
+        GroupHierarchyType hierContext = group.getHierarchicalContext();
         if (group instanceof KeywordGroup) {
             searchField = ((KeywordGroup) group).getSearchField();
             searchExpr = ((KeywordGroup) group).getSearchExpression();
@@ -327,7 +326,7 @@ public abstract class DBExporter extends DBImporterExporter {
                         + (caseSens != null ? '\'' + caseSens + '\'' : "NULL")
                         + ", "
                         + (reg_exp != null ? '\'' + reg_exp + '\'' : "NULL")
-                        + ", " + hierContext + ", '" + database_id + "');");
+                        + ", " + hierContext.ordinal() + ", '" + database_id + "');");
         // recurse on child nodes (depth-first traversal)
         Object response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='"
@@ -569,7 +568,7 @@ public abstract class DBExporter extends DBImporterExporter {
         Vector<Vector<String>> matrix = new Vector<Vector<String>>();
         dbNames.clear();
         v = new Vector<String>();
-        v.add(Globals.lang("< CREATE NEW DATABASE >"));
+        v.add(Localization.lang("< CREATE NEW DATABASE >"));
         matrix.add(v);
         while (rs.next()) {
             v = new Vector<String>();

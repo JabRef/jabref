@@ -8,6 +8,8 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -26,17 +28,17 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     private final EventList<TableEntry> entries = new BasicEventList<TableEntry>();
     //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
-    private boolean okPressed = false;
+    private boolean okPressed;
     private final JabRefFrame frame;
     private final int warningLimit;
 
 
     public FetcherPreviewDialog(JabRefFrame frame, int warningLimit, int tableRowHeight) {
-        super(frame, Globals.lang("Title"), true);
+        super(frame, Localization.lang("Title"), true);
         this.frame = frame;
         this.warningLimit = warningLimit;
 
-        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("Ok"));
         ok.addActionListener(new ActionListener() {
 
             @Override
@@ -47,7 +49,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                 }
             }
         });
-        JButton cancel = new JButton(Globals.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
             @Override
@@ -56,7 +58,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                 dispose();
             }
         });
-        JButton selectAll = new JButton(Globals.lang("Select all"));
+        JButton selectAll = new JButton(Localization.lang("Select all"));
         selectAll.addActionListener(new ActionListener() {
 
             @Override
@@ -64,7 +66,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
                 setSelectionAll(true);
             }
         });
-        JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+        JButton deselectAll = new JButton(Localization.lang("Deselect all"));
         deselectAll.addActionListener(new ActionListener() {
 
             @Override
@@ -132,10 +134,10 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         }
         if (selected > warningLimit) {
             int result = JOptionPane.showConfirmDialog(this,
-                    Globals.lang("You have selected more than %0 entries for download. Some web sites "
-                            + "might block you if you make too many rapid downloads. Do you want to continue?",
+                    Localization.lang("You have selected more than %0 entries for download. Some web sites "
+                                    + "might block you if you make too many rapid downloads. Do you want to continue?",
                             String.valueOf(warningLimit)),
-                    Globals.lang("Confirm selection"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    Localization.lang("Confirm selection"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             return result == JOptionPane.YES_OPTION;
         } else {
             return true;
@@ -173,7 +175,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
         private final String id;
         private final JLabel preview;
-        private boolean wanted = false;
+        private boolean wanted;
 
 
         public TableEntry(String id, JLabel preview) {
@@ -265,9 +267,9 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         @Override
         public String getColumnName(int i) {
             if (i == 0) {
-                return Globals.lang("Keep");
+                return Localization.lang("Keep");
             } else {
-                return Globals.lang("Preview");
+                return Localization.lang("Preview");
             }
         }
 

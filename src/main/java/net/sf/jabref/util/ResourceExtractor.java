@@ -20,10 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.JabRef;
-import net.sf.jabref.Worker;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.net.URLDownload;
 
 /**
  * This class performs the somewhat weird action of extracting a file from within the running JabRef jar,
@@ -40,6 +43,8 @@ public class ResourceExtractor implements Worker {
     private final URL resource;
     private final Component parent;
     private final File destination;
+    
+    private static final Log LOGGER = LogFactory.getLog(ResourceExtractor.class);
 
 
     /** Creates a new instance of ResourceExtractor */
@@ -52,11 +57,11 @@ public class ResourceExtractor implements Worker {
 
     @Override
     public void run() {
-        URLDownload ud = URLDownload.buildMonitoredDownload(parent, resource);
+        URLDownload ud = MonitoredURLDownload.buildMonitoredDownload(parent, resource);
         try {
             ud.downloadToFile(destination);
         } catch (IOException ex) {
-            Globals.logger("Error extracting resource: " + ex.getMessage());
+            LOGGER.info("Error extracting resource: " + ex.getMessage());
         }
     }
 }

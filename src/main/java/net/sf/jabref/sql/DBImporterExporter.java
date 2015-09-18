@@ -11,13 +11,10 @@ import net.sf.jabref.MetaData;
 
 public class DBImporterExporter {
 
-    public void removeDB(DBImportExportDialog dialogo, String dbName,
-            Connection conn, MetaData metadata) throws SQLException {
+    public void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, MetaData metadata) throws SQLException {
         if (dialogo.removeAction) {
             if ((dialogo.selectedInt <= 0) && dialogo.isExporter()) {
-                JOptionPane.showMessageDialog(dialogo.getDiag(),
-                        "Please select a DB to be removed", "SQL Export",
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(dialogo.getDiag(), "Please select a DB to be removed", "SQL Export", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 removeAGivenDB(conn, getDatabaseIDByName(metadata, conn, dbName));
             }
@@ -38,13 +35,10 @@ public class DBImporterExporter {
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
-    protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName)
-            throws SQLException {
+    protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
 
         if (out instanceof Connection) {
-            Object response = SQLUtil.processQueryWithResults(out,
-                    "SELECT database_id FROM jabref_database WHERE database_name='"
-                            + dbName + "';");
+            Object response = SQLUtil.processQueryWithResults(out, "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
             ResultSet rs = ((Statement) response).getResultSet();
             if (rs.next()) {
                 return rs.getInt("database_id");
@@ -62,9 +56,7 @@ public class DBImporterExporter {
 
     private void removeAGivenDB(Object out, int database_id) throws SQLException {
         removeAllRecordsForAGivenDB(out, database_id);
-        SQLUtil.processQuery(out,
-                "DELETE FROM jabref_database WHERE database_id='" + database_id
-                        + "';");
+        SQLUtil.processQuery(out, "DELETE FROM jabref_database WHERE database_id='" + database_id + "';");
     }
 
     /**
@@ -78,14 +70,10 @@ public class DBImporterExporter {
      *            Id of the database being exported.
      * @throws SQLException
      */
-    protected void removeAllRecordsForAGivenDB(Object out, int database_id)
-            throws SQLException {
-        SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='"
-                + database_id + "';");
-        SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='"
-                + database_id + "';");
-        SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='"
-                + database_id + "';");
+    protected void removeAllRecordsForAGivenDB(Object out, int database_id) throws SQLException {
+        SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='" + database_id + "';");
+        SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='" + database_id + "';");
+        SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='" + database_id + "';");
     }
 
     /**
@@ -100,17 +88,14 @@ public class DBImporterExporter {
      *
      * @throws SQLException
      */
-    private void insertJabRefDatabase(final MetaData metaData, Object out,
-            String dbName) throws SQLException {
+    private void insertJabRefDatabase(final MetaData metaData, Object out, String dbName) throws SQLException {
         String path;
-        if (null == metaData.getFile()) {
+        if (metaData.getFile() == null) {
             path = dbName;
         } else {
             path = metaData.getFile().getAbsolutePath();
         }
-        SQLUtil.processQuery(out,
-                "INSERT INTO jabref_database(database_name, md5_path) VALUES ('"
-                        + dbName + "', md5('" + path + "'));");
+        SQLUtil.processQuery(out, "INSERT INTO jabref_database(database_name, md5_path) VALUES ('" + dbName + "', md5('" + path + "'));");
     }
 
 }

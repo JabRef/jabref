@@ -18,11 +18,11 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoablePreambleChange;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoablePreambleChange;
+import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleChange extends Change {
 
@@ -39,16 +39,16 @@ class PreambleChange extends Change {
 
         StringBuilder text = new StringBuilder();
         text.append("<FONT SIZE=3>");
-        text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
+        text.append("<H2>").append(Localization.lang("Changed preamble")).append("</H2>");
 
-        if ((disk != null) && !disk.isEmpty()) {
-            text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
+        if (disk != null && !disk.isEmpty()) {
+            text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
         } else {
-            text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+            text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
         }
 
-        if ((mem != null) && !mem.isEmpty()) {
-            text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
+        if (mem != null && !mem.isEmpty()) {
+            text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
         }
 
         //tp.setContentType("text/html");

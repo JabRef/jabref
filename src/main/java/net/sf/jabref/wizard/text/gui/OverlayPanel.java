@@ -62,7 +62,7 @@ class OverlayPanel extends JPanel {
         int len = label.getWidth();
 
         Dimension dim = this.getSize();
-        if ((dim.height > 25) && (dim.width > (len + 10))) {
+        if (dim.height > 25 && dim.width > len + 10) {
             int x = (dim.width - len) / 2;
             int y = dim.height / 2;
 

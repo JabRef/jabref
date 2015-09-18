@@ -54,12 +54,12 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.integrity.IntegrityCheck;
 import net.sf.jabref.wizard.integrity.IntegrityMessage;
 import net.sf.jabref.wizard.text.gui.HintListModel;
@@ -101,14 +101,14 @@ public class IntegrityMessagePanel
         JPanel fixPanel = new JPanel();
         //    BoxLayout box = new BoxLayout(fixPanel, BoxLayout.LINE_AXIS) ;
 
-        JLabel label1 = new JLabel(Globals.lang("Field_content"));
+        JLabel label1 = new JLabel(Localization.lang("Field_content"));
 
         content = new JTextField(40);
         content.addKeyListener(this);
-        applyButton = new JButton(Globals.lang("Apply"));
+        applyButton = new JButton(Localization.lang("Apply"));
         applyButton.addActionListener(this);
         applyButton.setEnabled(false);
-        JButton fixButton = new JButton(Globals.lang("Suggest"));
+        JButton fixButton = new JButton(Localization.lang("Suggest"));
         fixButton.setEnabled(false);
 
         fixPanel.add(label1);
@@ -225,10 +225,10 @@ public class IntegrityMessagePanel
     class IntegrityListRenderer extends DefaultListCellRenderer
     {
 
-        final ImageIcon warnIcon = GUIGlobals.getImage("integrityWarn");
-        final ImageIcon infoIcon = GUIGlobals.getImage("integrityInfo");
-        final ImageIcon failIcon = GUIGlobals.getImage("integrityFail");
-        final ImageIcon fixedIcon = GUIGlobals.getImage("complete");
+        final ImageIcon warnIcon = IconTheme.getImage("integrityWarn");
+        final ImageIcon infoIcon = IconTheme.getImage("integrityInfo");
+        final ImageIcon failIcon = IconTheme.getImage("integrityFail");
+        final ImageIcon fixedIcon = IconTheme.getImage("complete");
 
 
         @Override

@@ -15,14 +15,13 @@
 */
 package net.sf.jabref.collab;
 
-import net.sf.jabref.FileUtil;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.io.FileUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.logging.Logger;
 
 /**
  * This thread monitors a set of files, each associated with a FileUpdateListener, for changes
@@ -30,28 +29,22 @@ import java.util.logging.Logger;
  */
 public class FileUpdateMonitor implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(FileUpdateMonitor.class.getName());
+    private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;
 
-    private int numberOfUpdateListener = 0;
+    private int numberOfUpdateListener;
     private final HashMap<String, Entry> entries = new HashMap<String, Entry>();
 
     @Override
     public void run() {
         // The running variable is used to make the thread stop when needed.
         while (true) {
-            //System.out.println("Polling...");
-            Iterator<String> i = entries.keySet().iterator();
-            for (; i.hasNext();) {
-                Entry e = entries.get(i.next());
+            for(Entry e : entries.values()) {
                 try {
                     if (e.hasBeenUpdated()) {
                         e.notifyListener();
                     }
-
-                    //else
-                    //System.out.println("File '"+e.file.getPath()+"' not modified.");
                 } catch (IOException ex) {
                     e.notifyFileRemoved();
                 }
@@ -61,7 +54,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                FileUpdateMonitor.logger.finest("FileUpdateMonitor has been interrupted.");
+                LOGGER.debug("FileUpdateMonitor has been interrupted. Terminating...");
                 return;
             }
         }
@@ -158,7 +151,8 @@ public class FileUpdateMonitor implements Runnable {
         final FileUpdateListener listener;
         final File file;
         final File tmpFile;
-        long timeStamp, fileSize;
+        long timeStamp;
+        long fileSize;
 
 
         public Entry(FileUpdateListener ul, File f) {
@@ -182,7 +176,7 @@ public class FileUpdateMonitor implements Runnable {
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
-            return (timeStamp != modified) || (fileSize != fileSizeNow);
+            return timeStamp != modified || fileSize != fileSizeNow;
         }
 
         public void updateTimeStamp() {
@@ -202,7 +196,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 res = FileUtil.copyFile(file, tmpFile, true);
             } catch (IOException ex) {
-                Globals.logger("Cannot copy to temporary file '" + tmpFile.getPath() + '\'');
+                LOGGER.info("Cannot copy to temporary file '" + tmpFile.getPath() + '\'', ex);
             }
             //Util.pr("</copy>");
             return res;

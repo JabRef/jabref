@@ -22,9 +22,13 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 class EntryChange extends Change {
 
@@ -44,7 +48,7 @@ class EntryChange extends Change {
 
         // Another (unlikely?) possibility is that both disk and mem version has been modified
         // in the same way. Check for this, too.
-        boolean modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
+        boolean modificationsAgree = DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1;
 
         //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
         //        +" Modifications agree: "+modificationsAgree);
@@ -55,15 +59,17 @@ class EntryChange extends Change {
         allFields.addAll(diskEntry.getAllFields());
 
         for (String field : allFields) {
-            String mem = memEntry.getField(field), tmp = tmpEntry.getField(field), disk = diskEntry.getField(field);
+            String mem = memEntry.getField(field);
+            String tmp = tmpEntry.getField(field);
+            String disk = diskEntry.getField(field);
 
-            if ((tmp != null) && (disk != null)) {
+            if (tmp != null && disk != null) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
                     add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
                 }
-            } else if ((tmp == null) && (disk != null) && !disk.isEmpty() || (disk == null) && (tmp != null) && !tmp.isEmpty()
-                    && (mem != null) && !mem.isEmpty()) {
+            } else if (tmp == null && disk != null && !disk.isEmpty() || disk == null && tmp != null && !tmp.isEmpty()
+                    && mem != null && !mem.isEmpty()) {
                 // Added externally.
                 add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
             }
@@ -125,19 +131,19 @@ class EntryChange extends Change {
 
             StringBuilder text = new StringBuilder();
             text.append("<FONT SIZE=10>");
-            text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
+            text.append("<H2>").append(Localization.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
-            if ((onDisk != null) && !onDisk.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
+            if (onDisk != null && !onDisk.isEmpty()) {
+                text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + ' ').append(onDisk);
             } else {
-                text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+                text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
             }
 
-            if ((inMem != null) && !inMem.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + ' ').append(inMem);
+            if (inMem != null && !inMem.isEmpty()) {
+                text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + ' ').append(inMem);
             }
-            if ((onTmp != null) && !onTmp.isEmpty()) {
-                text.append("<H3>").append(Globals.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
+            if (onTmp != null && !onTmp.isEmpty()) {
+                text.append("<H3>").append(Localization.lang("Current tmp value")).append(":</H3>" + ' ').append(onTmp);
             } else {
                 // No value in memory.
                 /*if ((onTmp != null) && !onTmp.equals(inMem))

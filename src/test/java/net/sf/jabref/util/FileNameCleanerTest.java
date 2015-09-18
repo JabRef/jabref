@@ -1,5 +1,6 @@
 package net.sf.jabref.util;
 
+import net.sf.jabref.logic.util.io.FileNameCleaner;
 import org.junit.Assert;
 import org.junit.Test;
 

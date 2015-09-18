@@ -28,42 +28,43 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.MnemonicAwareAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Editor for external file types.
  */
 public class ExternalFileTypeEditor extends JDialog {
 
-    private JFrame frame = null;
-    private JDialog dialog = null;
+    private JFrame frame;
+    private JDialog dialog;
     private ArrayList<ExternalFileType> fileTypes;
     private JTable table;
-    private ExternalFileTypeEntryEditor entryEditor = null;
+    private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
-    private final JButton ok = new JButton(Globals.lang("Ok"));
-    private final JButton cancel = new JButton(Globals.lang("Cancel"));
-    private final JButton add = new JButton(GUIGlobals.getImage("add"));
-    private final JButton remove = new JButton(GUIGlobals.getImage("remove"));
-    private final JButton edit = new JButton(GUIGlobals.getImage("edit"));
-    private final JButton toDefaults = new JButton(Globals.lang("Default"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private final JButton add = new JButton(IconTheme.getImage("add"));
+    private final JButton remove = new JButton(IconTheme.getImage("remove"));
+    private final JButton edit = new JButton(IconTheme.getImage("edit"));
+    private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
 
     private ExternalFileTypeEditor(JFrame frame) {
-        super(frame, Globals.lang("Manage external file types"), true);
+        super(frame, Localization.lang("Manage external file types"), true);
         this.frame = frame;
         init();
     }
 
     private ExternalFileTypeEditor(JDialog dialog) {
-        super(dialog, Globals.lang("Manage external file types"), true);
+        super(dialog, Localization.lang("Manage external file types"), true);
         this.dialog = dialog;
         init();
     }
@@ -220,7 +221,7 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new");
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.getImage("new"));
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
@@ -243,7 +244,7 @@ public class ExternalFileTypeEditor extends JDialog {
                 fileTypes.remove(rows[i]);
             }
             tableModel.fireTableDataChanged();
-            if (fileTypes.size() > 0) {
+            if (!fileTypes.isEmpty()) {
                 int row = Math.min(rows[0], fileTypes.size() - 1);
                 table.setRowSelectionInterval(row, row);
             }
@@ -296,13 +297,13 @@ public class ExternalFileTypeEditor extends JDialog {
             case 0:
                 return " ";
             case 1:
-                return Globals.lang("Name");
+                return Localization.lang("Name");
             case 2:
-                return Globals.lang("Extension");
+                return Localization.lang("Extension");
             case 3:
-                return Globals.lang("MIME type");
+                return Localization.lang("MIME type");
             case 4:
-                return Globals.lang("Application");
+                return Localization.lang("Application");
             default:
                 return null;
             }
@@ -363,9 +364,9 @@ public class ExternalFileTypeEditor extends JDialog {
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
 
-        private JabRefFrame frame = null;
-        private JDialog dialog = null;
-        ExternalFileTypeEditor editor = null;
+        private JabRefFrame frame;
+        private JDialog dialog;
+        ExternalFileTypeEditor editor;
 
 
         public EditExternalFileTypesAction(JabRefFrame frame) {

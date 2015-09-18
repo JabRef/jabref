@@ -29,9 +29,6 @@ package net.sf.jabref.bst;
  * needed matching |right_brace|s. If any of the types is incorrect, it
  * complains and pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class BibtexTextPrefix {
 

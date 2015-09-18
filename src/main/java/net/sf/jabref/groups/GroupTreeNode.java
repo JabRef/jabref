@@ -26,17 +26,21 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.SearchRule;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
+import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
- * 
+ *
  * @author jzieren
  */
-public class GroupTreeNode extends DefaultMutableTreeNode implements
-        Transferable {
+public class GroupTreeNode extends DefaultMutableTreeNode implements Transferable {
 
     public static final DataFlavor flavor;
     private static final DataFlavor[] flavors;
@@ -50,7 +54,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
             // never happens
         }
         flavor = df;
-        flavors = new DataFlavor[] {GroupTreeNode.flavor};
+        flavors = new DataFlavor[]{GroupTreeNode.flavor};
     }
 
 
@@ -87,7 +91,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
             cursor = e.nextElement();
-            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup().toString()).append("\n");
+            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup()).append("\n");
         }
         return sb.toString();
     }
@@ -95,7 +99,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     /**
      * Creates a deep copy of this node and all of its children, including all
      * groups.
-     * 
+     *
      * @return This object's deep copy.
      */
     public GroupTreeNode deepCopy() {
@@ -123,9 +127,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 
     /**
      * @return An indexed path from the root node to this node. The elements in
-     *         the returned array represent the child index of each node in the
-     *         path. If this node is the root node, the returned array has zero
-     *         elements.
+     * the returned array represent the child index of each node in the
+     * path. If this node is the root node, the returned array has zero
+     * elements.
      */
     public int[] getIndexedPath() {
         TreeNode[] path = getPath();
@@ -149,18 +153,17 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     /**
-     * @param indexedPath
-     *            A sequence of child indices that describe a path from this
-     *            node to one of its desendants. Be aware that if <b>indexedPath
-     *            </b> was obtained by getIndexedPath(), this node should
-     *            usually be the root node.
+     * @param indexedPath A sequence of child indices that describe a path from this
+     *                    node to one of its desendants. Be aware that if <b>indexedPath
+     *                    </b> was obtained by getIndexedPath(), this node should
+     *                    usually be the root node.
      * @return The descendant found by evaluating <b>indexedPath </b>. If the
-     *         path could not be traversed completely (i.e. one of the child
-     *         indices did not exist), null will be returned.
+     * path could not be traversed completely (i.e. one of the child
+     * indices did not exist), null will be returned.
      */
     public GroupTreeNode getDescendant(int[] indexedPath) {
         GroupTreeNode cursor = this;
-        for (int i = 0; (i < indexedPath.length) && (cursor != null); ++i) {
+        for (int i = 0; i < indexedPath.length && cursor != null; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
         }
         return cursor;
@@ -172,29 +175,28 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
      * children's groups (recursively), or the intersection of the elements in
      * its own group and its parent's group. This setting is configured in the
      * group contained in this node.
-     * 
+     *
      * @return A SearchRule that finds the desired elements.
      */
     public SearchRule getSearchRule() {
         return getSearchRule(getGroup().getHierarchicalContext());
     }
 
-    private SearchRule getSearchRule(int originalContext) {
-        final int context = getGroup().getHierarchicalContext();
-        if (context == AbstractGroup.INDEPENDENT) {
+    private SearchRule getSearchRule(GroupHierarchyType originalContext) {
+        final GroupHierarchyType context = getGroup().getHierarchicalContext();
+        if (context == GroupHierarchyType.INDEPENDENT) {
             return getGroup().getSearchRule();
         }
-        AndOrSearchRuleSet searchRule = new AndOrSearchRuleSet(
-                context == AbstractGroup.REFINING, false);
+        SearchRuleSet searchRule = SearchRuleSets.build(context == GroupHierarchyType.REFINING ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
         searchRule.addRule(getGroup().getSearchRule());
-        if ((context == AbstractGroup.INCLUDING)
-                && (originalContext != AbstractGroup.REFINING)) {
+        if (context == GroupHierarchyType.INCLUDING
+                && originalContext != GroupHierarchyType.REFINING) {
             for (int i = 0; i < getChildCount(); ++i) {
                 searchRule.addRule(((GroupTreeNode) getChildAt(i))
                         .getSearchRule(originalContext));
             }
-        } else if ((context == AbstractGroup.REFINING) && !isRoot()
-                && (originalContext != AbstractGroup.INCLUDING)) {
+        } else if (context == GroupHierarchyType.REFINING && !isRoot()
+                && originalContext != GroupHierarchyType.INCLUDING) {
             searchRule.addRule(((GroupTreeNode) getParent())
                     .getSearchRule(originalContext));
         }
@@ -227,7 +229,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 
     /**
      * Scans the subtree rooted at this node.
-     * 
+     *
      * @return All groups that contain the specified entry.
      */
     public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
@@ -235,7 +237,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         Enumeration<GroupTreeNode> e = preorderEnumeration();
         AbstractGroup group;
         while (e.hasMoreElements()) {
-            group = (e.nextElement()).getGroup();
+            group = e.nextElement().getGroup();
             if (group.contains(null, entry)) {
                 matchingGroups.add(group);
             }
@@ -246,12 +248,12 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     public boolean canMoveUp() {
-        return (getPreviousSibling() != null)
+        return getPreviousSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
-        return (getNextSibling() != null)
+        return getNextSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
@@ -261,7 +263,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     public boolean canMoveRight() {
-        return (getPreviousSibling() != null)
+        return getPreviousSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
@@ -280,7 +282,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     public AbstractUndoableEdit moveDown(GroupSelector groupSelector) {
         final GroupTreeNode myParent = (GroupTreeNode) getParent();
         final int index = myParent.getIndex(this);
-        if (index < (parent.getChildCount() - 1)) {
+        if (index < parent.getChildCount() - 1) {
             UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                     groupSelector.getGroupTreeRoot(), this, myParent, index + 1);
             myParent.insert(this, index + 1);
@@ -319,24 +321,24 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     }
 
     /**
-     * @param path
-     *            A sequence of child indices that designate a node relative to
-     *            this node.
+     * @param path A sequence of child indices that designate a node relative to
+     *             this node.
      * @return The node designated by the specified path, or null if one or more
-     *         indices in the path could not be resolved.
+     * indices in the path could not be resolved.
      */
     public GroupTreeNode getChildAt(int[] path) {
         GroupTreeNode cursor = this;
-        for (int i = 0; (i < path.length) && (cursor != null); ++i) {
+        for (int i = 0; i < path.length && cursor != null; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(path[i]);
         }
         return cursor;
     }
 
-    /** Adds the selected entries to this node's group. */
+    /**
+     * Adds the selected entries to this node's group.
+     */
     public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
-        if (getGroup() == null)
-         {
+        if (getGroup() == null) {
             return null; // paranoia
         }
         AbstractUndoableEdit undo = getGroup().add(entries);
@@ -346,10 +348,11 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         return undo;
     }
 
-    /** Removes the selected entries from this node's group. */
+    /**
+     * Removes the selected entries from this node's group.
+     */
     public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
-        if (getGroup() == null)
-         {
+        if (getGroup() == null) {
             return null; // paranoia
         }
         AbstractUndoableEdit undo = getGroup().remove(entries);
@@ -392,10 +395,10 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         }
         AbstractGroup g1 = getGroup();
         AbstractGroup g2 = otherNode.getGroup();
-        if (((g1 == null) && (g2 != null)) || ((g1 != null) && (g2 == null))) {
+        if (g1 == null && g2 != null || g1 != null && g2 == null) {
             return false;
         }
-        if ((g1 != null) && (g2 != null) && !g1.equals(g2)) {
+        if (g1 != null && g2 != null && !g1.equals(g2)) {
             return false;
         }
         for (int i = 0; i < getChildCount(); ++i) {

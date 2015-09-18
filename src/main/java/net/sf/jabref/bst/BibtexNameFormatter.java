@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.bst;
 
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.AuthorList.Author;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.AuthorList.Author;
 
 /**
  * From Bibtex:
@@ -99,7 +99,7 @@ public class BibtexNameFormatter {
                 i--; // unskip last brace (for last i++ at the end)
                 String control = level1Chars.toString().toLowerCase();
 
-                if (control.length() == 0) {
+                if (control.isEmpty()) {
                     continue;
                 }
 
@@ -224,6 +224,7 @@ public class BibtexNameFormatter {
                 }
                 if (sb.length() > 0) {
                     boolean noDisTie = false;
+                    // @formatter:off
                     if ((sb.charAt(sb.length() - 1) == '~') &&
                             ((BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
                             ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
@@ -232,6 +233,7 @@ public class BibtexNameFormatter {
                             sb.append(' ');
                         }
                     }
+                    // @formatter:on
                 }
             } else if (c[i] == '}') {
                 if (warn != null) {

@@ -23,14 +23,19 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 public class PushToLyx implements PushToApplication {
 
     private final JTextField lyxPipe = new JTextField(30);
-    private JPanel settings = null;
+    private JPanel settings;
 
-    private boolean couldNotFindPipe = false;
-    private boolean couldNotWrite = false;
+    private boolean couldNotFindPipe;
+    private boolean couldNotWrite;
 
 
     @Override
@@ -39,7 +44,7 @@ public class PushToLyx implements PushToApplication {
         couldNotFindPipe = false;
         couldNotWrite = false;
 
-        String lyxpipeSetting = Globals.prefs.get("lyxpipe");
+        String lyxpipeSetting = Globals.prefs.get(JabRefPreferences.LYXPIPE);
         if (!lyxpipeSetting.endsWith(".in")) {
             lyxpipeSetting = lyxpipeSetting + ".in";
         }
@@ -78,7 +83,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public String getName() {
-        return Globals.lang("Insert selected citations into LyX/Kile");
+        return Localization.lang("Insert selected citations into LyX/Kile");
     }
 
     @Override
@@ -88,12 +93,12 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Globals.lang("Push selection to LyX/Kile");
+        return Localization.lang("Push selection to LyX/Kile");
     }
 
     @Override
     public Icon getIcon() {
-        return GUIGlobals.getImage("lyx");
+        return IconTheme.getImage("lyx");
     }
 
     @Override
@@ -104,15 +109,15 @@ public class PushToLyx implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotFindPipe) {
-            panel.output(Globals.lang("Error") + ": " + Globals.lang("verify that LyX is running and that the lyxpipe is valid")
-                    + ". [" + Globals.prefs.get("lyxpipe") + "]");
+            panel.output(Localization.lang("Error") + ": " + Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                    + ". [" + Globals.prefs.get(JabRefPreferences.LYXPIPE) + "]");
         } else if (couldNotWrite) {
-            panel.output(Globals.lang("Error") + ": " + Globals.lang("unable to write to") + " " + Globals.prefs.get("lyxpipe") +
+            panel.output(Localization.lang("Error") + ": " + Localization.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
                     ".in");
         } else {
 
             String message = "";
-            panel.output(Globals.lang("Pushed the citations for the following rows to") + " Lyx: " +
+            panel.output(Localization.lang("Pushed the citations for the following rows to") + " Lyx: " +
                     message);
         }
 
@@ -128,18 +133,18 @@ public class PushToLyx implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        lyxPipe.setText(Globals.prefs.get("lyxpipe"));
+        lyxPipe.setText(Globals.prefs.get(JabRefPreferences.LYXPIPE));
         return settings;
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("lyxpipe", lyxPipe.getText());
+        Globals.prefs.put(JabRefPreferences.LYXPIPE, lyxPipe.getText());
     }
 
     private void initSettingsPanel() {
         settings = new JPanel();
-        settings.add(new JLabel(Globals.lang("Path to LyX pipe") + ":"));
+        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
         settings.add(lyxPipe);
     }
     /*class Timeout extends javax.swing.Timer

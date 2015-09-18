@@ -36,10 +36,24 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OpenFileFilter;
+import net.sf.jabref.gui.UrlDragDrop;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.util.XMPUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.FileFinder;
+import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
  * Initial Version:
@@ -64,9 +78,10 @@ public class ExternalFilePanel extends JPanel {
 
     private final MetaData metaData;
 
+    private static final Log LOGGER = LogFactory.getLog(ExternalFilePanel.class);
 
-    public ExternalFilePanel(final String fieldName, final MetaData metaData,
-            final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
+
+    public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
         this(null, metaData, null, fieldName, off, editor);
         this.entry = entry;
         this.entryEditor = null;
@@ -83,11 +98,11 @@ public class ExternalFilePanel extends JPanel {
 
         setLayout(new GridLayout(2, 2));
 
-        JButton browseBut = new JButton(Globals.lang("Browse"));
-        JButton download = new JButton(Globals.lang("Download"));
-        JButton auto = new JButton(Globals.lang("Auto"));
-        JButton xmp = new JButton(Globals.lang("Write XMP"));
-        xmp.setToolTipText(Globals.lang("Write BibtexEntry as XMP-metadata to PDF."));
+        JButton browseBut = new JButton(Localization.lang("Browse"));
+        JButton download = new JButton(Localization.lang("Download"));
+        JButton auto = new JButton(Localization.lang("Auto"));
+        JButton xmp = new JButton(Localization.lang("Write XMP"));
+        xmp.setToolTipText(Localization.lang("Write BibtexEntry as XMP-metadata to PDF."));
 
         browseBut.addActionListener(new ActionListener() {
 
@@ -144,15 +159,15 @@ public class ExternalFilePanel extends JPanel {
     }
 
     private BibtexDatabase getDatabase() {
-        return (database != null ? database : entryEditor.getDatabase());
+        return database != null ? database : entryEditor.getDatabase();
     }
 
     private BibtexEntry getEntry() {
-        return (entry != null ? entry : entryEditor.getEntry());
+        return entry != null ? entry : entryEditor.getEntry();
     }
 
     private Object getKey() {
-        return getEntry().getField(BibtexFields.KEY_FIELD);
+        return getEntry().getField(BibtexEntry.KEY_FIELD);
     }
 
     private void output(String s) {
@@ -168,7 +183,7 @@ public class ExternalFilePanel extends JPanel {
             @Override
             public void run() {
 
-                output(Globals.lang("Looking for pdf..."));
+                output(Localization.lang("Looking for pdf..."));
 
                 // Find the default directory for this field type, if any:
                 String[] dirs = metaData.getFileDirectory(fieldName);
@@ -186,25 +201,25 @@ public class ExternalFilePanel extends JPanel {
 
                 final File finalFile = file;
 
-                output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
+                output(Localization.lang("Writing XMP to '%0'...", finalFile.getName()));
                 try {
                     XMPUtil.writeXMP(finalFile, getEntry(), getDatabase());
-                    output(Globals.lang("Wrote XMP to '%0'.", finalFile.getName()));
+                    output(Localization.lang("Wrote XMP to '%0'.", finalFile.getName()));
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(editor.getParent(),
-                            Globals.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
-                            Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    Globals.logger(Globals.lang("Error writing XMP to file: %0", finalFile
-                            .getAbsolutePath()));
-                    output(Globals.lang("Error writing XMP to file: %0", finalFile.getName()));
+                            Localization.lang("Error writing XMP to file: %0", e.getLocalizedMessage()),
+                            Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.info(Localization.lang("Error writing XMP to file: %0", finalFile
+                            .getAbsolutePath()), e);
+                    output(Localization.lang("Error writing XMP to file: %0", finalFile.getName()));
 
                 } catch (TransformerException e) {
                     JOptionPane.showMessageDialog(editor.getParent(),
-                            Globals.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
-                            Globals.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-                    Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
-                            finalFile.getAbsolutePath()));
-                    output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
+                            Localization.lang("Error converting BibTeX to XMP: %0", e.getLocalizedMessage()),
+                            Localization.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.info(Localization.lang("Error while converting BibtexEntry to XMP %0",
+                            finalFile.getAbsolutePath()), e);
+                    output(Localization.lang("Error converting XMP to '%0'...", finalFile.getName()));
                 }
             }
         });
@@ -214,14 +229,14 @@ public class ExternalFilePanel extends JPanel {
 
         String[] dirs = metaData.getFileDirectory(fieldName);
         String directory = null;
-        if (dirs.length > 0)
-         {
+        if (dirs.length > 0) {
             directory = dirs[0]; // Default to the first directory in the list
         }
 
-        String dir = editor.getText(), retVal;
+        String dir = editor.getText();
+        String retVal;
 
-        if ((directory == null) || !(new File(dir)).isAbsolute()) {
+        if (directory == null || !new File(dir).isAbsolute()) {
             if (directory != null) {
                 dir = directory;
             } else {
@@ -229,17 +244,15 @@ public class ExternalFilePanel extends JPanel {
             }
         }
 
-        String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName,
-                JFileChooser.OPEN_DIALOG, false);
+        String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldName, JFileChooser.OPEN_DIALOG, false);
 
         if (chosenFile != null) {
             File newFile = new File(chosenFile);
             String position = newFile.getParent();
 
-            if ((directory != null) && position.startsWith(directory)) {
+            if (directory != null && position.startsWith(directory)) {
                 // Construct path relative to pdf base dir
-                String relPath = position.substring(directory.length(), position.length())
-                        + File.separator + newFile.getName();
+                String relPath = position.substring(directory.length(), position.length()) + File.separator + newFile.getName();
 
                 // Remove leading path separator
                 if (relPath.startsWith(File.separator)) {
@@ -262,9 +275,9 @@ public class ExternalFilePanel extends JPanel {
             final Component parent) {
 
         final String res = JOptionPane.showInputDialog(parent,
-                Globals.lang("Enter URL to download"));
+                Localization.lang("Enter URL to download"));
 
-        if ((res == null) || (res.trim().isEmpty())) {
+        if (res == null || res.trim().isEmpty()) {
             return;
         }
 
@@ -292,8 +305,8 @@ public class ExternalFilePanel extends JPanel {
                     plannedName = getKey() + suffix;
                 } else {
                     plannedName = JOptionPane.showInputDialog(parent,
-                            Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));
-                    if ((plannedName != null) && !off.accept(plannedName)) {
+                            Localization.lang("BibTeX key not set. Enter a name for the downloaded file"));
+                    if (plannedName != null && !off.accept(plannedName)) {
                         plannedName += suffix;
                     }
                 }
@@ -304,10 +317,10 @@ public class ExternalFilePanel extends JPanel {
                  * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
                  * 
                  */
-                if (Globals.ON_WIN) {
+                if (OS.WINDOWS) {
                     plannedName = plannedName.replaceAll(
                             "\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
-                } else if (Globals.ON_MAC) {
+                } else if (OS.OS_X) {
                     plannedName = plannedName.replaceAll(":", "");
                 }
 
@@ -321,8 +334,8 @@ public class ExternalFilePanel extends JPanel {
                 boolean updateEditor = true;
 
                 try {
-                    fieldEditor.setText(Globals.lang("Downloading..."));
-                    output(Globals.lang("Downloading..."));
+                    fieldEditor.setText(Localization.lang("Downloading..."));
+                    output(Localization.lang("Downloading..."));
                     String plannedName = getPlannedFileName(res);
 
                     // Find the default directory for this field type:
@@ -337,11 +350,11 @@ public class ExternalFilePanel extends JPanel {
                     }
                     if (directory == null) {
                         if (dirs.length > 0) {
-                            JOptionPane.showMessageDialog(parent, Globals.lang("Could not find directory for %0-files: %1", fieldName, dirs[0]),
-                                    Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(parent, Localization.lang("Could not find directory for %0-files: %1", fieldName, dirs[0]),
+                                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         } else {
-                            JOptionPane.showMessageDialog(parent, Globals.lang("No directory defined for %0-files", fieldName),
-                                    Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(parent, Localization.lang("No directory defined for %0-files", fieldName),
+                                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                         }
                         return;
                     }
@@ -350,15 +363,15 @@ public class ExternalFilePanel extends JPanel {
                     URL url = new URL(res);
 
                     try {
-                        URLDownload.buildMonitoredDownload(parent, url).downloadToFile(file);
+                        MonitoredURLDownload.buildMonitoredDownload(parent, url).downloadToFile(file);
                     } catch (IOException e2) {
-                        JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL") + ": "
-                                        + e2.getMessage(), Globals.lang("Download file"),
+                        JOptionPane.showMessageDialog(parent, Localization.lang("Invalid URL") + ": "
+                                        + e2.getMessage(), Localization.lang("Download file"),
                                 JOptionPane.ERROR_MESSAGE);
-                        Globals.logger("Error while downloading " + url.toString());
+                        LOGGER.info("Error while downloading " + url, e2);
                         return;
                     }
-                    output(Globals.lang("Download completed"));
+                    output(Localization.lang("Download completed"));
 
                     String textToSet = file.getPath();
                     if (textToSet.startsWith(directory)) {
@@ -375,7 +388,7 @@ public class ExternalFilePanel extends JPanel {
                      * Check if we should update the editor text field, or
                      * update the target entry directly:
                      */
-                    if ((entryEditor == null) || (entryEditor.getEntry() != targetEntry)) {
+                    if (entryEditor == null || entryEditor.getEntry() != targetEntry) {
                         /*
                          * Editor has probably changed to show a different
                          * entry. So we must update the target entry directly
@@ -409,8 +422,8 @@ public class ExternalFilePanel extends JPanel {
                     }
 
                 } catch (MalformedURLException e1) {
-                    JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL"),
-                            Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, Localization.lang("Invalid URL"),
+                            Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                 } finally {
                     // If stuff goes wrong along the road, put back original
                     // value
@@ -436,13 +449,13 @@ public class ExternalFilePanel extends JPanel {
      */
     public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
-        if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
-            output(Globals.lang("You must set both BibTeX key and %0 directory", fieldName
+        if (o == null || Globals.prefs.get(fieldName + "Directory") == null) {
+            output(Localization.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
                     + '.');
             return null;
         }
-        output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + '.'
+        output(Localization.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o + '.'
                 + fieldName + "'...");
 
         return new Runnable() {
@@ -462,7 +475,7 @@ public class ExternalFilePanel extends JPanel {
                 String[] dirs = metaData.getFileDirectory(fieldName);
                 Collections.addAll(list, dirs);
 
-                String found = UtilFindFiles.findPdf(getEntry(), fieldName, list
+                String found = FileFinder.findPdf(getEntry(), fieldName, list
                         .toArray(new String[list.size()]));// , off);
 
                 // To activate findFile:
@@ -474,13 +487,12 @@ public class ExternalFilePanel extends JPanel {
                     if (entryEditor != null) {
                         entryEditor.updateField(editor);
                     }
-                    output(Globals.lang("%0 field set", fieldName.toUpperCase()) + '.');
+                    output(Localization.lang("%0 field set", fieldName.toUpperCase()) + '.');
                 } else {
-                    output(Globals.lang("No %0 found", fieldName.toUpperCase()) + '.');
+                    output(Localization.lang("No %0 found", fieldName.toUpperCase()) + '.');
                 }
 
             }
         };
     }
-
 }

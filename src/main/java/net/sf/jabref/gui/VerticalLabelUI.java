@@ -44,14 +44,14 @@ import javax.swing.plaf.basic.BasicLabelUI;
  */
 public class VerticalLabelUI extends BasicLabelUI {
 
-    private boolean clockwise = false;
+    private boolean clockwise;
     // see comment in BasicLabelUI
     private Rectangle verticalViewR = new Rectangle();
     private Rectangle verticalIconR = new Rectangle();
     private Rectangle verticalTextR = new Rectangle();
     private static final VerticalLabelUI verticalLabelUI =
             new VerticalLabelUI();
-    private final static VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
+    private static final VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
             new VerticalLabelUI();
 
 

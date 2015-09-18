@@ -18,30 +18,38 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableRemoveString;
+import net.sf.jabref.logic.l10n.Localization;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableRemoveString;
 
 class StringRemoveChange extends Change {
 
+
+    private static final long serialVersionUID = 1L;
+    
     private final BibtexString string;
     private final BibtexString inMem;
 
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
+    
+    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
         this.tmpString = tmpString;
-        name = Globals.lang("Removed string") + ": '" + string.getName() + '\'';
+        name = Localization.lang("Removed string") + ": '" + string.getName() + '\'';
         this.string = string;
         this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
-        tp.setText("<HTML><H2>" + Globals.lang("Removed string") + "</H2><H3>" + Globals.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Globals.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
+        tp.setText("<HTML><H2>" + Localization.lang("Removed string") + "</H2><H3>" + Localization.lang("Label") + ":</H3>" + string.getName() + "<H3>" + Localization.lang("Content") + ":</H3>" + string.getContent() + "</HTML>");
 
     }
 
@@ -52,7 +60,7 @@ class StringRemoveChange extends Change {
             panel.database().removeString(inMem.getId());
             undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
         } catch (Exception ex) {
-            Globals.logger("Error: could not add string '" + string.getName() + "': " + ex.getMessage());
+            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
 
         // Update tmp database:

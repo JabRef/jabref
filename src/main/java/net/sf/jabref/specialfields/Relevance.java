@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class Relevance extends SpecialField {
 
@@ -30,7 +30,8 @@ public class Relevance extends SpecialField {
     private Relevance() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         // action directly set by JabRefFrame
-        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Globals.lang("Toggle relevance"), GUIGlobals.getImage("relevant"), Globals.lang("Toggle relevance")));
+        // DO NOT TRANSLATE "relevant" as this makes the produced .bib files non portable
+        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.getImage("relevant"), Localization.lang("Toggle relevance")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
     }
@@ -59,7 +60,7 @@ public class Relevance extends SpecialField {
 
     @Override
     public String getMenuString() {
-        return Globals.lang("Relevance");
+        return Localization.lang("Relevance");
     }
 
     @Override

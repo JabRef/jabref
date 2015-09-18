@@ -29,13 +29,11 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
-import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.labelPattern.LabelPatternPanel;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -47,7 +45,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
-        super(parent, Globals.lang("Bibtex key patterns"), true);
+        super(parent, Localization.lang("Bibtex key patterns"), true);
         this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag);
         setPanel(panel);
         init();
@@ -69,7 +67,7 @@ public class BibtexKeyPatternDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(labelPatternPanel, BorderLayout.CENTER);
 
-        JButton ok = new JButton(Globals.lang("Ok"));
+        JButton ok = new JButton(Localization.lang("Ok"));
         JButton cancel = new JButton(); // label of "cancel" is set later as the label is overwritten by assigning an action to the button
 
         JPanel lower = new JPanel();
@@ -106,7 +104,7 @@ public class BibtexKeyPatternDialog extends JDialog {
             }
         };
         cancel.setAction(cancelAction);
-        cancel.setText(Globals.lang("Cancel"));
+        cancel.setText(Localization.lang("Cancel"));
 
         Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
     }

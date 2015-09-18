@@ -34,7 +34,7 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class PostgreSQLImporter extends DBImporter {
 
-    private static PostgreSQLImporter instance = null;
+    private static PostgreSQLImporter instance;
 
 
     private PostgreSQLImporter() {

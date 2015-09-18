@@ -23,6 +23,10 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
 
 /**
  * The menu item used in the popup menu for opening external resources associated
@@ -36,7 +40,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     private final MetaData metaData;
     private ExternalFileType fileType;
     private final JabRefFrame frame;
-    private String fieldName = null;
+    private String fieldName;
 
 
     public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
@@ -62,17 +66,17 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         boolean success = openLink();
         if (!success) {
-            frame.output(Globals.lang("Unable to open link."));
+            frame.output(Localization.lang("Unable to open link."));
         }
     }
 
     public boolean openLink() {
-        frame.output(Globals.lang("External viewer called") + ".");
+        frame.output(Localization.lang("External viewer called") + ".");
         try {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
                 if (this.fieldName != null) {
-                    Util.openExternalViewer(frame.basePanel().metaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(frame.basePanel().metaData(), link, fieldName);
                     return true;
                 }
                 else {
@@ -81,7 +85,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     // We try to check the extension for the file:
                     String name = file.getName();
                     int pos = name.indexOf('.');
-                    String extension = ((pos >= 0) && (pos < (name.length() - 1))) ? name.substring(pos + 1)
+                    String extension = pos >= 0 && pos < name.length() - 1 ? name.substring(pos + 1)
                             .trim().toLowerCase() : null;
                     // Now we know the extension, check if it is one we know about:
                     type = Globals.prefs.getExternalFileTypeByExt(extension);
@@ -90,10 +94,10 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             }
 
             if (type instanceof UnknownExternalFileType) {
-                return Util.openExternalFileUnknown(frame, entry, metaData, link,
+                return JabRefDesktop.openExternalFileUnknown(frame, entry, metaData, link,
                         (UnknownExternalFileType) type);
             } else {
-                return Util.openExternalFileAnyFormat(metaData, link, type);
+                return JabRefDesktop.openExternalFileAnyFormat(metaData, link, type);
             }
 
         } catch (IOException e1) {
@@ -101,14 +105,14 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             // link with. We check if the file type is set, and if the file type has a non-empty
             // application link. If that link is referred by the error message, we can assume
             // that the problem is in the open-with-application setting:
-            if ((fileType != null) && (fileType.getOpenWith() != null)
-                    && (fileType.getOpenWith().length() > 0) &&
-                    (e1.getMessage().contains(fileType.getOpenWith()))) {
+            if (fileType != null && fileType.getOpenWith() != null
+                    && !fileType.getOpenWith().isEmpty() &&
+                    e1.getMessage().contains(fileType.getOpenWith())) {
 
-                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to open link. "
-                        + "The application '%0' associated with the file type '%1' could not be called.",
-                        fileType.getOpenWith(), fileType.getName()),
-                        Globals.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, Localization.lang("Unable to open link. "
+                                        + "The application '%0' associated with the file type '%1' could not be called.",
+                                fileType.getOpenWith(), fileType.getName()),
+                        Localization.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
 

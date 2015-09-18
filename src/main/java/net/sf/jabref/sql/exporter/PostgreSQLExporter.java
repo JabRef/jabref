@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import net.sf.jabref.IdGenerator;
+import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
@@ -36,7 +36,7 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class PostgreSQLExporter extends DBExporter {
 
-    private static PostgreSQLExporter instance = null;
+    private static PostgreSQLExporter instance;
 
 
     private PostgreSQLExporter() {

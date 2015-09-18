@@ -26,6 +26,7 @@ public abstract class SpecialField {
     // currently, menuString is used for undo string
     // public static String TEXT_UNDO;
 
+    // Plain string; NOT treated by Globals.lang
     public String TEXT_DONE_PATTERN;
 
     private List<SpecialFieldValue> values;

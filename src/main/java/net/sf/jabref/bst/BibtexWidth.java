@@ -25,9 +25,6 @@ package net.sf.jabref.bst;
  * pushes the resulting string. If the literal isn't a string, it complains and
  * pushes the null string.
  * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class BibtexWidth {
 
@@ -170,7 +167,7 @@ public class BibtexWidth {
             BibtexWidth.widths[126] = 500;
         }
 
-        if ((0 <= c) && (c < 128)) {
+        if ((c >= 0) && (c < 128)) {
             return BibtexWidth.widths[c];
         } else {
             return 0;

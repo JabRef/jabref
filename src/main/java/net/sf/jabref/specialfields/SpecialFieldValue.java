@@ -18,7 +18,7 @@ package net.sf.jabref.specialfields;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
 
 public class SpecialFieldValue {
 
@@ -33,9 +33,9 @@ public class SpecialFieldValue {
     // localized menu string used at menu / button
     private final String menuString;
 
-    private SpecialFieldAction action = null;
+    private SpecialFieldAction action;
 
-    private SpecialFieldMenuAction menuAction = null;
+    private SpecialFieldMenuAction menuAction;
 
     private final ImageIcon icon;
 
@@ -48,12 +48,13 @@ public class SpecialFieldValue {
     /**
      * 
      * @param field The special field this value is a value of
-     * @param keyword - The keyword to be used at BibTex's keyword field
+     * @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
      * @param actionName - the action to call
      * @param menuString - the string to display at a menu
      * @param icon - the icon of this value
      * @param toolTipText - the tool tip text
      */
+    // @formatter:off
     public SpecialFieldValue(
             SpecialField field,
             String keyword,
@@ -61,6 +62,7 @@ public class SpecialFieldValue {
             String menuString,
             ImageIcon icon,
             String toolTipText) {
+        // @formatter:on
         this.field = field;
         this.keyword = keyword;
         this.actionName = actionName;
@@ -101,6 +103,7 @@ public class SpecialFieldValue {
 
     public SpecialFieldAction getAction(JabRefFrame frame) {
         if (this.action == null) {
+            // @formatter:off
             action = new SpecialFieldAction(
                     frame,
                     this.field,
@@ -110,6 +113,7 @@ public class SpecialFieldValue {
                     this.field.getValues().size() == 1,
                     this.getMenuString(),
                     this.field.TEXT_DONE_PATTERN);
+            // @formatter:on
         }
         return action;
     }

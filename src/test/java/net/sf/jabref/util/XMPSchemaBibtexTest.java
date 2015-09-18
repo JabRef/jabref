@@ -1,7 +1,8 @@
 package net.sf.jabref.util;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.FileBasedTestCase;
+import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.BibtexTestData;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -19,8 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class XMPSchemaBibtexTest {
 
@@ -77,8 +76,8 @@ public class XMPSchemaBibtexTest {
         Assert.assertEquals(2, l.getLength());
 
         Assert.assertEquals("Tom DeMarco", XMLUtil
-                .getStringValue(((Element) l.item(0))));
-        Assert.assertEquals("Kent Beck", XMLUtil.getStringValue(((Element) l.item(1))));
+                .getStringValue((Element) l.item(0)));
+        Assert.assertEquals("Kent Beck", XMLUtil.getStringValue((Element) l.item(1)));
 
         List<String> authors = bibtex.getPersonList("author");
         Assert.assertEquals(2, authors.size());
@@ -159,11 +158,10 @@ public class XMPSchemaBibtexTest {
             Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
             Assert.assertTrue(l.get(1).equals("Tom DeMarco"));
         }
-        { // Removes both
-            bibtex.removeBagValue("author", "Tom DeMarco");
-            List<String> l = bibtex.getBagList("author");
-            Assert.assertEquals(0, l.size());
-        }
+        // Removes both
+        bibtex.removeBagValue("author", "Tom DeMarco");
+        List<String> l = bibtex.getBagList("author");
+        Assert.assertEquals(0, l.size());
     }
 
     @Test
@@ -202,11 +200,10 @@ public class XMPSchemaBibtexTest {
             Assert.assertTrue(l.get(0).equals("Kent Beck"));
             Assert.assertTrue(l.get(1).equals("Kent Beck"));
         }
-        { // Remvoes all
-            bibtex.removeSequenceValue("author", "Kent Beck");
-            List<String> l = bibtex.getSequenceList("author");
-            Assert.assertEquals(0, l.size());
-        }
+        // Remvoes all
+        bibtex.removeSequenceValue("author", "Kent Beck");
+        List<String> l = bibtex.getSequenceList("author");
+        Assert.assertEquals(0, l.size());
     }
 
     @Test
@@ -240,7 +237,7 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        BibtexEntry e = FileBasedTestCase.getBibtexEntry();
+        BibtexEntry e = BibtexTestData.getBibtexEntry();
         bibtex.setBibtexEntry(e, null);
 
         BibtexEntry e2 = bibtex.getBibtexEntry();

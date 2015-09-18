@@ -22,15 +22,17 @@ import java.sql.SQLException;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.AllEntriesGroup;
-import net.sf.jabref.groups.ExplicitGroup;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.KeywordGroup;
-import net.sf.jabref.groups.SearchGroup;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * 
@@ -131,7 +133,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 String id = rsEntries.getString("entries_id");
                 BibtexEntry entry = new BibtexEntry(IdGenerator.next(),
                         types.get(rsEntries.getString("entry_types_id")));
-                entry.setField(BibtexFields.KEY_FIELD,
+                entry.setField(BibtexEntry.KEY_FIELD,
                         rsEntries.getString("cite_key"));
                 for (String col : colNames) {
                     String value = rsEntries.getString(col);
@@ -150,8 +152,9 @@ public abstract class DBImporter extends DBImporterExporter {
             ResultSet rsStrings = SQLUtil.queryAllFromTable(conn,
                     "strings WHERE database_id='" + database_id + '\'');
             while (rsStrings.next()) {
-                String label = rsStrings.getString("label"), content = rsStrings
-                        .getString("content");
+                String label = rsStrings.getString("label");
+                String content = rsStrings
+                                        .getString("content");
                 if (label.equals("@PREAMBLE")) {
                     database.setPreamble(content);
                 } else {
@@ -209,7 +212,7 @@ public abstract class DBImporter extends DBImporterExporter {
                 groups.put(rsGroups.getString("groups_id"), rootNode);
             } else if (typeId.equals(ExplicitGroup.ID)) {
                 group = new ExplicitGroup(rsGroups.getString("label"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(KeywordGroup.ID)) {
                 System.out.println("Keyw: "
                         + rsGroups.getBoolean("case_sensitive"));
@@ -218,7 +221,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             } else if (typeId.equals(SearchGroup.ID)) {
                 System.out.println("Search: "
                         + rsGroups.getBoolean("case_sensitive"));
@@ -226,7 +229,7 @@ public abstract class DBImporter extends DBImporterExporter {
                         StringUtil.unquote(rsGroups.getString("search_expression"),
                                 '\\'), rsGroups.getBoolean("case_sensitive"),
                         rsGroups.getBoolean("reg_exp"),
-                        rsGroups.getInt("hierarchical_context"));
+                        GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
             }
 
             if (group != null) {
@@ -250,8 +253,9 @@ public abstract class DBImporter extends DBImporterExporter {
             ResultSet rsEntryGroup = SQLUtil.queryAllFromTable(conn,
                     "entry_group");
             while (rsEntryGroup.next()) {
-                String entryId = rsEntryGroup.getString("entries_id"), groupId = rsEntryGroup
-                        .getString("groups_id");
+                String entryId = rsEntryGroup.getString("entries_id");
+                String groupId = rsEntryGroup
+                                        .getString("groups_id");
                 GroupTreeNode node = groups.get(groupId);
                 if ((node != null)
                         && (node.getGroup() instanceof ExplicitGroup)) {

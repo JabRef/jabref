@@ -18,24 +18,36 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertString;
-import net.sf.jabref.undo.UndoableStringChange;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.model.entry.BibtexString;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.gui.undo.UndoableStringChange;
 
 class StringNameChange extends Change {
 
+    private static final long serialVersionUID = 1L;
+    
     private final BibtexString string;
     private final String mem;
     private final String disk;
     private final String content;
     private final BibtexString tmpString;
+    
+    private static final Log LOGGER = LogFactory.getLog(StringNameChange.class);
 
 
     public StringNameChange(BibtexString string, BibtexString tmpString,
             String mem, String tmp, String disk, String content) {
         this.tmpString = tmpString;
-        name = Globals.lang("Renamed string") + ": '" + tmp + '\'';
+        name = Localization.lang("Renamed string") + ": '" + tmp + '\'';
         this.string = string;
         this.content = content;
         this.mem = mem;
@@ -48,7 +60,7 @@ class StringNameChange extends Change {
 
         if (panel.database().hasStringLabel(disk)) {
             // The name to change to is already in the database, so we can't comply.
-            Globals.logger("Cannot rename string '" + mem + "' to '" + disk + "' because the name "
+            LOGGER.info("Cannot rename string '" + mem + "' to '" + disk + "' because the name "
                     + "is already in use.");
         }
 
@@ -64,7 +76,7 @@ class StringNameChange extends Change {
                 panel.database().addString(bs);
                 undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
             } catch (KeyCollisionException ex) {
-                Globals.logger("Error: could not add string '" + bs.getName() + "': " + ex.getMessage());
+                LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
         }
 

@@ -15,9 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +28,7 @@ public class SysTray {
 
     private final JabRefFrame frame;
     private final TrayIcon icon;
-    private SystemTray tray = null;
+    private SystemTray tray;
 
 
     public SysTray(JabRefFrame frame) {
@@ -50,11 +48,11 @@ public class SysTray {
 
             }
         };
-        MenuItem showWindow = new MenuItem(Globals.lang("Show"));
+        MenuItem showWindow = new MenuItem(Localization.lang("Show"));
         showWindow.addActionListener(showJabref);
         PopupMenu popup = new PopupMenu();
         popup.add(showWindow);
-        ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/JabRef-icon-48.png"));
+        ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/icons/JabRef-icon-48.png"));
         icon = new TrayIcon(imic.getImage(), "JabRef", popup);
         icon.setImageAutoSize(true);
         icon.addMouseListener(new MouseAdapter() {

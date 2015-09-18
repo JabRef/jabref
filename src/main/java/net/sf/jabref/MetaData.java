@@ -19,22 +19,27 @@ import java.io.*;
 import java.util.*;
 
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.VersionHandling;
-import net.sf.jabref.labelPattern.LabelPattern;
+import net.sf.jabref.migrations.VersionHandling;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.labelPattern.LabelPattern;
 
+import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class MetaData implements Iterable<String> {
 
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
+    
+    private static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
     private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
-    private GroupTreeNode groupsRoot = null;
-    private File file = null; // The File where this base gets saved.
+    private GroupTreeNode groupsRoot;
+    private File file; // The File where this base gets saved.
     private boolean groupTreeValid = true;
 
-    private LabelPattern labelPattern = null;
+    private LabelPattern labelPattern;
 
     private DBStrings dbStrings = new DBStrings();
 
@@ -88,7 +93,7 @@ public class MetaData implements Iterable<String> {
             putGroups(treeGroupsData, db, groupsVersionOnDisk);
         }
 
-        if (!groupsTreePresent && (flatGroupsData != null)) {
+        if (!groupsTreePresent && flatGroupsData != null) {
             try {
                 groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
                 groupTreeValid = true;
@@ -101,9 +106,7 @@ public class MetaData implements Iterable<String> {
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    public MetaData() {
-
-    }
+    public MetaData() {}
 
     /**
      * Add default metadata for new database:
@@ -166,20 +169,20 @@ public class MetaData implements Iterable<String> {
         // the preferences can specify one. The settings are prioritized in the following
         // order and the first defined setting is used: metadata user-specific directory,
         // metadata general directory, preferences directory.
-        String key = Globals.prefs.get("userFileDirIndividual");
+        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL);
         List<String> dirs = new ArrayList<String>();
 
         Vector<String> vec = getData(key);
         if (vec == null) {
-            key = Globals.prefs.get("userFileDir");
+            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR);
             vec = getData(key);
         }
-        if ((vec != null) && (vec.size() > 0)) {
+        if (vec != null && !vec.isEmpty()) {
             String dir;
             dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
-            if (!(new File(dir)).isAbsolute() && (file != null)) {
+            if (!new File(dir).isAbsolute() && file != null) {
                 String relDir;
                 if (dir.equals(".")) {
                     // if dir is only "current" directory, just use its parent (== real current directory) as path
@@ -189,7 +192,7 @@ public class MetaData implements Iterable<String> {
                 }
                 // If this directory actually exists, it is very likely that the
                 // user wants us to use it:
-                if ((new File(relDir)).exists()) {
+                if (new File(relDir).exists()) {
                     dir = relDir;
                 }
             }
@@ -203,9 +206,9 @@ public class MetaData implements Iterable<String> {
         }
 
         // Check if the bib file location should be included, and if so, if it is set:
-        if (Globals.prefs.getBoolean("bibLocationAsFileDir") && (getFile() != null)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR) && getFile() != null) {
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean("bibLocAsPrimaryDir")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
                 dirs.add(0, getFile().getParent());
             } else {
                 dirs.add(getFile().getParent());
@@ -253,17 +256,16 @@ public class MetaData implements Iterable<String> {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        for (String key : metaData.keySet()) {
+        SortedSet<String> sortedKeys = new TreeSet<String>(metaData.keySet());
+        for (String key : sortedKeys) {
             StringBuffer sb = new StringBuffer();
             Vector<String> orderedData = metaData.get(key);
-            if (orderedData.size() >= 0) {
-                sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
-                for (int j = 0; j < orderedData.size(); j++) {
-                    sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
-                }
-                sb.append("}");
+            sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
+            for (int j = 0; j < orderedData.size(); j++) {
+                sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
-            wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
+            sb.append("}");
+            wrapStringBuffer(sb, METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
 
@@ -271,7 +273,7 @@ public class MetaData implements Iterable<String> {
         }
         // write groups if present. skip this if only the root node exists 
         // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
+        if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
@@ -290,7 +292,7 @@ public class MetaData implements Iterable<String> {
             while (tok.hasMoreTokens()) {
                 StringBuffer s =
                         new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
-                wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
+                wrapStringBuffer(s, METADATA_LINE_LENGTH);
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
             }
@@ -302,7 +304,7 @@ public class MetaData implements Iterable<String> {
     }
 
     private void wrapStringBuffer(StringBuffer sb, int lineLength) {
-        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE_LENGTH) {
+        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE.length()) {
             sb.insert(i, Globals.NEWLINE);
         }
     }

@@ -23,10 +23,13 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.*;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 /**
  * <p>Title: </p>
@@ -58,12 +61,12 @@ public class GenFieldsCustomizer extends JDialog {
 
 
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
-        super(frame, Globals.lang("Set general fields"), false);
+        super(frame, Localization.lang("Set general fields"), false);
         parent = frame;
         //this.diag = diag;
         HelpAction help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
-                "Help", GUIGlobals.getIconUrl("helpSmall"));
-        helpBut = new JButton(Globals.lang("Help"));
+                Localization.lang("Help"), IconTheme.getImage("helpSmall"));
+        helpBut = new JButton(Localization.lang("Help"));
         helpBut.addActionListener(help);
         try {
             jbInit();
@@ -74,22 +77,22 @@ public class GenFieldsCustomizer extends JDialog {
     }
 
     private void jbInit() {
-        ok.setText(Globals.lang("Ok"));
+        ok.setText(Localization.lang("Ok"));
         ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
-        cancel.setText(Globals.lang("Cancel"));
+        cancel.setText(Localization.lang("Cancel"));
         cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
         //buttons.setBackground(GUIGlobals.lightGray);
-        jLabel1.setText(Globals.lang("Delimit fields with semicolon, ex.") + ": url;pdf;note");
+        jLabel1.setText(Localization.lang("Delimit fields with semicolon, ex.") + ": url;pdf;note");
         jPanel3.setLayout(gridBagLayout2);
         jPanel4.setBorder(BorderFactory.createEtchedBorder());
         jPanel4.setLayout(gridBagLayout1);
-        jLabel2.setText(Globals.lang("General fields"));
+        jLabel2.setText(Localization.lang("General fields"));
 
         //    fieldsArea.setText(parent.prefs.get("generalFields"));
         setFieldsText();
 
         //jPanel3.setBackground(GUIGlobals.lightGray);
-        revert.setText(Globals.lang("Default"));
+        revert.setText(Localization.lang("Default"));
         revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
         this.getContentPane().add(buttons, BorderLayout.SOUTH);
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
@@ -135,18 +138,18 @@ public class GenFieldsCustomizer extends JDialog {
             String[] parts = lines[i].split(":");
             if (parts.length != 2) {
                 // Report error and exit.
-                String field = Globals.lang("field");
-                JOptionPane.showMessageDialog(this, Globals.lang("Each line must be on the following form") + " '" +
-                        Globals.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'",
-                        Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                String field = Localization.lang("field");
+                JOptionPane.showMessageDialog(this, Localization.lang("Each line must be on the following form") + " '" +
+                        Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'",
+                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             String testString = Util.checkLegalKey(parts[1]);
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.
-                JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
-                        + "characters") + ": # { } ~ , ^ &",
-                        Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
+                                + "characters") + ": # { } ~ , ^ &",
+                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
                 return;
             }
@@ -196,7 +199,8 @@ public class GenFieldsCustomizer extends JDialog {
 
     void revert_actionPerformed(ActionEvent e) {
         StringBuffer sb = new StringBuffer();
-        String name, fields;
+        String name;
+        String fields;
         int i = 0;
         while ((name = (String) Globals.prefs.defaults.get
                 (JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i)) != null) {

@@ -24,9 +24,9 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
@@ -35,10 +35,6 @@ import net.sf.jabref.external.UnknownExternalFileType;
 public class FileListTableModel extends AbstractTableModel {
 
     private final ArrayList<FileListEntry> list = new ArrayList<FileListEntry>();
-
-
-    public FileListTableModel() {
-    }
 
     @Override
     public int getRowCount() {
@@ -285,7 +281,7 @@ public class FileListTableModel extends AbstractTableModel {
 
     private String encodeEntry(FileListEntry entry) {
         String type = entry.getType() != null ? entry.getType().getName() : "";
-        return Util.encodeString(entry.getDescription()) + ':' + Util.encodeString(entry.getLink()) + ':' + Util.encodeString(type);
+        return StringUtil.encodeString(entry.getDescription()) + ':' + StringUtil.encodeString(entry.getLink()) + ':' + StringUtil.encodeString(type);
     }
 
     public void print() {

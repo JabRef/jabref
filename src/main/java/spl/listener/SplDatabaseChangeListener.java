@@ -1,8 +1,11 @@
 package spl.listener;
 
-import net.sf.jabref.*;
 import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.model.database.DatabaseChangeEvent;
+import net.sf.jabref.model.database.DatabaseChangeListener;
 
 /**
  * Created by IntelliJ IDEA.

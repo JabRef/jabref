@@ -3,9 +3,6 @@ package net.sf.jabref.bst;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 public class BibtexCaseChangersTest {
 
     @Test

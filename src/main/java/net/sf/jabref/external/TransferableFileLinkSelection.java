@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.FileUtil;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 
 import java.awt.datatransfer.Transferable;

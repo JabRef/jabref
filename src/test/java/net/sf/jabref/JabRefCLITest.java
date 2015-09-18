@@ -5,9 +5,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class JabRefCLITest {
 
     @Test
@@ -28,6 +25,15 @@ public class JabRefCLITest {
         Assert.assertEquals("some/file", cli.getFileImport());
         Assert.assertTrue(cli.isDisableGui());
         Assert.assertEquals("some/export/file", cli.getFileExport());
+    }
+
+    @Test
+    public void testPreferencesExport() {
+        JabRefCLI cli = new JabRefCLI(new String[] {"-n", "-x=some/file"});
+
+        Assert.assertEquals("[]", Arrays.toString(cli.getLeftOver()));
+        Assert.assertEquals("some/file", cli.getPreferencesExport());
+        Assert.assertTrue(cli.isDisableGui());
     }
 
 }

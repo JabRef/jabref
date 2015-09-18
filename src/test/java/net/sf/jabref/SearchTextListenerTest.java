@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.fieldeditors.TextArea;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,15 +11,11 @@ import javax.swing.text.Highlighter.Highlight;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-
 public class SearchTextListenerTest {
 
     @Before
     public void setUp() throws Exception {
-
         Globals.prefs = JabRefPreferences.getInstance();
-        GUIGlobals.setUpIconTheme();
     }
 
     @Test
@@ -27,7 +25,7 @@ public class SearchTextListenerTest {
         String contentToHighlight1 = "Word";
         String contentToHighlight2 = "Content";
 
-        FieldTextArea ta = new FieldTextArea("", content);
+        TextArea ta = new TextArea("", content);
 
         Highlighter highlighter = ta.getHighlighter();
         Highlight[] highlight = highlighter.getHighlights();
@@ -82,7 +80,7 @@ public class SearchTextListenerTest {
         String content = "Test Word Content";
         String contentToHighlight1 = "Word";
 
-        FieldTextArea ta = new FieldTextArea("", content);
+        TextArea ta = new TextArea("", content);
 
         String textOne = ta.getText();
 
@@ -107,9 +105,8 @@ public class SearchTextListenerTest {
     public void testHighlightingInvalidParameter() {
 
         String content = "Test Word Content";
-        String contentToHighlight1 = "Word";
 
-        FieldTextArea ta = new FieldTextArea("", content);
+        TextArea ta = new TextArea("", content);
 
         //should not matter at all
         ta.searchText(null);

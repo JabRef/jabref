@@ -29,14 +29,24 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.logic.util.io.JabRefDesktop;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -48,14 +58,14 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    private PreviewPanel[] previewPanel = null;
-    private int activePreview = Globals.prefs.getInt("activePreview");
+    private PreviewPanel[] previewPanel;
+    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
     private PreviewPanel preview;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibtexEntry> tableRows;
-    private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
-    private boolean workingOnPreview = false;
+    private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
+    private boolean workingOnPreview;
 
     private boolean enabled = true;
 
@@ -63,10 +73,11 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
-    private int lastPressedCount = 0;
-    private long lastPressedTime = 0;
+    private int lastPressedCount;
+    private long lastPressedTime;
 
-
+    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    
     //private int lastCharPressed = -1;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
@@ -84,9 +95,9 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     private void instantiatePreviews() {
         previewPanel = new PreviewPanel[] {
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get("preview0"), true),
+                        .get(JabRefPreferences.PREVIEW_0), true),
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get("preview1"), true)};
+                        .get(JabRefPreferences.PREVIEW_1), true)};
 
         panel.frame().getSearchManager().addSearchListener(previewPanel[0]);
         panel.frame().getSearchManager().addSearchListener(previewPanel[1]);
@@ -94,8 +105,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
     public void updatePreviews() {
         try {
-            previewPanel[0].readLayout(Globals.prefs.get("preview0"));
-            previewPanel[1].readLayout(Globals.prefs.get("preview1"));
+            previewPanel[0].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+            previewPanel[1].readLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -237,7 +248,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     @Override
     public void mouseReleased(MouseEvent e) {
         // First find the column and row on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint()), row = table.rowAtPoint(e.getPoint());
+        final int col = table.columnAtPoint(e.getPoint());
+        final int row = table.rowAtPoint(e.getPoint());
 
         // Check if the user has clicked on an icon cell to open url or pdf.
         final String[] iconType = table.getIconTypeForColumn(col);
@@ -261,7 +273,8 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     public void mouseClicked(MouseEvent e) {
 
         // First find the column on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint()), row = table.rowAtPoint(e.getPoint());
+        final int col = table.columnAtPoint(e.getPoint());
+        final int row = table.rowAtPoint(e.getPoint());
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
@@ -276,7 +289,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         // Workaround for Windows. Right-click is not popup trigger on mousePressed, but
         // on mouseReleased. Therefore we need to avoid taking action at this point, because
         // action will be taken when the button is released:
-        if (Globals.ON_WIN && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
+        if (OS.WINDOWS && (iconType != null) && (e.getButton() != MouseEvent.BUTTON1)) {
             return;
         }
 
@@ -331,78 +344,76 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
 
                 @Override
                 public void run() {
-                    panel.output(Globals.lang("External viewer called") + '.');
+                    panel.output(Localization.lang("External viewer called") + '.');
 
                     Object link = entry.getField(fieldName);
                     if (link == null) {
-                        Globals.logger("Error: no link to " + fieldName + '.');
+                        LOGGER.info("Error: no link to " + fieldName + '.');
                         return; // There is an icon, but the field is not set.
                     }
 
-                    {
-                        // See if this is a simple file link field, or if it is a file-list
-                        // field that can specify a list of links:
-                        if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
+                    // See if this is a simple file link field, or if it is a file-list
+                    // field that can specify a list of links:
+                    if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
 
-                            // We use a FileListTableModel to parse the field content:
-                            FileListTableModel fileList = new FileListTableModel();
-                            fileList.setContent((String) link);
+                        // We use a FileListTableModel to parse the field content:
+                        FileListTableModel fileList = new FileListTableModel();
+                        fileList.setContent((String) link);
 
-                            FileListEntry flEntry = null;
-                            // If there are one or more links of the correct type,
-                            // open the first one:
-                            if (!listOfFileTypes.isEmpty()) {
-                                for (int i = 0; i < fileList.getRowCount(); i++) {
-                                    flEntry = fileList.getEntry(i);
-                                    boolean correctType = false;
-                                    for (String listOfFileType : listOfFileTypes) {
-                                        if (flEntry.getType().toString().equals(listOfFileType)) {
-                                            correctType = true;
-                                        }
+                        FileListEntry flEntry = null;
+                        // If there are one or more links of the correct type,
+                        // open the first one:
+                        if (!listOfFileTypes.isEmpty()) {
+                            for (int i = 0; i < fileList.getRowCount(); i++) {
+                                flEntry = fileList.getEntry(i);
+                                boolean correctType = false;
+                                for (String listOfFileType : listOfFileTypes) {
+                                    if (flEntry.getType().toString().equals(listOfFileType)) {
+                                        correctType = true;
                                     }
-                                    if (correctType) {
-                                        break;
-                                    }
-                                    flEntry = null;
                                 }
-                            }
-                            //If there are no file types specified, consider all files.
-                            else if (fileList.getRowCount() > 0) {
-                                flEntry = fileList.getEntry(0);
-                            }
-                            if (flEntry != null) {
-                                //                            if (fileList.getRowCount() > 0) {
-                                //                                FileListEntry flEntry = fileList.getEntry(0);
-
-                                ExternalFileMenuItem item = new ExternalFileMenuItem
-                                        (panel.frame(), entry, "",
-                                                flEntry.getLink(), flEntry.getType().getIcon(),
-                                                panel.metaData(), flEntry.getType());
-                                boolean success = item.openLink();
-                                if (!success) {
-                                    panel.output(Globals.lang("Unable to open link."));
+                                if (correctType) {
+                                    break;
                                 }
+                                flEntry = null;
                             }
-                        } else {
-                            try {
-                                Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
-                            } catch (IOException ex) {
-                                panel.output(Globals.lang("Unable to open link."));
-                            }
+                        }
+                        //If there are no file types specified, consider all files.
+                        else if (fileList.getRowCount() > 0) {
+                            flEntry = fileList.getEntry(0);
+                        }
+                        if (flEntry != null) {
+                            //                            if (fileList.getRowCount() > 0) {
+                            //                                FileListEntry flEntry = fileList.getEntry(0);
 
-                            /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
                             ExternalFileMenuItem item = new ExternalFileMenuItem
                                     (panel.frame(), entry, "",
-                                    (String)link, type.getIcon(),
-                                    panel.metaData(), type);
+                                            flEntry.getLink(), flEntry.getType().getIcon(),
+                                            panel.metaData(), flEntry.getType());
                             boolean success = item.openLink();
                             if (!success) {
-                                panel.output(Globals.lang("Unable to open link."));
-                            } */
-                            //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                                panel.output(Localization.lang("Unable to open link."));
+                            }
+                        }
+                    } else {
+                        try {
+                            JabRefDesktop.openExternalViewer(panel.metaData(), (String) link, fieldName);
+                        } catch (IOException ex) {
+                            panel.output(Localization.lang("Unable to open link."));
                         }
 
+                        /*ExternalFileType type = Globals.prefs.getExternalFileTypeByMimeType("text/html");
+                        ExternalFileMenuItem item = new ExternalFileMenuItem
+                                (panel.frame(), entry, "",
+                                (String)link, type.getIcon(),
+                                panel.metaData(), type);
+                        boolean success = item.openLink();
+                        if (!success) {
+                            panel.output(Globals.lang("Unable to open link."));
+                        } */
+                        //Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                     }
+
                     //catch (IOException ex) {
                     //    panel.output(Globals.lang("Error") + ": " + ex.getMessage());
                     //}
@@ -542,7 +553,7 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
         } else {
             activePreview = 0;
         }
-        Globals.prefs.putInt("activePreview", activePreview);
+        Globals.prefs.putInt(JabRefPreferences.ACTIVE_PREVIEW, activePreview);
         if (previewActive) {
             this.preview = previewPanel[activePreview];
 

@@ -28,6 +28,7 @@ import net.sf.jabref.Globals;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Dialog box for collecting database connection strings from the user
@@ -45,13 +46,13 @@ public class DBConnectDialog extends JDialog {
 
     private DBStrings dbStrings = new DBStrings();
 
-    private boolean connectToDB = false;
+    private boolean connectToDB;
 
 
     /** Creates a new instance of DBConnectDialog */
     public DBConnectDialog(JFrame parent, DBStrings dbs) {
 
-        super(parent, Globals.lang("Connect to SQL database"), true);
+        super(parent, Localization.lang("Connect to SQL database"), true);
 
         this.setResizable(false);
         this.setLocationRelativeTo(parent);
@@ -79,11 +80,11 @@ public class DBConnectDialog extends JDialog {
         rhs.add(pwdPassword);
 
         // setup label text
-        lblServerType.setText(Globals.lang("Server Type :"));
-        lblServerHostname.setText(Globals.lang("Server Hostname :"));
-        lblDatabase.setText(Globals.lang("Database :"));
-        lblUsername.setText(Globals.lang("Username :"));
-        lblPassword.setText(Globals.lang("Password :"));
+        lblServerType.setText(Localization.lang("Server Type :"));
+        lblServerHostname.setText(Localization.lang("Server Hostname :"));
+        lblDatabase.setText(Localization.lang("Database :"));
+        lblUsername.setText(Localization.lang("Username :"));
+        lblPassword.setText(Localization.lang("Password :"));
 
         // set label text alignment
         for (JLabel label : lhs) {
@@ -92,9 +93,9 @@ public class DBConnectDialog extends JDialog {
 
         // set button text
         JButton btnConnect = new JButton();
-        btnConnect.setText(Globals.lang("Connect"));
+        btnConnect.setText(Localization.lang("Connect"));
         JButton btnCancel = new JButton();
-        btnCancel.setText(Globals.lang("Cancel"));
+        btnCancel.setText(Localization.lang("Cancel"));
 
         // init input fields to current DB strings
         String srvSel = dbStrings.getServerType();
@@ -216,7 +217,7 @@ public class DBConnectDialog extends JDialog {
             cnt++;
         }
 
-        String errMsg = Globals.lang("Please specify the ");
+        String errMsg = Localization.lang("Please specify the ");
 
         switch (cnt) {
         case 0:
@@ -229,8 +230,7 @@ public class DBConnectDialog extends JDialog {
             errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
             break;
         case 3:
-            errMsg = errMsg + errors[0] + ", " + errors[1]
-                    + ", and " + errors[2] + '.';
+            errMsg = errMsg + errors[0] + ", " + errors[1] + ", and " + errors[2] + '.';
             break;
         default:
 

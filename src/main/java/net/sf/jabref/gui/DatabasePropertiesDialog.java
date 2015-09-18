@@ -39,16 +39,18 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BrowseAction;
+import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.config.SaveOrderConfig;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Encodings;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,7 +62,7 @@ import com.jgoodies.forms.layout.FormLayout;
 public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
-    private BasePanel panel = null;
+    private BasePanel panel;
     private final JComboBox encoding;
     private final JButton ok;
     private final JButton cancel;
@@ -76,23 +78,30 @@ public class DatabasePropertiesDialog extends JDialog {
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
 
-    private JRadioButton saveAsConfiguredGlobally, saveInOriginalOrder,
-            saveInSpecifiedOrder;
-    private JComboBox savePriSort, saveSecSort, saveTerSort;
-    private JTextField savePriField, saveSecField, saveTerField;
-    private JCheckBox savePriDesc, saveSecDesc, saveTerDesc;
+    private JRadioButton saveAsConfiguredGlobally;
+    private JRadioButton saveInOriginalOrder;
+    private JRadioButton saveInSpecifiedOrder;
+    private JComboBox savePriSort;
+    private JComboBox saveSecSort;
+    private JComboBox saveTerSort;
+    private JTextField savePriField;
+    private JTextField saveSecField;
+    private JTextField saveTerField;
+    private JCheckBox savePriDesc;
+    private JCheckBox saveSecDesc;
+    private JCheckBox saveTerDesc;
 
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
-    private final JCheckBox protect = new JCheckBox(Globals.lang("Refuse to save the database before external changes have been reviewed."));
-    private boolean oldProtectVal = false;
+    private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
+    private boolean oldProtectVal;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
-        super(parent, Globals.lang("Database properties"), true);
-        encoding = new JComboBox(Globals.ENCODINGS);
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
+        super(parent, Localization.lang("Database properties"), true);
+        encoding = new JComboBox(Encodings.ENCODINGS);
+        ok = new JButton(Localization.lang("Ok"));
+        cancel = new JButton(Localization.lang("Cancel"));
         init(parent);
     }
 
@@ -103,10 +112,10 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void init(JFrame parent) {
 
-        JButton browseFile = new JButton(Globals.lang("Browse"));
-        JButton browseFileIndv = new JButton(Globals.lang("Browse"));
-        JButton browsePdf = new JButton(Globals.lang("Browse"));
-        JButton browsePs = new JButton(Globals.lang("Browse"));
+        JButton browseFile = new JButton(Localization.lang("Browse"));
+        JButton browseFileIndv = new JButton(Localization.lang("Browse"));
+        JButton browsePdf = new JButton(Localization.lang("Browse"));
+        JButton browsePs = new JButton(Localization.lang("Browse"));
         browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
         browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
         browsePdf.addActionListener(BrowseAction.buildForDir(parent, pdfDir));
@@ -117,30 +126,30 @@ public class DatabasePropertiesDialog extends JDialog {
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref", ""));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        builder.append(Globals.lang("Database encoding"));
+        builder.append(Localization.lang("Database encoding"));
         builder.append(encoding);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Override default file directories"));
+        builder.appendSeparator(Localization.lang("Override default file directories"));
         builder.nextLine();
-        builder.append(Globals.lang("General file directory"));
+        builder.append(Localization.lang("General file directory"));
         builder.append(fileDir);
         builder.append(browseFile);
         builder.nextLine();
-        builder.append(Globals.lang("User-specific file directory"));
+        builder.append(Localization.lang("User-specific file directory"));
         builder.append(fileDirIndv);
         builder.append(browseFileIndv);
         builder.nextLine();
-        builder.append(Globals.lang("PDF directory"));
+        builder.append(Localization.lang("PDF directory"));
         builder.append(pdfDir);
         builder.append(browsePdf);
         builder.nextLine();
-        builder.append(Globals.lang("PS directory"));
+        builder.append(Localization.lang("PS directory"));
         builder.append(psDir);
         builder.append(browsePs);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Save sort order"));
+        builder.appendSeparator(Localization.lang("Save sort order"));
         builder.append(saveAsConfiguredGlobally, 1);
         builder.nextLine();
         builder.append(saveInOriginalOrder, 1);
@@ -151,19 +160,19 @@ public class DatabasePropertiesDialog extends JDialog {
         // Create a new panel with its own FormLayout for these items:
         FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        JLabel lab = new JLabel(Globals.lang("Primary sort criterion"));
+        JLabel lab = new JLabel(Localization.lang("Primary sort criterion"));
         builder2.append(lab);
         builder2.append(savePriSort);
         builder2.append(savePriField);
         builder2.append(savePriDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Secondary sort criterion"));
+        lab = new JLabel(Localization.lang("Secondary sort criterion"));
         builder2.append(lab);
         builder2.append(saveSecSort);
         builder2.append(saveSecField);
         builder2.append(saveSecDesc);
         builder2.nextLine();
-        lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
         builder2.append(lab);
         builder2.append(saveTerSort);
         builder2.append(saveTerField);
@@ -173,7 +182,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.append(saveSpecPanel);
         builder.nextLine();
 
-        builder.appendSeparator(Globals.lang("Database protection"));
+        builder.appendSeparator(Localization.lang("Database protection"));
         builder.nextLine();
         builder.append(protect, 3);
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -218,9 +227,9 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setupSortOrderConfiguration() {
-        saveAsConfiguredGlobally = new JRadioButton(Globals.lang("Save entries as configured globally"));
-        saveInOriginalOrder = new JRadioButton(Globals.lang("Save entries in their original order"));
-        saveInSpecifiedOrder = new JRadioButton(Globals.lang("Save entries ordered as specified"));
+        saveAsConfiguredGlobally = new JRadioButton(Localization.lang("Save entries as configured globally"));
+        saveInOriginalOrder = new JRadioButton(Localization.lang("Save entries in their original order"));
+        saveInSpecifiedOrder = new JRadioButton(Localization.lang("Save entries ordered as specified"));
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveAsConfiguredGlobally);
@@ -248,16 +257,16 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInSpecifiedOrder.addActionListener(listener);
 
         ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
-        v.add(BibtexFields.KEY_FIELD);
+        v.add(BibtexEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
         savePriSort = new JComboBox(allPlusKey);
         saveSecSort = new JComboBox(allPlusKey);
         saveTerSort = new JComboBox(allPlusKey);
 
-        savePriSort.insertItemAt(Globals.lang("<select>"), 0);
-        saveSecSort.insertItemAt(Globals.lang("<select>"), 0);
-        saveTerSort.insertItemAt(Globals.lang("<select>"), 0);
+        savePriSort.insertItemAt(Localization.lang("<select>"), 0);
+        saveSecSort.insertItemAt(Localization.lang("<select>"), 0);
+        saveTerSort.insertItemAt(Localization.lang("<select>"), 0);
 
         savePriField = new JTextField(10);
         saveSecField = new JTextField(10);
@@ -294,9 +303,9 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         });
 
-        savePriDesc = new JCheckBox(Globals.lang("Descending"));
-        saveSecDesc = new JCheckBox(Globals.lang("Descending"));
-        saveTerDesc = new JCheckBox(Globals.lang("Descending"));
+        savePriDesc = new JCheckBox(Localization.lang("Descending"));
+        saveSecDesc = new JCheckBox(Localization.lang("Descending"));
+        saveTerDesc = new JCheckBox(Localization.lang("Descending"));
 
     }
 
@@ -346,7 +355,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveTerField.setEnabled(selected);
         saveTerDesc.setEnabled(selected);
 
-        Vector<String> fileD = metaData.getData(Globals.prefs.get("userFileDir"));
+        Vector<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         if (fileD == null) {
             fileDir.setText("");
         } else {
@@ -356,8 +365,8 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         }
 
-        Vector<String> fileDI = metaData.getData(Globals.prefs.get("userFileDirIndividual")); // File dir setting
-        Vector<String> fileDIL = metaData.getData(Globals.prefs.get("userFileDirInd_Legacy")); // Legacy file dir setting for backward comp.
+        Vector<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
+        Vector<String> fileDIL = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_IND_LEGACY)); // Legacy file dir setting for backward comp.
         if (fileDI == null) {
             oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
             if (fileDIL == null) {
@@ -445,18 +454,18 @@ public class DatabasePropertiesDialog extends JDialog {
         String text = fileDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
-            metaData.putData(Globals.prefs.get("userFileDir"), dir);
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), dir);
         } else {
-            metaData.remove(Globals.prefs.get("userFileDir"));
+            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
         dir = new Vector<String>(1);
         text = fileDirIndv.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
-            metaData.putData(Globals.prefs.get("userFileDirIndividual"), dir);
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), dir);
         } else {
-            metaData.remove(Globals.prefs.get("userFileDirIndividual"));
+            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         }
 
         dir = new Vector<String>(1);

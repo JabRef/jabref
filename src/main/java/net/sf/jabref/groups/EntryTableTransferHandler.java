@@ -32,23 +32,29 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.MainTableFormat;
-import net.sf.jabref.imports.ImportMenuItem;
-import net.sf.jabref.imports.OpenDatabaseAction;
-import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.importer.ImportMenuItem;
+import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.importer.ParserResult;
 import spl.PdfImporter;
 import spl.PdfImporter.ImportPdfFilesResult;
 
 public class EntryTableTransferHandler extends TransferHandler {
+
+    private static final long serialVersionUID = 1L;
 
     private final MainTable entryTable;
 
@@ -61,6 +67,8 @@ public class EntryTableTransferHandler extends TransferHandler {
     private final DataFlavor stringFlavor;
 
     private static final boolean DROP_ALLOWED = true;
+    
+    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
 
 
     /**
@@ -80,8 +88,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            Globals.logger("Unable to configure drag and drop for main table");
-            e.printStackTrace();
+            LOGGER.info("Unable to configure drag and drop for main table", e);
         }
     }
 
@@ -104,7 +111,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         }
         else {
             draggingFile = false;
-            return (new TransferableFileLinkSelection(panel, entryTable.getSelectedEntries()));//.getTransferable();
+            return new TransferableFileLinkSelection(panel, entryTable.getSelectedEntries());//.getTransferable();
         }
     }
 
@@ -191,16 +198,16 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
 
         } catch (IOException ioe) {
-            System.err.println("failed to read dropped data: " + ioe.toString());
+            System.err.println("failed to read dropped data: " + ioe);
         } catch (UnsupportedFlavorException ufe) {
-            System.err.println("drop type error: " + ufe.toString());
+            System.err.println("drop type error: " + ufe);
         }
 
         // all supported flavors failed
         System.err.println("can't transfer input: ");
-        DataFlavor inflavs[] = t.getTransferDataFlavors();
+        DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            System.out.println("  " + inflav.toString());
+            System.out.println("  " + inflav);
         }
 
         return false;
@@ -231,7 +238,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
 
-    private boolean draggingFile = false;
+    private boolean draggingFile;
 
 
     @Override
@@ -411,13 +418,13 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
         ArrayList<String> notBibFiles = new ArrayList<String>();
-        String encoding = Globals.prefs.get("defaultEncoding");
+        String encoding = Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             String extension = "";
             ExternalFileType fileType = null;
             int index = fileName.lastIndexOf('.');
-            if ((index >= 0) && (index < fileName.length())) {
+            if (index >= 0 && index < fileName.length()) {
                 extension = fileName.substring(index + 1).toLowerCase();
                 fileType = Globals.prefs.getExternalFileTypeByExt(extension);
             }
@@ -425,7 +432,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 File f = new File(fileName);
                 try {
                     ParserResult pr = OpenDatabaseAction.loadDatabase(f, encoding);
-                    if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                    if (pr == null || pr == ParserResult.INVALID_FORMAT) {
                         notBibFiles.add(fileName);
                     } else {
                         openAction.addNewDatabase(pr, f, true);
@@ -447,7 +454,7 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if ((fileType != null) && (dropRow >= 0)) {
+            if (fileType != null && dropRow >= 0) {
 
                 /*
                  * TODO: need to signal if this is a local or autodownloaded
@@ -481,7 +488,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             					if (panel == null) {
             						// // Create a new, empty, database.
             						BibtexDatabase database = new BibtexDatabase();
-            						frame.addTab(database, null, null, Globals.prefs.get("defaultEncoding"),
+            						frame.addTab(database, null, null, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING),
             							true);
             						frame.output(Globals.lang("New database created."));
             						panel = frame.basePanel();
@@ -514,13 +521,13 @@ public class EntryTableTransferHandler extends TransferHandler {
             notBibFiles.add(fileName);
         }
 
-        if (notBibFiles.size() > 0) {
+        if (!notBibFiles.isEmpty()) {
             String[] toImport = new String[notBibFiles.size()];
             notBibFiles.toArray(toImport);
 
             // Import into new if entryTable==null, otherwise into current
             // database:
-            ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
+            ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
             importer.automatedImport(toImport);
         }
     }
@@ -532,10 +539,10 @@ public class EntryTableTransferHandler extends TransferHandler {
         // System.out.println("Import url: " + dropLink.toString());
         // System.out.println("Temp file: "+tmpfile.getAbsolutePath());
 
-        URLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
+        MonitoredURLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
 
         // Import into new if entryTable==null, otherwise into current database:
-        ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
+        ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
         importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
 
         return true;

@@ -16,7 +16,7 @@
 package net.sf.jabref.groups;
 
 import ca.odell.glazedlists.matchers.Matcher;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * Matcher for filtering or sorting the table according to whether entries
@@ -25,7 +25,6 @@ import net.sf.jabref.BibtexEntry;
 public class GroupMatcher implements Matcher<BibtexEntry> {
 
     public static final GroupMatcher INSTANCE = new GroupMatcher();
-
 
     @Override
     public boolean matches(BibtexEntry entry) {
