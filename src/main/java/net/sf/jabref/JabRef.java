@@ -666,10 +666,11 @@ public class JabRef {
     }
 
     private void openWindow(Vector<ParserResult> loaded) {
-        // Call the method performCompatibilityUpdate(), which does any
-        // necessary changes for users with a preference set from an older
+        // Perform checks and changes for users with a preference set from an older
         // Jabref version.
-        PreferencesMigrations.performCompatibilityUpdate();
+        PreferencesMigrations.replaceAbstractField();
+        PreferencesMigrations.upgradeOldPreferences();
+        PreferencesMigrations.upgradeFaultyEncodingStrings();
 
         // Set up custom or default icon theme:
         // This is now done at processArguments
