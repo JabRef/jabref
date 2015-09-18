@@ -449,6 +449,82 @@ public class JabRefPreferences {
                 putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             }
         }
+        upgradeFaultyEncodingStrings();
+    }
+
+    /**
+     * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
+     */
+    private void upgradeFaultyEncodingStrings(){
+        String defaultEncoding = this.get(DEFAULT_ENCODING);
+
+        switch(defaultEncoding){
+            case "UTF8":
+                this.put(DEFAULT_ENCODING, "UTF-8");
+                break;
+            case "Cp1250":
+                this.put(DEFAULT_ENCODING, "CP1250");
+                break;
+            case "Cp1251":
+                this.put(DEFAULT_ENCODING, "CP1251");
+                break;
+            case "Cp1252":
+                this.put(DEFAULT_ENCODING, "CP1252");
+                break;
+            case "Cp1253":
+                this.put(DEFAULT_ENCODING, "CP1253");
+                break;
+            case "Cp1254":
+                this.put(DEFAULT_ENCODING, "CP1254");
+                break;
+            case "Cp1257":
+                this.put(DEFAULT_ENCODING, "CP1257");
+                break;
+            case "ISO8859_1":
+                this.put(DEFAULT_ENCODING, "ISO8859-1");
+                break;
+            case "ISO8859_2":
+                this.put(DEFAULT_ENCODING, "ISO8859-2");
+                break;
+            case "ISO8859_3":
+                this.put(DEFAULT_ENCODING, "ISO8859-3");
+                break;
+            case "ISO8859_4":
+                this.put(DEFAULT_ENCODING, "ISO8859-4");
+                break;
+            case "ISO8859_5":
+                this.put(DEFAULT_ENCODING, "ISO8859-5");
+                break;
+            case "ISO8859_6":
+                this.put(DEFAULT_ENCODING, "ISO8859-6");
+                break;
+            case "ISO8859_7":
+                this.put(DEFAULT_ENCODING, "ISO8859-7");
+                break;
+            case "ISO8859_8":
+                this.put(DEFAULT_ENCODING, "ISO8859-8");
+                break;
+            case "ISO8859_9":
+                this.put(DEFAULT_ENCODING, "ISO8859-9");
+                break;
+            case "ISO8859_13":
+                this.put(DEFAULT_ENCODING, "ISO8859-13");
+                break;
+            case "ISO8859_15":
+                this.put(DEFAULT_ENCODING, "ISO8859-15");
+                break;
+            case "KOI8_R":
+                this.put(DEFAULT_ENCODING, "KOI8-R");
+                break;
+            case "Big5_HKSCS":
+                this.put(DEFAULT_ENCODING, "Big5-HKSCS");
+                break;
+            case "EUC_JP":
+                this.put(DEFAULT_ENCODING, "EUC-JP");
+                break;
+        }
+
+
     }
 
     // The constructor is made private to enforce this as a singleton class:
