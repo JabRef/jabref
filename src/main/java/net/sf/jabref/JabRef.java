@@ -670,6 +670,7 @@ public class JabRef {
         // necessary changes for users with a preference set from an older
         // Jabref version.
         PreferencesMigrations.performCompatibilityUpdate();
+        PreferencesMigrations.upgradeFaultyEncodingStrings();
 
         // Set up custom or default icon theme:
         // This is now done at processArguments
