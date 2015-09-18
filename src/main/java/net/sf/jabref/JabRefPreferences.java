@@ -458,6 +458,10 @@ public class JabRefPreferences {
     private void upgradeFaultyEncodingStrings(){
         String defaultEncoding = this.get(DEFAULT_ENCODING);
 
+        if(defaultEncoding == null){
+            return;
+        }
+
         switch(defaultEncoding){
             case "UTF8":
                 this.put(DEFAULT_ENCODING, "UTF-8");
