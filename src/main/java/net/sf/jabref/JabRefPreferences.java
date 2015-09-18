@@ -403,53 +403,7 @@ public class JabRefPreferences {
         return JabRefPreferences.singleton;
     }
 
-    // Upgrade the preferences for the current version
-    // The old preference is kept in case an old version of JabRef is used with 
-    // these preferences, but it is only used when the new preference does not 
-    // exist
-    private void upgradeOldPreferences() {
-        if (prefs.get(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, null) == null) {
-            if (prefs.getBoolean("saveInStandardOrder", false)) {
-                putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
-                put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "author");
-                put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "editor");
-                put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "year");
-                putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
-            } else if (prefs.getBoolean("saveInTitleOrder", false)) {
-                // saveInTitleOrder => title, author, editor
-                putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
-                put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "title");
-                put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "author");
-                put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "editor");
-                putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
-            }
-        }
 
-        if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
-            if (prefs.getBoolean("exportInStandardOrder", false)) {
-                putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "author");
-                put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "editor");
-                put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "year");
-                putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
-            } else if (prefs.getBoolean("exportInTitleOrder", false)) {
-                // exportInTitleOrder => title, author, editor
-                putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "title");
-                put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "author");
-                put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "editor");
-                putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
-                putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
-            }
-        }
-    }
 
 
 
@@ -466,7 +420,6 @@ public class JabRefPreferences {
 
         // load user preferences 
         prefs = Preferences.userNodeForPackage(JabRef.class);
-        upgradeOldPreferences();
 
         if (OS.OS_X) {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
@@ -940,6 +893,10 @@ public class JabRefPreferences {
 
     public boolean getBoolean(String key) {
         return prefs.getBoolean(key, getBooleanDefault(key));
+    }
+
+    public boolean getBoolean(String key, boolean def) {
+        return prefs.getBoolean(key, def);
     }
 
     private boolean getBooleanDefault(String key) {

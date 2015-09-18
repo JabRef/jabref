@@ -9,13 +9,13 @@ public class PreferencesMigrations {
      * This method is called at startup, and makes necessary adaptations to
      * preferences for users from an earlier version of Jabref.
      */
-    public static void performCompatibilityUpdate() {
+    public static void replaceAbstractField() {
         // Make sure "abstract" is not in General fields, because
         // Jabref 1.55 moves the abstract to its own tab.
         String genFields = Globals.prefs.get(JabRefPreferences.GENERAL_FIELDS);
-        // pr(genFields+"\t"+genFields.indexOf("abstract"));
+
         if (genFields.contains("abstract")) {
-            // pr(genFields+"\t"+genFields.indexOf("abstract"));
+
             String newGen;
             if (genFields.equals("abstract")) {
                 newGen = "";
@@ -28,7 +28,7 @@ public class PreferencesMigrations {
             } else {
                 newGen = genFields;
             }
-            // pr(newGen);
+
             Globals.prefs.put(JabRefPreferences.GENERAL_FIELDS, newGen);
         }
     }
@@ -109,7 +109,54 @@ public class PreferencesMigrations {
                 prefs.put(prefs.DEFAULT_ENCODING, "EUC-JP");
                 break;
         }
+    }
 
+    // Upgrade the preferences for the current version
+    // The old preference is kept in case an old version of JabRef is used with
+    // these preferences, but it is only used when the new preference does not
+    // exist
+    public static void upgradeOldPreferences() {
+        JabRefPreferences prefs = Globals.prefs;
+        if (prefs.get(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, null) == null) {
+            if (prefs.getBoolean("saveInStandardOrder", false)) {
+                prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
+                prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "author");
+                prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "editor");
+                prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "year");
+                prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
+            } else if (prefs.getBoolean("saveInTitleOrder", false)) {
+                // saveInTitleOrder => title, author, editor
+                prefs.putBoolean(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, true);
+                prefs.put(JabRefPreferences.SAVE_PRIMARY_SORT_FIELD, "title");
+                prefs.put(JabRefPreferences.SAVE_SECONDARY_SORT_FIELD, "author");
+                prefs.put(JabRefPreferences.SAVE_TERTIARY_SORT_FIELD, "editor");
+                prefs.putBoolean(JabRefPreferences.SAVE_PRIMARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.SAVE_SECONDARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.SAVE_TERTIARY_SORT_DESCENDING, false);
+            }
+        }
 
+        if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
+            if (prefs.getBoolean("exportInStandardOrder", false)) {
+                prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
+                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "author");
+                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "editor");
+                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "year");
+                prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
+            } else if (prefs.getBoolean("exportInTitleOrder", false)) {
+                // exportInTitleOrder => title, author, editor
+                prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
+                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "title");
+                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "author");
+                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "editor");
+                prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
+            }
+        }
     }
 }
