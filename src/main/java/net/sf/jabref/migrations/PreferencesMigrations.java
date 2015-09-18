@@ -3,6 +3,9 @@ package net.sf.jabref.migrations;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PreferencesMigrations {
 
     /**
@@ -36,78 +39,38 @@ public class PreferencesMigrations {
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
      */
-    public static void upgradeFaultyEncodingStrings(){
+    public static void upgradeFaultyEncodingStrings() {
         JabRefPreferences prefs = Globals.prefs;
         String defaultEncoding = prefs.get(prefs.DEFAULT_ENCODING);
-
-        if(defaultEncoding == null){
+        if (defaultEncoding == null) {
             return;
         }
 
-        switch(defaultEncoding){
-            case "UTF8":
-                prefs.put(prefs.DEFAULT_ENCODING, "UTF-8");
-                break;
-            case "Cp1250":
-                prefs.put(prefs.DEFAULT_ENCODING, "CP1250");
-                break;
-            case "Cp1251":
-                prefs.put(prefs.DEFAULT_ENCODING, "CP1251");
-                break;
-            case "Cp1252":
-                prefs.put(prefs.DEFAULT_ENCODING, "CP1252");
-                break;
-            case "Cp1253":
-                prefs.put(prefs.DEFAULT_ENCODING, "CP1253");
-                break;
-            case "Cp1254":
-                prefs.put(prefs.DEFAULT_ENCODING, "CP1254");
-                break;
-            case "Cp1257":
-                prefs.put(prefs.DEFAULT_ENCODING, "CP1257");
-                break;
-            case "ISO8859_1":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-1");
-                break;
-            case "ISO8859_2":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-2");
-                break;
-            case "ISO8859_3":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-3");
-                break;
-            case "ISO8859_4":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-4");
-                break;
-            case "ISO8859_5":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-5");
-                break;
-            case "ISO8859_6":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-6");
-                break;
-            case "ISO8859_7":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-7");
-                break;
-            case "ISO8859_8":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-8");
-                break;
-            case "ISO8859_9":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-9");
-                break;
-            case "ISO8859_13":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-13");
-                break;
-            case "ISO8859_15":
-                prefs.put(prefs.DEFAULT_ENCODING, "ISO8859-15");
-                break;
-            case "KOI8_R":
-                prefs.put(prefs.DEFAULT_ENCODING, "KOI8-R");
-                break;
-            case "Big5_HKSCS":
-                prefs.put(prefs.DEFAULT_ENCODING, "Big5-HKSCS");
-                break;
-            case "EUC_JP":
-                prefs.put(prefs.DEFAULT_ENCODING, "EUC-JP");
-                break;
+        Map<String, String> encodingMap = new HashMap<>();
+        encodingMap.put("UTF8", "UTF-8");
+        encodingMap.put("Cp1250", "CP1250");
+        encodingMap.put("Cp1251", "CP1251");
+        encodingMap.put("Cp1252", "CP1252");
+        encodingMap.put("Cp1253", "CP1253");
+        encodingMap.put("Cp1254", "CP1254");
+        encodingMap.put("Cp1257", "CP1257");
+        encodingMap.put("ISO8859_1", "ISO8859-1");
+        encodingMap.put("ISO8859_2", "ISO8859-2");
+        encodingMap.put("ISO8859_3", "ISO8859-3");
+        encodingMap.put("ISO8859_4", "ISO8859-4");
+        encodingMap.put("ISO8859_5", "ISO8859-5");
+        encodingMap.put("ISO8859_6", "ISO8859-6");
+        encodingMap.put("ISO8859_7", "ISO8859-7");
+        encodingMap.put("ISO8859_8", "ISO8859-8");
+        encodingMap.put("ISO8859_9", "ISO8859-9");
+        encodingMap.put("ISO8859_13", "ISO8859-13");
+        encodingMap.put("ISO8859_15", "ISO8859-15");
+        encodingMap.put("KOI8_R", "KOI8-R");
+        encodingMap.put("Big5_HKSCS", "Big5-HKSCS");
+        encodingMap.put("EUC_JP", "EUC-JP");
+
+        if (encodingMap.get(defaultEncoding) != null) {
+            prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
         }
     }
 
