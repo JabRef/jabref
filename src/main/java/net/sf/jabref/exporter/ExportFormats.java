@@ -165,7 +165,7 @@ public class ExportFormats {
             public ExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(Action.NAME, selectedOnly ? "Export selected entries" : "Export");
+                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization.menuTitle("Export"));
             }
 
             @Override

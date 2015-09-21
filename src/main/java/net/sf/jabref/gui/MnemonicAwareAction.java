@@ -39,7 +39,7 @@ public abstract class MnemonicAwareAction extends AbstractAction {
     @Override
     public void putValue(String key, Object value) {
         if (key.equals(Action.NAME)) {
-            String name = Localization.menuTitle(value.toString());
+            String name = value.toString();
             int i = name.indexOf('&');
             if (i >= 0) {
                 char mnemonic = Character.toUpperCase(name.charAt(i + 1));

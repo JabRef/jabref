@@ -42,7 +42,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
         this.frame = frame;
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Save all"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open databases"));
-        putValue(Action.NAME, "Save all");
+        putValue(Action.NAME, Localization.menuTitle("Save all"));
     }
 
     @Override

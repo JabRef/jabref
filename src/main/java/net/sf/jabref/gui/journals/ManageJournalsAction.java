@@ -17,6 +17,7 @@ package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
 import java.awt.event.ActionEvent;
@@ -29,7 +30,7 @@ public class ManageJournalsAction extends MnemonicAwareAction {
 
     public ManageJournalsAction(JabRefFrame frame) {
         super();
-        putValue(Action.NAME, "Manage journal abbreviations");
+        putValue(Action.NAME, Localization.menuTitle("Manage journal abbreviations"));
         this.frame = frame;
     }
 

@@ -70,7 +70,7 @@ public class DbImportAction extends AbstractWorker {
 
         public DbImpAction() {
             super(IconTheme.getImage("dbImport"));
-            putValue(Action.NAME, "Import from external SQL database");
+            putValue(Action.NAME, Localization.menuTitle("Import from external SQL database"));
 
         }
 

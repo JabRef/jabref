@@ -74,7 +74,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         super(IconTheme.getImage("open"));
         this.frame = frame;
         this.showDialog = showDialog;
-        putValue(Action.NAME, "Open database");
+        putValue(Action.NAME, Localization.menuTitle("Open database"));
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Open database"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }

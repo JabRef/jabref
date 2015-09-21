@@ -21,7 +21,7 @@ public class NewDatabaseAction extends MnemonicAwareAction {
     public NewDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.getImage("new"));
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, "New database");
+        putValue(Action.NAME, Localization.menuTitle("New database"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX database"));
         //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
     }

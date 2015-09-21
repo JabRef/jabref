@@ -43,14 +43,14 @@ public class HelpAction extends MnemonicAwareAction {
 
     public HelpAction(HelpDialog diag, String helpFile) {
         super(IconTheme.getImage("help"));
-        putValue(Action.NAME, "Help");
+        putValue(Action.NAME, Localization.menuTitle("Help"));
         this.diag = diag;
         this.helpFile = helpFile;
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
         super(IconTheme.getImage("help"));
-        putValue(Action.NAME, "Help");
+        putValue(Action.NAME, Localization.menuTitle("Help"));
         putValue(Action.SHORT_DESCRIPTION,tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
@@ -58,7 +58,7 @@ public class HelpAction extends MnemonicAwareAction {
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
         super(iconFile);
-        putValue(Action.NAME, "Help");
+        putValue(Action.NAME, Localization.menuTitle("Help"));
         putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;

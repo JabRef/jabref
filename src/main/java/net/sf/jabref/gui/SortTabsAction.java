@@ -34,7 +34,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
 
 
     public SortTabsAction(JabRefFrame frame) {
-        putValue(Action.NAME, "Sort tabs");
+        putValue(Action.NAME, Localization.menuTitle("Sort tabs"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Rearrange tabs alphabetically by title"));
         this.frame = frame;
     }

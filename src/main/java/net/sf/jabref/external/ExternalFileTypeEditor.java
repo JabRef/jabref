@@ -371,13 +371,13 @@ public class ExternalFileTypeEditor extends JDialog {
 
         public EditExternalFileTypesAction(JabRefFrame frame) {
             super();
-            putValue(Action.NAME, "Manage external file types");
+            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
             this.frame = frame;
         }
 
         public EditExternalFileTypesAction(JDialog dialog) {
             super();
-            putValue(Action.NAME, "Manage external file types");
+            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
             this.dialog = dialog;
         }
 

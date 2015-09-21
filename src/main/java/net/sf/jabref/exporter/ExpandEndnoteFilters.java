@@ -43,7 +43,7 @@ public class ExpandEndnoteFilters extends MnemonicAwareAction implements Worker 
     /** Creates a new instance of ExpandEndnoteFilters */
     public ExpandEndnoteFilters(JabRefFrame frame) {
         this.frame = frame;
-        putValue(Action.NAME, "Unpack EndNote filter set");
+        putValue(Action.NAME, Localization.menuTitle("Unpack EndNote filter set"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("<HTML>Unpack the zip file containing import/export filters for Endnote,<BR>"
                 + "for optimal interoperability with JabRef</HTML>"));
     }

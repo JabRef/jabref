@@ -91,7 +91,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(Action.NAME, "Manage keywords");
+        putValue(Action.NAME, Localization.menuTitle("Manage keywords"));
         this.frame = frame;
     }
 
