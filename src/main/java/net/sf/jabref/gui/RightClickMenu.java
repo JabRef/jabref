@@ -443,7 +443,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
         //menu.removeAll();
-        menu.setText(Localization.lang(field.getMenuString()));
+        menu.setText(field.getMenuString());
         menu.setIcon(field.getRepresentingIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(val.getMenuAction(frame));
