@@ -8,6 +8,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -20,6 +21,7 @@ public class BibtexEntryWriter {
      */
     private static final Map<String, String> tagDisplayNameMap = new HashMap<>();
 
+
     static {
         // The field name display map.
         BibtexEntryWriter.tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
@@ -29,6 +31,11 @@ public class BibtexEntryWriter {
         BibtexEntryWriter.tagDisplayNameMap.put("issn", "ISSN");
         BibtexEntryWriter.tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
     }
+
+    private static final Map<String, String[]> requiredFieldsSorted = new HashMap<>();
+
+    private static final Map<String, String[]> optionalFieldsSorted = new HashMap<>();
+
 
     /**
      * The maximum length of a field name to properly make the alignment of the
@@ -103,9 +110,9 @@ public class BibtexEntryWriter {
         // Thereby, write the title field first.
         boolean hasWritten = writeField(entry, out, "title", false);
         writtenFields.add("title");
-        String[] requiredFields = entry.getRequiredFields();
-        if (requiredFields != null) {
-            Arrays.sort(requiredFields); // Sorting in alphabetic order.
+
+        if (entry.getRequiredFields() != null) {
+            String[] requiredFields = getRequiredFieldsSorted(entry);
             for (String value : requiredFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -114,10 +121,9 @@ public class BibtexEntryWriter {
             }
         }
 
-        // Then optional fields.
-        String[] optionalFields = entry.getOptionalFields();
-        if (optionalFields != null) {
-            Arrays.sort(optionalFields); // Sorting in alphabetic order.
+        // Then optional fields
+        if (entry.getOptionalFields() != null) {
+            String[] optionalFields = getOptionalFieldsSorted(entry);
             for (String value : optionalFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -142,6 +148,34 @@ public class BibtexEntryWriter {
 
         // Finally, end the entry.
         out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
+    }
+
+    private String[] getRequiredFieldsSorted(BibtexEntry entry) {
+        String entryTypeName = entry.getType().getName();
+        String[] sortedFields = requiredFieldsSorted.get(entryTypeName);
+
+        // put into chache if necessary
+        if(sortedFields == null){
+            sortedFields = entry.getRequiredFields().clone();
+            Arrays.sort(sortedFields);
+            requiredFieldsSorted.put(entryTypeName, sortedFields);
+        }
+
+        return sortedFields;
+    }
+
+    private String[] getOptionalFieldsSorted(BibtexEntry entry) {
+        String entryTypeName = entry.getType().getName();
+        String[] sortedFields = optionalFieldsSorted.get(entryTypeName);
+
+        // put into chache if necessary
+        if(sortedFields == null){
+            sortedFields = entry.getOptionalFields().clone();
+            Arrays.sort(sortedFields);
+            optionalFieldsSorted.put(entryTypeName, sortedFields);
+        }
+
+        return sortedFields;
     }
 
     /**
