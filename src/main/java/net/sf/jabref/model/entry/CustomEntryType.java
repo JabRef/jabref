@@ -18,7 +18,9 @@ package net.sf.jabref.model.entry;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -96,28 +98,28 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     @Override
-    public String[] getOptionalFields() {
-        return optional;
+    public List<String> getOptionalFields() {
+        return Arrays.asList(optional);
     }
 
     @Override
-    public String[] getRequiredFields() {
-        return required;
+    public List<String> getRequiredFields() {
+        return Arrays.asList(required);
     }
 
     @Override
-    public String[] getPrimaryOptionalFields() {
-        return priOpt;
+    public List<String> getPrimaryOptionalFields() {
+        return Arrays.asList(priOpt);
     }
 
     @Override
-    public String[] getSecondaryOptionalFields() {
-        return StringUtil.getRemainder(optional, priOpt);
+    public List<String> getSecondaryOptionalFields() {
+        return Arrays.asList(StringUtil.getRemainder(optional, priOpt));
     }
 
     @Override
-    public String[] getRequiredFieldsForCustomization() {
-        return getRequiredFieldsString().split(";");
+    public List<String> getRequiredFieldsForCustomization() {
+        return Arrays.asList(getRequiredFieldsString().split(";"));
     }
 
     /**

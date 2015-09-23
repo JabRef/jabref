@@ -156,7 +156,7 @@ public class BibtexEntryWriter {
 
         // put into chache if necessary
         if (sortedFields == null) {
-            sortedFields = entry.getRequiredFields().clone();
+            sortedFields = entry.getRequiredFields().stream().toArray(size -> new String[size]);
             Arrays.sort(sortedFields);
             requiredFieldsSorted.put(entryTypeName, sortedFields);
         }
@@ -170,7 +170,7 @@ public class BibtexEntryWriter {
 
         // put into chache if necessary
         if (sortedFields == null) {
-            sortedFields = entry.getOptionalFields().clone();
+            sortedFields = entry.getOptionalFields().stream().toArray(size -> new String[size]);
             Arrays.sort(sortedFields);
             optionalFieldsSorted.put(entryTypeName, sortedFields);
         }
@@ -195,7 +195,7 @@ public class BibtexEntryWriter {
         written.add(BibtexEntry.KEY_FIELD);
         boolean hasWritten = false;
         // Write required fields first.
-        String[] fields = entry.getRequiredFields();
+        List<String> fields = entry.getRequiredFields();
         if (fields != null) {
             for (String value : fields) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten);

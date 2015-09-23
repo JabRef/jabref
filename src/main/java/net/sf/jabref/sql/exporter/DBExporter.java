@@ -231,12 +231,8 @@ public abstract class DBExporter extends DBImporterExporter {
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 fieldRequirement.add(i, "gen");
             }
-            List<String> reqFields = Arrays
-                    .asList(val.getRequiredFields() != null ? val
-                            .getRequiredFields() : new String[0]);
-            List<String> optFields = Arrays
-                    .asList(val.getOptionalFields() != null ? val
-                            .getOptionalFields() : new String[0]);
+            List<String> reqFields = val.getRequiredFields();
+            List<String> optFields = val.getOptionalFields();
             List<String> utiFields = Arrays
                     .asList(val.getUtilityFields() != null ? val
                             .getUtilityFields() : new String[0]);

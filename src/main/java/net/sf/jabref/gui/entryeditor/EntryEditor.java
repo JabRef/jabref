@@ -208,12 +208,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private void setupFieldPanels() {
         tabbed.removeAll();
         tabs.clear();
-        String[] fields = entry.getRequiredFields();
+        List<String> fieldList = entry.getRequiredFields();
 
-        List<String> fieldList = null;
-        if (fields != null) {
-            fieldList = java.util.Arrays.asList(fields);
-        }
         EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Localization.lang("Required fields"));
         if (reqPan.fileListEditor != null) {
             fileListEditor = reqPan.fileListEditor;
@@ -222,10 +218,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(reqPan);
 
-        if (entry.getOptionalFields() != null && entry.getOptionalFields().length >= 1) {
+        if (entry.getOptionalFields() != null && entry.getOptionalFields().size() >= 1) {
             EntryEditorTab optPan;
             if (!prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-                optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
+                optPan = new EntryEditorTab(frame, panel, entry.getOptionalFields(), this,
                         false, false, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
@@ -235,7 +231,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 tabs.add(optPan);
             } else {
                 optPan = new EntryEditorTab(frame, panel,
-                        java.util.Arrays.asList(entry.getType().getPrimaryOptionalFields()), this,
+                        entry.getType().getPrimaryOptionalFields(), this,
                         false, true, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
@@ -247,8 +243,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 Set<String> deprecatedFields = new HashSet<>(BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.keySet());
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
-                String[] secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
-                String[] optionalFieldsNotPrimaryOrDeprecated = StringUtil.getRemainder(secondaryOptionalFields,
+                List<String> secondaryOptionalFields = entry.getType().getSecondaryOptionalFields();
+                String[] optionalFieldsNotPrimaryOrDeprecated = StringUtil.getRemainder((secondaryOptionalFields.toArray(new String[0])),
                         deprecatedFields.toArray(new String[deprecatedFields.size()]));
 
                 // Get list of all optional fields of this entry and their aliases

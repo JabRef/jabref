@@ -118,14 +118,14 @@ public class BibtexEntry {
     /**
      * @return An array describing the optional fields for this entry. "null" if no fields are required
      */
-    public String[] getOptionalFields() {
+    public List<String> getOptionalFields() {
         return type.getOptionalFields();
     }
 
     /**
      * @return an array describing the required fields for this entry. "null" if no fields are required
      */
-    public String[] getRequiredFields() {
+    public List<String> getRequiredFields() {
         return type.getRequiredFields();
     }
 
@@ -434,6 +434,10 @@ public class BibtexEntry {
         }
 
         return true;
+    }
+
+    boolean allFieldsPresent(List<String> fields, BibtexDatabase database) {
+        return allFieldsPresent((String[]) fields.toArray(), database);
     }
 
     boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
