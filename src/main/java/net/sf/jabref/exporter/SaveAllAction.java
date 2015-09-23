@@ -21,6 +21,7 @@ import javax.swing.Action;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import spin.Spin;

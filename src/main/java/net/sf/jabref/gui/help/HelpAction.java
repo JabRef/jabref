@@ -17,7 +17,6 @@ package net.sf.jabref.gui.help;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -25,7 +24,7 @@ import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

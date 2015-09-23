@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
@@ -22,6 +22,9 @@ import java.util.TreeMap;
 import javax.swing.Action;
 import javax.swing.JTabbedPane;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

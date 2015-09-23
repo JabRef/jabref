@@ -32,6 +32,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;

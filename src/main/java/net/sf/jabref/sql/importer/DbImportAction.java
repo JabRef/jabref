@@ -26,6 +26,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.Globals;

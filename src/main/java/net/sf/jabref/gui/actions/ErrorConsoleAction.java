@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.l10n.Localization;
