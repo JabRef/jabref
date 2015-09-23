@@ -155,7 +155,7 @@ public class BibtexEntryWriter {
         String[] sortedFields = requiredFieldsSorted.get(entryTypeName);
 
         // put into chache if necessary
-        if(sortedFields == null){
+        if (sortedFields == null) {
             sortedFields = entry.getRequiredFields().clone();
             Arrays.sort(sortedFields);
             requiredFieldsSorted.put(entryTypeName, sortedFields);
@@ -169,7 +169,7 @@ public class BibtexEntryWriter {
         String[] sortedFields = optionalFieldsSorted.get(entryTypeName);
 
         // put into chache if necessary
-        if(sortedFields == null){
+        if (sortedFields == null) {
             sortedFields = entry.getOptionalFields().clone();
             Arrays.sort(sortedFields);
             optionalFieldsSorted.put(entryTypeName, sortedFields);
