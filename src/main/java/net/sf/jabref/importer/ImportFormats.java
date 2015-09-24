@@ -29,7 +29,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -88,8 +88,8 @@ public class ImportFormats {
                 this.frame = frame;
                 this.openInNew = openInNew;
 
-                putValue(Action.NAME, openInNew ? "Import into new database" :
-                        "Import into current database");
+                putValue(Action.NAME, openInNew ? Localization.menuTitle("Import into new database") :
+                        Localization.menuTitle("Import into current database"));
                 putValue(Action.ACCELERATOR_KEY, openInNew ? Globals.prefs.getKey("Import into new database") :
                         Globals.prefs.getKey("Import into current database"));
             }

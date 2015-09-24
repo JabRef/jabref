@@ -27,7 +27,7 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
@@ -165,7 +165,7 @@ public class ExportFormats {
             public ExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(Action.NAME, selectedOnly ? "Export selected entries" : "Export");
+                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization.menuTitle("Export"));
             }
 
             @Override

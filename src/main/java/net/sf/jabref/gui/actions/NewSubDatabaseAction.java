@@ -21,9 +21,8 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
     public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.getImage("new"));
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, "New subdatabase based on AUX file");
+        putValue(Action.NAME, Localization.menuTitle("New subdatabase based on AUX file"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX subdatabase"));
-        //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
     }
 
     @Override

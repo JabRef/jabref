@@ -171,7 +171,7 @@ public class SPIRESFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle(getKeyName());
+        return Localization.menuTitle("Fetch_SPIRES");
     }
 
     /*

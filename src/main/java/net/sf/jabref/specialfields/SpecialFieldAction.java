@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.gui.BaseAction;
+import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
