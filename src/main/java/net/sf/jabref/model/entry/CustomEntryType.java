@@ -43,12 +43,20 @@ public class CustomEntryType extends BibtexEntryType {
 
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
+    public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
+        this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),
+                secOpt.toArray(new String[secOpt.size()]));
+    }
 
     public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
         this.name = StringUtil.capitalizeFirst(name);
         parseRequiredFields(required);
         this.priOpt = priOpt;
         optional = StringUtil.arrayConcat(priOpt, secOpt);
+    }
+
+    public CustomEntryType(String name, List<String> required, List<String> optional) {
+        this(name, required.toArray(new String[required.size()]), optional.toArray(new String[optional.size()]));
     }
 
     public CustomEntryType(String name, String[] required, String[] optional) {

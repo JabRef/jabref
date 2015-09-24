@@ -232,18 +232,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 continue;
             }
 
-            List<String> reqFields = stringListEntry.getValue();
-            List<String> optFields = optLists.get(stringListEntry.getKey());
-            List<String> opt2Fields = opt2Lists.get(stringListEntry.getKey());
-            String[] reqStr = new String[reqFields.size()];
-            reqStr = reqFields.toArray(reqStr);
-            String[] optStr = new String[optFields.size()];
-            optStr = optFields.toArray(optStr);
-            String[] opt2Str;
-            if (opt2Fields != null) {
-                opt2Str = opt2Fields.toArray(new String[opt2Fields.size()]);
-            } else {
-                opt2Str = new String[0];
+            List<String> reqStr = stringListEntry.getValue();
+            List<String> optStr = optLists.get(stringListEntry.getKey());
+            List<String> opt2Str = opt2Lists.get(stringListEntry.getKey());
+
+            if (opt2Str != null) {
+                opt2Str = new ArrayList<>(0);
             }
 
             // If this type is already existing, check if any changes have
@@ -262,16 +256,16 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
             BibtexEntryType oldType = BibtexEntryType.getType(stringListEntry.getKey());
             if (oldType != null) {
-                String[] oldReq = oldType.getRequiredFields().toArray(new String[0]);
-                String[] oldOpt = oldType.getOptionalFields().toArray(new String[0]);
+                List<String> oldReq = oldType.getRequiredFields();
+                List<String> oldOpt = oldType.getOptionalFields();
                 if (biblatexMode) {
-                    String[] oldPriOpt = oldType.getPrimaryOptionalFields().toArray(new String[0]);
-                    String[] oldSecOpt = oldType.getSecondaryOptionalFields().toArray(new String[0]);
-                    if (equalArrays(oldReq, reqStr) && equalArrays(oldPriOpt, optStr) &&
-                            equalArrays(oldSecOpt, opt2Str)) {
+                    List<String> oldPriOpt = oldType.getPrimaryOptionalFields();
+                    List<String> oldSecOpt = oldType.getSecondaryOptionalFields();
+                    if (equalLists(oldReq, reqStr) && equalLists(oldPriOpt, optStr) &&
+                            equalLists(oldSecOpt, opt2Str)) {
                         changesMade = false;
                     }
-                } else if (equalArrays(oldReq, reqStr) && equalArrays(oldOpt, optStr)) {
+                } else if (equalLists(oldReq, reqStr) && equalLists(oldOpt, optStr)) {
                     changesMade = false;
                 }
             }
@@ -334,19 +328,19 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
     }
 
-    private boolean equalArrays(String[] one, String[] two) {
+    private boolean equalLists(List<String> one, List<String> two) {
         if ((one == null) && (two == null)) {
             return true; // Both null.
         }
         if ((one == null) || (two == null)) {
             return false; // One of them null, the other not.
         }
-        if (one.length != two.length) {
+        if (one.size() != two.size()) {
             return false; // Different length.
         }
         // If we get here, we know that both are non-null, and that they have the same length.
-        for (int i = 0; i < one.length; i++) {
-            if (!one[i].equals(two[i])) {
+        for (int i = 0; i < one.size(); i++) {
+            if (!one.get(i).equals(two.get(i))) {
                 return false;
             }
         }
