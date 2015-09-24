@@ -32,9 +32,9 @@ public class BibtexEntryWriter {
         BibtexEntryWriter.tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
     }
 
-    private static final Map<String, String[]> requiredFieldsSorted = new HashMap<>();
+    private static final Map<String, List<String>> requiredFieldsSorted = new HashMap<>();
 
-    private static final Map<String, String[]> optionalFieldsSorted = new HashMap<>();
+    private static final Map<String, List<String>> optionalFieldsSorted = new HashMap<>();
 
 
     /**
@@ -112,7 +112,7 @@ public class BibtexEntryWriter {
         writtenFields.add("title");
 
         if (entry.getRequiredFields() != null) {
-            String[] requiredFields = getRequiredFieldsSorted(entry);
+            List<String> requiredFields = getRequiredFieldsSorted(entry);
             for (String value : requiredFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -123,7 +123,7 @@ public class BibtexEntryWriter {
 
         // Then optional fields
         if (entry.getOptionalFields() != null) {
-            String[] optionalFields = getOptionalFieldsSorted(entry);
+            List<String> optionalFields = getOptionalFieldsSorted(entry);
             for (String value : optionalFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -150,28 +150,28 @@ public class BibtexEntryWriter {
         out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
     }
 
-    private String[] getRequiredFieldsSorted(BibtexEntry entry) {
+    private List<String> getRequiredFieldsSorted(BibtexEntry entry) {
         String entryTypeName = entry.getType().getName();
-        String[] sortedFields = requiredFieldsSorted.get(entryTypeName);
+        List<String> sortedFields = requiredFieldsSorted.get(entryTypeName);
 
         // put into chache if necessary
         if (sortedFields == null) {
-            sortedFields = entry.getRequiredFields().stream().toArray(size -> new String[size]);
-            Arrays.sort(sortedFields);
+            sortedFields = new ArrayList(entry.getRequiredFields());
+            Collections.sort(sortedFields);
             requiredFieldsSorted.put(entryTypeName, sortedFields);
         }
 
         return sortedFields;
     }
 
-    private String[] getOptionalFieldsSorted(BibtexEntry entry) {
+    private List<String> getOptionalFieldsSorted(BibtexEntry entry) {
         String entryTypeName = entry.getType().getName();
-        String[] sortedFields = optionalFieldsSorted.get(entryTypeName);
+        List<String> sortedFields = optionalFieldsSorted.get(entryTypeName);
 
         // put into chache if necessary
         if (sortedFields == null) {
-            sortedFields = entry.getOptionalFields().stream().toArray(size -> new String[size]);
-            Arrays.sort(sortedFields);
+            sortedFields = new ArrayList(entry.getOptionalFields());
+            Collections.sort(sortedFields);
             optionalFieldsSorted.put(entryTypeName, sortedFields);
         }
 
