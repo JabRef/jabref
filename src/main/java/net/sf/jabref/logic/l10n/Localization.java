@@ -11,9 +11,9 @@ public class Localization {
 
     private static final Locale defaultLocale = Locale.getDefault();
 
-    private static final String RESOURCE_PREFIX = "l10n/JabRef";
-    private static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
-    private static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
+    public static final String RESOURCE_PREFIX = "l10n/JabRef";
+    public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
