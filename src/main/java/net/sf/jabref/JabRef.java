@@ -71,12 +71,11 @@ import com.sun.jna.ptr.PointerByReference;
  * JabRef Main Class - The application gets started here.
  */
 public class JabRef {
+    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     public static JabRefFrame jrf;
 
     private static final int MAX_DIALOG_WARNINGS = 10;
-    
-    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     private JabRefCLI cli;
 
@@ -103,7 +102,7 @@ public class JabRef {
         Globals.startBackgroundTasks();
         setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
-        setLanguage(prefs);
+        Localization.setLanguage(prefs.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
         /*
          * The Plug-in System is started automatically on the first call to
@@ -184,23 +183,6 @@ public class JabRef {
     private void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
-    }
-
-    private void setLanguage(JabRefPreferences prefs) {
-        String langStr = prefs.get(JabRefPreferences.LANGUAGE);
-        String[] parts = langStr.split("_");
-        String language;
-        String country;
-        if (parts.length == 1) {
-            language = langStr;
-            country = "";
-        }
-        else {
-            language = parts[0];
-            country = parts[1];
-        }
-
-        Localization.setLanguage(language, country);
     }
 
     // Do not use this code in release version, it contains some memory leaks
