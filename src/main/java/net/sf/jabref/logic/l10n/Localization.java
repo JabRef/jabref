@@ -29,24 +29,17 @@ public class Localization {
 
             // silent fallback to system locale when bundle is not found
             if(!messages.getLocale().equals(locale)) {
-                LOGGER.warn("Tried loading <" + RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back to default locale <" + defaultLocale + ">");
-            }
-
-            if(!menuTitles.getLocale().equals(locale)) {
-                LOGGER.warn("Tried loading <" + MENU_RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back to default locale <" + defaultLocale + ">");
-            }
-
-            if(!intMessages.getLocale().equals(locale)) {
-                LOGGER.warn("Tried loading <" + INTEGRITY_RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back to default locale <" + defaultLocale + ">");
+                LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
             }
         } catch(MissingResourceException e) {
-            LOGGER.warn("Fallback to system locale <" + defaultLocale + "> failed, using locale <en> instead");
+            LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale + "> failed, using locale <en> instead");
 
             locale = new Locale("en");
             messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
             menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
             intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
         } finally {
+            // Set consistent VM locales
             Locale.setDefault(locale);
             javax.swing.JComponent.setDefaultLocale(locale);
         }
