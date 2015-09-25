@@ -554,12 +554,12 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private String[] getAllFields() {
-        ArrayList<String> f = new ArrayList<String>();
-        String[] req = entry.getRequiredFields();
-        String[] opt = entry.getOptionalFields();
+        ArrayList<String> f = new ArrayList<>();
+        List<String> req = entry.getRequiredFields();
+        List<String> opt = entry.getOptionalFields();
         String[] allFields = BibtexFields.getAllFieldNames();
-        Collections.addAll(f, req);
-        Collections.addAll(f, opt);
+        f.addAll(req);
+        f.addAll(opt);
         for (String allField : allFields) {
             if (!f.contains(allField)) {
                 f.add(allField);
