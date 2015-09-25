@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2004 R. Nagel
+Copyright (C) 2015 T. Denkinger
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -140,7 +141,7 @@ public class AuxSubGenerator {
         boolean loopFileOpen;
 
         // the important tag
-        pattern = Pattern.compile("\\\\citation\\{.+\\}");
+        pattern = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
 
         // input-file-buffer
         BufferedReader br = null;
@@ -194,8 +195,7 @@ public class AuxSubGenerator {
                         // extract the bibtex-key(s) XXX from \citation{XXX} string
                         int len = matcher.end() - matcher.start();
                         if (len > 11) {
-                            String str = matcher.group().substring(matcher.start() + 10,
-                                    matcher.end() - 1);
+                            String str = matcher.group(2);
                             // could be an comma separated list of keys
                             String[] keys = str.split(",");
                             if (keys != null) {

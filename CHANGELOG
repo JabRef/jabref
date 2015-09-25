@@ -1,5 +1,6 @@
 [master]
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
+    - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
     - Use correct encoding names (#155) and replace old encoding names in bibtex files. This changes the file header.
     - Feature: When pasting a Google search URL, meta data will be automatically stripped before insertion.
     - No longer write JabRef version to BibTex file header.
@@ -13,6 +14,7 @@
     - Fix bug #1285: Editing position is not lost on saving
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
+    - Solved feature request #767: New subdatabase based on AUX file (biblatex)
 [dev_2.11]
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
