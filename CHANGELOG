@@ -13,6 +13,7 @@
     - Fix bug #1285: Editing position is not lost on saving
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
+    - Solved feature request #767: New subdatabase based on AUX file (biblatex)
 [dev_2.11]
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
