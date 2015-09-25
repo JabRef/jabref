@@ -1,6 +1,7 @@
 [master]
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
+    - The default language is now automatically set to the system's locale.
     - Use correct encoding names (#155) and replace old encoding names in bibtex files. This changes the file header.
     - Feature: When pasting a Google search URL, meta data will be automatically stripped before insertion.
     - No longer write JabRef version to BibTex file header.

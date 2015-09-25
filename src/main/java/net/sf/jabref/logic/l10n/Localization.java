@@ -9,36 +9,40 @@ import java.util.*;
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
-    private static final String RESOURCE_PREFIX = "l10n/JabRef";
-    private static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
-    private static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
+    private static final Locale defaultLocale = Locale.getDefault();
+
+    public static final String RESOURCE_PREFIX = "l10n/JabRef";
+    public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String INTEGRITY_RESOURCE_PREFIX = "l10n/IntegrityMessage";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
     private static ResourceBundle intMessages;
 
-    public static void setLanguage(String language, String country) {
-        Locale locale = new Locale(language, country);
+    public static void setLanguage(String language) {
+        Locale locale = new Locale(language);
 
-        messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
-        intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        try {
+            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
 
-        // these checks are required as when the requested resource bundle is NOT found, the default locale is used as a fallback silently.
-        if(!messages.getLocale().equals(locale)) {
-            LOGGER.warn("tried loading <" + RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back on default locale <" + Locale.getDefault() + ">");
+            // silent fallback to system locale when bundle is not found
+            if(!messages.getLocale().equals(locale)) {
+                LOGGER.warn("Bundle for locale <" + locale + "> not found. Falling back to system locale <" + defaultLocale + ">");
+            }
+        } catch(MissingResourceException e) {
+            LOGGER.warn("Bundle for locale <" + locale + "> not found. Fallback to system locale <" + defaultLocale + "> failed, using locale <en> instead");
+
+            locale = new Locale("en");
+            messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+            intMessages = ResourceBundle.getBundle(INTEGRITY_RESOURCE_PREFIX, locale, new EncodingControl("UTF-8"));
+        } finally {
+            // Set consistent VM locales
+            Locale.setDefault(locale);
+            javax.swing.JComponent.setDefaultLocale(locale);
         }
-
-        if(!menuTitles.getLocale().equals(locale)) {
-            LOGGER.warn("tried loading <" + MENU_RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back on default locale <" + Locale.getDefault() + ">");
-        }
-
-        if(!intMessages.getLocale().equals(locale)) {
-            LOGGER.warn("tried loading <" + INTEGRITY_RESOURCE_PREFIX + "> for locale <" + locale + "> but had to fall back on default locale <" + Locale.getDefault() + ">");
-        }
-
-        Locale.setDefault(locale);
-        javax.swing.JComponent.setDefaultLocale(locale);
     }
 
     public static String lang(String key, String... params) {

@@ -478,7 +478,8 @@ public class JabRefPreferences {
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
         defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
-        defaults.put(LANGUAGE, "en");
+        // system locale as default
+        defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
         defaults.put(SHOW_SHORT, Boolean.TRUE);
 
         // Sorting preferences

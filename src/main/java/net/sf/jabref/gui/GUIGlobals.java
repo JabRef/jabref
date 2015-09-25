@@ -175,22 +175,22 @@ public class GUIGlobals {
         LANGUAGES = new TreeMap<>();
 
         // LANGUAGES contains mappings for supported languages.
-        GUIGlobals.LANGUAGES.put("English", "en");
         GUIGlobals.LANGUAGES.put("Dansk", "da");
         GUIGlobals.LANGUAGES.put("Deutsch", "de");
+        GUIGlobals.LANGUAGES.put("English", "en");
+        GUIGlobals.LANGUAGES.put("Español", "es");
+        GUIGlobals.LANGUAGES.put("Persian (فارسی)", "fa");
         GUIGlobals.LANGUAGES.put("Fran\u00E7ais", "fr");
+        GUIGlobals.LANGUAGES.put("Bahasa Indonesia", "in");
         GUIGlobals.LANGUAGES.put("Italiano", "it");
         GUIGlobals.LANGUAGES.put("Japanese", "ja");
         GUIGlobals.LANGUAGES.put("Nederlands", "nl");
         GUIGlobals.LANGUAGES.put("Norsk", "no");
-        GUIGlobals.LANGUAGES.put("Español", "es");
-        GUIGlobals.LANGUAGES.put("Turkish", "tr");
-        GUIGlobals.LANGUAGES.put("Simplified Chinese", "zh");
-        GUIGlobals.LANGUAGES.put("Vietnamese", "vi");
-        GUIGlobals.LANGUAGES.put("Bahasa Indonesia", "in");
         GUIGlobals.LANGUAGES.put("Brazilian Portugese", "pt_BR");
         GUIGlobals.LANGUAGES.put("Russian", "ru");
-        GUIGlobals.LANGUAGES.put("Persian (فارسی)", "fa");
+        GUIGlobals.LANGUAGES.put("Turkish", "tr");
+        GUIGlobals.LANGUAGES.put("Vietnamese", "vi");
+        GUIGlobals.LANGUAGES.put("Simplified Chinese", "zh");
 
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();
