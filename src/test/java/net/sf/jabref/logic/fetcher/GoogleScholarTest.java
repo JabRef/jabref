@@ -1,9 +1,8 @@
 package net.sf.jabref.logic.fetcher;
 
 import net.sf.jabref.model.entry.BibtexEntry;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import net.sf.jabref.support.DevEnvironment;
+import org.junit.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,6 +30,9 @@ public class GoogleScholarTest {
 
     @Test
     public void linkFound() throws IOException {
+        // CI server is blocked by Google
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         entry.setField("title", "Towards Application Portability in Platform as a Service");
 
         Assert.assertEquals(
@@ -41,6 +43,9 @@ public class GoogleScholarTest {
 
     @Test
     public void noLinkFound() throws IOException {
+        // CI server is blocked by Google
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
