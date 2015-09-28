@@ -658,7 +658,8 @@ class ManageJournalsPanel extends JPanel {
                     try {
                         JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
                         abbr.readJournalListFromFile(new File(tf.getText()));
-                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
+
+                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbr));
                         JScrollPane pane = new JScrollPane(table);
                         JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
                     } catch (FileNotFoundException ex) {
