@@ -18,28 +18,44 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
  * in JabRef style. The reformatting must undo all formatting done by JabRef when
  * writing the same fields.
  */
 class FieldContentParser {
+    private final List<String> multiLineFields;
+
+    public FieldContentParser() {
+        multiLineFields = new ArrayList<>();
+        multiLineFields.add("abstract");
+        multiLineFields.add("review");
+    }
 
     /**
      * Performs the reformatting
-     * @param content StringBuffer containing the field to format. key contains field name according to field
-     *  was edited by Kuehn/Havalevich
-     * @return The formatted field content. NOTE: the StringBuffer returned may
-     * or may not be the same as the argument given.
+     *
+     * @param content StringBuffer containing the field to format. bibtexKey contains field name according to field
+     *                was edited by Kuehn/Havalevich
+     * @param bibtexKey
+     * @return The formatted field content. The StringBuffer returned may or may not be the same as the argument given.
      */
-    public StringBuffer format(StringBuffer content, String key) {
-        int i = 0;
-
+    public StringBuffer format(StringBuffer content, String bibtexKey) {
         // Unify line breaks
         content = new StringBuffer(StringUtil.unifyLineBreaks(content.toString()));
 
+        // Do not format multiline fields
+        if(multiLineFields.contains(bibtexKey)) {
+            return content;
+        }
+
+        int i = 0;
         while (i < content.length()) {
             int c = content.charAt(i);
+
             if (c == '\n') {
                 // @formatter:off
                 if (content.length() > i + 1 && content.charAt(i + 1) == '\t'
@@ -120,7 +136,7 @@ class FieldContentParser {
                     // Yes, of course we have, but in Filenames it is necessary to have all spaces. :-)
                     // This is the reason why the next lines are required
                     // FIXME: just don't edit some fields rather than hacking every exception?
-                    if (key != null && key.equals(GUIGlobals.FILE_FIELD)) {
+                    if (bibtexKey != null && bibtexKey.equals(GUIGlobals.FILE_FIELD)) {
                         i++;
                     } else {
                         content.deleteCharAt(i);
@@ -137,15 +153,5 @@ class FieldContentParser {
         }
 
         return content;
-    }
-
-    /**
-     * Performs the reformatting
-     * @param content StringBuffer containing the field to format.
-     * @return The formatted field content. NOTE: the StringBuffer returned may
-     * or may not be the same as the argument given.
-     */
-    public StringBuffer format(StringBuffer content) {
-        return format(content, null);
     }
 }
