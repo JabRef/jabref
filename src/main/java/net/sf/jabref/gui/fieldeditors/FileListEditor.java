@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
@@ -45,6 +46,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.io.JabRefDesktop;
@@ -73,7 +75,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
-            EntryEditor entryEditor) {
+                          EntryEditor entryEditor) {
         this.frame = frame;
         this.metaData = metaData;
         this.fieldName = fieldName;
@@ -238,6 +240,26 @@ public class FileListEditor extends JTable implements FieldEditor,
         JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
+
+        JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
+        menu.add(deleteFile);
+        deleteFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = getSelectedRow();
+                // no selection
+                if (row == -1) {
+                    return;
+                }
+
+                FileListEntry entry = tableModel.getEntry(row);
+                // unlink file
+                removeEntries();
+                // delete file from filesystem
+                File expandedPath = FileUtil.expandFilename(metaData, entry.getLink());
+                FileUtil.deleteFile(expandedPath.getAbsolutePath());
+            }
+        });
     }
 
     private void openSelectedFile() {
@@ -367,7 +389,8 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     /**
      * Open an editor for this entry.
-     * @param entry The entry to edit.
+     *
+     * @param entry      The entry to edit.
      * @param openBrowse True to indicate that a Browse dialog should be immediately opened.
      * @return true if the edit was accepted, false if it was cancelled.
      */
@@ -434,6 +457,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     /**
      * This is the callback method that the DownloadExternalFile class uses to report the result
      * of a download operation. This call may never come, if the user cancelled the operation.
+     *
      * @param file The FileListEntry linking to the resulting local file.
      */
     @Override
@@ -453,8 +477,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     FileListEntry entry = tableModel.getEntry(row);
                     editListEntry(entry, false);
                 }
-            }
-            else if (e.isPopupTrigger()) {
+            } else if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
             }
         }
