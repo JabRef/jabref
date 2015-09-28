@@ -145,20 +145,6 @@ public class JabRef {
             }
         }
 
-        /*
-         * See if the user has a personal journal list set up. If so, add these
-         * journal names and abbreviations to the list:
-         */
-        String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null && !personalJournalList.isEmpty()) {
-            try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
-            } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Journal file not found") + ": " + e.getMessage(), Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
-            }
-        }
-
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
