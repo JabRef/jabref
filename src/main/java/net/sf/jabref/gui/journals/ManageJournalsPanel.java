@@ -36,6 +36,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 
@@ -172,8 +173,8 @@ class ManageJournalsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                abbr.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbrev));
+                abbr.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
+                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Abbreviations.journalAbbrev));
                 JScrollPane pane = new JScrollPane(table);
                 JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"), JOptionPane.INFORMATION_MESSAGE);
             }
@@ -423,7 +424,7 @@ class ManageJournalsPanel extends JPanel {
             Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
         }
 
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:

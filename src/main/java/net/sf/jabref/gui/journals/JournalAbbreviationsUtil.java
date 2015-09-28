@@ -2,8 +2,8 @@ package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
@@ -39,7 +39,7 @@ public class JournalAbbreviationsUtil {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String text = editor.getText();
-                if (Globals.journalAbbrev.isKnownName(text)) {
+                if (Abbreviations.journalAbbrev.isKnownName(text)) {
                     String s = toggleAbbreviation(text);
 
                     if (s != null) {
@@ -52,7 +52,7 @@ public class JournalAbbreviationsUtil {
             }
 
             public String toggleAbbreviation(String currentText) {
-                return Globals.journalAbbrev.getNextAbbreviation(currentText).orElse(currentText);
+                return Abbreviations.journalAbbrev.getNextAbbreviation(currentText).orElse(currentText);
             }
         });
 

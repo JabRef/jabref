@@ -1,10 +1,7 @@
 package net.sf.jabref.logic.journals;
 
-import net.sf.jabref.Globals;
-
 import static org.junit.Assert.*;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JournalAbbreviationRepositoryTest {
@@ -76,8 +73,8 @@ public class JournalAbbreviationRepositoryTest {
     @Test
     public void testParsing() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-        repository.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
+        repository.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
+        repository.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_INTERNAL_LIST);
         assertTrue(!repository.getAbbreviations().isEmpty());
     }
 

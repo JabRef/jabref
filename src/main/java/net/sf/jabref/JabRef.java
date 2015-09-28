@@ -20,7 +20,6 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +35,7 @@ import javax.swing.plaf.FontUIResource;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
@@ -120,7 +120,7 @@ public class JabRef {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
