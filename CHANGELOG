@@ -16,6 +16,8 @@
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
     - Solved feature request #767: New subdatabase based on AUX file (biblatex)
+    - Fixes GH Bug #173: Personal journal abbreviation list is not loaded twice
+    - Bugfix: Preview of external journal abbreviation list now displays the correct list
 [dev_2.11]
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
