@@ -67,11 +67,12 @@ public class Globals {
         String[] lists = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if (lists != null && lists.length > 0) {
             for (int i = lists.length - 1; i >= 0; i--) {
+                String filename = lists[i];
                 try {
-                    Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
+                    Globals.journalAbbrev.readJournalListFromFile(new File(filename));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find file", e);
+                    LOGGER.info("Cannot find external journal list file " + filename, e);
                 }
             }
         }
