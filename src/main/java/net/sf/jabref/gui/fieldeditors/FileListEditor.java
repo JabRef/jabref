@@ -255,18 +255,20 @@ public class FileListEditor extends JTable implements FieldEditor,
                 }
 
                 FileListEntry entry = tableModel.getEntry(row);
-                Path filePath = FileUtil.expandFilename(metaData, entry.getLink()).toPath();
+                File file = FileUtil.expandFilename(metaData, entry.getLink());
 
                 try {
                     // transactional delete and unlink
-                    if(Files.exists(filePath)) {
-                        Files.delete(filePath);
+                    if(file != null) {
+                        Files.delete(file.toPath());
                         removeEntries();
                     } else {
                         removeEntries();
                     }
                 } catch (IOException ex) {
-                    LOGGER.warn("File permission error while deleting: " + filePath);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
+                            Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("File permission error while deleting: " + file.toPath());
                 }
             }
         });
