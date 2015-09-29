@@ -255,16 +255,15 @@ public class FileListEditor extends JTable implements FieldEditor,
                 }
 
                 FileListEntry entry = tableModel.getEntry(row);
+                // null if file does not exist
                 File file = FileUtil.expandFilename(metaData, entry.getLink());
 
+                // transactional delete and unlink
                 try {
-                    // transactional delete and unlink
                     if(file != null) {
                         Files.delete(file.toPath());
-                        removeEntries();
-                    } else {
-                        removeEntries();
                     }
+                    removeEntries();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
                             Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
