@@ -45,6 +45,7 @@ public class JournalAbbreviationRepository {
     }
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
+        LOGGER.debug("Reading journal list from file " + file);
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(Objects.requireNonNull(file));
         for (Abbreviation abbreviation : parser.getAbbreviations()) {

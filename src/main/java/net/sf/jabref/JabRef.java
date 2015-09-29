@@ -20,7 +20,6 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +35,7 @@ import javax.swing.plaf.FontUIResource;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
@@ -120,7 +120,7 @@ public class JabRef {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -142,20 +142,6 @@ public class JabRef {
                     JabRefExecutorService.INSTANCE.shutdownEverything();
                     return;
                 }
-            }
-        }
-
-        /*
-         * See if the user has a personal journal list set up. If so, add these
-         * journal names and abbreviations to the list:
-         */
-        String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null && !personalJournalList.isEmpty()) {
-            try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
-            } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Journal file not found") + ": " + e.getMessage(), Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
             }
         }
 

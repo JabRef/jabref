@@ -3,6 +3,7 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Map;
 import java.util.Vector;
 
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -49,7 +50,7 @@ public class ContentAutoCompleters extends AutoCompleters {
     public void addJournalListToAutoCompleter() {
         AutoCompleter autoCompleter = get("journal");
         if(autoCompleter != null) {
-            for(Abbreviation abbreviation : Globals.journalAbbrev.getAbbreviations()) {
+            for(Abbreviation abbreviation : Abbreviations.journalAbbrev.getAbbreviations()) {
                 autoCompleter.addWordToIndex(abbreviation.getName());
             }
         }
