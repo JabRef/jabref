@@ -24,6 +24,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -253,11 +255,19 @@ public class FileListEditor extends JTable implements FieldEditor,
                 }
 
                 FileListEntry entry = tableModel.getEntry(row);
-                // unlink file
-                removeEntries();
-                // delete file from filesystem
-                File expandedPath = FileUtil.expandFilename(metaData, entry.getLink());
-                FileUtil.deleteFile(expandedPath.getAbsolutePath());
+                Path filePath = FileUtil.expandFilename(metaData, entry.getLink()).toPath();
+
+                try {
+                    // transactional delete and unlink
+                    if(Files.exists(filePath)) {
+                        Files.delete(filePath);
+                        removeEntries();
+                    } else {
+                        removeEntries();
+                    }
+                } catch (IOException ex) {
+                    LOGGER.warn("File permission error while deleting: " + filePath);
+                }
             }
         });
     }

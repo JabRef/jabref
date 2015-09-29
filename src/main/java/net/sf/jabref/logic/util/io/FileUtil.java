@@ -97,23 +97,6 @@ public class FileUtil {
     }
 
     /**
-     * Deletes a file from the local file system.
-     *
-     * @param filePath the file to delete
-     */
-    public static void deleteFile(String filePath) {
-        try {
-            Files.delete(Paths.get(filePath));
-        } catch (NoSuchFileException e) {
-            LOGGER.warn("No such file or directory found: " + filePath);
-        } catch (DirectoryNotEmptyException e) {
-            LOGGER.warn("Cannot delete non-empty directory: " + filePath);
-        } catch (IOException e) {
-            LOGGER.warn("File permission error while deleting: " + filePath);
-        }
-    }
-
-    /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.<br/>
      * <p>
