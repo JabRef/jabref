@@ -23,6 +23,14 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.Vector;
 
+/**
+ * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
+ * 
+ * Obeys following settings:
+ *  * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
+ *  * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
+ *  * JabRefPreferences.WRITEFIELD_WRAPFIELD
+ */
 public class LatexFieldFormatter implements FieldFormatter {
 
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
@@ -38,8 +46,8 @@ public class LatexFieldFormatter implements FieldFormatter {
     private final boolean neverFailOnHashes;
 
     private final boolean resolveStringsAllFields;
-    private final char valueDelimitersZero;
-    private final char valueDelimitersOne;
+    private final char valueDelimiterStartOfValue;
+    private final char valueDelimiterEndOfValue;
     private final boolean writefieldWrapfield;
     private final String[] doNotResolveStringsFors;
 
@@ -52,8 +60,8 @@ public class LatexFieldFormatter implements FieldFormatter {
         this.neverFailOnHashes = neverFailOnHashes;
 
         this.resolveStringsAllFields = Globals.prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
-        valueDelimitersZero = Globals.prefs.getValueDelimiters(0);
-        valueDelimitersOne = Globals.prefs.getValueDelimiters(1);
+        valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
+        valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
         doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
         writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
     }
@@ -63,7 +71,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             throws IllegalArgumentException {
 
         if (text == null) {
-            return valueDelimitersZero + "" + valueDelimitersOne;
+            return valueDelimiterStartOfValue + "" + valueDelimiterEndOfValue;
         }
 
         if (Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName)) {
@@ -120,7 +128,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             }
 
             sb = new StringBuffer(
-                    valueDelimitersZero + "");
+                    valueDelimiterStartOfValue + "");
             // No formatting at all for these fields, to allow custom formatting?
             //            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
             //              sb.append(text);
@@ -132,7 +140,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 sb.append(text);
             }
 
-            sb.append(valueDelimitersOne);
+            sb.append(valueDelimiterEndOfValue);
 
             return sb.toString();
         }
@@ -213,7 +221,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
-        sb.append(valueDelimitersZero);
+        sb.append(valueDelimiterStartOfValue);
         boolean escape = false;
         boolean inCommandName = false;
         boolean inCommand = false;
@@ -281,7 +289,7 @@ if (c == '&' && !escape &&
 }
             escape = c == '\\';
         }
-        sb.append(valueDelimitersOne);
+        sb.append(valueDelimiterEndOfValue);
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
@@ -302,7 +310,7 @@ if (c == '&' && !escape &&
         Vector<Integer> right = new Vector<Integer>(5, 3);
         int current = -1;
 
-        // First we collect all occurences:
+        // First we collect all occurrences:
         while ((current = text.indexOf('{', current + 1)) != -1) {
             left.add(current);
         }
