@@ -57,6 +57,17 @@ public class JournalAbbreviationRepositoryTest {
     }
 
     @Test
+    public void testDuplicatesIsoOnly() {
+        JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
+        repository.addEntry(new Abbreviation("Old Long Name", "L. N."));
+        repository.addEntry(new Abbreviation("New Long Name", "L. N."));
+        assertEquals(2, repository.size());
+
+        assertEquals("L N", repository.getNextAbbreviation("L. N.").orElse("WRONG"));
+        assertEquals("New Long Name", repository.getNextAbbreviation("L N").orElse("WRONG"));
+    }
+
+    @Test
     public void testDuplicateKeys() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
         repository.addEntry(new Abbreviation("Long Name", "L. N."));
@@ -68,14 +79,6 @@ public class JournalAbbreviationRepositoryTest {
         assertEquals("LA. N.", repository.getIsoAbbreviation("Long Name").orElse("WRONG"));
 
         assertEquals("Long Name = LA. N.", repository.getAbbreviations().first().toPropertiesLine());
-    }
-
-    @Test
-    public void testParsing() {
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
-        repository.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_INTERNAL_LIST);
-        assertTrue(!repository.getAbbreviations().isEmpty());
     }
 
 }
