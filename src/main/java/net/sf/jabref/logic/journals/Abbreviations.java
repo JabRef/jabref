@@ -13,15 +13,20 @@ public class Abbreviations {
 
     // journal initialization
     public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/journals/IEEEJournalList.txt";
+    public static final String JOURNALS_IEEE_OFFICIAL_ABBREVIATION_LIST = "/journals/IEEEJournalList.txt";
+    public static final String JOURNALS_IEEE_STANDARD_ABBREVIATION_LIST = "/journals/IEEEJournalListText.txt";
     public static JournalAbbreviationRepository journalAbbrev;
 
     public static void initializeJournalNames(JabRefPreferences jabRefPreferences) {
         // Read internal lists:
         journalAbbrev = new JournalAbbreviationRepository();
+
         journalAbbrev.readJournalListFromResource(JOURNALS_FILE_BUILTIN);
+
         if (jabRefPreferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_INTERNAL_LIST);
+            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_OFFICIAL_ABBREVIATION_LIST);
+        } else {
+            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_STANDARD_ABBREVIATION_LIST);
         }
 
         // Read external lists, if any (in reverse order, so the upper lists
