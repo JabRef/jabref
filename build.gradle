@@ -101,6 +101,10 @@ processResources {
     }
 }
 
+clean {
+    delete "src/main/gen"
+}
+
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
