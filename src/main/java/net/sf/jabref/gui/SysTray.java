@@ -15,9 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,16 +26,21 @@ import java.awt.event.MouseEvent;
 
 public class SysTray {
 
-    private JabRefFrame frame;
-    private TrayIcon icon;
-    private SystemTray tray = null;
+    private final JabRefFrame frame;
+    private final TrayIcon icon;
+    private SystemTray tray;
+
 
     public SysTray(JabRefFrame frame) {
         this.frame = frame;
 
         final ActionListener showJabref = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
                     public void run() {
                         SysTray.this.frame.showIfMinimizedToSysTray();
                     }
@@ -45,14 +48,15 @@ public class SysTray {
 
             }
         };
-        MenuItem showWindow = new MenuItem(Globals.lang("Show"));
+        MenuItem showWindow = new MenuItem(Localization.lang("Show"));
         showWindow.addActionListener(showJabref);
         PopupMenu popup = new PopupMenu();
         popup.add(showWindow);
-        ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/JabRef-icon-48.png"));
+        ImageIcon imic = new ImageIcon(GUIGlobals.class.getResource("/images/icons/JabRef-icon-48.png"));
         icon = new TrayIcon(imic.getImage(), "JabRef", popup);
         icon.setImageAutoSize(true);
         icon.addMouseListener(new MouseAdapter() {
+
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
                 showJabref.actionPerformed(new ActionEvent(mouseEvent.getSource(), 0, ""));
@@ -60,32 +64,34 @@ public class SysTray {
 
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
-                super.mousePressed(mouseEvent);    //To change body of overridden methods use File | Settings | File Templates.
+                super.mousePressed(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
-                super.mouseReleased(mouseEvent);    //To change body of overridden methods use File | Settings | File Templates.
+                super.mouseReleased(mouseEvent); //To change body of overridden methods use File | Settings | File Templates.
             }
         });
-        if (SystemTray.isSupported())
+        if (SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
+        }
     }
 
-    public void setTrayIconVisible(boolean visible) {
-        if (tray == null)
+    public void show() {
+        if (tray == null) {
             return;
+        }
         try {
-            if (visible)
-                tray.add(icon);
-            else
-                tray.remove(icon);
+            tray.add(icon);
         } catch (AWTException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(SystemTray.isSupported());
+    public void hide() {
+        if (tray == null) {
+            return;
+        }
+        tray.remove(icon);
     }
 }

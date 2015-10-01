@@ -31,9 +31,9 @@ public interface FullTextFinder {
      * @return true if the site is supported, false otherwise. If the site might be supported,
      *   it is best to return true.
      */
-    public boolean supportsSite(URL url);
+    boolean supportsSite(URL url);
 
-       /**
+    /**
      * Take the source HTML for an article page, and try to find the URL to the
      * full text for this article.
      *
@@ -41,5 +41,5 @@ public interface FullTextFinder {
      * @return The fulltext PDF URL, if found, or null if not found.
      * @throws java.io.IOException
      */
-    public URL findFullTextURL(URL url) throws IOException;
+    URL findFullTextURL(URL url) throws IOException;
 }

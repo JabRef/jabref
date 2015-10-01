@@ -18,48 +18,53 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoablePreambleChange;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.database.BibtexDatabase;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoablePreambleChange;
+import net.sf.jabref.logic.l10n.Localization;
 
-public class PreambleChange extends Change {
+class PreambleChange extends Change {
 
-  String tmp, mem, disk;
-  InfoPane tp = new InfoPane();
-  JScrollPane sp = new JScrollPane(tp);
+    private final String mem;
+    private final String disk;
+    private final InfoPane tp = new InfoPane();
+    private final JScrollPane sp = new JScrollPane(tp);
 
-  public PreambleChange(String tmp, String mem, String disk) {
-    super("Changed preamble");
-    this.disk = disk;
-    this.mem = mem;
-    this.tmp = tmp;
 
-    StringBuffer text = new StringBuffer();
-    text.append("<FONT SIZE=3>");
-      text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
+    public PreambleChange(String tmp, String mem, String disk) {
+        super("Changed preamble");
+        this.disk = disk;
+        this.mem = mem;
 
-    if ((disk != null) && !disk.equals(""))
-        text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
-    else
-        text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
+        StringBuilder text = new StringBuilder();
+        text.append("<FONT SIZE=3>");
+        text.append("<H2>").append(Localization.lang("Changed preamble")).append("</H2>");
 
-    if ((mem != null) && !mem.equals(""))
-        text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
+        if (disk != null && !disk.isEmpty()) {
+            text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
+        } else {
+            text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
+        }
 
-      //tp.setContentType("text/html");
-      tp.setText(text.toString());
-  }
+        if (mem != null && !mem.isEmpty()) {
+            text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
+        }
 
-  public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
-      panel.database().setPreamble(disk);
-      undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
-      secondary.setPreamble(disk);
-      return true;
-  }
+        //tp.setContentType("text/html");
+        tp.setText(text.toString());
+    }
 
-  JComponent description() {
-    return sp;
-  }
+    @Override
+    public boolean makeChange(BasePanel panel, BibtexDatabase secondary, NamedCompound undoEdit) {
+        panel.database().setPreamble(disk);
+        undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
+        secondary.setPreamble(disk);
+        return true;
+    }
+
+    @Override
+    JComponent description() {
+        return sp;
+    }
 }

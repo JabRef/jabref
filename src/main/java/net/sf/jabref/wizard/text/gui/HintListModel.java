@@ -21,18 +21,18 @@ import javax.swing.DefaultListModel;
 
 import net.sf.jabref.wizard.integrity.IntegrityMessage;
 
-public class HintListModel extends DefaultListModel<IntegrityMessage> {
-	
-	public void setData(Vector<IntegrityMessage> newData) {
-		clear();
-		if (newData != null) {
-			for (IntegrityMessage message : newData){
-				addElement(message);
-			}
-		}
-	}
+public class HintListModel extends DefaultListModel {
 
-	public void valueUpdated(int index) {
-		super.fireContentsChanged(this, index, index);
-	}
+    public void setData(Vector<IntegrityMessage> newData) {
+        clear();
+        if (newData != null) {
+            for (IntegrityMessage message : newData) {
+                addElement(message);
+            }
+        }
+    }
+
+    public void valueUpdated(int index) {
+        super.fireContentsChanged(this, index, index);
+    }
 }

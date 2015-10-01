@@ -1,5 +1,0 @@
-Path:    jarbundler-2.2.0.jar
-Project: Mac OS X JarBundler ANT Task
-URL:     http://informagen.com/JarBundler/index.html
-License: GPLv2
-Note:    Required to build Mac OS X Jar

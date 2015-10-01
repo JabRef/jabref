@@ -32,7 +32,7 @@
 // modified:
 //
 
-package net.sf.jabref.wizard.integrity.gui ;
+package net.sf.jabref.wizard.integrity.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -44,131 +44,135 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibtexDatabase;
 
 public class IntegrityWizard extends JDialog implements ActionListener {
 
-  private BibtexDatabase dbase ;
-  private BasePanel basePanel;
-  private JButton closeButton ;
-  private JButton startButton ;
-  private IntegrityMessagePanel warnPanel ;
+    private final BibtexDatabase dbase;
+    private final BasePanel basePanel;
+    private JButton closeButton;
+    private JButton startButton;
+    private IntegrityMessagePanel warnPanel;
 
-  public IntegrityWizard( JabRefFrame frame, BasePanel basePanel)
-  {
-    super( frame, "dialog", false ) ;  // no modal
 
-    this.basePanel = basePanel;
-    dbase = basePanel.database();
-
-    try
+    public IntegrityWizard(JabRefFrame frame, BasePanel basePanel)
     {
-      jbInit() ;
-      pack() ;
-    }
-    catch ( Exception ex )
-    {
-      ex.printStackTrace() ;
-    }
-  }
+        super(frame, "dialog", false); // no modal
 
-  private void jbInit() {
-//    this.setModal( true ) ;
-    this.setResizable( false ) ;
+        this.basePanel = basePanel;
+        dbase = basePanel.database();
 
-    // messages
-    this.setTitle( Globals.lang("Integrity_check") ) ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
-    //warnPanel = new IntegrityMessagePanel() ;
-    //this.setTitle( "Experimental feature - Integrity Check") ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
-    warnPanel = new IntegrityMessagePanel(basePanel) ;
-
-
-    // ButtonPanel
-    JPanel buttonPanel = new JPanel() ;
-    GridBagLayout gbl = new GridBagLayout() ;
-    GridBagConstraints con = new GridBagConstraints() ;
-    con.weightx = 0 ;
-    con.insets = new Insets( 5, 10, 0, 10 ) ;
-    con.fill = GridBagConstraints.HORIZONTAL ;
-
-    // Buttons
-    startButton = new JButton(Globals.lang("Scan")) ;
-    startButton.addActionListener( this) ;
-    closeButton = new JButton(Globals.lang("Close"));
-    closeButton.addActionListener( this) ;
-
-    // insert Buttons
-    con.gridwidth = GridBagConstraints.REMAINDER ;
-    gbl.setConstraints( startButton, con ) ;
-    buttonPanel.add( startButton ) ;
-
-    gbl.setConstraints( closeButton, con ) ;
-    buttonPanel.add( closeButton ) ;
-
-    // ----------------------------------------------------------------------
-    // add a short info, if available
-
-    JEditorPane infoText = null ;
-
-    URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath()
-                                           +GUIGlobals.shortIntegrityCheck);
-    if (infoURL != null)
-      try
-      {
-        infoText = new JEditorPane() ;
-        infoText.setEditable(false);
-        infoText.setPreferredSize( new Dimension(220, 60));
-        infoText.setMinimumSize( new Dimension(180, 50));
-        infoText.setPage(infoURL);
-        infoText.setBackground(GUIGlobals.infoField);
-        infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-//        bottomPanel.add( infoText, BorderLayout.CENTER ) ;
-      }
-      catch (IOException e)
-      {
-        infoText = null ;
-      }
-
-    // -----------------------------------------------------------------------
-
-    // content
-    Container content = this.getContentPane() ;
-    content.setLayout( new BorderLayout());
-
-    if (infoText != null) // only if some help available
-    {
-      content.add( infoText, BorderLayout.PAGE_START ) ;
-    }
-    content.add(warnPanel, BorderLayout.CENTER) ;
-    content.add(buttonPanel, BorderLayout.PAGE_END) ;
-  }
-
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-  public void actionPerformed( ActionEvent e )
-  {
-    Object sender = e.getSource() ;
-
-    if (sender == closeButton)
-    {
-      dispose() ;
-    }
-    else if (sender == startButton)
-    {
-      startButton.setEnabled(false);
-      Runnable scanWork = new Runnable()
-      {
-        public void run()
+        try
         {
-          warnPanel.updateView(dbase);
+            jbInit();
+            pack();
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
         }
-      } ;
-      SwingUtilities.invokeLater(scanWork);
-      startButton.setEnabled(true);
     }
-  }
 
+    private void jbInit() {
+        //    this.setModal( true ) ;
+        this.setResizable(false);
 
+        // messages
+        this.setTitle(Localization.lang("Integrity_check"));//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
+        //warnPanel = new IntegrityMessagePanel() ;
+        //this.setTitle( "Experimental feature - Integrity Check") ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
+        warnPanel = new IntegrityMessagePanel(basePanel);
+
+        // ButtonPanel
+        JPanel buttonPanel = new JPanel();
+        GridBagLayout gbl = new GridBagLayout();
+        GridBagConstraints con = new GridBagConstraints();
+        con.weightx = 0;
+        con.insets = new Insets(5, 10, 0, 10);
+        con.fill = GridBagConstraints.HORIZONTAL;
+
+        // Buttons
+        startButton = new JButton(Localization.lang("Scan"));
+        startButton.addActionListener(this);
+        closeButton = new JButton(Localization.lang("Close"));
+        closeButton.addActionListener(this);
+
+        // insert Buttons
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(startButton, con);
+        buttonPanel.add(startButton);
+
+        gbl.setConstraints(closeButton, con);
+        buttonPanel.add(closeButton);
+
+        // ----------------------------------------------------------------------
+        // add a short info, if available
+
+        JEditorPane infoText = null;
+
+        URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath()
+                + GUIGlobals.shortIntegrityCheck);
+        if (infoURL != null) {
+            try
+            {
+                infoText = new JEditorPane();
+                infoText.setEditable(false);
+                infoText.setPreferredSize(new Dimension(220, 60));
+                infoText.setMinimumSize(new Dimension(180, 50));
+                infoText.setPage(infoURL);
+                infoText.setBackground(GUIGlobals.infoField);
+                infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+                //        bottomPanel.add( infoText, BorderLayout.CENTER ) ;
+            } catch (IOException e)
+            {
+                infoText = null;
+            }
+        }
+
+        // -----------------------------------------------------------------------
+
+        // content
+        Container content = this.getContentPane();
+        content.setLayout(new BorderLayout());
+
+        if (infoText != null) // only if some help available
+        {
+            content.add(infoText, BorderLayout.PAGE_START);
+        }
+        content.add(warnPanel, BorderLayout.CENTER);
+        content.add(buttonPanel, BorderLayout.PAGE_END);
+    }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        Object sender = e.getSource();
+
+        if (sender == closeButton)
+        {
+            dispose();
+        }
+        else if (sender == startButton)
+        {
+            startButton.setEnabled(false);
+            Runnable scanWork = new Runnable()
+            {
+
+                @Override
+                public void run()
+                {
+                    warnPanel.updateView(dbase);
+                }
+            };
+            SwingUtilities.invokeLater(scanWork);
+            startButton.setEnabled(true);
+        }
+    }
 
 }

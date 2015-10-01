@@ -17,9 +17,10 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
+
     /** The root of the global groups tree */
     private final GroupTreeNode m_groupsRootHandle;
     /** The subtree that was added or removed */
@@ -45,6 +46,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     /** Removal of a node and all of its children. */
     public static final int REMOVE_NODE_AND_CHILDREN = 2;
 
+
     /**
      * Creates an object that can undo/redo an edit event.
      * 
@@ -68,7 +70,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         m_subtreeRootChildCount = editedNode.getChildCount();
         // storing a backup of the whole subtree is not required when children
         // are kept
-        m_subtreeBackup = editType != REMOVE_NODE_KEEP_CHILDREN ? editedNode
+        m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ? editedNode
                 .deepCopy() : new GroupTreeNode(editedNode.getGroup().deepCopy());
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
@@ -76,31 +78,35 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         m_pathToNode = editedNode.getIndexedPath();
     }
 
+    @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + getName();
+        return Localization.lang("Undo") + ": " + getName();
     }
 
-    public String getName() {
+    private String getName() {
         switch (m_editType) {
         case ADD_NODE:
-            return Globals.lang("add group");
+            return Localization.lang("add group");
         case REMOVE_NODE_KEEP_CHILDREN:
-            return Globals.lang("remove group (keep subgroups)");
+            return Localization.lang("remove group (keep subgroups)");
         case REMOVE_NODE_AND_CHILDREN:
-            return Globals.lang("remove group and subgroups");
+            return Localization.lang("remove group and subgroups");
         }
-        return "? (" + Globals.lang("unknown edit") + ")";
+        return "? (" + Localization.lang("unknown edit") + ")";
     }
 
+    @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + getName();
+        return Localization.lang("Redo") + ": " + getName();
     }
 
+    @Override
     public void undo() {
         super.undo();
         doOperation(true);
     }
 
+    @Override
     public void redo() {
         super.redo();
         doOperation(false);
@@ -110,8 +116,9 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         GroupTreeNode cursor = m_groupsRootHandle;
         final int childIndex = m_pathToNode[m_pathToNode.length - 1];
         // traverse path up to butlast element
-        for (int i = 0; i < m_pathToNode.length - 1; ++i)
+        for (int i = 0; i < m_pathToNode.length - 1; ++i) {
             cursor = (GroupTreeNode) cursor.getChildAt(m_pathToNode[i]);
+        }
         if (undo) {
             switch (m_editType) {
             case ADD_NODE:
@@ -140,17 +147,19 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 GroupTreeNode removedNode = (GroupTreeNode) cursor
                         .getChildAt(childIndex);
                 cursor.remove(childIndex);
-                while (removedNode.getChildCount() > 0)
+                while (removedNode.getChildCount() > 0) {
                     cursor.insert((GroupTreeNode) removedNode.getFirstChild(),
                             childIndex);
+                }
                 break;
             case REMOVE_NODE_AND_CHILDREN:
                 cursor.remove(childIndex);
                 break;
             }
         }
-        if (m_revalidate)
+        if (m_revalidate) {
             m_groupSelector.revalidateGroups();
+        }
     }
 
     /**

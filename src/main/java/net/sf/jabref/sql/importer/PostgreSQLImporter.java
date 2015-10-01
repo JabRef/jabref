@@ -34,38 +34,38 @@ import net.sf.jabref.sql.SQLUtil;
  */
 public class PostgreSQLImporter extends DBImporter {
 
-	private static PostgreSQLImporter instance = null;
+    private static PostgreSQLImporter instance;
 
-	private PostgreSQLImporter() {
-	}
 
-	/**
-	 * 
-	 * @return The singleton instance of the MySQLImporter
-	 */
-	public static PostgreSQLImporter getInstance() {
-		if (instance == null)
-			instance = new PostgreSQLImporter();
-		return instance;
-	}
+    private PostgreSQLImporter() {
+    }
 
-	@Override
-	protected ResultSet readColumnNames(Connection conn) throws SQLException {
-		Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
-				"SELECT column_name FROM information_schema.columns WHERE table_name ='entries';");
-		ResultSet rs = statement.getResultSet();
-		return rs;
-	}
+    /**
+     * 
+     * @return The singleton instance of the MySQLImporter
+     */
+    public static PostgreSQLImporter getInstance() {
+        if (PostgreSQLImporter.instance == null) {
+            PostgreSQLImporter.instance = new PostgreSQLImporter();
+        }
+        return PostgreSQLImporter.instance;
+    }
 
-	@Override
-	protected Connection connectToDB(DBStrings dbstrings) throws Exception{
-		String url = SQLUtil.createJDBCurl(dbstrings, true);
-		String drv = "org.postgresql.Driver";
+    @Override
+    protected ResultSet readColumnNames(Connection conn) throws SQLException {
+        Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
+                "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';");
+        return statement.getResultSet();
+    }
 
-		Class.forName(drv).newInstance();
-		Connection conn = DriverManager.getConnection(url,
-				dbstrings.getUsername(), dbstrings.getPassword());
-		return conn;
-	}
+    @Override
+    protected Connection connectToDB(DBStrings dbstrings) throws Exception {
+        String url = SQLUtil.createJDBCurl(dbstrings, true);
+        String drv = "org.postgresql.Driver";
+
+        Class.forName(drv).newInstance();
+        return DriverManager.getConnection(url,
+                dbstrings.getUsername(), dbstrings.getPassword());
+    }
 
 }

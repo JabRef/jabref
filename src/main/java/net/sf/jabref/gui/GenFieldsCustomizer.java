@@ -23,10 +23,13 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.*;
-import net.sf.jabref.help.HelpAction;
+import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 /**
  * <p>Title: </p>
@@ -38,155 +41,157 @@ import com.jgoodies.forms.layout.Sizes;
  */
 
 public class GenFieldsCustomizer extends JDialog {
-  JPanel buttons = new JPanel();
-  JButton ok = new JButton();
-  JButton cancel = new JButton();
-  JButton helpBut = new JButton();
-  TitledBorder titledBorder1;
-  TitledBorder titledBorder2;
-  JLabel jLabel1 = new JLabel();
-  JPanel jPanel3 = new JPanel();
-  JPanel jPanel4 = new JPanel();
-  GridBagLayout gridBagLayout1 = new GridBagLayout();
-  JScrollPane jScrollPane1 = new JScrollPane();
-  JLabel jLabel2 = new JLabel();
-  JTextArea fieldsArea = new JTextArea();
-  GridBagLayout gridBagLayout2 = new GridBagLayout();
-  JabRefFrame parent;
-  JButton revert = new JButton();
-  //EntryCustomizationDialog diag;
-  HelpAction help;
 
-  public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
-    super(frame, Globals.lang("Set general fields"), false);
-    parent = frame;
-    //this.diag = diag;
-    help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
-          "Help", GUIGlobals.getIconUrl("helpSmall"));
-    helpBut = new JButton(Globals.lang("Help"));
-    helpBut.addActionListener(help);
-    try {
-      jbInit();
-      setSize(new Dimension(650, 300));
+    private final JPanel buttons = new JPanel();
+    private final JButton ok = new JButton();
+    private final JButton cancel = new JButton();
+    private JButton helpBut = new JButton();
+    TitledBorder titledBorder1;
+    TitledBorder titledBorder2;
+    private final JLabel jLabel1 = new JLabel();
+    private final JPanel jPanel3 = new JPanel();
+    private final JPanel jPanel4 = new JPanel();
+    private final GridBagLayout gridBagLayout1 = new GridBagLayout();
+    private final JScrollPane jScrollPane1 = new JScrollPane();
+    private final JLabel jLabel2 = new JLabel();
+    private final JTextArea fieldsArea = new JTextArea();
+    private final GridBagLayout gridBagLayout2 = new GridBagLayout();
+    private final JabRefFrame parent;
+    private final JButton revert = new JButton();
+
+
+    public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
+        super(frame, Localization.lang("Set general fields"), false);
+        parent = frame;
+        //this.diag = diag;
+        HelpAction help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
+                Localization.lang("Help"), IconTheme.getImage("helpSmall"));
+        helpBut = new JButton(Localization.lang("Help"));
+        helpBut.addActionListener(help);
+        try {
+            jbInit();
+            setSize(new Dimension(650, 300));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
-    catch(Exception ex) {
-      ex.printStackTrace();
+
+    private void jbInit() {
+        ok.setText(Localization.lang("Ok"));
+        ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
+        cancel.setText(Localization.lang("Cancel"));
+        cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
+        //buttons.setBackground(GUIGlobals.lightGray);
+        jLabel1.setText(Localization.lang("Delimit fields with semicolon, ex.") + ": url;pdf;note");
+        jPanel3.setLayout(gridBagLayout2);
+        jPanel4.setBorder(BorderFactory.createEtchedBorder());
+        jPanel4.setLayout(gridBagLayout1);
+        jLabel2.setText(Localization.lang("General fields"));
+
+        //    fieldsArea.setText(parent.prefs.get("generalFields"));
+        setFieldsText();
+
+        //jPanel3.setBackground(GUIGlobals.lightGray);
+        revert.setText(Localization.lang("Default"));
+        revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
+        this.getContentPane().add(buttons, BorderLayout.SOUTH);
+        ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+        buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        bb.addGlue();
+        bb.addButton(ok);
+        bb.addButton(revert);
+        bb.addButton(cancel);
+        bb.addStrut(Sizes.DLUX5);
+        bb.addButton(helpBut);
+        bb.addGlue();
+
+        this.getContentPane().add(jPanel3, BorderLayout.CENTER);
+        jPanel3.add(jLabel1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0
+                , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        jPanel3.add(jPanel4, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
+                , GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 318, 193));
+        jPanel4.add(jScrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
+                , GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+        jScrollPane1.getViewport().add(fieldsArea, null);
+        jPanel4.add(jLabel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
+                , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+
+        // Key bindings:
+        ActionMap am = buttons.getActionMap();
+        InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
+        am.put("close", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                //diag.requestFocus();
+            }
+        });
+
     }
-  }
 
-  private void jbInit() {
-      ok.setText(Globals.lang("Ok"));
-    ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
-    cancel.setText(Globals.lang("Cancel"));
-    cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
-    //buttons.setBackground(GUIGlobals.lightGray);
-    jLabel1.setText(Globals.lang("Delimit fields with semicolon, ex.")+": url;pdf;note");
-    jPanel3.setLayout(gridBagLayout2);
-    jPanel4.setBorder(BorderFactory.createEtchedBorder());
-    jPanel4.setLayout(gridBagLayout1);
-    jLabel2.setText(Globals.lang("General fields"));
+    void ok_actionPerformed(ActionEvent e) {
+        String[] lines = fieldsArea.getText().split("\n");
+        int i = 0;
+        for (; i < lines.length; i++) {
+            String[] parts = lines[i].split(":");
+            if (parts.length != 2) {
+                // Report error and exit.
+                String field = Localization.lang("field");
+                JOptionPane.showMessageDialog(this, Localization.lang("Each line must be on the following form") + " '" +
+                        Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'",
+                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            String testString = Util.checkLegalKey(parts[1]);
+            if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
+                // Report error and exit.
+                JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
+                                + "characters") + ": # { } ~ , ^ &",
+                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
-    //    fieldsArea.setText(parent.prefs.get("generalFields"));
-    setFieldsText();
+                return;
+            }
 
-    //jPanel3.setBackground(GUIGlobals.lightGray);
-    revert.setText(Globals.lang("Default"));
-    revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
-    this.getContentPane().add(buttons, BorderLayout.SOUTH);
-    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
-    buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
-    bb.addGlue();
-    bb.addButton(ok);
-    bb.addButton(revert);
-    bb.addButton(cancel);
-    bb.addStrut(Sizes.DLUX5);
-    bb.addButton(helpBut);
-    bb.addGlue();
-    
-    this.getContentPane().add(jPanel3, BorderLayout.CENTER);
-    jPanel3.add(jLabel1,    new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-    jPanel3.add(jPanel4,   new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
-            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 318, 193));
-    jPanel4.add(jScrollPane1,    new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
-            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-    jScrollPane1.getViewport().add(fieldsArea, null);
-    jPanel4.add(jLabel2,    new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+            Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_NAME + i), parts[0]);
+            Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
+        }
+        Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
+        Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
+        Globals.prefs.updateEntryEditorTabList();
+        /*
+        String delimStr = fieldsArea.getText().replaceAll("\\s+","")
+          .replaceAll("\\n+","").trim();
+        parent.prefs.putStringArray("generalFields", Util.split(delimStr, ";"));
+        */
 
-  // Key bindings:
-  ActionMap am = buttons.getActionMap();
-  InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-  im.put(Globals.prefs.getKey("Close dialog"), "close");
-  am.put("close", new AbstractAction() {
-    public void actionPerformed(ActionEvent e) {
-      dispose();
-      //diag.requestFocus();
+        parent.removeCachedEntryEditors();
+        dispose();
+        //diag.requestFocus();
     }
-  });
 
-  }
+    void cancel_actionPerformed(ActionEvent e) {
+        dispose();
+        //diag.requestFocus();
+    }
 
-  void ok_actionPerformed(ActionEvent e) {
-      String[] lines = fieldsArea.getText().split("\n");
-      int i = 0;
-      for (; i < lines.length; i++) {
-          String[] parts = lines[i].split(":");
-          if (parts.length != 2) {
-              // Report error and exit.
-              String field = Globals.lang("field");
-              JOptionPane.showMessageDialog(this, Globals.lang("Each line must be on the following form") + " '" +
-                      Globals.lang("Tabname") + ":" + field + "1;" + field + "2;...;" + field + "N'",
-                      Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-              return;
-          }
-          String testString = Util.checkLegalKey(parts[1]);
-          if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
-              // Report error and exit.
-              JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
-                      + "characters") + ": # { } ~ , ^ &",
-                      Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-
-              return;
-          }
-
-          Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_NAME + i), parts[0]);
-          Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
-      }
-      Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
-      Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
-      Globals.prefs.updateEntryEditorTabList();
-      /*
-    String delimStr = fieldsArea.getText().replaceAll("\\s+","")
-        .replaceAll("\\n+","").trim();
-    parent.prefs.putStringArray("generalFields", Util.delimToStringArray(delimStr, ";"));
-      */
-
-      parent.removeCachedEntryEditors();
-      dispose();
-      //diag.requestFocus();
-  }
-
-  void cancel_actionPerformed(ActionEvent e) {
-    dispose();
-    //diag.requestFocus();
-  }
-
-    void setFieldsText() {
+    private void setFieldsText() {
         StringBuffer sb = new StringBuffer();
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i=0; i<tabList.getTabCount(); i++) {
+        for (int i = 0; i < tabList.getTabCount(); i++) {
             sb.append(tabList.getTabName(i));
-            sb.append(":");
+            sb.append(':');
             for (Iterator<String> j = tabList.getTabFields(i).iterator(); j
-				.hasNext();) {
-				String field = j.next();
-				sb.append(field);
-				if (j.hasNext())
-					sb.append(";");
-			}
-            sb.append("\n");
+                    .hasNext();) {
+                String field = j.next();
+                sb.append(field);
+                if (j.hasNext()) {
+                    sb.append(';');
+                }
+            }
+            sb.append('\n');
         }
 
         fieldsArea.setText(sb.toString());
@@ -194,16 +199,17 @@ public class GenFieldsCustomizer extends JDialog {
 
     void revert_actionPerformed(ActionEvent e) {
         StringBuffer sb = new StringBuffer();
-        String name = null, fields = null;
+        String name;
+        String fields;
         int i = 0;
         while ((name = (String) Globals.prefs.defaults.get
                 (JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i)) != null) {
             sb.append(name);
             fields = (String) Globals.prefs.defaults.get
                     (JabRefPreferences.CUSTOM_TAB_FIELDS + "_def" + i);
-            sb.append(":");
+            sb.append(':');
             sb.append(fields);
-            sb.append("\n");
+            sb.append('\n');
             i++;
         }
         fieldsArea.setText(sb.toString());
@@ -212,34 +218,46 @@ public class GenFieldsCustomizer extends JDialog {
 }
 
 class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListener {
-  GenFieldsCustomizer adaptee;
 
-  GenFieldsCustomizer_ok_actionAdapter(GenFieldsCustomizer adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.ok_actionPerformed(e);
-  }
+    private final GenFieldsCustomizer adaptee;
+
+
+    GenFieldsCustomizer_ok_actionAdapter(GenFieldsCustomizer adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        adaptee.ok_actionPerformed(e);
+    }
 }
 
 class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionListener {
-  GenFieldsCustomizer adaptee;
 
-  GenFieldsCustomizer_cancel_actionAdapter(GenFieldsCustomizer adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.cancel_actionPerformed(e);
-  }
+    private final GenFieldsCustomizer adaptee;
+
+
+    GenFieldsCustomizer_cancel_actionAdapter(GenFieldsCustomizer adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        adaptee.cancel_actionPerformed(e);
+    }
 }
 
 class GenFieldsCustomizer_revert_actionAdapter implements java.awt.event.ActionListener {
-  GenFieldsCustomizer adaptee;
 
-  GenFieldsCustomizer_revert_actionAdapter(GenFieldsCustomizer adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.revert_actionPerformed(e);
-  }
+    private final GenFieldsCustomizer adaptee;
+
+
+    GenFieldsCustomizer_revert_actionAdapter(GenFieldsCustomizer adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        adaptee.revert_actionPerformed(e);
+    }
 }

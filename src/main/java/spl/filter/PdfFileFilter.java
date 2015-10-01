@@ -12,6 +12,7 @@ import java.io.FileFilter;
  */
 public class PdfFileFilter implements FileFilter {
 
+    @Override
     public boolean accept(File file) {
         String path = file.getPath();
 
@@ -19,7 +20,9 @@ public class PdfFileFilter implements FileFilter {
     }
 
     public boolean accept(String path) {
-        if(path == null || path.isEmpty() || !path.contains(".")) return false;
+        if (path == null || path.isEmpty() || !path.contains(".")) {
+            return false;
+        }
 
         return isMatchingFileFilter(path);
     }
@@ -28,5 +31,5 @@ public class PdfFileFilter implements FileFilter {
         String dateiEndung = path.substring(path.lastIndexOf(".") + 1);
         return dateiEndung.equalsIgnoreCase("pdf");
     }
-    
+
 }

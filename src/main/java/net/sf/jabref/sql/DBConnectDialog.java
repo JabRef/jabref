@@ -28,7 +28,7 @@ import net.sf.jabref.Globals;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Dialog box for collecting database connection strings from the user
@@ -37,34 +37,22 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class DBConnectDialog extends JDialog {
 
-    // labels
-    JLabel lblServerType     = new JLabel();
-    JLabel lblServerHostname = new JLabel();
-    JLabel lblDatabase       = new JLabel();
-    JLabel lblUsername       = new JLabel();
-    JLabel lblPassword       = new JLabel();
-
     // input fields
-    JComboBox<String> cmbServerType = new JComboBox<String>();
-    JTextField txtServerHostname = new JTextField(40);
-    JTextField txtDatabase = new JTextField(40);
-    JTextField txtUsername = new JTextField(40);        
-    JPasswordField pwdPassword = new JPasswordField(40);
-    JButton btnConnect = new JButton();
-    JButton btnCancel = new JButton();
+    private final JComboBox cmbServerType = new JComboBox();
+    private final JTextField txtServerHostname = new JTextField(40);
+    private final JTextField txtDatabase = new JTextField(40);
+    private final JTextField txtUsername = new JTextField(40);
+    private final JPasswordField pwdPassword = new JPasswordField(40);
 
-    // array for holding components on left-hand and right-hand sides
-    ArrayList<JLabel> lhs = new ArrayList<JLabel>();
-    ArrayList<JComponent> rhs = new ArrayList<JComponent>();
+    private DBStrings dbStrings = new DBStrings();
 
-    DBStrings dbStrings = new DBStrings();
+    private boolean connectToDB;
 
-    private boolean connectToDB = false;
 
     /** Creates a new instance of DBConnectDialog */
-    public DBConnectDialog( JFrame parent, DBStrings dbs) {
+    public DBConnectDialog(JFrame parent, DBStrings dbs) {
 
-        super(parent, Globals.lang("Connect to SQL database"), true);
+        super(parent, Localization.lang("Connect to SQL database"), true);
 
         this.setResizable(false);
         this.setLocationRelativeTo(parent);
@@ -72,12 +60,19 @@ public class DBConnectDialog extends JDialog {
         dbStrings = dbs;
 
         // build collections of components
+        ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+        JLabel lblServerType = new JLabel();
         lhs.add(lblServerType);
+        JLabel lblServerHostname = new JLabel();
         lhs.add(lblServerHostname);
+        JLabel lblDatabase = new JLabel();
         lhs.add(lblDatabase);
+        JLabel lblUsername = new JLabel();
         lhs.add(lblUsername);
+        JLabel lblPassword = new JLabel();
         lhs.add(lblPassword);
 
+        ArrayList<JComponent> rhs = new ArrayList<JComponent>();
         rhs.add(cmbServerType);
         rhs.add(txtServerHostname);
         rhs.add(txtDatabase);
@@ -85,20 +80,22 @@ public class DBConnectDialog extends JDialog {
         rhs.add(pwdPassword);
 
         // setup label text
-        lblServerType.setText(Globals.lang("Server Type :"));
-        lblServerHostname.setText(Globals.lang("Server Hostname :"));
-        lblDatabase.setText(Globals.lang("Database :"));
-        lblUsername.setText(Globals.lang("Username :"));
-        lblPassword.setText(Globals.lang("Password :"));
+        lblServerType.setText(Localization.lang("Server Type :"));
+        lblServerHostname.setText(Localization.lang("Server Hostname :"));
+        lblDatabase.setText(Localization.lang("Database :"));
+        lblUsername.setText(Localization.lang("Username :"));
+        lblPassword.setText(Localization.lang("Password :"));
 
         // set label text alignment
-        for (JLabel label : lhs){
-            label.setHorizontalAlignment(JLabel.RIGHT);
+        for (JLabel label : lhs) {
+            label.setHorizontalAlignment(SwingConstants.RIGHT);
         }
-        
+
         // set button text
-        btnConnect.setText(Globals.lang("Connect"));
-        btnCancel.setText(Globals.lang("Cancel"));
+        JButton btnConnect = new JButton();
+        btnConnect.setText(Localization.lang("Connect"));
+        JButton btnCancel = new JButton();
+        btnCancel.setText(Localization.lang("Cancel"));
 
         // init input fields to current DB strings
         String srvSel = dbStrings.getServerType();
@@ -113,13 +110,11 @@ public class DBConnectDialog extends JDialog {
         txtUsername.setText(dbStrings.getUsername());
         pwdPassword.setText(dbStrings.getPassword());
 
-
         // construct dialog
         DefaultFormBuilder builder = new DefaultFormBuilder(new
-                                 FormLayout("right:pref, 4dlu, fill:pref", ""));
+                FormLayout("right:pref, 4dlu, fill:pref", ""));
 
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // add labels and input fields
         builder.append(lblServerType);
@@ -153,11 +148,13 @@ public class DBConnectDialog extends JDialog {
         pack();
 
         ActionListener connectAction = new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 String errorMessage = checkInput();
 
-                if ( errorMessage==null) {
+                if (errorMessage == null) {
                     storeSettings();
                     setVisible(false);
                     setConnectToDB(true);
@@ -176,6 +173,8 @@ public class DBConnectDialog extends JDialog {
         pwdPassword.addActionListener(connectAction);
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 dispose();
@@ -197,44 +196,43 @@ public class DBConnectDialog extends JDialog {
      * @return 
      *      Appropriate error message to be displayed to user
      */
-    private String checkInput () {
+    private String checkInput() {
 
         String[] fields = {"Server Hostname", "Database", "Username"};
         String[] errors = new String[fields.length];
         int cnt = 0;
 
-        if (txtServerHostname.getText().trim().equals("")) {
+        if (txtServerHostname.getText().trim().isEmpty()) {
             errors[cnt] = fields[0];
             cnt++;
         }
 
-        if (txtDatabase.getText().trim().equals("")) {
+        if (txtDatabase.getText().trim().isEmpty()) {
             errors[cnt] = fields[1];
             cnt++;
         }
 
-        if (txtUsername.getText().trim().equals("")) {
+        if (txtUsername.getText().trim().isEmpty()) {
             errors[cnt] = fields[2];
             cnt++;
         }
 
-        String errMsg = Globals.lang("Please specify the ");
+        String errMsg = Localization.lang("Please specify the ");
 
         switch (cnt) {
-            case 0:
-                errMsg = null;
-                break;
-            case 1:
-                errMsg = errMsg + errors[0] + ".";
-                break;
-            case 2:
-                errMsg = errMsg + errors[0] + " and " + errors[1] + "."; 
-                break;
-            case 3:
-                errMsg = errMsg + errors[0] + ", " +  errors[1] 
-                      + ", and " + errors[2] + ".";
-                break;
-            default:
+        case 0:
+            errMsg = null;
+            break;
+        case 1:
+            errMsg = errMsg + errors[0] + '.';
+            break;
+        case 2:
+            errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
+            break;
+        case 3:
+            errMsg = errMsg + errors[0] + ", " + errors[1] + ", and " + errors[2] + '.';
+            break;
+        default:
 
         }
 
@@ -244,7 +242,7 @@ public class DBConnectDialog extends JDialog {
     /**
      * Save user input.
      */
-    private void storeSettings () {
+    private void storeSettings() {
         dbStrings.setServerType(cmbServerType.getSelectedItem().toString());
         dbStrings.setServerHostname(txtServerHostname.getText());
         dbStrings.setDatabase(txtDatabase.getText());
@@ -259,7 +257,6 @@ public class DBConnectDialog extends JDialog {
             tmp = tmp + aPwd;
         }
         dbStrings.setPassword(tmp);
-        tmp = "";
         Arrays.fill(pwd, '0');
 
     }
@@ -268,7 +265,7 @@ public class DBConnectDialog extends JDialog {
         return dbStrings;
     }
 
-    public void setDBStrings(DBStrings dbStrings) { 
+    public void setDBStrings(DBStrings dbStrings) {
         this.dbStrings = dbStrings;
     }
 
@@ -276,7 +273,7 @@ public class DBConnectDialog extends JDialog {
         return connectToDB;
     }
 
-    public void setConnectToDB(boolean connectToDB) {
+    private void setConnectToDB(boolean connectToDB) {
         this.connectToDB = connectToDB;
     }
 

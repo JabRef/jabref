@@ -1,4 +1,88 @@
 [master]
+    - Feature: Add an option to the FileList context menu to delete an associated file from the file system
+    - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
+    - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
+    - The default language is now automatically set to the system's locale.
+    - Use correct encoding names (#155) and replace old encoding names in bibtex files. This changes the file header.
+    - Feature: When pasting a Google search URL, meta data will be automatically stripped before insertion.
+    - No longer write JabRef version to BibTex file header.
+    - No longer add blank lines inside a bibtex entry
+    - Perform syntax improvements enabled by Java 1.7+ (diamond operator, try-with-resources)
+    - List of authors is now auto generated `scripts/generate-authors.sh` and inserted into L10N About.html
+    - Remove Mr.DLib support as MR.DLib will be shut down in 2015
+    - Streamline logging API: Replace usages of java.util.logging with commons.logging
+    - BREAKING: Remove plugin functionality.
+    - Fixes Bug#1297: No console message on closing.
+    - Fix bug #1285: Editing position is not lost on saving
+    - Remove support for custom icon themes. The user has to use the default one.
+    - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
+    - Solved feature request #767: New subdatabase based on AUX file (biblatex)
+    - Fixes GH Bug #173: Personal journal abbreviation list is not loaded twice
+    - Bugfix: Preview of external journal abbreviation list now displays the correct list
+[dev_2.11]
+    - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
+2.11 beta 4
+    - Add of Persian localization (by Behrouz Javanmardi)
+    - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
+    - Backport from 2.80: Fixes Bug#1297: No console message on closing.
+    - Backport from 2.80: Fixes Bug#1290: Spanish localization was not displayed correctly.
+    - Backport from 2.80: Fixes #144: Unreadable text in Russian installer
+    - Fix for bugs #1221 and #1261 (also partly #1243): order of fields in customized entry types no longer gets destroyed by the entry editor 
+    - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)
+    - BREAKING: Search groups now use same search logic as UI --> avoids confusion when converting a UI search into a search group. Behaviour before: contains/regex check of whole search string; behaviour after: contains/regex check of every word of the search string. The new search is more powerful and con simulate the old behaviour: enclose everything in double quotes, e.g., process language --> "process language".
+    - Fix for bug #1276: OO styles do not consider editor fields anymore for sorting
+    - Fix for bug #1288: Emacs keybindings: Rebinding of C-f can now be configured
+    - Special fields: .bib files edited with 2.11 beta 3 are not compatible with this release. Other versions are not affected.
+    - JabRef metadata ("jabref-meta") @comments are now always written in alphabetical order
+    - Changed HTML description of search expressions, expressing the conditional logic more explicitly with brackets.
+    - Fixed INSPIRE searches compatibility problem (by Stefano Gariazzo).
+    - Change default of "use IEEE abbreviations" from TRUE to FALSE
+    - Fix for bug #1293: "Star" for modified database is correctly shown again.
+    - Journal abbreviation lists: In case entries are defined more than once, a message is output on the console
+    - Antialiasing is now enabled and set to LCD
+    - Update dependencies: jersey, commons.logging, pdfbox, JGoodies, glazedlists, JDBC connectors
+    - Remove local JGoodies dependency: replace SimpleInteralFrame with SwingX JXTitledPanel and UIFSplitPane by JSplitPane
+    - Switch from antlr2 grammar to antlr4 for capturing the search expressions. Should be backwards compatible.
+    - Streamline logging API: Replace usages of java.util.logging with commons.logging
+    - Refactored preferences
+    - Fix several FindBugs warnings
+2.11 beta 3
+    - New MacOSX integration
+    - Two releases for MacOSX: OSX-Java6 for Apple Java 1.6 and OSX for Oracle Java 1.7+
+    - Fix for bug #1278 Crash after changing LookAndFeel (showing a proper error message if L&F is not available)
+    - Adds some predefined look and feels in preference window (lists only available L&Fs)
+    - Fixes #1131: MacOSX: JabRef minimizes when clicking on x
+    - Dropped jayatana version 1.2.4 as version 2.x superseeds it
+    - Feature: Trim journal names before looking up the abbreviation
+    - Minor fixes regarding the status output of marking/unmarking entries
+    - Internal default key bindings are honored again
+    - Default key bindings for "Find unlinked files" (shift F7), "Open folder" (ctrl shift O), and "Hide/show toolbar" (ctrl alt t)
+    - Opening a file using the CLI works again. Just use the filename as parameter, without any command.
+    - Emacs keybindings: CTRL+f is not rebound as CTRL+f is more often used for "search"
+    - Performance Improvement: Saving of large databases is dramatically faster
+    - When a syntax error in the BibTeX source panel is made, the error cause is now always output
+    - Jars that are available in maven are now downloaded and used in both ant and gradle
+    - Replaced option parsing library ritopt with apache commons-cli which is in maven repository
+    - BREAKING passing an option file to the cli command no longer works due to change of internal cli library!
+    - Fix for bug #1283: Month fields like {8,} no longer cause exceptions
+    - Disabled ISBNtoBibTeX fetcher (see bug #1241)
+2.11 beta 2
+    - Feature: Option to clean URLs generated by Google (patch #204)
+    - Fix for bug #1272: JabRef now launches on Mac OS X
+    - Updated DBLPfetcher to new DBLP functionality
+    - Feature: Ability to reorder the panels in the side pane
+    - Feature: Option to save selected entries as plain BibTex without JabRef metadata
+2.11 beta
+    - Some UI updates (mainly removing unnecessary boundaries)
+    - Feature: Gridlines are now optional (and disabled by default)
+    - Fix for bug #1248: Key bindings not modified
+    - Fix for bug #876: Windows 7/8/10 - Pinning Jabref to the taskbar
+    - Feature: Option to change the table row height padding
+    - Feature: Make it possible to hide the toolbar
+    - Fix for bug #1270: Cleanup entries error 3
+    - Fix for bug #919: Accents don't export to RTF (by ruy.takata)
+    - Change the CrossRef content negotiation for bibtex DOI import (by sheffien)
+    - Fix for bug #1253: Cleanup entries error 2 (by ruy.takata)
     - Fix for bug 1213 (sourceforge): Fix encoding for DOI import
     - Feature #809: import pubmed central id (pmc) field from medline
     - Fix undoing Cleanup/Convert to Biblatex
@@ -824,7 +908,7 @@
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
         - Fixed bug that made explicit groups appear empty after updating group tree from external
           change.
-        - New windows installer thanks to Uwe St�hr.
+        - New windows installer thanks to Uwe Stöhr.
         - [ 1641247 ] Fixed: No update of preview after generating bibtex key
         - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
@@ -837,7 +921,7 @@
           dropdown menu in the file dialog.
         - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
         - Added warning dialog when exporting failed.
-        - Added fix for exporting special chars in RTF like ���...
+        - Added fix for exporting special chars in RTF like ï¿½ï¿½ï¿½...
         - Added NameFormat LayoutFormatter based on Bibtex method name.format$
         - Added Fetch from ArXiv.org to Web Search
           [ 1587342 ] Quering ArXiv (and any OAI2 Repository)

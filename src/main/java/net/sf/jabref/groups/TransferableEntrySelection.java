@@ -21,16 +21,17 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.model.entry.BibtexEntry;
 
-public class TransferableEntrySelection implements Transferable {
+class TransferableEntrySelection implements Transferable {
+
     public static final DataFlavor flavorInternal;
-    public static final DataFlavor flavorExternal;
-    public static final DataFlavor[] flavors;
-    public final BibtexEntry[] selectedEntries;
-    public final String selectedEntriesCiteKeys;
-    
-    protected boolean includeCiteKeyword = false;
+    private static final DataFlavor flavorExternal;
+    private static final DataFlavor[] flavors;
+    private final BibtexEntry[] selectedEntries;
+    private final String selectedEntriesCiteKeys;
+
+    private boolean includeCiteKeyword;
 
     static {
         DataFlavor df1 = null;
@@ -44,40 +45,47 @@ public class TransferableEntrySelection implements Transferable {
         }
         flavorInternal = df1;
         flavorExternal = df2;
-        flavors = new DataFlavor[] { flavorInternal, flavorExternal };
+        flavors = new DataFlavor[] {TransferableEntrySelection.flavorInternal, TransferableEntrySelection.flavorExternal};
     }
+
 
     public TransferableEntrySelection(BibtexEntry[] selectedEntries) {
         this.selectedEntries = selectedEntries;
-        StringBuffer keys = new StringBuffer();
+        StringBuilder keys = new StringBuilder();
         for (int i = 0; i < selectedEntries.length; ++i) {
             keys.append(selectedEntries[i].getCiteKey());
-            if (i + 1 < selectedEntries.length)
+            if (i + 1 < selectedEntries.length) {
                 keys.append(",");
+            }
         }
         selectedEntriesCiteKeys = keys.toString();
     }
 
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return flavors;
+        return TransferableEntrySelection.flavors;
     }
 
+    @Override
     public boolean isDataFlavorSupported(DataFlavor someFlavor) {
-        return someFlavor.equals(flavorInternal)
-                || someFlavor.equals(flavorExternal);
+        return someFlavor.equals(TransferableEntrySelection.flavorInternal)
+                || someFlavor.equals(TransferableEntrySelection.flavorExternal);
     }
 
+    @Override
     public Object getTransferData(DataFlavor someFlavor)
             throws UnsupportedFlavorException, IOException {
-        if (!isDataFlavorSupported(someFlavor))
+        if (!isDataFlavorSupported(someFlavor)) {
             throw new UnsupportedFlavorException(someFlavor);
-        if (someFlavor.equals(flavorInternal))
+        }
+        if (someFlavor.equals(TransferableEntrySelection.flavorInternal)) {
             return this;
+        }
         String s = includeCiteKeyword ?
-                "\\cite{" + selectedEntriesCiteKeys + "}" 
+                "\\cite{" + selectedEntriesCiteKeys + "}"
                 : selectedEntriesCiteKeys;
         return new ByteArrayInputStream(s.getBytes(
-                flavorExternal.getParameter("charset").trim()));
+                TransferableEntrySelection.flavorExternal.getParameter("charset").trim()));
     }
 
     public BibtexEntry[] getSelection() {
@@ -87,6 +95,5 @@ public class TransferableEntrySelection implements Transferable {
     public void setIncludeCiteKeyword(boolean includeCiteKeyword) {
         this.includeCiteKeyword = includeCiteKeyword;
     }
-    
 
 }

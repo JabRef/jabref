@@ -17,14 +17,17 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.logic.l10n.Localization;
 
-public class UndoableModifyGroup extends AbstractUndoableEdit {
+class UndoableModifyGroup extends AbstractUndoableEdit {
+
     private final GroupSelector m_groupSelector;
     private final AbstractGroup m_oldGroupBackup;
     private final AbstractGroup m_newGroupBackup;
     private final GroupTreeNode m_groupsRootHandle;
     private final int[] m_pathToNode;
+
 
     /**
      * @param node
@@ -42,16 +45,19 @@ public class UndoableModifyGroup extends AbstractUndoableEdit {
         m_groupsRootHandle = groupsRoot;
     }
 
+    @Override
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " 
-            + Globals.lang("modify group");
+        return Localization.lang("Undo") + ": "
+                + Localization.lang("modify group");
     }
 
+    @Override
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " 
-            + Globals.lang("modify group");
+        return Localization.lang("Redo") + ": "
+                + Localization.lang("modify group");
     }
 
+    @Override
     public void undo() {
         super.undo();
         m_groupsRootHandle.getDescendant(m_pathToNode).setGroup(
@@ -59,6 +65,7 @@ public class UndoableModifyGroup extends AbstractUndoableEdit {
         m_groupSelector.revalidateGroups();
     }
 
+    @Override
     public void redo() {
         super.redo();
         m_groupsRootHandle.getDescendant(m_pathToNode).setGroup(

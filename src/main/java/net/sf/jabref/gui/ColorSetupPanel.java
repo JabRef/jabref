@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,8 +36,10 @@ import net.sf.jabref.Globals;
  */
 public class ColorSetupPanel extends JPanel {
 
-    private final static int ICON_WIDTH=30, ICON_HEIGHT=20;
-    private ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+    private static final int ICON_WIDTH = 30;
+    private static final int ICON_HEIGHT = 20;
+    private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
+
 
     public ColorSetupPanel() {
 
@@ -44,23 +47,23 @@ public class ColorSetupPanel extends JPanel {
                 ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        buttons.add(new ColorButton("tableText", Globals.lang("Table text color")));
-        buttons.add(new ColorButton("markedEntryBackground0", Globals.lang("Marking color %0", "1")));
-        buttons.add(new ColorButton("tableBackground", Globals.lang("Table background color")));
-        buttons.add(new ColorButton("markedEntryBackground1", Globals.lang("Marking color %0", "2")));
-        buttons.add(new ColorButton("tableReqFieldBackground", Globals.lang("Background color for required fields")));
-        buttons.add(new ColorButton("markedEntryBackground2", Globals.lang("Marking color %0", "3")));
-        buttons.add(new ColorButton("tableOptFieldBackground", Globals.lang("Background color for optional fields")));
-        buttons.add(new ColorButton("markedEntryBackground3", Globals.lang("Marking color %0", "4")));
-        buttons.add(new ColorButton("incompleteEntryBackground", Globals.lang("Color for marking incomplete entries")));
-        buttons.add(new ColorButton("markedEntryBackground4", Globals.lang("Marking color %0", "5")));
-        buttons.add(new ColorButton("gridColor", Globals.lang("Table grid color")));
-        buttons.add(new ColorButton("markedEntryBackground5", Globals.lang("Import marking color")));
+        buttons.add(new ColorButton("tableText", Localization.lang("Table text color")));
+        buttons.add(new ColorButton("markedEntryBackground0", Localization.lang("Marking color %0", "1")));
+        buttons.add(new ColorButton("tableBackground", Localization.lang("Table background color")));
+        buttons.add(new ColorButton("markedEntryBackground1", Localization.lang("Marking color %0", "2")));
+        buttons.add(new ColorButton("tableReqFieldBackground", Localization.lang("Background color for required fields")));
+        buttons.add(new ColorButton("markedEntryBackground2", Localization.lang("Marking color %0", "3")));
+        buttons.add(new ColorButton("tableOptFieldBackground", Localization.lang("Background color for optional fields")));
+        buttons.add(new ColorButton("markedEntryBackground3", Localization.lang("Marking color %0", "4")));
+        buttons.add(new ColorButton("incompleteEntryBackground", Localization.lang("Color for marking incomplete entries")));
+        buttons.add(new ColorButton("markedEntryBackground4", Localization.lang("Marking color %0", "5")));
+        buttons.add(new ColorButton("gridColor", Localization.lang("Table grid color")));
+        buttons.add(new ColorButton("markedEntryBackground5", Localization.lang("Import marking color")));
 
-        buttons.add(new ColorButton("fieldEditorTextColor", Globals.lang("Entry editor font color")));
-        buttons.add(new ColorButton("validFieldBackgroundColor", Globals.lang("Entry editor background color")));
-        buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Globals.lang("Entry editor active background color")));
-        buttons.add(new ColorButton("invalidFieldBackgroundColor", Globals.lang("Entry editor invalid field color")));
+        buttons.add(new ColorButton("fieldEditorTextColor", Localization.lang("Entry editor font color")));
+        buttons.add(new ColorButton("validFieldBackgroundColor", Localization.lang("Entry editor background color")));
+        buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Localization.lang("Entry editor active background color")));
+        buttons.add(new ColorButton("invalidFieldBackgroundColor", Localization.lang("Entry editor invalid field color")));
 
         for (ColorButton but : buttons) {
             builder.append(but);
@@ -74,7 +77,6 @@ public class ColorSetupPanel extends JPanel {
         add(builder.getPanel(), BorderLayout.CENTER);
 
         setValues();
-
 
     }
 
@@ -91,16 +93,22 @@ public class ColorSetupPanel extends JPanel {
         }
     }
 
+
     class ColorButtonListener implements ActionListener {
-        private ColorButton button;
+
+        private final ColorButton button;
+
 
         public ColorButtonListener(ColorButton button) {
             this.button = button;
         }
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             Color chosen = JColorChooser.showDialog(null, button.getName(), button.getColor());
-            if (chosen != null)
+            if (chosen != null) {
                 button.setColor(chosen);
+            }
         }
     }
 
@@ -109,8 +117,11 @@ public class ColorSetupPanel extends JPanel {
      * Includes a method to produce a Default button for this setting.
      */
     class ColorButton extends JButton implements Icon {
+
         private Color color = Color.white;
-        private String key, name;
+        private final String key;
+        private final String name;
+
 
         public ColorButton(String key, String name) {
             setIcon(this);
@@ -120,8 +131,10 @@ public class ColorSetupPanel extends JPanel {
         }
 
         public JButton getDefaultButton() {
-            JButton toDefault = new JButton(Globals.lang("Default"));
+            JButton toDefault = new JButton(Localization.lang("Default"));
             toDefault.addActionListener(new ActionListener() {
+
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setColor(Globals.prefs.getDefaultColor(key));
                     repaint();
@@ -130,11 +143,11 @@ public class ColorSetupPanel extends JPanel {
             return toDefault;
         }
 
-
         public String getKey() {
             return key;
         }
 
+        @Override
         public String getName() {
             return name;
         }
@@ -147,18 +160,21 @@ public class ColorSetupPanel extends JPanel {
             this.color = color;
         }
 
+        @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Rectangle r = g.getClipBounds();
             g.setColor(color);
             g.fillRect(r.x, r.y, r.width, r.height);
         }
 
+        @Override
         public int getIconWidth() {
-            return ICON_WIDTH;
+            return ColorSetupPanel.ICON_WIDTH;
         }
 
+        @Override
         public int getIconHeight() {
-            return ICON_HEIGHT;
+            return ColorSetupPanel.ICON_HEIGHT;
         }
     }
 

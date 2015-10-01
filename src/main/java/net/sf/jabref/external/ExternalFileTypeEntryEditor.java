@@ -25,37 +25,41 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * This class produces a dialog box for editing an external file type.
  */
 public class ExternalFileTypeEntryEditor {
 
-    JFrame fParent = null;
-    JDialog dParent = null;
-    JDialog diag;
-    JTextField extension = new JTextField(),
-        name = new JTextField(),
-        mimeType = new JTextField(),
-        application = new JTextField();
-    String selectedIcon = null;
-    JButton icon = new JButton(GUIGlobals.getImage("picture"));
-    JButton ok = new JButton(Globals.lang("Ok")),
-            cancel = new JButton(Globals.lang("Cancel"));
-    JRadioButton useDefault = new JRadioButton(Globals.lang("Default")),
-        other = new JRadioButton("");
-    final String emptyMessage = "<"+Globals.lang("Use default viewer")+">";
-    boolean applicationFieldEmpty = false;
+    private JFrame fParent;
+    private JDialog dParent;
+    private JDialog diag;
+    private final JTextField extension = new JTextField();
+    private final JTextField name = new JTextField();
+    private final JTextField mimeType = new JTextField();
+    private final JTextField application = new JTextField();
+    private String selectedIcon;
+    private final JButton icon = new JButton(IconTheme.getImage("picture"));
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
+    private final JRadioButton other = new JRadioButton("");
+    final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
+    boolean applicationFieldEmpty;
 
     private ExternalFileType entry;
-    private boolean okPressed = false;
+    private boolean okPressed;
+
 
     public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {
         fParent = parent;
@@ -77,22 +81,22 @@ public class ExternalFileTypeEntryEditor {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
-        builder.append(Globals.lang("Icon"));
+        builder.append(Localization.lang("Icon"));
         builder.append(icon);
         builder.nextLine();
-        builder.append(Globals.lang("Name"));
+        builder.append(Localization.lang("Name"));
         builder.append(name);
         builder.nextLine();
-        builder.append(Globals.lang("Extension"));
+        builder.append(Localization.lang("Extension"));
         builder.append(extension);
         builder.nextLine();
-        builder.append(Globals.lang("MIME type"));
+        builder.append(Localization.lang("MIME type"));
         builder.append(mimeType);
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.nextLine();
-        builder.append(Globals.lang("Application"));
-        JButton browseBut = new JButton(Globals.lang("Browse"));
-        if (Globals.ON_WIN) {
+        builder.append(Localization.lang("Application"));
+        JButton browseBut = new JButton(Localization.lang("Browse"));
+        if (OS.WINDOWS) {
             builder.append(useDefault);
             builder.nextLine();
             JPanel p1 = new JPanel();
@@ -117,61 +121,74 @@ public class ExternalFileTypeEntryEditor {
         bb.addGlue();
 
         ok.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 okPressed = true;
                 storeSettings(ExternalFileTypeEntryEditor.this.entry);
                 diag.dispose();
-                                
+
             }
         });
         cancel.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
             }
         });
 
         icon.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String initSel = ExternalFileTypeEntryEditor.this.entry.getIconName();
-                if (selectedIcon != null)
+                if (selectedIcon != null) {
                     initSel = selectedIcon;
+                }
                 IconSelection ic = new IconSelection(diag, initSel);
                 ic.setVisible(true);
                 if (ic.isOkPressed()) {
                     selectedIcon = ic.getSelectedIconKey();
-                    icon.setIcon(GUIGlobals.getImage(selectedIcon));
+                    icon.setIcon(IconTheme.getImage(selectedIcon));
                 }
                 //JOptionPane.showMessageDialog(null, "Sorry, the icon can unfortunately not be changed in this version of JabRef");
             }
         });
 
-        if (Globals.ON_WIN) {
+        if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
+
                 private void handle(DocumentEvent e) {
-                    if (application.getText().length() == 0) {
+                    if (application.getText().isEmpty()) {
                         useDefault.setSelected(true);
                     } else {
                         other.setSelected(true);
                     }
                 }
+
+                @Override
                 public void insertUpdate(DocumentEvent e) {
                     handle(e);
                 }
 
+                @Override
                 public void removeUpdate(DocumentEvent documentEvent) {
                     handle(documentEvent);
                 }
 
+                @Override
                 public void changedUpdate(DocumentEvent documentEvent) {
                     handle(documentEvent);
                 }
             });
         }
 
-        if (dParent != null)
-            diag = new JDialog(dParent, Globals.lang("Edit file type"), true);
-        else
-            diag = new JDialog(fParent, Globals.lang("Edit file type"), true);
+        if (dParent != null) {
+            diag = new JDialog(dParent, Localization.lang("Edit file type"), true);
+        } else {
+            diag = new JDialog(fParent, Localization.lang("Edit file type"), true);
+        }
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
@@ -179,11 +196,13 @@ public class ExternalFileTypeEntryEditor {
         BrowseListener browse = new BrowseListener(diag, application);
         browseBut.addActionListener(browse);
 
-        if (dParent != null)
+        if (dParent != null) {
             diag.setLocationRelativeTo(dParent);
-        else
+        }
+        else {
             diag.setLocationRelativeTo(fParent);
         //Util.placeDialog(diag, parent);
+        }
 
         setValues(entry);
     }
@@ -194,45 +213,51 @@ public class ExternalFileTypeEntryEditor {
     }
 
     public void setVisible(boolean visible) {
-        if (visible)
+        if (visible) {
             okPressed = false;
+        }
         diag.setVisible(visible);
     }
 
-    public void setValues(ExternalFileType entry) {
+    private void setValues(ExternalFileType entry) {
         name.setText(entry.getName());
         extension.setText(entry.getExtension());
         mimeType.setText(entry.getMimeType());
         application.setText(entry.getOpenWith());
         icon.setIcon(entry.getIcon());
-        if ((application.getText().length() == 0))
+        if (application.getText().isEmpty()) {
             useDefault.setSelected(true);
-        else
+        } else {
             other.setSelected(true);
+        }
         selectedIcon = null;
     }
 
-    public void storeSettings(ExternalFileType entry) {
+    private void storeSettings(ExternalFileType entry) {
         entry.setName(name.getText().trim());
         entry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:
         String ext = extension.getText().trim();
-        if ((ext.length() > 0) && (ext.charAt(0) == '.'))
+        if (!ext.isEmpty() && ext.charAt(0) == '.') {
             entry.setExtension(ext.substring(1));
-        else
+        } else {
             entry.setExtension(ext);
-        
-        if (selectedIcon != null)
+        }
+
+        if (selectedIcon != null) {
             entry.setIconName(selectedIcon);
-        if (!Globals.ON_WIN) {
+            entry.setIcon(IconTheme.getImage(entry.getIconName()));
+        }
+        if (!OS.WINDOWS) {
             entry.setOpenWith(application.getText().trim());
         } else {
             // On Windows, store application as empty if the "Default" option is selected,
             // or if the application name is empty:
-            if (useDefault.isSelected() || (application.getText().trim().length() == 0))
+            if (useDefault.isSelected() || application.getText().trim().isEmpty()) {
                 entry.setOpenWith("");
-            else
+            } else {
                 entry.setOpenWith(application.getText().trim());
+            }
         }
     }
 
@@ -240,25 +265,29 @@ public class ExternalFileTypeEntryEditor {
         return okPressed;
     }
 
+
     class BrowseListener implements ActionListener {
-        private JTextField comp;
+
+        private final JTextField comp;
+
 
         public BrowseListener(JDialog parent, JTextField comp) {
             this.comp = comp;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             File initial = new File(comp.getText().trim());
-            if (comp.getText().trim().length() == 0) {
+            if (comp.getText().trim().isEmpty()) {
                 // Nothing in the field. Go to the last file dir used:
-                initial = new File(Globals.prefs.get("fileWorkingDirectory"));
+                initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
             String chosen = FileDialogs.getNewFile(/*parent*/null, initial, Globals.NONE,
-                JFileChooser.OPEN_DIALOG, false);
+                    JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
-                Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
                 comp.setText(newFile.getPath());
                 comp.requestFocus();
             }

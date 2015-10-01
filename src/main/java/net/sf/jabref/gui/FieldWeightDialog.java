@@ -23,14 +23,10 @@ import java.util.TreeSet;
 
 import javax.swing.*;
 
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,37 +37,38 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FieldWeightDialog extends JDialog {
 
-    JabRefFrame frame;
-    HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
-    JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
+    private final JabRefFrame frame;
+    private final HashMap<JSlider, SliderInfo> sliders = new HashMap<JSlider, SliderInfo>();
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
-   public static void main(String[] args) {
+
+    public static void main(String[] args) {
         new FieldWeightDialog(null).setVisible(true);
     }
 
-    public FieldWeightDialog(JabRefFrame frame) {
+    private FieldWeightDialog(JabRefFrame frame) {
         this.frame = frame;
         JPanel main = buildMainPanel();
-        main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buildButtonPanel(), BorderLayout.SOUTH);
         pack();
     }
 
-    public JPanel buildMainPanel() {
+    private JPanel buildMainPanel() {
         FormLayout layout = new FormLayout
-            ("right:pref, 4dlu, fill:pref, 8dlu, right:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-             "");
+                ("right:pref, 4dlu, fill:pref, 8dlu, right:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        builder.appendSeparator(Globals.lang("Field sizes"));
+        builder.appendSeparator(Localization.lang("Field sizes"));
 
         // We use this list to build an alphabetical list of field names:
         TreeSet<String> fields = new TreeSet<String>();
         // We use this map to remember which slider represents which field name:
         sliders.clear();
-        for (int i=0, len=BibtexFields.numberOfPublicFields(); i<len; i++)
+        for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; i++)
         {
             fields.add(BibtexFields.getFieldName(i));
         }
@@ -94,15 +91,19 @@ public class FieldWeightDialog extends JDialog {
 
     }
 
-    public JPanel buildButtonPanel() {
+    private JPanel buildButtonPanel() {
 
         ok.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 storeSettings();
                 dispose();
             }
         });
         cancel.addActionListener(new ActionListener() {
+
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 dispose();
             }
@@ -116,25 +117,29 @@ public class FieldWeightDialog extends JDialog {
         return builder.getPanel();
     }
 
-    public void storeSettings() {
+    private void storeSettings() {
         for (JSlider slider : sliders.keySet()) {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
-                double weight = GUIGlobals.MAX_FIELD_WEIGHT * (slider.getValue()) / 100d;
+                double weight = GUIGlobals.MAX_FIELD_WEIGHT * slider.getValue() / 100d;
                 BibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }
         frame.removeCachedEntryEditors();
     }
 
+
     /**
      * "Struct" class to hold the necessary info about one of our JSliders:
      * which field it represents, and what value it started out with.
      */
     static class SliderInfo {
-        String fieldName;
-        int originalValue;
+
+        final String fieldName;
+        final int originalValue;
+
+
         public SliderInfo(String fieldName, int originalValue) {
             this.fieldName = fieldName;
             this.originalValue = originalValue;

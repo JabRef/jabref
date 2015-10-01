@@ -23,6 +23,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  * Listens for TableColumnModelEvents to keep track of changes made to the
@@ -38,105 +39,112 @@ import net.sf.jabref.Globals;
  */
 public class PersistenceTableColumnListener implements TableColumnModelListener {
 
-	public static final String ACTIVATE_PREF_KEY = 
-	    "ActivatePersistenceTableColumnListener";
+    public static final String ACTIVATE_PREF_KEY =
+            "ActivatePersistenceTableColumnListener";
 
-	public static final boolean DEFAULT_ENABLED = true;
+    public static final boolean DEFAULT_ENABLED = true;
 
-	private static final String simpleClassName = 
-	    PersistenceTableColumnListener.class.getSimpleName();
+    private static final String simpleClassName =
+            PersistenceTableColumnListener.class.getSimpleName();
 
-	// needed to get column names / indices mapped from view to model 
-	// and to access the table model 
-	private final MainTable mainTable;
+    // needed to get column names / indices mapped from view to model 
+    // and to access the table model 
+    private final MainTable mainTable;
 
-	/**
-	 * @param mainTable
-	 */
-	public PersistenceTableColumnListener(final MainTable mainTable) {
-		this.mainTable = mainTable;
-	}
 
-	/**
-	 * update columns names and their width, store it in the global prefs.
-	 */
-	private void updateColumnPrefs() {
+    /**
+     * @param mainTable
+     */
+    public PersistenceTableColumnListener(final MainTable mainTable) {
+        this.mainTable = mainTable;
+    }
+
+    /**
+     * update columns names and their width, store it in the global prefs.
+     */
+    private void updateColumnPrefs() {
         final int columnCount = mainTable.getColumnCount();
-		Vector<String> storedColumns = new Vector<String>(columnCount - 1);
-		Vector<String> columnsWidths = new Vector<String>(columnCount - 1);
-		int ncWidth = -1;
+        Vector<String> storedColumns = new Vector<String>(columnCount - 1);
+        Vector<String> columnsWidths = new Vector<String>(columnCount - 1);
+        int ncWidth = -1;
 
-		for (int i = 0; i < columnCount; i++) {
-			final String name = mainTable.getColumnName(i);
-            if (name == null || name.equals("")) {
+        for (int i = 0; i < columnCount; i++) {
+            final String name = mainTable.getColumnName(i);
+            if ((name == null) || name.isEmpty()) {
             } else if (name.equals("#")) { // TODO: get "#" from prefs?
-				ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
+                ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
 
-			} else {
-				storedColumns.add(name.toLowerCase());
-				columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(
-						i).getWidth()));
+            } else {
+                storedColumns.add(name.toLowerCase());
+                columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(
+                        i).getWidth()));
 
-			}
-		}
+            }
+        }
 
-		// Finally, we store the new preferences.
-		Globals.prefs.putStringArray("columnNames",
+        // Finally, we store the new preferences.
+        Globals.prefs.putStringArray(JabRefPreferences.COLUMN_NAMES,
                 storedColumns.toArray(new String[storedColumns.size()]));
-		Globals.prefs.putStringArray("columnWidths",
+        Globals.prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS,
                 columnsWidths.toArray(new String[columnsWidths.size()]));
 
-		// width of the number ("#") column
-		Globals.prefs.putInt("numberColWidth", ncWidth);
-	}
+        // width of the number ("#") column
+        Globals.prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
+    }
 
-	/**
-	 * @see javax.swing.event.TableColumnModelListener#columnAdded(javax.swing.event.TableColumnModelEvent)
-	 */
-	public void columnAdded(TableColumnModelEvent e) {
-		assert e != null : simpleClassName + " received null event";
+    /**
+     * @see javax.swing.event.TableColumnModelListener#columnAdded(javax.swing.event.TableColumnModelEvent)
+     */
+    @Override
+    public void columnAdded(TableColumnModelEvent e) {
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
-		updateColumnPrefs();
-	}
+        updateColumnPrefs();
+    }
 
-	/**
-	 * @see javax.swing.event.TableColumnModelListener#columnMarginChanged(javax.swing.event.ChangeEvent)
-	 */
-	public void columnMarginChanged(ChangeEvent e) {
-		assert e != null : simpleClassName + " received null event";
-		
-		updateColumnPrefs();
-	}
+    /**
+     * @see javax.swing.event.TableColumnModelListener#columnMarginChanged(javax.swing.event.ChangeEvent)
+     */
+    @Override
+    public void columnMarginChanged(ChangeEvent e) {
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
-	/**
-	 * @see javax.swing.event.TableColumnModelListener#columnMoved(javax.swing.event.TableColumnModelEvent)
-	 */
-	public void columnMoved(TableColumnModelEvent e) {
-		assert e != null : simpleClassName + " received null event";
+        updateColumnPrefs();
+    }
 
-		// not really moved, ignore ...
-		if (e.getFromIndex() == e.getToIndex())
-			return;
+    /**
+     * @see javax.swing.event.TableColumnModelListener#columnMoved(javax.swing.event.TableColumnModelEvent)
+     */
+    @Override
+    public void columnMoved(TableColumnModelEvent e) {
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
-		updateColumnPrefs();
+        // not really moved, ignore ...
+        if (e.getFromIndex() == e.getToIndex()) {
+            return;
+        }
 
-	}
+        updateColumnPrefs();
 
-	/**
-	 * @see javax.swing.event.TableColumnModelListener#columnRemoved(javax.swing.event.TableColumnModelEvent)
-	 */
-	public void columnRemoved(TableColumnModelEvent e) {
-		assert e != null : simpleClassName + " received null event";
+    }
 
-		updateColumnPrefs();
+    /**
+     * @see javax.swing.event.TableColumnModelListener#columnRemoved(javax.swing.event.TableColumnModelEvent)
+     */
+    @Override
+    public void columnRemoved(TableColumnModelEvent e) {
+        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
 
-	}
+        updateColumnPrefs();
 
-	/**
-	 * @see javax.swing.event.TableColumnModelListener#columnSelectionChanged(javax.swing.event.ListSelectionEvent)
-	 */
-	public void columnSelectionChanged(ListSelectionEvent e) {
-		// ignore
-	}
+    }
+
+    /**
+     * @see javax.swing.event.TableColumnModelListener#columnSelectionChanged(javax.swing.event.ListSelectionEvent)
+     */
+    @Override
+    public void columnSelectionChanged(ListSelectionEvent e) {
+        // ignore
+    }
 
 }

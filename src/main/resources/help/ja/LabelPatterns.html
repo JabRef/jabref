@@ -6,7 +6,7 @@
 
 <body>
 
-    <h1>BibTeX<ruby><rb>鍵</rb><rp>(</rp><rt>キー</rt><rp>)</rp></ruby>生成機構の自作</h1>
+    <h1>BibTeX<ruby><rb>鍵</rb><rp>(</rp><rt>キー</rt><rp>)</rp></ruby>生成方法の調整</h1>
 
     <p>JabRef設定の「BibTeX鍵の生成」タブでは、BibTeXラベルの自動生成に使用されるフィールドを設定することができます。パターンは、標準的な項目型それぞれに対して設定することができます。</p>
 
@@ -41,7 +41,13 @@
 
         <li><b>[<code>auth.etal</code>]</b>: 第1著者の姓の後に、著者が2名の時は第2著者の姓、著者が3名以上の時は「.etal」。<br /></li>
 
+        <li><b>[<code>authEtAl</code>]</b>: 第1著者の姓の後に、著者が2名の時は第2著者の姓、著者が3名以上の時は「EtAl」。これは、<code>auth.etal</code>に近いですが、著者同士が「.」によって区切られないことと、著者が3名以上の時に「.etal」ではなく「Etal」が付け加えられるところが違います。<br /></li>
+
         <li><b>[<code>authshort</code>]</b>: 著者1名の時はその姓、著者2名以上の時は、3名までの著者の姓の最初の文字。4名以上の著者がいる時には、その後に+文字。<br /></li>
+
+	<li><b>[<code>authForeIni</code>]</b>: 第1著者の名のイニシャル。<br /></li>
+
+	<li><b>[<code>authorLastForeIni</code>]</b>: 最後の著者の名のイニシャル。<br /></li>
 
     </ul>
 
@@ -65,6 +71,10 @@
         <li><b>[<code>edtr.edtr.ea</code>]</b>: 最初の2編者の姓と、3名以上の場合は「.ea」を追加。<br /></li>
 
         <li><b>[<code>edtrshort</code>]</b>: 編者1名の時はその姓、編者2名以上の時は、3名までの編者の姓の最初の文字。4名以上の編者がいる時には、その後に+文字。<br /></li>
+
+	<li><b>[<code>edtrForeIni</code>]</b>: 第1編者の名のイニシャル。<br /></li>
+
+	<li><b>[<code>editorLastForeIni</code>]</b>: 最後の編者の名のイニシャル。<br /></li>
 
         <li><b>[<code>firstpage</code>]</b>: 発行物の最初のページ番号(注意：bibtexは<code>7,41,73--97</code>あるいは<code>43+</code>という表記をするので、pagesフィールド中の最小のページ番号を返します)<br /></li>
 

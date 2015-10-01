@@ -26,11 +26,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
  * An Action for launching mass field.
@@ -41,21 +46,28 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Either set field, or clear field.
  */
 public class MassSetFieldAction extends MnemonicAwareAction {
-    private JabRefFrame frame;
+
+    private final JabRefFrame frame;
     private JDialog diag;
-    private JRadioButton all, selected, clear, set, rename;
-    private JTextField field, text, renameTo;
-    private JButton ok, cancel;
-    boolean cancelled = true;
+    private JRadioButton all;
+    private JRadioButton selected;
+    private JRadioButton clear;
+    private JRadioButton set;
+    private JRadioButton rename;
+    private JTextField field;
+    private JTextField text;
+    private JTextField renameTo;
+    private boolean cancelled = true;
     private JCheckBox overwrite;
 
+
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(NAME, "Set/clear/rename fields");
+        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields"));
         this.frame = frame;
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Globals.lang("Set/clear/rename fields"), true);
+        diag = new JDialog(frame, Localization.lang("Set/clear/rename fields"), true);
 
         field = new JTextField();
         text = new JTextField();
@@ -63,34 +75,40 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
-        ok = new JButton(Globals.lang("Ok"));
-        cancel = new JButton(Globals.lang("Cancel"));
+        JButton ok = new JButton(Localization.lang("Ok"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
 
-        all = new JRadioButton(Globals.lang("All entries"));
-        selected = new JRadioButton(Globals.lang("Selected entries"));
-        clear = new JRadioButton(Globals.lang("Clear fields"));
-        set = new JRadioButton(Globals.lang("Set fields"));
-        rename = new JRadioButton(Globals.lang("Rename field to:"));
-        rename.setToolTipText(Globals.lang("Move contents of a field into a field with a different name"));
+        all = new JRadioButton(Localization.lang("All entries"));
+        selected = new JRadioButton(Localization.lang("Selected entries"));
+        clear = new JRadioButton(Localization.lang("Clear fields"));
+        set = new JRadioButton(Localization.lang("Set fields"));
+        rename = new JRadioButton(Localization.lang("Rename field to:"));
+        rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
         set.addChangeListener(new ChangeListener() {
+
+            @Override
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are setting, not clearing:
                 text.setEnabled(set.isSelected());
             }
         });
         clear.addChangeListener(new ChangeListener() {
+
+            @Override
             public void stateChanged(ChangeEvent event) {
                 // Overwrite protection makes no sense if we are clearing the field:
                 overwrite.setEnabled(!clear.isSelected());
             }
         });
         rename.addChangeListener(new ChangeListener() {
+
+            @Override
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are renaming
                 renameTo.setEnabled(rename.isSelected());
             }
         });
-        overwrite = new JCheckBox(Globals.lang("Overwrite existing field values"), true);
+        overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
         bg.add(all);
         bg.add(selected);
@@ -100,16 +118,16 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         bg.add(rename);
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout(
                 "left:pref, 4dlu, fill:100dlu", ""));
-        builder.appendSeparator(Globals.lang("Field name"));
-        builder.append(Globals.lang("Field name"));
+        builder.appendSeparator(Localization.lang("Field name"));
+        builder.append(Localization.lang("Field name"));
         builder.append(field);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("Include entries"));
+        builder.appendSeparator(Localization.lang("Include entries"));
         builder.append(all, 3);
         builder.nextLine();
         builder.append(selected, 3);
         builder.nextLine();
-        builder.appendSeparator(Globals.lang("New field value"));
+        builder.appendSeparator(Localization.lang("New field value"));
         builder.append(set);
         builder.append(text);
         builder.nextLine();
@@ -120,40 +138,43 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         builder.nextLine();
         builder.append(overwrite, 3);
 
-
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
         ok.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent e) {
-               // Check if the user tries to rename multiple fields:
-               if (rename.isSelected()) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Check if the user tries to rename multiple fields:
+                if (rename.isSelected()) {
                     String[] fields = getFieldNames(field.getText());
-                   if (fields.length > 1) {
-                       JOptionPane.showMessageDialog(diag, Globals.lang("You can only rename one field at a time"),
-                               "", JOptionPane.ERROR_MESSAGE);
-                       return; // Do not close the dialog.
-                   }
-               }
+                    if (fields.length > 1) {
+                        JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
+                                "", JOptionPane.ERROR_MESSAGE);
+                        return; // Do not close the dialog.
+                    }
+                }
                 cancelled = false;
                 diag.dispose();
             }
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    cancelled = true;
-                    diag.dispose();
-                }
-            };
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancelled = true;
+                diag.dispose();
+            }
+        };
         cancel.addActionListener(cancelAction);
 
         // Key bindings:
@@ -165,41 +186,49 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
     private void prepareDialog(boolean selection) {
         selected.setEnabled(selection);
-        if (selection)
+        if (selection) {
             selected.setSelected(true);
-        else
+        } else {
             all.setSelected(true);
+        }
         // Make sure one of the following ones is selected:
-        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected())
+        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected()) {
             set.setSelected(true);
+        }
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         BasePanel bp = frame.basePanel();
-        if (bp == null)
+        if (bp == null) {
             return;
+        }
         BibtexEntry[] entries = bp.getSelectedEntries();
         // Lazy creation of the dialog:
-        if (diag == null)
+        if (diag == null) {
             createDialog();
+        }
         cancelled = true;
         prepareDialog(entries.length > 0);
         Util.placeDialog(diag, frame);
         diag.setVisible(true);
-        if (cancelled)
+        if (cancelled) {
             return;
+        }
 
         Collection<BibtexEntry> entryList;
         // If all entries should be treated, change the entries array:
-        if (all.isSelected())
+        if (all.isSelected()) {
             entryList = bp.database().getEntries();
-        else
+        } else {
             entryList = Arrays.asList(entries);
+        }
         String toSet = text.getText();
-        if (toSet.length() == 0)
+        if (toSet.isEmpty()) {
             toSet = null;
+        }
         String[] fields = getFieldNames(field.getText().trim().toLowerCase());
-        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
                 // TODO: message: can only rename a single field
