@@ -260,7 +260,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle(getKeyName());
+        return Localization.menuTitle("Fetch ArXiv.org");
     }
 
     @Override

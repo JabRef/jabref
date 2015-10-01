@@ -54,6 +54,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.id.IdGenerator;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -527,7 +528,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = Globals.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
+                    fullName = Abbreviations.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
                 }
             }
             if (type.getName().equals("Inproceedings")) {

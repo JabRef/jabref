@@ -28,7 +28,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -62,7 +62,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, "Set/clear/rename fields");
+        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields"));
         this.frame = frame;
     }
 

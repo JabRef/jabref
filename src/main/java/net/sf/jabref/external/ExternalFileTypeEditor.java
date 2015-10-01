@@ -31,7 +31,7 @@ import javax.swing.table.TableCellRenderer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -371,13 +371,13 @@ public class ExternalFileTypeEditor extends JDialog {
 
         public EditExternalFileTypesAction(JabRefFrame frame) {
             super();
-            putValue(Action.NAME, "Manage external file types");
+            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
             this.frame = frame;
         }
 
         public EditExternalFileTypesAction(JDialog dialog) {
             super();
-            putValue(Action.NAME, "Manage external file types");
+            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
             this.dialog = dialog;
         }
 

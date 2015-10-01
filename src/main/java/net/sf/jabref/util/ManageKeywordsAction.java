@@ -45,7 +45,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
 import net.sf.jabref.logic.l10n.Localization;
@@ -91,7 +91,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(Action.NAME, "Manage keywords");
+        putValue(Action.NAME, Localization.menuTitle("Manage keywords"));
         this.frame = frame;
     }
 

@@ -18,7 +18,9 @@ package net.sf.jabref.model.entry;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -41,12 +43,20 @@ public class CustomEntryType extends BibtexEntryType {
 
     private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
+    public CustomEntryType(String name, List<String> required, List<String> priOpt, List<String> secOpt) {
+        this(name, required.toArray(new String[required.size()]), priOpt.toArray(new String[priOpt.size()]),
+                secOpt.toArray(new String[secOpt.size()]));
+    }
 
     public CustomEntryType(String name, String[] required, String[] priOpt, String[] secOpt) {
         this.name = StringUtil.capitalizeFirst(name);
         parseRequiredFields(required);
         this.priOpt = priOpt;
         optional = StringUtil.arrayConcat(priOpt, secOpt);
+    }
+
+    public CustomEntryType(String name, List<String> required, List<String> optional) {
+        this(name, required.toArray(new String[required.size()]), optional.toArray(new String[optional.size()]));
     }
 
     public CustomEntryType(String name, String[] required, String[] optional) {
@@ -96,28 +106,28 @@ public class CustomEntryType extends BibtexEntryType {
     }
 
     @Override
-    public String[] getOptionalFields() {
-        return optional;
+    public List<String> getOptionalFields() {
+        return Arrays.asList(optional);
     }
 
     @Override
-    public String[] getRequiredFields() {
-        return required;
+    public List<String> getRequiredFields() {
+        return Arrays.asList(required);
     }
 
     @Override
-    public String[] getPrimaryOptionalFields() {
-        return priOpt;
+    public List<String> getPrimaryOptionalFields() {
+        return Arrays.asList(priOpt);
     }
 
     @Override
-    public String[] getSecondaryOptionalFields() {
-        return StringUtil.getRemainder(optional, priOpt);
+    public List<String> getSecondaryOptionalFields() {
+        return Arrays.asList(StringUtil.getRemainder(optional, priOpt));
     }
 
     @Override
-    public String[] getRequiredFieldsForCustomization() {
-        return getRequiredFieldsString().split(";");
+    public List<String> getRequiredFieldsForCustomization() {
+        return Arrays.asList(getRequiredFieldsString().split(";"));
     }
 
     /**

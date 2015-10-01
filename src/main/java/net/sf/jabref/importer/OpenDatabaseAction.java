@@ -32,6 +32,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -74,7 +75,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         super(IconTheme.getImage("open"));
         this.frame = frame;
         this.showDialog = showDialog;
-        putValue(Action.NAME, "Open database");
+        putValue(Action.NAME, Localization.menuTitle("Open database"));
         putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Open database"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
     }

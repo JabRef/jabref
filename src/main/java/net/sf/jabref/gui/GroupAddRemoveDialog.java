@@ -1,6 +1,7 @@
 package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.groups.*;

@@ -1229,6 +1229,7 @@ public class Util {
         };
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 // show dialog which will be hidden when the task is done
                 if (diag != null) {

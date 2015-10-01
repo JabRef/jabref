@@ -420,14 +420,14 @@ public class MainTable extends JTable {
 
         // Default sort order:
         String[] sortFields = new String[] {
-                Globals.prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD),
-                Globals.prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD)
+                Globals.prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD),
+                Globals.prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD),
+                Globals.prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD)
         };
         boolean[] sortDirections = new boolean[] {
-                Globals.prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING),
-                Globals.prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING)
+                Globals.prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING),
+                Globals.prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING),
+                Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
         }; // descending
 
         sortedForTable.getReadWriteLock().writeLock().lock();
@@ -460,24 +460,24 @@ public class MainTable extends JTable {
                 // Update preferences:
                 int count = Math.min(fields.size(), order.size());
                 if (count >= 1) {
-                    Globals.prefs.put(JabRefPreferences.PRIMARY_SORT_FIELD, fields.get(0));
-                    Globals.prefs.putBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING, order.get(0));
+                    Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
+                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
                 }
                 if (count >= 2) {
-                    Globals.prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, fields.get(1));
-                    Globals.prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, order.get(1));
+                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
+                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
                 }
                 else {
-                    Globals.prefs.put(JabRefPreferences.SECONDARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING, false);
+                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
+                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
                 }
                 if (count >= 3) {
-                    Globals.prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, fields.get(2));
-                    Globals.prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, order.get(2));
+                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
+                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
                 }
                 else {
-                    Globals.prefs.put(JabRefPreferences.TERTIARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING, false);
+                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
+                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
                 }
             }
 

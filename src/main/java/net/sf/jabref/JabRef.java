@@ -20,7 +20,6 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +35,7 @@ import javax.swing.plaf.FontUIResource;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
@@ -71,12 +71,11 @@ import com.sun.jna.ptr.PointerByReference;
  * JabRef Main Class - The application gets started here.
  */
 public class JabRef {
+    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     public static JabRefFrame jrf;
 
     private static final int MAX_DIALOG_WARNINGS = 10;
-    
-    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     private JabRefCLI cli;
 
@@ -103,7 +102,7 @@ public class JabRef {
         Globals.startBackgroundTasks();
         setupLogHandlerForErrorConsole();
         Globals.prefs = prefs;
-        setLanguage(prefs);
+        Localization.setLanguage(prefs.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
         /*
          * The Plug-in System is started automatically on the first call to
@@ -121,7 +120,7 @@ public class JabRef {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -143,20 +142,6 @@ public class JabRef {
                     JabRefExecutorService.INSTANCE.shutdownEverything();
                     return;
                 }
-            }
-        }
-
-        /*
-         * See if the user has a personal journal list set up. If so, add these
-         * journal names and abbreviations to the list:
-         */
-        String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null && !personalJournalList.isEmpty()) {
-            try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
-            } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Journal file not found") + ": " + e.getMessage(), Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
             }
         }
 
@@ -184,23 +169,6 @@ public class JabRef {
     private void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
-    }
-
-    private void setLanguage(JabRefPreferences prefs) {
-        String langStr = prefs.get(JabRefPreferences.LANGUAGE);
-        String[] parts = langStr.split("_");
-        String language;
-        String country;
-        if (parts.length == 1) {
-            language = langStr;
-            country = "";
-        }
-        else {
-            language = parts[0];
-            country = parts[1];
-        }
-
-        Localization.setLanguage(language, country);
     }
 
     // Do not use this code in release version, it contains some memory leaks

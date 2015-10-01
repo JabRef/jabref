@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.gui.journals;
 
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -49,7 +49,7 @@ public class AbbreviateAction extends AbstractWorker {
             return;
         }
 
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(Globals.journalAbbrev, iso);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(Abbreviations.journalAbbrev, iso);
 
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;

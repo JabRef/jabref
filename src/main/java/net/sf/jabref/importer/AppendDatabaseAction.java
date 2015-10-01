@@ -28,6 +28,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;

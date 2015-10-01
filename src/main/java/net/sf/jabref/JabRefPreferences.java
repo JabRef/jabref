@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.CleanUpAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
@@ -100,12 +101,12 @@ public class JabRefPreferences {
     public static final String PROXY_PORT = "proxyPort";
     public static final String PROXY_HOSTNAME = "proxyHostname";
     public static final String USE_PROXY = "useProxy";
-    public static final String PRIMARY_SORT_FIELD = "priSort";
-    public static final String PRIMARY_SORT_DESCENDING = "priDescending";
-    public static final String SECONDARY_SORT_FIELD = "secSort";
-    public static final String SECONDARY_SORT_DESCENDING = "secDescending";
-    public static final String TERTIARY_SORT_FIELD = "terSort";
-    public static final String TERTIARY_SORT_DESCENDING = "terDescending";
+    public static final String TABLE_PRIMARY_SORT_FIELD = "priSort";
+    public static final String TABLE_PRIMARY_SORT_DESCENDING = "priDescending";
+    public static final String TABLE_SECONDARY_SORT_FIELD = "secSort";
+    public static final String TABLE_SECONDARY_SORT_DESCENDING = "secDescending";
+    public static final String TABLE_TERTIARY_SORT_FIELD = "terSort";
+    public static final String TABLE_TERTIARY_SORT_DESCENDING = "terDescending";
     public static final String SAVE_IN_ORIGINAL_ORDER = "saveInOriginalOrder";
     public static final String SAVE_IN_SPECIFIED_ORDER = "saveInSpecifiedOrder";
     public static final String SAVE_PRIMARY_SORT_FIELD = "savePriSort";
@@ -477,16 +478,17 @@ public class JabRefPreferences {
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
         defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
-        defaults.put(LANGUAGE, "en");
+        // system locale as default
+        defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
         defaults.put(SHOW_SHORT, Boolean.TRUE);
 
         // Sorting preferences
-        defaults.put(PRIMARY_SORT_FIELD, "author");
-        defaults.put(PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(SECONDARY_SORT_FIELD, "year");
-        defaults.put(SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(TERTIARY_SORT_FIELD, "author");
-        defaults.put(TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(TABLE_PRIMARY_SORT_FIELD, "author");
+        defaults.put(TABLE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(TABLE_SECONDARY_SORT_FIELD, "year");
+        defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(TABLE_TERTIARY_SORT_FIELD, "author");
+        defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
         defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
         defaults.put(SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
@@ -1319,8 +1321,8 @@ public class JabRefPreferences {
         String nr = "" + number;
         put(JabRefPreferences.CUSTOM_TYPE_NAME + nr, tp.getName());
         put(JabRefPreferences.CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, tp.getOptionalFields());
-        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, tp.getPrimaryOptionalFields());
+        putStringArray(JabRefPreferences.CUSTOM_TYPE_OPT + nr, tp.getOptionalFields().toArray(new String[0]));
+        putStringArray(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr, tp.getPrimaryOptionalFields().toArray(new String[0]));
     }
 
     /**

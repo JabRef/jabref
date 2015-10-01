@@ -118,29 +118,15 @@ public class BibtexEntry {
     /**
      * @return An array describing the optional fields for this entry. "null" if no fields are required
      */
-    public String[] getOptionalFields() {
-        String[] res = type.getOptionalFields();
-        if (res == null) {
-            return res;
-        } else {
-            // Fix for https://sourceforge.net/p/jabref/bugs/1221/ - see https://github.com/fc7/jabref/commit/e92238a37cc780eb7fccc0684fa62d2437ddd825
-            return res.clone();
-        }
+    public List<String> getOptionalFields() {
+        return type.getOptionalFields();
     }
 
     /**
      * @return an array describing the required fields for this entry. "null" if no fields are required
      */
-    public String[] getRequiredFields() {
-        String[] res = type.getRequiredFields();
-        if (res == null) {
-            return res;
-        } else {
-            // FIXME: This fix slows down saving very much. The issue should be investigated further and the one working on the result should do the clone
-            //        Removing the "clone()" here is against a rule in "Effective Java". However, the speed improvement weights more 
-            // Fix for https://sourceforge.net/p/jabref/bugs/1221/ - see https://github.com/fc7/jabref/commit/e92238a37cc780eb7fccc0684fa62d2437ddd825
-            return res.clone();
-        }
+    public List<String> getRequiredFields() {
+        return type.getRequiredFields();
     }
 
     public String[] getUserDefinedFields() {
@@ -448,6 +434,10 @@ public class BibtexEntry {
         }
 
         return true;
+    }
+
+    boolean allFieldsPresent(List<String> fields, BibtexDatabase database) {
+        return allFieldsPresent((String[]) fields.toArray(), database);
     }
 
     boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {

@@ -324,12 +324,12 @@ public class FileActions {
                 terD = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
             } else {
                 // The setting is to save according to the current table order.
-                pri = Globals.prefs.get(JabRefPreferences.PRIMARY_SORT_FIELD);
-                sec = Globals.prefs.get(JabRefPreferences.SECONDARY_SORT_FIELD);
-                ter = Globals.prefs.get(JabRefPreferences.TERTIARY_SORT_FIELD);
-                priD = Globals.prefs.getBoolean(JabRefPreferences.PRIMARY_SORT_DESCENDING);
-                secD = Globals.prefs.getBoolean(JabRefPreferences.SECONDARY_SORT_DESCENDING);
-                terD = Globals.prefs.getBoolean(JabRefPreferences.TERTIARY_SORT_DESCENDING);
+                pri = Globals.prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD);
+                sec = Globals.prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD);
+                ter = Globals.prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD);
+                priD = Globals.prefs.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING);
+                secD = Globals.prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING);
+                terD = Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING);
             }
         }
     }

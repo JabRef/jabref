@@ -5,7 +5,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 
@@ -21,7 +20,7 @@ public class NewDatabaseAction extends MnemonicAwareAction {
     public NewDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.getImage("new"));
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, "New database");
+        putValue(Action.NAME, Localization.menuTitle("New database"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX database"));
         //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
     }

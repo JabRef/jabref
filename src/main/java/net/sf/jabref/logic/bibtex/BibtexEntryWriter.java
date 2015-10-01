@@ -1,3 +1,20 @@
+/*  Copyright (C) -2015 JabRef contributors.
+    Copyright (C) 2015 Oliver Kopp
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.logic.bibtex;
 
 import net.sf.jabref.gui.BibtexFields;
@@ -8,6 +25,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -20,15 +38,24 @@ public class BibtexEntryWriter {
      */
     private static final Map<String, String> tagDisplayNameMap = new HashMap<>();
 
+
     static {
         // The field name display map.
         BibtexEntryWriter.tagDisplayNameMap.put("bibtexkey", "BibTeXKey");
+        BibtexEntryWriter.tagDisplayNameMap.put("doi", "DOI");
+        BibtexEntryWriter.tagDisplayNameMap.put("ee", "EE");
         BibtexEntryWriter.tagDisplayNameMap.put("howpublished", "HowPublished");
         BibtexEntryWriter.tagDisplayNameMap.put("lastchecked", "LastChecked");
         BibtexEntryWriter.tagDisplayNameMap.put("isbn", "ISBN");
         BibtexEntryWriter.tagDisplayNameMap.put("issn", "ISSN");
         BibtexEntryWriter.tagDisplayNameMap.put("UNKNOWN", "UNKNOWN");
+        BibtexEntryWriter.tagDisplayNameMap.put("url", "URL");
     }
+
+    private static final Map<String, List<String>> requiredFieldsSorted = new HashMap<>();
+
+    private static final Map<String, List<String>> optionalFieldsSorted = new HashMap<>();
+
 
     /**
      * The maximum length of a field name to properly make the alignment of the
@@ -103,9 +130,9 @@ public class BibtexEntryWriter {
         // Thereby, write the title field first.
         boolean hasWritten = writeField(entry, out, "title", false);
         writtenFields.add("title");
-        String[] requiredFields = entry.getRequiredFields();
-        if (requiredFields != null) {
-            Arrays.sort(requiredFields); // Sorting in alphabetic order.
+
+        if (entry.getRequiredFields() != null) {
+            List<String> requiredFields = getRequiredFieldsSorted(entry);
             for (String value : requiredFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -114,10 +141,9 @@ public class BibtexEntryWriter {
             }
         }
 
-        // Then optional fields.
-        String[] optionalFields = entry.getOptionalFields();
-        if (optionalFields != null) {
-            Arrays.sort(optionalFields); // Sorting in alphabetic order.
+        // Then optional fields
+        if (entry.getOptionalFields() != null) {
+            List<String> optionalFields = getOptionalFieldsSorted(entry);
             for (String value : optionalFields) {
                 if (!writtenFields.contains(value)) { // If field appears both in req. and opt. don't repeat.
                     hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
@@ -144,6 +170,34 @@ public class BibtexEntryWriter {
         out.write((hasWritten ? Globals.NEWLINE : "") + '}' + Globals.NEWLINE);
     }
 
+    private List<String> getRequiredFieldsSorted(BibtexEntry entry) {
+        String entryTypeName = entry.getType().getName();
+        List<String> sortedFields = requiredFieldsSorted.get(entryTypeName);
+
+        // put into chache if necessary
+        if (sortedFields == null) {
+            sortedFields = new ArrayList(entry.getRequiredFields());
+            Collections.sort(sortedFields);
+            requiredFieldsSorted.put(entryTypeName, sortedFields);
+        }
+
+        return sortedFields;
+    }
+
+    private List<String> getOptionalFieldsSorted(BibtexEntry entry) {
+        String entryTypeName = entry.getType().getName();
+        List<String> sortedFields = optionalFieldsSorted.get(entryTypeName);
+
+        // put into chache if necessary
+        if (sortedFields == null) {
+            sortedFields = new ArrayList(entry.getOptionalFields());
+            Collections.sort(sortedFields);
+            optionalFieldsSorted.put(entryTypeName, sortedFields);
+        }
+
+        return sortedFields;
+    }
+
     /**
      * old style ver<=2.9.2, write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
      *
@@ -161,7 +215,7 @@ public class BibtexEntryWriter {
         written.add(BibtexEntry.KEY_FIELD);
         boolean hasWritten = false;
         // Write required fields first.
-        String[] fields = entry.getRequiredFields();
+        List<String> fields = entry.getRequiredFields();
         if (fields != null) {
             for (String value : fields) {
                 hasWritten = hasWritten | writeField(entry, out, value, hasWritten);
