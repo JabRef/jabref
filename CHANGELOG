@@ -1,4 +1,6 @@
 [master]
+    - Fixed a bug in IEEEXploreFetcher
+    - Improved the case changing functionality to honor words within {}
     - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"

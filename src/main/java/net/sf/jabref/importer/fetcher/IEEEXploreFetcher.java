@@ -47,6 +47,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -58,6 +61,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 
 public class IEEEXploreFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(IEEEXploreFetcher.class);
 
     final CaseKeeperList caseKeeperList = new CaseKeeperList();
     private final CaseKeeper caseKeeper = new CaseKeeper();
@@ -318,7 +323,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         String citation = abs ? "citation-abstract" : "citation-only";
 
         String content = "recordIds=" + recordIds.replaceAll(" ", "%20") + "&fromPageName=&citations-format=" + citation + "&download-format=download-bibtex";
-        System.out.println(content);
+        LOGGER.debug(content);
         out.write(content);
         out.flush();
         out.close();
@@ -335,7 +340,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 sb.append(buffer[i]);
             }
         }
-        System.out.println(sb);
+        LOGGER.debug(sb.toString());
 
         ParserResult results = new BibtexParser(bufr).parse();
         bufr.close();
@@ -479,7 +484,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (parts.length == 3) {
                     fullName += parts[2];
                 }
-                if (entry.getField("note").equals("Early Access")) {
+                String note = entry.getField("note");
+                if (note != null && note.equals("Early Access")) {
                     entry.setField("year", "to be published");
                     entry.clearField("month");
                     entry.clearField("pages");
@@ -555,7 +561,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
                 String year = entry.getField("year");
-                fullName = fullName.replaceAll(", " + year + "\\.?", "");
+                if(year!=null) {
+                	fullName = fullName.replaceAll(", " + year + "\\.?", "");
+                }
 
                 if (!fullName.contains("Abstract") && !fullName.contains("Summaries") && !fullName.contains("Conference Record")) {
                     fullName = "Proc. " + fullName;
@@ -660,9 +668,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             if (type == null) {
                 type = BibtexEntryType.getType("misc");
                 sourceField = "note";
-                System.err.println("Type detection failed. Use MISC instead.");
+                LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
                 unparseable++;
-                System.err.println(text);
             }
 
             entry = new BibtexEntry(IdGenerator.next(), type);
@@ -714,11 +721,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 //System.out.println(authorCount + ": " + authorMatcher.group(1));
                 authorCount++;
             }
-            entry.setField("author", authorNames.toString());
-            if (entry.getField("author") == null || entry.getField("author").startsWith("a href") ||
-                    entry.getField("author").startsWith("Topic(s)")) { // Fix for some documents without authors
+            
+            String authorString = authorNames.toString();
+            if (authorString == null || authorString.startsWith("a href") ||
+            		authorString.startsWith("Topic(s)")) { // Fix for some documents without authors
                 entry.setField("author", "");
+            } else {
+            	entry.setField("author",authorString);
             }
+
             if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
                 entry.setType(BibtexEntryType.getStandardType("proceedings"));
             }
@@ -755,7 +766,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-            System.out.println(page);
+            LOGGER.debug(page);
             throw new IOException(Localization.lang("Could not parse number of hits"));
         }
         String substring = page.substring(ind, page.length());
