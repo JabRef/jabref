@@ -131,10 +131,12 @@ public abstract class DBExporter extends DBImporterExporter {
                 query = query + ", ";
                 val = entry.getField(SQLUtil.getAllFields().get(i));
                 if (val != null) {
-                    val = val.replace("\\", "\\\\");
-                    val = val.replace("\"", "\\\"");
-                    val = val.replace("\'", "''");
-                    val = val.replace("`", "\\`");
+                    if(dbStrings.getServerType().equals("MySQL")){
+                        val = val.replace("\\", "\\\\");
+                        val = val.replace("\"", "\\\"");
+                        val = val.replace("\'", "''");
+                        val = val.replace("`", "\\`");
+					}
                     query = query + '\'' + val + '\'';
                 } else {
                     query = query + "NULL";
