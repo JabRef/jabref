@@ -38,17 +38,17 @@ class FieldContentParser {
     /**
      * Performs the reformatting
      *
-     * @param content StringBuffer containing the field to format. bibtexKey contains field name according to field
+     * @param content StringBuffer containing the field to format. bibtexField contains field name according to field
      *                was edited by Kuehn/Havalevich
-     * @param bibtexKey
+     * @param bibtexField
      * @return The formatted field content. The StringBuffer returned may or may not be the same as the argument given.
      */
-    public StringBuffer format(StringBuffer content, String bibtexKey) {
+    public StringBuffer format(StringBuffer content, String bibtexField) {
         // Unify line breaks
         content = new StringBuffer(StringUtil.unifyLineBreaks(content.toString()));
 
         // Do not format multiline fields
-        if(multiLineFields.contains(bibtexKey)) {
+        if(multiLineFields.contains(bibtexField)) {
             return content;
         }
 
@@ -136,7 +136,7 @@ class FieldContentParser {
                     // Yes, of course we have, but in Filenames it is necessary to have all spaces. :-)
                     // This is the reason why the next lines are required
                     // FIXME: just don't edit some fields rather than hacking every exception?
-                    if (bibtexKey != null && bibtexKey.equals(GUIGlobals.FILE_FIELD)) {
+                    if (bibtexField != null && bibtexField.equals(GUIGlobals.FILE_FIELD)) {
                         i++;
                     } else {
                         content.deleteCharAt(i);
