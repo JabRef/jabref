@@ -132,12 +132,12 @@ public abstract class DBExporter extends DBImporterExporter {
                 query = query + ", ";
                 val = entry.getField(SQLUtil.getAllFields().get(i));
 				
-                if (val != null) {if(dbStrings.getServerType().equals("MySQL")){
-					if(dbStrings.getServerType().equals("MySQL")){
-                    val = val.replace("\\", "\\\\");
-                    val = val.replace("\"", "\\\"");
-                    val = val.replace("\'", "''");
-                    val = val.replace("`", "\\`");
+                if (val != null) {
+                	if(dbStrings.getServerType().equals("MySQL")){
+                        val = val.replace("\\", "\\\\");
+                        val = val.replace("\"", "\\\"");
+                        val = val.replace("\'", "''");
+                        val = val.replace("`", "\\`");
 					}
 					query = query + "'" + val + "'";
 				} else {
@@ -148,6 +148,7 @@ public abstract class DBExporter extends DBImporterExporter {
 			SQLUtil.processQuery(out, query);
 		}
 	}
+  
 
     /**
      * Recursive method to include a tree of groups.
