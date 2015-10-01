@@ -148,7 +148,6 @@ public abstract class DBExporter extends DBImporterExporter{
 				}
 			}
 			query = query + ", '" + database_id + "');";
-			System.out.println("\nServer Type: " + dbStrings.getServerType());
 			SQLUtil.processQuery(out, query);
 		}
 	}
