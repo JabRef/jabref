@@ -136,7 +136,7 @@ public abstract class DBExporter extends DBImporterExporter {
                         val = val.replace("\"", "\\\"");
                         val = val.replace("\'", "''");
                         val = val.replace("`", "\\`");
-					}
+		    }
                     query = query + '\'' + val + '\'';
                 } else {
                     query = query + "NULL";
