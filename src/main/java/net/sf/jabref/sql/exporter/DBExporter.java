@@ -131,16 +131,16 @@ public abstract class DBExporter extends DBImporterExporter {
                 query = query + ", ";
                 val = entry.getField(SQLUtil.getAllFields().get(i));
                 if (val != null) {
-    /**
-     * This condition is here since PostgreSQL automatically escapes the backslashes,
-     * so the entry would double the number of slashes after storing/retrieving.
-     **/                	
-                    if(dbStrings.getServerType().equals("MySQL")){
+                    /**
+                    * The condition below is there since PostgreSQL automatically escapes the backslashes,
+                    * so the entry would double the number of slashes after storing/retrieving.
+                    **/
+                    if (dbStrings.getServerType().equals("MySQL")) {
                         val = val.replace("\\", "\\\\");
                         val = val.replace("\"", "\\\"");
                         val = val.replace("\'", "''");
                         val = val.replace("`", "\\`");
-		    }
+                    }
                     query = query + '\'' + val + '\'';
                 } else {
                     query = query + "NULL";
