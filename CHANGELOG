@@ -1,5 +1,5 @@
 [master]
-	- Added more characters to HTML/Unicode converter
+    - Added more characters to HTML/Unicode converter
     - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
