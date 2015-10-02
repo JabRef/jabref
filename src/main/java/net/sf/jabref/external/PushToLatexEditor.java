@@ -43,7 +43,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Insert selected citations into LatexEditor");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push to LatexEditor");
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override

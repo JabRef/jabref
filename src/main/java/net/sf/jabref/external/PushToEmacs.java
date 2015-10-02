@@ -52,7 +52,7 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Insert selected citations into Emacs");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to Emacs");
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -202,7 +202,7 @@ public class PushToEmacs implements PushToApplication {
                             + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
-            panel.output(Localization.lang("Pushed citations to Emacs"));
+            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
     }
 

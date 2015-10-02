@@ -25,7 +25,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public class PushToTeXstudio implements PushToApplication {
 
-    private final String defaultCiteCommand = "\\cite";
     private JPanel settings;
     private final JTextField citeCommand = new JTextField(30);
     private final JTextField progPath = new JTextField(30);
@@ -36,8 +35,7 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into TeXstudio");
-    }
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());    }
 
     @Override
     public String getApplicationName() {
@@ -46,7 +44,7 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to TeXstudio");
+        return Localization.lang("Push to %0",getApplicationName());
     }
 
     @Override
@@ -76,12 +74,10 @@ public class PushToTeXstudio implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        String citeCom = Globals.prefs.get("citeCommandTeXstudio");
-        if (citeCom == null) {
-            citeCom = defaultCiteCommand;
-        }
+        String citeCom = Globals.prefs.get(JabRefPreferences.CITE_COMMAND_TEXSTUDIO);
         citeCommand.setText(citeCom);
-        String programPath = Globals.prefs.get("TeXstudioPath");
+        
+        String programPath = Globals.prefs.get(JabRefPreferences.TEXSTUDIO_PATH);
         if (programPath == null) {
             programPath = defaultProgramPath();
         }
@@ -91,8 +87,8 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put("citeCommandTeXstudio", citeCommand.getText().trim());
-        Globals.prefs.put("TeXstudioPath", progPath.getText().trim());
+        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_TEXSTUDIO, citeCommand.getText().trim());
+        Globals.prefs.put(JabRefPreferences.TEXSTUDIO_PATH, progPath.getText().trim());
     }
 
     private void initSettingsPanel() {
@@ -100,7 +96,7 @@ public class PushToTeXstudio implements PushToApplication {
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
                 
-        builder.addLabel(Localization.lang("Path to TeXstudio") + ":").xy(1, 1);
+        builder.addLabel(Localization.lang("Path to %0",getApplicationName()) + ":").xy(1, 1);
         builder.add(progPath).xy(3, 1);
         BrowseAction action = BrowseAction.buildForFile(progPath);
         JButton browse = new JButton(Localization.lang("Browse"));
@@ -116,11 +112,8 @@ public class PushToTeXstudio implements PushToApplication {
 
         couldNotConnect = false;
         couldNotRunClient = false;
-        String citeCom = Globals.prefs.get("citeCommandTeXstudio");
-        if (citeCom == null) {
-            citeCom = defaultCiteCommand;
-        }
-        String programPath = Globals.prefs.get("TeXstudioPath");
+        String citeCom = Globals.prefs.get(JabRefPreferences.CITE_COMMAND_TEXSTUDIO);
+        String programPath = Globals.prefs.get(JabRefPreferences.TEXSTUDIO_PATH);
         if (programPath == null) {
             programPath = defaultProgramPath();
         }
@@ -175,7 +168,7 @@ public class PushToTeXstudio implements PushToApplication {
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         }
         else if (couldNotRunClient) {
-            String programPath = Globals.prefs.get("TeXstudioPath");
+            String programPath = Globals.prefs.get(JabRefPreferences.TEXSTUDIO_PATH);
             if (programPath == null) {
                 programPath = defaultProgramPath();
             }
@@ -185,7 +178,7 @@ public class PushToTeXstudio implements PushToApplication {
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         }
         else {
-            panel.output(Localization.lang("Pushed citations to %0", "TeXstudio"));
+            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
     }
 

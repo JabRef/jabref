@@ -83,7 +83,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into LyX/Kile");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to LyX/Kile");
+        return Localization.lang("Push to %0",getApplicationName());
     }
 
     @Override

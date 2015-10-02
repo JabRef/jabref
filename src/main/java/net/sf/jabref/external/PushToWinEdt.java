@@ -40,7 +40,7 @@ public class PushToWinEdt implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into WinEdt");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -50,7 +50,7 @@ public class PushToWinEdt implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to WinEdt");
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -97,7 +97,7 @@ public class PushToWinEdt implements PushToApplication {
             panel.output(Localization.lang("Error") + ": " + Localization.lang("Could not call executable") + " '"
                     + Globals.prefs.get(JabRefPreferences.WIN_EDT_PATH) + "'.");
         } else {
-            Localization.lang("Pushed citations to WinEdt");
+            Localization.lang("Pushed citations to %0", getApplicationName());
         }
     }
 

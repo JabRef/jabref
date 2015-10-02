@@ -76,6 +76,7 @@ public class JabRefPreferences {
     public static final String FONT_FAMILY = "fontFamily";
     public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
     public static final String LATEX_EDITOR_PATH = "latexEditorPath";
+    public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
     public static final String SHOW_SHORT = "showShort";
@@ -294,6 +295,7 @@ public class JabRefPreferences {
     public static final String CITE_COMMAND_EMACS = "citeCommandEmacs";
     public static final String CITE_COMMAND_TEXMAKER = "citeCommandTexmaker";
     public static final String CITE_COMMAND_VIM = "citeCommandVim";
+    public static final String CITE_COMMAND_TEXSTUDIO = "citeCommandTeXstudio";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     public static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
@@ -742,6 +744,7 @@ public class JabRefPreferences {
         defaults.put(CITE_COMMAND_VIM, "\\cite");
         defaults.put(CITE_COMMAND_EMACS, "\\cite");
         defaults.put(CITE_COMMAND_WIN_EDT, "\\cite");
+        defaults.put(CITE_COMMAND_TEXSTUDIO, "\\cite");
         defaults.put(CITE_COMMAND_LED, "\\cite");
         defaults.put(CITE_COMMAND_TEXMAKER, "\\cite");
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);

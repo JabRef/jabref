@@ -49,7 +49,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into Vim");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to Vim");
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -163,7 +163,7 @@ public class PushToVim implements PushToApplication {
                     Localization.lang("Could not run the 'vim' program."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
-            panel.output(Localization.lang("Pushed citations to Vim"));
+            panel.output(Localization.lang("Pushed citations to %0",getApplicationName()));
         }
     }
 
