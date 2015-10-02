@@ -92,7 +92,7 @@ processResources {
                 "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "))
     }
 
-    filesMatching("resource/build.properties") {
+    filesMatching("build.properties") {
         expand version: project.version
     }
 

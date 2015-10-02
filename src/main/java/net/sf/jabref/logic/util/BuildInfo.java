@@ -24,7 +24,7 @@ public class BuildInfo {
 
 
     public BuildInfo() {
-        this("/resource/build.properties");
+        this("/build.properties");
     }
 
     public BuildInfo(String path) {

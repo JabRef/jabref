@@ -12,7 +12,6 @@ buildant/
 build.number
 classes/
 user.properties
-src/main/resources/resource/build.properties
 src/main/resources/windows/nsis/dist/
 
 # Gradle
