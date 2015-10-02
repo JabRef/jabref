@@ -622,7 +622,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             Matcher typeMatcher = typePattern.matcher(text);
             if (typeMatcher.find()) {
                 typeName = typeMatcher.group(1);
-                if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") || typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") || typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") || typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")) {
+                if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
+                        typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
+                        typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") ||
+                        typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")) {
                     type = BibtexEntryType.getType("article");
                     sourceField = "journal";
                 } else
