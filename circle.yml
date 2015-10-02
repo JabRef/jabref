@@ -10,7 +10,7 @@ dependencies:
     - chmod +x launch4j/launch4j
     - wget http://nsis.sourceforge.net/mediawiki/images/5/54/WinShell.zip
     - unzip WinShell.zip
-    - sudo cp Plugins/x86-unicode/WinShell.dll /usr/share/nsis/Plugins/
+    - sudo cp Plugins/x86-ansi/WinShell.dll /usr/share/nsis/Plugins/
   override:
     - TERM=dumb ./gradlew dependencies
 
