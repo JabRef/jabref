@@ -30,7 +30,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -79,28 +79,25 @@ public class ExternalFileTypeEntryEditor {
         bg.add(useDefault);
         bg.add(other);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
-        builder.append(Localization.lang("Icon"));
-        builder.append(icon);
-        builder.nextLine();
-        builder.append(Localization.lang("Name"));
-        builder.append(name);
-        builder.nextLine();
-        builder.append(Localization.lang("Extension"));
-        builder.append(extension);
-        builder.nextLine();
-        builder.append(Localization.lang("MIME type"));
-        builder.append(mimeType);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout
+                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Icon")).xy(1, 1);
+        builder.add(icon).xy(3,  1);
+        builder.add(Localization.lang("Name")).xy(1, 3);
+        builder.add(name).xy(3, 3);
+        builder.add(Localization.lang("Extension")).xy(1, 5);
+        builder.add(extension).xy(3, 5);
+        builder.add(Localization.lang("MIME type")).xy(1, 7);
+        builder.add(mimeType).xy(3, 7);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        builder.nextLine();
-        builder.append(Localization.lang("Application"));
+        builder.add(Localization.lang("Application")).xy(1, 9);
         JButton browseBut = new JButton(Localization.lang("Browse"));
         if (OS.WINDOWS) {
-            builder.append(useDefault);
-            builder.nextLine();
+            builder.add(useDefault).xy(3,9);
+            builder.appendRows("2dlu, p");
             JPanel p1 = new JPanel();
-            builder.append(p1);
+            builder.add(p1).xy(1,11);
             JPanel p2 = new JPanel();
             application.setPreferredSize(new Dimension(300, application.getPreferredSize().height));
             BorderLayout bl = new BorderLayout();
@@ -108,11 +105,11 @@ public class ExternalFileTypeEntryEditor {
             p2.setLayout(bl);
             p2.add(other, BorderLayout.WEST);
             p2.add(application, BorderLayout.CENTER);
-            builder.append(p2);
-            builder.append(browseBut);
+            builder.add(p2).xy(3, 11);
+            builder.add(browseBut).xy(5, 11);
         } else {
-            builder.append(application);
-            builder.append(browseBut);
+            builder.add(application).xy(3, 9);
+            builder.add(browseBut).xy(5, 9);
         }
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -184,10 +181,16 @@ public class ExternalFileTypeEntryEditor {
             });
         }
 
+        String title = "Edit file type";
+        
+        if(entry.getName().isEmpty()) {
+            title = "Add new file type";
+        }
+        
         if (dParent != null) {
-            diag = new JDialog(dParent, Localization.lang("Edit file type"), true);
+            diag = new JDialog(dParent, Localization.lang(title), true);
         } else {
-            diag = new JDialog(fParent, Localization.lang("Edit file type"), true);
+            diag = new JDialog(fParent, Localization.lang(title), true);
         }
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -209,6 +212,11 @@ public class ExternalFileTypeEntryEditor {
 
     public void setEntry(ExternalFileType entry) {
         this.entry = entry;
+        if(entry.getName().isEmpty()) {
+            diag.setTitle(Localization.lang("Add new file type"));
+        } else {
+            diag.setTitle(Localization.lang("Edit file type"));
+        }
         setValues(entry);
     }
 

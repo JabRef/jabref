@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.external;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
@@ -91,22 +91,19 @@ public class PushToVim implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-
-        builder.append(new JLabel(Localization.lang("Path to Vim") + ":"));
-        builder.append(vimPath);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
+        builder.add(vimPath).xy(3,1);
         BrowseAction action = BrowseAction.buildForFile(vimPath);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
-        builder.append(browse);
-        builder.nextLine();
-        builder.append(Localization.lang("Vim Server Name") + ":");
-        builder.append(vimServer);
-        builder.nextLine();
-        builder.append(Localization.lang("Cite command") + ":");
-        builder.append(citeCommand);
-        settings = builder.getPanel();
+        builder.add(browse).xy(5,1);
+        builder.add(Localization.lang("Vim Server Name") + ":").xy(1, 3);
+        builder.add(vimServer).xy(3,3);
+        builder.add(Localization.lang("Cite command") + ":").xy(1, 5);
+        builder.add(citeCommand).xy(3,5);
+        settings = builder.build();
     }
 
     @Override

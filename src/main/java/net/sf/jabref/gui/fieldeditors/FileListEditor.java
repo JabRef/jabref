@@ -25,7 +25,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -43,7 +42,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
@@ -145,14 +144,14 @@ public class FileListEditor extends JTable implements FieldEditor,
                 downloadFile();
             }
         });
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
-        builder.append(up);
-        builder.append(add);
-        builder.append(auto);
-        builder.append(down);
-        builder.append(remove);
-        builder.append(download);
+        builder.add(up).xy(1, 1);
+        builder.add(add).xy(3, 1);
+        builder.add(auto).xy(5, 1);
+        builder.add(down).xy(1, 2);
+        builder.add(remove).xy(3, 2);
+        builder.add(download).xy(5, 2);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);

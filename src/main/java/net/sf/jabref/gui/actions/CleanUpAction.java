@@ -28,8 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jgoodies.forms.factories.Borders;
-
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.*;
@@ -41,8 +39,7 @@ import net.sf.jabref.importer.fetcher.UnitFormatter;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -145,29 +142,28 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpUnits = new JCheckBox(Localization.lang("Add brackets and replace separators with their non-breaking version for units"));
         cleanUpUnicode = new JCheckBox(Localization.lang("Run Unicode converter on title, author(s), and abstract"));
         cleanUpBibLatex = new JCheckBox(Localization.lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
-        optionsPanel = new JPanel();
         retrieveSettings();
 
         FormLayout layout = new FormLayout("left:15dlu,pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout, optionsPanel);
-        builder.border(Borders.DIALOG);
-        CellConstraints cc = new CellConstraints();
-        builder.add(cleanUpHTML, cc.xyw(1, 1, 2));
-        builder.add(cleanUpUnicode, cc.xyw(1, 2, 2));
-        builder.add(cleanUpCase, cc.xyw(1, 3, 2));
-        builder.add(cleanUpLaTeX, cc.xyw(1, 4, 2));
-        builder.add(cleanUpUnits, cc.xyw(1, 5, 2));
-        builder.add(cleanUpSuperscripts, cc.xyw(1, 6, 2));
-        builder.add(cleanUpDOI, cc.xyw(1, 7, 2));
-        builder.add(cleanUpMonth, cc.xyw(1, 8, 2));
-        builder.add(cleanUpPageNumbers, cc.xyw(1, 9, 2));
-        builder.add(cleanUpUpgradeExternalLinks, cc.xyw(1, 10, 2));
-        builder.add(cleanUpMakePathsRelative, cc.xyw(1, 11, 2));
-        builder.add(cleanUpRenamePDF, cc.xyw(1, 12, 2));
+        FormBuilder builder = FormBuilder.create().layout(layout);
+        builder.add(cleanUpHTML).xyw(1, 1, 2);
+        builder.add(cleanUpUnicode).xyw(1, 2, 2);
+        builder.add(cleanUpCase).xyw(1, 3, 2);
+        builder.add(cleanUpLaTeX).xyw(1, 4, 2);
+        builder.add(cleanUpUnits).xyw(1, 5, 2);
+        builder.add(cleanUpSuperscripts).xyw(1, 6, 2);
+        builder.add(cleanUpDOI).xyw(1, 7, 2);
+        builder.add(cleanUpMonth).xyw(1, 8, 2);
+        builder.add(cleanUpPageNumbers).xyw(1, 9, 2);
+        builder.add(cleanUpUpgradeExternalLinks).xyw(1, 10, 2);
+        builder.add(cleanUpMakePathsRelative).xyw(1, 11, 2);
+        builder.add(cleanUpRenamePDF).xyw(1, 12, 2);
         String currentPattern = Localization.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern), cc.xyw(2, 13, 1));
-        builder.add(cleanUpRenamePDFonlyRelativePaths, cc.xyw(2, 14, 1));
-        builder.add(cleanUpBibLatex, cc.xyw(1, 15, 2));
+        builder.add(new JLabel(currentPattern)).xy(2, 13);
+        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 14);
+        builder.add(cleanUpBibLatex).xyw(1, 15, 2);
+        optionsPanel = builder.build();
+        
     }
 
     private void retrieveSettings() {

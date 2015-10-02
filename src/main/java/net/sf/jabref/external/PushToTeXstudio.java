@@ -6,10 +6,11 @@ import java.io.InputStream;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -95,14 +96,19 @@ public class PushToTeXstudio implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref", ""));
-        builder.append(Localization.lang("Cite command") + ":");
-        builder.append(citeCommand);
-        builder.nextLine();
-        builder.append(Localization.lang("Path to TeXstudio") + ":");
-        builder.append(progPath);
-        settings = builder.getPanel();
+        
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
+                
+        builder.addLabel(Localization.lang("Path to TeXstudio") + ":").xy(1, 1);
+        builder.add(progPath).xy(3, 1);
+        BrowseAction action = BrowseAction.buildForFile(progPath);
+        JButton browse = new JButton(Localization.lang("Browse"));
+        browse.addActionListener(action);
+        builder.add(browse).xy(5, 1);
+        builder.addLabel(Localization.lang("Cite command") + ":").xy(1, 3);
+        builder.add(citeCommand).xy(3, 3);
+        settings = builder.build();
     }
 
     @Override
@@ -179,7 +185,7 @@ public class PushToTeXstudio implements PushToApplication {
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         }
         else {
-            panel.output(Localization.lang("Pushed citations to TeXstudio"));
+            panel.output(Localization.lang("Pushed citations to %0", "TeXstudio"));
         }
     }
 

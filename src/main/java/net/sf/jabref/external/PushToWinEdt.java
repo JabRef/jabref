@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
@@ -117,18 +117,17 @@ public class PushToWinEdt implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Localization.lang("Path to WinEdt.exe") + ":"));
-        builder.append(winEdtPath);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
+        builder.add(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
+        builder.add(winEdtPath).xy(3,1);
         BrowseAction action = BrowseAction.buildForFile(winEdtPath);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
-        builder.append(browse);
-        builder.nextLine();
-        builder.append(Localization.lang("Cite command") + ":");
-        builder.append(citeCommand);
-        settings = builder.getPanel();
+        builder.add(browse).xy(5,1);
+        builder.add(Localization.lang("Cite command") + ":").xy(1, 3);
+        builder.add(citeCommand).xy(3,3);
+        settings = builder.build();
     }
 
     @Override

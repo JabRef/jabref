@@ -23,7 +23,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jgoodies.forms.factories.Borders;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -37,8 +36,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -89,17 +87,15 @@ public class DroppedFileHandler {
 
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref", "bottom:14pt,pref,pref,pref,pref");
         layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout, optionsPanel);
-        builder.border(Borders.DIALOG);
-        CellConstraints cc = new CellConstraints();
-
-        builder.add(linkInPlace, cc.xyw(1, 1, 4));
-        builder.add(destDirLabel, cc.xyw(1, 2, 4));
-        builder.add(copyRadioButton, cc.xyw(2, 3, 3));
-        builder.add(moveRadioButton, cc.xyw(2, 4, 3));
-        builder.add(renameCheckBox, cc.xyw(2, 5, 1));
-        builder.add(renameToTextBox, cc.xyw(4, 5, 1));
-
+        FormBuilder builder = FormBuilder.create().layout(layout);
+        
+        builder.add(linkInPlace).xyw(1, 1, 4);
+        builder.add(destDirLabel).xyw(1, 2, 4);
+        builder.add(copyRadioButton).xyw(2, 3, 3);
+        builder.add(moveRadioButton).xyw(2, 4, 3);
+        builder.add(renameCheckBox).xyw(2, 5, 1);
+        builder.add(renameToTextBox).xyw(4, 5, 1);
+        optionsPanel.add(builder.getPanel());
     }
 
     /**
@@ -139,7 +135,6 @@ public class DroppedFileHandler {
 
         // Show dialog
         boolean newEntry = false;
-        String citeKey = entry.getCiteKey();
         if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
             return;
         }
@@ -185,7 +180,6 @@ public class DroppedFileHandler {
 
         // Show dialog
         boolean newEntry = false;
-        String citeKey = entry.getCiteKey();
         if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
             return;
         }
@@ -349,8 +343,7 @@ public class DroppedFileHandler {
     //
     private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
                                                  BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
-        String citeKey = entry.getCiteKey();
-
+       
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
         String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
         int found = -1;

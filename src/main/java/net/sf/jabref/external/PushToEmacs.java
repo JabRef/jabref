@@ -22,7 +22,7 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
@@ -96,24 +96,21 @@ public class PushToEmacs implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Localization.lang("Path to gnuclient or emacsclient").concat(":")));
-        builder.append(emacsPath);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Path to gnuclient or emacsclient") + ":").xy(1, 1);
+        builder.add(emacsPath).xy(3,1);
         BrowseAction action = BrowseAction.buildForFile(emacsPath);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
-        builder.append(browse);
-        builder.nextLine();
-        builder.append(Localization.lang("Additional parameters").concat(":"));
-        builder.append(additionalParams);
-        builder.nextLine();
-        builder.append(Localization.lang("Use EMACS 23 insertion string").concat(":"));
-        builder.append(useEmacs23);
-        builder.nextLine();
-        builder.append(Localization.lang("Cite command") + ":");
-        builder.append(citeCommand);
-        settings = builder.getPanel();
+        builder.add(browse).xy(5,1);
+        builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
+        builder.add(additionalParams).xy(3,3);
+        builder.add(Localization.lang("Use EMACS 23 insertion string") + ":").xy(1, 5);
+        builder.add(useEmacs23).xy(3,5);
+        builder.add(Localization.lang("Cite command") + ":").xy(1, 7);
+        builder.add(citeCommand).xy(3,7);
+        settings = builder.build();
     }
 
     @Override
