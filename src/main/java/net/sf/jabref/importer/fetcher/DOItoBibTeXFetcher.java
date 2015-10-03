@@ -38,7 +38,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
-
+    
 
     @Override
     public void stopFetching() {
@@ -77,7 +77,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    private BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
+    public BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
         DOI doi = new DOI(doiStr);
 
         // Send the request
