@@ -74,6 +74,13 @@ public class MergeEntryDOIDialog extends JDialog {
         panel.output(Localization.lang("Fetching info based on DOI"));
         this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi"), null);
 
+        if (this.doiEntry == null) {
+            panel.output("");   
+            JOptionPane.showMessageDialog(frame, Localization.lang("Can not get info based on given DOI: %0", this.originalEntry.getField("doi")), Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+            return;
+        }
+        
         panel.output(Localization.lang("Opening dialog"));
         // Start setting up the dialog
         init();
