@@ -87,21 +87,21 @@ public class DOITest {
     public void correctlyEncodeDOIs() {
         // See http://www.doi.org/doi_handbook/2_Numbering.html#2.5.2.4
         // % -> (%25)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%25.0001", new DOI("http://doi.org/10.1006/rwei.1999%25.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%25.0001", new DOI("http://doi.org/10.1006/rwei.1999%25.0001").getURLAsASCIIString());
         // " -> (%22)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%22.0001", new DOI("http://doi.org/10.1006/rwei.1999%22.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%22.0001", new DOI("http://doi.org/10.1006/rwei.1999%22.0001").getURLAsASCIIString());
         // # -> (%23)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%23.0001", new DOI("http://doi.org/10.1006/rwei.1999%23.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%23.0001", new DOI("http://doi.org/10.1006/rwei.1999%23.0001").getURLAsASCIIString());
         // SPACE -> (%20)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%20.0001", new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%20.0001", new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getURLAsASCIIString());
         // ? -> (%3F)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%3F.0001", new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%3F.0001", new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getURLAsASCIIString());
     }
 
     @Test
     public void constructCorrectURLForDoi() {
         // add / to RESOLVER url if missing
-        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURL());
-        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURLAsASCIIString());
+        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURLAsASCIIString());
     }
 }

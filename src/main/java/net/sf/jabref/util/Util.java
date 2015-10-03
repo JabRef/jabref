@@ -344,12 +344,12 @@ public class Util {
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
             link = link.replaceFirst("^doi:/*", "");
-            link = new DOI(link).getURL();
+            link = new DOI(link).getURLAsASCIIString();
         }
 
         Optional<DOI> doi = DOI.build(link);
         if (doi.isPresent() && !link.matches("^https?://.*")) {
-            link = doi.get().getURL();
+            link = doi.get().getURLAsASCIIString();
         }
 
         // FIXME: everything below is really flawed atm

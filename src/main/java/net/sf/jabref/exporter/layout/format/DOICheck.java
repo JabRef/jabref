@@ -30,6 +30,6 @@ public class DOICheck implements LayoutFormatter {
             return null;
         }
 
-        return DOI.build(fieldText).map(doi -> doi.getURL()).orElse(fieldText);
+        return DOI.build(fieldText).map(doi -> doi.getURLAsASCIIString()).orElse(fieldText);
     }
 }

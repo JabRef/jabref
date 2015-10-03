@@ -101,14 +101,23 @@ public class DOI {
      *
      * @return an encoded URL representation of the DOI
      */
-    public String getURL() {
+    public URI getURI() {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
-            return uri.toASCIIString();
+            return uri;
         } catch(URISyntaxException e) {
             // should never happen
-            LOGGER.error(doi + " could not be encoded as URL.");
-            return "";
+            LOGGER.error(doi + " could not be encoded as URI.");
+            return null;
         }
+    }
+
+    /**
+     * Return an ASCII URL presentation for the DOI
+     *
+     * @return an encoded URL representation of the DOI
+     */
+    public String getURLAsASCIIString() {
+        return getURI().toASCIIString();
     }
 }

@@ -1,4 +1,6 @@
 /*  Copyright (C) 2014 JabRef contributors.
+    Copyright (C) 2015 Oliver Kopp
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -31,11 +33,11 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 
-    private static final String URL_PATTERN = "http://dx.doi.org/%s";
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
 
@@ -47,16 +49,13 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-
         BibtexEntry entry = getEntryFromDOI(query, status);
-        if (entry != null)
-        {
+        if (entry != null) {
             inspector.addEntry(entry);
             return true;
         } else {
             return false;
         }
-
     }
 
     @Override
@@ -80,22 +79,15 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    private BibtexEntry getEntryFromDOI(String doi, OutputPrinter status) {
-        String q;
-        try {
-            q = URLEncoder.encode(doi, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // this should never happen
-            e.printStackTrace();
-            return null;
-        }
-
-        String urlString = String.format(DOItoBibTeXFetcher.URL_PATTERN, q);
+    private BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
+        DOI doi = new DOI(doiStr);
 
         // Send the request
+
+        // construct URL
         URL url;
         try {
-            url = new URL(urlString);
+            url = doi.getURI().toURL();
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
@@ -117,9 +109,11 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         } catch (FileNotFoundException e) {
 
             if (status != null) {
-                status.showMessage(Localization.lang("Unknown DOI: '%0'.",
-                                doi),
-                        Localization.lang("Get BibTeX entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+                // @formatter:off
+                status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
+                                   Localization.lang("Get BibTeX entry from DOI"),
+                                   JOptionPane.INFORMATION_MESSAGE);
+                // @formatter:on
             }
             return null;
         } catch (IOException e) {
