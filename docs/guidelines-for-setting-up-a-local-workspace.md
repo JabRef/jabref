@@ -50,4 +50,4 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 4. In Eclipse, right click on the project and choose Run as --> Java application (Forget about the existing errors)
 5. Choose JabRefMain as the main class to be executed
 
-Got it running? GREAT! You are ready to lurk the code and contribute to JabRef :books:
+Got it running? GREAT! You are ready to lurk the code and contribute to JabRef :books: . In the latter case, please read [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
