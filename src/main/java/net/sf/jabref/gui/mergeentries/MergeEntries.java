@@ -42,19 +42,21 @@ import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.layout.ColumnSpec;
 
 /**
- * @author Oscar
+ * @author Oscar Gustafsson
  *
- * Class for dealing with merging entries
+ *         Class for dealing with merging entries
  */
 
 public class MergeEntries {
 
+    // @formatter:off
     private final String[] columnHeadings = {Localization.lang("Field"),
             Localization.lang("First entry"),
             "\u2190 " + Localization.lang("Use"),
             Localization.lang("None"),
             Localization.lang("Use") + " \u2192",
             Localization.lang("Second entry")};
+    // @formatter:on
     private final Dimension DIM = new Dimension(800, 800);
     private JRadioButton[][] rb;
     private Boolean[] identical;
@@ -69,8 +71,10 @@ public class MergeEntries {
     private String[] jointStrings;
     private final JPanel mergePanel = new JPanel();
 
-    /** 
+
+    /**
      * Constructor taking two entries
+     * 
      * @param bOne First entry
      * @param bTwo Second entry
      */
@@ -79,12 +83,13 @@ public class MergeEntries {
         two = bTwo;
         initialize();
     }
-    
-    /** 
+
+    /**
      * Constructor with optional column captions for the two entries
+     * 
      * @param bOne First entry
      * @param bTwo Second entry
-     * @param headingOne Heading for first entry 
+     * @param headingOne Heading for first entry
      * @param headingTwo Heading for second entry
      */
     public MergeEntries(BibtexEntry bOne, BibtexEntry bTwo, String headingOne, String headingTwo) {
@@ -92,16 +97,15 @@ public class MergeEntries {
         columnHeadings[5] = headingTwo;
         one = bOne;
         two = bTwo;
-        
+
         initialize();
     }
-        
 
     /**
-     *  Main function for building the merge entry JPanel
+     * Main function for building the merge entry JPanel
      */
     private void initialize() {
-        
+
         joint = new TreeSet<String>(one.getAllFields());
         joint.addAll(two.getAllFields());
 
@@ -132,7 +136,6 @@ public class MergeEntries {
         rowBuilder.append("10px, top:4cm:grow");
 
         FormLayout layout = new FormLayout(colSpec, rowBuilder.toString());
-        // layout.setColumnGroups(new int[][] {{3, 11}});
         mergePanel.setLayout(layout);
 
         // Set headings
@@ -292,7 +295,6 @@ public class MergeEntries {
         jta.setText(sw.getBuffer().toString());
         jta.setCaretPosition(0);
 
-
         // Add some margin around the layout
         layout.appendRow(RowSpec.decode("10px"));
         layout.appendColumn(ColumnSpec.decode("10px"));
@@ -304,7 +306,7 @@ public class MergeEntries {
         }
         if (mergePanel.getWidth() > DIM.width) {
             mergePanel.setSize(new Dimension(DIM.width, mergePanel.getHeight()));
-        } 
+        }
 
         // Everything done, allow any action to actually update the merged entry
         doneBuilding = true;
@@ -320,16 +322,14 @@ public class MergeEntries {
     public BibtexEntry getMergeEntry() {
         return mergedEntry;
     }
-    
-    
+
     /**
      * @return The merge entry JPanel
      */
     public JPanel getMergeEntryPanel() {
         return mergePanel;
     }
-    
-    
+
     /**
      * Update the merged BibtexEntry with source and preview panel everytime something is changed
      */
