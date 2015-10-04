@@ -1,4 +1,6 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2015 JabRef contributors.
+    Copyright (C) 2015 Oscar Gustafsson.
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,8 +26,14 @@ import javax.swing.text.JTextComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * @author Oscar Gustafsson
+ *
+ * Menu to show up on right-click in a text field for converting text formats
+ */
 public class ConversionMenu extends JMenu {
 
+    private static final long serialVersionUID = 8553688191031156265L;
     private final JTextComponent parent;
 
 

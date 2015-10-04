@@ -18,11 +18,9 @@ package net.sf.jabref.importer.fetcher;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

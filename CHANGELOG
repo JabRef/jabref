@@ -2,7 +2,6 @@
     - Fixed a bug in the IEEEXploreFetcher
     - Added more characters to HTML/Unicode converter
     - Feature: Push citations to Texmaker (SF: #318, #582)
-	- Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
     - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
     - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
