@@ -38,7 +38,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
-    
+
 
     @Override
     public void stopFetching() {

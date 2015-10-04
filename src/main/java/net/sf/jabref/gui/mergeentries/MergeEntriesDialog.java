@@ -75,7 +75,10 @@ public class MergeEntriesDialog extends JDialog {
 
         // Check if there are two entries selected
         if (selected.length != 2) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(frame, Localization.lang("You have to choose exactly two entries to merge."), Localization.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
+            // @formatter:off
+            JOptionPane.showMessageDialog(frame, Localization.lang("You have to choose exactly two entries to merge."),
+                    Localization.lang("Merge entries"), JOptionPane.INFORMATION_MESSAGE);
+            // @formatter:on
             this.dispose();
             return;
         }

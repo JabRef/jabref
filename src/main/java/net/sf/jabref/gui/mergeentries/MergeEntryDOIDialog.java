@@ -45,7 +45,6 @@ public class MergeEntryDOIDialog extends JDialog {
 
     private static final long serialVersionUID = 5454378088546423798L;
 
-    // private String [] preferedOrder = {"author", "title", "journal", "booktitle", "volume", "number", "pages", "year", "month"};
     private final Dimension DIM = new Dimension(800, 800);
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -65,22 +64,28 @@ public class MergeEntryDOIDialog extends JDialog {
         this.frame = panel.frame();
 
         if (panel.getSelectedEntries().length != 1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Select one entry."), Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+            // @formatter:off
+            JOptionPane.showMessageDialog(frame, Localization.lang("Select one entry."),
+                    Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+            // @formatter:on
             this.dispose();
             return;
         }
-        
+
         this.originalEntry = panel.getSelectedEntries()[0];
         panel.output(Localization.lang("Fetching info based on DOI"));
         this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi"), null);
 
         if (this.doiEntry == null) {
-            panel.output("");   
-            JOptionPane.showMessageDialog(frame, Localization.lang("Can not get info based on given DOI: %0", this.originalEntry.getField("doi")), Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+            panel.output("");
+            // @formatter:off
+            JOptionPane.showMessageDialog(frame, Localization.lang("Can not get info based on given DOI: %0", this.originalEntry.getField("doi")),
+                    Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+            // @formatter:on
             this.dispose();
             return;
         }
-        
+
         panel.output(Localization.lang("Opening dialog"));
         // Start setting up the dialog
         init();
@@ -93,8 +98,10 @@ public class MergeEntryDOIDialog extends JDialog {
      * @param selected Selected BibtexEntries
      */
     private void init() {
-
-        mergeEntries = new MergeEntries(this.originalEntry, this.doiEntry, Localization.lang("Original entry"), Localization.lang("Entry from DOI"));
+        // @formatter:off
+        mergeEntries = new MergeEntries(this.originalEntry, this.doiEntry, Localization.lang("Original entry"),
+                Localization.lang("Entry from DOI"));
+        // @formatter:on
 
         // Create undo-compound
         ce = new NamedCompound(Localization.lang("Merge from DOI"));
@@ -171,7 +178,7 @@ public class MergeEntryDOIDialog extends JDialog {
             // Remove the old entry and add it to the undo stack (which is not working...)
             TreeSet<String> joint = new TreeSet<String>(mergedEntry.getAllFields());
             Boolean edited = false;
-            
+
             for (String field : joint) {
                 String originalString = originalEntry.getField(field);
                 String mergedString = mergedEntry.getField(field);
