@@ -45,20 +45,32 @@ public class Localization {
         }
     }
 
-    public static String lang(String key, String... params) {
+    /**
+     * In the translation, %c is translated to ":", %e is translated to "=", %<anythingelse> to <anythingelse>, %0, ... %9 to the respective params given
+     *
+     * @param resBundle the ResourceBundle to use
+     * @param idForErrorMessage output when translation is not found
+     * @param key the key to lookup in resBundle
+     * @param params a list of Strings to replace %0, %1, ...
+     * @return
+     */
+    private static String translate(ResourceBundle resBundle, String idForErrorMessage, String key, String... params) {
         String translation = null;
         try {
-            if (messages != null) {
-                translation = messages.getString(key.replaceAll(" ", "_"));
+            if (resBundle != null) {
+                translation = resBundle.getString(key.replaceAll(" ", "_"));
             }
         } catch (MissingResourceException ex) {
-            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
+            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale " + Locale.getDefault());
         }
         if (translation == null) {
             translation = key;
         }
 
+        // replace %0, %1, ...
         if (translation != null && !translation.isEmpty()) {
+            // also done if no params are given
+            //  Then, %c is translated to ":", %e is translated to "=", ...
             translation = translation.replaceAll("_", " ");
             StringBuffer sb = new StringBuffer();
             boolean b = false;
@@ -99,43 +111,20 @@ public class Localization {
         return key;
     }
 
+    public static String lang(String key, String... params) {
+        return translate(messages, "message", key, params);
+    }
+
     public static String lang(String key) {
         return lang(key, (String[]) null);
     }
 
-    public static String menuTitle(String key) {
-        String translation = null;
-        try {
-            if (messages != null) {
-                translation = menuTitles.getString(key.replaceAll(" ", "_"));
-            }
-        } catch (MissingResourceException ex) {
-            translation = key;
-            LOGGER.warn("Warning: could not get menu item translation for \"" + key + "\"");
-        }
-        if (translation != null && !translation.isEmpty()) {
-            return translation.replaceAll("_", " ");
-        } else {
-            return key;
-        }
+    public static String menuTitle(String key, String... params) {
+        return translate(menuTitles, "menu item", key, params);
     }
 
-    public static String getIntegrityMessage(String key) {
-        String translation = null;
-        try {
-            if (intMessages != null) {
-                translation = intMessages.getString(key);
-            }
-        } catch (MissingResourceException ex) {
-            translation = key;
-
-            LOGGER.warn("Warning: could not get translation for integrity message \"" + key + "\"");
-        }
-        if (translation != null && !translation.isEmpty()) {
-            return translation;
-        } else {
-            return key;
-        }
+    public static String getIntegrityMessage(String key, String... params) {
+        return translate(menuTitles, "integrity message", key, params);
     }
 }
 
