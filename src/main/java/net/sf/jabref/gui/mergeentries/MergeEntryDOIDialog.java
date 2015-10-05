@@ -106,7 +106,7 @@ public class MergeEntryDOIDialog extends JDialog {
         // Create undo-compound
         ce = new NamedCompound(Localization.lang("Merge from DOI"));
 
-        FormLayout layout = new FormLayout("fill:700px:grow", "p, 4px, p, 5px, p");
+        FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
         // layout.setColumnGroups(new int[][] {{3, 11}});
         this.setLayout(layout);
 

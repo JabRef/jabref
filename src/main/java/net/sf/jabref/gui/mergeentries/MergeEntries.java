@@ -70,6 +70,7 @@ public class MergeEntries {
     private Set<String> joint;
     private String[] jointStrings;
     private final JPanel mergePanel = new JPanel();
+    private final JPanel mainPanel = new JPanel();
 
 
     /**
@@ -127,27 +128,31 @@ public class MergeEntries {
         identical = new Boolean[joint.size() + 1];
         jointStrings = new String[joint.size()];
 
-        // Create layout
+        // Create main layout
         String colSpec = "left:pref, 5px, fill:3cm:grow, 5px, right:pref, 3px, center:pref, 3px, left:pref, 5px, fill:3cm:grow";
-        StringBuilder rowBuilder = new StringBuilder("pref, 10px, pref, ");
+        String rowSpec = "pref, pref, 10px, fill:6cm:grow, 10px, pref, 10px, 4cm";
+        StringBuilder rowBuilder = new StringBuilder("");
         for (int i = 0; i < joint.size(); i++) {
             rowBuilder.append("pref, ");
         }
-        rowBuilder.append("10px, top:4cm:grow");
+        rowBuilder.append("pref");
 
-        FormLayout layout = new FormLayout(colSpec, rowBuilder.toString());
-        mergePanel.setLayout(layout);
+
+        FormLayout mainLayout = new FormLayout(colSpec, rowSpec);
+        FormLayout mergeLayout = new FormLayout(colSpec, rowBuilder.toString());
+        mainPanel.setLayout(mainLayout);
+        mergePanel.setLayout(mergeLayout);
 
         // Set headings
         for (int i = 0; i < 6; i++) {
             JLabel label = new JLabel(columnHeadings[i]);
             Font font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-            mergePanel.add(label, cc.xy(1 + (i * 2), 1));
+            mainPanel.add(label, cc.xy(1 + (i * 2), 2));
 
         }
 
-        mergePanel.add(new JSeparator(), cc.xyw(1, 2, 11));
+        mainPanel.add(new JSeparator(), cc.xyw(1, 3, 11));
 
         // Start with entry type
         BibtexEntryType type1 = one.getType();
@@ -157,18 +162,18 @@ public class MergeEntries {
         JLabel label = new JLabel(Localization.lang("Entry type"));
         Font font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-        mergePanel.add(label, cc.xy(1, 3));
+        mergePanel.add(label, cc.xy(1, 1));
 
         JTextArea type1ta = new JTextArea(type1.getName());
         type1ta.setEditable(false);
-        mergePanel.add(type1ta, cc.xy(3, 3));
+        mergePanel.add(type1ta, cc.xy(3, 1));
         if (type1.compareTo(type2) != 0) {
             identical[0] = false;
             rbg[0] = new ButtonGroup();
             for (int k = 0; k < 3; k += 2) {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
-                mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 3));
+                mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 1));
                 rb[k][0].addChangeListener(new ChangeListener() {
 
                     @Override
@@ -183,22 +188,22 @@ public class MergeEntries {
         }
         JTextArea type2ta = new JTextArea(type2.getName());
         type2ta.setEditable(false);
-        mergePanel.add(type2ta, cc.xy(11, 3));
+        mergePanel.add(type2ta, cc.xy(11, 1));
 
         // For all fields in joint add a row and possibly radio buttons
-        int row = 4;
+        int row = 2;
         for (String field : joint) {
-            jointStrings[row - 4] = field;
+            jointStrings[row - 2] = field;
             label = new JLabel(StringUtil.toUpperFirstLetter(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mergePanel.add(label, cc.xy(1, row));
             String string1 = one.getField(field);
             String string2 = two.getField(field);
-            identical[row - 3] = false;
+            identical[row - 1] = false;
             if ((string1 != null) && (string2 != null)) {
                 if (string1.equals(string2)) {
-                    identical[row - 3] = true;
+                    identical[row - 1] = true;
                 }
             }
 
@@ -209,7 +214,7 @@ public class MergeEntries {
                 tf.setEditable(false);
                 JScrollPane jsptf = new JScrollPane(tf);
 
-                layout.setRowSpec(row, RowSpec.decode("center:2cm:grow"));
+                mergeLayout.setRowSpec(row, RowSpec.decode("center:2cm:grow"));
                 mergePanel.add(jsptf, cc.xy(3, row, "f, f"));
                 tf.setText(string1);
                 tf.setCaretPosition(0);
@@ -222,13 +227,13 @@ public class MergeEntries {
             }
 
             // Add radio buttons if the two entries do not have identical fields
-            if (!identical[row - 3]) {
-                rbg[row - 3] = new ButtonGroup();
+            if (!identical[row - 1]) {
+                rbg[row - 1] = new ButtonGroup();
                 for (int k = 0; k < 3; k++) {
-                    rb[k][row - 3] = new JRadioButton();
-                    rbg[row - 3].add(rb[k][row - 3]);
-                    mergePanel.add(rb[k][row - 3], cc.xy(5 + (k * 2), row));
-                    rb[k][row - 3].addChangeListener(new ChangeListener() {
+                    rb[k][row - 1] = new JRadioButton();
+                    rbg[row - 1].add(rb[k][row - 1]);
+                    mergePanel.add(rb[k][row - 1], cc.xy(5 + (k * 2), row));
+                    rb[k][row - 1].addChangeListener(new ChangeListener() {
 
                         @Override
                         public void stateChanged(ChangeEvent e) {
@@ -238,10 +243,10 @@ public class MergeEntries {
                 }
                 if (string1 != null) {
                     mergedEntry.setField(field, string1);
-                    rb[0][row - 3].setSelected(true);
+                    rb[0][row - 1].setSelected(true);
                 } else {
                     mergedEntry.setField(field, string2);
-                    rb[2][row - 3].setSelected(true);
+                    rb[2][row - 1].setSelected(true);
                 }
             } else {
                 mergedEntry.setField(field, string1);
@@ -267,24 +272,26 @@ public class MergeEntries {
             row++;
         }
 
-        mergePanel.add(new JSeparator(), cc.xyw(1, row, 11));
-        row++;
+        JScrollPane scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
+        mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
+
 
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         label = new JLabel(Localization.lang("Merged entry"));
         font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-        mergePanel.add(label, cc.xy(1, row));
+        mainPanel.add(label, cc.xyw(1, 6, 5));
 
         String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         pp = new PreviewPanel(null, mergedEntry, null, new MetaData(), layoutString);
-        // JScrollPane jsppp = new JScrollPane(pp);
-        mergePanel.add(pp, cc.xyw(3, row, 3));
+        // JScrollPane jsppp = new JScrollPane(pp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        mainPanel.add(pp, cc.xyw(1, 8, 5));
 
         jta = new JTextArea();
         jta.setLineWrap(true);
         JScrollPane jspta = new JScrollPane(jta);
-        mergePanel.add(jspta, cc.xyw(9, row, 3));
+        mainPanel.add(jspta, cc.xyw(9, 8, 3));
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
@@ -296,23 +303,23 @@ public class MergeEntries {
         jta.setCaretPosition(0);
 
         // Add some margin around the layout
-        layout.appendRow(RowSpec.decode("10px"));
-        layout.appendColumn(ColumnSpec.decode("10px"));
-        layout.insertRow(1, RowSpec.decode("10px"));
-        layout.insertColumn(1, ColumnSpec.decode("10px"));
+        mainLayout.appendRow(RowSpec.decode("10px"));
+        mainLayout.appendColumn(ColumnSpec.decode("10px"));
+        mainLayout.insertRow(1, RowSpec.decode("10px"));
+        mainLayout.insertColumn(1, ColumnSpec.decode("10px"));
 
-        if (mergePanel.getHeight() > DIM.height) {
-            mergePanel.setSize(new Dimension(mergePanel.getWidth(), DIM.height));
+        if (mainPanel.getHeight() > DIM.height) {
+            mainPanel.setSize(new Dimension(mergePanel.getWidth(), DIM.height));
         }
-        if (mergePanel.getWidth() > DIM.width) {
-            mergePanel.setSize(new Dimension(DIM.width, mergePanel.getHeight()));
+        if (mainPanel.getWidth() > DIM.width) {
+            mainPanel.setSize(new Dimension(DIM.width, mergePanel.getHeight()));
         }
 
         // Everything done, allow any action to actually update the merged entry
         doneBuilding = true;
 
         // Show what we've got
-        mergePanel.setVisible(true);
+        mainPanel.setVisible(true);
 
     }
 
@@ -327,7 +334,7 @@ public class MergeEntries {
      * @return The merge entry JPanel
      */
     public JPanel getMergeEntryPanel() {
-        return mergePanel;
+        return mainPanel;
     }
 
     /**
