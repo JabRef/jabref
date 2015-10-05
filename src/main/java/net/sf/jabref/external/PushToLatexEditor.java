@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -93,12 +93,16 @@ public class PushToLatexEditor implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
+            // @formatter:off
             panel.output(Localization.lang("Error") + ": " +
                     Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
-        }
-        else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": " + Localization.lang("Could not call executable") + " '"
+            // @formatter:on
+        } else if (couldNotCall) {
+            // @formatter:off
+            panel.output(Localization.lang("Error") + ": " + 
+                    Localization.lang("Could not call executable") + " '"
                     + Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH) + "'.");
+            // @formatter:on
         } else {
             Localization.lang("Pushed citations to %0", "LatexEditor");
         }
@@ -122,7 +126,7 @@ public class PushToLatexEditor implements PushToApplication {
     private void initSettingsPanel() {
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
-        builder.add(Localization.lang("Path to LatexEditor (LEd.exe)") + ":").xy(1, 1);
+        builder.add(Localization.lang("Path to LatexEditor (LEd.exe)") + ":").xy(1, 1); // Note the LEd.exe part
         builder.add(ledPath).xy(3,1);
         BrowseAction action = BrowseAction.buildForFile(ledPath);
         JButton browse = new JButton(Localization.lang("Browse"));

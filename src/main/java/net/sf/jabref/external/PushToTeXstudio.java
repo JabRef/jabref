@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.external;
 
 import java.io.IOException;
@@ -17,11 +32,8 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Jan 14, 2006
- * Time: 4:55:23 PM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM To change this template use File | Settings
+ * | File Templates.
  */
 public class PushToTeXstudio implements PushToApplication {
 
@@ -35,7 +47,8 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into %0" ,getApplicationName());    }
+        return Localization.lang("Insert selected citations into %0", getApplicationName());
+    }
 
     @Override
     public String getApplicationName() {
@@ -44,7 +57,7 @@ public class PushToTeXstudio implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push to %0",getApplicationName());
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -76,7 +89,7 @@ public class PushToTeXstudio implements PushToApplication {
         }
         String citeCom = Globals.prefs.get(JabRefPreferences.CITE_COMMAND_TEXSTUDIO);
         citeCommand.setText(citeCom);
-        
+
         String programPath = Globals.prefs.get(JabRefPreferences.TEXSTUDIO_PATH);
         if (programPath == null) {
             programPath = defaultProgramPath();
@@ -92,11 +105,11 @@ public class PushToTeXstudio implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        
+
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
-                
-        builder.addLabel(Localization.lang("Path to %0",getApplicationName()) + ":").xy(1, 1);
+
+        builder.addLabel(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
         builder.add(progPath).xy(3, 1);
         BrowseAction action = BrowseAction.buildForFile(progPath);
         JButton browse = new JButton(Localization.lang("Browse"));
@@ -119,9 +132,8 @@ public class PushToTeXstudio implements PushToApplication {
         }
         try {
             String[] com = OS.WINDOWS ?
-                    // No additional escaping is needed for TeXstudio:
-                    new String[] {programPath, "--insert-cite", citeCom + "{" + keys + "}"}
-                    : new String[] {programPath, "--insert-cite", citeCom + "{" + keys + "}"};
+            // No additional escaping is needed for TeXstudio:
+            new String[] {programPath, "--insert-cite", citeCom + "{" + keys + "}"} : new String[] {programPath, "--insert-cite", citeCom + "{" + keys + "}"};
 
             /*for (int i = 0; i < com.length; i++) {
                 String s = com[i];
@@ -162,22 +174,23 @@ public class PushToTeXstudio implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
-                    "TeXstudio: could not connect",
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        }
-        else if (couldNotRunClient) {
+            // @formatter:off
+            JOptionPane.showMessageDialog(panel.frame(), 
+                    "TeXstudio: could not connect", 
+                    Localization.lang("Error"), 
+                    JOptionPane.ERROR_MESSAGE);
+            // @formatter:on
+        } else if (couldNotRunClient) {
             String programPath = Globals.prefs.get(JabRefPreferences.TEXSTUDIO_PATH);
             if (programPath == null) {
                 programPath = defaultProgramPath();
             }
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
+            JOptionPane.showMessageDialog(panel.frame(),
+                    // @formatter:off
                     "TeXstudio: " + Localization.lang("Program '%0' not found", programPath),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        }
-        else {
+                    // @formatter:on
+        } else {
             panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
     }

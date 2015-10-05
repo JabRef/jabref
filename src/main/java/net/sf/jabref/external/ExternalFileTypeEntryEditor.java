@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -55,6 +55,8 @@ public class ExternalFileTypeEntryEditor {
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
     private final JRadioButton other = new JRadioButton("");
     final String emptyMessage = "<" + Localization.lang("Use default viewer") + ">";
+    private final String editFileTitle = Localization.lang("Edit file type");
+    private final String newFileTitle = Localization.lang("Add new file type");
     boolean applicationFieldEmpty;
 
     private ExternalFileType entry;
@@ -181,16 +183,16 @@ public class ExternalFileTypeEntryEditor {
             });
         }
 
-        String title = "Edit file type";
+        String title = editFileTitle;
         
-        if(entry.getName().isEmpty()) {
-            title = "Add new file type";
+        if (entry.getName().isEmpty()) {
+            title = newFileTitle;
         }
         
         if (dParent != null) {
-            diag = new JDialog(dParent, Localization.lang(title), true);
+            diag = new JDialog(dParent, title, true);
         } else {
-            diag = new JDialog(fParent, Localization.lang(title), true);
+            diag = new JDialog(fParent, title, true);
         }
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -213,9 +215,9 @@ public class ExternalFileTypeEntryEditor {
     public void setEntry(ExternalFileType entry) {
         this.entry = entry;
         if(entry.getName().isEmpty()) {
-            diag.setTitle(Localization.lang("Add new file type"));
+            diag.setTitle(newFileTitle);
         } else {
-            diag.setTitle(Localization.lang("Edit file type"));
+            diag.setTitle(editFileTitle);
         }
         setValues(entry);
     }

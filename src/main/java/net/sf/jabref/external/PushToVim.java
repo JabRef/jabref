@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -113,9 +113,13 @@ public class PushToVim implements PushToApplication {
         couldNotConnect = false;
         couldNotRunClient = false;
         try {
-            String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
+            // @formatter:off
+            String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", 
+                    Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
                     "<C-\\><C-N>a" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM) +
                             "{" + keys + "}"};
+            // @formatter:on
+
 
             final Process p = Runtime.getRuntime().exec(com);
 
