@@ -59,6 +59,8 @@ gets
  *  Copyright (C) 2015 Stefan Jauch
 ```
 
+Please, **do not add yourself at `@authors`**.
+We have track this information in the header only.
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
@@ -74,6 +76,11 @@ In case you do not have time to add a test case, we nevertheless ask you to run 
 Please try to use a version available at jCenter and add it to `build.gradle`.
 In any case, describe the library at [external-libraries.txt](external-libraries.txt).
 We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
+
+
+### When adding a new Localization.lang entry
+Run `python scripts/syncLang.py -s` to search for new untranslated strings.
+If everything is OK, run `python scripts/syncLang.py -s -u` to update `JabRef_en.properties`.
 
 
 ### Create a pull request
