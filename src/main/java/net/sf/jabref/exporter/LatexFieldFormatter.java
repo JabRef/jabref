@@ -41,7 +41,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     }
 
 
-    private StringBuffer stringBuffer;
+    private StringBuilder stringBuilder;
 
     private final boolean neverFailOnHashes;
 
@@ -127,7 +127,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 throw new IllegalArgumentException("Curly braces { and } must be balanced.");
             }
 
-            stringBuffer = new StringBuffer(
+            stringBuilder = new StringBuilder(
                     valueDelimiterStartOfValue + "");
             // No formatting at all for these fields, to allow custom formatting?
             //            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
@@ -140,17 +140,17 @@ public class LatexFieldFormatter implements FieldFormatter {
             boolean strangePrefSettings = writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName);
 
             if (strangePrefSettings && doWrap) {
-                stringBuffer.append(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH));
+                stringBuilder.append(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH));
             } else {
-                stringBuffer.append(text);
+                stringBuilder.append(text);
             }
 
-            stringBuffer.append(valueDelimiterEndOfValue);
+            stringBuilder.append(valueDelimiterEndOfValue);
 
-            return stringBuffer.toString();
+            return stringBuilder.toString();
         }
 
-        stringBuffer = new StringBuffer();
+        stringBuilder = new StringBuilder();
         int pivot = 0;
         int pos1;
         int pos2;
@@ -213,10 +213,10 @@ public class LatexFieldFormatter implements FieldFormatter {
         // currently, we do not add newlines and new formatting
         if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
             //             introduce a line break to be read at the parser
-            return StringUtil.wrap(stringBuffer.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
+            return StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
 
         } else {
-            return stringBuffer.toString();
+            return stringBuilder.toString();
         }
 
     }
@@ -226,7 +226,7 @@ public class LatexFieldFormatter implements FieldFormatter {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
-        stringBuffer.append(valueDelimiterStartOfValue);
+        stringBuilder.append(valueDelimiterStartOfValue);
         boolean escape = false;
         boolean inCommandName = false;
         boolean inCommand = false;
@@ -288,13 +288,13 @@ public class LatexFieldFormatter implements FieldFormatter {
 if (c == '&' && !escape &&
                     !(inCommand && commandName.toString().equals("url")) &&
         nestedEnvironments == 0) {
-                stringBuffer.append("\\&");
+                stringBuilder.append("\\&");
             } else {
-    stringBuffer.append(c);
+    stringBuilder.append(c);
 }
             escape = c == '\\';
         }
-        stringBuffer.append(valueDelimiterEndOfValue);
+        stringBuilder.append(valueDelimiterEndOfValue);
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
@@ -306,7 +306,7 @@ if (c == '&' && !escape &&
     }
 
     private void putIn(String s) {
-        stringBuffer.append(StringUtil.wrap(s, GUIGlobals.LINE_LENGTH));
+        stringBuilder.append(StringUtil.wrap(s, GUIGlobals.LINE_LENGTH));
     }
 
     private void checkBraces(String text) throws IllegalArgumentException {
