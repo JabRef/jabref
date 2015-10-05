@@ -20,10 +20,9 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
- * Class with static methods for changing the case of strings and arrays of
- * strings.
+ * Class with static methods for changing the case of strings and arrays of strings.
  *
- * @author Moritz Ringler, Simon Harrer
+ * @author Moritz Ringler, Simon Harrer, Oscar Gustafsson
  */
 public class CaseChangers {
 
@@ -46,7 +45,18 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            return input.toLowerCase();
+            String[] words = input.split("\\s+");
+            String[] result = new String[words.length];
+
+            for (int i = 0; i < words.length; i++) {
+                if (words[i].startsWith("{")) {
+                    result[i] = words[i];
+                } else {
+                    result[i] = words[i].toLowerCase();
+                }
+            }
+
+            return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
         }
     }
 
@@ -59,7 +69,18 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            return input.toUpperCase();
+            String[] words = input.split("\\s+");
+            String[] result = new String[words.length];
+
+            for (int i = 0; i < words.length; i++) {
+                if (words[i].startsWith("{")) {
+                    result[i] = words[i];
+                } else {
+                    result[i] = words[i].toUpperCase();
+                }
+            }
+
+            return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
         }
     }
 
@@ -75,7 +96,7 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            String lowerCase = input.toLowerCase();
+            String lowerCase = CaseChangers.LOWER.changeCase(input);
 
             Matcher matcher = UpperFirstCaseChanger.UF_PATTERN.matcher(lowerCase);
 
@@ -96,12 +117,15 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            String lowerCase = input.toLowerCase();
-            String[] words = lowerCase.split("\\s+");
+            String[] words = input.split("\\s+");
             String[] result = new String[words.length];
 
             for (int i = 0; i < words.length; i++) {
-                result[i] = StringUtil.capitalizeFirst(words[i]);
+                if (words[i].startsWith("{")) {
+                    result[i] = words[i];
+                } else {
+                    result[i] = StringUtil.capitalizeFirst(words[i].toLowerCase());
+                }
             }
 
             return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
@@ -112,16 +136,20 @@ public class CaseChangers {
 
         private static final Set<String> notToCapitalize;
 
+
         static {
             Set<String> smallerWords = new HashSet<>();
 
-            smallerWords.addAll(Arrays.asList("a", "an", "the", "and", "but", "or", "for", "nor", "as", "at", "by", "for",
-                    "from", "in", "into", "near", "of", "on", "onto", "to", "with"));
+            // Articles
+            smallerWords.addAll(Arrays.asList("a", "an", "the"));
+            // Prepositions
+            smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
+            // Conjuctions
+            smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
 
             // unmodifiable for thread safety
             notToCapitalize = Collections.unmodifiableSet(smallerWords);
         }
-
 
         @Override
         public String getName() {
@@ -130,21 +158,24 @@ public class CaseChangers {
 
         @Override
         public String changeCase(String input) {
-            String lowerCase = input.toLowerCase();
-            String[] words = lowerCase.split("\\s+");
+            String[] words = input.split("\\s+");
             String[] result = new String[words.length];
 
             for (int i = 0; i < words.length; i++) {
-                String word = words[i];
-                // first word is Always capitalized
-                boolean alwaysCapitalizeFirstWord = i == 0;
-                boolean alwaysCapitalizeLastWord = i == words.length - 1;
-                if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord) {
-                    result[i] = StringUtil.capitalizeFirst(word);
-                } else if (TitleCaseChanger.notToCapitalize.contains(word)) {
-                    result[i] = word;
+                if (words[i].startsWith("{")) {
+                    result[i] = words[i];
                 } else {
-                    result[i] = StringUtil.capitalizeFirst(word);
+                    String word = words[i].toLowerCase();
+                    // first word is Always capitalized
+                    boolean alwaysCapitalizeFirstWord = i == 0;
+                    boolean alwaysCapitalizeLastWord = i == (words.length - 1);
+                    if (alwaysCapitalizeFirstWord || alwaysCapitalizeLastWord) {
+                        result[i] = StringUtil.capitalizeFirst(word);
+                    } else if (TitleCaseChanger.notToCapitalize.contains(word)) {
+                        result[i] = word;
+                    } else {
+                        result[i] = StringUtil.capitalizeFirst(word);
+                    }
                 }
             }
 
