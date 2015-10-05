@@ -154,7 +154,7 @@ public class CaseChangers {
             smallerWords.addAll(Arrays.asList("a", "an", "the"));
             // Prepositions
             smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
-            // Conjuctions
+            // Conjunctions
             smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
 
             // unmodifiable for thread safety
