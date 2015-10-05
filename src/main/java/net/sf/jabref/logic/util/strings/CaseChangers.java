@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors and Moritz Ringler, Simon Harrer, Oscar Gustafsson
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,8 +21,6 @@ import java.util.regex.Matcher;
 
 /**
  * Class with static methods for changing the case of strings and arrays of strings.
- *
- * @author Moritz Ringler, Simon Harrer, Oscar Gustafsson
  */
 public class CaseChangers {
 
