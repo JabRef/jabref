@@ -63,8 +63,8 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox includeEmptyFields;
     private final JCheckBox camelCase;
     private final JCheckBox sameColumn;
-    private final JComboBox valueDelimiter;
-    private final JComboBox newlineSeparator;
+    private final JComboBox<String> valueDelimiter;
+    private final JComboBox<String> newlineSeparator;
     private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
     private final JTextField bracesAroundCapitalsFields;
