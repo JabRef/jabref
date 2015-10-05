@@ -74,6 +74,7 @@ public class FieldTextMenu implements MouseListener {
 
         if (field.getTextComponent() instanceof JTextComponent) {
             inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
+            inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
         }
     }
 
