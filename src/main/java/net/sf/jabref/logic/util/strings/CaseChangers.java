@@ -41,6 +41,9 @@ public class CaseChangers {
             return "lower";
         }
 
+        /**
+         * Converts all characters of the string to lower case, but does not change words starting with "{"
+         */
         @Override
         public String changeCase(String input) {
             String[] words = input.split("\\s+");
@@ -65,6 +68,9 @@ public class CaseChangers {
             return "UPPER";
         }
 
+        /**
+         * Converts all characters of the given string to upper case, but does not change words starting with "{"
+         */
         @Override
         public String changeCase(String input) {
             String[] words = input.split("\\s+");
@@ -92,6 +98,9 @@ public class CaseChangers {
             return "Upper first";
         }
 
+        /**
+         * Converts the first character of the first word of the given string to a upper case (and the remaining characters of the first word to lower case), but does not change anything if word starts with "{"
+         */
         @Override
         public String changeCase(String input) {
             String lowerCase = CaseChangers.LOWER.changeCase(input);
@@ -113,6 +122,9 @@ public class CaseChangers {
             return "Upper Each First";
         }
 
+        /**
+         * Converts the first character of each word of the given string to a upper case (and all others to lower case), but does not change words starting with "{"
+         */
         @Override
         public String changeCase(String input) {
             String[] words = input.split("\\s+");
@@ -154,6 +166,10 @@ public class CaseChangers {
             return "Title";
         }
 
+        /**
+         * Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
+         * Does not change words starting with "{"
+         */
         @Override
         public String changeCase(String input) {
             String[] words = input.split("\\s+");
