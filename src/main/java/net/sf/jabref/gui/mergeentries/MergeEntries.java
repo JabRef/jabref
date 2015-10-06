@@ -129,8 +129,8 @@ public class MergeEntries {
         jointStrings = new String[joint.size()];
 
         // Create main layout
-        String colSpecMain = "left:pref, 5px, center:3cm:grow, 5px, right:pref, 3px, center:pref, 3px, left:pref, 5px, center:3cm:grow";
-        String colSpecMerge = "left:pref, 5px, fill:3cm:grow, 5px, right:pref, 3px, center:pref, 3px, left:pref, 5px, fill:3cm:grow";
+        String colSpecMain = "left:pref, 5px, center:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, center:3cm:grow";
+        String colSpecMerge = "left:pref, 5px, fill:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, fill:3cm:grow";
         String rowSpec = "pref, pref, 10px, fill:6cm:grow, 10px, pref, 10px, fill:4cm";
         StringBuilder rowBuilder = new StringBuilder("");
         for (int i = 0; i < joint.size(); i++) {
@@ -143,11 +143,17 @@ public class MergeEntries {
         mainPanel.setLayout(mainLayout);
         mergePanel.setLayout(mergeLayout);
 
+        JLabel label = new JLabel(Localization.lang("Use"));
+        Font font = label.getFont();
+        label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
+        
+        mainPanel.add(label, cc.xyw(4, 1, 7, "center, bottom"));
+        
         // Set headings
         JLabel headingLabels[] = new JLabel[6];
         for (int i = 0; i < 6; i++) {
             headingLabels[i] = new JLabel(columnHeadings[i]);
-            Font font = headingLabels[i].getFont();
+            font = headingLabels[i].getFont();
             headingLabels[i].setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mainPanel.add(headingLabels[i], cc.xy(1 + (i * 2), 2));
 
@@ -160,8 +166,8 @@ public class MergeEntries {
         BibtexEntryType type2 = two.getType();
 
         mergedEntry.setType(type1);
-        JLabel label = new JLabel(Localization.lang("Entry type"));
-        Font font = label.getFont();
+        label = new JLabel(Localization.lang("Entry type"));
+        font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         mergePanel.add(label, cc.xy(1, 1));
 
