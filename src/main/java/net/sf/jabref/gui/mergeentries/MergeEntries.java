@@ -288,7 +288,8 @@ public class MergeEntries {
 
         JScrollPane scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
-        scrollPane.getVerticalScrollBar().setValue(0);
+        JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
+        verticalBar.setValue(verticalBar.getMinimum());
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
 
         // Synchronize column widths
