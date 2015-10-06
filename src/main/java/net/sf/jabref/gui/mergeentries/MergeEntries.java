@@ -51,11 +51,11 @@ public class MergeEntries {
 
     // @formatter:off
     private final String[] columnHeadings = {Localization.lang("Field"),
-            Localization.lang("First entry"),
-            "\u2190 " + Localization.lang("Use"),
+            Localization.lang("Left entry"),
+            Localization.lang("Left"),
             Localization.lang("None"),
-            Localization.lang("Use") + " \u2192",
-            Localization.lang("Second entry")};
+            Localization.lang("Right"),
+            Localization.lang("Right entry")};
     // @formatter:on
     private final Dimension DIM = new Dimension(800, 800);
     private JRadioButton[][] rb;
@@ -129,17 +129,17 @@ public class MergeEntries {
         jointStrings = new String[joint.size()];
 
         // Create main layout
-        String colSpec = "left:pref, 5px, fill:3cm:grow, 5px, right:pref, 3px, center:pref, 3px, left:pref, 5px, fill:3cm:grow";
-        String rowSpec = "pref, pref, 10px, fill:6cm:grow, 10px, pref, 10px, 4cm";
+        String colSpecMain = "left:pref, 5px, center:3cm:grow, 5px, right:pref, 3px, center:pref, 3px, left:pref, 5px, center:3cm:grow";
+        String colSpecMerge = "left:pref, 5px, fill:3cm:grow, 5px, right:pref, 3px, center:pref, 3px, left:pref, 5px, fill:3cm:grow";
+        String rowSpec = "pref, pref, 10px, fill:6cm:grow, 10px, pref, 10px, fill:4cm";
         StringBuilder rowBuilder = new StringBuilder("");
         for (int i = 0; i < joint.size(); i++) {
             rowBuilder.append("pref, ");
         }
         rowBuilder.append("pref");
 
-
-        FormLayout mainLayout = new FormLayout(colSpec, rowSpec);
-        FormLayout mergeLayout = new FormLayout(colSpec, rowBuilder.toString());
+        FormLayout mainLayout = new FormLayout(colSpecMain, rowSpec);
+        FormLayout mergeLayout = new FormLayout(colSpecMerge, rowBuilder.toString());
         mainPanel.setLayout(mainLayout);
         mergePanel.setLayout(mergeLayout);
 
@@ -165,9 +165,6 @@ public class MergeEntries {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         mergePanel.add(label, cc.xy(1, 1));
 
-        float radioBoxAlignment[] = {Component.RIGHT_ALIGNMENT , Component.CENTER_ALIGNMENT, Component.LEFT_ALIGNMENT};
-        String radioBoxAlignmentString[] = {"right" , "center", "left"};
-        
         JTextArea type1ta = new JTextArea(type1.getName());
         type1ta.setEditable(false);
         mergePanel.add(type1ta, cc.xy(3, 1));
@@ -177,9 +174,7 @@ public class MergeEntries {
             for (int k = 0; k < 3; k += 2) {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
-                mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 1, radioBoxAlignmentString[k]));
-                rb[k][0].setPreferredSize(new Dimension(headingLabels[k+2].getPreferredSize().width, rb[k][0].getPreferredSize().height));
-                rb[k][0].setAlignmentX(radioBoxAlignment[k]);
+                mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 1));
                 rb[k][0].addChangeListener(new ChangeListener() {
 
                     @Override
@@ -214,12 +209,12 @@ public class MergeEntries {
                     identical[row - 1] = true;
                 }
             }
-            
+
             tmpLabelWidth = label.getPreferredSize().width;
             if (tmpLabelWidth > maxLabelWidth) {
                 maxLabelWidth = tmpLabelWidth;
             }
-            
+
             if (field.equals("abstract") || field.equals("review")) {
                 // Treat the abstract and review fields special
                 JTextArea tf = new JTextArea();
@@ -245,9 +240,7 @@ public class MergeEntries {
                 for (int k = 0; k < 3; k++) {
                     rb[k][row - 1] = new JRadioButton();
                     rbg[row - 1].add(rb[k][row - 1]);
-                    rb[k][row - 1].setPreferredSize(new Dimension(headingLabels[k+2].getPreferredSize().width, rb[k][row-1].getPreferredSize().height));
                     mergePanel.add(rb[k][row - 1], cc.xy(5 + (k * 2), row));
-                    rb[k][row - 1].setAlignmentX(radioBoxAlignment[k]);
                     rb[k][row - 1].addChangeListener(new ChangeListener() {
 
                         @Override
@@ -289,27 +282,44 @@ public class MergeEntries {
 
         JScrollPane scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
+        scrollPane.getVerticalScrollBar().setValue(0);
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
-        
+
         // Synchronize column widths
-        // headingLabels[0].setPreferredSize(new Dimension(maxLabelWidth, headingLabels[0].getPreferredSize().height));
+        String rbAlign[] = {"right", "center", "left"};
         mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
+        Integer maxRBWidth = -1;
+        Integer tmpRBWidth;
+        for (int k = 0; k < 3; k++) {
+            tmpRBWidth = headingLabels[k + 2].getPreferredSize().width;
+            if (tmpRBWidth > maxRBWidth) {
+                maxRBWidth = tmpRBWidth;
+            }
+        }
+        for (int k = 0; k < 3; k++) {
+            mergeLayout.setColumnSpec(5 + (k * 2), ColumnSpec.decode(rbAlign[k] + ":" + maxRBWidth.toString() + "px"));
+        }
 
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         label = new JLabel(Localization.lang("Merged entry"));
         font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-        mainPanel.add(label, cc.xyw(1, 6, 5));
+        mainPanel.add(label, cc.xyw(1, 6, 6));
 
         String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         pp = new PreviewPanel(null, mergedEntry, null, new MetaData(), layoutString);
         // JScrollPane jsppp = new JScrollPane(pp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        mainPanel.add(pp, cc.xyw(1, 8, 5));
+        mainPanel.add(pp, cc.xyw(1, 8, 6));
+
+        label = new JLabel(Localization.lang("Merged BibTeX entry"));
+        font = label.getFont();
+        label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
+        mainPanel.add(label, cc.xyw(8, 6, 4));
 
         jta = new JTextArea();
         jta.setLineWrap(true);
         JScrollPane jspta = new JScrollPane(jta);
-        mainPanel.add(jspta, cc.xyw(9, 8, 3));
+        mainPanel.add(jspta, cc.xyw(8, 8, 4));
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
