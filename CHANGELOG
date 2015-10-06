@@ -19,6 +19,7 @@
     - BREAKING: Remove plugin functionality.
     - Fixes Bug#1297: No console message on closing.
     - Fix bug #1285: Editing position is not lost on saving
+    - Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
     - Solved feature request #767: New subdatabase based on AUX file (biblatex)
