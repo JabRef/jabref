@@ -144,11 +144,12 @@ public class MergeEntries {
         mergePanel.setLayout(mergeLayout);
 
         // Set headings
+        JLabel headingLabels[] = new JLabel[6];
         for (int i = 0; i < 6; i++) {
-            JLabel label = new JLabel(columnHeadings[i]);
-            Font font = label.getFont();
-            label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-            mainPanel.add(label, cc.xy(1 + (i * 2), 2));
+            headingLabels[i] = new JLabel(columnHeadings[i]);
+            Font font = headingLabels[i].getFont();
+            headingLabels[i].setFont(font.deriveFont(font.getStyle() | Font.BOLD));
+            mainPanel.add(headingLabels[i], cc.xy(1 + (i * 2), 2));
 
         }
 
@@ -164,6 +165,9 @@ public class MergeEntries {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         mergePanel.add(label, cc.xy(1, 1));
 
+        float radioBoxAlignment[] = {Component.RIGHT_ALIGNMENT , Component.CENTER_ALIGNMENT, Component.LEFT_ALIGNMENT};
+        String radioBoxAlignmentString[] = {"right" , "center", "left"};
+        
         JTextArea type1ta = new JTextArea(type1.getName());
         type1ta.setEditable(false);
         mergePanel.add(type1ta, cc.xy(3, 1));
@@ -173,7 +177,9 @@ public class MergeEntries {
             for (int k = 0; k < 3; k += 2) {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
-                mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 1));
+                mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 1, radioBoxAlignmentString[k]));
+                rb[k][0].setPreferredSize(new Dimension(headingLabels[k+2].getPreferredSize().width, rb[k][0].getPreferredSize().height));
+                rb[k][0].setAlignmentX(radioBoxAlignment[k]);
                 rb[k][0].addChangeListener(new ChangeListener() {
 
                     @Override
@@ -192,6 +198,8 @@ public class MergeEntries {
 
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
+        int maxLabelWidth = -1;
+        int tmpLabelWidth = 0;
         for (String field : joint) {
             jointStrings[row - 2] = field;
             label = new JLabel(StringUtil.toUpperFirstLetter(field));
@@ -206,9 +214,14 @@ public class MergeEntries {
                     identical[row - 1] = true;
                 }
             }
-
-            if (field.equals("abstract")) {
-                // Treat the abstract field special, maybe more fields? Review? Note?
+            
+            tmpLabelWidth = label.getPreferredSize().width;
+            if (tmpLabelWidth > maxLabelWidth) {
+                maxLabelWidth = tmpLabelWidth;
+            }
+            
+            if (field.equals("abstract") || field.equals("review")) {
+                // Treat the abstract and review fields special
                 JTextArea tf = new JTextArea();
                 tf.setLineWrap(true);
                 tf.setEditable(false);
@@ -232,7 +245,9 @@ public class MergeEntries {
                 for (int k = 0; k < 3; k++) {
                     rb[k][row - 1] = new JRadioButton();
                     rbg[row - 1].add(rb[k][row - 1]);
+                    rb[k][row - 1].setPreferredSize(new Dimension(headingLabels[k+2].getPreferredSize().width, rb[k][row-1].getPreferredSize().height));
                     mergePanel.add(rb[k][row - 1], cc.xy(5 + (k * 2), row));
+                    rb[k][row - 1].setAlignmentX(radioBoxAlignment[k]);
                     rb[k][row - 1].addChangeListener(new ChangeListener() {
 
                         @Override
@@ -251,8 +266,8 @@ public class MergeEntries {
             } else {
                 mergedEntry.setField(field, string1);
             }
-            if (field.equals("abstract")) {
-                // Again, treat abstract special
+            if (field.equals("abstract") || field.equals("review")) {
+                // Again, treat abstract and review special
                 JTextArea tf = new JTextArea();
                 tf.setLineWrap(true);
                 tf.setEditable(false);
@@ -275,7 +290,10 @@ public class MergeEntries {
         JScrollPane scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
-
+        
+        // Synchronize column widths
+        // headingLabels[0].setPreferredSize(new Dimension(maxLabelWidth, headingLabels[0].getPreferredSize().height));
+        mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
 
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         label = new JLabel(Localization.lang("Merged entry"));
