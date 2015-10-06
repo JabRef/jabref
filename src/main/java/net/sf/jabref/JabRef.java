@@ -33,6 +33,7 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
@@ -45,6 +46,10 @@ import net.sf.jabref.remote.RemotePreferences;
 import net.sf.jabref.remote.client.RemoteListenerClient;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
+
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.nativeext.WindowsExtensions;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
@@ -59,12 +64,6 @@ import net.sf.jabref.imports.*;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.util.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
-
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.WString;
-import com.sun.jna.ptr.PointerByReference;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -171,11 +170,9 @@ public class JabRef {
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
         Globals.NEWLINE_LENGTH = Globals.NEWLINE.length();
 
-        if (Globals.ON_WIN) {
-            // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
-            // Based on http://stackoverflow.com/a/1928830
-            JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
-            //System.out.println(getCurrentProcessExplicitAppUserModelID());
+        if (OS.WINDOWS) {
+            // activate pin to taskbar for Windows 7 and up
+            WindowsExtensions.enablePinToTaskbar();
         }
 
         Vector<ParserResult> loaded = processArguments(args, true);
@@ -187,11 +184,12 @@ public class JabRef {
 
         openWindow(loaded);
     }
-    
+
     private void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
+
 
     private void setLanguage(JabRefPreferences prefs) {
         String langStr = prefs.get(JabRefPreferences.LANGUAGE);
@@ -208,40 +206,6 @@ public class JabRef {
 
         Globals.setLanguage(language, country);
     }
-
-    // Do not use this code in release version, it contains some memory leaks
-    public static String getCurrentProcessExplicitAppUserModelID()
-    {
-        final PointerByReference r = new PointerByReference();
-
-        if (JabRef.GetCurrentProcessExplicitAppUserModelID(r).longValue() == 0)
-        {
-            final Pointer p = r.getValue();
-
-            return p.getString(0, true); // here we leak native memory by lazyness
-        }
-        return "N/A";
-    }
-
-    private static void setCurrentProcessExplicitAppUserModelID(final String appID)
-    {
-        if (JabRef.SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0) {
-            throw new RuntimeException("unable to set current process explicit AppUserModelID to: " + appID);
-        }
-    }
-
-    private static native NativeLong GetCurrentProcessExplicitAppUserModelID(PointerByReference appID);
-
-    private static native NativeLong SetCurrentProcessExplicitAppUserModelID(WString appID);
-
-
-    static
-    {
-        if (Globals.ON_WIN) {
-            Native.register("shell32");
-        }
-    }
-
 
     public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
 
