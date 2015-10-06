@@ -1,7 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id "eu.appsatori.fatjar" version "0.3"
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
     id "edu.sc.seis.launch4j" version "1.1.4"
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
@@ -189,11 +189,8 @@ format {
     //files = sourceSets.main.java
 }
 
-fatJar {
+shadowJar {
     classifier 'fat'
-    manifest {
-        attributes 'Main-Class': project.mainClassName
-    }
 }
 
 
@@ -229,9 +226,9 @@ launch4j {
     initialHeapSize = 32
     maxHeapSize = 512
 }
-createExe.dependsOn "fatJar"
+createExe.dependsOn "shadowJar"
 
-task releaseJar(dependsOn: "fatJar") {
+task releaseJar(dependsOn: "shadowJar") {
     group = 'JabRef - Release'
     description "Creates a Jar release."
 
