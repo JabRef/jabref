@@ -97,9 +97,9 @@ public class DOI {
     }
 
     /**
-     * Return a URL presentation for the DOI
+     * Return a URI presentation for the DOI
      *
-     * @return an encoded URL representation of the DOI
+     * @return an encoded URI representation of the DOI
      */
     public URI getURI() {
         try {

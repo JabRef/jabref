@@ -3,6 +3,8 @@
     - Feature: Merge information from a DOI generated BibTex entry to an entry
     - Added more characters to HTML/Unicode converter
     - Feature: Push citations to Texmaker (SF: #318, #582)
+    - Case changers improved to honor words (not yet more than single words) within {}
+    - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
     - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
@@ -18,6 +20,7 @@
     - BREAKING: Remove plugin functionality.
     - Fixes Bug#1297: No console message on closing.
     - Fix bug #1285: Editing position is not lost on saving
+    - Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
     - Solved feature request #767: New subdatabase based on AUX file (biblatex)
