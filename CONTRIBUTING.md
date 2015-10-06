@@ -78,9 +78,26 @@ In any case, describe the library at [external-libraries.txt](external-libraries
 We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
 
 
+### When making an architectural decision
+In case you add a library or do mayor code rewrites, we ask you to document your decision.
+Recommended reading: http://www.infoq.com/articles/sustainable-architectural-design-decisions
+
+Template:
+```
+In the context of <use case/user story u>,
+facing <concern c>
+we decided for <option o>
+and neglected <other options>,
+to achieve <system qualities/desired consequences>,
+accepting <downside d/undesired consequences>.
+because <additional rationale>.
+```
+
+
 ### When adding a new Localization.lang entry
 Run `python scripts/syncLang.py -s` to search for new untranslated strings.
 If everything is OK, run `python scripts/syncLang.py -s -u` to update `JabRef_en.properties`.
+
 
 
 ### Create a pull request
