@@ -3,6 +3,8 @@ package net.sf.jabref.logic.util.io;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -10,15 +12,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class FileUtil {
+    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     /**
      * Returns the extension of a file or null if the file does not have one (no . in name).
      *
      * @param file
-     *
      * @return The extension, trimmed and in lowercase.
      */
     public static String getFileExtension(File file) {
@@ -34,16 +40,13 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param source
-     *            File Source file
-     * @param dest
-     *            File Destination file
-     * @param deleteIfExists
-     *            boolean Determines whether the copy goes on even if the file
-     *            exists.
-     * @throws IOException
+     * @param source         File Source file
+     * @param dest           File Destination file
+     * @param deleteIfExists boolean Determines whether the copy goes on even if the file
+     *                       exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the
-     *         file already existing.
+     * file already existing.
+     * @throws IOException
      */
     public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
 
@@ -78,7 +81,6 @@ public class FileUtil {
     }
 
     /**
-     *
      * @param fileName
      * @param destFilename
      * @return
@@ -97,17 +99,15 @@ public class FileUtil {
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.<br/>
-     *
+     * <p>
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
      * <li>the standard file directory</li>
      * <li>the directory of the bib file</li>
      * </ul>
      *
-     * @param metaData
-     *            The MetaData for the database this file belongs to.
-     * @param name
-     *            The file name, may also be a relative path to the file
+     * @param metaData The MetaData for the database this file belongs to.
+     * @param name     The file name, may also be a relative path to the file
      */
     public static File expandFilename(final MetaData metaData, String name) {
         int pos = name.lastIndexOf('.');
@@ -136,7 +136,7 @@ public class FileUtil {
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
-     *
+     * <p>
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
@@ -206,12 +206,12 @@ public class FileUtil {
     /**
      * Converts an absolute filename to a relative one, if necessary.
      * Returns the parameter fileName itself if no shortening is possible
-     *
+     * <p>
      * This method works correctly only if dirs are sorted decent in their length
      * i.e. /home/user/literature/important before /home/user/literature
      *
      * @param fileName the file name to be shortened
-     * @param dirs directories to check.
+     * @param dirs     directories to check.
      */
     public static File shortenFileName(File fileName, String[] dirs) {
         if (fileName == null || fileName.length() == 0) {

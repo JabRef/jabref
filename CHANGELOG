@@ -1,5 +1,12 @@
 [master]
     - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
+    - Fixed a bug in the IEEEXploreFetcher
+    - Replaced some deprecated DefaultFormBuilder with FormBuilder
+    - Added more characters to HTML/Unicode converter
+    - Feature: Push citations to Texmaker (SF: #318, #582)
+    - Case changers improved to honor words (not yet more than single words) within {}
+    - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
+    - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
     - The default language is now automatically set to the system's locale.
@@ -14,16 +21,23 @@
     - BREAKING: Remove plugin functionality.
     - Fixes Bug#1297: No console message on closing.
     - Fix bug #1285: Editing position is not lost on saving
+    - Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
     - Solved feature request #767: New subdatabase based on AUX file (biblatex)
+    - Fixes GH Bug #173: Personal journal abbreviation list is not loaded twice
+    - Bugfix: Preview of external journal abbreviation list now displays the correct list
+    - Feature: DOItoBibTeX fetcher now also handles HTTP URLs
+    - Feature: "Normalize to BibTeX name format" also removes newlines
+    - Tweak of preference defaults: Autolink requires that the filename starts with the given BibTeX key and the default filename patterns is key followed by title
 [dev_2.11]
+    - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
     - Backport from 2.80: Fixes #115: Remove whitespaces in serialization
     - Backport from 2.80: Fixes Bug#1297: No console message on closing.
     - Backport from 2.80: Fixes Bug#1290: Spanish localization was not displayed correctly.
-	- Backport from 2.80: Fixes #144: Unreadable text in Russian installer
+    - Backport from 2.80: Fixes #144: Unreadable text in Russian installer
     - Fix for bugs #1221 and #1261 (also partly #1243): order of fields in customized entry types no longer gets destroyed by the entry editor 
     - "ISBN to BibTeX" fetcher now uses eBook.de's API (fixes bug #1241)
     - BREAKING: Search groups now use same search logic as UI --> avoids confusion when converting a UI search into a search group. Behaviour before: contains/regex check of whole search string; behaviour after: contains/regex check of every word of the search string. The new search is more powerful and con simulate the old behaviour: enclose everything in double quotes, e.g., process language --> "process language".

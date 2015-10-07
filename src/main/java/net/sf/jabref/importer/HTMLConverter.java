@@ -20,11 +20,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 public class HTMLConverter implements LayoutFormatter {
+
+    private static final Log LOGGER = LogFactory.getLog(HTMLConverter.class);
 
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
@@ -41,8 +46,7 @@ public class HTMLConverter implements LayoutFormatter {
     // An array of arrays of strings in the format:
     // {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
     // Leaving a field empty is OK as it then will not be included
-    private final String[][] conversionList = new String[][] {
-            {"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
+    private final String[][] conversionList = new String[][] {{"160", "nbsp", "\\{~\\}"}, // no-break space = non-breaking space, 
             //                                 U+00A0 ISOnum 
             {"161", "iexcl", "\\{\\\\textexclamdown\\}"}, // inverted exclamation mark, U+00A1 ISOnum
             {"162", "cent", "\\{\\\\textcent\\}"}, // cent sign, U+00A2 ISOnum  
@@ -503,7 +507,8 @@ public class HTMLConverter implements LayoutFormatter {
             {"8364", "euro", "\\{\\\\texteuro\\}"}, // euro sign, U+20AC NEW 
 
             /* Manually added */
-            {"24", "dollar", "\\\\$"}, // Percent
+            {"35", "", "\\\\#"}, // Hash
+            {"36", "dollar", "\\\\$"}, // Dollar
             {"37", "percnt", "\\\\%"}, // Percent
             {"39", "apos", "'"}, // Apostrophe
             {"40", "lpar", "("}, // Left bracket
@@ -558,14 +563,26 @@ public class HTMLConverter implements LayoutFormatter {
             {"304", "Idot", "\\{\\\\.\\{I\\}\\}"}, // capital I with dot above
             {"305", "inodot", "\\{\\\\i\\}"}, // Small i without the dot
             {"", "imath", "\\{\\\\i\\}"}, // Small i without the dot
-            {"321", "Lstrok", "\\{\\\\L\\}"}, // upper case l with stroke
+            {"306", "", "\\{\\\\IJ\\}"}, // Dutch di-graph IJ
+            {"307", "", "\\{\\\\ij\\}"}, // Dutch di-graph ij
+            {"312", "", "\\{\\\\textkra\\}"}, // Letter kra
+            {"321", "Lstrok", "\\{\\\\L\\}"}, // upper case L with stroke
             {"322", "lstrok", "\\{\\\\l\\}"}, // lower case l with stroke
+            {"330", "", "\\{\\\\NG\\}"}, // upper case letter Eng
+            {"331", "", "\\{\\\\ng\\}"}, // lower case letter Eng
+            {"338", "", "\\{\\\\OE\\}"}, // OE-ligature
+            {"339", "", "\\{\\\\oe\\}"}, // oe-ligature
             {"348", "Scirc", "\\{\\\\\\^\\{S\\}\\}"}, // upper case S with circumflex
             {"349", "scirc", "\\{\\\\\\^\\{s\\}\\}"}, // lower case s with circumflex
             {"370", "Uogon", "\\{\\\\k\\{U\\}\\}"}, // capital U with ogonek
             {"371", "uogon", "\\{\\\\k\\{u\\}\\}"}, // small u with ogonek
             {"381", "Zcaron", "\\{\\\\v\\{Z\\}\\}"}, // capital Z with caron
             {"382", "zcaron", "\\{\\\\v\\{z\\}\\}"}, // small z with caron
+            {"405", "", "\\{\\\\hv\\}"}, // small letter Hv
+            {"416", "", "\\{\\\\OHORN\\}"}, // capital O with horn
+            {"417", "", "\\{\\\\ohorn\\}"}, // small o with horn
+            {"431", "", "\\{\\\\UHORN\\}"}, // capital U with horn
+            {"432", "", "\\{\\\\uhorn\\}"}, // small u with horn
             {"490", "Oogon", "\\{\\\\k\\{O\\}\\}"}, // capital letter O with ogonek
             {"491", "oogon", "\\{\\\\k\\{o\\}\\}"}, // small letter o with ogonek
             {"492", "", "\\{\\\\k\\{\\\\=\\{O\\}\\}\\}"}, // capital letter O with ogonek and macron
@@ -595,7 +612,9 @@ public class HTMLConverter implements LayoutFormatter {
             {"8198", "", "\\\\hspace\\{0.167em\\}"}, // Six-Per-Em Space
             {"8208", "hyphen", "-"}, // Hyphen
             {"8229", "nldr", "\\.\\."}, // Double dots - en leader
-            {"8450", "complexes", "\\$\\\\mathbb\\{C\\}\\$"}, // double struck capital C -- requires e.g. amsfonts
+            {"8241", "", "\\{\\\\textpertenthousand\\}"}, // per ten thousands sign
+            {"8244", "", "\\{\\\\prime\\\\prime\\\\prime\\}"}, // triple prime 
+            {"8251", "", "\\{\\\\textreferencemark\\}"}, {"8253", "", "\\{\\\\textinterrobang\\}"}, {"8450", "complexes", "\\$\\\\mathbb\\{C\\}\\$"}, // double struck capital C -- requires e.g. amsfonts
             {"8451", "", "\\$\\\\deg\\$\\{C\\}"}, // Degree Celsius
             {"8459", "Hscr", "\\$\\\\mathcal\\{H\\}\\$"}, // script capital H -- possibly use \mathscr
             {"8460", "Hfr", "\\$\\\\mathbb\\{H\\}\\$"}, // black letter capital H -- requires e.g. amsfonts
@@ -657,8 +676,7 @@ public class HTMLConverter implements LayoutFormatter {
     };
 
     // List of combining accents
-    private final String[][] accentList = new String[][] {
-            {"768", "`"}, // Grave 
+    private final String[][] accentList = new String[][] {{"768", "`"}, // Grave 
             {"769", "'"}, // Acute
             {"770", "\\^"}, // Circumflex
             {"771", "~"}, // Tilde
@@ -678,21 +696,21 @@ public class HTMLConverter implements LayoutFormatter {
             {"785", "t"}, // Inverted breve
             //        {"786", ""},    // Turned comma above
             //        {"787", ""},    // Comma above
-            //        {"788", ""},    // Reversed comma above
-            //        {"789", ""},    // Comma above right
+            {"788", "textrevcommaabove"}, // Reversed comma above
+            {"789", "textcommaabover"}, // Comma above right
             {"790", "textsubgrave"}, // Grave accent below -requires tipa
             {"791", "textsubacute"}, // Acute accent below - requires tipa
             {"792", "textadvancing"}, // Left tack below - requires tipa
             {"793", "textretracting"}, // Right tack below - requires tipa
-            //        {"794", ""},    // Left angle above
-            //        {"795", ""},    // Horn
+            {"794", "textlangleabove"}, // Left angle above
+            {"795", "textrighthorn"}, // Horn
             {"796", "textsublhalfring"}, // Left half ring below - requires tipa
             {"797", "textraising"}, // Up tack below - requires tipa
             {"798", "textlowering"}, // Down tack below - requires tipa
             {"799", "textsubplus"}, // Plus sign below - requires tipa
-            //        {"800", ""},    // Minus sign below
-            //        {"801", ""},    // Palatalized hook below
-            //        {"802", ""},    // Retroflex hook below
+            {"800", "textsubbar"}, // Minus sign below
+            {"801", "textpalhookbelow"}, // Palatalized hook below
+            {"802", "M"}, // Retroflex hook below - textrethookbelow?
             {"803", "d"}, // Dot below
             {"804", "textsubumlaut"}, // Diaeresis below - requires tipa
             {"805", "textsubring"}, // Ring below - requires tipa
@@ -704,17 +722,17 @@ public class HTMLConverter implements LayoutFormatter {
             {"811", "textsubw"}, // Inverted double arch below - requires tipa
             {"812", "textsubwedge"}, // Caron below
             {"813", "textsubcircum"}, // Circumflex accent below - requires tipa
-            //        {"814", ""},    // Breve below
+            {"814", "textsubbreve"}, // Breve below
             {"815", "textsubarch"}, // Inverted breve below - requires tipa
             {"816", "textsubtilde"}, // Tilde below - requires tipa
             {"817", "b"}, // Macron below - not completely correct
             {"818", "b"}, // Underline
             {"819", "subdoublebar"}, // Double low line -- requires extraipa
             {"820", "textsuperimposetilde"}, // Tilde overlay - requires tipa
-            //        {"821", ""},    // Short stroke overlay
-            //        {"822", ""},    // Long stroke overlay
-            //        {"823", ""},    // Short solidus overlay
-            //        {"824", ""},    // Long solidus overlay
+            {"821", "B"}, // Short stroke overlay - textsstrokethru?
+            {"822", "textlstrokethru"}, // Long stroke overlay
+            {"823", "textsstrikethru"}, // Short solidus overlay
+            {"824", "textlstrikethru"}, // Long solidus overlay
             {"825", "textsubrhalfring"}, // Right half ring below - requires tipa
             {"826", "textinvsubbridge"}, // inverted bridge below - requires tipa
             {"827", "textsubsquare"}, // Square below - requires tipa
@@ -737,8 +755,11 @@ public class HTMLConverter implements LayoutFormatter {
             {"844", "doubletilde"}, // Almost equal to above - requires extraipa
             {"845", "spreadlips"}, // Left right arrow below - requires extraipa
             {"846", "whistle"}, // Upwards arrow below - requires extraipa
-            //        {"864", ""},    // Double tilde
-            //        {"865", ""},    // Double inverted breve
+            {"861", "textdoublebreve"}, // Double breve
+            {"862", "textdoublemacron"}, // Double macron
+            {"863", "textdoublemacronbelow"}, // Double macron below
+            {"864", "textdoubletilde"}, // Double tilde
+            {"865", "texttoptiebar"}, // Double inverted breve
             {"866", "sliding"}, // Double rightwards arrow below - requires extraipa
     };
 
@@ -778,6 +799,14 @@ public class HTMLConverter implements LayoutFormatter {
         for (Character character : chars) {
             // System.err.println(new Integer((int) character).toString() + ": " + character.toString() + ": " + unicodeSymbols.get(character));
             text = text.replaceAll(character.toString(), unicodeSymbols.get(character));
+        }
+
+        Integer cp;
+        for (int i = 0; i <= text.length() - 1; i++) {
+            cp = text.codePointAt(i);
+            if (cp >= 129) {
+                LOGGER.warn("Unicode character not converted: " + cp.toString());
+            }
         }
         return text;
     }
@@ -825,7 +854,7 @@ public class HTMLConverter implements LayoutFormatter {
         Pattern escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
         Matcher m = escapedPattern.matcher(text);
         while (m.find()) {
-            //	    System.err.println("Found pattern: " + m.group(1));
+            //      System.err.println("Found pattern: " + m.group(1));
             //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if (numSymbols.containsKey(num)) {
@@ -836,7 +865,7 @@ public class HTMLConverter implements LayoutFormatter {
         escapedPattern = Pattern.compile("(.)&#([x]*)([0]*)(\\p{XDigit}+);");
         m = escapedPattern.matcher(text);
         while (m.find()) {
-            //	    System.err.println("Found pattern: " + m.group(1));
+            //      System.err.println("Found pattern: " + m.group(1));
             //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if (escapedAccents.containsKey(num)) {
@@ -853,10 +882,10 @@ public class HTMLConverter implements LayoutFormatter {
         escapedPattern = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
         m = escapedPattern.matcher(text);
         while (m.find()) {
-            //	    System.err.println("Found pattern: " + m.group(1));
+            //      System.err.println("Found pattern: " + m.group(1));
             //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
-            System.err.println("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
+            LOGGER.warn("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
         }
 
         // Remove $$ in case of two adjacent conversions
@@ -866,7 +895,7 @@ public class HTMLConverter implements LayoutFormatter {
         escapedPattern = Pattern.compile("&(\\w+);");
         m = escapedPattern.matcher(text);
         while (m.find()) {
-            System.err.println("HTML escaped char not converted: " + m.group(1));
+            LOGGER.warn("HTML escaped char not converted: " + m.group(1));
         }
 
         return text.trim();
@@ -878,12 +907,12 @@ public class HTMLConverter implements LayoutFormatter {
 
     /*private final int MAX_TAG_LENGTH = 30;*/
     /*private final int MAX_CHAR_LENGTH = 10;
-
+    
     private int readHtmlChar(String text, StringBuffer sb, int position) {
         // Have just read the < character that starts the tag.
         int index = text.indexOf(';', position);
         if ((index > position) && (index-position < MAX_CHAR_LENGTH)) {
-        	//String code = text.substring(position, index);
+            //String code = text.substring(position, index);
             //System.out.println("Removed code: "+text.substring(position, index));
             return index; // Just skip the tag.
         } else return position; // Don't do anything.
@@ -895,8 +924,7 @@ public class HTMLConverter implements LayoutFormatter {
         if (index > position && index - position < MAX_TAG_LENGTH) {
             //System.out.println("Removed tag: "+text.substring(position, index));
             return index; // Just skip the tag.
-        }
-        else {
+        } else {
             return position; // Don't do anything.
         }
     }

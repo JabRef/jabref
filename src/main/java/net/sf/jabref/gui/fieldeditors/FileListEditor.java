@@ -22,7 +22,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -40,11 +42,12 @@ import javax.swing.TransferHandler;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.io.JabRefDesktop;
@@ -73,7 +76,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
-            EntryEditor entryEditor) {
+                          EntryEditor entryEditor) {
         this.frame = frame;
         this.metaData = metaData;
         this.fieldName = fieldName;
@@ -141,14 +144,14 @@ public class FileListEditor extends JTable implements FieldEditor,
                 downloadFile();
             }
         });
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
-        builder.append(up);
-        builder.append(add);
-        builder.append(auto);
-        builder.append(down);
-        builder.append(remove);
-        builder.append(download);
+        builder.add(up).xy(1, 1);
+        builder.add(add).xy(3, 1);
+        builder.add(auto).xy(5, 1);
+        builder.add(down).xy(1, 2);
+        builder.add(remove).xy(3, 2);
+        builder.add(download).xy(5, 2);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
@@ -238,6 +241,35 @@ public class FileListEditor extends JTable implements FieldEditor,
         JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
+
+        JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
+        menu.add(deleteFile);
+        deleteFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = getSelectedRow();
+                // no selection
+                if (row == -1) {
+                    return;
+                }
+
+                FileListEntry entry = tableModel.getEntry(row);
+                // null if file does not exist
+                File file = FileUtil.expandFilename(metaData, entry.getLink());
+
+                // transactional delete and unlink
+                try {
+                    if(file != null) {
+                        Files.delete(file.toPath());
+                    }
+                    removeEntries();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
+                            Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("File permission error while deleting: " + file.toPath());
+                }
+            }
+        });
     }
 
     private void openSelectedFile() {
@@ -367,7 +399,8 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     /**
      * Open an editor for this entry.
-     * @param entry The entry to edit.
+     *
+     * @param entry      The entry to edit.
      * @param openBrowse True to indicate that a Browse dialog should be immediately opened.
      * @return true if the edit was accepted, false if it was cancelled.
      */
@@ -434,6 +467,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     /**
      * This is the callback method that the DownloadExternalFile class uses to report the result
      * of a download operation. This call may never come, if the user cancelled the operation.
+     *
      * @param file The FileListEntry linking to the resulting local file.
      */
     @Override
@@ -453,8 +487,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     FileListEntry entry = tableModel.getEntry(row);
                     editListEntry(entry, false);
                 }
-            }
-            else if (e.isPopupTrigger()) {
+            } else if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
             }
         }

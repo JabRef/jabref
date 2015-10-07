@@ -36,6 +36,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -233,8 +234,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
         if (useIEEEAbrv.isSelected()) {
-            Globals.journalAbbrev = new JournalAbbreviationRepository();
-            Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_IEEE_INTERNAL_LIST);
+            Abbreviations.journalAbbrev = new JournalAbbreviationRepository();
+            Abbreviations.journalAbbrev.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_INTERNAL_LIST);
         }
         storeRemoteSettings();
 

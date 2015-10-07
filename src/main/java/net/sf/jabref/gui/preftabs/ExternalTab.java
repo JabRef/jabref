@@ -193,13 +193,14 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.nextLine();
 
         JPanel butpan = new JPanel();
-        butpan.setLayout(new GridLayout(2, 3));
+        butpan.setLayout(new GridLayout(3, 3));
         addSettingsButton(new PushToLyx(), butpan);
         addSettingsButton(new PushToEmacs(), butpan);
         addSettingsButton(new PushToWinEdt(), butpan);
         addSettingsButton(new PushToVim(), butpan);
         addSettingsButton(new PushToLatexEditor(), butpan);
         addSettingsButton(new PushToTeXstudio(), butpan);
+        addSettingsButton(new PushToTexmaker(), butpan);
         builder.append(new JPanel());
         builder.append(butpan, 3);
 
@@ -241,7 +242,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         emailSubject.setText(prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
-        if (prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+        if (prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
             useRegExpComboBox.setSelected(true);
         } else if (prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY)) {
             matchExactKeyOnly.setSelected(true);
@@ -253,7 +254,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
 
-        prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, useRegExpComboBox.isSelected());
+        prefs.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, useRegExpComboBox.isSelected());
         if (useRegExpComboBox.isSelected()) {
             prefs.put(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY, regExpTextField.getText());
         }

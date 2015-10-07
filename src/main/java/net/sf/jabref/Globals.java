@@ -21,15 +21,11 @@ import net.sf.jabref.gui.GlobalFocusListener;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 
 public class Globals {
 
@@ -46,47 +42,6 @@ public class Globals {
 
     // Remote listener
     public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
-
-    // journal initialization
-    public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/journals/IEEEJournalList.txt";
-
-    public static JournalAbbreviationRepository journalAbbrev;
-
-
-    public static void initializeJournalNames() {
-        // Read internal lists:
-        Globals.journalAbbrev = new JournalAbbreviationRepository();
-        Globals.journalAbbrev.readJournalListFromResource(Globals.JOURNALS_FILE_BUILTIN);
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-            Globals.journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_INTERNAL_LIST);
-        }
-
-        // Read external lists, if any (in reverse order, so the upper lists
-        // override the lower):
-        String[] lists = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if (lists != null && lists.length > 0) {
-            for (int i = lists.length - 1; i >= 0; i--) {
-                try {
-                    Globals.journalAbbrev.readJournalListFromFile(new File(lists[i]));
-                } catch (FileNotFoundException e) {
-                    // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find file", e);
-                }
-            }
-        }
-
-        // Read personal list, if set up:
-        if (Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST) != null) {
-            try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST)));
-            } catch (FileNotFoundException e) {
-                LOGGER.info("Personal journal list file '" + Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST) + "' not found.", e);
-            }
-        }
-
-    }
-
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 

@@ -53,7 +53,6 @@ public class KeyBinds {
     public static final String INCREMENTAL_SEARCH = "Incremental search";
     public static final String LOAD_SESSION = "Load session";
     public static final String MARK_ENTRIES = "Mark entries";
-    public static final String MINIMIZE_TO_SYSTEM_TRAY = "Minimize to system tray";
     public static final String NEW_ARTICLE = "New article";
     public static final String NEW_BOOK = "New book";
     public static final String NEW_ENTRY = "New entry";
@@ -212,7 +211,6 @@ public class KeyBinds {
         keyBindMap.put(REFRESH_OO, "ctrl alt O");
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_UP, "ctrl UP");
         keyBindMap.put(FILE_LIST_EDITOR_MOVE_ENTRY_DOWN, "ctrl DOWN");
-        keyBindMap.put(MINIMIZE_TO_SYSTEM_TRAY, "ctrl alt W");
         keyBindMap.put(HIDE_SHOW_TOOLBAR, "ctrl alt T");
     }
 

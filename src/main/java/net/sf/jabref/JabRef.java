@@ -20,7 +20,6 @@ import com.jgoodies.looks.plastic.theme.SkyBluer;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,8 +33,10 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.nativeext.WindowsExtensions;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
@@ -60,12 +61,6 @@ import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.logging.CacheableHandler;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
-
-import com.sun.jna.Native;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
-import com.sun.jna.WString;
-import com.sun.jna.ptr.PointerByReference;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -120,7 +115,7 @@ public class JabRef {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations:
-        Globals.initializeJournalNames();
+        Abbreviations.initializeJournalNames(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -145,29 +140,13 @@ public class JabRef {
             }
         }
 
-        /*
-         * See if the user has a personal journal list set up. If so, add these
-         * journal names and abbreviations to the list:
-         */
-        String personalJournalList = prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null && !personalJournalList.isEmpty()) {
-            try {
-                Globals.journalAbbrev.readJournalListFromFile(new File(personalJournalList));
-            } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Journal file not found") + ": " + e.getMessage(), Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                Globals.prefs.put(JabRefPreferences.PERSONAL_JOURNAL_LIST, "");
-            }
-        }
-
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
         if (OS.WINDOWS) {
-            // Set application user model id so that pinning JabRef to the Win7/8 taskbar works
-            // Based on http://stackoverflow.com/a/1928830
-            JabRef.setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
-            //System.out.println(getCurrentProcessExplicitAppUserModelID());
+            // activate pin to taskbar for Windows 7 and up
+            WindowsExtensions.enablePinToTaskbar();
         }
 
         Vector<ParserResult> loaded = processArguments(args, true);
@@ -179,45 +158,11 @@ public class JabRef {
 
         openWindow(loaded);
     }
-    
+
     private void setupLogHandlerForErrorConsole() {
         Globals.handler = new CacheableHandler();
         ((Jdk14Logger)LOGGER).getLogger().addHandler(Globals.handler);
     }
-
-    // Do not use this code in release version, it contains some memory leaks
-    public static String getCurrentProcessExplicitAppUserModelID()
-    {
-        final PointerByReference r = new PointerByReference();
-
-        if (JabRef.GetCurrentProcessExplicitAppUserModelID(r).longValue() == 0)
-        {
-            final Pointer p = r.getValue();
-
-            return p.getString(0, true); // here we leak native memory by lazyness
-        }
-        return "N/A";
-    }
-
-    private static void setCurrentProcessExplicitAppUserModelID(final String appID)
-    {
-        if (JabRef.SetCurrentProcessExplicitAppUserModelID(new WString(appID)).longValue() != 0) {
-            throw new RuntimeException("unable to set current process explicit AppUserModelID to: " + appID);
-        }
-    }
-
-    private static native NativeLong GetCurrentProcessExplicitAppUserModelID(PointerByReference appID);
-
-    private static native NativeLong SetCurrentProcessExplicitAppUserModelID(WString appID);
-
-
-    static
-    {
-        if (OS.WINDOWS) {
-            Native.register("shell32");
-        }
-    }
-
 
     public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
 

@@ -179,8 +179,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final FileHistory fileHistory = new FileHistory(prefs, this);
 
-    private SysTray sysTray;
-
     // The help window.
     public final HelpDialog helpDiag = new HelpDialog(this);
 
@@ -850,11 +848,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         prefs.flush();
 
-        // hide systray because the JVM can only shut down when no systray icon is shown
-        if (sysTray != null) {
-            sysTray.hide();
-        }
-
         // dispose all windows, even if they are not displayed anymore
         for (Window window : Window.getWindows()) {
             window.dispose();
@@ -1229,7 +1222,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         file.addSeparator();
         file.add(close);
-        file.add(new MinimizeToSysTrayAction());
         file.add(quit);
         mb.add(file);
         //edit.add(test);
@@ -1875,10 +1867,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             openInNew);
                     diag.addEntries(entries);
                     diag.entryListComplete();
-                    // On the one hand, the following statement could help at issues when JabRef is minimized to the systray
-                    // On the other hand, users might dislake modality and this is not required to let the GUI work.
-                    // Therefore, it is disabled.
-                    // diag.setModal(true);
                     Util.placeDialog(diag, JabRefFrame.this);
                     diag.setVisible(true);
                     diag.toFront();
@@ -2475,44 +2463,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             for (int i = 0; i < baseCount(); i++) {
                 baseAt(i).updateTableFont();
             }
-        }
-    }
-
-    class MinimizeToSysTrayAction extends MnemonicAwareAction {
-
-        public MinimizeToSysTrayAction() {
-            putValue(Action.NAME, Localization.menuTitle("Minimize to system tray"));
-            putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Minimize to system tray"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            if (sysTray == null) {
-                sysTray = new SysTray(JabRefFrame.this);
-            }
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    sysTray.show();
-                    JabRefFrame.this.setVisible(false);
-                }
-            });
-        }
-    }
-
-
-    public void showIfMinimizedToSysTray() {
-        // TODO: does not work correctly when a dialog is shown
-        // Workaround: put into invokeLater queue before a dialog is added to that queue
-        if (!this.isVisible()) {
-            // isVisible() is false if minimized to systray
-            if (sysTray != null) {
-                sysTray.hide();
-            }
-            setVisible(true);
-            this.isActive();
-            toFront();
         }
     }
 

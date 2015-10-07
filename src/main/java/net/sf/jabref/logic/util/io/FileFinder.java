@@ -101,7 +101,7 @@ public class FileFinder {
     public static String findPdf(BibtexEntry entry, String extension, String[] directories) {
 
         String regularExpression;
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
             regularExpression = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
         } else {
             regularExpression = Globals.prefs

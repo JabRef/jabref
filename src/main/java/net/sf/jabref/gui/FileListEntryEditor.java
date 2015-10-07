@@ -42,7 +42,7 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
@@ -114,40 +114,37 @@ public class FileListEntryEditor {
             }
         });
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(Localization.lang("Link"));
-        builder.append(link);
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout
+                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Link")).xy(1, 1);
+        builder.add(link).xy(3, 1);
         final BrowseListener browse = new BrowseListener(frame, link);
         final JButton browseBut = new JButton(Localization.lang("Browse"));
         browseBut.addActionListener(browse);
-        builder.append(browseBut);
+        builder.add(browseBut).xy(5, 1);
         JButton open = new JButton(Localization.lang("Open"));
         if (showOpenButton) {
-            builder.append(open);
+            builder.add(open).xy(7, 1);
         }
-        builder.nextLine();
-        builder.append(Localization.lang("Description"));
-        builder.append(description, 3);
+        builder.add(Localization.lang("Description")).xy(1, 3);
+        builder.add(description).xyw(3,3,3);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        builder.nextLine();
-        builder.append(Localization.lang("File type"));
-        builder.append(types, 3);
+        builder.add(Localization.lang("File type")).xy(1, 5);
+        builder.add(types).xyw(3, 5, 3);
         if (showProgressBar) {
-            builder.nextLine();
-            builder.append(downloadLabel);
-            builder.append(prog, 3);
+            builder.appendRows("2dlu, p");
+            builder.add(downloadLabel).xy(1,7);
+            builder.add(prog).xyw(3,7,3);
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        //bb.addButton(open);
-        //bb.addRelatedGap();
         bb.addRelatedGap();
         bb.addButton(ok);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         ok.addActionListener(okAction);
         // Add OK action to the two text fields to simplify entering:
