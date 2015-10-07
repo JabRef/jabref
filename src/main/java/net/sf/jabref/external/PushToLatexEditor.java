@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
@@ -43,7 +43,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Insert selected citations into LatexEditor");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PushToLatexEditor implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push to LatexEditor");
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -93,12 +93,16 @@ public class PushToLatexEditor implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
+            // @formatter:off
             panel.output(Localization.lang("Error") + ": " +
                     Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
-        }
-        else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": " + Localization.lang("Could not call executable") + " '"
+            // @formatter:on
+        } else if (couldNotCall) {
+            // @formatter:off
+            panel.output(Localization.lang("Error") + ": " + 
+                    Localization.lang("Could not call executable") + " '"
                     + Globals.prefs.get(JabRefPreferences.LATEX_EDITOR_PATH) + "'.");
+            // @formatter:on
         } else {
             Localization.lang("Pushed citations to %0", "LatexEditor");
         }
@@ -120,18 +124,17 @@ public class PushToLatexEditor implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-        builder.append(new JLabel(Localization.lang("Path to LatexEditor (LEd.exe)") + ":"));
-        builder.append(ledPath);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
+        builder.add(Localization.lang("Path to LatexEditor (LEd.exe)") + ":").xy(1, 1); // Note the LEd.exe part
+        builder.add(ledPath).xy(3,1);
         BrowseAction action = BrowseAction.buildForFile(ledPath);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
-        builder.append(browse);
-        builder.nextLine();
-        builder.append(Localization.lang("Cite command") + ":");
-        builder.append(citeCommand);
-        settings = builder.getPanel();
+        builder.add(browse).xy(5,1);
+        builder.add(Localization.lang("Cite command") + ":").xy(1, 3);
+        builder.add(citeCommand).xy(3,3);
+        settings = builder.build();
     }
 
     @Override

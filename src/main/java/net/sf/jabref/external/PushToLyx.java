@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -83,7 +83,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into LyX/Kile");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class PushToLyx implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to LyX/Kile");
+        return Localization.lang("Push to %0",getApplicationName());
     }
 
     @Override
@@ -109,16 +109,17 @@ public class PushToLyx implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotFindPipe) {
-            panel.output(Localization.lang("Error") + ": " + Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+            // @formatter:off
+            panel.output(Localization.lang("Error") + ": " + 
+                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
                     + ". [" + Globals.prefs.get(JabRefPreferences.LYXPIPE) + "]");
         } else if (couldNotWrite) {
-            panel.output(Localization.lang("Error") + ": " + Localization.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
+            panel.output(Localization.lang("Error") + ": " + 
+                    Localization.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
                     ".in");
+            // @formatter:on
         } else {
-
-            String message = "";
-            panel.output(Localization.lang("Pushed the citations for the following rows to") + " Lyx: " +
-                    message);
+            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
 
     }

@@ -28,7 +28,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -108,20 +108,23 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 false);
 
         JPanel message = new JPanel();
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref", ""), message);
+        FormBuilder b = FormBuilder.create().layout(new FormLayout("left:pref", "p"));
         // Keep the formatting of these lines. Otherwise, strings have to be translated again.
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
-        b.append(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
+        int row = 1;
+        b.add(new JLabel("<html>" + Localization.lang("This database was written using an older version of JabRef.") + "<br>"
                 + Localization.lang("The current version features a new way of handling links to external files.<br>To take advantage of this, your links must be changed into the new format, and<br>JabRef must be configured to show the new links.") + "<p>"
-                + Localization.lang("Do you want JabRef to do the following operations?") + "</html>"));
-        b.nextLine();
+                + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
+        
         if (offerChangeSettings) {
-            b.append(changeSettings);
-            b.nextLine();
+            b.appendRows("2dlu, p");
+            row += 2;
+            b.add(changeSettings).xy(1, row);
         }
         if (offerChangeDatabase) {
-            b.append(changeDatabase);
-            b.nextLine();
+            b.appendRows("2dlu, p");
+            row += 2;
+            b.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
             if (Globals.prefs.hasKey("pdfDirectory")) {
@@ -135,13 +138,15 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             JButton browse = new JButton(Localization.lang("Browse"));
             browse.addActionListener(BrowseAction.buildForDir(fileDir));
             pan.add(browse);
-            b.append(pan);
-            b.nextLine();
+            b.appendRows("2dlu, p");
+            row += 2;
+            b.add(pan).xy(1, row);
         }
-        b.append("");
-        b.nextLine();
-        b.append(doNotShowDialog);
+        b.appendRows("6dlu, p");
+        b.add(doNotShowDialog).xy(1, row+2);
 
+        message.add(b.build());
+        
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {

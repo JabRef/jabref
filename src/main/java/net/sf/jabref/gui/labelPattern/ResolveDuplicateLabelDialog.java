@@ -16,7 +16,7 @@
 package net.sf.jabref.gui.labelPattern;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
@@ -58,25 +58,26 @@ class ResolveDuplicateLabelDialog {
             List<BibtexEntry> entries) {
         diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
-                "left:pref, 4dlu, fill:pref", ""));
-        b.append(new JLabel(Localization.lang("Duplicate key") + ": " + key), 3);
-        b.nextLine();
+        FormBuilder b = FormBuilder.create().layout(new FormLayout(
+                "left:pref, 4dlu, fill:pref", "p"));
+        b.add(new JLabel(Localization.lang("Duplicate key") + ": " + key)).xyw(1, 1, 3);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         boolean first = true;
+        int row = 3;
         for (BibtexEntry entry : entries) {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate key"), !first);
             //JPanel pan = new JPanel();
             //pan.setLayout(new BorderLayout());
             //pan.add(cb, BorderLayout.NORTH);
             //cb.add(new JPanel(), BorderLayout.CENTER);
-            b.append(cb);
+            b.appendRows("1dlu, p");
+            b.add(cb).xy(1, row);
             PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), ResolveDuplicateLabelDialog.layout);
             pp.setPreferredSize(new Dimension(800, 90));
             //pp.setBorder(BorderFactory.createEtchedBorder());
-            b.append(new JScrollPane(pp));
-            b.nextLine();
+            b.add(new JScrollPane(pp)).xy(3, row);
+            row += 2;
             cbs.add(cb);
             first = false;
         }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -42,6 +42,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ExternalFileTypeEditor extends JDialog {
 
+    private static final long serialVersionUID = 2818719761022588069L;
     private JFrame frame;
     private JDialog dialog;
     private ArrayList<ExternalFileType> fileTypes;
@@ -100,6 +101,8 @@ public class ExternalFileTypeEditor extends JDialog {
             }
         });
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = -4147450749465768880L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -281,6 +284,8 @@ public class ExternalFileTypeEditor extends JDialog {
 
     private class FileTypeTableModel extends AbstractTableModel {
 
+        private static final long serialVersionUID = 687769574139355925L;
+
         @Override
         public int getColumnCount() {
             return 5;
@@ -364,6 +369,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
 
+        private static final long serialVersionUID = 6828273495822942935L;
         private JabRefFrame frame;
         private JDialog dialog;
         ExternalFileTypeEditor editor;

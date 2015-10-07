@@ -93,11 +93,15 @@ public class PushToTexmaker implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
-            panel.output(Localization.lang("Error") + ": " + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
+            // @formatter:off
+            panel.output(Localization.lang("Error") + ": " 
+                    + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
         } else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": " + Localization.lang("Could not call executable") + " '" + Globals.prefs.get(JabRefPreferences.TEXMAKER_PATH) + "'.");
+            panel.output(Localization.lang("Error") + ": "
+                    + Localization.lang("Could not call executable") + " '" + Globals.prefs.get(JabRefPreferences.TEXMAKER_PATH) + "'.");
+            // @formatter:on
         } else {
-            Localization.lang("Pushed citations to %0", getApplicationName());
+            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
     }
 

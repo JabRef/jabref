@@ -20,12 +20,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -65,22 +64,15 @@ public class NetworkTab extends JPanel implements PrefsTab {
         });
 
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+                ("8dlu, left:pref, 4dlu, fill:150dlu", "p, 2dlu, p, 2dlu, p, 2dlu, p");
+        FormBuilder builder = FormBuilder.create().layout(layout);
 
-        builder.appendSeparator(Localization.lang("Network"));
-        builder.nextLine();
-        builder.append(useProxy, 5);
-        builder.nextLine();
-        builder.append(new JPanel());
-        JLabel lap = new JLabel(Localization.lang("Host") + ':');
-        builder.append(lap);
-        builder.append(defProxyHostname);
-        builder.nextLine();
-        builder.append(new JPanel());
-        JLabel lap2 = new JLabel(Localization.lang("Port") + ':');
-        builder.append(lap2);
-        builder.append(defProxyPort);
+        builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 4);
+        builder.add(useProxy).xyw(2, 3, 3);
+        builder.add(Localization.lang("Host") + ':').xy(2, 5);
+        builder.add(defProxyHostname).xy(4, 5);
+        builder.add(Localization.lang("Port") + ':').xy(2, 7);
+        builder.add(defProxyPort).xy(4, 7);
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
