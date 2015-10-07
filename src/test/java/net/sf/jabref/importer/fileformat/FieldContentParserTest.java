@@ -1,7 +1,5 @@
 package net.sf.jabref.importer.fileformat;
 
-import junit.framework.Assert;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +19,7 @@ public class FieldContentParserTest {
         String expected = "I\nunify\nline\nbreaks.";
         String processed = parser.format(new StringBuffer(original), "abstract").toString();
 
-        Assert.assertEquals(expected, processed);
+        assertEquals(expected, processed);
     }
 
     @Test
@@ -30,8 +28,8 @@ public class FieldContentParserTest {
         String abstrakt = parser.format(new StringBuffer(original), "abstract").toString();
         String review = parser.format(new StringBuffer(original), "review").toString();
 
-        Assert.assertEquals(original, abstrakt);
-        Assert.assertEquals(original, review);
+        assertEquals(original, abstrakt);
+        assertEquals(original, review);
     }
 
     @Test
@@ -43,8 +41,8 @@ public class FieldContentParserTest {
         String review = parser.format(new StringBuffer(original), "doi").toString();
         String any = parser.format(new StringBuffer(original), "anyotherfield").toString();
 
-        Assert.assertEquals(expected, abstrakt);
-        Assert.assertEquals(expected, review);
-        Assert.assertEquals(expected, any);
+        assertEquals(expected, abstrakt);
+        assertEquals(expected, review);
+        assertEquals(expected, any);
     }
 }
