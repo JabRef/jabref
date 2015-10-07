@@ -27,6 +27,15 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
+import net.sf.jabref.external.push.PushToApplication;
+import net.sf.jabref.external.push.PushToApplicationButton;
+import net.sf.jabref.external.push.PushToEmacs;
+import net.sf.jabref.external.push.PushToLatexEditor;
+import net.sf.jabref.external.push.PushToLyx;
+import net.sf.jabref.external.push.PushToTeXstudio;
+import net.sf.jabref.external.push.PushToTexmaker;
+import net.sf.jabref.external.push.PushToVim;
+import net.sf.jabref.external.push.PushToWinEdt;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
