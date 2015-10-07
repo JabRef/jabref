@@ -465,7 +465,7 @@ public class BibtexParser {
             }
             if (c == '"') {
                 StringBuffer text = parseQuotedFieldExactly();
-                value.append(fieldContentParser.format(text));
+                value.append(fieldContentParser.format(text, key));
                 /*
                  * 
                  * The following code doesn't handle {"} correctly: // value is

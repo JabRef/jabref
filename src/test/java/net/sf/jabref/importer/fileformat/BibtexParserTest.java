@@ -326,7 +326,7 @@ public class BibtexParserTest {
                 + "file = {Bemerkung:H:\\bla\\ups  \tsala.pdf:PDF}, \n"
                 + "}");
 
-        Assert.assertEquals("Bemerkung:H:\\bla\\ups  sala.pdf:PDF", e.getField("file"));
+        Assert.assertEquals("Bemerkung:H:\\bla\\ups  \tsala.pdf:PDF", e.getField("file"));
     }
 
     /**
