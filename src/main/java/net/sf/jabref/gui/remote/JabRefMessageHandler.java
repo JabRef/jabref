@@ -22,18 +22,6 @@ public class JabRefMessageHandler implements MessageHandler {
             throw new IllegalStateException("Could not start JabRef with arguments " + message);
         }
 
-        // put "bringToFront" in the queue
-        // it has to happen before the call to import as the import might open a dialog
-        // --> Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG)
-        // this dialog has to be shown AFTER JabRef has been brought to front
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                JabRef.jrf.showIfMinimizedToSysTray();
-            }
-        });
-
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.elementAt(i);
             JabRef.jrf.addParserResult(pr, i == 0);
