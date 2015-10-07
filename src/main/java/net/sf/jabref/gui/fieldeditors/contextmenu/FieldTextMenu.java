@@ -78,6 +78,7 @@ public class FieldTextMenu implements MouseListener {
         }
     }
 
+    @SuppressWarnings("serial")
     class ReplaceAction extends AbstractAction {
         public ReplaceAction() {
             putValue(Action.NAME, Localization.lang("Normalize to BibTeX name format"));
