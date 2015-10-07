@@ -1,4 +1,5 @@
 [master]
+    - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"
     - The default language is now automatically set to the system's locale.
