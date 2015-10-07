@@ -11,4 +11,24 @@ public class OS {
     public static final boolean LINUX = osName.startsWith("linux");
     public static final boolean WINDOWS = osName.startsWith("win");
     public static final boolean OS_X = osName.startsWith("mac");
+    
+    public static final String guessProgramPath(String programName, String windowsDirectory) {
+        if (OS.WINDOWS) {
+            String progFiles = System.getenv("ProgramFiles(x86)");
+            if (progFiles == null) {
+                progFiles = System.getenv("ProgramFiles");
+            }
+            if (windowsDirectory != null) {
+                return progFiles + "\\" + windowsDirectory + "\\" + programName + ".exe";
+            } else {
+                return progFiles + "\\" + programName + ".exe";
+            }
+        } else {
+            return programName;
+        }
+    }
+
+    public static final String guessProgramPath(String programName) {
+        return guessProgramPath(programName);
+    }
 }
