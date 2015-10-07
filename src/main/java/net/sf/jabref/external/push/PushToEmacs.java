@@ -33,36 +33,18 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Jan 14, 2006
- * Time: 4:55:23 PM
+ * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM
  */
-public class PushToEmacs implements PushToApplication {
+public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
-    private JPanel settings;
-    private final JTextField citeCommand = new JTextField(30);
-    private final JTextField emacsPath = new JTextField(30);
     private final JTextField additionalParams = new JTextField(30);
     private final JCheckBox useEmacs23 = new JCheckBox();
 
     private boolean couldNotConnect;
-    private boolean couldNotRunClient;
-
-
-    @Override
-    public String getName() {
-        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
-    }
-
+    
     @Override
     public String getApplicationName() {
         return "Emacs";
-    }
-
-    @Override
-    public String getTooltip() {
-        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -71,17 +53,14 @@ public class PushToEmacs implements PushToApplication {
     }
 
     @Override
-    public String getKeyStrokeName() {
-        return "Push to Emacs";
-    }
-
-    @Override
     public JPanel getSettingsPanel() {
+        initParameters();
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+        
         if (settings == null) {
             initSettingsPanel();
         }
-        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS));
-        emacsPath.setText(Globals.prefs.get(JabRefPreferences.EMACS_PATH));
+        Path.setText(commandPath);
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
         return settings;
@@ -89,27 +68,24 @@ public class PushToEmacs implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_EMACS, citeCommand.getText());
-        Globals.prefs.put(JabRefPreferences.EMACS_PATH, emacsPath.getText());
+        Globals.prefs.put(commandPathPreferenceKey, Path.getText());
         Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
         Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());
     }
 
-    private void initSettingsPanel() {
+    protected void initSettingsPanel() {
         FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
         builder.add(Localization.lang("Path to gnuclient or emacsclient") + ":").xy(1, 1);
-        builder.add(emacsPath).xy(3,1);
-        BrowseAction action = BrowseAction.buildForFile(emacsPath);
+        builder.add(Path).xy(3, 1);
+        BrowseAction action = BrowseAction.buildForFile(Path);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
-        builder.add(browse).xy(5,1);
+        builder.add(browse).xy(5, 1);
         builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
-        builder.add(additionalParams).xy(3,3);
+        builder.add(additionalParams).xy(3, 3);
         builder.add(Localization.lang("Use EMACS 23 insertion string") + ":").xy(1, 5);
-        builder.add(useEmacs23).xy(3,5);
-        builder.add(Localization.lang("Cite command") + ":").xy(1, 7);
-        builder.add(citeCommand).xy(3,7);
+        builder.add(useEmacs23).xy(3, 5);
         settings = builder.build();
     }
 
@@ -117,12 +93,15 @@ public class PushToEmacs implements PushToApplication {
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
-        couldNotRunClient = false;
-        String command = Globals.prefs.get(JabRefPreferences.EMACS_PATH);
+        couldNotCall = false;
+        
+        initParameters();
+        
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
         String[] addParams = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
         try {
             String[] com = new String[addParams.length + 2];
-            com[0] = command;
+            com[0] = commandPath;
             System.arraycopy(addParams, 0, com, 1, addParams.length);
             String prefix;
             String suffix;
@@ -135,19 +114,16 @@ public class PushToEmacs implements PushToApplication {
             }
 
             com[com.length - 1] = OS.WINDOWS ?
-                    // Windows gnuclient escaping:
-                    // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
-                    // so cmd receives: (insert \"\\cite{Blah2001}\")
-                    // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\\\"\\" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS).replaceAll("\\\\", "\\\\\\\\") +
-                            "{" + keys + "}\\\"").concat(suffix)
-                    :
-                    // Linux gnuclient escaping:
-                    // java string: "(insert \"\\\\cite{Blah2001}\")"
-                    // so sh receives: (insert "\\cite{Blah2001}")
-                    // so emacs receives: (insert "\cite{Blah2001}")
-                    prefix.concat("\"" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_EMACS).replaceAll("\\\\", "\\\\\\\\") +
-                            "{" + keys + "}\"").concat(suffix);
+            // Windows gnuclient escaping:
+            // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
+            // so cmd receives: (insert \"\\cite{Blah2001}\")
+            // so emacs receives: (insert "\cite{Blah2001}")
+            prefix.concat("\\\"\\" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
+            // Linux gnuclient escaping:
+            // java string: "(insert \"\\\\cite{Blah2001}\")"
+            // so sh receives: (insert "\\cite{Blah2001}")
+            // so emacs receives: (insert "\cite{Blah2001}")
+            prefix.concat("\"" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -179,7 +155,7 @@ public class PushToEmacs implements PushToApplication {
             };
             JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
         } catch (IOException excep) {
-            couldNotRunClient = true;
+            couldNotCall = true;
         }
 
     }
@@ -187,27 +163,26 @@ public class PushToEmacs implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
-                    "<HTML>" +
-                            Localization.lang("Could not connect to a running gnuserv process. Make sure that "
-                                    + "Emacs or XEmacs is running,<BR>and that the server has been started "
-                                    + "(by running the command 'server-start'/'gnuserv-start').")
-                            + "</HTML>",
+            // @formatter:off
+            JOptionPane.showMessageDialog(panel.frame(), "<HTML>" + 
+                    Localization.lang("Could not connect to a running gnuserv process. Make sure that "
+                    + "Emacs or XEmacs is running,<BR>and that the server has been started "
+                    + "(by running the command 'server-start'/'gnuserv-start').") + "</HTML>",
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        } else if (couldNotRunClient) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
+        } else if (couldNotCall) {
+            JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
-                            + "the emacsclient/gnuclient program installed and available in the PATH."),
+                    + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            // @formatter:on
         } else {
             panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
     }
-
+    
     @Override
-    public boolean requiresBibtexKeys() {
-        return true;
+    protected void initParameters() {
+        commandPathPreferenceKey = JabRefPreferences.EMACS_PATH;
     }
+
 }

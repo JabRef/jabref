@@ -36,30 +36,15 @@ import java.io.InputStream;
  * Time: 6:55:56 PM
  * To change this template use File | Settings | File Templates.
  */
-public class PushToVim implements PushToApplication {
+public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    private JPanel settings;
-    private final JTextField vimPath = new JTextField(30);
     private final JTextField vimServer = new JTextField(30);
-    private final JTextField citeCommand = new JTextField(30);
-
+    
     private boolean couldNotConnect;
-    private boolean couldNotRunClient;
-
-
-    @Override
-    public String getName() {
-        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
-    }
-
+    
     @Override
     public String getApplicationName() {
         return "Vim";
-    }
-
-    @Override
-    public String getTooltip() {
-        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -68,41 +53,32 @@ public class PushToVim implements PushToApplication {
     }
 
     @Override
-    public String getKeyStrokeName() {
-        return null;
-    }
-
-    @Override
     public JPanel getSettingsPanel() {
         if (settings == null) {
             initSettingsPanel();
         }
-        vimPath.setText(Globals.prefs.get(JabRefPreferences.VIM));
+        Path.setText(Globals.prefs.get(JabRefPreferences.VIM));
         vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
-        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM));
         return settings;
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put(JabRefPreferences.VIM, vimPath.getText());
+        Globals.prefs.put(JabRefPreferences.VIM, Path.getText());
         Globals.prefs.put(JabRefPreferences.VIM_SERVER, vimServer.getText());
-        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_VIM, citeCommand.getText());
     }
 
-    private void initSettingsPanel() {
+    protected void initSettingsPanel() {
         FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
         builder.add(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
-        builder.add(vimPath).xy(3,1);
-        BrowseAction action = BrowseAction.buildForFile(vimPath);
+        builder.add(Path).xy(3,1);
+        BrowseAction action = BrowseAction.buildForFile(Path);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
         builder.add(browse).xy(5,1);
         builder.add(Localization.lang("Vim Server Name") + ":").xy(1, 3);
         builder.add(vimServer).xy(3,3);
-        builder.add(Localization.lang("Cite command") + ":").xy(1, 5);
-        builder.add(citeCommand).xy(3,5);
         settings = builder.build();
     }
 
@@ -111,12 +87,12 @@ public class PushToVim implements PushToApplication {
             MetaData metaData) {
 
         couldNotConnect = false;
-        couldNotRunClient = false;
+        couldNotCall = false;
         try {
             // @formatter:off
             String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", 
                     Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
-                    "<C-\\><C-N>a" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM) +
+                    "<C-\\><C-N>a" + citeCommand +
                             "{" + keys + "}"};
             // @formatter:on
 
@@ -146,7 +122,7 @@ public class PushToVim implements PushToApplication {
             };
             JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
         } catch (IOException excep) {
-            couldNotRunClient = true;
+            couldNotCall = true;
         }
 
     }
@@ -161,7 +137,7 @@ public class PushToVim implements PushToApplication {
                                     + "Vim is running<BR>with correct server name.")
                             + "</HTML>",
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        } else if (couldNotRunClient) {
+        } else if (couldNotCall) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     Localization.lang("Could not run the 'vim' program."),
@@ -169,10 +145,5 @@ public class PushToVim implements PushToApplication {
         } else {
             panel.output(Localization.lang("Pushed citations to %0",getApplicationName()));
         }
-    }
-
-    @Override
-    public boolean requiresBibtexKeys() {
-        return true;
     }
 }

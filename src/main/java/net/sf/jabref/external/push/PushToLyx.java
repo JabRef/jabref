@@ -29,20 +29,15 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
-public class PushToLyx implements PushToApplication {
-
-    private final JTextField lyxPipe = new JTextField(30);
-    private JPanel settings;
+public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
     private boolean couldNotFindPipe;
-    private boolean couldNotWrite;
-
 
     @Override
     public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
         couldNotFindPipe = false;
-        couldNotWrite = false;
+        couldNotCall = false;
 
         String lyxpipeSetting = Globals.prefs.get(JabRefPreferences.LYXPIPE);
         if (!lyxpipeSetting.endsWith(".in")) {
@@ -75,15 +70,10 @@ public class PushToLyx implements PushToApplication {
                     lyx_out.close();
 
                 } catch (IOException excep) {
-                    couldNotWrite = true;
+                    couldNotCall = true;
                 }
             }
         });
-    }
-
-    @Override
-    public String getName() {
-        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -92,18 +82,8 @@ public class PushToLyx implements PushToApplication {
     }
 
     @Override
-    public String getTooltip() {
-        return Localization.lang("Push to %0",getApplicationName());
-    }
-
-    @Override
     public Icon getIcon() {
         return IconTheme.getImage("lyx");
-    }
-
-    @Override
-    public String getKeyStrokeName() {
-        return "Push to LyX";
     }
 
     @Override
@@ -113,7 +93,7 @@ public class PushToLyx implements PushToApplication {
             panel.output(Localization.lang("Error") + ": " + 
                     Localization.lang("verify that LyX is running and that the lyxpipe is valid")
                     + ". [" + Globals.prefs.get(JabRefPreferences.LYXPIPE) + "]");
-        } else if (couldNotWrite) {
+        } else if (couldNotCall) {
             panel.output(Localization.lang("Error") + ": " + 
                     Localization.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
                     ".in");
@@ -125,28 +105,14 @@ public class PushToLyx implements PushToApplication {
     }
 
     @Override
-    public boolean requiresBibtexKeys() {
-        return true;
+    protected void initParameters() {
+        commandPathPreferenceKey = JabRefPreferences.LYXPIPE;
     }
 
-    @Override
-    public JPanel getSettingsPanel() {
-        if (settings == null) {
-            initSettingsPanel();
-        }
-        lyxPipe.setText(Globals.prefs.get(JabRefPreferences.LYXPIPE));
-        return settings;
-    }
-
-    @Override
-    public void storeSettings() {
-        Globals.prefs.put(JabRefPreferences.LYXPIPE, lyxPipe.getText());
-    }
-
-    private void initSettingsPanel() {
+    protected void initSettingsPanel() {
         settings = new JPanel();
         settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(lyxPipe);
+        settings.add(Path);
     }
     /*class Timeout extends javax.swing.Timer
     {

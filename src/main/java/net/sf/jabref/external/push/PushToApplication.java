@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -23,8 +23,7 @@ import net.sf.jabref.MetaData;
 import javax.swing.*;
 
 /**
- * Class that defines interaction with an external application in the form of
- * "pushing" selected entries to it.
+ * Class that defines interaction with an external application in the form of "pushing" selected entries to it.
  */
 public interface PushToApplication {
 
@@ -39,28 +38,26 @@ public interface PushToApplication {
     String getKeyStrokeName();
 
     /**
-     * This method asks the implementing class to return a JPanel populated
-     * with the imlementation's options panel, if necessary. If the JPanel
-     * is shown to the user, and the user indicates that settings should
-     * be stored, the implementation's storeSettings() method will be called.
-     * This method must make sure all widgets in the panel are in the correct
-     * selection states.
+     * This method asks the implementing class to return a JPanel populated with the imlementation's options panel, if
+     * necessary. If the JPanel is shown to the user, and the user indicates that settings should be stored, the
+     * implementation's storeSettings() method will be called. This method must make sure all widgets in the panel are
+     * in the correct selection states.
      *
      * @return a JPanel containing options, or null if options are not needed.
      */
     JPanel getSettingsPanel();
 
     /**
-     * This method is called to indicate that the settings panel returned from
-     * the getSettingsPanel() method has been shown to the user and that the
-     * user has indicated that the settings should be stored. This method must
-     * store the state of the widgets in the settings panel to Globals.prefs.
+     * This method is called to indicate that the settings panel returned from the getSettingsPanel() method has been
+     * shown to the user and that the user has indicated that the settings should be stored. This method must store the
+     * state of the widgets in the settings panel to Globals.prefs.
      */
     void storeSettings();
 
     /**
-     * The actual operation. This method will not be called on the event dispatch
-     * thread, so it should not do GUI operations without utilizing invokeLater().
+     * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
+     * operations without utilizing invokeLater().
+     * 
      * @param database
      * @param entries
      * @param metaData
@@ -68,14 +65,14 @@ public interface PushToApplication {
     void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData);
 
     /**
-     * Reporting etc., this method is called on the event dispatch thread after
-     * pushEntries() returns.
+     * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
      */
     void operationCompleted(BasePanel panel);
 
     /**
-     * Check whether this operation requires BibTeX keys to be set for the entries.
-     * If true is returned an error message will be displayed if keys are missing.
+     * Check whether this operation requires BibTeX keys to be set for the entries. If true is returned an error message
+     * will be displayed if keys are missing.
+     * 
      * @return true if BibTeX keys are required for this operation.
      */
     boolean requiresBibtexKeys();

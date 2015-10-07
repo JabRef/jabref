@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -33,6 +33,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 class PushToApplicationAction extends AbstractAction implements Runnable {
 
+    private static final long serialVersionUID = 9008115216029319314L;
     private final PushToApplication operation;
     private final JabRefFrame frame;
     private BasePanel panel;
@@ -62,8 +63,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // Check if any entries are selected:
         entries = panel.getSelectedEntries();
         if (entries.length == 0) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires one or more entries to be selected."),
-                    (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires one or more entries to be selected."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -71,8 +71,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         if (operation.requiresBibtexKeys()) {
             for (BibtexEntry entry : entries) {
                 if (entry.getCiteKey() == null || entry.getCiteKey().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."),
-                            (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -99,7 +98,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
 
     private String getKeyString(BibtexEntry[] entries) {
         StringBuilder result = new StringBuilder();
-        String citeKey;//, message = "";
+        String citeKey;
         boolean first = true;
         for (BibtexEntry bes : entries) {
             citeKey = bes.getField(BibtexEntry.KEY_FIELD);

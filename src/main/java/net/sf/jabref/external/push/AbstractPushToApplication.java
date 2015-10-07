@@ -31,7 +31,7 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
- * Class for pushing entries into TexMaker.
+ * Abstract class for pushing entries into different editors.
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
@@ -39,9 +39,10 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean notDefined = false;
     protected JPanel settings;
     protected final JTextField Path = new JTextField(30);
-    protected String searchPath = null;
-    protected String searchPathPreferenceKey = null;
+    protected String commandPath = null;
+    protected String commandPathPreferenceKey = null;
     protected String citeCommand = Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
+
 
     @Override
     public String getName() {
@@ -53,29 +54,27 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return Localization.lang("Push to %0", getApplicationName());
     }
 
-
     @Override
     public String getKeyStrokeName() {
-        return null;
+        return Localization.lang("Push to %0", getApplicationName());
     }
-    
+
     @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
         couldNotCall = false;
         notDefined = false;
-        
-        initParameters();
-        searchPath = Globals.prefs.get(searchPathPreferenceKey);
 
-        if ((searchPath == null) || searchPath.trim().isEmpty()) {
+        initParameters();
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+
+        if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
         try {
             Runtime.getRuntime().exec(getCommandLine(keyString));
-
         }
 
         catch (IOException excep) {
@@ -83,7 +82,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             excep.printStackTrace();
         }
     }
-
 
     @Override
     public void operationCompleted(BasePanel panel) {
@@ -93,7 +91,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
         } else if (couldNotCall) {
             panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not call executable") + " '" + searchPath + "'.");
+                    + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
             // @formatter:on
         } else {
             panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
@@ -104,39 +102,51 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     public boolean requiresBibtexKeys() {
         return true;
     }
-    
-    protected String getCommandLine(String keyString) {
+
+    protected String[] getCommandLine(String keyString) {
+        return null;
+    }
+
+    protected String getCommandName() {
         return null;
     }
 
     @Override
     public JPanel getSettingsPanel() {
         initParameters();
-        searchPath = Globals.prefs.get(searchPathPreferenceKey);
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
         if (settings == null) {
             initSettingsPanel();
         }
-        Path.setText(searchPath);
+        Path.setText(commandPath);
         return settings;
     }
 
     protected void initParameters() {
-        searchPathPreferenceKey = null;
+        commandPathPreferenceKey = null;
     }
-    
-    private void initSettingsPanel() {
+
+    protected void initSettingsPanel() {
         FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p"));
-        builder.add(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
+        String label = Localization.lang("Path to %0", getApplicationName());
+        // In case the application name and the actual command is not the same, add the command in brackets
+        if (getCommandName() != null) {
+            label += " (" + getCommandName() + "):";
+        } else {
+            label += ":";
+        }
+        builder.add(label).xy(1, 1);
         builder.add(Path).xy(3, 1);
         BrowseAction action = BrowseAction.buildForFile(Path);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
+        builder.add(browse).xy(5, 1);
         settings = builder.build();
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put(searchPathPreferenceKey, Path.getText());
+        Globals.prefs.put(commandPathPreferenceKey, Path.getText());
     }
 }

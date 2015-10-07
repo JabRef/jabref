@@ -18,15 +18,13 @@ package net.sf.jabref.external.push;
 
 import javax.swing.*;
 
-import net.sf.jabref.*;
-
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.external.push.AbstractPushToApplication;
 
 /**
  * Class for pushing entries into TexMaker.
  */
-public class PushToTexmaker extends AbstractPushToApplication {
+public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getApplicationName() {
@@ -39,12 +37,13 @@ public class PushToTexmaker extends AbstractPushToApplication {
     }
 
     @Override
-    protected String getCommandLine(String keyString) {
-        return searchPath + " " + "-insert " + citeCommand + "{" + keyString + "}";
+    protected String[] getCommandLine(String keyString) {
+        return new String[] {commandPath, "-insert", citeCommand + "{" + keyString + "}"};
     }
+
     @Override
     protected void initParameters() {
-        searchPathPreferenceKey = JabRefPreferences.TEXMAKER_PATH;
+        commandPathPreferenceKey = JabRefPreferences.TEXMAKER_PATH;
     }
 
 }
