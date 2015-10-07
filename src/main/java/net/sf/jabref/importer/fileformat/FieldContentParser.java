@@ -32,6 +32,8 @@ class FieldContentParser {
         multiLineFields = new ArrayList<>();
         multiLineFields.add("abstract");
         multiLineFields.add("review");
+        // the file field should not be formatted, therefore we treat it as a multi line field
+        multiLineFields.add("file");
     }
 
     /**
