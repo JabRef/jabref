@@ -314,7 +314,7 @@ public class JabRefPreferences {
     public static final String NUMERIC_FIELDS = "numericFields";
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
-    public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
+    public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     public static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     public static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
     public static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
@@ -757,7 +757,7 @@ public class JabRefPreferences {
         defaults.put(SEARCH_DIALOG_WIDTH, 650);
         defaults.put(SEARCH_DIALOG_HEIGHT, 500);
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
-        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
+        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(USE_LOCK_FILES, Boolean.TRUE);
@@ -816,7 +816,7 @@ public class JabRefPreferences {
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
+        defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
