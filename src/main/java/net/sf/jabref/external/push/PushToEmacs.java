@@ -22,11 +22,8 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -40,8 +37,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     private final JTextField additionalParams = new JTextField(30);
     private final JCheckBox useEmacs23 = new JCheckBox();
 
-    private boolean couldNotConnect;
-    
+
     @Override
     public String getApplicationName() {
         return "Emacs";
@@ -54,34 +50,22 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
 
     @Override
     public JPanel getSettingsPanel() {
-        initParameters();
-        commandPath = Globals.prefs.get(commandPathPreferenceKey);
-        
-        if (settings == null) {
-            initSettingsPanel();
-        }
-        Path.setText(commandPath);
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
-        return settings;
+        return super.getSettingsPanel();
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put(commandPathPreferenceKey, Path.getText());
+        super.storeSettings();
         Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
         Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());
     }
 
+    @Override
     protected void initSettingsPanel() {
-        FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
-        builder.add(Localization.lang("Path to gnuclient or emacsclient") + ":").xy(1, 1);
-        builder.add(Path).xy(3, 1);
-        BrowseAction action = BrowseAction.buildForFile(Path);
-        JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(action);
-        builder.add(browse).xy(5, 1);
+        super.initSettingsPanel();
+        builder.appendRows("2dlu, p, 2dlu, p");
         builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
         builder.add(additionalParams).xy(3, 3);
         builder.add(Localization.lang("Use EMACS 23 insertion string") + ":").xy(1, 5);
@@ -94,9 +78,16 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
 
         couldNotConnect = false;
         couldNotCall = false;
-        
+        notDefined = false;
+
         initParameters();
-        
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+
+        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+            notDefined = true;
+            return;
+        }
+
         commandPath = Globals.prefs.get(commandPathPreferenceKey);
         String[] addParams = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
         try {
@@ -175,14 +166,18 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                     + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             // @formatter:on
-        } else {
-            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
         }
+        super.operationCompleted(panel);
     }
-    
+
     @Override
     protected void initParameters() {
         commandPathPreferenceKey = JabRefPreferences.EMACS_PATH;
+    }
+
+    @Override
+    protected String getCommandName() {
+        return "gnuclient " + Localization.lang("or") + " emacsclient";
     }
 
 }

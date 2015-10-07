@@ -35,13 +35,15 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
-    protected boolean couldNotCall = false;
-    protected boolean notDefined = false;
+    protected boolean couldNotCall;
+    protected boolean couldNotConnect;
+    protected boolean notDefined;
     protected JPanel settings;
     protected final JTextField Path = new JTextField(30);
-    protected String commandPath = null;
-    protected String commandPathPreferenceKey = null;
+    protected String commandPath;
+    protected String commandPathPreferenceKey;
     protected String citeCommand = Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
+    protected FormBuilder builder;
 
 
     @Override
@@ -62,6 +64,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
+        couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
 
@@ -89,12 +92,13 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             // @formatter:off
             panel.output(Localization.lang("Error") + ": " 
                     + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
-        } else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": "
-                    + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
             // @formatter:on
+        } else if (couldNotCall) {
+            panel.output(getCouldNotCall());
+        } else if (couldNotConnect) {
+            panel.output(getCouldNotConnect());
         } else {
-            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
+            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
         }
     }
 
@@ -122,12 +126,10 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return settings;
     }
 
-    protected void initParameters() {
-        commandPathPreferenceKey = null;
-    }
+    abstract protected void initParameters();
 
     protected void initSettingsPanel() {
-        FormBuilder builder = FormBuilder.create();
+        builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
         String label = Localization.lang("Path to %0", getApplicationName());
         // In case the application name and the actual command is not the same, add the command in brackets
@@ -149,4 +151,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     public void storeSettings() {
         Globals.prefs.put(commandPathPreferenceKey, Path.getText());
     }
+
+    protected String getCouldNotCall() {
+        // @formatter:off
+        return Localization.lang("Error") + ": "
+                + Localization.lang("Could not call executable") + " '" + commandPath + "'.";
+        // @formatter:on
+    }
+
+    protected String getCouldNotConnect() {
+        // @formatter:off
+        return Localization.lang("Error") + ": "
+                + Localization.lang("Could not connect to ") + getApplicationName() + ".";
+        // @formatter:on
+    }
+
 }

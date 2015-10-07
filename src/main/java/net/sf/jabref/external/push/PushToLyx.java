@@ -23,7 +23,6 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -31,24 +30,30 @@ import net.sf.jabref.model.entry.BibtexEntry;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
-    private boolean couldNotFindPipe;
-
     @Override
     public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
-        couldNotFindPipe = false;
+        couldNotConnect = false;
         couldNotCall = false;
+        notDefined = false;
 
-        String lyxpipeSetting = Globals.prefs.get(JabRefPreferences.LYXPIPE);
-        if (!lyxpipeSetting.endsWith(".in")) {
-            lyxpipeSetting = lyxpipeSetting + ".in";
+        initParameters();
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+
+        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+            notDefined = true;
+            return;
         }
-        File lp = new File(lyxpipeSetting); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+
+        if (!commandPath.endsWith(".in")) {
+            commandPath = commandPath + ".in";
+        }
+        File lp = new File(commandPath); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
         if (!lp.exists() || !lp.canWrite()) {
             // See if it helps to append ".in":
-            lp = new File(lyxpipeSetting + ".in");
+            lp = new File(commandPath + ".in");
             if (!lp.exists() || !lp.canWrite()) {
-                couldNotFindPipe = true;
+                couldNotConnect = true;
                 return;
             }
         }
@@ -87,28 +92,30 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void operationCompleted(BasePanel panel) {
-        if (couldNotFindPipe) {
-            // @formatter:off
-            panel.output(Localization.lang("Error") + ": " + 
-                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                    + ". [" + Globals.prefs.get(JabRefPreferences.LYXPIPE) + "]");
-        } else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": " + 
-                    Localization.lang("unable to write to") + " " + Globals.prefs.get(JabRefPreferences.LYXPIPE) +
-                    ".in");
-            // @formatter:on
-        } else {
-            panel.output(Localization.lang("Pushed citations to %0", getApplicationName()));
-        }
-
-    }
-
-    @Override
     protected void initParameters() {
         commandPathPreferenceKey = JabRefPreferences.LYXPIPE;
     }
 
+    @Override
+    protected String getCouldNotCall() {
+        // @formatter:off
+        return Localization.lang("Error") + ": " + 
+                Localization.lang("unable to write to") + " " + commandPath +
+                ".in";
+        // @formatter:on
+    }
+
+    @Override
+    protected String getCouldNotConnect() {
+        // @formatter:off
+        return Localization.lang("Error") + ": " + 
+                Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                + ". [" + commandPath + "]";
+        // @formatter:on
+
+    }
+
+    @Override
     protected void initSettingsPanel() {
         settings = new JPanel();
         settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
