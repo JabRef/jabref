@@ -85,12 +85,11 @@ class AdvancedTab extends JPanel implements PrefsTab {
         biblatexMode = new JCheckBox(Localization.lang("BibLaTeX mode"));
         remoteServerPort = new JTextField();
         String[] possibleLookAndFeels = {
+                UIManager.getSystemLookAndFeelClassName(),
+                UIManager.getCrossPlatformLookAndFeelClassName(),
                 "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
-                "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
                 "com.sun.java.swing.plaf.motif.MotifLookAndFeel",
                 "javax.swing.plaf.mac.MacLookAndFeel",
-                "com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
-                "javax.swing.plaf.metal.MetalLookAndFeel"
         };
         // Only list L&F which are available
         List<String> lookAndFeels = new ArrayList<String>();
