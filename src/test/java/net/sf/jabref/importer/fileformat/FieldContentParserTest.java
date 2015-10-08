@@ -1,12 +1,20 @@
 package net.sf.jabref.importer.fileformat;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class FieldContentParserTest {
     FieldContentParser parser;
+
+    @BeforeClass
+    public static void loadPreferences() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -38,11 +46,9 @@ public class FieldContentParserTest {
         String expected = "I should not include additional whitespaces or tabs.";
 
         String abstrakt = parser.format(new StringBuffer(original), "title").toString();
-        String review = parser.format(new StringBuffer(original), "doi").toString();
         String any = parser.format(new StringBuffer(original), "anyotherfield").toString();
 
         assertEquals(expected, abstrakt);
-        assertEquals(expected, review);
         assertEquals(expected, any);
     }
 }
