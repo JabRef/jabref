@@ -35,9 +35,9 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
-    protected boolean couldNotCall;
-    protected boolean couldNotConnect;
-    protected boolean notDefined;
+    protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
+    protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
+    protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
     protected JPanel settings;
     protected final JTextField Path = new JTextField(30);
     protected String commandPath;
@@ -71,15 +71,18 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         initParameters();
         commandPath = Globals.prefs.get(commandPathPreferenceKey);
 
+        // Check if a path to the command has been specified
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
+        // Execute command
         try {
             Runtime.getRuntime().exec(getCommandLine(keyString));
         }
 
+        // In case it didn't work
         catch (IOException excep) {
             couldNotCall = true;
             excep.printStackTrace();
@@ -107,10 +110,21 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return true;
     }
 
+    /**
+     * Function to get the command to be executed for pushing keys to be cited
+     *
+     * @param keyString String containing the Bibtex keys to be pushed to the application
+     * @return String array with the command to call and its arguments
+     */
     protected String[] getCommandLine(String keyString) {
         return null;
     }
 
+    /**
+     * Function to get the command name in case it is different from the application name
+     *
+     * @return String with the command name
+     */
     protected String getCommandName() {
         return null;
     }
@@ -126,8 +140,15 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return settings;
     }
 
+    /**
+     * Function to initialize parameters. Currently it is expected that commandPathPreferenceKey is set to the path of
+     * the application.
+     */
     abstract protected void initParameters();
 
+    /**
+     * Create a FormBuilder, fill it with a textbox for the path and store the JPanel in settings
+     */
     protected void initSettingsPanel() {
         builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
@@ -152,6 +173,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         Globals.prefs.put(commandPathPreferenceKey, Path.getText());
     }
 
+    /**
+     * @return Error message in case couldNotCall is set
+     */
     protected String getCouldNotCall() {
         // @formatter:off
         return Localization.lang("Error") + ": "
@@ -159,6 +183,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         // @formatter:on
     }
 
+    /**
+     * @return Error message in case couldNotConnect is set
+     */
     protected String getCouldNotConnect() {
         // @formatter:off
         return Localization.lang("Error") + ": "

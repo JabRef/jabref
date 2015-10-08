@@ -31,6 +31,47 @@ import net.sf.jabref.model.entry.BibtexEntry;
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
     @Override
+    public String getApplicationName() {
+        return "LyX/Kile";
+    }
+
+    @Override
+    public Icon getIcon() {
+        return IconTheme.getImage("lyx");
+    }
+
+    @Override
+    protected void initParameters() {
+        commandPathPreferenceKey = JabRefPreferences.LYXPIPE;
+    }
+
+    @Override
+    protected String getCouldNotCall() {
+        // @formatter:off
+        return Localization.lang("Error") + ": " +
+                Localization.lang("unable to write to") + " " + commandPath +
+                ".in";
+        // @formatter:on
+    }
+
+    @Override
+    protected String getCouldNotConnect() {
+        // @formatter:off
+        return Localization.lang("Error") + ": " +
+                Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                + ". [" + commandPath + "]";
+        // @formatter:on
+
+    }
+
+    @Override
+    protected void initSettingsPanel() {
+        settings = new JPanel();
+        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
+        settings.add(Path);
+    }
+
+    @Override
     public void pushEntries(BibtexDatabase database, final BibtexEntry[] entries, final String keyString, MetaData metaData) {
 
         couldNotConnect = false;
@@ -81,46 +122,6 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
         });
     }
 
-    @Override
-    public String getApplicationName() {
-        return "LyX/Kile";
-    }
-
-    @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("lyx");
-    }
-
-    @Override
-    protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.LYXPIPE;
-    }
-
-    @Override
-    protected String getCouldNotCall() {
-        // @formatter:off
-        return Localization.lang("Error") + ": " + 
-                Localization.lang("unable to write to") + " " + commandPath +
-                ".in";
-        // @formatter:on
-    }
-
-    @Override
-    protected String getCouldNotConnect() {
-        // @formatter:off
-        return Localization.lang("Error") + ": " + 
-                Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                + ". [" + commandPath + "]";
-        // @formatter:on
-
-    }
-
-    @Override
-    protected void initSettingsPanel() {
-        settings = new JPanel();
-        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(Path);
-    }
     /*class Timeout extends javax.swing.Timer
     {
       public Timeout(int timeout, final Thread toStop, final String message) {
