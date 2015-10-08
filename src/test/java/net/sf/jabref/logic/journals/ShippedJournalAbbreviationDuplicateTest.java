@@ -11,10 +11,10 @@ public class ShippedJournalAbbreviationDuplicateTest {
         repoBuiltIn.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
 
         JournalAbbreviationRepository repoBuiltInIEEEOfficial = new JournalAbbreviationRepository();
-        repoBuiltInIEEEOfficial.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_OFFICIAL_ABBREVIATION_LIST);
+        repoBuiltInIEEEOfficial.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
 
         JournalAbbreviationRepository repoBuiltInIEEEStandard = new JournalAbbreviationRepository();
-        repoBuiltInIEEEStandard.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_STANDARD_ABBREVIATION_LIST);
+        repoBuiltInIEEEStandard.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
 
         for(Abbreviation abbreviation : repoBuiltInIEEEOfficial.getAbbreviations()) {
             Assert.assertFalse("duplicate name " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent());
