@@ -6,6 +6,7 @@
     - Feature: Push citations to Texmaker (SF: #318, #582)
     - Case changers improved to honor words (not yet more than single words) within {}
     - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
+    - Fixed bug 1282 (SourceForge) related to backslashes duplication.
     - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
     - Feature: Field names "Doi", "Ee", and "Url" are now written as "DOI", "EE", and "URL"

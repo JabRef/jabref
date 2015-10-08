@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -50,7 +50,7 @@ import net.sf.jabref.sql.SQLUtil;
 
 /**
  * 
- * @author ifsteinm.
+ * @author igorsteinmacher.
  * 
  *         Jan 20th Abstract Class to provide main features to export entries to
  *         a DB. To insert a new DB it is necessary to extend this class and add
@@ -131,10 +131,16 @@ public abstract class DBExporter extends DBImporterExporter {
                 query = query + ", ";
                 val = entry.getField(SQLUtil.getAllFields().get(i));
                 if (val != null) {
-                    val = val.replace("\\", "\\\\");
-                    val = val.replace("\"", "\\\"");
-                    val = val.replace("\'", "''");
-                    val = val.replace("`", "\\`");
+                    /**
+                    * The condition below is there since PostgreSQL automatically escapes the backslashes,
+                    * so the entry would double the number of slashes after storing/retrieving.
+                    **/
+                    if (dbStrings.getServerType().equals("MySQL")) {
+                        val = val.replace("\\", "\\\\");
+                        val = val.replace("\"", "\\\"");
+                        val = val.replace("\'", "''");
+                        val = val.replace("`", "\\`");
+                    }
                     query = query + '\'' + val + '\'';
                 } else {
                     query = query + "NULL";
@@ -580,16 +586,12 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     /**
-     * Returns a Jabref Database ID from the database in case the DB is already
-     * exported. In case the bib was already exported before, the method returns
-     * the id, otherwise it calls the method that inserts a new row and returns
-     * the ID for this new database
+     * Returns a Jabref Database ID from the database in case the DB is already exported. In case the bib was already
+     * exported before, the method returns the id, otherwise it calls the method that inserts a new row and returns the
+     * ID for this new database
      * 
-     * @param metaData
-     *            The MetaData object containing the database information
-     * @param out
-     *            The output (PrintStream or Connection) object to which the DML
-     *            should be written.
+     * @param metaData The MetaData object containing the database information
+     * @param out The output (PrintStream or Connection) object to which the DML should be written.
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
