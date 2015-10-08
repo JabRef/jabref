@@ -28,7 +28,7 @@ import java.util.List;
  * in JabRef style. The reformatting must undo all formatting done by JabRef when
  * writing the same fields.
  */
-class FieldContentParser {
+public class FieldContentParser {
     private final List<String> multiLineFields;
 
     public FieldContentParser() {
@@ -60,5 +60,9 @@ class FieldContentParser {
         text = text.replaceAll("\\s+", " ");
 
         return new StringBuffer(text);
+    }
+
+    public String format(String content, String bibtexField) {
+        return format(new StringBuffer(content), bibtexField).toString();
     }
 }

@@ -18,6 +18,7 @@ package net.sf.jabref.exporter;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -25,11 +26,11 @@ import java.util.Vector;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
- * 
+ * <p>
  * Obeys following settings:
- *  * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
- *  * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
- *  * JabRefPreferences.WRITEFIELD_WRAPFIELD
+ * * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
+ * * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
+ * * JabRefPreferences.WRITEFIELD_WRAPFIELD
  */
 public class LatexFieldFormatter implements FieldFormatter {
 
@@ -51,6 +52,8 @@ public class LatexFieldFormatter implements FieldFormatter {
     private final boolean writefieldWrapfield;
     private final String[] doNotResolveStringsFors;
 
+    private final FieldContentParser parser;
+
 
     public LatexFieldFormatter() {
         this(true);
@@ -64,6 +67,8 @@ public class LatexFieldFormatter implements FieldFormatter {
         valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
         doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
         writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
+
+        parser = new FieldContentParser();
     }
 
     @Override
@@ -140,9 +145,9 @@ public class LatexFieldFormatter implements FieldFormatter {
             boolean strangePrefSettings = writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName);
 
             if (strangePrefSettings && doWrap) {
-                stringBuilder.append(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH));
+                stringBuilder.append(parser.format(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH), fieldName));
             } else {
-                stringBuilder.append(text);
+                stringBuilder.append(parser.format(text, fieldName));
             }
 
             stringBuilder.append(valueDelimiterEndOfValue);
@@ -168,8 +173,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 if (pos1 > 0 && text.charAt(pos1 - 1) == '\\') {
                     goFrom = pos1 + 1;
                     pos1++;
-                }
-                else {
+                } else {
                     goFrom = pos1 - 1; // Ends the loop.
                 }
             }
@@ -203,26 +207,25 @@ public class LatexFieldFormatter implements FieldFormatter {
 
             if (pos2 > -1) {
                 pivot = pos2 + 1;
-            }
-            else {
+            } else {
                 pivot = pos1 + 1;
-            //if (tell++ > 10) System.exit(0);
+                //if (tell++ > 10) System.exit(0);
             }
         }
 
         // currently, we do not add newlines and new formatting
         if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
             //             introduce a line break to be read at the parser
-            return StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
+            return parser.format(StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH), fieldName);//, but that lead to ugly .tex
 
         } else {
-            return stringBuilder.toString();
+            return parser.format(stringBuilder.toString(), fieldName);
         }
 
     }
 
     private void writeText(String text, int start_pos,
-            int end_pos) {
+                           int end_pos) {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
@@ -285,20 +288,20 @@ public class LatexFieldFormatter implements FieldFormatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-if (c == '&' && !escape &&
+            if (c == '&' && !escape &&
                     !(inCommand && commandName.toString().equals("url")) &&
-        nestedEnvironments == 0) {
+                    nestedEnvironments == 0) {
                 stringBuilder.append("\\&");
             } else {
-    stringBuilder.append(c);
-}
+                stringBuilder.append(c);
+            }
             escape = c == '\\';
         }
         stringBuilder.append(valueDelimiterEndOfValue);
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
-            boolean first, boolean last) {
+                                  boolean first, boolean last) {
         //sb.append(Util.wrap((first ? "" : " # ") + text.substring(start_pos, end_pos)
         //		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
         putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
