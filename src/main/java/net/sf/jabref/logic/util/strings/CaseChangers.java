@@ -22,13 +22,17 @@ import java.util.stream.Collectors;
 
 /**
  * Class with static methods for changing the case of strings and arrays of strings.
+ * <p>
+ * This class must detect the words in the title and whether letters are protected for case changes via enclosing them with '{' and '}' brakets.
+ * Hence, for each letter to be changed, it needs to be known wether it is protected or not.
+ * This can be done by starting at the letter position and moving forward and backword to see if there is a '{' and '}, respectively.
  */
 public class CaseChangers {
 
     /**
      * Represents a word in a title of a bibtex entry.
-     *
-     * A word can be mutable vs constant ({word}) and small (a, an, the, ...) vs large.
+     * <p>
+     * A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
      */
     private static final class Word {
 
@@ -48,34 +52,62 @@ public class CaseChangers {
             SMALLER_WORDS = Collections.unmodifiableSet(smallerWords);
         }
 
-        private String word;
+        private char[] chars;
+        private boolean[] protectedChars;
 
-        public Word(String word) {
-            this.word = Objects.requireNonNull(word);
+        public Word(char[] chars, boolean[] protectedChars) {
+            this.chars = Objects.requireNonNull(chars);
+            this.protectedChars = Objects.requireNonNull(protectedChars);
+
+            if (this.chars.length != this.protectedChars.length) {
+                throw new IllegalArgumentException("the chars and the protectedChars array must be of same length");
+            }
         }
 
-        public boolean isConstant() {
-            return word.startsWith("{") && word.endsWith("}");
-        }
-
-        public boolean isMutable() {
-            return !isConstant();
-        }
-
+        /**
+         * Only change letters of the word that are unprotected to upper case.
+         */
         public void toUpperCase() {
-            this.word = this.word.toUpperCase();
+            for (int i = 0; i < chars.length; i++) {
+                if (protectedChars[i]) {
+                    continue;
+                }
+
+                chars[i] = Character.toUpperCase(chars[i]);
+            }
         }
 
+        /**
+         * Only change letters of the word that are unprotected to lower case.
+         */
         public void toLowerCase() {
-            this.word = this.word.toLowerCase();
+            for (int i = 0; i < chars.length; i++) {
+                if (protectedChars[i]) {
+                    continue;
+                }
+
+                chars[i] = Character.toLowerCase(chars[i]);
+            }
         }
+
 
         public void toUpperFirst() {
-            this.word = StringUtil.capitalizeFirst(this.word);
+            for (int i = 0; i < chars.length; i++) {
+                if (protectedChars[i]) {
+                    continue;
+                }
+
+                if (i == 0) {
+                    chars[i] = Character.toUpperCase(chars[i]);
+                } else {
+                    chars[i] = Character.toLowerCase(chars[i]);
+                }
+            }
         }
 
         public boolean isSmallerWord() {
-            return SMALLER_WORDS.contains(this.word.toLowerCase());
+            // "word:" is still a small "word"
+            return SMALLER_WORDS.contains(this.toString().replaceAll("[:]", "").toLowerCase());
         }
 
         public boolean isLargerWord() {
@@ -84,8 +116,86 @@ public class CaseChangers {
 
         @Override
         public String toString() {
-            return word;
+            return new String(chars);
         }
+
+        public boolean endsWithColon() {
+            return this.toString().endsWith(":");
+        }
+    }
+
+    /**
+     * Parses a title to a list of words.
+     */
+    private static final class TitleParser {
+
+        private StringBuffer buffer;
+        private int wordStart;
+
+        public List<Word> parse(String title) {
+            List<Word> words = new LinkedList<>();
+
+            boolean[] isProtected = determineProtectedChars(title);
+
+            reset();
+
+            int index = 0;
+            for (char c : title.toCharArray()) {
+                if (!Character.isWhitespace(c)) {
+                    if (wordStart == -1) {
+                        wordStart = index;
+                    }
+
+                    buffer.append(c);
+                } else {
+                    createWord(isProtected).ifPresent(words::add);
+                }
+
+                index++;
+            }
+            createWord(isProtected).ifPresent(words::add);
+
+            return words;
+        }
+
+        private Optional<Word> createWord(boolean[] isProtected) {
+            if (buffer.length() <= 0) {
+                return Optional.empty();
+            }
+
+            char[] chars = buffer.toString().toCharArray();
+            boolean[] protectedChars = new boolean[chars.length];
+
+            System.arraycopy(isProtected, wordStart, protectedChars, 0, chars.length);
+
+            reset();
+
+            return Optional.of(new Word(chars, protectedChars));
+        }
+
+        private void reset() {
+            wordStart = -1;
+            buffer = new StringBuffer();
+        }
+
+        private static boolean[] determineProtectedChars(String title) {
+            boolean[] isProtected = new boolean[title.length()];
+            char[] chars = title.toCharArray();
+
+            int brakets = 0;
+            for (int i = 0; i < title.length(); i++) {
+                if (chars[i] == '{') {
+                    brakets++;
+                } else if (chars[i] == '}') {
+                    brakets--;
+                } else {
+                    isProtected[i] = brakets > 0;
+                }
+            }
+
+            return isProtected;
+        }
+
     }
 
     /**
@@ -96,9 +206,7 @@ public class CaseChangers {
         private final List<Word> words = new LinkedList<>();
 
         public Title(String title) {
-            for (String word : Objects.requireNonNull(title).split("\\s+")) {
-                words.add(new Word(word));
-            }
+            this.words.addAll(new TitleParser().parse(title));
         }
 
         public List<Word> getWords() {
@@ -146,7 +254,7 @@ public class CaseChangers {
         public String changeCase(String input) {
             Title title = new Title(input);
 
-            title.getWords().stream().filter(Word::isMutable).forEach(Word::toLowerCase);
+            title.getWords().stream().forEach(Word::toLowerCase);
 
             return title.toString();
         }
@@ -166,7 +274,7 @@ public class CaseChangers {
         public String changeCase(String input) {
             Title title = new Title(input);
 
-            title.getWords().stream().filter(Word::isMutable).forEach(Word::toUpperCase);
+            title.getWords().stream().forEach(Word::toUpperCase);
 
             return title.toString();
         }
@@ -186,7 +294,7 @@ public class CaseChangers {
         public String changeCase(String input) {
             Title title = new Title(LOWER.changeCase(input));
 
-            title.getWords().stream().findFirst().filter(Word::isMutable).ifPresent(Word::toUpperFirst);
+            title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
 
             return title.toString();
         }
@@ -206,15 +314,13 @@ public class CaseChangers {
         public String changeCase(String input) {
             Title title = new Title(input);
 
-            title.getWords().stream().filter(Word::isMutable).forEach(Word::toUpperFirst);
+            title.getWords().stream().forEach(Word::toUpperFirst);
 
             return title.toString();
         }
     }
 
     public static class TitleCaseChanger implements CaseChanger {
-
-
 
         @Override
         public String getName() {
@@ -230,11 +336,17 @@ public class CaseChangers {
         public String changeCase(String input) {
             Title title = new Title(input);
 
-            title.getWords().stream().filter(Word::isMutable).filter(Word::isSmallerWord).forEach(Word::toLowerCase);
-            title.getWords().stream().filter(Word::isMutable).filter(Word::isLargerWord).forEach(Word::toUpperFirst);
+            title.getWords().stream().filter(Word::isSmallerWord).forEach(Word::toLowerCase);
+            title.getWords().stream().filter(Word::isLargerWord).forEach(Word::toUpperFirst);
 
-            title.getFirstWord().filter(Word::isMutable).ifPresent(Word::toUpperFirst);
-            title.getLastWord().filter(Word::isMutable).ifPresent(Word::toUpperFirst);
+            title.getFirstWord().ifPresent(Word::toUpperFirst);
+            title.getLastWord().ifPresent(Word::toUpperFirst);
+
+            for (int i = 0; i < title.getWords().size() - 2; i++) {
+                if (title.getWords().get(i).endsWithColon()) {
+                    title.getWords().get(i + 1).toUpperFirst();
+                }
+            }
 
             return title.toString();
         }

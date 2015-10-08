@@ -30,6 +30,7 @@
     - Feature: "Normalize to BibTeX name format" also removes newlines
     - Tweak of preference defaults: Autolink requires that the filename starts with the given BibTeX key and the default filename patterns is key followed by title
     - Remove support to the move-to-SysTray action
+    - Feature: case changers now leave protected areas (enclosed with curly brakets) alone
 [dev_2.11]
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
 2.11 beta 4
