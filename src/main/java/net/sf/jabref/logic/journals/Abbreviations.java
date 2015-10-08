@@ -13,7 +13,7 @@ public class Abbreviations {
 
     // journal initialization
     public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    public static final String JOURNALS_IEEE_OFFICIAL_ABBREVIATION_LIST = "/journals/IEEEJournalList.txt";
+    public static final String JOURNALS_IEEE_OFFICIAL_ABBREVIATION_LIST = "/journals/IEEEJournalListCode.txt";
     public static final String JOURNALS_IEEE_STANDARD_ABBREVIATION_LIST = "/journals/IEEEJournalListText.txt";
     public static JournalAbbreviationRepository journalAbbrev;
 
