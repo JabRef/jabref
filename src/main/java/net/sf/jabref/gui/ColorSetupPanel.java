@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
 package net.sf.jabref.gui;
 
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,6 +36,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ColorSetupPanel extends JPanel {
 
+    private static final long serialVersionUID = -4634367444666144966L;
     private static final int ICON_WIDTH = 30;
     private static final int ICON_HEIGHT = 20;
     private final ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
@@ -44,8 +45,9 @@ public class ColorSetupPanel extends JPanel {
     public ColorSetupPanel() {
 
         FormLayout layout = new FormLayout
-                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", 
+                        "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+        FormBuilder builder = FormBuilder.create().layout(layout);
 
         buttons.add(new ColorButton("tableText", Localization.lang("Table text color")));
         buttons.add(new ColorButton("markedEntryBackground0", Localization.lang("Marking color %0", "1")));
@@ -65,12 +67,17 @@ public class ColorSetupPanel extends JPanel {
         buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Localization.lang("Entry editor active background color")));
         buttons.add(new ColorButton("invalidFieldBackgroundColor", Localization.lang("Entry editor invalid field color")));
 
+        int rowcnt = 0;
+        int col = 0;
+        int row;
         for (ColorButton but : buttons) {
-            builder.append(but);
-            builder.append(but.getDefaultButton());
-            builder.append(but.getName());
+            row = (2*(rowcnt/2)) + 1; // == 2*floor(rowcnt/2) + 1
+            builder.add((JButton)but).xy((6*col)+1, row);
+            builder.add(but.getDefaultButton()).xy((6*col)+3, row);
+            builder.add(but.getName()).xy((6*col)+5, row);
             but.addActionListener(new ColorButtonListener(but));
-
+            col = 1-col;  // Change 0 -> 1 -> 0 ...
+            rowcnt++;
         }
 
         setLayout(new BorderLayout());
@@ -118,6 +125,7 @@ public class ColorSetupPanel extends JPanel {
      */
     class ColorButton extends JButton implements Icon {
 
+        private static final long serialVersionUID = -1974112633706382299L;
         private Color color = Color.white;
         private final String key;
         private final String name;

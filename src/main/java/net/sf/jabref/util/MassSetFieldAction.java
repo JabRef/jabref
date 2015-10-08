@@ -32,7 +32,7 @@ import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -47,6 +47,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public class MassSetFieldAction extends MnemonicAwareAction {
 
+    private static final long serialVersionUID = -3335783568376999899L;
     private final JabRefFrame frame;
     private JDialog diag;
     private JRadioButton all;
@@ -82,7 +83,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         selected = new JRadioButton(Localization.lang("Selected entries"));
         clear = new JRadioButton(Localization.lang("Clear fields"));
         set = new JRadioButton(Localization.lang("Set fields"));
-        rename = new JRadioButton(Localization.lang("Rename field to:"));
+        rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
         set.addChangeListener(new ChangeListener() {
 
@@ -116,27 +117,21 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         bg.add(clear);
         bg.add(set);
         bg.add(rename);
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout(
-                "left:pref, 4dlu, fill:100dlu", ""));
-        builder.appendSeparator(Localization.lang("Field name"));
-        builder.append(Localization.lang("Field name"));
-        builder.append(field);
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("Include entries"));
-        builder.append(all, 3);
-        builder.nextLine();
-        builder.append(selected, 3);
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("New field value"));
-        builder.append(set);
-        builder.append(text);
-        builder.nextLine();
-        builder.append(clear);
-        builder.nextLine();
-        builder.append(rename);
-        builder.append(renameTo);
-        builder.nextLine();
-        builder.append(overwrite, 3);
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
+                "left:pref, 4dlu, fill:100dlu:grow", "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
+        builder.addSeparator(Localization.lang("Field name")).xyw(1, 1, 3);
+        builder.add(Localization.lang("Field name")).xy(1, 3);
+        builder.add(field).xy(3, 3);
+        builder.addSeparator(Localization.lang("Include entries")).xyw(1, 5, 3);
+        builder.add(all).xyw(1, 7, 3);
+        builder.add(selected).xyw(1, 9, 3);
+        builder.addSeparator(Localization.lang("New field value")).xyw(1, 11, 3);
+        builder.add(set).xy(1, 13);
+        builder.add(text).xy(3, 13);
+        builder.add(clear).xyw(1, 15, 3);
+        builder.add(rename).xy(1, 17);
+        builder.add(renameTo).xy(3, 17);
+        builder.add(overwrite).xyw(1, 19, 3);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -168,6 +163,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 5590008814009727518L;
 
             @Override
             public void actionPerformed(ActionEvent e) {

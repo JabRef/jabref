@@ -39,7 +39,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -58,10 +58,13 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     private static final Log log = LogFactory.getLog(AutoSetExternalFileForEntries.class);
 
-    private final Object[] brokenLinkOptions =
-    {Localization.lang("Ignore"), Localization.lang("Assign new file"), Localization.lang("Clear field"),
+    private final Object[] brokenLinkOptions = {
+            // @formatter:off
+            Localization.lang("Ignore"),
+            Localization.lang("Assign new file"),
+            Localization.lang("Clear field"),
             Localization.lang("Quit synchronization")};
-
+            // @formatter:on
     private boolean goOn = true;
     private boolean autoSet = true;
     private boolean overWriteAllowed = true;
@@ -131,7 +134,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
-                if (old != null && !old.equals("") && !overWriteAllowed) {
+                if ((old != null) && !old.equals("") && !overWriteAllowed) {
                     continue;
                 }
                 extPan.setEntry(aSel, panel.getDatabase());
@@ -154,11 +157,11 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 panel.frame().setProgressBarValue(progress++);
                 final String old = aSel.getField(fieldName);
                 // Check if a extension is set:
-                if (old != null && !old.equals("")) {
+                if ((old != null) && !old.equals("")) {
                     // Get an absolute path representation:
                     File file = FileUtil.expandFilename(old, dirs);
 
-                    if (file == null || !file.exists()) {
+                    if ((file == null) || !file.exists()) {
 
                         int answer =
                                 JOptionPane.showOptionDialog(panel.frame(),
@@ -200,7 +203,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         //log brokenLinks if some were found
         if (brokenLinks > 0) {
-            log.warn(Localization.lang("Found %0 broken links", brokenLinks + ""));
+            AutoSetExternalFileForEntries.log.warn(Localization.lang("Found %0 broken links", brokenLinks + ""));
         }
 
         if (entriesChanged > 0) {
@@ -278,33 +281,27 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             bg.add(autoSetUnset);
             bg.add(autoSetNone);
             bg.add(autoSetAll);
-            FormLayout layout = new FormLayout("fill:pref", "");
-            DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+            FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+            FormBuilder builder = FormBuilder.create().layout(layout);
             description = new JLabel("<HTML>" +
                     Localization.lang(//"This function helps you keep your external %0 links up-to-date." +
                             "Attempt to autoset %0 links for your entries. Autoset works if "
                                     + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.", fn)
                     + "</HTML>");
-            //            name.setVerticalAlignment(JLabel.TOP);
-            builder.appendSeparator(Localization.lang("Autoset"));
-            builder.append(description);
-            builder.nextLine();
-            builder.append(autoSetUnset);
-            builder.nextLine();
-            builder.append(autoSetAll);
-            builder.nextLine();
-            builder.append(autoSetNone);
-            builder.nextLine();
-            builder.appendSeparator(Localization.lang("Check links"));
+
+            builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
+            builder.add(description).xy(1, 3);
+            builder.add(autoSetUnset).xy(1, 5);
+            builder.add(autoSetAll).xy(1, 6);
+            builder.add(autoSetNone).xy(1, 7);
+            builder.addSeparator(Localization.lang("Check links")).xy(1, 9);
 
             description = new JLabel("<HTML>" +
                     Localization.lang("This makes JabRef look up each %0 link and check if the file exists. If not, you will be given options<BR>to resolve the problem.", fn)
                     + "</HTML>");
-            builder.append(description);
-            builder.nextLine();
-            builder.append(checkLinks);
-            builder.nextLine();
-            builder.appendSeparator();
+            builder.add(description).xy(1, 11);
+            builder.add(checkLinks).xy(1, 13);
+            builder.addSeparator("").xy(1, 15);
 
             JPanel main = builder.getPanel();
             main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
