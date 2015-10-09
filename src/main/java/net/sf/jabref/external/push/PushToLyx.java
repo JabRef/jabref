@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -46,22 +47,18 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    protected String getCouldNotCall() {
-        // @formatter:off
-        return Localization.lang("Error") + ": " +
-                Localization.lang("unable to write to") + " " + commandPath +
-                ".in";
-        // @formatter:on
-    }
-
-    @Override
-    protected String getCouldNotConnect() {
-        // @formatter:off
-        return Localization.lang("Error") + ": " +
-                Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                + ". [" + commandPath + "]";
-        // @formatter:on
-
+    public void operationCompleted(BasePanel panel) {
+        if(couldNotConnect) {
+            panel.output(Localization.lang("Error") + ": " +
+                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                    + ". [" + commandPath + "]");
+        } else if(couldNotCall) {
+            panel.output(Localization.lang("Error") + ": " +
+                    Localization.lang("unable to write to") + " " + commandPath +
+                    ".in");
+        } else {
+            super.operationCompleted(panel);
+        }
     }
 
     @Override

@@ -90,7 +90,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         // In case it didn't work
         catch (IOException excep) {
             couldNotCall = true;
-            LOGGER.warn(getCouldNotCall());
+
+            LOGGER.warn(Localization.lang("Error") + ": "
+                    + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         }
     }
 
@@ -102,9 +104,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
             // @formatter:on
         } else if (couldNotCall) {
-            panel.output(getCouldNotCall());
+            panel.output(Localization.lang("Error") + ": "
+                    + Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         } else if (couldNotConnect) {
-            panel.output(getCouldNotConnect());
+            panel.output(Localization.lang("Error") + ": "
+                    + Localization.lang("Could not connect to ") + getApplicationName() + ".");
         } else {
             panel.output(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
         }
@@ -176,26 +180,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     @Override
     public void storeSettings() {
         Globals.prefs.put(commandPathPreferenceKey, Path.getText());
-    }
-
-    /**
-     * @return Error message in case couldNotCall is set
-     */
-    protected String getCouldNotCall() {
-        // @formatter:off
-        return Localization.lang("Error") + ": "
-                + Localization.lang("Could not call executable") + " '" + commandPath + "'.";
-        // @formatter:on
-    }
-
-    /**
-     * @return Error message in case couldNotConnect is set
-     */
-    protected String getCouldNotConnect() {
-        // @formatter:off
-        return Localization.lang("Error") + ": "
-                + Localization.lang("Could not connect to ") + getApplicationName() + ".";
-        // @formatter:on
     }
 
 }

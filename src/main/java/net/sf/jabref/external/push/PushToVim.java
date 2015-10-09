@@ -142,8 +142,9 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                     Localization.lang("Could not run the 'vim' program."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             // formatter:on
+        } else {
+            super.operationCompleted(panel);
         }
-        super.operationCompleted(panel);
     }
     
     @Override

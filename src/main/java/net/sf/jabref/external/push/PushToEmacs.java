@@ -171,8 +171,9 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                     + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             // @formatter:on
+        } else {
+            super.operationCompleted(panel);
         }
-        super.operationCompleted(panel);
     }
 
     @Override
