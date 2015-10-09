@@ -26,6 +26,8 @@ import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
@@ -34,7 +36,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     private final BasePanel basePanel;
     private BibtexEntry entry;
-    private FindFullText.FindResult result;
+    private Optional<URL> result;
 
 
     public FindFullTextAction(BasePanel basePanel) {
@@ -48,6 +50,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
+        // TODO: just download for all entries and save files without dialog
         entry = basePanel.getSelectedEntries()[0];
         FindFullText fft = new FindFullText();
         result = fft.findFullText(entry);
@@ -55,31 +58,26 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void update() {
-        //pdfURL = new URL("http://geog-www.sbs.ohio-state.edu/faculty/bmark/abbott_etal_ppp03.pdf");
-        if (result.url != null) {
-            //System.out.println("PDF URL: "+result.url);
+        if (result.isPresent()) {
             String bibtexKey = entry.getCiteKey();
             String[] dirs = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             if (dirs.length == 0) {
-                // TODO: error message if file dir not defined
-                //JOptionPane.showMessageDialog(frame, Globals.lang);
+                // FIXME: Localization
+                JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(),
-                    bibtexKey);
+            // TODO: this needs its own thread as it blocks the UI!
+            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(), bibtexKey);
             try {
-                def.download(result.url, new DownloadExternalFile.DownloadCallback() {
-
+                def.download(result.get(), new DownloadExternalFile.DownloadCallback() {
                     @Override
                     public void downloadComplete(FileListEntry file) {
-                        System.out.println("finished");
                         FileListTableModel tm = new FileListTableModel();
                         String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
                         tm.setContent(oldValue);
                         tm.addEntry(tm.getRowCount(), file);
                         String newValue = tm.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry,
-                                GUIGlobals.FILE_FIELD, oldValue, newValue);
+                        UndoableFieldChange edit = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue);
                         entry.setField(GUIGlobals.FILE_FIELD, newValue);
                         basePanel.undoManager.addEdit(edit);
                         basePanel.markBaseChanged();
@@ -91,31 +89,9 @@ public class FindFullTextAction extends AbstractWorker {
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }
         else {
-            String message = null;
-            switch (result.status) {
-            case FindFullText.UNKNOWN_DOMAIN:
-                message = Localization.lang("Unable to find full text article. No search algorithm "
-                        + "defined for the '%0' web site.", result.host);
-                break;
-            case FindFullText.WRONG_MIME_TYPE:
-                message = Localization.lang("Found pdf link, but received the wrong MIME type. "
-                        + "This could indicate that you don't have access to the fulltext article.");
-                break;
-            case FindFullText.LINK_NOT_FOUND:
-                message = Localization.lang("Unable to find full text document in the linked web page.");
-                break;
-            case FindFullText.IO_EXCEPTION:
-                message = Localization.lang("Connection error when trying to find full text document.");
-                break;
-            case FindFullText.NO_URLS_DEFINED:
-                message = Localization.lang("This entry provides no URL or DOI links.");
-                break;
-
-            }
-            basePanel.output(Localization.lang("Full text article download failed"));
-            JOptionPane.showMessageDialog(basePanel.frame(), message, Localization.lang("Full text article download failed"),
-                    JOptionPane.ERROR_MESSAGE);
+            String message = Localization.lang("Full text article download failed");
+            basePanel.output(message);
+            JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
         }
-
     }
 }

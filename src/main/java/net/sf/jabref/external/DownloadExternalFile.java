@@ -49,6 +49,7 @@ import java.net.URL;
  * If the download is cancelled, or failed, the user is informed. The callback is never called.
  */
 public class DownloadExternalFile {
+    private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
     private final JabRefFrame frame;
     private final MetaData metaData;
@@ -57,11 +58,7 @@ public class DownloadExternalFile {
     private boolean downloadFinished;
     private boolean dontShowDialog;
 
-    private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
-
-
     public DownloadExternalFile(JabRefFrame frame, MetaData metaData, String bibtexKey) {
-
         this.frame = frame;
         this.metaData = metaData;
         this.bibtexKey = bibtexKey;
@@ -99,9 +96,7 @@ public class DownloadExternalFile {
      *                 is complete.
      */
     public void download(URL url, final DownloadCallback callback) throws IOException {
-
         String res = url.toString();
-
         String mimeType;
 
         // First of all, start the download itself in the background to a temporary file:
@@ -110,7 +105,6 @@ public class DownloadExternalFile {
 
         URLDownload udl = MonitoredURLDownload.buildMonitoredDownload(frame, url);
 
-        //long time = System.currentTimeMillis();
         try {
             // TODO: what if this takes long time?
             // TODO: stop editor dialog if this results in an error:
@@ -124,12 +118,10 @@ public class DownloadExternalFile {
         }
         final URL urlF = url;
         final URLDownload udlF = udl;
-        //System.out.println("Time: "+(System.currentTimeMillis()-time));
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
 
+        JabRefExecutorService.INSTANCE.execute(new Runnable() {
             @Override
             public void run() {
-
                 try {
                     udlF.downloadToFile(tmp);
                 } catch (IOException e2) {
@@ -143,10 +135,8 @@ public class DownloadExternalFile {
                     LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
                     return;
                 }
-
                 // Download finished: call the method that stops the progress bar etc.:
                 SwingUtilities.invokeLater(new Runnable() {
-
                     @Override
                     public void run() {
                         downloadFinished();
@@ -157,10 +147,8 @@ public class DownloadExternalFile {
 
         ExternalFileType suggestedType = null;
         if (mimeType != null) {
-            System.out.println("mimetype:" + mimeType);
+            LOGGER.debug("MIME Type suggested: " + mimeType);
             suggestedType = Globals.prefs.getExternalFileTypeByMimeType(mimeType);
-            /*if (suggestedType != null)
-                System.out.println("Found type '"+suggestedType.getName()+"' by MIME type '"+udl.getMimeType()+"'");*/
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
@@ -172,7 +160,7 @@ public class DownloadExternalFile {
             suggestedType = Globals.prefs.getExternalFileTypeByExt(suffix);
         }
 
-        String suggestedName = bibtexKey != null ? getSuggestedFileName(suffix) : "";
+        String suggestedName = getSuggestedFileName(suffix);
         String[] fDirectory = getFileDirectory(res);
         final String directory;
         if (fDirectory.length == 0) {
@@ -182,8 +170,7 @@ public class DownloadExternalFile {
         }
         final String suggestDir = directory != null ? directory : System.getProperty("user.home");
         File file = new File(new File(suggestDir), suggestedName);
-        FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getCanonicalPath() : "",
-                suggestedType);
+        FileListEntry entry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
         editor = new FileListEntryEditor(frame, entry, true, false, metaData);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
@@ -286,10 +273,9 @@ public class DownloadExternalFile {
         editor.setOkEnabled(true);
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
-
+    // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
-
-        String plannedName = bibtexKey;
+        String plannedName = bibtexKey != null ? bibtexKey : "set-filename";
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
         }
@@ -298,7 +284,10 @@ public class DownloadExternalFile {
         * [ 1548875 ] download pdf produces unsupported filename
         *
         * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
-        *
+        * FIXME: rework this! just allow alphanumeric stuff or so?
+        * https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#naming_conventions
+        * http://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os
+        * https://support.apple.com/en-us/HT202808
         */
         if (OS.WINDOWS) {
             plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
@@ -310,7 +299,7 @@ public class DownloadExternalFile {
     }
 
     /**
-     * Look for the last '.' in the link, and returnthe following characters.
+     * Look for the last '.' in the link, and return the following characters.
      * This gives the extension for most reasonably named links.
      *
      * @param link The link

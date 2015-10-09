@@ -22,6 +22,7 @@ public class Actions {
     public static final String DB_CONNECT = "dbConnect";
     public static final String DB_EXPORT = "dbExport";
     public static final String DELETE = "delete";
+    public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
     public static final String EDIT = "edit";
     public static final String EDIT_PREAMBLE = "editPreamble";

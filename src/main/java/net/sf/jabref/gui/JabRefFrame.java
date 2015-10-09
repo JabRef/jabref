@@ -383,6 +383,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("New entry from plain text"),
             prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
 
+
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
@@ -437,6 +438,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.getImage("mergeentries"));
 
     private final AbstractAction dbImport = new DbImportAction(this).getAction();
+    private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT, Localization.menuTitle("Look up full text document"),
+            Localization.lang("Follow DOI or URL link and try to locate PDF full text document"));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
@@ -1332,7 +1335,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(makeKeyAction);
         tools.add(Cleanup);
         tools.add(mergeEntries);
-        //tools.add(downloadFullText);
+        tools.add(downloadFullText);
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
         OpenOfficePanel otp = OpenOfficePanel.getInstance();

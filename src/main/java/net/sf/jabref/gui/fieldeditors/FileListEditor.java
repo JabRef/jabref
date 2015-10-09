@@ -58,8 +58,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Created by Morten O. Alver 2007.02.22
  */
-public class FileListEditor extends JTable implements FieldEditor,
-        DownloadExternalFile.DownloadCallback {
+public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
 
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
@@ -73,7 +72,6 @@ public class FileListEditor extends JTable implements FieldEditor,
     private final FileListTableModel tableModel;
     private final JButton auto;
     private final JPopupMenu menu = new JPopupMenu();
-
 
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
                           EntryEditor entryEditor) {
@@ -420,22 +418,35 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     public void autoSetLinks() {
         auto.setEnabled(false);
-        BibtexEntry entry = entryEditor.getEntry();
-        JDialog diag = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
 
+        BibtexEntry entry = entryEditor.getEntry();
+
+        // filesystem lookup
+        JDialog dialog = new JDialog(frame, true);
+        JabRefExecutorService.INSTANCE.execute(Util.autoSetLinks(entry, tableModel, metaData, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
+
+
+
+
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
                     frame.output(Localization.lang("Finished autosetting external links."));
                 } else {
                     frame.output(Localization.lang("Finished autosetting external links.")
                             + " " + Localization.lang("No files found."));
+
+                    // auto download file as no file found before
+                    frame.basePanel().runCommand("downloadFullText");
                 }
+
+                // reset
+                auto.setEnabled(true);
             }
-        }, diag));
+        }, dialog));
+
 
     }
 
@@ -516,34 +527,26 @@ public class FileListEditor extends JTable implements FieldEditor,
     }
 
     @Override
-    public void undo() {
-    }
+    public void undo() {}
 
     @Override
-    public void redo() {
-    }
+    public void redo() {}
 
     @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-    }
+    public void setAutoCompleteListener(AutoCompleteListener listener) {}
 
     @Override
-    public void clearAutoCompleteSuggestion() {
-    }
+    public void clearAutoCompleteSuggestion() {}
 
     @Override
-    public void setActiveBackgroundColor() {
-    }
+    public void setActiveBackgroundColor() {}
 
     @Override
-    public void setValidBackgroundColor() {
-    }
+    public void setValidBackgroundColor() {}
 
     @Override
-    public void setInvalidBackgroundColor() {
-    }
+    public void setInvalidBackgroundColor() {}
 
     @Override
-    public void updateFontColor() {
-    }
+    public void updateFontColor() {}
 }
