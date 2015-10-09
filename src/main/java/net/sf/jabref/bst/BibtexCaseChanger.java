@@ -277,11 +277,13 @@ public class BibtexCaseChanger {
      * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
      * If nothing found, return null
      *
+     * Also used by BibtexPurify
+     *
      * @param c the current "String"
      * @param pos the position
      * @return the special LaTeX character or null
      */
-    private static String findSpecialChar(char[] c, int pos) {
+    static String findSpecialChar(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
                 return "oe";
