@@ -30,10 +30,15 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Abstract class for pushing entries into different editors.
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
+
+    private static final Log LOGGER = LogFactory.getLog(AbstractPushToApplication.class);
 
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
@@ -58,7 +63,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getKeyStrokeName() {
-        return Localization.lang("Push to %0", getApplicationName());
+        return "Push to " + getApplicationName();
     }
 
     @Override
@@ -85,7 +90,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         // In case it didn't work
         catch (IOException excep) {
             couldNotCall = true;
-            excep.printStackTrace();
+            LOGGER.warn(getCouldNotCall());
         }
     }
 
