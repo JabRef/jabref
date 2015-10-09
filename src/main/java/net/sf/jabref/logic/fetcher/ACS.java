@@ -41,7 +41,7 @@ public class ACS implements FullTextFinder {
         if(doi.isPresent()) {
             String source = String.format(SOURCE, doi.get().getDOI());
             // Retrieve PDF link
-            Document html = Jsoup.connect(source).timeout(5000).ignoreHttpErrors(true).get();
+            Document html = Jsoup.connect(source).ignoreHttpErrors(true).get();
             Element link = html.select(".pdf-high-res a").first();
 
             if(link != null) {
