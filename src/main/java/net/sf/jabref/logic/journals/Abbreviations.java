@@ -20,6 +20,10 @@ public class Abbreviations {
     public static void initializeJournalNames(JabRefPreferences jabRefPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 
+        // the order of reading the journal lists is important
+        // method: last added abbreviation wins
+        // for instance, in the personal list one can overwrite abbreviations in the built in list
+
         // Read builtin list
         journalAbbrev.readJournalListFromResource(JOURNALS_FILE_BUILTIN);
 
