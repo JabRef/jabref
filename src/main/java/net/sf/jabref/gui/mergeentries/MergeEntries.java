@@ -49,6 +49,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 
 public class MergeEntries {
 
+    // Headings
     // @formatter:off
     private final String[] columnHeadings = {Localization.lang("Field"),
             Localization.lang("Left entry"),
@@ -131,7 +132,7 @@ public class MergeEntries {
         // Create main layout
         String colSpecMain = "left:pref, 5px, center:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, center:3cm:grow";
         String colSpecMerge = "left:pref, 5px, fill:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, fill:3cm:grow";
-        String rowSpec = "pref, pref, 10px, fill:6cm:grow, 10px, pref, 10px, fill:4cm";
+        String rowSpec = "pref, pref, 10px, fill:5cm:grow, 10px, pref, 10px, fill:3cm:grow";
         StringBuilder rowBuilder = new StringBuilder("");
         for (int i = 0; i < joint.size(); i++) {
             rowBuilder.append("pref, ");
@@ -258,7 +259,11 @@ public class MergeEntries {
                 if (string1 != null) {
                     mergedEntry.setField(field, string1);
                     rb[0][row - 1].setSelected(true);
+                    if (string2 == null) {
+                        rb[2][row-1].setEnabled(false);
+                    }
                 } else {
+                    rb[0][row-1].setEnabled(false);
                     mergedEntry.setField(field, string2);
                     rb[2][row - 1].setSelected(true);
                 }
@@ -287,9 +292,8 @@ public class MergeEntries {
         }
 
         JScrollPane scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
         mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
-        JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
-        verticalBar.setValue(verticalBar.getMinimum());
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
 
         // Synchronize column widths
@@ -355,7 +359,12 @@ public class MergeEntries {
 
         // Show what we've got
         mainPanel.setVisible(true);
-
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                scrollPane.getVerticalScrollBar().setValue(0);
+            }
+         });
     }
 
     /**
