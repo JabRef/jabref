@@ -90,6 +90,36 @@ public class BibtexCaseChangersTest {
         assertCaseChangerTitleLowers("Hallo world- how", "HAllo WORLD- HOW");
     }
 
+    @Test
+    public void testSpecialBracketPlacement() {
+        // area between brackets spanning multiple words
+        assertCaseChangerAllLowers("this i{S REALLY CraZy ST}uff", "tHIS I{S REALLY CraZy ST}UfF");
+        assertCaseChangerAllLowers("this i{S R{\\'E}ALLY CraZy ST}uff", "tHIS I{S R{\\'E}ALLY CraZy ST}UfF");
+
+        // real use case: Formulas
+        assertCaseChangerAllUppers("AN {$O(n \\log n)$} SORTING ALGORITHM", "An {$O(n \\log n)$} Sorting Algorithm");
+
+        // only one special character, no strange bracket placement
+        assertCaseChangerAllLowers("this is r{\\'e}ally crazy stuff", "tHIS IS R{\\'E}ALLY CraZy STUfF");
+    }
+
+    @Test
+    public void testTitleCase() {
+        // CaseChangers.TITLE is good at keeping some words lower case
+        // Here some modified test cases to show that escaping with BibtexCaseChanger also works
+        // Examples taken from https://github.com/JabRef/jabref/pull/176#issuecomment-142723792
+        assertCaseChangerAllLowers("this is a simple example {TITLE}", "This is a simple example {TITLE}");
+        assertCaseChangerAllLowers("this {IS} another simple example tit{LE}", "This {IS} another simple example tit{LE}");
+        assertCaseChangerAllLowers("{What ABOUT thIS} one?", "{What ABOUT thIS} one?");
+        assertCaseChangerAllLowers("{And {thIS} might {a{lso}} be possible}", "{And {thIS} might {a{lso}} be possible}");
+
+        /* the real test would look like as follows. Also from the comment of issue 176, order reversed as the "should be" comes first */
+        // assertCaseChangerTitleUppers("This is a Simple Example {TITLE}", "This is a simple example {TITLE}");
+        // assertCaseChangerTitleUppers("This {IS} Another Simple Example Tit{LE}", "This {IS} another simple example tit{LE}");
+        // assertCaseChangerTitleUppers("{What ABOUT thIS} one?", "{What ABOUT thIS} one?");
+        // assertCaseChangerTitleUppers("{And {thIS} might {a{lso}} be possible}", "{And {thIS} might {a{lso}} be possible}");
+    }
+
     private void assertCaseChangerTitleLowers(final String string, final String string2) {
         Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, FORMAT_MODE.TITLE_LOWERS));
 
