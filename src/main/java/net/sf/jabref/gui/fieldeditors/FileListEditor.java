@@ -73,8 +73,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final JButton auto;
     private final JPopupMenu menu = new JPopupMenu();
 
-    private static boolean fileFound;
-
     public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
                           EntryEditor entryEditor) {
         this.frame = frame;
@@ -429,24 +427,27 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
+
+
+
+
                 if (e.getID() > 0) {
-                    fileFound = true;
                     entryEditor.updateField(FileListEditor.this);
                     frame.output(Localization.lang("Finished autosetting external links."));
                 } else {
                     frame.output(Localization.lang("Finished autosetting external links.")
                             + " " + Localization.lang("No files found."));
+
+                    // auto download file as no file found before
+                    frame.basePanel().runCommand("downloadFullText");
                 }
+
+                // reset
+                auto.setEnabled(true);
             }
         }, dialog));
 
-        // auto download file
-        if(!fileFound) {
-            frame.basePanel().runCommand("downloadFullText");
-        }
-        // reset
-        auto.setEnabled(true);
-        fileFound = false;
+
     }
 
     /**
