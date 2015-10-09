@@ -542,73 +542,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-
-            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
-            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
-            int posX = prefs.getInt(JabRefPreferences.POS_X);
-            int posY = prefs.getInt(JabRefPreferences.POS_Y);
-
-            /*
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            GraphicsDevice[] gs = ge.getScreenDevices();
-
-
-            // Get size of each screen
-            for (int i=0; i<gs.length; i++) {
-                DisplayMode dm = gs[i].getDisplayMode();
-                int screenWidth = dm.getWidth();
-                int screenHeight = dm.getHeight();
-                System.out.println(gs[i].getDefaultConfiguration().getBounds());
-            }*/
-
-            //
-            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
-            //
-            // Do not put a window outside the screen if the preference values are wrong.
-            //
-            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
-            // googled on forums.java.sun.com graphicsenvironment second screen java
-            //
-            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1) {
-
-                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-                        .getDefaultConfiguration().getBounds();
-                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-
-                // Make sure we are not above or to the left of the screen bounds:
-                if (posX < bounds.x) {
-                    posX = bounds.x;
-                }
-                if (posY < bounds.y) {
-                    posY = bounds.y;
-                }
-
-                int height = (int) dim.getHeight();
-                int width = (int) dim.getWidth();
-
-                //if (posX < )
-
-                if (posX + sizeX > width) {
-                    if (sizeX <= width) {
-                        posX = width - sizeX;
-                    } else {
-                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
-                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
-                    }
-                }
-
-                if (posY + sizeY > height) {
-                    if (sizeY <= height) {
-                        posY = height - sizeY;
-                    } else {
-                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
-                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
-                    }
-                }
-            }
-            setBounds(posX, posY, sizeX, sizeY);
-        }
+        positionWindowOnScreen();
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
@@ -653,6 +587,60 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             } catch (Exception e) {
                 LOGGER.fatal("could not interface with Mac OS X methods", e);
             }
+        }
+    }
+
+    private void positionWindowOnScreen() {
+        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
+
+            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
+            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
+            int posX = prefs.getInt(JabRefPreferences.POS_X);
+            int posY = prefs.getInt(JabRefPreferences.POS_Y);
+
+            //
+            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
+            //
+            // Do not put a window outside the screen if the preference values are wrong.
+            //
+            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
+            // googled on forums.java.sun.com graphicsenvironment second screen java
+            //
+            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length >= 1) {
+                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+                        .getDefaultConfiguration().getBounds();
+                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+                // Make sure we are not above or to the left of the screen bounds:
+                if (posX < bounds.x) {
+                    posX = bounds.x;
+                }
+                if (posY < bounds.y) {
+                    posY = bounds.y;
+                }
+
+                int height = (int) dim.getHeight();
+                int width = (int) dim.getWidth();
+
+                if (posX + sizeX > width) {
+                    if (sizeX <= width) {
+                        posX = width - sizeX;
+                    } else {
+                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
+                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
+                    }
+                }
+
+                if (posY + sizeY > height) {
+                    if (sizeY <= height) {
+                        posY = height - sizeY;
+                    } else {
+                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
+                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
+                    }
+                }
+            }
+            setBounds(posX, posY, sizeX, sizeY);
         }
     }
 
