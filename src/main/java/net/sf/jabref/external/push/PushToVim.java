@@ -23,6 +23,10 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,6 +35,8 @@ import java.io.InputStream;
  * | File Templates.
  */
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
+
+    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
 
     private final JTextField vimServer = new JTextField(30);
 
@@ -103,11 +109,11 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                             sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.warn("Could not read from stderr.");
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        System.out.println(sb);
+                        LOGGER.warn("Push to Emacs error: " + sb);
                         couldNotConnect = true;
                     }
                 }

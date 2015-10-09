@@ -1,5 +1,6 @@
 [master]
     - Removes non-compact rank symbols in favor of compact rank
+    - Reworked the PushToXXX functionality
     - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
     - Fixed a bug in the IEEEXploreFetcher
     - Replaced some deprecated DefaultFormBuilder with FormBuilder

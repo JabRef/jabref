@@ -29,10 +29,15 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM
  */
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
+
+    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
 
     private final JTextField additionalParams = new JTextField(30);
     private final JCheckBox useEmacs23 = new JCheckBox();
@@ -135,11 +140,11 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                             sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.warn("Could not read from stderr.");
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        System.out.println(sb);
+                        LOGGER.warn("Push to Emacs error: " + sb);
                         couldNotConnect = true;
                     }
                 }
