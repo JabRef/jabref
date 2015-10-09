@@ -101,7 +101,7 @@ public class BibtexCaseChanger {
                 continue;
             }
             if (braceLevel == 0) {
-                i = convertChar0(c, i, sb, format);
+                i = convertCharIfBraceLevelIsZero(c, i, sb, format);
                 continue;
             }
             sb.append(c[i]);
@@ -182,7 +182,7 @@ public class BibtexCaseChanger {
      * @param s
      * @param sb
      * @param format
-     * @return
+     * @return the new position
      */
     private int convertAccented(char[] c, int pos, String s, StringBuffer sb, FORMAT_MODE format) {
         pos += s.length();
@@ -200,7 +200,6 @@ public class BibtexCaseChanger {
             if ("l o oe ae aa".contains(s)) {
                 sb.append(s.toUpperCase());
             } else if ("i j ss".contains(s)) {
-
                 sb.deleteCharAt(sb.length() - 1); // Kill backslash
                 sb.append(s.toUpperCase());
                 while ((pos < c.length) && Character.isWhitespace(c[pos])) {
@@ -229,7 +228,7 @@ public class BibtexCaseChanger {
         return pos;
     }
 
-    private int convertChar0(char[] c, int i, StringBuffer sb, FORMAT_MODE format) {
+    private int convertCharIfBraceLevelIsZero(char[] c, int i, StringBuffer sb, FORMAT_MODE format) {
         switch (format) {
         case TITLE_LOWERS:
             if (i == 0) {
@@ -255,7 +254,15 @@ public class BibtexCaseChanger {
         return i;
     }
 
-    static String findSpecialChar(char[] c, int pos) {
+    /**
+     * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
+     * If nothing found, return null
+     *
+     * @param c the current "String"
+     * @param pos the position
+     * @return the special LaTeX character or null
+     */
+    private static String findSpecialChar(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
                 return "oe";

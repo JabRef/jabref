@@ -81,7 +81,6 @@ public class BibtexCaseChangersTest {
 
     @Test
     public void testColon() {
-
         assertCaseChangerTitleLowers("Hallo world: How", "HAllo WORLD: HOW");
         assertCaseChangerTitleLowers("Hallo world! how", "HAllo WORLD! HOW");
         assertCaseChangerTitleLowers("Hallo world? how", "HAllo WORLD? HOW");
