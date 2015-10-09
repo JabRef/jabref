@@ -15,9 +15,12 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +28,7 @@ import java.util.List;
  * in JabRef style. The reformatting must undo all formatting done by JabRef when
  * writing the same fields.
  */
-class FieldContentParser {
+public class FieldContentParser {
     private final List<String> multiLineFields;
 
     public FieldContentParser() {
@@ -33,7 +36,7 @@ class FieldContentParser {
         multiLineFields.add("abstract");
         multiLineFields.add("review");
         // the file field should not be formatted, therefore we treat it as a multi line field
-        multiLineFields.add("file");
+        multiLineFields.addAll(Arrays.asList(Globals.prefs.getStringArray(JabRefPreferences.NON_WRAPPABLE_FIELDS)));
     }
 
     /**
@@ -57,5 +60,9 @@ class FieldContentParser {
         text = text.replaceAll("\\s+", " ");
 
         return new StringBuffer(text);
+    }
+
+    public String format(String content, String bibtexField) {
+        return format(new StringBuffer(content), bibtexField).toString();
     }
 }

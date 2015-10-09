@@ -18,53 +18,226 @@
 package net.sf.jabref.logic.util.strings;
 
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * Class with static methods for changing the case of strings and arrays of strings.
+ * <p>
+ * This class must detect the words in the title and whether letters are protected for case changes via enclosing them with '{' and '}' brakets.
+ * Hence, for each letter to be changed, it needs to be known wether it is protected or not.
+ * This can be done by starting at the letter position and moving forward and backword to see if there is a '{' and '}, respectively.
  */
 public class CaseChangers {
 
-    private static final String SPACE_SEPARATOR = " ";
+    /**
+     * Represents a word in a title of a bibtex entry.
+     * <p>
+     * A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
+     */
+    private static final class Word {
 
+        private static final Set<String> SMALLER_WORDS;
+
+        static {
+            Set<String> smallerWords = new HashSet<>();
+
+            // Articles
+            smallerWords.addAll(Arrays.asList("a", "an", "the"));
+            // Prepositions
+            smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
+            // Conjunctions
+            smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
+
+            // unmodifiable for thread safety
+            SMALLER_WORDS = Collections.unmodifiableSet(smallerWords);
+        }
+
+        private char[] chars;
+        private boolean[] protectedChars;
+
+        public Word(char[] chars, boolean[] protectedChars) {
+            this.chars = Objects.requireNonNull(chars);
+            this.protectedChars = Objects.requireNonNull(protectedChars);
+
+            if (this.chars.length != this.protectedChars.length) {
+                throw new IllegalArgumentException("the chars and the protectedChars array must be of same length");
+            }
+        }
+
+        /**
+         * Only change letters of the word that are unprotected to upper case.
+         */
+        public void toUpperCase() {
+            for (int i = 0; i < chars.length; i++) {
+                if (protectedChars[i]) {
+                    continue;
+                }
+
+                chars[i] = Character.toUpperCase(chars[i]);
+            }
+        }
+
+        /**
+         * Only change letters of the word that are unprotected to lower case.
+         */
+        public void toLowerCase() {
+            for (int i = 0; i < chars.length; i++) {
+                if (protectedChars[i]) {
+                    continue;
+                }
+
+                chars[i] = Character.toLowerCase(chars[i]);
+            }
+        }
+
+
+        public void toUpperFirst() {
+            for (int i = 0; i < chars.length; i++) {
+                if (protectedChars[i]) {
+                    continue;
+                }
+
+                if (i == 0) {
+                    chars[i] = Character.toUpperCase(chars[i]);
+                } else {
+                    chars[i] = Character.toLowerCase(chars[i]);
+                }
+            }
+        }
+
+        public boolean isSmallerWord() {
+            // "word:" is still a small "word"
+            return SMALLER_WORDS.contains(this.toString().replaceAll("[:]", "").toLowerCase());
+        }
+
+        public boolean isLargerWord() {
+            return !isSmallerWord();
+        }
+
+        @Override
+        public String toString() {
+            return new String(chars);
+        }
+
+        public boolean endsWithColon() {
+            return this.toString().endsWith(":");
+        }
+    }
+
+    /**
+     * Parses a title to a list of words.
+     */
+    private static final class TitleParser {
+
+        private StringBuffer buffer;
+        private int wordStart;
+
+        public List<Word> parse(String title) {
+            List<Word> words = new LinkedList<>();
+
+            boolean[] isProtected = determineProtectedChars(title);
+
+            reset();
+
+            int index = 0;
+            for (char c : title.toCharArray()) {
+                if (!Character.isWhitespace(c)) {
+                    if (wordStart == -1) {
+                        wordStart = index;
+                    }
+
+                    buffer.append(c);
+                } else {
+                    createWord(isProtected).ifPresent(words::add);
+                }
+
+                index++;
+            }
+            createWord(isProtected).ifPresent(words::add);
+
+            return words;
+        }
+
+        private Optional<Word> createWord(boolean[] isProtected) {
+            if (buffer.length() <= 0) {
+                return Optional.empty();
+            }
+
+            char[] chars = buffer.toString().toCharArray();
+            boolean[] protectedChars = new boolean[chars.length];
+
+            System.arraycopy(isProtected, wordStart, protectedChars, 0, chars.length);
+
+            reset();
+
+            return Optional.of(new Word(chars, protectedChars));
+        }
+
+        private void reset() {
+            wordStart = -1;
+            buffer = new StringBuffer();
+        }
+
+        private static boolean[] determineProtectedChars(String title) {
+            boolean[] isProtected = new boolean[title.length()];
+            char[] chars = title.toCharArray();
+
+            int brakets = 0;
+            for (int i = 0; i < title.length(); i++) {
+                if (chars[i] == '{') {
+                    brakets++;
+                } else if (chars[i] == '}') {
+                    brakets--;
+                } else {
+                    isProtected[i] = brakets > 0;
+                }
+            }
+
+            return isProtected;
+        }
+
+    }
+
+    /**
+     * Represents a title of a bibtex entry.
+     */
+    private static final class Title {
+
+        private final List<Word> words = new LinkedList<>();
+
+        public Title(String title) {
+            this.words.addAll(new TitleParser().parse(title));
+        }
+
+        public List<Word> getWords() {
+            return words;
+        }
+
+        public Optional<Word> getFirstWord() {
+            if (getWords().isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(getWords().get(0));
+        }
+
+        public Optional<Word> getLastWord() {
+            if (getWords().isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(getWords().get(getWords().size() - 1));
+        }
+
+        public String toString() {
+            return words.stream().map(Word::toString).collect(Collectors.joining(" "));
+        }
+
+    }
 
     public interface CaseChanger {
 
         String getName();
 
         String changeCase(String input);
-    }
-
-    interface WordConversionInterface {
-
-        /**
-         * @param word The current Word
-         * @param curWordIndex the index of the current word (0..totalWordCount-1)
-         * @param totalWordCount the number of total words
-         * @return the converted word
-         */
-        String doWordConversion(final String word, final int curWordIndex, int totalWordCount);
-    }
-
-    private static String doConversion(final String input, WordConversionInterface converter) {
-        // split on spaces
-        String[] words = input.split("\\s+");
-
-        // create result array without content
-        String[] result = new String[words.length];
-
-        // iterate over all words
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].startsWith("{")) {
-                result[i] = words[i];
-            } else {
-                result[i] = converter.doWordConversion(words[i], i, words.length);
-            }
-        }
-
-        // create an return result
-        return StringUtil.join(result, CaseChangers.SPACE_SEPARATOR);
     }
 
     public static class LowerCaseChanger implements CaseChanger {
@@ -79,7 +252,11 @@ public class CaseChangers {
          */
         @Override
         public String changeCase(String input) {
-            return doConversion(input, (s, i, c) -> s.toLowerCase());
+            Title title = new Title(input);
+
+            title.getWords().stream().forEach(Word::toLowerCase);
+
+            return title.toString();
         }
     }
 
@@ -95,13 +272,15 @@ public class CaseChangers {
          */
         @Override
         public String changeCase(String input) {
-            return doConversion(input, (s, i, c) -> s.toUpperCase());
+            Title title = new Title(input);
+
+            title.getWords().stream().forEach(Word::toUpperCase);
+
+            return title.toString();
         }
     }
 
     public static class UpperFirstCaseChanger implements CaseChanger {
-
-        private static final Pattern UF_PATTERN = Pattern.compile("\\b\\w");
 
         @Override
         public String getName() {
@@ -113,15 +292,11 @@ public class CaseChangers {
          */
         @Override
         public String changeCase(String input) {
-            String lowerCase = CaseChangers.LOWER.changeCase(input);
+            Title title = new Title(LOWER.changeCase(input));
 
-            Matcher matcher = UpperFirstCaseChanger.UF_PATTERN.matcher(lowerCase);
+            title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
 
-            if (matcher.find()) {
-                return matcher.replaceFirst(matcher.group(0).toUpperCase());
-            } else {
-                return input;
-            }
+            return title.toString();
         }
     }
 
@@ -137,27 +312,15 @@ public class CaseChangers {
          */
         @Override
         public String changeCase(String input) {
-            return doConversion(input, (s, i, c) -> StringUtil.capitalizeFirst(s.toLowerCase()));
+            Title title = new Title(input);
+
+            title.getWords().stream().forEach(Word::toUpperFirst);
+
+            return title.toString();
         }
     }
 
     public static class TitleCaseChanger implements CaseChanger {
-
-        private static final Set<String> notToCapitalize;
-
-        static {
-            Set<String> smallerWords = new HashSet<>();
-
-            // Articles
-            smallerWords.addAll(Arrays.asList("a", "an", "the"));
-            // Prepositions
-            smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
-            // Conjunctions
-            smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
-
-            // unmodifiable for thread safety
-            notToCapitalize = Collections.unmodifiableSet(smallerWords);
-        }
 
         @Override
         public String getName() {
@@ -171,19 +334,21 @@ public class CaseChangers {
          */
         @Override
         public String changeCase(String input) {
-            return doConversion(input, (s, i, c) -> {
-                    String word = s.toLowerCase();
-                    boolean isFirstWord = (i == 0);
-                    boolean isLastWord = (i == (c - 1));
-                    // first word and last word are always capitalized
-                    if (isFirstWord || isLastWord) {
-                        return StringUtil.capitalizeFirst(word);
-                    } else if (TitleCaseChanger.notToCapitalize.contains(word)) {
-                        return word;
-                    } else {
-                        return StringUtil.capitalizeFirst(word);
-                    }
-                });
+            Title title = new Title(input);
+
+            title.getWords().stream().filter(Word::isSmallerWord).forEach(Word::toLowerCase);
+            title.getWords().stream().filter(Word::isLargerWord).forEach(Word::toUpperFirst);
+
+            title.getFirstWord().ifPresent(Word::toUpperFirst);
+            title.getLastWord().ifPresent(Word::toUpperFirst);
+
+            for (int i = 0; i < title.getWords().size() - 2; i++) {
+                if (title.getWords().get(i).endsWithColon()) {
+                    title.getWords().get(i + 1).toUpperFirst();
+                }
+            }
+
+            return title.toString();
         }
     }
 

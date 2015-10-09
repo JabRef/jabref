@@ -1,4 +1,4 @@
-package net.sf.jabref.util;
+package net.sf.jabref.logic.util;
 
 import net.sf.jabref.logic.util.DOI;
 import org.junit.Assert;

@@ -10,6 +10,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class for working with Digital object identifiers (DOIs)
+ *
+ * @see https://en.wikipedia.org/wiki/Digital_object_identifier
+ */
 public class DOI {
     private static final Log LOGGER = LogFactory.getLog(DOI.class);
 

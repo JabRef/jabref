@@ -383,6 +383,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("New entry from plain text"),
             prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
 
+
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
@@ -437,6 +438,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.getImage("mergeentries"));
 
     private final AbstractAction dbImport = new DbImportAction(this).getAction();
+    private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT, Localization.menuTitle("Look up full text document"),
+            Localization.lang("Follow DOI or URL link and try to locate PDF full text document"));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
@@ -539,73 +542,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-
-            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
-            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
-            int posX = prefs.getInt(JabRefPreferences.POS_X);
-            int posY = prefs.getInt(JabRefPreferences.POS_Y);
-
-            /*
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            GraphicsDevice[] gs = ge.getScreenDevices();
-
-
-            // Get size of each screen
-            for (int i=0; i<gs.length; i++) {
-                DisplayMode dm = gs[i].getDisplayMode();
-                int screenWidth = dm.getWidth();
-                int screenHeight = dm.getHeight();
-                System.out.println(gs[i].getDefaultConfiguration().getBounds());
-            }*/
-
-            //
-            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
-            //
-            // Do not put a window outside the screen if the preference values are wrong.
-            //
-            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
-            // googled on forums.java.sun.com graphicsenvironment second screen java
-            //
-            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1) {
-
-                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
-                        .getDefaultConfiguration().getBounds();
-                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-
-                // Make sure we are not above or to the left of the screen bounds:
-                if (posX < bounds.x) {
-                    posX = bounds.x;
-                }
-                if (posY < bounds.y) {
-                    posY = bounds.y;
-                }
-
-                int height = (int) dim.getHeight();
-                int width = (int) dim.getWidth();
-
-                //if (posX < )
-
-                if (posX + sizeX > width) {
-                    if (sizeX <= width) {
-                        posX = width - sizeX;
-                    } else {
-                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
-                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
-                    }
-                }
-
-                if (posY + sizeY > height) {
-                    if (sizeY <= height) {
-                        posY = height - sizeY;
-                    } else {
-                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
-                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
-                    }
-                }
-            }
-            setBounds(posX, posY, sizeX, sizeY);
-        }
+        positionWindowOnScreen();
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
@@ -650,6 +587,60 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             } catch (Exception e) {
                 LOGGER.fatal("could not interface with Mac OS X methods", e);
             }
+        }
+    }
+
+    private void positionWindowOnScreen() {
+        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
+
+            int sizeX = prefs.getInt(JabRefPreferences.SIZE_X);
+            int sizeY = prefs.getInt(JabRefPreferences.SIZE_Y);
+            int posX = prefs.getInt(JabRefPreferences.POS_X);
+            int posY = prefs.getInt(JabRefPreferences.POS_Y);
+
+            //
+            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
+            //
+            // Do not put a window outside the screen if the preference values are wrong.
+            //
+            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
+            // googled on forums.java.sun.com graphicsenvironment second screen java
+            //
+            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length >= 1) {
+                Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]
+                        .getDefaultConfiguration().getBounds();
+                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+                // Make sure we are not above or to the left of the screen bounds:
+                if (posX < bounds.x) {
+                    posX = bounds.x;
+                }
+                if (posY < bounds.y) {
+                    posY = bounds.y;
+                }
+
+                int height = (int) dim.getHeight();
+                int width = (int) dim.getWidth();
+
+                if (posX + sizeX > width) {
+                    if (sizeX <= width) {
+                        posX = width - sizeX;
+                    } else {
+                        posX = prefs.getIntDefault(JabRefPreferences.POS_X);
+                        sizeX = prefs.getIntDefault(JabRefPreferences.SIZE_X);
+                    }
+                }
+
+                if (posY + sizeY > height) {
+                    if (sizeY <= height) {
+                        posY = height - sizeY;
+                    } else {
+                        posY = prefs.getIntDefault(JabRefPreferences.POS_Y);
+                        sizeY = prefs.getIntDefault(JabRefPreferences.SIZE_Y);
+                    }
+                }
+            }
+            setBounds(posX, posY, sizeX, sizeY);
         }
     }
 
@@ -1332,7 +1323,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(makeKeyAction);
         tools.add(Cleanup);
         tools.add(mergeEntries);
-        //tools.add(downloadFullText);
+        tools.add(downloadFullText);
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
         OpenOfficePanel otp = OpenOfficePanel.getInstance();
