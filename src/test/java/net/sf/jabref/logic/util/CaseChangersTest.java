@@ -8,11 +8,11 @@ public class CaseChangersTest {
 
     @Test
     public void testNumberOfModes() {
-        Assert.assertEquals("lower", CaseChangers.LOWER.getName());
-        Assert.assertEquals("UPPER", CaseChangers.UPPER.getName());
-        Assert.assertEquals("Upper first", CaseChangers.UPPER_FIRST.getName());
-        Assert.assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.getName());
-        Assert.assertEquals("Title", CaseChangers.TITLE.getName());
+        Assert.assertEquals("lower", CaseChangers.LOWER.getName()); // equals: FORMAT_MODE.ALL_LOWERS
+        Assert.assertEquals("UPPER", CaseChangers.UPPER.getName()); // equals: FORMAT_MODE.ALL_UPPERS
+        Assert.assertEquals("Upper first", CaseChangers.UPPER_FIRST.getName()); // equals: FORMAT_MODE.TITLE_LOWERS
+        Assert.assertEquals("Upper Each First", CaseChangers.UPPER_EACH_FIRST.getName()); // equals: FORMAT_MODE.EACH_FIRST_UPPERS
+        Assert.assertEquals("Title", CaseChangers.TITLE.getName()); // equals: FORMAT_MODE.TITLE_UPPERS
     }
 
     @Test

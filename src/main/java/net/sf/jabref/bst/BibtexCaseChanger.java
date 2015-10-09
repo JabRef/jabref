@@ -24,9 +24,26 @@ public class BibtexCaseChanger {
     private int braceLevel;
 
     public enum FORMAT_MODE {
+        // First character and character after a ":" as upper case - everything else in lower case. Obey {}.
         TITLE_LOWERS('t'),
+
+        // All characters lower case - Obey {}
         ALL_LOWERS('l'),
+
+        // all characters upper case - Obey {}
         ALL_UPPERS('u');
+
+        // the following would have to be done if the functionality of CaseChangers would be included here
+        // However, we decided against it and will probably do the other way round: https://github.com/JabRef/jabref/pull/215#issuecomment-146981624
+
+        // Each word should start with a capital letter
+        //EACH_FIRST_UPPERS('f'),
+
+        // Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
+        // Capitalizes first and last word
+        // Does not change words starting with "{"
+        // DIFFERENCE to old CaseChangers.TITLE: last word is NOT capitalized in all cases
+        //TITLE_UPPERS('T');
 
         public char asChar() {
             return asChar;
@@ -85,7 +102,8 @@ public class BibtexCaseChanger {
                     continue;
                 }
                 if ((format == FORMAT_MODE.TITLE_LOWERS) && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
-                    sb.append(c[i]);
+                    assert(c[i] == '{');
+                    sb.append('{');
                     i++;
                     prevColon = false;
                     continue;
@@ -141,11 +159,12 @@ public class BibtexCaseChanger {
      * special with |colon|s.
      * 
      * @param c
-     * @param i
+     * @param i the current position. It points to the opening brace
      * @param format
      * @return
      */
     private int convertSpecialChar(StringBuffer sb, char[] c, int i, FORMAT_MODE format) {
+        assert(c[i] == '{');
 
         sb.append(c[i]);
         i++; // skip over open brace
