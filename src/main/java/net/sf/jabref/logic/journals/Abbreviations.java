@@ -13,19 +13,28 @@ public class Abbreviations {
 
     // journal initialization
     public static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    public static final String JOURNALS_IEEE_INTERNAL_LIST = "/journals/IEEEJournalList.txt";
+    public static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.txt";
+    public static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
     public static JournalAbbreviationRepository journalAbbrev;
 
     public static void initializeJournalNames(JabRefPreferences jabRefPreferences) {
-        // Read internal lists:
         journalAbbrev = new JournalAbbreviationRepository();
+
+        // the order of reading the journal lists is important
+        // method: last added abbreviation wins
+        // for instance, in the personal list one can overwrite abbreviations in the built in list
+
+        // Read builtin list
         journalAbbrev.readJournalListFromResource(JOURNALS_FILE_BUILTIN);
+
+        // read IEEE list
         if (jabRefPreferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_INTERNAL_LIST);
+            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
+        } else {
+            journalAbbrev.readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
         }
 
-        // Read external lists, if any (in reverse order, so the upper lists
-        // override the lower):
+        // Read external lists
         String[] lists = jabRefPreferences.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         if (lists != null && lists.length > 0) {
             for (int i = lists.length - 1; i >= 0; i--) {
@@ -39,7 +48,7 @@ public class Abbreviations {
             }
         }
 
-        // Read personal list, if set up:
+        // Read personal list
         String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
         if (personalJournalList != null) {
             try {

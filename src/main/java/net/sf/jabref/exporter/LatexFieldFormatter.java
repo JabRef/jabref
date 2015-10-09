@@ -18,6 +18,7 @@ package net.sf.jabref.exporter;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -25,11 +26,11 @@ import java.util.Vector;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
- * 
+ * <p>
  * Obeys following settings:
- *  * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
- *  * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
- *  * JabRefPreferences.WRITEFIELD_WRAPFIELD
+ * * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
+ * * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
+ * * JabRefPreferences.WRITEFIELD_WRAPFIELD
  */
 public class LatexFieldFormatter implements FieldFormatter {
 
@@ -41,7 +42,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     }
 
 
-    private StringBuffer sb;
+    private StringBuilder stringBuilder;
 
     private final boolean neverFailOnHashes;
 
@@ -50,6 +51,8 @@ public class LatexFieldFormatter implements FieldFormatter {
     private final char valueDelimiterEndOfValue;
     private final boolean writefieldWrapfield;
     private final String[] doNotResolveStringsFors;
+
+    private final FieldContentParser parser;
 
 
     public LatexFieldFormatter() {
@@ -64,6 +67,8 @@ public class LatexFieldFormatter implements FieldFormatter {
         valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
         doNotResolveStringsFors = Globals.prefs.getStringArray(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
         writefieldWrapfield = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_WRAPFIELD);
+
+        parser = new FieldContentParser();
     }
 
     @Override
@@ -104,48 +109,53 @@ public class LatexFieldFormatter implements FieldFormatter {
                     || BIBTEX_STRING.equals(fieldName);
         }
         if (!resolveStrings) {
-            int brc = 0;
+            int numberOfBrackets = 0;
             boolean ok = true;
             for (int i = 0; i < text.length(); i++) {
                 char c = text.charAt(i);
                 //Util.pr(""+c);
                 if (c == '{') {
-                    brc++;
+                    numberOfBrackets++;
                 }
                 if (c == '}') {
-                    brc--;
+                    numberOfBrackets--;
                 }
-                if (brc < 0) {
+                if (numberOfBrackets < 0) {
                     ok = false;
                     break;
                 }
             }
-            if (brc > 0) {
+            if (numberOfBrackets > 0) {
                 ok = false;
             }
             if (!ok) {
                 throw new IllegalArgumentException("Curly braces { and } must be balanced.");
             }
 
-            sb = new StringBuffer(
+            stringBuilder = new StringBuilder(
                     valueDelimiterStartOfValue + "");
             // No formatting at all for these fields, to allow custom formatting?
             //            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
             //              sb.append(text);
             //            else
             //             currently, we do not do any more wrapping
-            if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
-                sb.append(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH));
+            boolean isAbstract = "abstract".equals(fieldName);
+            boolean isReview = "review".equals(fieldName);
+            boolean doWrap = !isAbstract || !isReview;
+            boolean strangePrefSettings = writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName);
+
+            if (strangePrefSettings && doWrap) {
+                stringBuilder.append(parser.format(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH), fieldName));
             } else {
-                sb.append(text);
+                stringBuilder.append(parser.format(text, fieldName));
             }
 
-            sb.append(valueDelimiterEndOfValue);
+            stringBuilder.append(valueDelimiterEndOfValue);
 
-            return sb.toString();
+            return stringBuilder.toString();
         }
 
-        sb = new StringBuffer();
+        stringBuilder = new StringBuilder();
         int pivot = 0;
         int pos1;
         int pos2;
@@ -163,8 +173,7 @@ public class LatexFieldFormatter implements FieldFormatter {
                 if (pos1 > 0 && text.charAt(pos1 - 1) == '\\') {
                     goFrom = pos1 + 1;
                     pos1++;
-                }
-                else {
+                } else {
                     goFrom = pos1 - 1; // Ends the loop.
                 }
             }
@@ -198,30 +207,29 @@ public class LatexFieldFormatter implements FieldFormatter {
 
             if (pos2 > -1) {
                 pivot = pos2 + 1;
-            }
-            else {
+            } else {
                 pivot = pos1 + 1;
-            //if (tell++ > 10) System.exit(0);
+                //if (tell++ > 10) System.exit(0);
             }
         }
 
         // currently, we do not add newlines and new formatting
         if (writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName)) {
             //             introduce a line break to be read at the parser
-            return StringUtil.wrap(sb.toString(), GUIGlobals.LINE_LENGTH);//, but that lead to ugly .tex
+            return parser.format(StringUtil.wrap(stringBuilder.toString(), GUIGlobals.LINE_LENGTH), fieldName);//, but that lead to ugly .tex
 
         } else {
-            return sb.toString();
+            return parser.format(stringBuilder.toString(), fieldName);
         }
 
     }
 
     private void writeText(String text, int start_pos,
-            int end_pos) {
+                           int end_pos) {
         /*sb.append("{");
         sb.append(text.substring(start_pos, end_pos));
         sb.append("}");*/
-        sb.append(valueDelimiterStartOfValue);
+        stringBuilder.append(valueDelimiterStartOfValue);
         boolean escape = false;
         boolean inCommandName = false;
         boolean inCommand = false;
@@ -280,20 +288,20 @@ public class LatexFieldFormatter implements FieldFormatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-if (c == '&' && !escape &&
+            if (c == '&' && !escape &&
                     !(inCommand && commandName.toString().equals("url")) &&
-        nestedEnvironments == 0) {
-                sb.append("\\&");
+                    nestedEnvironments == 0) {
+                stringBuilder.append("\\&");
             } else {
-    sb.append(c);
-}
+                stringBuilder.append(c);
+            }
             escape = c == '\\';
         }
-        sb.append(valueDelimiterEndOfValue);
+        stringBuilder.append(valueDelimiterEndOfValue);
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
-            boolean first, boolean last) {
+                                  boolean first, boolean last) {
         //sb.append(Util.wrap((first ? "" : " # ") + text.substring(start_pos, end_pos)
         //		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
         putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
@@ -301,7 +309,7 @@ if (c == '&' && !escape &&
     }
 
     private void putIn(String s) {
-        sb.append(StringUtil.wrap(s, GUIGlobals.LINE_LENGTH));
+        stringBuilder.append(StringUtil.wrap(s, GUIGlobals.LINE_LENGTH));
     }
 
     private void checkBraces(String text) throws IllegalArgumentException {

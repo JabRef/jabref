@@ -290,8 +290,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, (BaseAction) selectionListener::editSignalled);
 
-        actions.put("test", new FindFullTextAction(this));
-
         // The action for saving a database.
         actions.put(Actions.SAVE, saveAction);
 
@@ -960,7 +958,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     }
                                     // Run the search operation:
                                     Map<BibtexEntry, List<File>> result;
-                                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+                                    if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                                         String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                                         result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                                     } else {
@@ -1358,9 +1356,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
+
         actions.put(Actions.ADD_TO_GROUP, new GroupAddRemoveDialog(this, true, false));
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
+
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
     }
 
     /**
@@ -1374,37 +1375,38 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void runCommand(String _command) {
         if (actions.get(_command) == null) {
             LOGGER.info("No action defined for '" + _command + '\'');
-        } else {
-            Object o = actions.get(_command);
-            try {
-                if (o instanceof BaseAction) {
-                    ((BaseAction) o).action();
-                } else {
-                    // This part uses Spin's features:
-                    Worker wrk = ((AbstractWorker) o).getWorker();
-                    // The Worker returned by getWorker() has been wrapped
-                    // by Spin.off(), which makes its methods be run in
-                    // a different thread from the EDT.
-                    CallBack clb = ((AbstractWorker) o).getCallBack();
+            return;
+        }
 
-                    ((AbstractWorker) o).init(); // This method runs in this same thread, the EDT.
-                    // Useful for initial GUI actions, like printing a message.
+        Object o = actions.get(_command);
+        try {
+            if (o instanceof BaseAction) {
+                ((BaseAction) o).action();
+            } else {
+                // This part uses Spin's features:
+                Worker wrk = ((AbstractWorker) o).getWorker();
+                // The Worker returned by getWorker() has been wrapped
+                // by Spin.off(), which makes its methods be run in
+                // a different thread from the EDT.
+                CallBack clb = ((AbstractWorker) o).getCallBack();
 
-                    // The CallBack returned by getCallBack() has been wrapped
-                    // by Spin.over(), which makes its methods be run on
-                    // the EDT.
-                    wrk.run(); // Runs the potentially time-consuming action
-                    // without freezing the GUI. The magic is that THIS line
-                    // of execution will not continue until run() is finished.
-                    clb.update(); // Runs the update() method on the EDT.
-                }
-            } catch (Throwable ex) {
-                // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
-                // The call to unblock will simply hide the glasspane, so there is no harm in calling
-                // it even if the frame hasn't been blocked.
-                frame.unblock();
-                ex.printStackTrace();
+                ((AbstractWorker) o).init(); // This method runs in this same thread, the EDT.
+                // Useful for initial GUI actions, like printing a message.
+
+                // The CallBack returned by getCallBack() has been wrapped
+                // by Spin.over(), which makes its methods be run on
+                // the EDT.
+                wrk.run(); // Runs the potentially time-consuming action
+                // without freezing the GUI. The magic is that THIS line
+                // of execution will not continue until run() is finished.
+                clb.update(); // Runs the update() method on the EDT.
             }
+        } catch (Throwable ex) {
+            // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
+            // The call to unblock will simply hide the glasspane, so there is no harm in calling
+            // it even if the frame hasn't been blocked.
+            frame.unblock();
+            LOGGER.error("runCommand error: " + ex.getMessage());
         }
     }
 

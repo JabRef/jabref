@@ -1,4 +1,11 @@
 [master]
+    - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
+    - Fixed a bug in the IEEEXploreFetcher
+    - Replaced some deprecated DefaultFormBuilder with FormBuilder
+    - Added more characters to HTML/Unicode converter
+    - Feature: Push citations to Texmaker (SF: #318, #582)
+    - Case changers improved to honor words (not yet more than single words) within {}
+    - Feature: Added converters from HTML and Unicode to LaTeX on right click in text fields (#191)
     - Fixed bug 1282 (SourceForge) related to backslashes duplication.
     - Feature: Add an option to the FileList context menu to delete an associated file from the file system
     - Breaking API change: String[] is replaced by List<String> in BibtexEntryType
@@ -8,6 +15,7 @@
     - Feature: When pasting a Google search URL, meta data will be automatically stripped before insertion.
     - No longer write JabRef version to BibTex file header.
     - No longer add blank lines inside a bibtex entry
+    - Feature: PDF auto download from ACS, arXiv, ScienceDirect, SpringerLink, and Google Scholar
     - Perform syntax improvements enabled by Java 1.7+ (diamond operator, try-with-resources)
     - List of authors is now auto generated `scripts/generate-authors.sh` and inserted into L10N About.html
     - Remove Mr.DLib support as MR.DLib will be shut down in 2015
@@ -15,12 +23,20 @@
     - BREAKING: Remove plugin functionality.
     - Fixes Bug#1297: No console message on closing.
     - Fix bug #1285: Editing position is not lost on saving
+    - Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Remove support for custom icon themes. The user has to use the default one.
     - Bugfix: Tooltips are now shown for the #-field when the bibtex entry is incomplete.
     - Solved feature request #767: New subdatabase based on AUX file (biblatex)
     - Fixes GH Bug #173: Personal journal abbreviation list is not loaded twice
     - Bugfix: Preview of external journal abbreviation list now displays the correct list
+    - Feature: DOItoBibTeX fetcher now also handles HTTP URLs
+    - Feature: "Normalize to BibTeX name format" also removes newlines
+    - Tweak of preference defaults: Autolink requires that the filename starts with the given BibTeX key and the default filename patterns is key followed by title
+    - Remove support to the move-to-SysTray action
+    - Feature: case changers now leave protected areas (enclosed with curly brakets) alone
+    - Fix #223: Window is displayed in visible area even when having multiple screens
 [dev_2.11]
+    - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)

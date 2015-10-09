@@ -1,4 +1,4 @@
-package net.sf.jabref.util;
+package net.sf.jabref.logic.util;
 
 import net.sf.jabref.logic.util.DOI;
 import org.junit.Assert;
@@ -10,6 +10,7 @@ public class DOITest {
         Assert.assertEquals("10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getDOI());
         Assert.assertEquals("10.231/JIM.0b013e31820bab4c", new DOI("10.231/JIM.0b013e31820bab4c").getDOI());
         Assert.assertEquals("10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S", new DOI("10.1002/(SICI)1522-2594(199911)42:5<952::AID-MRM16>3.0.CO;2-S").getDOI());
+        Assert.assertEquals("10.1126/sciadv.1500214", new DOI("10.1126/sciadv.1500214").getDOI());
     }
 
     @Test
@@ -87,21 +88,21 @@ public class DOITest {
     public void correctlyEncodeDOIs() {
         // See http://www.doi.org/doi_handbook/2_Numbering.html#2.5.2.4
         // % -> (%25)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%25.0001", new DOI("http://doi.org/10.1006/rwei.1999%25.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%25.0001", new DOI("http://doi.org/10.1006/rwei.1999%25.0001").getURLAsASCIIString());
         // " -> (%22)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%22.0001", new DOI("http://doi.org/10.1006/rwei.1999%22.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%22.0001", new DOI("http://doi.org/10.1006/rwei.1999%22.0001").getURLAsASCIIString());
         // # -> (%23)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%23.0001", new DOI("http://doi.org/10.1006/rwei.1999%23.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%23.0001", new DOI("http://doi.org/10.1006/rwei.1999%23.0001").getURLAsASCIIString());
         // SPACE -> (%20)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%20.0001", new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%20.0001", new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getURLAsASCIIString());
         // ? -> (%3F)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%3F.0001", new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%3F.0001", new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getURLAsASCIIString());
     }
 
     @Test
     public void constructCorrectURLForDoi() {
         // add / to RESOLVER url if missing
-        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURL());
-        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURL());
+        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURLAsASCIIString());
+        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURLAsASCIIString());
     }
 }

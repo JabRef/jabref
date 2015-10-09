@@ -344,12 +344,12 @@ public class Util {
         if (link.matches("^doi:/*.*")) {
             // Remove 'doi:'
             link = link.replaceFirst("^doi:/*", "");
-            link = new DOI(link).getURL();
+            link = new DOI(link).getURLAsASCIIString();
         }
 
         Optional<DOI> doi = DOI.build(link);
         if (doi.isPresent() && !link.matches("^https?://.*")) {
-            link = doi.get().getURL();
+            link = doi.get().getURLAsASCIIString();
         }
 
         // FIXME: everything below is really flawed atm
@@ -714,55 +714,6 @@ public class Util {
         return off;
     }
 
-    /**
-     * This method can be used to display a "rich" error dialog which offers the
-     * entire stack trace for an exception.
-     * 
-     * @param parent
-     * @param e
-     */
-    public static void showQuickErrorDialog(JFrame parent, String title, Exception e) {
-        // create and configure a text area - fill it with exception text.
-        final JPanel pan = new JPanel();
-        final JPanel details = new JPanel();
-        final CardLayout crd = new CardLayout();
-        pan.setLayout(crd);
-        final JTextArea textArea = new JTextArea();
-        textArea.setFont(new Font("Sans-Serif", Font.PLAIN, 10));
-        textArea.setEditable(false);
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
-        textArea.setText(writer.toString());
-        JLabel lab = new JLabel(e.getMessage());
-        JButton flip = new JButton(Localization.lang("Details"));
-
-        FormLayout layout = new FormLayout("left:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.append(lab);
-        builder.nextLine();
-        builder.append(Box.createVerticalGlue());
-        builder.nextLine();
-        builder.append(flip);
-        final JPanel simple = builder.getPanel();
-
-        // stuff it in a scrollpane with a controlled size.
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(350, 150));
-        details.setLayout(new BorderLayout());
-        details.add(scrollPane, BorderLayout.CENTER);
-
-        flip.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                crd.show(pan, "details");
-            }
-        });
-        pan.add(simple, "simple");
-        pan.add(details, "details");
-        // pass the scrollpane to the joptionpane.
-        JOptionPane.showMessageDialog(parent, pan, title, JOptionPane.ERROR_MESSAGE);
-    }
 
     /**
      * Set a given field to a given value for all entries in a Collection. This
@@ -1143,7 +1094,7 @@ public class Util {
 
                 // Run the search operation:
                 Map<BibtexEntry, java.util.List<File>> result;
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
+                if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {

@@ -1,7 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id "eu.appsatori.fatjar" version "0.3"
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
     id "edu.sc.seis.launch4j" version "1.1.4"
     id "com.github.kt3k.coveralls" version "2.4.0"
     id "edu.sc.seis.macAppBundle" version "2.1.1"
@@ -26,7 +26,7 @@ targetCompatibility = 1.8
 mainClassName = "net.sf.jabref.JabRefMain"
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.6'
+    gradleVersion = '2.7'
 }
 
 repositories {
@@ -63,18 +63,21 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
     compile 'mysql:mysql-connector-java:5.1.36'
-    compile 'org.postgresql:postgresql:9.4-1201-jdbc41'
+    compile 'org.postgresql:postgresql:9.4-1203-jdbc42'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'net.java.dev.jna:jna:4.1.0'
+    compile 'net.java.dev.jna:jna:4.2.0'
 
     compile 'com.google.guava:guava:18.0'
 
     compile 'commons-logging:commons-logging:1.2'
 
     compile 'junit:junit:4.12'
+
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.mashape.unirest:unirest-java:1.4.6'
 }
 
 sourceSets {
@@ -92,7 +95,7 @@ processResources {
                 "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "))
     }
 
-    filesMatching("resource/build.properties") {
+    filesMatching("build.properties") {
         expand version: project.version
     }
 
@@ -189,11 +192,8 @@ format {
     //files = sourceSets.main.java
 }
 
-fatJar {
+shadowJar {
     classifier 'fat'
-    manifest {
-        attributes 'Main-Class': project.mainClassName
-    }
 }
 
 
@@ -229,9 +229,9 @@ launch4j {
     initialHeapSize = 32
     maxHeapSize = 512
 }
-createExe.dependsOn "fatJar"
+createExe.dependsOn "shadowJar"
 
-task releaseJar(dependsOn: "fatJar") {
+task releaseJar(dependsOn: "shadowJar") {
     group = 'JabRef - Release'
     description "Creates a Jar release."
 
@@ -337,4 +337,11 @@ task releaseSourceTar(type: Exec) {
     doFirst {
         mkdir("$buildDir/releases")
     }
+}
+
+// workaround until https://issues.gradle.org/browse/GRADLE-2274 is resolved
+eclipseJdt << {
+    File f = file('.settings/org.eclipse.core.resources.prefs')
+    f.write('eclipse.preferences.version=1\n')
+    f.append('encoding/<project>=UTF-8')
 }

@@ -76,7 +76,9 @@ public class JabRefPreferences {
     public static final String FONT_FAMILY = "fontFamily";
     public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
     public static final String LATEX_EDITOR_PATH = "latexEditorPath";
+    public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
+    public static final String TEXMAKER_PATH = "texmakerPath";
     public static final String SHOW_SHORT = "showShort";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -291,7 +293,9 @@ public class JabRefPreferences {
     public static final String CITE_COMMAND_LED = "citeCommandLed";
     public static final String CITE_COMMAND_WIN_EDT = "citeCommandWinEdt";
     public static final String CITE_COMMAND_EMACS = "citeCommandEmacs";
+    public static final String CITE_COMMAND_TEXMAKER = "citeCommandTexmaker";
     public static final String CITE_COMMAND_VIM = "citeCommandVim";
+    public static final String CITE_COMMAND_TEXSTUDIO = "citeCommandTeXstudio";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     public static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
@@ -312,7 +316,7 @@ public class JabRefPreferences {
     public static final String NUMERIC_FIELDS = "numericFields";
     public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
-    public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
+    public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     public static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     public static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
     public static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
@@ -438,6 +442,7 @@ public class JabRefPreferences {
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(WIN_EDT_PATH, "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
             defaults.put(LATEX_EDITOR_PATH, "C:\\Program Files\\LEd\\LEd.exe");
+            defaults.put(TEXMAKER_PATH, "C:\\Program Files\\Texmaker\\texmaker.exe");
             defaults.put(EMACS_PATH, "emacsclient.exe");
             defaults.put(EMACS_23, true);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
@@ -454,6 +459,8 @@ public class JabRefPreferences {
             defaults.put(EMACS_PATH, "gnuclient");
             defaults.put(EMACS_23, false);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
+            defaults.put(TEXMAKER_PATH, "texmaker");
+            
         }
         defaults.put(USE_PROXY, Boolean.FALSE);
         defaults.put(PROXY_HOSTNAME, "my proxy host");
@@ -737,7 +744,9 @@ public class JabRefPreferences {
         defaults.put(CITE_COMMAND_VIM, "\\cite");
         defaults.put(CITE_COMMAND_EMACS, "\\cite");
         defaults.put(CITE_COMMAND_WIN_EDT, "\\cite");
+        defaults.put(CITE_COMMAND_TEXSTUDIO, "\\cite");
         defaults.put(CITE_COMMAND_LED, "\\cite");
+        defaults.put(CITE_COMMAND_TEXMAKER, "\\cite");
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
@@ -751,7 +760,7 @@ public class JabRefPreferences {
         defaults.put(SEARCH_DIALOG_WIDTH, 650);
         defaults.put(SEARCH_DIALOG_HEIGHT, 500);
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
-        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.TRUE);
+        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(USE_LOCK_FILES, Boolean.TRUE);
@@ -810,7 +819,7 @@ public class JabRefPreferences {
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
+        defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);

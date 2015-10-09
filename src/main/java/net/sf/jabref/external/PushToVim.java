@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.external;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
@@ -49,7 +49,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.lang("Insert selected citations into Vim");
+        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class PushToVim implements PushToApplication {
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push selection to Vim");
+        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -91,22 +91,19 @@ public class PushToVim implements PushToApplication {
     }
 
     private void initSettingsPanel() {
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
-
-        builder.append(new JLabel(Localization.lang("Path to Vim") + ":"));
-        builder.append(vimPath);
+        FormBuilder builder = FormBuilder.create();
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        builder.add(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
+        builder.add(vimPath).xy(3,1);
         BrowseAction action = BrowseAction.buildForFile(vimPath);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
-        builder.append(browse);
-        builder.nextLine();
-        builder.append(Localization.lang("Vim Server Name") + ":");
-        builder.append(vimServer);
-        builder.nextLine();
-        builder.append(Localization.lang("Cite command") + ":");
-        builder.append(citeCommand);
-        settings = builder.getPanel();
+        builder.add(browse).xy(5,1);
+        builder.add(Localization.lang("Vim Server Name") + ":").xy(1, 3);
+        builder.add(vimServer).xy(3,3);
+        builder.add(Localization.lang("Cite command") + ":").xy(1, 5);
+        builder.add(citeCommand).xy(3,5);
+        settings = builder.build();
     }
 
     @Override
@@ -116,9 +113,13 @@ public class PushToVim implements PushToApplication {
         couldNotConnect = false;
         couldNotRunClient = false;
         try {
-            String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
+            // @formatter:off
+            String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", 
+                    Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
                     "<C-\\><C-N>a" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM) +
                             "{" + keys + "}"};
+            // @formatter:on
+
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -166,7 +167,7 @@ public class PushToVim implements PushToApplication {
                     Localization.lang("Could not run the 'vim' program."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
-            panel.output(Localization.lang("Pushed citations to Vim"));
+            panel.output(Localization.lang("Pushed citations to %0",getApplicationName()));
         }
     }
 

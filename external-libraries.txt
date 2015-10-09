@@ -49,6 +49,11 @@ Project: JGoodies Looks
 URL:     http://www.jgoodies.com/downloads/libraries/
 License: BSD
 
+Id:      com.mashape.unirest
+Project: Unirest for Java
+URL:     https://github.com/Mashape/unirest-java
+License: MIT
+
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
@@ -78,6 +83,11 @@ Id:      org.apache.pdfbox:pdfbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache 2.0
+
+Id:      org.jsoup:jsoup
+Project: jsoup
+URL:     https://github.com/jhy/jsoup/
+License: MIT
 
 Id:      org.openoffice:juh
 Project: OpenOffice.org

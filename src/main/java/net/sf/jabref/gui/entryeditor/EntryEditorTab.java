@@ -300,7 +300,12 @@ class EntryEditorTab {
         if(fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
             fieldEditor.setText(content);
-            ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
+            int textLength = fieldEditor.getText().length();
+            if(initialCaretPosition<textLength) {
+                ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
+            } else {
+                ((JTextComponent) fieldEditor).setCaretPosition(textLength);
+            }
         } else {
             fieldEditor.setText(content);
         }

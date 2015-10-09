@@ -74,9 +74,11 @@ public class FieldTextMenu implements MouseListener {
 
         if (field.getTextComponent() instanceof JTextComponent) {
             inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
+            inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
         }
     }
 
+    @SuppressWarnings("serial")
     class ReplaceAction extends AbstractAction {
         public ReplaceAction() {
             putValue(Action.NAME, Localization.lang("Normalize to BibTeX name format"));

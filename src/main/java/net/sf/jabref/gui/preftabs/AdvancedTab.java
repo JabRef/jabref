@@ -232,10 +232,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences.putBoolean(JabRefPreferences.USE_NATIVE_FILE_DIALOG_ON_MAC, useNativeFileDialogOnMac.isSelected());
         preferences.putBoolean(JabRefPreferences.FILECHOOSER_DISABLE_RENAME, filechooserDisableRename.isSelected());
         UIManager.put("FileChooser.readOnly", filechooserDisableRename.isSelected());
-        preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
-        if (useIEEEAbrv.isSelected()) {
-            Abbreviations.journalAbbrev = new JournalAbbreviationRepository();
-            Abbreviations.journalAbbrev.readJournalListFromResource(Abbreviations.JOURNALS_IEEE_INTERNAL_LIST);
+
+        if(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
+            preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
+            Abbreviations.initializeJournalNames(preferences);
         }
         storeRemoteSettings();
 

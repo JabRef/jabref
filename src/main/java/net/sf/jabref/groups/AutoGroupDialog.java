@@ -36,7 +36,7 @@ import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.gui.undo.NamedCompound;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -168,26 +168,21 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         bg.add(authors);
         bg.add(editors);
         keywords.setSelected(true);
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout
-                ("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:0dlu", ""), main);
-        b.append(keywords, 5);
-        b.nextLine();
-        b.append(new JPanel());
-        b.append(Localization.lang("Field to group by") + ":");
-        b.append(field);
-        b.nextLine();
-        b.append(new JPanel());
-        b.append(Localization.lang("Characters to ignore") + ":");
-        b.append(remove);
-        b.nextLine();
-        b.append(new JPanel());
-        b.append(nd);
-        b.append(deliminator);
-        b.nextLine();
-        b.append(authors, 5);
-        b.nextLine();
-        b.append(editors, 5);
-        b.nextLine();
+        
+        FormBuilder b = FormBuilder.create();
+        b.layout(new FormLayout
+                ("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        b.add(keywords).xyw(1, 1, 5);
+        b.add(Localization.lang("Field to group by") + ":").xy(3, 3);
+        b.add(field).xy(5, 3);
+        b.add(Localization.lang("Characters to ignore") + ":").xy(3, 5);
+        b.add(remove).xy(5, 5);
+        b.add(nd).xy(3, 7);
+        b.add(deliminator).xy(5, 7);
+        b.add(authors).xyw(1, 9, 5);
+        b.add(editors).xyw(1, 11, 5);
+        b.build();
+        b.border(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JPanel opt = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(opt);
@@ -243,9 +238,11 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(cancel, con);
         opt.add(cancel);*/
+        
         main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         opt.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(main, BorderLayout.CENTER);
+        getContentPane().add(b.getPanel(), BorderLayout.CENTER);
         getContentPane().add(opt, BorderLayout.SOUTH);
         // pack();
         updateComponents();
