@@ -25,18 +25,14 @@ public class BibtexCaseChanger {
 
     private final int n;
 
-    private final Warn warn;
-
-
-    private BibtexCaseChanger(String s, char format, Warn warn) {
+    private BibtexCaseChanger(String s, char format) {
         this.s = s;
         this.format = format;
         this.n = s.length();
-        this.warn = warn;
     }
 
-    public static String changeCase(String s, char format, Warn warn) {
-        return (new BibtexCaseChanger(s, format, warn)).changeCase();
+    public static String changeCase(String s, char format) {
+        return (new BibtexCaseChanger(s, format)).changeCase();
     }
 
     private String changeCase() {

@@ -90,41 +90,15 @@ public class BibtexCaseChangersTest {
     }
 
     private void assertCaseChangerT(final String string, final String string2) {
-        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 't', new Warn() {
-
-            @Override
-            public void warn(String s) {
-                Assert.fail("Should not Warn (" + s + ")! changeCase('t') should be " + string + " for "
-                        + string2);
-
-            }
-        }));
+        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 't'));
 
     }
 
     private void assertCaseChangerL(final String string, final String string2) {
-        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 'l', new Warn() {
-
-            @Override
-            public void warn(String s) {
-                Assert.fail("Should not Warn (" + s + ")! changeCase('l') should be " + string + " for "
-                        + string2);
-
-            }
-        }));
-
+        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 'l'));
     }
 
     private void assertCaseChangerU(final String string, final String string2) {
-        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 'u', new Warn() {
-
-            @Override
-            public void warn(String s) {
-                Assert.fail("Should not Warn (" + s + ")! changeCase('u') should be " + string + " for "
-                        + string2);
-
-            }
-        }));
-
+        Assert.assertEquals(string, BibtexCaseChanger.changeCase(string2, 'u'));
     }
 }

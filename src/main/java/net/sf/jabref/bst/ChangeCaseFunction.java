@@ -74,7 +74,7 @@ public class ChangeCaseFunction implements BstFunction {
         char format = (((String) o1).toLowerCase().charAt(0));
         String s = (String) o2;
 
-        stack.push(BibtexCaseChanger.changeCase(s, format, vm));
+        stack.push(BibtexCaseChanger.changeCase(s, format));
     }
 
 }
