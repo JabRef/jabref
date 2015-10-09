@@ -471,7 +471,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (parts.length == 3) {
                     fullName += parts[2];
                 }
-                if (entry.getField("note").equals("Early Access")) {
+                String note = entry.getField("note");
+                if (note != null && note.equals("Early Access")) {
                     entry.setField("year", "to be published");
                     entry.clearField("month");
                     entry.clearField("pages");
