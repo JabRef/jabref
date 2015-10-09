@@ -1,4 +1,5 @@
 [dev_2.11]
+    - Backports from 2.80: Bug fix in #193: sometimes IEEEXplore stalls during fetch
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
 2.11 beta 4
     - Add of Persian localization (by Behrouz Javanmardi)
