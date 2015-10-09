@@ -17,13 +17,11 @@ package net.sf.jabref.bst;
 
 public class BibtexCaseChanger {
 
-    private final String s;
-
-    private final FORMAT_MODE format;
-
+    // stores whether the char before the current char was a colon
     private boolean prevColon = true;
 
-    private final int n;
+    // global variable to store the current brace level
+    private int braceLevel;
 
     public enum FORMAT_MODE {
         TITLE_LOWERS('t'),
@@ -55,10 +53,7 @@ public class BibtexCaseChanger {
         }
     }
 
-    private BibtexCaseChanger(String s, FORMAT_MODE format) {
-        this.s = s;
-        this.format = format;
-        this.n = s.length();
+    private BibtexCaseChanger() {
     }
 
     /**
@@ -69,15 +64,16 @@ public class BibtexCaseChanger {
      * @return
      */
     public static String changeCase(String s, FORMAT_MODE format) {
-        return (new BibtexCaseChanger(s, format)).changeCase();
+        return (new BibtexCaseChanger()).doChangeCase(s, format);
     }
 
-    private String changeCase() {
+    private String doChangeCase(String s, FORMAT_MODE format) {
         char[] c = s.toCharArray();
 
         StringBuffer sb = new StringBuffer();
 
         int i = 0;
+        int n = s.length();
 
         while (i < n) {
             if (c[i] == '{') {
@@ -114,10 +110,6 @@ public class BibtexCaseChanger {
         BibtexCaseChanger.checkBrace(s, braceLevel);
         return sb.toString();
     }
-
-
-    private int braceLevel;
-
 
     private int decrBraceLevel(String string, int braceLevel) {
         if (braceLevel == 0) {
