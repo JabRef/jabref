@@ -17,7 +17,6 @@
 package net.sf.jabref.external.push;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import net.sf.jabref.openoffice.OpenOfficePanel;
@@ -29,7 +28,6 @@ public class PushToApplications {
      * Set up the current available choices:
      */
     static {
-        //TODO plugins create collection class
         applications = new ArrayList<PushToApplication>();
 
         PushToApplications.applications.add(new PushToLyx());
@@ -40,19 +38,5 @@ public class PushToApplications {
         PushToApplications.applications.add(OpenOfficePanel.getInstance());
         PushToApplications.applications.add(new PushToTeXstudio());
         PushToApplications.applications.add(new PushToTexmaker());
-
-        // Finally, sort the entries:
-        //Collections.sort(applications, new PushToApplicationComparator());
-    }
-
-    /**
-     * Comparator for sorting the selection according to name.
-     */
-    private static class PushToApplicationComparator implements Comparator<PushToApplication> {
-
-        @Override
-        public int compare(PushToApplication one, PushToApplication two) {
-            return one.getName().compareTo(two.getName());
-        }
     }
 }
