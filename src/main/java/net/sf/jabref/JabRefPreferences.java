@@ -494,23 +494,31 @@ public class JabRefPreferences {
         defaults.put(TABLE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(TABLE_SECONDARY_SORT_FIELD, "year");
         defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(TABLE_TERTIARY_SORT_FIELD, "author");
+        defaults.put(TABLE_TERTIARY_SORT_FIELD, "title");
         defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+
+        // if both are false, then the entries are saved in table order
         defaults.put(SAVE_IN_ORIGINAL_ORDER, Boolean.FALSE);
-        defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.FALSE);
+        defaults.put(SAVE_IN_SPECIFIED_ORDER, Boolean.TRUE);
+
+        // save order: if SAVE_IN_SPECIFIED_ORDER, then use following criteria
         defaults.put(SAVE_PRIMARY_SORT_FIELD, "bibtexkey");
         defaults.put(SAVE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(SAVE_SECONDARY_SORT_FIELD, "author");
-        defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(SAVE_TERTIARY_SORT_FIELD, "");
+        defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(SAVE_TERTIARY_SORT_FIELD, "title");
         defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+
+        // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
         defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
+
+        // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
         defaults.put(EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
         defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(EXPORT_SECONDARY_SORT_FIELD, "author");
-        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(EXPORT_TERTIARY_SORT_FIELD, "");
+        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
+        defaults.put(EXPORT_TERTIARY_SORT_FIELD, "title");
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
         defaults.put(NEWLINE, System.lineSeparator());
