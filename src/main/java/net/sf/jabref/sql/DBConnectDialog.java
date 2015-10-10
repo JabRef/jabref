@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,7 +26,7 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -37,8 +37,9 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class DBConnectDialog extends JDialog {
 
+    private static final long serialVersionUID = 7395276764910821176L;
     // input fields
-    private final JComboBox cmbServerType = new JComboBox();
+    private final JComboBox<String> cmbServerType = new JComboBox<String>();
     private final JTextField txtServerHostname = new JTextField(40);
     private final JTextField txtDatabase = new JTextField(40);
     private final JTextField txtUsername = new JTextField(40);
@@ -111,27 +112,22 @@ public class DBConnectDialog extends JDialog {
         pwdPassword.setText(dbStrings.getPassword());
 
         // construct dialog
-        DefaultFormBuilder builder = new DefaultFormBuilder(new
-                FormLayout("right:pref, 4dlu, fill:pref", ""));
+        FormBuilder builder = FormBuilder.create().layout(new
+                FormLayout("right:pref, 4dlu, fill:pref", "pref, 4dlu, pref, 4dlu, pref, 4dlu, pref, 4dlu, pref"));
 
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // add labels and input fields
-        builder.append(lblServerType);
-        builder.append(cmbServerType);
-        builder.nextLine();
-        builder.append(lblServerHostname);
-        builder.append(txtServerHostname);
-        builder.nextLine();
-        builder.append(lblDatabase);
-        builder.append(txtDatabase);
-        builder.nextLine();
-        builder.append(lblUsername);
-        builder.append(txtUsername);
-        builder.nextLine();
-        builder.append(lblPassword);
-        builder.append(pwdPassword);
-        builder.nextLine();
+        builder.add(lblServerType).xy(1, 1);
+        builder.add(cmbServerType).xy(3, 1);
+        builder.add(lblServerHostname).xy(1, 3);
+        builder.add(txtServerHostname).xy(3, 3);
+        builder.add(lblDatabase).xy(1, 5);
+        builder.add(txtDatabase).xy(3, 5);
+        builder.add(lblUsername).xy(1, 7);
+        builder.add(txtUsername).xy(3, 7);
+        builder.add(lblPassword).xy(1, 9);
+        builder.add(pwdPassword).xy(3, 9);
 
         // add the panel to the CENTER of your dialog:
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -173,6 +169,8 @@ public class DBConnectDialog extends JDialog {
         pwdPassword.addActionListener(connectAction);
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 812282483921018251L;
 
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -88,7 +88,7 @@ import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1427,9 +1427,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
         } catch (UnsupportedCharsetException ex2) {
+            // @formatter:off
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file. "
                             + "Character encoding '%0' is not supported.", encoding),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+            // @formatter:on
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
@@ -1457,13 +1459,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         boolean commit = true;
         if (!session.getWriter().couldEncodeAll()) {
-            DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref", ""));
+            FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.append(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
-                    session.getEncoding()));
-            builder.append(ta);
-            builder.append(Localization.lang("What do you want to do?"));
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters: ",
+                    session.getEncoding())).xy(1, 1);
+            builder.add(ta).xy(3, 1);
+            builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,

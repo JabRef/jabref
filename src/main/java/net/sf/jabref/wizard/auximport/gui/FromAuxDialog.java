@@ -73,6 +73,7 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FromAuxDialog
         extends JDialog {
 
+    private static final long serialVersionUID = -7839874395438295941L;
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
     private final JButton selectInDBButton = new JButton();
@@ -80,10 +81,10 @@ public class FromAuxDialog
     private final JButton cancelButton = new JButton();
     private final JButton parseButton = new JButton();
 
-    private final JComboBox dbChooser = new JComboBox();
+    private final JComboBox<String> dbChooser = new JComboBox<String>();
     private JTextField auxFileField;
 
-    private JList notFoundList;
+    private JList<String> notFoundList;
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
@@ -171,6 +172,8 @@ public class FromAuxDialog
         im.put(parent.prefs().getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            private static final long serialVersionUID = -4511569209048851343L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -196,7 +199,7 @@ public class FromAuxDialog
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
         browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
-        notFoundList = new JList();
+        notFoundList = new JList<String>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
@@ -313,6 +316,7 @@ public class FromAuxDialog
     static class BrowseAction
             extends AbstractAction {
 
+        private static final long serialVersionUID = 685593871964202310L;
         private final JTextField comp;
         private final JabRefFrame _frame;
 
