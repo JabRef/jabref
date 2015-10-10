@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -50,6 +50,7 @@ import net.sf.jabref.util.Util;
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
+    private static final long serialVersionUID = 6164143717906802116L;
     private final JabRefFrame frame;
     private final boolean openInNew;
     private final ImportFormat importer;
@@ -106,7 +107,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     importer != null ? importer.getExtensions() : null, true);
 
-            if (filenames != null && filenames.length > 0) {
+            if ((filenames != null) && (filenames.length > 0)) {
                 frame.block();
                 frame.output(Localization.lang("Starting import"));
                 fileOk = true;
@@ -199,7 +200,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     // for single entries):
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
                             (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE)
-                            || bibtexResult.getDatabase().getEntryCount() > 1)) {
+                            || (bibtexResult.getDatabase().getEntryCount() > 1))) {
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
                                 BibtexFields.DEFAULT_INSPECTION_FIELDS,
                                 Localization.lang("Import"), openInNew);
@@ -209,6 +210,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         diag.setVisible(true);
                         diag.toFront();
                     } else {
+                        Integer addCount = 0;
+                        Integer replaceCount = 0;
+                        Integer mergeCount = 0;
+                        String preString = null;
                         boolean generateKeys = Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION);
                         NamedCompound ce = new NamedCompound(Localization.lang("Import entries"));
 
@@ -219,34 +224,66 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             }
                         }
 
+                        mainLoop:
                         for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()) {
                             try {
                                 // Check if the entry is a duplicate of an existing one:
                                 boolean keepEntry = true;
+                                boolean remove = false;
+                                BibtexEntry mergedEntry = null;
                                 BibtexEntry duplicate = DuplicateCheck.containsDuplicate(toAddTo, entry);
                                 if (duplicate != null) {
-                                    int answer = DuplicateResolverDialog.resolveDuplicateInImport
-                                            (frame, duplicate, entry);
+                                    DuplicateResolverDialog drd = new DuplicateResolverDialog
+                                            (frame, duplicate, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                                    drd.setVisible(true);
+                                    int answer = drd.getSelected();
+                                    // int answer = DuplicateResolverDialog.resolveDuplicateInImport
+                                    //        (frame, duplicate, entry);
                                     // The upper entry is the
                                     if (answer == DuplicateResolverDialog.DO_NOT_IMPORT) {
                                         keepEntry = false;
+                                    } else if (answer == DuplicateResolverDialog.IMPORT_AND_DELETE_OLD) {
+                                        remove = true;
+                                        replaceCount++;
+                                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                                        keepEntry = false;
+                                        remove = true;
+                                        mergedEntry = drd.getMergedEntry();
+                                        mergeCount++;
+                                    } else if (answer == DuplicateResolverDialog.BREAK) {
+                                        preString = Localization.lang("Import cancelled.");
+                                        break mainLoop;
                                     }
-                                    if (answer == DuplicateResolverDialog.IMPORT_AND_DELETE_OLD) {
-                                        // Remove the old one and import the new one.
-                                        toAddTo.removeEntry(duplicate.getId());
-                                        ce.addEdit(new UndoableRemoveEntry(toAddTo, duplicate, panel));
-                                    }
+                                }
+
+                                // Remove the old entry, if we are supposed to
+                                if (remove) {
+                                 // Remove the old one and import the new one.
+                                    toAddTo.removeEntry(duplicate.getId());
+                                    ce.addEdit(new UndoableRemoveEntry(toAddTo, duplicate, panel));
                                 }
                                 // Add the entry, if we are supposed to:
                                 if (keepEntry) {
                                     toAddTo.insertEntry(entry);
                                     // Generate key, if we are supposed to:
                                     if (generateKeys) {
-                                        LabelPatternUtil.makeLabel(bibtexResult.getMetaData(), toAddTo, entry);
+                                        LabelPatternUtil.makeLabel(panel.metaData(), toAddTo, entry);
                                         //System.out.println("gen:"+entry.getCiteKey());
                                     }
                                     ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
+                                    addCount++;
                                 }
+                                // Add the merged entry, if we are supposed to:
+                                if (mergedEntry != null) {
+                                    toAddTo.insertEntry(mergedEntry);
+                                    // Generate key, if we are supposed to:
+                                    if (generateKeys) {
+                                        LabelPatternUtil.makeLabel(panel.metaData(), toAddTo, mergedEntry);
+                                        //System.out.println("gen:"+entry.getCiteKey());
+                                    }
+                                    ce.addEdit(new UndoableInsertEntry(toAddTo, mergedEntry, panel));
+                                }
+                                
                             } catch (KeyCollisionException e) {
                                 e.printStackTrace();
                             }
@@ -256,7 +293,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             panel.undoManager.addEdit(ce);
                             panel.markBaseChanged();
                         }
-
+                        if (preString != null) {
+                            frame.output(preString + " " + Localization.lang("Added %0 entries. Replaced %1 entries. Added information to %2 entries.", addCount.toString(), replaceCount.toString(), mergeCount.toString()));
+                        } else {
+                            frame.output(Localization.lang("Added %0 entries. Replaced %1 entries. Added information to %2 entries.", addCount.toString(), replaceCount.toString(), mergeCount.toString()));
+                        }
                     }
 
                 }
@@ -302,7 +343,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 ParserResult pr = importResult.parserResult;
 
                 anythingUseful = anythingUseful
-                        || pr.getDatabase().getEntryCount() > 0 || pr.getDatabase().getStringCount() > 0;
+                        || (pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0);
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {
@@ -345,7 +386,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return null;
         }
 
-        if (imports.size() == 1 && directParserResult != null) {
+        if ((imports.size() == 1) && (directParserResult != null)) {
             return directParserResult;
         } else {
 
