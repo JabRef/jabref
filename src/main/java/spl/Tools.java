@@ -109,7 +109,7 @@ class Tools {
     }
 
     private static boolean isAbsolutePath(String path) {
-        // On Windows, we cannot just ask if the file name starts with file
+        // On Windows, we cannot just ask if the filename starts with file
         // separator.
         // If path contains ":" at the second position, then it is not relative,
         // I guess.

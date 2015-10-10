@@ -115,7 +115,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             File f = new File(dir);
             lfName = f.getName();
             lfName = lfName.substring(0, lfName.indexOf("."));
-            // Remove file name - we want the directory only.
+            // Remove filename - we want the directory only.
             dir = f.getParent() + System.getProperty("file.separator");
         }
         final String format = lfName,

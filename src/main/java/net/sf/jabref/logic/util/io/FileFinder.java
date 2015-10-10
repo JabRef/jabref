@@ -130,7 +130,7 @@ public class FileFinder {
     }
 
     /**
-     * Searches the given directory and file name pattern for a file for the
+     * Searches the given directory and filename pattern for a file for the
      * bibtexentry.
      *
      * Used to fix:

@@ -126,7 +126,7 @@ public class CleanUpAction extends AbstractWorker {
         cleanUpMonth = new JCheckBox(Localization.lang("Format content of month field to #mon#"));
         cleanUpPageNumbers = new JCheckBox(Localization.lang("Ensure that page ranges are of the form num1--num2"));
         cleanUpMakePathsRelative = new JCheckBox(Localization.lang("Make paths of linked files relative (if possible)"));
-        cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given file name format pattern"));
+        cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given filename format pattern"));
         cleanUpRenamePDF.addChangeListener(new ChangeListener() {
 
             @Override
@@ -158,7 +158,7 @@ public class CleanUpAction extends AbstractWorker {
         builder.add(cleanUpUpgradeExternalLinks).xyw(1, 10, 2);
         builder.add(cleanUpMakePathsRelative).xyw(1, 11, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 12, 2);
-        String currentPattern = Localization.lang("File name format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+        String currentPattern = Localization.lang("Filename format pattern").concat(": ").concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 13);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 14);
         builder.add(cleanUpBibLatex).xyw(1, 15, 2);

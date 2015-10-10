@@ -349,7 +349,7 @@ class ManageJournalsPanel extends JPanel {
                 == JOptionPane.OK_OPTION;
             } else {
                 if (tableModel.getRowCount() > 0) {
-                    JOptionPane.showMessageDialog(this, Localization.lang("You must choose a file name to store journal abbreviations"),
+                    JOptionPane.showMessageDialog(this, Localization.lang("You must choose a filename to store journal abbreviations"),
                             Localization.lang("Store journal abbreviations"), JOptionPane.ERROR_MESSAGE);
                     return false;
                 } else {

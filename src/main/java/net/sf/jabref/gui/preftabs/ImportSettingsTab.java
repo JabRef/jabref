@@ -104,7 +104,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(pan);
         JPanel pan2 = new JPanel();
-        JLabel lab = new JLabel(Localization.lang("File name format pattern").concat(":"));
+        JLabel lab = new JLabel(Localization.lang("Filename format pattern").concat(":"));
         pan2.add(lab);
         pan2.add(fileNamePattern);
         pan2.add(selectFileNamePattern);

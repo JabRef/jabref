@@ -107,7 +107,7 @@ public class FileUtil {
      * </ul>
      *
      * @param metaData The MetaData for the database this file belongs to.
-     * @param name     The file name, may also be a relative path to the file
+     * @param name     The filename, may also be a relative path to the file
      */
     public static File expandFilename(final MetaData metaData, String name) {
         int pos = name.lastIndexOf('.');
@@ -210,7 +210,7 @@ public class FileUtil {
      * This method works correctly only if dirs are sorted decent in their length
      * i.e. /home/user/literature/important before /home/user/literature
      *
-     * @param fileName the file name to be shortened
+     * @param fileName the filename to be shortened
      * @param dirs     directories to check.
      */
     public static File shortenFileName(File fileName, String[] dirs) {

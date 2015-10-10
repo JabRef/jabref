@@ -153,7 +153,7 @@ public class JabRefDesktop {
      * Opens a file on a Windows system, using its default viewer.
      *
      * @param link
-     *            The file name.
+     *            The filename.
      * @param localFile
      *            true if it is a local file, not an URL.
      * @throws IOException
@@ -166,7 +166,7 @@ public class JabRefDesktop {
     /**
      * Opens a file on a Windows system, using the given application.
      *
-     * @param link The file name.
+     * @param link The filename.
      * @param application Link to the app that opens the file.
      * @throws IOException
      */
@@ -182,7 +182,7 @@ public class JabRefDesktop {
      * @param metaData
      *            The MetaData for the database this file belongs to.
      * @param link
-     *            The file name.
+     *            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final MetaData metaData, String link, final ExternalFileType fileType) throws IOException {

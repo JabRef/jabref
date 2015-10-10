@@ -62,7 +62,7 @@ public class FileHistory extends JMenu implements ActionListener {
     }
 
     /**
-     * Adds the file name to the top of the menu. If it already is in
+     * Adds the filename to the top of the menu. If it already is in
      * the menu, it is merely moved to the top.
      *
      * @param filename a <code>String</code> value

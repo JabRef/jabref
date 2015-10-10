@@ -124,14 +124,14 @@ public class ExportFormat implements IExportFormat {
      * implementation.
      * 
      * @param filename
-     *            the file name
+     *            the filename
      * @throws IOException
      *             if the reader could not be created
      * 
      * @return a newly created reader
      */
     Reader getReader(String filename) throws IOException {
-        // If this is a custom export, just use the given file name:
+        // If this is a custom export, just use the given filename:
         String dir;
         if (customExport) {
             dir = "";
@@ -313,7 +313,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * See if there is a name formatter file bundled with this export format. If so, read
      * all the name formatters so they can be used by the filter layouts.
-     * @param lfFileName The layout file name.
+     * @param lfFileName The layout filename.
      */
     private HashMap<String, String> readFormatterFile(String lfFileName) {
         HashMap<String, String> formatters = new HashMap<String, String>();

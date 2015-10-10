@@ -69,7 +69,7 @@ public class GUIGlobals {
     public static final int KEYBIND_COL_1 = 80; // Added to the font size when determining table
     public static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
 
-    // File names.
+    // Filenames.
     public static final String backupExt = ".bak";
 
     // Image paths.

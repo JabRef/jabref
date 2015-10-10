@@ -781,7 +781,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * <p>
      * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
      *
-     * @param filenames the file names of all currently opened files - used for storing them if prefs openLastEdited is set to true
+     * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(Vector<String> filenames) {
         JabRefExecutorService.INSTANCE.shutdownEverything();
@@ -808,7 +808,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
-            // previously stored file name.
+            // previously stored filename.
             if (filenames.isEmpty()) {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
@@ -2160,7 +2160,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
-            // previously stored file name.
+            // previously stored filename.
             Vector<String> filenames = new Vector<>();
             if (tabbedPane.getTabCount() > 0) {
                 for (int i = 0; i < tabbedPane.getTabCount(); i++) {
