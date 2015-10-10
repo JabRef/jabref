@@ -43,7 +43,7 @@ public class PushToTexmaker implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Insert selected citations into Texmaker");
+        return Localization.lang("Insert selected citations into %0", getApplicationName());
     }
 
     @Override
