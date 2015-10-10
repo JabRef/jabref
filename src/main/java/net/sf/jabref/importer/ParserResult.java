@@ -86,6 +86,9 @@ public class ParserResult {
         this.jabrefVersion = jabrefVersion;
     }
 
+    /**
+     * @return 0 if not known (e.g., no version header in file)
+     */
     public int getJabrefMajorVersion() {
         return jabrefMajorVersion;
     }
@@ -94,6 +97,9 @@ public class ParserResult {
         this.jabrefMajorVersion = jabrefMajorVersion;
     }
 
+    /**
+     * @return 0 if not known (e.g., no version header in file)
+     */
     public int getJabrefMinorVersion() {
         return jabrefMinorVersion;
     }

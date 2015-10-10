@@ -61,19 +61,16 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         if (!Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)) {
             return false;
         }
-        if (pr.getJabrefMajorVersion() < 0)
-         {
+        if (pr.getJabrefMajorVersion() <= 0) {
             return false; // non-JabRef file
-        }
-        if (pr.getJabrefMajorVersion() < 2)
-         {
+        } else if (pr.getJabrefMajorVersion() < 2) {
             return true; // old
+        } else if (pr.getJabrefMajorVersion() == 2) {
+            return pr.getJabrefMinorVersion() <= 2;
+        } else {
+            // JabRef version 3 does not contain a header, but who knows
+            return true;
         }
-        if (pr.getJabrefMajorVersion() > 2)
-         {
-            return false; // wow, did we ever reach version 3?
-        }
-        return pr.getJabrefMinorVersion() <= 2;
     }
 
     /**
