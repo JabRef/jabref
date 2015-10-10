@@ -146,6 +146,8 @@ public class LatexFieldFormatter {
             //              sb.append(text);
             //            else
             //             currently, we do not do any more wrapping
+            // these two are also hard coded in net.sf.jabref.importer.fileformat.FieldContentParser.multiLineFields
+            // there, JabRefPreferences.NON_WRAPPABLE_FIELDS are also included
             boolean isAbstract = "abstract".equals(fieldName);
             boolean isReview = "review".equals(fieldName);
             boolean doWrap = !isAbstract || !isReview;

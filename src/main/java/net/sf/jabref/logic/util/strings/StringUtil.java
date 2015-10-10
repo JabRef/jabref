@@ -11,7 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-    private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r");
+    // contains all possible line breaks, not ommitting any break such as "\\n"
+    private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
+
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
      * and removing (at most) one pair of braces or " surrounding it.
@@ -607,7 +609,7 @@ public class StringUtil {
     }
 
     /**
-     * This method looks for occurences of capital letters enclosed in an
+     * This method looks for occurrences of capital letters enclosed in an
      * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
      * pairs of braces are removed.
      *
@@ -624,7 +626,7 @@ public class StringUtil {
     }
 
     /**
-     * This method looks for occurences of capital letters enclosed in one pair
+     * This method looks for occurrences of capital letters enclosed in one pair
      * of braces, e.g. "{AB}". All these are replaced by only the capitals in
      * between the braces.
      *
@@ -646,16 +648,18 @@ public class StringUtil {
     }
 
     /**
-     * Replaces all platform-dependent line breaks by UNIX-style newlines.
+     * Replaces all platform-dependent line breaks by Globals.NEWLINE line breaks.
+     *
+     * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
      * <example>
-     * Legacy Macintosh \r -> \n
-     * Windows \r\n -> \n
+     * Legacy Macintosh \r -> Globals.NEWLINE
+     * Windows \r\n -> Globals.NEWLINE
      * </example>
      *
-     * @return a String with only \n as line breaks
+     * @return a String with only Globals.NEWLINE as line breaks
      */
-    public static String unifyLineBreaks(String s) {
-        return LINE_BREAKS.matcher(s).replaceAll("\n");
+    public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
+        return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
     }
 }

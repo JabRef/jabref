@@ -44,6 +44,7 @@
     - BREAKING: The BibTeX key generator settings from previous versions are lost
     - BREAKING: LabelPatterns [auth.etal], [authEtAl], [authors], [authorsN] to omit spaces and commas (and work as described at http://jabref.sourceforge.net/help/LabelPatterns.php)
     - Feature: new LabelPattern [authFirstFull] returning the last name of the first author and also a "van" or "von" if it exists
+    - Feature: all new lines when writing an entry are obeying the globally configured new line (File -> newline separator). Affects fields: abstract and review 
 [dev_2.11]
     - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly

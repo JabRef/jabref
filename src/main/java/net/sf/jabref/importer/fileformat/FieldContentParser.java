@@ -33,6 +33,7 @@ public class FieldContentParser {
 
     public FieldContentParser() {
         multiLineFields = new ArrayList<>();
+        // the following two are also coded in net.sf.jabref.exporter.LatexFieldFormatter.format(String, String)
         multiLineFields.add("abstract");
         multiLineFields.add("review");
         // the file field should not be formatted, therefore we treat it as a multi line field
@@ -49,7 +50,7 @@ public class FieldContentParser {
     public StringBuffer format(StringBuffer content, String bibtexField) {
 
         // Unify line breaks
-        String text = StringUtil.unifyLineBreaks(content.toString());
+        String text = StringUtil.unifyLineBreaksToConfiguredLineBreaks(content.toString());
 
         // Do not format multiline fields
         if (multiLineFields.contains(bibtexField)) {
