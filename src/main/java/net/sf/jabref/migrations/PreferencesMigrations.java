@@ -74,11 +74,13 @@ public class PreferencesMigrations {
         }
     }
 
-    // Upgrade the preferences for the current version
-    // The old preference is kept in case an old version of JabRef is used with
-    // these preferences, but it is only used when the new preference does not
-    // exist
-    public static void upgradeOldPreferences() {
+    /**
+     * Upgrade the sort order preferences for the current version
+     * The old preference is kept in case an old version of JabRef is used with
+     * these preferences, but it is only used when the new preference does not
+     * exist
+     */
+    public static void upgradeSortOrder() {
         JabRefPreferences prefs = Globals.prefs;
         if (prefs.get(JabRefPreferences.SAVE_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("saveInStandardOrder", false)) {
@@ -122,4 +124,5 @@ public class PreferencesMigrations {
             }
         }
     }
+
 }

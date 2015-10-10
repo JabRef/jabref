@@ -594,9 +594,9 @@ public class JabRef {
 
     private void openWindow(Vector<ParserResult> loaded) {
         // Perform checks and changes for users with a preference set from an older
-        // Jabref version.
+        // JabRef version.
         PreferencesMigrations.replaceAbstractField();
-        PreferencesMigrations.upgradeOldPreferences();
+        PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
 
         // Set up custom or default icon theme:
