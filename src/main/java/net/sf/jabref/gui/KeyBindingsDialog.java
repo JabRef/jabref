@@ -367,7 +367,10 @@ class KeyBindingsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int[] selected = table.getSelectedRows();
                 if (selected.length == 0) {
-                    int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this, Localization.lang("All key bindings will be reset to their defaults.") + " " + Localization.lang("Continue?"), Localization.lang("Resetting all key bindings"),
+                    int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this,
+                            Localization.lang("All key bindings will be reset to their defaults.") + " " + 
+                            Localization.lang("Continue?"),
+                            Localization.lang("Resetting all key bindings"),
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE, null,
                             new String[] {Localization.lang("Ok"), Localization.lang("Cancel")},
