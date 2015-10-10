@@ -1,15 +1,25 @@
 package net.sf.jabref.logic.labelPattern;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
 
 public class LabelPatternUtilTest {
+
+    @BeforeClass
+    public static void setUpGlobalsPrefs() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Before
     public void setUp() {
@@ -217,6 +227,85 @@ public class LabelPatternUtilTest {
         } catch (NullPointerException ignored) {
 
         }
+    }
+
+    /**
+     * Tests the [auth.etal] and [authEtAl] patterns
+     */
+    @Test
+    public void testAuthEtAl() {
+        // tests taken from the comments
+
+        String firstAuthors = "Isaac Newton and James Maxwell and Albert Einstein";
+        String secondAuthors = "Isaac Newton and James Maxwell";
+
+        // [auth.etal]
+        String delim = ".";
+        String append = ".etal";
+        Assert.assertEquals("Newton.etal", LabelPatternUtil.authEtal(firstAuthors, delim, append));
+        Assert.assertEquals("Newton.Maxwell", LabelPatternUtil.authEtal(secondAuthors, delim, append));
+
+        // [authEtAl]
+        delim = "";
+        append = "EtAl";
+        Assert.assertEquals("NewtonEtAl", LabelPatternUtil.authEtal(firstAuthors, delim, append));
+        Assert.assertEquals("NewtonMaxwell", LabelPatternUtil.authEtal(secondAuthors, delim, append));
+    }
+
+    /**
+     * Test the [authshort] pattern
+     */
+    @Test
+    public void testAuthShort() {
+        // tests taken from the comments
+        Assert.assertEquals(
+                "NME+",
+                LabelPatternUtil.authshort("I. Newton and J. Maxwell and A. Einstein and N. Bohr"));
+        Assert.assertEquals(
+                "NME",
+                LabelPatternUtil.authshort("I. Newton and J. Maxwell and A. Einstein"));
+        Assert.assertEquals(
+                "NM",
+                LabelPatternUtil.authshort("I. Newton and J. Maxwell"));
+        Assert.assertEquals(
+                "Newton",
+                LabelPatternUtil.authshort("I. Newton"));
+    }
+
+    /**
+     * Tests [authors]
+     */
+    @Test
+    public void testAllAuthors() {
+        Assert.assertEquals(
+                "Newton",
+                LabelPatternUtil.allAuthors("I. Newton"));
+        Assert.assertEquals(
+                "NewtonMaxwell",
+                LabelPatternUtil.allAuthors("I. Newton and J. Maxwell"));
+        Assert.assertEquals(
+                "NewtonMaxwellEinstein",
+                LabelPatternUtil.allAuthors("I. Newton and J. Maxwell and A. Einstein"));
+    }
+
+    /**
+     * Tests the [authorsN] pattern.
+     */
+    @Test
+    public void testNAuthors() {
+        // test [authors3]
+        Assert.assertEquals(
+                "Newton",
+                LabelPatternUtil.NAuthors("I. Newton", 3));
+        Assert.assertEquals(
+                "NewtonMaxwell",
+                LabelPatternUtil.NAuthors("I. Newton and J. Maxwell", 3));
+        Assert.assertEquals(
+                "NewtonMaxwellEinstein",
+                LabelPatternUtil.NAuthors("I. Newton and J. Maxwell and A. Einstein", 3));
+        Assert.assertEquals(
+                "NewtonMaxwellEinsteinEtAl",
+                LabelPatternUtil.NAuthors("I. Newton and J. Maxwell and A. Einstein and N. Bohr", 3));
     }
 
     @Test

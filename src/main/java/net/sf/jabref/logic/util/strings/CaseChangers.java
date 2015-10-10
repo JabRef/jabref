@@ -41,6 +41,8 @@ public class CaseChangers {
         static {
             Set<String> smallerWords = new HashSet<>();
 
+            // see also net.sf.jabref.logic.labelPattern.LabelPatternUtil.SKIP_WORDS
+
             // Articles
             smallerWords.addAll(Arrays.asList("a", "an", "the"));
             // Prepositions

@@ -1,4 +1,6 @@
 /*  Copyright (C) 2003-2015 JabRef contributors.
+                  2003-2015 Ulrik Stervbo (ulriks AT ruc.dk)
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,12 +36,7 @@ import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
 import net.sf.jabref.util.Util;
 
 /**
- *
- * @author Ulrik Stervbo (ulriks AT ruc.dk)
- */
-/**
  * This is the utility class of the LabelPattern package.
- * @author Ulrik Stervbo (ulriks AT ruc.dk)
  */
 public class LabelPatternUtil {
 
@@ -47,7 +44,8 @@ public class LabelPatternUtil {
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
     
     private static final Log LOGGER = LogFactory.getLog(LabelPatternUtil.class);
-    
+
+    // see also net.sf.jabref.logic.util.strings.CaseChangers.Word.smallerWords
     private static final String[] SKIP_WORDS = {"a", "an", "the", "for", "on", "of"};
 
     public static ArrayList<String> DEFAULT_LABELPATTERN;
@@ -965,18 +963,9 @@ public class LabelPatternUtil {
      * @param authorField a <code>String</code>
      * @return the sur name of all authors/editors
      */
-    private static String allAuthors(String authorField) {
-        String author = "";
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
-        int i = 0;
-        while (tokens.length > i) {
-            // convert lastname, firstname to firstname lastname
-            String[] firstAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
-            // lastname, firstname
-            author += firstAuthor[0];
-            i++;
-        }
-        return author;
+    static String allAuthors(String authorField) {
+        // Quick hack to use NAuthors to avoid code duplication
+        return NAuthors(authorField, Integer.MAX_VALUE);
     }
 
     /**
@@ -1027,21 +1016,19 @@ public class LabelPatternUtil {
      * @param n the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
-    private static String NAuthors(String authorField, int n) {
+    static String NAuthors(String authorField, int n) {
         String author = "";
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
+        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
         int i = 0;
         while (tokens.length > i && i < n) {
-            // convert lastname, firstname to firstname lastname
-            String[] firstAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
-            // lastname, firstname
-            author += firstAuthor[0];
+            String lastName = tokens[i].replaceAll(",\\s+.*", "");
+            author += lastName;
             i++;
         }
         if (tokens.length <= n) {
             return author;
         }
-        return "EtAl";
+        return author + "EtAl";
     }
 
     /**
@@ -1112,13 +1099,15 @@ public class LabelPatternUtil {
      *  authEtAl give (delim="", append="EtAl"):
      * NewtonEtAl
      * NewtonMaxwell
+     *
+     * Note that [authEtAl] equals [authors2]
      */
-    private static String authEtal(String authorField, String delim,
+    static String authEtal(String authorField, String delim,
             String append) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
         StringBuilder author = new StringBuilder();
 
-        String[] tokens = authorField.split("\\band\\b");
+        String[] tokens = authorField.split("\\s*\\band\\b\\s*");
         if (tokens.length == 0) {
             return "";
         }
@@ -1174,7 +1163,7 @@ public class LabelPatternUtil {
      *   
      *   Newton
      */
-    private static String authshort(String authorField) {
+    static String authshort(String authorField) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
         StringBuilder author = new StringBuilder();
         String[] tokens = authorField.split("\\band\\b");
@@ -1230,7 +1219,7 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField is null and n > 0
      */
-    public static String authIniN(String authorField, int n) {
+    static String authIniN(String authorField, int n) {
 
         if (n <= 0) {
             return "";
