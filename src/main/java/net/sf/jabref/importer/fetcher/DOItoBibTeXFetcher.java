@@ -77,7 +77,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    private BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
+    public BibtexEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
         DOI doi = new DOI(doiStr);
 
         // Send the request

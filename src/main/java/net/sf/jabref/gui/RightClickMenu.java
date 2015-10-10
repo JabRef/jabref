@@ -324,6 +324,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
+        add(new AbstractAction(Localization.lang("Get BibTeX data from DOI"), IconTheme.getImage("doi")) {
+
+            {
+                if(!(isFieldSetForSelectedEntry("doi"))) {
+                    this.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    panel.runCommand(Actions.MERGE_DOI);
+                } catch (Throwable ex) {
+                    LOGGER.warn("Could not merge with DOI data", ex);
+                }
+            }
+        });
+
         add(new AbstractAction(Localization.lang("Copy BibTeX key")) {
 
             @Override
