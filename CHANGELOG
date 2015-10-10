@@ -36,6 +36,7 @@
     - Remove support to the move-to-SysTray action
     - Feature: case changers now leave protected areas (enclosed with curly brakets) alone
     - Fix #223: Window is displayed in visible area even when having multiple screens
+    - Localization tweaks: "can not" -> "cannot" and "file name" -> "filename"
 [dev_2.11]
     - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
