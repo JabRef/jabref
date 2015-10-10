@@ -1454,6 +1454,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // editing of a field:
             storeCurrentEdit();
 
+            // This is a partial clone of net.sf.jabref.gui.BasePanel.setupActions().new AbstractWorker() {...}.run()
+
             // this updates the table automatically, on close, but not
             // within the tab
             Object oldValue = entry.getField(BibtexEntry.KEY_FIELD);

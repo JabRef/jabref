@@ -647,6 +647,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // First check if any entries have keys set already. If so, possibly remove
                 // them from consideration, or warn about overwriting keys.
+                // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
                 for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext(); ) {
                     bes = i.next();
                     if (bes.getField(BibtexEntry.KEY_FIELD) != null) {
