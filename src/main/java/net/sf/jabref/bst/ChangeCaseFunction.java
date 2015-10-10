@@ -17,6 +17,7 @@ package net.sf.jabref.bst;
 
 import java.util.Stack;
 
+import net.sf.jabref.bst.BibtexCaseChanger.FORMAT_MODE;
 import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.BstFunction;
 
@@ -74,7 +75,7 @@ public class ChangeCaseFunction implements BstFunction {
         char format = (((String) o1).toLowerCase().charAt(0));
         String s = (String) o2;
 
-        stack.push(BibtexCaseChanger.changeCase(s, format, vm));
+        stack.push(BibtexCaseChanger.changeCase(s, FORMAT_MODE.getFormatModeForBSTFormat(format)));
     }
 
 }

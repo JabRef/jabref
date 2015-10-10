@@ -17,34 +17,80 @@ package net.sf.jabref.bst;
 
 public class BibtexCaseChanger {
 
-    private final String s;
-
-    private final char format;
-
+    // stores whether the char before the current char was a colon
     private boolean prevColon = true;
 
-    private final int n;
+    // global variable to store the current brace level
+    private int braceLevel;
 
-    private final Warn warn;
+    public enum FORMAT_MODE {
+        // First character and character after a ":" as upper case - everything else in lower case. Obey {}.
+        TITLE_LOWERS('t'),
 
+        // All characters lower case - Obey {}
+        ALL_LOWERS('l'),
 
-    private BibtexCaseChanger(String s, char format, Warn warn) {
-        this.s = s;
-        this.format = format;
-        this.n = s.length();
-        this.warn = warn;
+        // all characters upper case - Obey {}
+        ALL_UPPERS('u');
+
+        // the following would have to be done if the functionality of CaseChangers would be included here
+        // However, we decided against it and will probably do the other way round: https://github.com/JabRef/jabref/pull/215#issuecomment-146981624
+
+        // Each word should start with a capital letter
+        //EACH_FIRST_UPPERS('f'),
+
+        // Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
+        // Capitalizes first and last word
+        // Does not change words starting with "{"
+        // DIFFERENCE to old CaseChangers.TITLE: last word is NOT capitalized in all cases
+        //TITLE_UPPERS('T');
+
+        public char asChar() {
+            return asChar;
+        }
+
+        private final char asChar;
+
+        private FORMAT_MODE(char asChar) {
+            this.asChar = asChar;
+        }
+
+        /**
+         * Convert bstFormat char into ENUM
+         *
+         * @throws IllegalArgumentException if char is not 't', 'l', 'u'
+         */
+        public static FORMAT_MODE getFormatModeForBSTFormat(final char bstFormat) {
+            for (FORMAT_MODE mode : FORMAT_MODE.values()) {
+                if (mode.asChar == bstFormat) {
+                    return mode;
+                }
+            }
+            throw new IllegalArgumentException();
+        }
     }
 
-    public static String changeCase(String s, char format, Warn warn) {
-        return (new BibtexCaseChanger(s, format, warn)).changeCase();
+    private BibtexCaseChanger() {
     }
 
-    private String changeCase() {
+    /**
+     * Changes case of the given string s
+     *
+     * @param s the string to handle
+     * @param format the format
+     * @return
+     */
+    public static String changeCase(String s, FORMAT_MODE format) {
+        return (new BibtexCaseChanger()).doChangeCase(s, format);
+    }
+
+    private String doChangeCase(String s, FORMAT_MODE format) {
         char[] c = s.toCharArray();
 
         StringBuffer sb = new StringBuffer();
 
         int i = 0;
+        int n = s.length();
 
         while (i < n) {
             if (c[i] == '{') {
@@ -55,8 +101,9 @@ public class BibtexCaseChanger {
                     i++;
                     continue;
                 }
-                if ((format == 't') && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
-                    sb.append(c[i]);
+                if ((format == FORMAT_MODE.TITLE_LOWERS) && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
+                    assert(c[i] == '{');
+                    sb.append('{');
                     i++;
                     prevColon = false;
                     continue;
@@ -72,7 +119,7 @@ public class BibtexCaseChanger {
                 continue;
             }
             if (braceLevel == 0) {
-                i = convertChar0(c, i, sb, format);
+                i = convertCharIfBraceLevelIsZero(c, i, sb, format);
                 continue;
             }
             sb.append(c[i]);
@@ -81,10 +128,6 @@ public class BibtexCaseChanger {
         BibtexCaseChanger.checkBrace(s, braceLevel);
         return sb.toString();
     }
-
-
-    private int braceLevel;
-
 
     private int decrBraceLevel(String string, int braceLevel) {
         if (braceLevel == 0) {
@@ -116,11 +159,12 @@ public class BibtexCaseChanger {
      * special with |colon|s.
      * 
      * @param c
-     * @param i
+     * @param i the current position. It points to the opening brace
      * @param format
      * @return
      */
-    private int convertSpecialChar(StringBuffer sb, char[] c, int i, char format) {
+    private int convertSpecialChar(StringBuffer sb, char[] c, int i, FORMAT_MODE format) {
+        assert(c[i] == '{');
 
         sb.append(c[i]);
         i++; // skip over open brace
@@ -157,9 +201,9 @@ public class BibtexCaseChanger {
      * @param s
      * @param sb
      * @param format
-     * @return
+     * @return the new position
      */
-    private int convertAccented(char[] c, int pos, String s, StringBuffer sb, char format) {
+    private int convertAccented(char[] c, int pos, String s, StringBuffer sb, FORMAT_MODE format) {
         pos += s.length();
 
         switch (format) {
@@ -175,7 +219,6 @@ public class BibtexCaseChanger {
             if ("l o oe ae aa".contains(s)) {
                 sb.append(s.toUpperCase());
             } else if ("i j ss".contains(s)) {
-
                 sb.deleteCharAt(sb.length() - 1); // Kill backslash
                 sb.append(s.toUpperCase());
                 while ((pos < c.length) && Character.isWhitespace(c[pos])) {
@@ -189,7 +232,7 @@ public class BibtexCaseChanger {
         return pos;
     }
 
-    private int convertNonControl(char[] c, int pos, StringBuffer sb, char format) {
+    private int convertNonControl(char[] c, int pos, StringBuffer sb, FORMAT_MODE format) {
         switch (format) {
         case TITLE_LOWERS:
         case ALL_LOWERS:
@@ -204,15 +247,7 @@ public class BibtexCaseChanger {
         return pos;
     }
 
-
-    private static final char TITLE_LOWERS = 't';
-
-    private static final char ALL_LOWERS = 'l';
-
-    private static final char ALL_UPPERS = 'u';
-
-
-    private int convertChar0(char[] c, int i, StringBuffer sb, char format) {
+    private int convertCharIfBraceLevelIsZero(char[] c, int i, StringBuffer sb, FORMAT_MODE format) {
         switch (format) {
         case TITLE_LOWERS:
             if (i == 0) {
@@ -238,6 +273,16 @@ public class BibtexCaseChanger {
         return i;
     }
 
+    /**
+     * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
+     * If nothing found, return null
+     *
+     * Also used by BibtexPurify
+     *
+     * @param c the current "String"
+     * @param pos the position
+     * @return the special LaTeX character or null
+     */
     static String findSpecialChar(char[] c, int pos) {
         if ((pos + 1) < c.length) {
             if ((c[pos] == 'o') && (c[pos + 1] == 'e')) {
