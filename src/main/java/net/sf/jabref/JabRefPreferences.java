@@ -260,7 +260,11 @@ public class JabRefPreferences {
     public static final String PREVIEW_0 = "preview0";
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
+
+    // Currently, it is not possible to specify defaults for specific entry types
+    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
+
     public static final String SEARCH_ALL_BASES = "searchAllBases";
     public static final String SHOW_SEARCH_IN_DIALOG = "showSearchInDialog";
     public static final String FLOAT_SEARCH = "floatSearch";
@@ -1210,7 +1214,8 @@ public class JabRefPreferences {
     }
 
     /**
-     * Fetches key patterns from preferences Not cached
+     * Fetches key patterns from preferences.
+     * The implementation doesn't cache the results
      *
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
