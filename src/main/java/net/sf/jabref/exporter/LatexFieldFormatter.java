@@ -32,7 +32,7 @@ import java.util.Vector;
  * * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
  * * JabRefPreferences.WRITEFIELD_WRAPFIELD
  */
-public class LatexFieldFormatter implements FieldFormatter {
+public class LatexFieldFormatter {
 
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
@@ -71,7 +71,14 @@ public class LatexFieldFormatter implements FieldFormatter {
         parser = new FieldContentParser();
     }
 
-    @Override
+    /**
+     * Formats the content of a field.
+     *
+     * @param s the content of the field
+     * @param fieldName the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+     * @return a formatted string suitable for output
+     * @throws IllegalArgumentException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
+     */
     public String format(String text, String fieldName)
             throws IllegalArgumentException {
 

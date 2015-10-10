@@ -20,7 +20,7 @@ package net.sf.jabref.logic.bibtex;
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.FieldFormatter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -83,7 +83,7 @@ public class BibtexEntryWriter {
         maxFieldLength = max;
     }
 
-    private final FieldFormatter fieldFormatter;
+    private final LatexFieldFormatter fieldFormatter;
     private final boolean write;
     private final boolean writeFieldCameCaseName = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_CAMELCASENAME);
     private final boolean writeFieldAddSpaces = Globals.prefs.getBoolean(JabRefPreferences.WRITEFIELD_ADDSPACES);
@@ -91,7 +91,7 @@ public class BibtexEntryWriter {
     private final int writeFieldSortStyle = Globals.prefs.getInt(JabRefPreferences.WRITEFIELD_SORTSTYLE);
 
 
-    public BibtexEntryWriter(FieldFormatter fieldFormatter, boolean write) {
+    public BibtexEntryWriter(LatexFieldFormatter fieldFormatter, boolean write) {
         this.fieldFormatter = fieldFormatter;
         this.write = write;
     }
