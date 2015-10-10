@@ -385,9 +385,9 @@ class LayoutEntry {
             } catch (ClassNotFoundException ex) {
                 throw new Exception(Localization.lang("Formatter not found") + ": " + className);
             } catch (InstantiationException ex) {
-                throw new Exception(className + " can not be instantiated.");
+                throw new Exception(className + " cannot be instantiated.");
             } catch (IllegalAccessException ex) {
-                throw new Exception(className + " can't be accessed.");
+                throw new Exception(className + " cannot be accessed.");
             }
         }
         return null;

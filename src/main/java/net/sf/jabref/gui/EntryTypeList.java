@@ -76,7 +76,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         else if (s.equalsIgnoreCase("comment")) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' can not be used as an entry type name."),
+            JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' cannot be used as an entry type name."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             return;
         }

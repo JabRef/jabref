@@ -255,21 +255,21 @@ class StringDialog extends JDialog {
                     } else if (((String) value).contains(" ")) {
                         JOptionPane.showMessageDialog
                                 (parent,
-                                        Localization.lang("The label of the string can not contain spaces."),
+                                        Localization.lang("The label of the string cannot contain spaces."),
                                         Localization.lang("Label"),
                                         JOptionPane.ERROR_MESSAGE);
                     }
                     else if (((String) value).contains("#")) {
                         JOptionPane.showMessageDialog
                                 (parent,
-                                        Localization.lang("The label of the string can not contain the '#' character."),
+                                        Localization.lang("The label of the string cannot contain the '#' character."),
                                         Localization.lang("Label"),
                                         JOptionPane.ERROR_MESSAGE);
                     }
                     else if (isNumber((String) value)) {
                         JOptionPane.showMessageDialog
                                 (parent,
-                                        Localization.lang("The label of the string can not be a number."),
+                                        Localization.lang("The label of the string cannot be a number."),
                                         Localization.lang("Label"),
                                         JOptionPane.ERROR_MESSAGE);
                     }
@@ -331,7 +331,7 @@ class StringDialog extends JDialog {
 
 
     private boolean isNumber(String name) {
-        // A pure integer number can not be used as a string label,
+        // A pure integer number cannot be used as a string label,
         // since Bibtex will read it as a number.
         try {
             Integer.parseInt(name);
@@ -404,7 +404,7 @@ class StringDialog extends JDialog {
             if (isNumber(name)) {
                 JOptionPane.showMessageDialog
                         (parent,
-                                Localization.lang("The label of the string can not be a number."),
+                                Localization.lang("The label of the string cannot be a number."),
                                 Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
@@ -412,7 +412,7 @@ class StringDialog extends JDialog {
             if (name.contains("#")) {
                 JOptionPane.showMessageDialog
                         (parent,
-                                Localization.lang("The label of the string can not contain the '#' character."),
+                                Localization.lang("The label of the string cannot contain the '#' character."),
                                 Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
@@ -420,7 +420,7 @@ class StringDialog extends JDialog {
             if (name.contains(" ")) {
                 JOptionPane.showMessageDialog
                         (parent,
-                                Localization.lang("The label of the string can not contain spaces."),
+                                Localization.lang("The label of the string cannot contain spaces."),
                                 Localization.lang("Label"),
                                 JOptionPane.ERROR_MESSAGE);
                 return;
