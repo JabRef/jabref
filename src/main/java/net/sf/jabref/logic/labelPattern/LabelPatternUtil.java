@@ -178,7 +178,6 @@ public class LabelPatternUtil {
      * @return True if the author or editor is an institution.
      */
     private static boolean isInstitution(String author) {
-        Author a = AuthorList.getAuthorList(author).getAuthor(0);
         return author.charAt(0) == '{'
                 && author.charAt(author.length() - 1) == '}';
     }
@@ -625,6 +624,8 @@ public class LabelPatternUtil {
                     return LabelPatternUtil.firstAuthor(authString);
                 } else if (val.equals("authForeIni")) {
                     return LabelPatternUtil.firstAuthorForenameInitials(authString);
+                } else if (val.equals("authFirstFull")) {
+                    return LabelPatternUtil.firstAuthorVonAndLast(authString);
                 } else if (val.equals("authors")) {
                     return LabelPatternUtil.allAuthors(authString);
                 } else if (val.equals("authorsAlpha")) {
@@ -863,7 +864,7 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField == null
      */
-    public static String firstAuthor(String authorField) {
+    static String firstAuthor(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
         if (authorList.size() == 0) {
             return "";
@@ -874,7 +875,7 @@ public class LabelPatternUtil {
     }
 
     /**
-     * Gets the first name initals of the first author/editor
+     * Gets the first name initials of the first author/editor
      * 
      * @param authorField
      *            a <code>String</code>
@@ -884,7 +885,7 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField == null
      */
-    private static String firstAuthorForenameInitials(String authorField) {
+    static String firstAuthorForenameInitials(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
         if (authorList.size() == 0) {
             return "";
@@ -895,6 +896,7 @@ public class LabelPatternUtil {
 
     /**
      * Gets the von part and the last name of the first author/editor
+     * No spaces are returned
      *
      * @param authorField
      *            a <code>String</code>
@@ -904,16 +906,15 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField == null
      */
-    public static String firstAuthorVonAndLast(String authorField) {
+    static String firstAuthorVonAndLast(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
         if (authorList.size() == 0) {
             return "";
         }
-        String vonAuthor = authorList.getAuthor(0).getVon();
+        String vonAuthor = authorList.getAuthor(0).getVon().replaceAll(" ", "");
         StringBuilder stringBuilder = new StringBuilder();
         if (vonAuthor != null) {
             stringBuilder.append(vonAuthor);
-            stringBuilder.append(' ');
         }
         vonAuthor = authorList.getAuthor(0).getLast();
         if (vonAuthor != null) {

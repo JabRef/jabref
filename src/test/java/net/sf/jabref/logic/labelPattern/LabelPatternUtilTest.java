@@ -16,6 +16,19 @@ import net.sf.jabref.util.Util;
 
 public class LabelPatternUtilTest {
 
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = "Isaac Newton";
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2 = "Isaac Newton and James Maxwell";
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = "Isaac Newton and James Maxwell and Albert Einstein";
+
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1 = "Wil van der Aalst";
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2 = "Wil van der Aalst and Tammo van Lessen";
+
+    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1 = "I. Newton";
+    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2 = "I. Newton and J. Maxwell";
+    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3 = "I. Newton and J. Maxwell and A. Einstein";
+    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4 = "I. Newton and J. Maxwell and A. Einstein and N. Bohr";
+    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5 = "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown";
+
     @BeforeClass
     public static void setUpGlobalsPrefs() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -180,8 +193,8 @@ public class LabelPatternUtilTest {
         Assert.assertEquals(
                 "Newton",
                 LabelPatternUtil
-                        .firstAuthor("I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown"));
-        Assert.assertEquals("Newton", LabelPatternUtil.firstAuthor("I. Newton"));
+                        .firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        Assert.assertEquals("Newton", LabelPatternUtil.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
 
         // https://sourceforge.net/forum/message.php?msg_id=4498555
         Assert.assertEquals("K{\\\"o}ning", LabelPatternUtil
@@ -203,23 +216,23 @@ public class LabelPatternUtilTest {
                 "NMEB",
                 LabelPatternUtil
                         .authIniN(
-                                "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown",
+                                AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5,
                                 4));
         Assert.assertEquals("NMEB", LabelPatternUtil.authIniN(
-                "I. Newton and J. Maxwell and A. Einstein and N. Bohr", 4));
+                AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 4));
         Assert.assertEquals("NeME", LabelPatternUtil.authIniN(
-                "I. Newton and J. Maxwell and A. Einstein", 4));
+                AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 4));
         Assert.assertEquals("NeMa", LabelPatternUtil.authIniN(
-                "I. Newton and J. Maxwell", 4));
-        Assert.assertEquals("Newt", LabelPatternUtil.authIniN("I. Newton", 4));
+                AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 4));
+        Assert.assertEquals("Newt", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 4));
         Assert.assertEquals("", "");
 
-        Assert.assertEquals("N", LabelPatternUtil.authIniN("I. Newton", 1));
-        Assert.assertEquals("", LabelPatternUtil.authIniN("I. Newton", 0));
-        Assert.assertEquals("", LabelPatternUtil.authIniN("I. Newton", -1));
+        Assert.assertEquals("N", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
+        Assert.assertEquals("", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 0));
+        Assert.assertEquals("", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, -1));
 
-        Assert.assertEquals("Newton", LabelPatternUtil.authIniN("I. Newton", 6));
-        Assert.assertEquals("Newton", LabelPatternUtil.authIniN("I. Newton", 7));
+        Assert.assertEquals("Newton", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 6));
+        Assert.assertEquals("Newton", LabelPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
 
         try {
             LabelPatternUtil.authIniN(null, 3);
@@ -236,20 +249,17 @@ public class LabelPatternUtilTest {
     public void testAuthEtAl() {
         // tests taken from the comments
 
-        String firstAuthors = "Isaac Newton and James Maxwell and Albert Einstein";
-        String secondAuthors = "Isaac Newton and James Maxwell";
-
         // [auth.etal]
         String delim = ".";
         String append = ".etal";
-        Assert.assertEquals("Newton.etal", LabelPatternUtil.authEtal(firstAuthors, delim, append));
-        Assert.assertEquals("Newton.Maxwell", LabelPatternUtil.authEtal(secondAuthors, delim, append));
+        Assert.assertEquals("Newton.etal", LabelPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
+        Assert.assertEquals("Newton.Maxwell", LabelPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
 
         // [authEtAl]
         delim = "";
         append = "EtAl";
-        Assert.assertEquals("NewtonEtAl", LabelPatternUtil.authEtal(firstAuthors, delim, append));
-        Assert.assertEquals("NewtonMaxwell", LabelPatternUtil.authEtal(secondAuthors, delim, append));
+        Assert.assertEquals("NewtonEtAl", LabelPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
+        Assert.assertEquals("NewtonMaxwell", LabelPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
     }
 
     /**
@@ -260,16 +270,48 @@ public class LabelPatternUtilTest {
         // tests taken from the comments
         Assert.assertEquals(
                 "NME+",
-                LabelPatternUtil.authshort("I. Newton and J. Maxwell and A. Einstein and N. Bohr"));
+                LabelPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
         Assert.assertEquals(
                 "NME",
-                LabelPatternUtil.authshort("I. Newton and J. Maxwell and A. Einstein"));
+                LabelPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
         Assert.assertEquals(
                 "NM",
-                LabelPatternUtil.authshort("I. Newton and J. Maxwell"));
+                LabelPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         Assert.assertEquals(
                 "Newton",
-                LabelPatternUtil.authshort("I. Newton"));
+                LabelPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+    }
+
+    /**
+     * Tests [authForeIni]
+     */
+    @Test
+    public void firstAuthorForenameInitials() {
+        Assert.assertEquals(
+                "I",
+                LabelPatternUtil.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        Assert.assertEquals(
+                "I",
+                LabelPatternUtil.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+        Assert.assertEquals(
+                "I",
+                LabelPatternUtil.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
+        Assert.assertEquals(
+                "I",
+                LabelPatternUtil.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
+    }
+
+    /**
+     * Tests [authFirstFull]
+     */
+    @Test
+    public void firstAuthorVonAndLast() {
+        Assert.assertEquals(
+                "vanderAalst",
+                LabelPatternUtil.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
+        Assert.assertEquals(
+                "vanderAalst",
+                LabelPatternUtil.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
     }
 
     /**
@@ -279,13 +321,13 @@ public class LabelPatternUtilTest {
     public void testAllAuthors() {
         Assert.assertEquals(
                 "Newton",
-                LabelPatternUtil.allAuthors("I. Newton"));
+                LabelPatternUtil.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
         Assert.assertEquals(
                 "NewtonMaxwell",
-                LabelPatternUtil.allAuthors("I. Newton and J. Maxwell"));
+                LabelPatternUtil.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         Assert.assertEquals(
                 "NewtonMaxwellEinstein",
-                LabelPatternUtil.allAuthors("I. Newton and J. Maxwell and A. Einstein"));
+                LabelPatternUtil.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
     }
 
     /**
@@ -296,16 +338,16 @@ public class LabelPatternUtilTest {
         // test [authors3]
         Assert.assertEquals(
                 "Newton",
-                LabelPatternUtil.NAuthors("I. Newton", 3));
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
         Assert.assertEquals(
                 "NewtonMaxwell",
-                LabelPatternUtil.NAuthors("I. Newton and J. Maxwell", 3));
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3));
         Assert.assertEquals(
                 "NewtonMaxwellEinstein",
-                LabelPatternUtil.NAuthors("I. Newton and J. Maxwell and A. Einstein", 3));
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3));
         Assert.assertEquals(
                 "NewtonMaxwellEinsteinEtAl",
-                LabelPatternUtil.NAuthors("I. Newton and J. Maxwell and A. Einstein and N. Bohr", 3));
+                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 3));
     }
 
     @Test
