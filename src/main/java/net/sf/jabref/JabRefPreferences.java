@@ -678,7 +678,7 @@ public class JabRefPreferences {
         defaults.put(FLOAT_SEARCH, Boolean.TRUE);
         defaults.put(SHOW_SEARCH_IN_DIALOG, Boolean.FALSE);
         defaults.put(SEARCH_ALL_BASES, Boolean.FALSE);
-        defaults.put(DEFAULT_LABEL_PATTERN, "[auth][year]");
+        defaults.put(DEFAULT_LABEL_PATTERN, "[authors3][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);
         defaults.put(PREVIEW_0, "<font face=\"arial\">"
