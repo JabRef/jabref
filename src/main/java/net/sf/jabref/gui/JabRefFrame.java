@@ -1907,11 +1907,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             mainLoop:
             for (BibtexEntry entry : bibentries) {
                 boolean dupli = false;
+                final ArrayList<BibtexEntry> toAdd = new ArrayList<BibtexEntry>();
                 // Check for duplicates among the current entries:
                 for (String s : database.getKeySet()) {
                     BibtexEntry existingEntry = database.getEntryById(s);
-                    if (DuplicateCheck.isDuplicate(entry, existingEntry
-                    )) {
+                    boolean remove = false;
+                    if (DuplicateCheck.isDuplicate(entry, existingEntry)) {
                         DuplicateResolverDialog drd = new DuplicateResolverDialog
                                 (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                         drd.setVisible(true);
@@ -1919,16 +1920,22 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         if (res == DuplicateResolverDialog.KEEP_LOWER) {
                             dupli = true;
                         } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
-                            database.removeEntry(existingEntry.getId());
-                            ce.addEdit(new UndoableRemoveEntry
-                                    (database, existingEntry, basePanel));
+                            remove = true;
+                        } else if (res == DuplicateResolverDialog.KEEP_MERGE) {
+                            LOGGER.error("Merge button!");
+                            dupli = true;
+                            remove = true;
+                            toAdd.add(drd.getMergedEntry());
                         } else if (res == DuplicateResolverDialog.BREAK) {
                             break mainLoop;
+                        }
+                        if (remove) {
+                            database.removeEntry(existingEntry.getId());
+                            ce.addEdit(new UndoableRemoveEntry(database, existingEntry, basePanel));
                         }
                         break;
                     }
                 }
-
                 if (!dupli) {
 
                     entry.setId(IdGenerator.next());
@@ -1936,7 +1943,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     ce.addEdit(new UndoableInsertEntry
                             (database, entry, basePanel));
                     addedEntries++;
-
+                }
+                if (!toAdd.isEmpty()) {
+                    for (BibtexEntry addEntry : toAdd) {
+                        addEntry.setId(IdGenerator.next());
+                        database.insertEntry(addEntry);
+                        ce.addEdit(new UndoableInsertEntry(database, addEntry, basePanel));
+                        addedEntries++;
+                    }
                 }
             }
             if (addedEntries > 0) {

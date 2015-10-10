@@ -150,7 +150,7 @@ public class MergeEntriesDialog extends JDialog {
     /**
      * Act on button pressed
      * 
-     * @param button Butten pressed
+     * @param button Button pressed
      */
     private void buttonPressed(String button) {
         BibtexEntry mergedEntry = mergeEntries.getMergeEntry();
@@ -160,14 +160,14 @@ public class MergeEntriesDialog extends JDialog {
 
             dispose();
         } else if (button.equals("replace")) {
-            // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
-            panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
             ce.addEdit(new UndoableRemoveEntry(panel.database(), one, panel));
             panel.database().removeEntry(one.getId());
             ce.addEdit(new UndoableRemoveEntry(panel.database(), two, panel));
             panel.database().removeEntry(two.getId());
+            // Create a new entry and add it to the undo stack
+            panel.insertEntry(mergedEntry);
+            ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
             ce.end();
             panel.undoManager.addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
