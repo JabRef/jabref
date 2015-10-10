@@ -30,7 +30,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 
@@ -94,12 +95,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
         LabelPatternUtil.updateDefaultPattern();
 
-        // fetch the old parent from the currently stored patterns
-        LabelPattern defKeyPattern = prefs.getKeyPattern().getParent();
         // fetch entries from GUI
-        LabelPattern keypatterns = getLabelPattern();
-        // restore old parent
-        keypatterns.setParent(defKeyPattern);
+        GlobalLabelPattern keypatterns = getLabelPatternAsGlobalLabelPattern();
         // store new patterns globally
         prefs.putKeyPattern(keypatterns);
     }

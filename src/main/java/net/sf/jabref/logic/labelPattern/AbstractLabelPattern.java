@@ -25,41 +25,13 @@ import java.util.Hashtable;
  * A small table, where an entry type is associated with a label pattern (an
  * <code>ArrayList</code>). A parent LabelPattern can be set.
  */
-public class LabelPattern {
+public abstract class AbstractLabelPattern {
 
-    private ArrayList<String> defaultPattern;
+    protected ArrayList<String> defaultPattern;
 
-    /**
-     * The parent of this LabelPattern.
-     */
-    private LabelPattern parent;
+    protected Hashtable<String, ArrayList<String>> data = new Hashtable<>();
 
-    private Hashtable<String, ArrayList<String>> data = new Hashtable<>();
-
-    public LabelPattern() {
-    }
-
-    public LabelPattern(LabelPattern parent) {
-        this.parent = parent;
-    }
-
-    /**
-     * Sets the parent LabelPattern.
-     * 
-     * @param parent
-     *            a <code>String</code>
-     */
-    public void setParent(LabelPattern parent) {
-        this.parent = parent;
-    }
-
-    /**
-     * Get the parent LabelPattern
-     * 
-     * @return the parent LabelPattern
-     */
-    public LabelPattern getParent() {
-        return parent;
+    public AbstractLabelPattern() {
     }
 
     public void addLabelPattern(String type, String pattern) {
@@ -67,57 +39,28 @@ public class LabelPattern {
     }
 
     /**
-     * Remove a label pattern from the LabelPattern. No key patterns can be
-     * removed from the very parent LabelPattern since is thought of as a
-     * default. To do this, use the removeKeyPattern(String type, boolean sure)
+     * Remove a label pattern from the LabelPattern.
      * 
-     * @param type
-     *            a <code>String</code>
+     * @param type a <code>String</code>
      */
     public void removeLabelPattern(String type) {
-        if (data.containsKey(type) && parent != null) {
-            data.remove(type);
-        }
-    }
-
-    public void removeLabelPattern(String type, boolean sure) {
-        if (data.containsKey(type) && sure) {
+        if (data.containsKey(type)) {
             data.remove(type);
         }
     }
 
     /**
      * Gets an object for a desired label from this LabelPattern or one of it's
-     * parents. This method first tries to obtain the object from this
+     * parents (in the case of DatabaseLAbelPattern). This method first tries to obtain the object from this
      * LabelPattern via the <code>get</code> method of <code>Hashtable</code>.
      * If this fails, we try the default.<br />
      * If that fails, we try the parent.<br />
      * If that fails, we return the DEFAULT_LABELPATTERN<br />
      * 
      * @param key a <code>String</code>
-     * @return the list of Strings for the given key
+     * @return the list of Strings for the given key. First entry: the complete key
      */
-    public final ArrayList<String> getValue(String key) {
-        ArrayList<String> result = data.get(key);
-        // Test to see if we found anything
-        if (result == null) {
-            // check default value
-            result = getDefaultValue();
-            if (result == null) {
-                // no default value, ask parent
-                if (parent != null) {
-                    result = parent.getValue(key);
-                    // parent will definitely return something != null
-                } else {
-                    // we are the "last" parent
-                    // we don't have anything left
-                    // return the global default pattern
-                    return LabelPatternUtil.DEFAULT_LABELPATTERN;
-                }
-            }
-        }
-        return result;
-    }
+    public abstract ArrayList<String> getValue(String key);
 
     /**
      * Checks whether this pattern is customized or the default value.
@@ -129,7 +72,8 @@ public class LabelPattern {
 
     /**
      * This method is called "...Value" to be in line with the other methods
-     * @return
+     *
+     * @return null if not available.
      */
     public ArrayList<String> getDefaultValue() {
         return this.defaultPattern;

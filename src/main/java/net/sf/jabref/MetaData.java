@@ -21,8 +21,8 @@ import java.util.*;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.logic.labelPattern.LabelPattern;
-
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -39,7 +39,7 @@ public class MetaData implements Iterable<String> {
     private File file; // The File where this base gets saved.
     private boolean groupTreeValid = true;
 
-    private LabelPattern labelPattern;
+    private AbstractLabelPattern labelPattern;
 
     private DBStrings dbStrings = new DBStrings();
 
@@ -357,16 +357,14 @@ public class MetaData implements Iterable<String> {
     /**
      * @return the stored label patterns
      */
-    public LabelPattern getLabelPattern() {
+    public AbstractLabelPattern getLabelPattern() {
         if (labelPattern != null) {
             return labelPattern;
         }
 
-        labelPattern = new LabelPattern();
+        labelPattern = new DatabaseLabelPattern();
 
-        // the parent label pattern of a BibTeX data base is the global pattern stored in the preferences
-        labelPattern.setParent(Globals.prefs.getKeyPattern());
-
+        // read the data from the metadata and store it into the labelPattern
         for (String key : this) {
             if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 Vector<String> value = getData(key);
@@ -374,7 +372,6 @@ public class MetaData implements Iterable<String> {
                 labelPattern.addLabelPattern(type, value.get(0));
             }
         }
-
         Vector<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
             labelPattern.setDefaultValue(defaultPattern.get(0));
@@ -389,7 +386,7 @@ public class MetaData implements Iterable<String> {
      * @param labelPattern the key patterns to update to. <br />
      * A reference to this object is stored internally and is returned at getLabelPattern();
      */
-    public void setLabelPattern(LabelPattern labelPattern) {
+    public void setLabelPattern(DatabaseLabelPattern labelPattern) {
         // remove all keypatterns from metadata
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {

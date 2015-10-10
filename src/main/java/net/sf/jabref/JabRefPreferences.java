@@ -43,7 +43,8 @@ import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
@@ -367,7 +368,7 @@ public class JabRefPreferences {
 
     private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
     private final HashSet<String> nonWrappableFields = new HashSet<String>(5);
-    private static LabelPattern keyPattern;
+    private static GlobalLabelPattern keyPattern;
 
     // Object containing custom export formats:
     public final CustomExportList customExports;
@@ -1219,9 +1220,9 @@ public class JabRefPreferences {
      *
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
-    public LabelPattern getKeyPattern() {
-        JabRefPreferences.keyPattern = new LabelPattern();
-        Preferences pre = Preferences.userNodeForPackage(LabelPattern.class);
+    public GlobalLabelPattern getKeyPattern() {
+        JabRefPreferences.keyPattern = new GlobalLabelPattern();
+        Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
@@ -1240,11 +1241,11 @@ public class JabRefPreferences {
      *
      * @param pattern the pattern to store
      */
-    public void putKeyPattern(LabelPattern pattern) {
+    public void putKeyPattern(GlobalLabelPattern pattern) {
         JabRefPreferences.keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(LabelPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {

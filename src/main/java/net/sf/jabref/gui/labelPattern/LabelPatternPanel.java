@@ -38,7 +38,9 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPattern;
+import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
@@ -224,11 +226,9 @@ public class LabelPatternPanel extends JPanel {
     }
 
     /**
-     * @return the LabelPattern generated from the text fields 
+     * fill the given LabelPattern by values generated from the text fields
      */
-    public LabelPattern getLabelPattern() {
-        LabelPattern keypatterns = new LabelPattern();
-
+    private void fillPatternUsingPanelData(AbstractLabelPattern keypatterns) {
         // each entry type
         for (String s1 : textFields.keySet()) {
             String text = textFields.get(s1).getText();
@@ -242,8 +242,18 @@ public class LabelPatternPanel extends JPanel {
         if (!"".equals(text.trim())) { // we do not trim the value at the assignment to enable users to have spaces at the beginning and at the end of the pattern
             keypatterns.setDefaultValue(text);
         }
+    }
 
-        return keypatterns;
+    protected GlobalLabelPattern getLabelPatternAsGlobalLabelPattern() {
+        GlobalLabelPattern res = new GlobalLabelPattern();
+        fillPatternUsingPanelData(res);
+        return res;
+    }
+
+    public DatabaseLabelPattern getLabelPatternAsDatabaseLabelPattern() {
+        DatabaseLabelPattern res = new DatabaseLabelPattern();
+        fillPatternUsingPanelData(res);
+        return res;
     }
 
     /**
@@ -251,7 +261,7 @@ public class LabelPatternPanel extends JPanel {
      * 
      * @param keypatterns the LabelPattern to use as initial value
      */
-    public void setValues(LabelPattern keypatterns) {
+    public void setValues(AbstractLabelPattern keypatterns) {
         for (String name : textFields.keySet()) {
             JTextField tf = textFields.get(name);
             setValue(tf, name, keypatterns);
@@ -264,7 +274,7 @@ public class LabelPatternPanel extends JPanel {
         }
     }
 
-    private void setValue(JTextField tf, String fieldName, LabelPattern keypatterns) {
+    private void setValue(JTextField tf, String fieldName, AbstractLabelPattern keypatterns) {
         if (keypatterns.isDefaultValue(fieldName)) {
             tf.setText("");
         } else {

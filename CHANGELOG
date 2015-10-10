@@ -37,6 +37,8 @@
     - Feature: case changers now leave protected areas (enclosed with curly brakets) alone
     - Fix #223: Window is displayed in visible area even when having multiple screens
     - Localization tweaks: "can not" -> "cannot" and "file name" -> "filename"
+    - Bugfix: When reconfiguring the BibTeX key generator, changes are applied instantly without requiring a restart of JabRef
+    - BREAKING: The BibTeX key generator settings from previous versions are lost
 [dev_2.11]
     - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
