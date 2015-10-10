@@ -400,10 +400,12 @@ public class MetaData implements Iterable<String> {
         }
 
         // set new value if it is not a default value
-        for (String key : labelPattern.keySet()) {
+        Enumeration<String> allKeys = labelPattern.getAllKeys();
+        while (allKeys.hasMoreElements()) {
+            String key = allKeys.nextElement();
             String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
-            ArrayList<String> value = labelPattern.get(key);
-            if (value != null) {
+            if (!labelPattern.isDefaultValue(key)) {
+                ArrayList<String> value = labelPattern.getValue(key);
                 Vector<String> data = new Vector<String>();
                 data.add(value.get(0));
                 this.putData(metaDataKey, data);

@@ -1251,13 +1251,15 @@ public class JabRefPreferences {
             LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
-        for (Map.Entry<String, ArrayList<String>> stringArrayListEntry : pattern.entrySet()) {
-            ArrayList<String> value = stringArrayListEntry.getValue();
-            if (value != null) {
+        Enumeration<String> allKeys = pattern.getAllKeys();
+        while (allKeys.hasMoreElements()) {
+            String key = allKeys.nextElement();
+            if (!pattern.isDefaultValue(key)) {
+                ArrayList<String> value = pattern.getValue(key);
                 // no default value
                 // the first entry in the array is the full pattern
                 // see net.sf.jabref.logic.labelPattern.LabelPatternUtil.split(String)
-                pre.put(stringArrayListEntry.getKey(), value.get(0));
+                pre.put(key, value.get(0));
             }
         }
     }

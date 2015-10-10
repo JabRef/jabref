@@ -1,4 +1,6 @@
 /*  Copyright (C) 2003-2015 JabRef contributors.
+                  2003 Ulrik Stervbo (ulriks AT ruc.dk)
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,15 +18,14 @@
 package net.sf.jabref.logic.labelPattern;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
  * A small table, where an entry type is associated with a label pattern (an
  * <code>ArrayList</code>). A parent LabelPattern can be set.
- * 
- * @author Ulrik Stervbo (ulriks AT ruc.dk)
  */
-public class LabelPattern extends Hashtable<String, ArrayList<String>> {
+public class LabelPattern {
 
     private ArrayList<String> defaultPattern;
 
@@ -33,6 +34,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      */
     private LabelPattern parent;
 
+    private Hashtable<String, ArrayList<String>> data = new Hashtable<>();
 
     public LabelPattern() {
     }
@@ -61,7 +63,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
     }
 
     public void addLabelPattern(String type, String pattern) {
-        put(type, LabelPatternUtil.split(pattern));
+        data.put(type, LabelPatternUtil.split(pattern));
     }
 
     /**
@@ -73,15 +75,14 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      *            a <code>String</code>
      */
     public void removeLabelPattern(String type) {
-        if (containsKey(type) && parent != null) {
-            remove(type);
+        if (data.containsKey(type) && parent != null) {
+            data.remove(type);
         }
     }
 
     public void removeLabelPattern(String type, boolean sure) {
-
-        if (containsKey(type) && sure) {
-            remove(type);
+        if (data.containsKey(type) && sure) {
+            data.remove(type);
         }
     }
 
@@ -97,7 +98,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      * @return the list of Strings for the given key
      */
     public final ArrayList<String> getValue(String key) {
-        ArrayList<String> result = get(key);
+        ArrayList<String> result = data.get(key);
         // Test to see if we found anything
         if (result == null) {
             // check default value
@@ -122,7 +123,7 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      * Checks whether this pattern is customized or the default value.
      */
     public final boolean isDefaultValue(String key) {
-        Object _obj = get(key);
+        Object _obj = data.get(key);
         return _obj == null;
     }
 
@@ -140,5 +141,9 @@ public class LabelPattern extends Hashtable<String, ArrayList<String>> {
      */
     public void setDefaultValue(String labelPattern) {
         this.defaultPattern = LabelPatternUtil.split(labelPattern);
+    }
+
+    public Enumeration<String> getAllKeys() {
+        return data.keys();
     }
 }
