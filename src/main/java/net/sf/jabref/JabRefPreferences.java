@@ -507,7 +507,7 @@ public class JabRefPreferences {
         defaults.put(SAVE_SECONDARY_SORT_FIELD, "author");
         defaults.put(SAVE_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(SAVE_TERTIARY_SORT_FIELD, "title");
-        defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(SAVE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
 
         // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
