@@ -728,9 +728,13 @@ public class JabRefPreferences {
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
-        defaults.put(TIME_STAMP_FORMAT, "yyyy.MM.dd");
+
+        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
+        defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
+
         defaults.put(TIME_STAMP_FIELD, BibtexFields.TIMESTAMP);
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
+
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
         // behavior of JabRef before 2.10: both: false
