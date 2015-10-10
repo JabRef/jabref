@@ -63,7 +63,7 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.5.1-1'
 
     compile 'mysql:mysql-connector-java:5.1.36'
-    compile 'org.postgresql:postgresql:9.4-1203-jdbc42'
+    compile 'org.postgresql:postgresql:9.4-1204-jdbc42'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
@@ -77,7 +77,7 @@ dependencies {
     compile 'junit:junit:4.12'
 
     compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.mashape.unirest:unirest-java:1.4.6'
+    compile 'com.mashape.unirest:unirest-java:1.4.7'
 }
 
 sourceSets {
