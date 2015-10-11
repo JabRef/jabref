@@ -29,30 +29,29 @@ import java.util.stream.Collectors;
  */
 public class CaseChangers {
 
+    public static final Set<String> SMALLER_WORDS;
+
+    static {
+        Set<String> smallerWords = new HashSet<>();
+        // NOTE: before JabRef 2.80, it was SKIP_WORDS = {"a", "an", "the", "for", "on", "of"}; in net.sf.jabref.logic.labelPattern.LabelPatternUtil.SKIP_WORDS 
+
+        // Articles
+        smallerWords.addAll(Arrays.asList("a", "an", "the"));
+        // Prepositions
+        smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
+        // Conjunctions
+        smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
+
+        // unmodifiable for thread safety
+        SMALLER_WORDS = Collections.unmodifiableSet(smallerWords);
+    }
+
     /**
      * Represents a word in a title of a bibtex entry.
      * <p>
      * A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
      */
     private static final class Word {
-
-        private static final Set<String> SMALLER_WORDS;
-
-        static {
-            Set<String> smallerWords = new HashSet<>();
-
-            // see also net.sf.jabref.logic.labelPattern.LabelPatternUtil.SKIP_WORDS
-
-            // Articles
-            smallerWords.addAll(Arrays.asList("a", "an", "the"));
-            // Prepositions
-            smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
-            // Conjunctions
-            smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
-
-            // unmodifiable for thread safety
-            SMALLER_WORDS = Collections.unmodifiableSet(smallerWords);
-        }
 
         private char[] chars;
         private boolean[] protectedChars;

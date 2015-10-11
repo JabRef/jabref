@@ -29,6 +29,15 @@ public class LabelPatternUtilTest {
     private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4 = "I. Newton and J. Maxwell and A. Einstein and N. Bohr";
     private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5 = "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown";
 
+    private static final String TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH = "application migration effort in the cloud - the case of cloud platforms";
+    private static final String TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON = "{BPEL} conformance in open source engines: the case of static analysis";
+    private static final String TITLE_STRING_CASED = "Process Viewing Patterns";
+    private static final String TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD = "BPMN Conformance in Open Source Engines";
+    private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING = "The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages";
+    private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON = "Cloud Computing: The Next Revolution in IT";
+    private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD = "Towards Choreography-based Process Distribution in the Cloud";
+    private static final String TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS = "On the Measurement of Design-Time Adaptability for Process-Based Systems ";
+
     @BeforeClass
     public static void setUpGlobalsPrefs() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -548,6 +557,72 @@ public class LabelPatternUtilTest {
         } catch (NullPointerException ignored) {
 
         }
+    }
+
+    /**
+     * Tests [veryShortTitle]
+     */
+    @Test
+    public void veryShortTitle() {
+        // veryShortTitle is getTitleWords with "1" as count
+        final int count = 1;
+        Assert.assertEquals(
+                "application",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+        Assert.assertEquals(
+                "BPEL",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        Assert.assertEquals(
+                "Process",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
+        Assert.assertEquals(
+                "BPMN",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+        Assert.assertEquals(
+                "Difference",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
+        Assert.assertEquals(
+                "Cloud",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        Assert.assertEquals(
+                "Towards",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+        Assert.assertEquals(
+                "Measurement",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+    }
+
+    /**
+     * Tests [shortTitle]
+     */
+    @Test
+    public void shortTitle() {
+        // veryShortTitle is getTitleWords with "3" as count
+        final int count = 3;
+        Assert.assertEquals(
+                "applicationmigrationeffort",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+        Assert.assertEquals(
+                "BPELconformanceopen",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        Assert.assertEquals(
+                "ProcessViewingPatterns",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
+        Assert.assertEquals(
+                "BPMNConformanceOpen",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+        Assert.assertEquals(
+                "DifferenceGraphBased",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
+        Assert.assertEquals(
+                "CloudComputingNext",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        Assert.assertEquals(
+                "TowardsChoreographybased",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+        Assert.assertEquals(
+                "MeasurementDesignTime",
+                LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
 }

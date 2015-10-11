@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.*;
 import net.sf.jabref.model.entry.AuthorList.Author;
 import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
+import net.sf.jabref.logic.util.strings.CaseChangers;
 import net.sf.jabref.util.Util;
 
 /**
@@ -44,9 +45,6 @@ public class LabelPatternUtil {
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
     
     private static final Log LOGGER = LogFactory.getLog(LabelPatternUtil.class);
-
-    // see also net.sf.jabref.logic.util.strings.CaseChangers.Word.smallerWords
-    private static final String[] SKIP_WORDS = {"a", "an", "the", "for", "on", "of"};
 
     public static ArrayList<String> DEFAULT_LABELPATTERN;
 
@@ -735,7 +733,7 @@ public class LabelPatternUtil {
             } else if (val.equals("lastpage")) {
                 return LabelPatternUtil.lastPage(entry.getField("pages"));
             } else if (val.equals("shorttitle")) {
-                return LabelPatternUtil.getTitleWords(3, entry);
+                return LabelPatternUtil.getTitleWords(3, entry.getField("title"));
             } else if (val.equals("shortyear")) {
                 String ss = entry.getFieldOrAlias("year");
                 if (ss.startsWith("in") || ss.startsWith("sub")) {
@@ -746,7 +744,7 @@ public class LabelPatternUtil {
                     return ss;
                 }
             } else if (val.equals("veryshorttitle")) {
-                return LabelPatternUtil.getTitleWords(1, entry);
+                return LabelPatternUtil.getTitleWords(1, entry.getField("title"));
             } else if (val.matches("keyword\\d+")) {
                 StringBuilder sb = new StringBuilder();
                 int num = Integer.parseInt(val.substring(7));
@@ -798,8 +796,11 @@ public class LabelPatternUtil {
         }
     }
 
-    private static String getTitleWords(int number, BibtexEntry entry) {
-        String ss = new RemoveLatexCommands().format(entry.getField("title"));
+    /**
+     * Determines "number" words out of the "title" field in the given BibTeX entry
+     */
+    static String getTitleWords(int number, String title) {
+        String ss = new RemoveLatexCommands().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
         int piv = 0;
@@ -822,8 +823,8 @@ public class LabelPatternUtil {
             if (word.isEmpty()) {
                 continue;
             }
-            for (int _i = 0; _i < SKIP_WORDS.length; _i++) {
-                if (word.equalsIgnoreCase(SKIP_WORDS[_i])) {
+            for (String smallWord: CaseChangers.SMALLER_WORDS) {
+                if (word.equalsIgnoreCase(smallWord)) {
                     continue mainl;
                 }
             }
