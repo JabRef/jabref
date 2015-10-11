@@ -637,8 +637,7 @@ public class LabelPatternUtil {
                 } else if (val.equals("authorLastForeIni")) {
                     return LabelPatternUtil.lastAuthorForenameInitials(authString);
                 } else if (val.equals("authorIni")) {
-                    String s = LabelPatternUtil.oneAuthorPlusIni(authString);
-                    return s == null ? "" : s;
+                    return LabelPatternUtil.oneAuthorPlusIni(authString);
                 } else if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
                     String s = LabelPatternUtil.authIniN(authString, num);
@@ -658,7 +657,7 @@ public class LabelPatternUtil {
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
                     String s = LabelPatternUtil.authN_M(authString, Integer.parseInt(nums[0]),
-                            Integer.parseInt(nums[1]) - 1);
+                            Integer.parseInt(nums[1]));
                     return s == null ? "" : s;
                 } else if (val.matches("auth\\d+")) {
                     // authN. First N chars of the first author's last
@@ -674,8 +673,7 @@ public class LabelPatternUtil {
                     }
                     return fa.substring(0, num);
                 } else if (val.matches("authors\\d+")) {
-                    String s = LabelPatternUtil.NAuthors(authString, Integer.parseInt(val
-                            .substring(7)));
+                    String s = LabelPatternUtil.NAuthors(authString, Integer.parseInt(val.substring(7)));
                     return s == null ? "" : s;
                 } else {
                     // This "auth" business was a dead end, so just
@@ -697,8 +695,7 @@ public class LabelPatternUtil {
                 } else if (val.equals("editorLastForeIni")) {
                     return LabelPatternUtil.lastAuthorForenameInitials(entry.getField("editor"));
                 } else if (val.equals("editorIni")) {
-                    String s = LabelPatternUtil.oneAuthorPlusIni(entry.getField("editor"));
-                    return s == null ? "" : s;
+                    return LabelPatternUtil.oneAuthorPlusIni(entry.getField("editor"));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
                     String s = LabelPatternUtil.authIniN(entry.getField("editor"), num);
@@ -926,15 +923,15 @@ public class LabelPatternUtil {
     /**
      * Gets the last name of the last author/editor
      * @param authorField a <code>String</code>
-     * @return the sur name of an author/editor
+     * @return the surname of an author/editor
      */
-    private static String lastAuthor(String authorField) {
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
-        if (tokens.length > 0) { // if author is empty
-            String[] lastAuthor = tokens[tokens.length - 1].replaceAll("\\s+", " ").trim().split(" ");
+    static String lastAuthor(String authorField) {
+        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
+        if (tokens.length > 0) {
+            String[] lastAuthor = tokens[tokens.length - 1].split(",");
             return lastAuthor[0];
-
         } else {
+            // if author is empty
             return "";
         }
     }
@@ -950,7 +947,7 @@ public class LabelPatternUtil {
      * @throws NullPointerException
      *             if authorField == null
      */
-    private static String lastAuthorForenameInitials(String authorField) {
+    static String lastAuthorForenameInitials(String authorField) {
         AuthorList authorList = AuthorList.getAuthorList(authorField);
         if (authorList.size() == 0) {
             return "";
@@ -974,7 +971,7 @@ public class LabelPatternUtil {
      * @param authorField string containing the value of the author field
      * @return the initials of all authornames
      */
-    private static String authorsAlpha(String authorField) {
+    static String authorsAlpha(String authorField) {
         String authors = "";
 
         String fixedAuthors = AuthorList.fixAuthor_lastNameOnlyCommas(authorField, false);
@@ -1036,29 +1033,29 @@ public class LabelPatternUtil {
      * Gets the first part of the last name of the first
      * author/editor, and appends the last name initial of the
      * remaining authors/editors.
+     * Maximum 5 characters
      * @param authorField a <code>String</code>
-     * @return the sur name of all authors/editors
+     * @return the surname of all authors/editors
      */
-    private static String oneAuthorPlusIni(String authorField) {
+    static String oneAuthorPlusIni(String authorField) {
         final int CHARS_OF_FIRST = 5;
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
         String author = "";
-        String[] tokens = authorField.split("\\band\\b");
+        String[] tokens = authorField.split("\\s+\\band\\b\\s+");
         int i = 1;
         if (tokens.length == 0) {
             return author;
         }
-        String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").split(" ");
-        author = firstAuthor[0].substring(0,
+        String firstAuthor = tokens[0].split(",")[0];
+        author = firstAuthor.substring(0,
                 Math.min(CHARS_OF_FIRST,
-                        firstAuthor[0].length()));
+                        firstAuthor.length()));
         while (tokens.length > i) {
             // convert lastname, firstname to firstname lastname
-            author += tokens[i].trim().charAt(0);
+            author += tokens[i].charAt(0);
             i++;
         }
         return author;
-
     }
 
     /**
@@ -1069,19 +1066,22 @@ public class LabelPatternUtil {
      * Newton.Maxwell.ea
      * Newton.Maxwell
      */
-    private static String authAuthEa(String authorField) {
+    static String authAuthEa(String authorField) {
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
         StringBuilder author = new StringBuilder();
 
-        String[] tokens = authorField.split("\\band\\b");
+        String[] tokens = authorField.split("\\s+\\band\\b\\s+");
         if (tokens.length == 0) {
             return "";
         }
+        // append first author
         author.append((tokens[0].split(","))[0]);
         if (tokens.length >= 2) {
+            // append second author
             author.append(".").append((tokens[1].split(","))[0]);
         }
         if (tokens.length > 2) {
+            // append ".ea" if more than 2 authors
             author.append(".ea");
         }
 
@@ -1124,15 +1124,19 @@ public class LabelPatternUtil {
 
     /**
      * The first N characters of the Mth author/editor.
+     * M starts counting from 1
      */
-    private static String authN_M(String authorField, int n, int m) {
+    static String authN_M(String authorField, int n, int m) {
+        // have m counting from 0
+        m--;
+
         authorField = AuthorList.fixAuthorForAlphabetization(authorField);
 
-        String[] tokens = authorField.split("\\band\\b");
+        String[] tokens = authorField.split("\\s+\\band\\b\\s+");
         if (tokens.length <= m || n < 0 || m < 0) {
             return "";
         }
-        String lastName = (tokens[m].split(","))[0].trim();
+        String lastName = (tokens[m].split(","))[0];
         if (lastName.length() <= n) {
             return lastName;
         } else {
@@ -1171,20 +1175,15 @@ public class LabelPatternUtil {
         int i = 0;
 
         if (tokens.length == 1) {
-
-            author.append(LabelPatternUtil.authN_M(authorField, authorField.length(), 0));
-
+            author.append(LabelPatternUtil.authN_M(authorField, authorField.length(), 1));
         } else if (tokens.length >= 2) {
-
             while (tokens.length > i && i < 3) {
-                author.append(LabelPatternUtil.authN_M(authorField, 1, i));
+                author.append(LabelPatternUtil.authN_M(authorField, 1, i+1));
                 i++;
             }
-
             if (tokens.length > 3) {
                 author.append("+");
             }
-
         }
 
         return author.toString();
@@ -1238,9 +1237,9 @@ public class LabelPatternUtil {
 
         while (tokens.length > i) {
             if (i < n % tokens.length) {
-                author.append(LabelPatternUtil.authN_M(authorField, charsAll + 1, i));
+                author.append(LabelPatternUtil.authN_M(authorField, charsAll + 1, i+1));
             } else {
-                author.append(LabelPatternUtil.authN_M(authorField, charsAll, i));
+                author.append(LabelPatternUtil.authN_M(authorField, charsAll, i+1));
             }
             i++;
         }

@@ -42,7 +42,7 @@
     - Localization tweaks: "can not" -> "cannot" and "file name" -> "filename"
     - Bugfix: When reconfiguring the BibTeX key generator, changes are applied instantly without requiring a restart of JabRef
     - BREAKING: The BibTeX key generator settings from previous versions are lost
-    - BREAKING: LabelPatterns [auth.etal], [authEtAl], [authors], [authorsN] to omit spaces and commas (and work as described at http://jabref.sourceforge.net/help/LabelPatterns.php)
+    - BREAKING: LabelPatterns [auth.etal], [authEtAl], [authors], [authorsN], [authorLast] and more to omit spaces and commas (and work as described at http://jabref.sourceforge.net/help/LabelPatterns.php)
     - Feature: new LabelPattern [authFirstFull] returning the last name of the first author and also a "van" or "von" if it exists
     - Feature: all new lines when writing an entry are obeying the globally configured new line (File -> newline separator). Affects fields: abstract and review 
 [dev_2.11]
