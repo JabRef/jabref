@@ -55,7 +55,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-// import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -906,32 +905,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             removeSelectedEntries();
         }
     }
-
-/*    private static class MyTable extends JTable {
-
-        public MyTable(TableModel model) {
-            super(model);
-            // setDefaultRenderer(Boolean.class, );
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return col == 0;
-        }
-    }
-
-    private static class MyTableModel extends DefaultTableModel {
-
-        @Override
-        public Class<?> getColumnClass(int i) {
-            if (i == 0) {
-                return Boolean.class;
-            } else {
-                return String.class;
-            }
-        }
-
-    }*/
 
     class SelectionButton implements ActionListener {
 
