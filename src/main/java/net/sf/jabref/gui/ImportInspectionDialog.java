@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -40,7 +55,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
+// import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -343,6 +358,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
 
+            private static final long serialVersionUID = -8941873408564974406L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -614,6 +631,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     class AddToGroupAction extends AbstractAction {
 
+        private static final long serialVersionUID = -1970798352969620339L;
+
         final GroupTreeNode node;
 
 
@@ -876,6 +895,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class DeleteListener extends AbstractAction {
 
+        private static final long serialVersionUID = 2194171696097722369L;
+
         public DeleteListener() {
             super(Localization.lang("Delete"), IconTheme.getImage("delete"));
         }
@@ -886,7 +907,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    private static class MyTable extends JTable {
+/*    private static class MyTable extends JTable {
 
         public MyTable(TableModel model) {
             super(model);
@@ -910,7 +931,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
         }
 
-    }
+    }*/
 
     class SelectionButton implements ActionListener {
 
@@ -1111,8 +1132,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // Check if any other action should be taken:
             final int col = glTable.columnAtPoint(e.getPoint());
-            final int row = glTable.rowAtPoint(e
-                    .getPoint());
+            final int row = glTable.rowAtPoint(e.getPoint());
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibtexEntry first = sortedList.get(row);
@@ -1148,13 +1168,33 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         entries.getReadWriteLock().writeLock().lock();
                         first.setGroupHit(false);
                         entries.getReadWriteLock().writeLock().unlock();
+                    } else if (diag.getSelected() == DuplicateResolverDialog.KEEP_MERGE) {
+                        // Remove old entry. Or... add it to a list of entries
+                        // to be deleted. We only delete
+                        // it after Ok is clicked.
+                        entriesToDelete.add(other);
+                        // Store merged entry for later adding
+                        // Clear duplicate icon, which is controlled by the
+                        // group hit
+                        // field of the entry:
+                        entries.getReadWriteLock().writeLock().lock();
+                        diag.getMergedEntry().setGroupHit(false);
+                        diag.getMergedEntry().setSearchHit(true);
+                        entries.add(diag.getMergedEntry());
+                        entries.remove(first);
+                        first = new BibtexEntry(); // Reset first so the next duplicate doesn't trigger
+                        entries.getReadWriteLock().writeLock().unlock();
                     }
                 }
                 // Check if the duplicate is of another entry in the import:
                 other = internalDuplicate(entries, first);
                 if (other != null) {
-                    int answer = DuplicateResolverDialog.resolveDuplicate(
-                            ImportInspectionDialog.this, first, other);
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog(
+                            ImportInspectionDialog.this, first, other, DuplicateResolverDialog.DUPLICATE_SEARCH);
+                    Util.placeDialog(diag, ImportInspectionDialog.this);
+                    diag.setVisible(true);
+                    ImportInspectionDialog.this.toFront();
+                    int answer = diag.getSelected();
                     if (answer == DuplicateResolverDialog.KEEP_UPPER) {
                         entries.remove(other);
                         first.setGroupHit(false);
@@ -1162,6 +1202,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         entries.remove(first);
                     } else if (answer == DuplicateResolverDialog.KEEP_BOTH) {
                         first.setGroupHit(false);
+                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                        diag.getMergedEntry().setGroupHit(false);
+                        diag.getMergedEntry().setSearchHit(true);
+                        entries.add(diag.getMergedEntry());
+                        entries.remove(first);
+                        entries.remove(other);
                     }
                 }
             }
@@ -1169,6 +1215,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     class AttachUrl extends JMenuItem implements ActionListener {
+
+        private static final long serialVersionUID = 7383044092577400425L;
 
         public AttachUrl() {
             super(Localization.lang("Attach URL"));
@@ -1198,6 +1246,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class DownloadFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
+
+        private static final long serialVersionUID = 2352217043684991255L;
 
         BibtexEntry entry;
 
@@ -1250,6 +1300,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class AutoSetLinks extends JMenuItem implements ActionListener {
 
+        private static final long serialVersionUID = 157259103597850990L;
+
         public AutoSetLinks() {
             super(Localization.lang("Autoset external links"));
             addActionListener(this);
@@ -1300,6 +1352,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class LinkLocalFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
+
+        private static final long serialVersionUID = -8747503564455760079L;
 
         BibtexEntry entry;
 
@@ -1436,6 +1490,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
 
     class EntryTable extends JTable {
+
+        private static final long serialVersionUID = 1709722308102333448L;
 
         final GeneralRenderer renderer = new GeneralRenderer(Color.white);
 
