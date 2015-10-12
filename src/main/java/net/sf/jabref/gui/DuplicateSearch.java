@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -124,7 +124,7 @@ public class DuplicateSearch implements Runnable {
                         duplicateCounter--; // correct counter
                     } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
                         toRemove.add(be[0]);
-                        toRemove.add(be[0]);
+                        toRemove.add(be[1]);
                         toAdd.add(cb.getMergedEntry());
                     }
                 }
