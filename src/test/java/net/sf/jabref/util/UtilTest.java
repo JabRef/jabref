@@ -3,6 +3,7 @@ package net.sf.jabref.util;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
@@ -168,6 +169,8 @@ public class UtilTest {
 
     @Before
     public void setUp() {
+        // Required by BibtexParser -> FieldContentParser
+        Globals.prefs = JabRefPreferences.getInstance();
 
         StringReader reader = new StringReader(
                 "@ARTICLE{HipKro03," + "\n" +
@@ -343,6 +346,14 @@ public class UtilTest {
         Assert.assertEquals("AN", StringUtil.toUpperFirstLetter("AN"));
         Assert.assertEquals("TestTest", StringUtil.toUpperFirstLetter("testTest"));
 
+    }
+
+    @Test
+    public void getSeparatedKeywords() {
+        String keywords = "w1, w2a w2b, w3";
+        ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(keywords);
+        String[] expected = new String[]{"w1", "w2a w2b", "w3"};
+        Assert.assertArrayEquals(expected, separatedKeywords.toArray());
     }
 
 }

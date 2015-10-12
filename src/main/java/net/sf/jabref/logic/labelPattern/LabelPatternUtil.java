@@ -746,15 +746,31 @@ public class LabelPatternUtil {
                     return ss;
                 }
             } else if (val.matches("keyword\\d+")) {
-                StringBuilder sb = new StringBuilder();
+                // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                String kw = LabelPatternUtil.getField(entry, "keywords");
-                if (kw != null) {
-                    // TODO: merge this functionality with Util.getSeparatedKeywords
-                    String[] keywords = kw.split("[,;]\\s*");
-                    if (num > 0 && num < keywords.length) {
-                        sb.append(keywords[num - 1].trim());
-                    }
+                ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+                if (separatedKeywords.size() < num) {
+                    // not enough keywords
+                    return "";
+                } else {
+                    // num counts from 1 to n, but index in arrayList count from 0 to n-1
+                    return separatedKeywords.get(num-1);
+                }
+            } else if (val.matches("keywords\\d*")) {
+                // return all keywords, not separated
+                int num;
+                if (val.length() > 8) {
+                    num = Integer.parseInt(val.substring(8));
+                } else {
+                    num = Integer.MAX_VALUE;
+                }
+                ArrayList<String> separatedKeywords = Util.getSeparatedKeywords(entry);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < Math.min(separatedKeywords.size(), num); i++) {
+                    String keyword = separatedKeywords.get(i);
+                    // remove all spaces
+                    keyword = keyword.replaceAll("\\s+", "");
+                    sb.append(keyword);
                 }
                 return sb.toString();
             } else {
@@ -775,8 +791,8 @@ public class LabelPatternUtil {
      * @return The field value.
      */
     private static String getField(BibtexEntry entry, String field) {
-        Object o = entry.getFieldOrAlias(field);
-        return o != null ? (String) o : "";
+        String s = entry.getFieldOrAlias(field);
+        return s == null ? "" : s;
     }
 
     /**

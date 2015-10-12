@@ -625,4 +625,38 @@ public class LabelPatternUtilTest {
                 LabelPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
+    @Test
+    public void keywordN_keywordsSeparatedBySpace() {
+        BibtexEntry entry = new BibtexEntry();
+        entry.setField("keywords", "w1, w2a w2b, w3");
+
+        String result = LabelPatternUtil.makeLabel(entry, "keyword1");
+        Assert.assertEquals("w1", result);
+
+        // check keywords with space
+        result = LabelPatternUtil.makeLabel(entry, "keyword2");
+        Assert.assertEquals("w2a w2b", result);
+
+        // check out of range
+        result = LabelPatternUtil.makeLabel(entry, "keyword4");
+        Assert.assertEquals("", result);
+    }
+
+    @Test
+    public void keywordsN_keywordsSeparatedBySpace() {
+        BibtexEntry entry = new BibtexEntry();
+        entry.setField("keywords", "w1, w2a w2b, w3");
+
+        // all keywords
+        String result = LabelPatternUtil.makeLabel(entry, "keywords");
+        Assert.assertEquals("w1w2aw2bw3", result);
+
+        // check keywords with space
+        result = LabelPatternUtil.makeLabel(entry, "keywords2");
+        Assert.assertEquals("w1w2aw2b", result);
+
+        // check out of range
+        result = LabelPatternUtil.makeLabel(entry, "keywords55");
+        Assert.assertEquals("w1w2aw2bw3", result);
+    }
 }

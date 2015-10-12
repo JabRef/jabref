@@ -821,6 +821,10 @@ public class Util {
         return targetName;
     }
 
+    /**
+     * @param keywords a String of keywords
+     * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
+     */
     public static ArrayList<String> getSeparatedKeywords(String keywords) {
         ArrayList<String> res = new ArrayList<String>();
         if (keywords == null) {
