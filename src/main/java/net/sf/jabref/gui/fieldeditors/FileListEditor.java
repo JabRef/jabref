@@ -45,6 +45,7 @@ import net.sf.jabref.external.*;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -428,9 +429,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
 
-
-
-
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
                     frame.output(Localization.lang("Finished autosetting external links."));
@@ -439,15 +437,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                             + " " + Localization.lang("No files found."));
 
                     // auto download file as no file found before
-                    frame.basePanel().runCommand("downloadFullText");
+                    frame.basePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
                 }
-
                 // reset
                 auto.setEnabled(true);
             }
         }, dialog));
-
-
     }
 
     /**

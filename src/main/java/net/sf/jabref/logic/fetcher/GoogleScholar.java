@@ -37,7 +37,7 @@ public class GoogleScholar implements FullTextFinder {
         String url = String.format(SEARCH_URL, URLEncoder.encode(entryTitle, "UTF-8"));
 
         Document doc = Jsoup.connect(url)
-                .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler FIXME: still gets blocked in tests
+                .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler
                 .get();
         // Check results for PDF link
         // TODO: link always on first result or none?
