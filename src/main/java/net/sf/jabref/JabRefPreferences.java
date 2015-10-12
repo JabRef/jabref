@@ -1678,4 +1678,14 @@ public class JabRefPreferences {
     public boolean isNonWrappableField(String fieldName) {
         return nonWrappableFields.contains(fieldName);
     }
+
+    /**
+     * ONLY FOR TESTING!
+     *
+     * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
+     * @param prefs
+     */
+    void overwritePreferences(JabRefPreferences prefs) {
+        singleton = prefs;
+    }
 }
