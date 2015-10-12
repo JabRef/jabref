@@ -1,4 +1,5 @@
 [master]
+    - Feature: Merge information from both entries on duplication detection
     - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
     - Fixed a bug in the IEEEXploreFetcher
     - Replaced some deprecated DefaultFormBuilder with FormBuilder

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
@@ -29,6 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -39,11 +42,14 @@ import net.sf.jabref.util.Util;
 
 public class DuplicateResolverDialog extends JDialog {
 
+    private static final long serialVersionUID = -2557945726792977644L;
+
     private static final int NOT_CHOSEN = -1;
     public static final int KEEP_BOTH = 0;
     public static final int KEEP_UPPER = 1;
     public static final int KEEP_LOWER = 2;
     public static final int AUTOREMOVE_EXACT = 3;
+    public static final int KEEP_MERGE = 4;
     public static final int BREAK = 5; // close
     public static final int IMPORT_AND_DELETE_OLD = 1;
     public static final int IMPORT_AND_KEEP_OLD = 0;
@@ -53,23 +59,26 @@ public class DuplicateResolverDialog extends JDialog {
     public static final int INSPECTION = 3;
     public static final int DUPLICATE_SEARCH_WITH_EXACT = 4;
 
-    private final Dimension DIM = new Dimension(650, 600);
+    private final Dimension DIM = new Dimension(800, 600);
 
     private PreviewPanel p1;
     private PreviewPanel p2;
+    private PreviewPanel p3;
     private JTextArea ta1;
     private JTextArea ta2;
+    private JTextArea ta3;
     private final JTabbedPane tabbed = new JTabbedPane();
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
     private JButton removeExact;
     private final JPanel options = new JPanel();
     private final JPanel main = new JPanel();
     private final JPanel source = new JPanel();
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private boolean block = true;
-
+    private MergeEntries me;
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
@@ -110,18 +119,25 @@ public class DuplicateResolverDialog extends JDialog {
             both = new JButton(Localization.lang("Import and keep old entry"));
         }
 
+        me = new MergeEntries(one, two, Localization.lang("Upper"),
+                Localization.lang("Lower"));
+
         String layout = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         p1 = new PreviewPanel(null, one, null, new MetaData(), layout);
         p2 = new PreviewPanel(null, two, null, new MetaData(), layout);
+        p3 = new PreviewPanel(null, me.getMergeEntry(), null, new MetaData(), layout);
         ta1 = new JTextArea();
         ta2 = new JTextArea();
+        ta3 = new JTextArea();
         ta1.setEditable(false);
         ta2.setEditable(false);
+        ta3.setEditable(false);
+
 
         //ta1.setPreferredSize(dim);
         //ta2.setPreferredSize(dim);
 
-        setSourceView(one, two);
+        setSourceView(one, two, me.getMergeEntry());
 
         //getContentPane().setLayout();
         main.setLayout(gbl);
@@ -131,8 +147,12 @@ public class DuplicateResolverDialog extends JDialog {
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weightx = 1;
         con.weighty = 0;
-        TitleLabel lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
+
+        // @formatter:off
+        TitleLabel lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ||
+                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ? "" :
                 Localization.lang("Entry in current database"));
+        // @formatter:on
         gbl.setConstraints(lab, con);
         main.add(lab);
         con.weighty = 1;
@@ -142,8 +162,11 @@ public class DuplicateResolverDialog extends JDialog {
         main.add(sp);
         con.weighty = 0;
         con.insets = new Insets(10, 10, 0, 10);
-        lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
+        // @formatter:off
+        lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ||
+                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ? "" :
                 Localization.lang("Entry in import"));
+        // @formatter:on
         gbl.setConstraints(lab, con);
         main.add(lab);
         con.weighty = 1;
@@ -157,18 +180,31 @@ public class DuplicateResolverDialog extends JDialog {
         sp = new JScrollPane(ta2);
         gbl.setConstraints(sp, con);
         source.add(sp);
+        con.weighty = 0;
+        con.insets = new Insets(10, 10, 0, 10);
+        lab = new TitleLabel(Localization.lang("Merged entry"));
+        gbl.setConstraints(lab, con);
+        main.add(lab);
+        con.weighty = 1;
+        con.insets = new Insets(5, 10, 10, 10);
+        sp = new JScrollPane(p3);
+        gbl.setConstraints(sp, con);
+        main.add(sp);
+        sp = new JScrollPane(ta3);
+        gbl.setConstraints(sp, con);
+        source.add(sp);
         tabbed.add(Localization.lang("Short form"), main);
         tabbed.add(Localization.lang("Complete record"), source);
+        tabbed.add(Localization.lang("Merged entry"), me.getMergeEntryPanel());
         if (removeExact != null) {
             options.add(removeExact);
         }
         options.add(first);
         options.add(second);
         options.add(both);
-        if (type != DuplicateResolverDialog.IMPORT_CHECK) {
-            options.add(Box.createHorizontalStrut(5));
-            options.add(cancel);
-        }
+        options.add(merge);
+        options.add(Box.createHorizontalStrut(5));
+        options.add(cancel);
 
         first.addActionListener(new ActionListener() {
 
@@ -200,6 +236,16 @@ public class DuplicateResolverDialog extends JDialog {
             }
         });
 
+        merge.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                status = DuplicateResolverDialog.KEEP_MERGE;
+                block = false;
+                dispose();
+            }
+        });
+
         if (removeExact != null) {
             removeExact.addActionListener(new ActionListener() {
 
@@ -222,6 +268,24 @@ public class DuplicateResolverDialog extends JDialog {
             }
         });
 
+        //
+        ChangeListener changeListener = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent changeEvent) {
+                if (((JTabbedPane) changeEvent.getSource()).getSelectedIndex() == 1) {
+                    StringWriter sw = new StringWriter();
+                    try {
+                        new BibtexEntryWriter(new LatexFieldFormatter(), false).write(me.getMergeEntry(), sw);
+                    } catch (IOException ignored) {
+                    }
+                    ta3.setText(sw.getBuffer().toString());
+                    ta3.setCaretPosition(0);
+                }
+            }
+        };
+
+        tabbed.addChangeListener(changeListener);
+
         getContentPane().add(tabbed, BorderLayout.CENTER);
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
@@ -237,22 +301,29 @@ public class DuplicateResolverDialog extends JDialog {
 
     }
 
-    private void setSourceView(BibtexEntry one, BibtexEntry two) {
+    private void setSourceView(BibtexEntry one, BibtexEntry two, BibtexEntry three) {
         try {
             StringWriter sw = new StringWriter();
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(one, sw);
             ta1.setText(sw.getBuffer().toString());
+            ta1.setCaretPosition(0);
             sw = new StringWriter();
             new BibtexEntryWriter(new LatexFieldFormatter(), false).write(two, sw);
             ta2.setText(sw.getBuffer().toString());
+            ta2.setCaretPosition(0);
+            sw = new StringWriter();
+            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(three, sw);
+            ta3.setText(sw.getBuffer().toString());
+            ta3.setCaretPosition(0);
         } catch (IOException ignored) {
         }
     }
 
-    public void setEntries(BibtexEntry newOne, BibtexEntry newTwo) {
-        setSourceView(newOne, newTwo);
+    public void setEntries(BibtexEntry newOne, BibtexEntry newTwo, BibtexEntry newThree) {
+        setSourceView(newOne, newTwo, newThree);
         p1.setEntry(newOne);
         p2.setEntry(newTwo);
+        p3.setEntry(newThree);
         status = DuplicateResolverDialog.NOT_CHOSEN;
         p1.revalidate();
         p1.repaint();
@@ -265,6 +336,10 @@ public class DuplicateResolverDialog extends JDialog {
 
     public int getSelected() {
         return status;
+    }
+
+    public BibtexEntry getMergedEntry() {
+        return me.getMergeEntry();
     }
 
     public static int resolveDuplicate(JFrame frame, BibtexEntry one, BibtexEntry two) {
