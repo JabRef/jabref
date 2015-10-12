@@ -221,14 +221,14 @@ public class FontSelectorDialog extends JDialog {
         JPanel familyPanel = createTextFieldAndListPanel(
                 Localization.lang("Font Family"),
                 familyField = new JTextField(),
-                familyList = new JList(getFontList()));
+                familyList = new JList<>(getFontList()));
         listPanel.add(familyPanel);
 
         String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
         JPanel sizePanel = createTextFieldAndListPanel(
                 Localization.lang("Font Size"),
                 sizeField = new JTextField(),
-                sizeList = new JList(sizes));
+                sizeList = new JList<>(sizes));
         listPanel.add(sizePanel);
 
         String[] styles = {FontSelectorDialog.PLAIN, FontSelectorDialog.BOLD, FontSelectorDialog.ITALIC, FontSelectorDialog.BOLD_ITALIC};
@@ -236,7 +236,7 @@ public class FontSelectorDialog extends JDialog {
         JPanel stylePanel = createTextFieldAndListPanel(
                 Localization.lang("Font Style"),
                 styleField = new JTextField(),
-                styleList = new JList(styles));
+                styleList = new JList<>(styles));
         styleField.setEditable(false);
         listPanel.add(stylePanel);
 
@@ -340,11 +340,11 @@ public class FontSelectorDialog extends JDialog {
     // private members
     private boolean isOK;
     private final JTextField familyField;
-    private final JList familyList;
+    private final JList<String> familyList;
     private final JTextField sizeField;
-    private final JList sizeList;
+    private final JList<String> sizeList;
     private final JTextField styleField;
-    private final JList styleList;
+    private final JList<String> styleList;
     private final JLabel preview;
     private final JButton ok;
     private final JButton cancel;

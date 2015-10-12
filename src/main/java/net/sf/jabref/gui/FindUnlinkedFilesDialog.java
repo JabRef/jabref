@@ -141,8 +141,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private JTree tree;
     private JScrollPane scrollpaneTree;
-    private JComboBox comboBoxFileTypeSelection;
-    private JComboBox comboBoxEntryTypeSelection;
+    private JComboBox<FileFilter> comboBoxFileTypeSelection;
+    private JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
 
     private JProgressBar progressBarSearching;
     private JProgressBar progressBarImporting;
@@ -1063,7 +1063,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         for (FileFilter fileFilter : fileFilterList) {
             vector.add(fileFilter);
         }
-        comboBoxFileTypeSelection = new JComboBox(vector);
+        comboBoxFileTypeSelection = new JComboBox<>(vector);
 
         comboBoxFileTypeSelection.setRenderer(new DefaultListCellRenderer() {
 
@@ -1100,7 +1100,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         while (iterator.hasNext()) {
             list.add(new BibtexEntryTypeWrapper(iterator.next()));
         }
-        comboBoxEntryTypeSelection = new JComboBox(list);
+        comboBoxEntryTypeSelection = new JComboBox<>(list);
     }
 
 

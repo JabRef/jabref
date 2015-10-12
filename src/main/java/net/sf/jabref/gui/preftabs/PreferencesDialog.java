@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -70,7 +71,7 @@ public class PreferencesDialog extends JDialog {
         final JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
-        final JList chooser;
+        final JList<String> chooser;
 
         JButton importPrefs = new JButton(Localization.lang("Import preferences"));
         JButton exportPrefs = new JButton(Localization.lang("Export preferences"));
@@ -89,7 +90,7 @@ public class PreferencesDialog extends JDialog {
         // ----------------------------------------------------------------
         // Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
         // ----------------------------------------------------------------
-        ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
+        List<PrefsTab> tabs = new ArrayList<>();
         tabs.add(new GeneralTab(frame, prefs));
         tabs.add(new NetworkTab(prefs));
         tabs.add(new FileTab(frame, prefs));
@@ -120,7 +121,7 @@ public class PreferencesDialog extends JDialog {
 
         upper.setBorder(BorderFactory.createEtchedBorder());
 
-        chooser = new JList(names);
+        chooser = new JList<>(names);
         chooser.setBorder(BorderFactory.createEtchedBorder());
         // Set a prototype value to control the width of the list:
         chooser.setPrototypeCellValue("This should be wide enough");

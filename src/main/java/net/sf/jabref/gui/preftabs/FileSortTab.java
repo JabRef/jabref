@@ -53,9 +53,9 @@ class FileSortTab extends JPanel implements PrefsTab {
     private JTextField savePriField;
     private JTextField saveSecField;
     private JTextField saveTerField;
-    private JComboBox savePriSort;
-    private JComboBox saveSecSort;
-    private JComboBox saveTerSort;
+    private JComboBox<String> savePriSort;
+    private JComboBox<String> saveSecSort;
+    private JComboBox<String> saveTerSort;
 
     private final JRadioButton exportInOriginalOrder;
     private final JRadioButton exportInTableOrder;
@@ -66,9 +66,9 @@ class FileSortTab extends JPanel implements PrefsTab {
     private JTextField exportPriField;
     private JTextField exportSecField;
     private JTextField exportTerField;
-    private JComboBox exportPriSort;
-    private JComboBox exportSecSort;
-    private JComboBox exportTerSort;
+    private JComboBox<String> exportPriSort;
+    private JComboBox<String> exportSecSort;
+    private JComboBox<String> exportTerSort;
 
 
     public FileSortTab(JabRefPreferences prefs) {
@@ -112,9 +112,9 @@ class FileSortTab extends JPanel implements PrefsTab {
             fieldNames.add(BibtexEntry.KEY_FIELD);
             Collections.sort(fieldNames);
             String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-            savePriSort = new JComboBox(allPlusKey);
-            saveSecSort = new JComboBox(allPlusKey);
-            saveTerSort = new JComboBox(allPlusKey);
+            savePriSort = new JComboBox<>(allPlusKey);
+            saveSecSort = new JComboBox<>(allPlusKey);
+            saveTerSort = new JComboBox<>(allPlusKey);
 
             savePriField = new JTextField(10);
             saveSecField = new JTextField(10);
@@ -232,9 +232,9 @@ class FileSortTab extends JPanel implements PrefsTab {
         fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        exportPriSort = new JComboBox(allPlusKey);
-        exportSecSort = new JComboBox(allPlusKey);
-        exportTerSort = new JComboBox(allPlusKey);
+        exportPriSort = new JComboBox<>(allPlusKey);
+        exportSecSort = new JComboBox<>(allPlusKey);
+        exportTerSort = new JComboBox<>(allPlusKey);
 
         exportPriField = new JTextField(10);
         exportSecField = new JTextField(10);

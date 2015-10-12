@@ -63,7 +63,7 @@ public class IntegrityMessagePanel
 
 {
 
-    private final JList warnings;
+    private final JList<IntegrityMessage> warnings;
     private final HintListModel warningData;
 
     private final IntegrityCheck validChecker;
@@ -80,7 +80,7 @@ public class IntegrityMessagePanel
 
         // JList --------------------------------------------------------------
         warningData = new HintListModel();
-        warnings = new JList(warningData);
+        warnings = new JList<>(warningData);
         warnings.setCellRenderer(new IntegrityListRenderer());
         warnings.addListSelectionListener(this);
 
@@ -226,7 +226,7 @@ public class IntegrityMessagePanel
 
         @Override
         public Component getListCellRendererComponent(
-                JList list,
+                JList<?> list,
                 Object value, // value to display
                 int index, // cell index
                 boolean iss, // is the cell selected

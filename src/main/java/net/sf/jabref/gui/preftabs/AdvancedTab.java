@@ -56,7 +56,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox filechooserDisableRename;
     private final JCheckBox useIEEEAbrv;
     private final JCheckBox biblatexMode;
-    private final JComboBox className;
+    private final JComboBox<String> className;
     private final JTextField remoteServerPort;
     private String oldLnf = "";
     private boolean oldUseDef;
@@ -102,9 +102,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
             } catch (ClassNotFoundException ignored) {
             }
         }
-        className = new JComboBox(lookAndFeels.toArray(new String[lookAndFeels.size()]));
+        className = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         className.setEditable(true);
-        final JComboBox clName = className;
+        final JComboBox<String> clName = className;
         useDefault.addChangeListener(new ChangeListener() {
 
             @Override

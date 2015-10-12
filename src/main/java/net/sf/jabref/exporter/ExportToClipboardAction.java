@@ -83,7 +83,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             piv++;
         }
 
-        JList list = new JList(array);
+        JList<String> list = new JList<>(array);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -21,7 +21,7 @@ import javax.swing.DefaultListModel;
 
 import net.sf.jabref.wizard.integrity.IntegrityMessage;
 
-public class HintListModel extends DefaultListModel {
+public class HintListModel extends DefaultListModel<IntegrityMessage> {
 
     public void setData(Vector<IntegrityMessage> newData) {
         clear();

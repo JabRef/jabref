@@ -110,7 +110,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private final JPanel rawPanel = new JPanel();
     private final JPanel sourcePanel = new JPanel();
     private final IntegrityMessagePanel warnPanel;
-    private JList fieldList;
+    private JList<String> fieldList;
     private JRadioButton overRadio;
 
     private final BibtexEntry entry;
@@ -270,7 +270,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
-        fieldList = new JList(getAllFields());
+        fieldList = new JList<>(getAllFields());
         fieldList.setCellRenderer(new SimpleCellRenderer(fieldList.getFont()));
         ListSelectionModel listSelectionModel = fieldList.getSelectionModel();
         listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -655,7 +655,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
          */
         @Override
         public Component getListCellRendererComponent(
-                JList list,
+                JList<?> list,
                 Object value, // value to display
                 int index, // cell index
                 boolean iss, // is the cell selected

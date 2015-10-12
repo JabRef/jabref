@@ -36,7 +36,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class IconSelection extends JDialog {
 
-    private JList icons;
+    private JList<JLabel> icons;
     private List<String> iconKeys;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));

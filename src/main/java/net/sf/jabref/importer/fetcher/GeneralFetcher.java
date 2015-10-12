@@ -57,7 +57,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final JTextField tf = new JTextField();
     private final JButton helpBut = new JButton(
             IconTheme.getImage("helpSmall"));
-    private final JComboBox fetcherChoice;
+    private final JComboBox<String> fetcherChoice;
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
@@ -88,7 +88,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             else
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
-        fetcherChoice = new JComboBox(choices);
+        fetcherChoice = new JComboBox<>(choices);
         int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
         if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
