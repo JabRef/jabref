@@ -65,6 +65,24 @@ public static void setUp() {
 }
 ```
 
+If you modify preference, use following pattern:
+
+```
+private JabRefPreferences backup;
+
+@Before
+    public void setUp() {
+    prefs = JabRefPreferences.getInstance();
+    backup = prefs;
+}
+
+@After
+public void tearDown() {
+    //clean up preferences to default state
+    prefs.overwritePreferences(backup);
+}
+```
+
 ## UI for Preferences
 
   * `JabRefFrame.preferences()` shows the preferences 
