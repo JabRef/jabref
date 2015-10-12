@@ -25,16 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.gui.IconTheme;
@@ -88,11 +79,11 @@ class IconSelection extends JDialog {
 
     private void init(String initialSelection) {
         int initSelIndex = -1;
-        iconKeys = new ArrayList<String>();
+        iconKeys = new ArrayList<>();
         Map<String, String> icns = IconTheme.getAllIcons();
-        HashSet<ImageIcon> iconSet = new LinkedHashSet<ImageIcon>();
+        HashSet<Icon> iconSet = new LinkedHashSet<>();
         for (String key : icns.keySet()) {
-            ImageIcon icon = IconTheme.getImage(key);
+            Icon icon = IconTheme.getImage(key);
             if (!iconSet.contains(icon)) {
                 iconKeys.add(key);
                 if (key.equals(initialSelection)) {
@@ -103,9 +94,9 @@ class IconSelection extends JDialog {
 
         }
 
-        DefaultListModel listModel = new DefaultListModel();
+        DefaultListModel<JLabel> listModel = new DefaultListModel();
         icons = new JList(listModel);
-        for (ImageIcon anIconSet : iconSet) {
+        for (Icon anIconSet : iconSet) {
             listModel.addElement(new JLabel(anIconSet));
         }
         class MyRenderer implements ListCellRenderer {

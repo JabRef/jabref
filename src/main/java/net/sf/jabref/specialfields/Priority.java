@@ -17,7 +17,7 @@ package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -26,13 +26,13 @@ public class Priority extends SpecialField {
 
     private static Priority INSTANCE;
 
-    private final ImageIcon icon = IconTheme.getImage("priority");
+    private final Icon icon = IconTheme.getImage("priority");
 
 
     private Priority() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null, Localization.lang("No priority information")));
-        ImageIcon icon;
+        Icon icon;
         icon = IconTheme.getImage("red");
         // DO NOT TRANSLATE "prio1" etc. as this makes the .bib files non portable
         values.add(new SpecialFieldValue(this, "prio1", "setPriority1", Localization.lang("Set priority to high"), icon, Localization.lang("Priority high")));
@@ -57,7 +57,7 @@ public class Priority extends SpecialField {
     }
 
     @Override
-    public ImageIcon getRepresentingIcon() {
+    public Icon getRepresentingIcon() {
         return this.icon;
     }
 

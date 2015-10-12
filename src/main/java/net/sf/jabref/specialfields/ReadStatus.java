@@ -17,7 +17,7 @@ package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -26,13 +26,13 @@ public class ReadStatus extends SpecialField {
 
     private static ReadStatus INSTANCE;
 
-    private final ImageIcon icon = IconTheme.getImage("readstatus");
+    private final Icon icon = IconTheme.getImage("readstatus");
 
 
     private ReadStatus() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
-        ImageIcon icon;
+        Icon icon;
         icon = IconTheme.getImage("readStatusRead");
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Localization.lang("Set read status to read"), icon, Localization.lang("Read status read")));
@@ -55,7 +55,7 @@ public class ReadStatus extends SpecialField {
     }
 
     @Override
-    public ImageIcon getRepresentingIcon() {
+    public Icon getRepresentingIcon() {
         return this.icon;
     }
 

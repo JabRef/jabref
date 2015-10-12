@@ -44,33 +44,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -518,7 +492,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // glassPane.setVisible(true);
 
         setTitle(GUIGlobals.frameTitle);
-        setIconImage(IconTheme.getImage("jabrefIcon48").getImage());
+        setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
@@ -1110,7 +1084,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        public GeneralAction(String command, String text, String description, ImageIcon icon) {
+        public GeneralAction(String command, String text, String description, Icon icon) {
             super(icon);
 
             this.command = command;
@@ -1131,7 +1105,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
-        public GeneralAction(String command, String text, String description, KeyStroke key, ImageIcon icon) {
+        public GeneralAction(String command, String text, String description, KeyStroke key, Icon icon) {
             super(icon);
 
             this.command = command;
@@ -2291,7 +2265,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class EditAction extends MnemonicAwareAction {
         private final String command;
 
-        public EditAction(String command, ImageIcon icon) {
+        public EditAction(String command, Icon icon) {
             super(icon);
             this.command = command;
             String nName = StringUtil.capitalizeFirst(command);

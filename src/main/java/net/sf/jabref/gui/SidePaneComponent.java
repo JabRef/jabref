@@ -21,11 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import org.jdesktop.swingx.JXTitledPanel;
 
@@ -42,7 +38,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     protected BasePanel panel;
 
 
-    public SidePaneComponent(SidePaneManager manager, ImageIcon icon, String title) {
+    public SidePaneComponent(SidePaneManager manager, Icon icon, String title) {
         super(title);
         this.add(new JLabel(icon));
         this.manager = manager;

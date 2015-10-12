@@ -534,7 +534,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     abstract class AbstractMoveRowAction extends AbstractAction {
 
-        public AbstractMoveRowAction(String string, ImageIcon image) {
+        public AbstractMoveRowAction(String string, Icon image) {
             super(string, image);
         }
 

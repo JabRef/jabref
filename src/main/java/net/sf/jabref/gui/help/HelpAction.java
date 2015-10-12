@@ -18,10 +18,7 @@ package net.sf.jabref.gui.help;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -55,7 +52,7 @@ public class HelpAction extends MnemonicAwareAction {
         this.helpFile = helpFile;
     }
 
-    public HelpAction(HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
+    public HelpAction(HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
         super(iconFile);
         putValue(Action.NAME, Localization.menuTitle("Help"));
         putValue(Action.SHORT_DESCRIPTION, tooltip);
@@ -80,7 +77,7 @@ public class HelpAction extends MnemonicAwareAction {
         this.helpFile = helpFile;
     }
 
-    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, ImageIcon iconFile) {
+    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
         super(iconFile);
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, tooltip);

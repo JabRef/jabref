@@ -117,7 +117,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private OpenOfficePanel() {
-        ImageIcon connectImage = IconTheme.getImage("connect_no");
+        Icon connectImage = IconTheme.getImage("connect_no");
 
         OpenOfficePanel.connect = new JButton(connectImage);
         OpenOfficePanel.manualConnect = new JButton(connectImage);
@@ -1069,7 +1069,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
 
     class OOPanel extends SidePaneComponent {
 
-        public OOPanel(SidePaneManager sidePaneManager, ImageIcon url, String s) {
+        public OOPanel(SidePaneManager sidePaneManager, Icon url, String s) {
             super(sidePaneManager, url, s);
         }
 

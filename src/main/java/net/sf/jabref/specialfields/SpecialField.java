@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 public abstract class SpecialField {
 
@@ -62,7 +62,7 @@ public abstract class SpecialField {
 
     public abstract String getFieldName();
 
-    public abstract ImageIcon getRepresentingIcon();
+    public abstract Icon getRepresentingIcon();
 
     public abstract String getMenuString();
 

@@ -43,14 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -225,10 +218,10 @@ public class IntegrityMessagePanel
     class IntegrityListRenderer extends DefaultListCellRenderer
     {
 
-        final ImageIcon warnIcon = IconTheme.getImage("integrityWarn");
-        final ImageIcon infoIcon = IconTheme.getImage("integrityInfo");
-        final ImageIcon failIcon = IconTheme.getImage("integrityFail");
-        final ImageIcon fixedIcon = IconTheme.getImage("complete");
+        final Icon warnIcon = IconTheme.getImage("integrityWarn");
+        final Icon infoIcon = IconTheme.getImage("integrityInfo");
+        final Icon failIcon = IconTheme.getImage("integrityFail");
+        final Icon fixedIcon = IconTheme.getImage("complete");
 
 
         @Override

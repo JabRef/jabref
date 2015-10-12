@@ -39,7 +39,7 @@ public class IconTheme {
      * @param name The name of the icon, such as "open", "save", "saveAs" etc.
      * @return The ImageIcon for the function.
      */
-    public static ImageIcon getImage(String name) {
+    public static Icon getImage(String name) {
         return new ImageIcon(getIconUrl(name));
     }
 
@@ -50,7 +50,7 @@ public class IconTheme {
      * @param name The name of the icon, such as "open", "save", "saveAs" etc.
      * @return The URL to the actual image to use.
      */
-    private static URL getIconUrl(String name) {
+    public static URL getIconUrl(String name) {
         String key = Objects.requireNonNull(name, "icon name");
         if(!KEY_TO_ICON.containsKey(key)) {
             LOGGER.warn("could not find icon url by name " + name + ", so falling back on default icon " + DEFAULT_ICON_PATH);

@@ -17,9 +17,7 @@ package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.logic.l10n.Localization;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 /**
  * This class extends {@link AbstractAction} with the ability to set
@@ -32,7 +30,7 @@ public abstract class MnemonicAwareAction extends AbstractAction {
 
     public MnemonicAwareAction() {}
 
-    public MnemonicAwareAction(ImageIcon icon) {
+    public MnemonicAwareAction(Icon icon) {
         putValue(Action.SMALL_ICON, icon);
     }
 

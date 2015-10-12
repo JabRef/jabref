@@ -28,9 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.
@@ -149,7 +147,7 @@ class DragDropPane extends JTabbedPane {
             setOpaque(false);
 
             // Sets the marker image
-            markerImg = IconTheme.getImage("dragNdropArrow").getImage();
+            markerImg = new ImageIcon(IconTheme.getIconUrl("dragNdropArrow")).getImage();
         }
 
         @Override

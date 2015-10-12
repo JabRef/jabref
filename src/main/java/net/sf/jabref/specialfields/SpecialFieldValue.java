@@ -15,8 +15,7 @@
 */
 package net.sf.jabref.specialfields;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 import net.sf.jabref.gui.JabRefFrame;
 
@@ -37,7 +36,7 @@ public class SpecialFieldValue {
 
     private SpecialFieldMenuAction menuAction;
 
-    private final ImageIcon icon;
+    private final Icon icon;
 
     private final String toolTipText;
 
@@ -60,7 +59,7 @@ public class SpecialFieldValue {
             String keyword,
             String actionName,
             String menuString,
-            ImageIcon icon,
+            Icon icon,
             String toolTipText) {
         // @formatter:on
         this.field = field;
@@ -93,7 +92,7 @@ public class SpecialFieldValue {
         return this.keyword;
     }
 
-    public ImageIcon getIcon() {
+    public Icon getIcon() {
         return this.icon;
     }
 

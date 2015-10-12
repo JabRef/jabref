@@ -74,31 +74,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -666,8 +642,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
     class SimpleCellRenderer extends DefaultListCellRenderer {
         private final Font baseFont;
         private final Font usedFont;
-        private final ImageIcon okIcon = IconTheme.getImage("complete");
-        private final ImageIcon needIcon = IconTheme.getImage("wrong");
+        private final Icon okIcon = IconTheme.getImage("complete");
+        private final Icon needIcon = IconTheme.getImage("wrong");
 
         public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;
@@ -744,7 +720,7 @@ class PopupListener extends MouseAdapter {
 }
 
 abstract class BasicAction extends AbstractAction {
-    public BasicAction(String text, String description, ImageIcon icon) {
+    public BasicAction(String text, String description, Icon icon) {
         super(Localization.lang(text), icon);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang(description));
     }

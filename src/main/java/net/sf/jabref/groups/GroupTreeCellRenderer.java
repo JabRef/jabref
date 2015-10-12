@@ -17,10 +17,7 @@ package net.sf.jabref.groups;
 
 import java.awt.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.gui.IconTheme;
@@ -47,10 +44,10 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private Object[] highlight3Cells;
     private Object highlightBorderCell;
 
-    private static final ImageIcon
+    private static final Icon
             groupRefiningIcon = IconTheme.getImage("groupRefining");
-    private static final ImageIcon groupIncludingIcon = IconTheme.getImage("groupIncluding");
-    private static final ImageIcon groupRegularIcon = null;
+    private static final Icon groupIncludingIcon = IconTheme.getImage("groupIncluding");
+    private static final Icon groupRegularIcon = null;
 
 
     @Override
