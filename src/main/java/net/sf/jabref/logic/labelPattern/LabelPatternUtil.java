@@ -734,6 +734,8 @@ public class LabelPatternUtil {
                 return LabelPatternUtil.lastPage(entry.getField("pages"));
             } else if (val.equals("shorttitle")) {
                 return LabelPatternUtil.getTitleWords(3, entry.getField("title"));
+            } else if (val.equals("veryshorttitle")) {
+                return LabelPatternUtil.getTitleWords(1, entry.getField("title"));
             } else if (val.equals("shortyear")) {
                 String ss = entry.getFieldOrAlias("year");
                 if (ss.startsWith("in") || ss.startsWith("sub")) {
@@ -743,8 +745,6 @@ public class LabelPatternUtil {
                 } else {
                     return ss;
                 }
-            } else if (val.equals("veryshorttitle")) {
-                return LabelPatternUtil.getTitleWords(1, entry.getField("title"));
             } else if (val.matches("keyword\\d+")) {
                 StringBuilder sb = new StringBuilder();
                 int num = Integer.parseInt(val.substring(7));
