@@ -20,7 +20,6 @@ import net.sf.jabref.exporter.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
 
 import java.util.*;
 import java.io.File;
@@ -147,7 +146,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         if (Globals.prefs.fileDirForDatabase != null) {
                             dirs = Globals.prefs.fileDirForDatabase;
                         } else {
-                            dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
+                            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + "Directory")};
                         }
 
                         File f = FileUtil.expandFilename(flEntry.getLink(), dirs);

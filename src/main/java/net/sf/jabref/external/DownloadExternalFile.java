@@ -18,7 +18,6 @@ package net.sf.jabref.external;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
@@ -354,7 +353,7 @@ public class DownloadExternalFile {
     }
 
     private String[] getFileDirectory(String link) {
-        return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        return metaData.getFileDirectory(Globals.FILE_FIELD);
     }
 
 

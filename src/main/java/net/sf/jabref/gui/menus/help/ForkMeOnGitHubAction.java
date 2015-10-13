@@ -23,7 +23,7 @@ import javax.swing.Action;
 
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 @SuppressWarnings("serial")
 public class ForkMeOnGitHubAction extends AbstractAction {

@@ -1,7 +1,7 @@
 package spl.listener;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;

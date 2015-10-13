@@ -192,7 +192,7 @@ public class BibtexFields {
         add(new BibtexSingleField("keywords", false, GUIGlobals.SMALL_W));
         //FIELD_EXTRAS.put("keywords", "selector");
 
-        dummy = new BibtexSingleField(GUIGlobals.FILE_FIELD, false);
+        dummy = new BibtexSingleField(Globals.FILE_FIELD, false);
         dummy.setEditorType(GUIGlobals.FILE_LIST_EDITOR);
         add(dummy);
 

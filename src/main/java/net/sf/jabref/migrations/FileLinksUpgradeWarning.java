@@ -21,7 +21,6 @@ import javax.swing.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.importer.ParserResult;
@@ -87,7 +86,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         boolean offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        boolean offerSetFileDir = !Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory")
+        boolean offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + "Directory")
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         if (!offerChangeDatabase && !offerChangeSettings && !offerSetFileDir)
@@ -192,7 +191,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(GUIGlobals.FILE_FIELD + "Directory", fileDir);
+            Globals.prefs.put(Globals.FILE_FIELD + "Directory", fileDir);
         }
 
         if (upgradePrefs) {
@@ -209,7 +208,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 if (!gfs.isEmpty()) {
                     sb.append(";");
                 }
-                sb.append(GUIGlobals.FILE_FIELD);
+                sb.append(Globals.FILE_FIELD);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
@@ -224,7 +223,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         outer: for (int i = 0; i < tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
             for (String field : fields) {
-                if (field.equals(GUIGlobals.FILE_FIELD)) {
+                if (field.equals(Globals.FILE_FIELD)) {
                     found = true;
                     break outer;
                 }

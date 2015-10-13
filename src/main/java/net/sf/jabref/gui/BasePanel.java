@@ -70,7 +70,7 @@ import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.matchers.NoSearchMatcher;
 import net.sf.jabref.logic.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
@@ -948,8 +948,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     entries.add(bes[0]);
                                     ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                                     ArrayList<File> dirs = new ArrayList<>();
-                                    if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD).length > 0) {
-                                        String[] mdDirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                                    if (metaData.getFileDirectory(Globals.FILE_FIELD).length > 0) {
+                                        String[] mdDirs = metaData.getFileDirectory(Globals.FILE_FIELD);
                                         for (String mdDir : mdDirs) {
                                             dirs.add(new File(mdDir));
 
@@ -1044,7 +1044,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     @Override
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
-                        String field = GUIGlobals.FILE_FIELD;
+                        String field = Globals.FILE_FIELD;
                         if (bes != null && bes.length == 1) {
                             Object link = bes[0].getField(field);
                             if (link == null) {
@@ -1080,7 +1080,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     @Override
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
-                        List<File> files = Util.getListOfLinkedFiles(bes, metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+                        List<File> files = Util.getListOfLinkedFiles(bes, metaData().getFileDirectory(Globals.FILE_FIELD));
                         for (File f : files) {
                             try {
                                 JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());

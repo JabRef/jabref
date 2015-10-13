@@ -231,7 +231,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     public void setValues() {
         pdfDir.setText(prefs.get("pdfDirectory"));
         psDir.setText(prefs.get("psDirectory"));
-        fileDir.setText(prefs.get(GUIGlobals.FILE_FIELD + "Directory"));
+        fileDir.setText(prefs.get(Globals.FILE_FIELD + "Directory"));
         bibLocationAsFileDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
@@ -262,7 +262,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         // We should maybe do some checking on the validity of the contents?
         prefs.put("pdfDirectory", pdfDir.getText());
         prefs.put("psDirectory", psDir.getText());
-        prefs.put(GUIGlobals.FILE_FIELD + "Directory", fileDir.getText());
+        prefs.put(Globals.FILE_FIELD + "Directory", fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());

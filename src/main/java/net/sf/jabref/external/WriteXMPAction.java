@@ -128,8 +128,8 @@ public class WriteXMPAction extends AbstractWorker {
             }
 
             // Then check the "file" field:
-            dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            String field = entry.getField(GUIGlobals.FILE_FIELD);
+            dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+            String field = entry.getField(Globals.FILE_FIELD);
             if (field != null) {
                 FileListTableModel tm = new FileListTableModel();
                 tm.setContent(field);

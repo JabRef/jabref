@@ -64,7 +64,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
     private static final String[] QUALITY = {SpecialFieldsUtils.FIELDNAME_QUALITY};
     private static final String[] PRINTED = {SpecialFieldsUtils.FIELDNAME_PRINTED};
     private static final String[] READ = {SpecialFieldsUtils.FIELDNAME_READ};
-    public static final String[] FILE = {GUIGlobals.FILE_FIELD};
+    public static final String[] FILE = {Globals.FILE_FIELD};
 
     private final BasePanel panel;
 
@@ -227,8 +227,8 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             }
 
             // Ok, so we are going to display an icon. Find out which one, and return it:
-            if (iconType[hasField].equals(GUIGlobals.FILE_FIELD)) {
-                o = FileListTableModel.getFirstLabel(be.getField(GUIGlobals.FILE_FIELD));
+            if (iconType[hasField].equals(Globals.FILE_FIELD)) {
+                o = FileListTableModel.getFirstLabel(be.getField(Globals.FILE_FIELD));
 
                 if (fieldCount[1] > 1) {
                     o = modifyIconForMultipleLinks((JLabel) o);
@@ -333,7 +333,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             return new int[]{-1, -1};
         }
         int hasField = -1;
-        if (!field[0].equals(GUIGlobals.FILE_FIELD)) {
+        if (!field[0].equals(Globals.FILE_FIELD)) {
             for (int i = field.length - 1; i >= 0; i--) {
                 if (hasField(be, field[i])) {
                     hasField = i;
@@ -342,7 +342,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
             return new int[]{hasField, -1};
         } else {
             // We use a FileListTableModel to parse the field content:
-            Object o = be.getField(GUIGlobals.FILE_FIELD);
+            Object o = be.getField(Globals.FILE_FIELD);
             FileListTableModel fileList = new FileListTableModel();
             fileList.setContent((String) o);
             if (field.length == 1) {
@@ -448,7 +448,7 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
             String[] desiredColumns = Globals.prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             for (String desiredColumn : desiredColumns) {
-                iconCols.put(coln, new String[]{GUIGlobals.FILE_FIELD, desiredColumn});
+                iconCols.put(coln, new String[]{Globals.FILE_FIELD, desiredColumn});
                 coln++;
             }
         }

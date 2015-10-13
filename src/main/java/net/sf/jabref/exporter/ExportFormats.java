@@ -29,7 +29,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 
@@ -209,7 +208,7 @@ public class ExportFormats {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
-                            .getFileDirectory(GUIGlobals.FILE_FIELD);
+                            .getFileDirectory(Globals.FILE_FIELD);
                     // Also store the database's file in a global variable:
                     Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
 

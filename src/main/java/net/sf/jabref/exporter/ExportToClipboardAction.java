@@ -36,7 +36,6 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -103,7 +102,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.basePanel().metaData()
-                .getFileDirectory(GUIGlobals.FILE_FIELD);
+                .getFileDirectory(Globals.FILE_FIELD);
         // Also store the database's file in a global variable:
         Globals.prefs.databaseFile = frame.basePanel().metaData().getFile();
 

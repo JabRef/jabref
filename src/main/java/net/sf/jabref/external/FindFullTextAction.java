@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.external;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -60,7 +60,7 @@ public class FindFullTextAction extends AbstractWorker {
     public void update() {
         if (result.isPresent()) {
             String bibtexKey = entry.getCiteKey();
-            String[] dirs = basePanel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = basePanel.metaData().getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
                 // FIXME: Localization
                 JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
@@ -73,12 +73,12 @@ public class FindFullTextAction extends AbstractWorker {
                     @Override
                     public void downloadComplete(FileListEntry file) {
                         FileListTableModel tm = new FileListTableModel();
-                        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+                        String oldValue = entry.getField(Globals.FILE_FIELD);
                         tm.setContent(oldValue);
                         tm.addEntry(tm.getRowCount(), file);
                         String newValue = tm.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue);
-                        entry.setField(GUIGlobals.FILE_FIELD, newValue);
+                        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
+                        entry.setField(Globals.FILE_FIELD, newValue);
                         basePanel.undoManager.addEdit(edit);
                         basePanel.markBaseChanged();
                     }
