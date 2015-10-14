@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
@@ -263,7 +262,7 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:

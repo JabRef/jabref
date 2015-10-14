@@ -35,6 +35,12 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public abstract class ImportFormat implements Comparable<ImportFormat> {
 
+    /**
+     * Using this when I have no database open or when I read
+     * non bibtex file formats (used by the ImportFormatReader.java)
+     */
+    public static final String DEFAULT_BIBTEXENTRY_ID = "__ID";
+
     private boolean isCustomImporter;
 
 

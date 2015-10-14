@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.sf.jabref.gui.BibtexFields;
+
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -201,7 +201,7 @@ public class BiomailImporter extends ImportFormat {
             }
 
             BibtexEntry b =
-                    new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes.getEntryType(Type)); // id assumes an existing database so don't
+                    new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes.getEntryType(Type)); // id assumes an existing database so don't
 
             // create one here
             b.setField(hm);
