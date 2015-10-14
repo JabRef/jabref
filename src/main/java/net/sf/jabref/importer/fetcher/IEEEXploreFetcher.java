@@ -66,7 +66,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private int hits;
     private int unparseable;
     private int parsed;
-    private int piv;
     private boolean shouldContinue;
     private boolean includeAbstract;
 
@@ -123,7 +122,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         terms = query;
-        piv = 0;
         shouldContinue = true;
         parsed = 0;
         unparseable = 0;
@@ -166,7 +164,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 // @formatter:on
             }
 
-            parse(dialog, page, 0);
+            parse(dialog, page);
             return true;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -206,9 +204,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + startIndex;
     }
 
-    private void parse(ImportInspector dialog, String text, int startIndex) {
-        piv = startIndex;
-        
+    private void parse(ImportInspector dialog, String text) {
         BibtexEntry entry;
         while (((entry = parseNextEntry(text)) != null) && shouldContinue) {
             if (entry.getField("title") != null) {
@@ -482,12 +478,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private BibtexEntry parseNextEntry(String allText) {
         BibtexEntry entry = null;
 
-        int index = allText.indexOf("<div class=\"detail", piv);
+        int index = allText.indexOf("<div class=\"detail", 0);
         int endIndex = allText.indexOf("</div>", index);
 
         if ((index >= 0) && (endIndex > 0)) {
             endIndex += 6;
-            piv = endIndex;
             String text = allText.substring(index, endIndex);
 
             BibtexEntryType type = null;
