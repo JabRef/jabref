@@ -121,7 +121,7 @@ public class PdfImporter {
         int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
         // Get a list of file directories:
-        String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
 
         List<BibtexEntry> res = new ArrayList<BibtexEntry>();
 
@@ -181,7 +181,7 @@ public class PdfImporter {
                     tm.addEntry(0, new FileListEntry(toLink.getName(),
                             FileUtil.shortenFileName(toLink, dirsS).getPath(),
                             Globals.prefs.getExternalFileTypeByName("pdf")));
-                    entry.setField(GUIGlobals.FILE_FIELD, tm.getStringRepresentation());
+                    entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
                     res.add(entry);
                     break;
 

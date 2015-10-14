@@ -33,7 +33,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import org.apache.commons.logging.Log;

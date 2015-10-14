@@ -44,15 +44,15 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.EntryComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -229,7 +229,7 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(new String[] {GUIGlobals.FILE_FIELD}));
+                comparators.add(new IconComparator(new String[] {Globals.FILE_FIELD}));
             } else if (i == URL_COL) {
                 comparators.add(new IconComparator(new String[] {"url"}));
             }
@@ -339,7 +339,7 @@ public class SearchResultsDialog {
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
                 case FILE_COL:
-                    Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                    Object o = entry.getField(Globals.FILE_FIELD);
                     if (o != null) {
                         FileListTableModel tableModel = new FileListTableModel();
                         tableModel.setContent((String) o);
@@ -382,7 +382,7 @@ public class SearchResultsDialog {
 
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
-                Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                Object o = entry.getField(Globals.FILE_FIELD);
                 FileListTableModel fileList = new FileListTableModel();
                 fileList.setContent((String) o);
                 // If there are one or more links, open the first one:
@@ -460,7 +460,7 @@ public class SearchResultsDialog {
                 Object o;
                 switch (column) {
                 case FILE_COL:
-                    o = entry.getField(GUIGlobals.FILE_FIELD);
+                    o = entry.getField(Globals.FILE_FIELD);
                     if (o != null) {
                         FileListTableModel model = new FileListTableModel();
                         model.setContent((String) o);

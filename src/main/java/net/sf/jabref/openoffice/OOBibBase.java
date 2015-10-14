@@ -33,7 +33,7 @@ import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;

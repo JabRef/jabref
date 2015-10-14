@@ -23,7 +23,6 @@ import java.util.*;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -283,7 +282,7 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                     hm.put("comment", s.toString());
                 }
-                BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
                         BibtexEntryTypes.getEntryType(bibtexType));
                 b.setField(hm);
                 bibItems.add(b);

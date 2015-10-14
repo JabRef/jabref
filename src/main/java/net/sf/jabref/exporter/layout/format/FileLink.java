@@ -18,7 +18,6 @@ package net.sf.jabref.exporter.layout.format;
 import java.io.File;
 
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.ParamLayoutFormatter;
 import net.sf.jabref.gui.FileListEntry;
@@ -72,7 +71,7 @@ public class FileLink implements ParamLayoutFormatter {
         if (Globals.prefs.fileDirForDatabase != null) {
             dirs = Globals.prefs.fileDirForDatabase;
         } else {
-            dirs = new String[] {Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")};
+            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + "Directory")};
         }
 
         File f = FileUtil.expandFilename(link, dirs);

@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class SynchronizeFileField extends AbstractWorker {
 
-    private final String fieldName = GUIGlobals.FILE_FIELD;
+    private final String fieldName = Globals.FILE_FIELD;
     private final BasePanel panel;
     private BibtexEntry[] sel;
     private SynchronizeFileField.OptionsDialog optDiag;
@@ -156,7 +156,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     tableModel.setContentDontGuessTypes(old);
 
                     // We need to specify which directories to search in for Util.expandFilename:
-                    String[] dirsS = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+                    String[] dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
                     ArrayList<File> dirs = new ArrayList<File>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
@@ -391,7 +391,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 canceled = true;
             }
 
-            String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
 
                 autoSetNone.setSelected(true);

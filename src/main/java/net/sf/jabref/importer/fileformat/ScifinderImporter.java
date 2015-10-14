@@ -26,7 +26,6 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -151,7 +150,7 @@ public class ScifinderImporter extends ImportFormat {
                 }
             }
 
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(hm);

@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.util.io;
+package net.sf.jabref.gui.desktop;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
@@ -338,7 +338,7 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+            String oldValue = entry.getField(Globals.FILE_FIELD);
             tModel.setContent(oldValue);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:
@@ -359,9 +359,9 @@ public class JabRefDesktop {
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
                 String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD,
+                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
                         oldValue, newValue);
-                entry.setField(GUIGlobals.FILE_FIELD, newValue);
+                entry.setField(Globals.FILE_FIELD, newValue);
                 frame.basePanel().undoManager.addEdit(ce);
                 frame.basePanel().markBaseChanged();
                 // Finally, open the link:

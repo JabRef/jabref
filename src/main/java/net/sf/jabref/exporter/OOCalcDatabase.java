@@ -27,8 +27,8 @@ import net.sf.jabref.exporter.layout.format.GetOpenOfficeType;
 import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
 
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import org.w3c.dom.Document;

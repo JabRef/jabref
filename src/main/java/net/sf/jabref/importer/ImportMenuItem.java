@@ -32,7 +32,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.gui.undo.NamedCompound;

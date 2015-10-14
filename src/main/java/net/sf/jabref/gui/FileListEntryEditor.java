@@ -35,7 +35,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
@@ -308,7 +308,7 @@ public class FileListEntryEditor {
         entry.setDescription(description.getText().trim());
         // See if we should trim the file link to be relative to the file directory:
         try {
-            String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
                 entry.setLink(link.getText().trim());
             } else {
@@ -371,7 +371,7 @@ public class FileListEntryEditor {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());

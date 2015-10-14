@@ -29,10 +29,10 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
@@ -948,7 +948,7 @@ class MSBibEntry {
 
         BibtexEntry entry = null;
         if (tag == null) {
-            entry = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+            entry = new BibtexEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID,
                     mapMSBibToBibtexType(sourceType));
         } else {
             entry = new BibtexEntry(tag,

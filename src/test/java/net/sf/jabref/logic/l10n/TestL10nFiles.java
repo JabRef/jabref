@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.l10n;
 
-import net.sf.jabref.gui.GUIGlobals;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +34,7 @@ public class TestL10nFiles {
 
     @Test
     public void testCompletenessOfBundles() {
-        for(String lang : GUIGlobals.LANGUAGES.values()) {
+        for(String lang : Languages.LANGUAGES.values()) {
             Assert.assertTrue(Files.exists(Paths.get("src/main/resources").resolve(Localization.INTEGRITY_RESOURCE_PREFIX + "_" + lang + ".properties")));
             Assert.assertTrue(Files.exists(Paths.get("src/main/resources").resolve(Localization.MENU_RESOURCE_PREFIX + "_" + lang + ".properties")));
             Assert.assertTrue(Files.exists(Paths.get("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + lang + ".properties")));

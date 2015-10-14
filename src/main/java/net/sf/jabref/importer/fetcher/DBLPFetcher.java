@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.bibtex.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
 
