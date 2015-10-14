@@ -500,7 +500,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
                         typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
                         typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") ||
-                        typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")) {
+                        typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines") ||
+                        typeName.equalsIgnoreCase("MIT Press Journals") || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
                     type = BibtexEntryType.getType("article");
                     sourceField = "journal";
                 } else
@@ -513,10 +514,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
                     type = BibtexEntryType.getType("electronic");
                     sourceField = "note";
-                } else
-                    if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters") || typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+                } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") ||
+                        typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
+                        typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
                     type = BibtexEntryType.getType("incollection");
                     sourceField = "booktitle";
+                } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
+                    type = BibtexEntryType.getType("book");
+                    sourceField = "note";
                 }
             }
 
@@ -539,6 +544,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 entry.setField("publisher", "MIT Press");
             } else if (typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
                 entry.setField("publisher", "IEEE USA");
+            } else if (typeName.equalsIgnoreCase("Morgan \\& Claypool eBooks")) {
+                entry.setField("publisher", "Morgan and Claypool");
             }
 
             if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
