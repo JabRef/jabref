@@ -10,10 +10,9 @@ import net.sf.jabref.gui.IconTheme;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-import spl.PdfImporter;
-import spl.PdfImporter.ImportPdfFilesResult;
-
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.pdfimport.PdfImporter;
+import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;

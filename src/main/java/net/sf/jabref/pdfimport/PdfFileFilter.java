@@ -1,4 +1,4 @@
-package spl.filter;
+package net.sf.jabref.pdfimport;
 
 import java.io.File;
 import java.io.FileFilter;

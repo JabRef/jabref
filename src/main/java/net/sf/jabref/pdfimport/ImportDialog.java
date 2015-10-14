@@ -1,4 +1,4 @@
-package spl.gui;
+package net.sf.jabref.pdfimport;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;

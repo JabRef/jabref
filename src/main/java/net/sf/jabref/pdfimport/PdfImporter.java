@@ -1,4 +1,4 @@
-package spl;
+package net.sf.jabref.pdfimport;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -41,8 +41,6 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.util.Util;
-import spl.filter.PdfFileFilter;
-import spl.gui.ImportDialog;
 
 /**
  * Created by IntelliJ IDEA.

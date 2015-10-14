@@ -49,8 +49,8 @@ import net.sf.jabref.gui.MainTableFormat;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
-import spl.PdfImporter;
-import spl.PdfImporter.ImportPdfFilesResult;
+import net.sf.jabref.pdfimport.PdfImporter;
+import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
