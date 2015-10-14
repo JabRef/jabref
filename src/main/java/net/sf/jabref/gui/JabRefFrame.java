@@ -73,7 +73,8 @@ import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.exporter.SaveAllAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.PushToApplicationButton;
+import net.sf.jabref.external.push.PushToApplicationButton;
+import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
@@ -908,7 +909,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         setProgressBarVisible(false);
 
         pushExternalButton = new PushToApplicationButton(this,
-                PushToApplicationButton.applications);
+                PushToApplications.applications);
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);

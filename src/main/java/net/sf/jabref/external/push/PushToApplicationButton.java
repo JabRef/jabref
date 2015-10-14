@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.external;
+package net.sf.jabref.external.push;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -22,7 +22,6 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.openoffice.OpenOfficePanel;
 
 import javax.swing.*;
 
@@ -31,8 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,8 +41,6 @@ import java.util.List;
  * method can be called with a null argument.
  */
 public class PushToApplicationButton implements ActionListener {
-
-    public static final List<PushToApplication> applications;
 
     private final JabRefFrame frame;
     private final List<PushToApplication> pushActions;
@@ -60,27 +55,6 @@ public class PushToApplicationButton implements ActionListener {
     private final MenuAction mAction = new MenuAction();
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
-
-    /**
-     * Set up the current available choices:
-     */
-    static {
-        //TODO plugins create collection class
-        applications = new ArrayList<PushToApplication>();
-
-        PushToApplicationButton.applications.add(new PushToLyx());
-        PushToApplicationButton.applications.add(new PushToEmacs());
-        PushToApplicationButton.applications.add(new PushToWinEdt());
-        PushToApplicationButton.applications.add(new PushToLatexEditor());
-        PushToApplicationButton.applications.add(new PushToVim());
-        PushToApplicationButton.applications.add(OpenOfficePanel.getInstance());
-        PushToApplicationButton.applications.add(new PushToTeXstudio());
-        PushToApplicationButton.applications.add(new PushToTexmaker());
-
-        // Finally, sort the entries:
-        //Collections.sort(applications, new PushToApplicationComparator());
-    }
-
 
     public PushToApplicationButton(JabRefFrame frame, List<PushToApplication> pushActions) {
         this.frame = frame;
@@ -248,6 +222,8 @@ public class PushToApplicationButton implements ActionListener {
         im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
 
+            private static final long serialVersionUID = -4839826710086306753L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
@@ -304,6 +280,8 @@ public class PushToApplicationButton implements ActionListener {
 
     class MenuAction extends MnemonicAwareAction {
 
+        private static final long serialVersionUID = -4339280220347418559L;
+
         public MenuAction() {
             putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Push to application"));
         }
@@ -350,17 +328,6 @@ public class PushToApplicationButton implements ActionListener {
                 optPopup.show(pushButton, e.getX(), e.getY());
             }
 
-        }
-    }
-
-    /**
-     * Comparator for sorting the selection according to name.
-     */
-    private static class PushToApplicationComparator implements Comparator<PushToApplication> {
-
-        @Override
-        public int compare(PushToApplication one, PushToApplication two) {
-            return one.getName().compareTo(two.getName());
         }
     }
 }

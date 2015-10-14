@@ -13,53 +13,37 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.external;
+package net.sf.jabref.external.push;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Mar 7, 2007
- * Time: 6:55:56 PM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: alver Date: Mar 7, 2007 Time: 6:55:56 PM To change this template use File | Settings
+ * | File Templates.
  */
-public class PushToVim implements PushToApplication {
+public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    private JPanel settings;
-    private final JTextField vimPath = new JTextField(30);
+    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
+
     private final JTextField vimServer = new JTextField(30);
-    private final JTextField citeCommand = new JTextField(30);
 
-    private boolean couldNotConnect;
-    private boolean couldNotRunClient;
-
-
-    @Override
-    public String getName() {
-        return Localization.lang("Insert selected citations into %0" ,getApplicationName());
-    }
 
     @Override
     public String getApplicationName() {
         return "Vim";
-    }
-
-    @Override
-    public String getTooltip() {
-        return Localization.lang("Push to %0", getApplicationName());
     }
 
     @Override
@@ -68,58 +52,48 @@ public class PushToVim implements PushToApplication {
     }
 
     @Override
-    public String getKeyStrokeName() {
-        return null;
-    }
-
-    @Override
     public JPanel getSettingsPanel() {
-        if (settings == null) {
-            initSettingsPanel();
-        }
-        vimPath.setText(Globals.prefs.get(JabRefPreferences.VIM));
         vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
-        citeCommand.setText(Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM));
-        return settings;
+        return super.getSettingsPanel();
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put(JabRefPreferences.VIM, vimPath.getText());
+        super.storeSettings();
         Globals.prefs.put(JabRefPreferences.VIM_SERVER, vimServer.getText());
-        Globals.prefs.put(JabRefPreferences.CITE_COMMAND_VIM, citeCommand.getText());
     }
 
-    private void initSettingsPanel() {
-        FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
-        builder.add(Localization.lang("Path to %0", getApplicationName()) + ":").xy(1, 1);
-        builder.add(vimPath).xy(3,1);
-        BrowseAction action = BrowseAction.buildForFile(vimPath);
-        JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(action);
-        builder.add(browse).xy(5,1);
+    @Override
+    protected void initSettingsPanel() {
+        super.initSettingsPanel();
+        builder.appendRows("2dlu, p");
         builder.add(Localization.lang("Vim Server Name") + ":").xy(1, 3);
-        builder.add(vimServer).xy(3,3);
-        builder.add(Localization.lang("Cite command") + ":").xy(1, 5);
-        builder.add(citeCommand).xy(3,5);
+        builder.add(vimServer).xy(3, 3);
         settings = builder.build();
     }
 
     @Override
-    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys,
-            MetaData metaData) {
+    public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
-        couldNotRunClient = false;
+        couldNotCall = false;
+        notDefined = false;
+
+        initParameters();
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+
+        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+            notDefined = true;
+            return;
+        }
+
         try {
             // @formatter:off
-            String[] com = new String[] {Globals.prefs.get(JabRefPreferences.VIM), "--servername", 
+            String[] com = new String[] {commandPath, "--servername", 
                     Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
-                    "<C-\\><C-N>a" + Globals.prefs.get(JabRefPreferences.CITE_COMMAND_VIM) +
+                    "<C-\\><C-N>a" + citeCommand +
                             "{" + keys + "}"};
             // @formatter:on
-
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -135,18 +109,18 @@ public class PushToVim implements PushToApplication {
                             sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.warn("Could not read from stderr.");
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        System.out.println(sb);
+                        LOGGER.warn("Push to Emacs error: " + sb);
                         couldNotConnect = true;
                     }
                 }
             };
             JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
         } catch (IOException excep) {
-            couldNotRunClient = true;
+            couldNotCall = true;
         }
 
     }
@@ -154,6 +128,7 @@ public class PushToVim implements PushToApplication {
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
+            // @formatter:off
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     "<HTML>" +
@@ -161,18 +136,19 @@ public class PushToVim implements PushToApplication {
                                     + "Vim is running<BR>with correct server name.")
                             + "</HTML>",
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        } else if (couldNotRunClient) {
+        } else if (couldNotCall) {
             JOptionPane.showMessageDialog(
                     panel.frame(),
                     Localization.lang("Could not run the 'vim' program."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-        } else {
-            panel.output(Localization.lang("Pushed citations to %0",getApplicationName()));
+            // formatter:on
         }
+        super.operationCompleted(panel);
+    }
+    
+    @Override
+    protected void initParameters() {
+        commandPathPreferenceKey = JabRefPreferences.VIM;
     }
 
-    @Override
-    public boolean requiresBibtexKeys() {
-        return true;
-    }
 }

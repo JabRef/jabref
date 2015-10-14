@@ -294,12 +294,6 @@ public class JabRefPreferences {
     public static final String FILECHOOSER_DISABLE_RENAME = "filechooserDisableRename";
     public static final String USE_NATIVE_FILE_DIALOG_ON_MAC = "useNativeFileDialogOnMac";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
-    public static final String CITE_COMMAND_LED = "citeCommandLed";
-    public static final String CITE_COMMAND_WIN_EDT = "citeCommandWinEdt";
-    public static final String CITE_COMMAND_EMACS = "citeCommandEmacs";
-    public static final String CITE_COMMAND_TEXMAKER = "citeCommandTexmaker";
-    public static final String CITE_COMMAND_VIM = "citeCommandVim";
-    public static final String CITE_COMMAND_TEXSTUDIO = "citeCommandTeXstudio";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     public static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
@@ -430,6 +424,11 @@ public class JabRefPreferences {
         // load user preferences 
         prefs = Preferences.userNodeForPackage(JabRef.class);
 
+        defaults.put(TEXMAKER_PATH, OS.guessProgramPath("texmaker", "Texmaker"));
+        defaults.put(WIN_EDT_PATH, OS.guessProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(LATEX_EDITOR_PATH, OS.guessProgramPath("LEd", "LEd"));
+        defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
+        
         if (OS.OS_X) {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
@@ -444,9 +443,6 @@ public class JabRefPreferences {
             //defaults.put("psviewer", "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
-            defaults.put(WIN_EDT_PATH, "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
-            defaults.put(LATEX_EDITOR_PATH, "C:\\Program Files\\LEd\\LEd.exe");
-            defaults.put(TEXMAKER_PATH, "C:\\Program Files\\Texmaker\\texmaker.exe");
             defaults.put(EMACS_PATH, "emacsclient.exe");
             defaults.put(EMACS_23, true);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
@@ -463,7 +459,6 @@ public class JabRefPreferences {
             defaults.put(EMACS_PATH, "gnuclient");
             defaults.put(EMACS_23, false);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
-            defaults.put(TEXMAKER_PATH, "texmaker");
             
         }
         defaults.put(USE_PROXY, Boolean.FALSE);
@@ -755,13 +750,7 @@ public class JabRefPreferences {
 
         defaults.put(PERSONAL_JOURNAL_LIST, null);
         defaults.put(EXTERNAL_JOURNAL_LISTS, null);
-        defaults.put(CITE_COMMAND, "cite"); // obsoleted by the app-specific ones
-        defaults.put(CITE_COMMAND_VIM, "\\cite");
-        defaults.put(CITE_COMMAND_EMACS, "\\cite");
-        defaults.put(CITE_COMMAND_WIN_EDT, "\\cite");
-        defaults.put(CITE_COMMAND_TEXSTUDIO, "\\cite");
-        defaults.put(CITE_COMMAND_LED, "\\cite");
-        defaults.put(CITE_COMMAND_TEXMAKER, "\\cite");
+        defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
