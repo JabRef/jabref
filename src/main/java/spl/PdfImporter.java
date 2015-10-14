@@ -1,35 +1,46 @@
 package spl;
 
-import java.io.*;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
-import net.sf.jabref.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.EntryTypeDialog;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.FocusRequester;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.logic.xmp.XMPUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import spl.filter.PdfFileFilter;
 import spl.gui.ImportDialog;
 
@@ -48,6 +59,33 @@ public class PdfImporter {
     private int dropRow;
     
     private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
+
+    /**
+     * Used nowhere else, will be removed at the JavaFX migration
+     */
+    private static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
+        int x;
+        int y;
+
+        Point topLeft = win.getLocationOnScreen();
+        Dimension parentSize = win.getSize();
+
+        Dimension mySize = diag.getSize();
+
+        if (parentSize.width > mySize.width) {
+            x = (parentSize.width - mySize.width) / 2 + topLeft.x;
+        } else {
+            x = topLeft.x;
+        }
+
+        if (parentSize.height > mySize.height) {
+            y = (parentSize.height - mySize.height) / 2 + topLeft.y;
+        } else {
+            y = topLeft.y;
+        }
+
+        diag.setLocation(x, y);
+    }
 
 
     /**
@@ -132,7 +170,7 @@ public class PdfImporter {
                 if (!hasXmpEntries(xmpEntriesInFile)) {
                     importDialog.disableXMPChoice();
                 }
-                Tools.centerRelativeToWindow(importDialog, frame);
+                centerRelativeToWindow(importDialog, frame);
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.getDoNotShowAgain();
             }
@@ -263,10 +301,6 @@ public class PdfImporter {
             dfh.linkPdfToEntry(fileName, entryTable, newEntry);
         }
         return newEntry;
-    }
-
-    private boolean fieldExists(String string) {
-        return string != null && !string.isEmpty();
     }
 
     private BibtexEntry createNewEntry() {
