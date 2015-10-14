@@ -14,8 +14,8 @@ public class Languages {
         LANGUAGES.put("Dansk", "da");
         LANGUAGES.put("Deutsch", "de");
         LANGUAGES.put("English", "en");
-        LANGUAGES.put("Espa�ol", "es");
-        LANGUAGES.put("Persian (?????)", "fa");
+        LANGUAGES.put("Español", "es");
+        LANGUAGES.put("Persian (فارسی)", "fa");
         LANGUAGES.put("Fran\u00E7ais", "fr");
         LANGUAGES.put("Bahasa Indonesia", "in");
         LANGUAGES.put("Italiano", "it");
