@@ -16,7 +16,7 @@ public class Languages {
         LANGUAGES.put("English", "en");
         LANGUAGES.put("Español", "es");
         LANGUAGES.put("Persian (فارسی)", "fa");
-        LANGUAGES.put("Fran\u00E7ais", "fr");
+        LANGUAGES.put("Français", "fr");
         LANGUAGES.put("Bahasa Indonesia", "in");
         LANGUAGES.put("Italiano", "it");
         LANGUAGES.put("Japanese", "ja");
