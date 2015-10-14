@@ -70,7 +70,7 @@ class OpenDocumentRepresentation {
             }
         }
 
-        entries = new SortedList(entryList, new FieldComparatorStack(comparators));
+        entries = new SortedList<BibtexEntry>(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
     }
 
     public Document getDOMrepresentation() {

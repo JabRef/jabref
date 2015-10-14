@@ -53,7 +53,6 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
-    private final ImportInspector dialog = null;
     private final HTMLConverter htmlConverter = new HTMLConverter();
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -120,8 +119,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         this.terms = query;
         piv = 0;
         shouldContinue = true;
-        int parsed = 0;
-        int unparseable = 0;
         acmOrGuide = acmButton.isSelected();
         fetchAbstract = absCheckBox.isSelected();
         int firstEntry = 1;
@@ -452,6 +449,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 sb.append((char) buffer[i]);
             }
         }
+        in.close();
         return sb.toString();
     }
 
@@ -474,6 +472,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 sb.append((char) buffer[i]);
             }
         }
+        in.close();
         return sb.toString();
     }
 

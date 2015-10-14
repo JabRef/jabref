@@ -88,7 +88,9 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        String bibtexString = new Scanner(source).useDelimiter("\\A").next();
+        Scanner scan = new Scanner(source);
+        String bibtexString = scan.useDelimiter("\\A").next();
+        scan.close();
 
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
         if (entry != null) {

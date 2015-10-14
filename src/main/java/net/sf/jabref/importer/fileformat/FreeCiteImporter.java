@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012, 2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -56,7 +56,9 @@ public class FreeCiteImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
-        String text = new Scanner(in).useDelimiter("\\A").next();
+        Scanner scan = new Scanner(in);
+        String text = scan.useDelimiter("\\A").next();
+        scan.close();
         return importEntries(text, status);
     }
 
