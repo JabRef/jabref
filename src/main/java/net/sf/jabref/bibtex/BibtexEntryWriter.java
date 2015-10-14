@@ -15,7 +15,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.bibtex;
+package net.sf.jabref.bibtex;
 
 import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.Globals;
@@ -25,7 +25,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import java.io.IOException;
 import java.io.Writer;

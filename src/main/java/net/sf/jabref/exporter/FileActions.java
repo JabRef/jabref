@@ -29,11 +29,11 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
-import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
+import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.logic.l10n.Localization;

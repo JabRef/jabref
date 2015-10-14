@@ -28,7 +28,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
