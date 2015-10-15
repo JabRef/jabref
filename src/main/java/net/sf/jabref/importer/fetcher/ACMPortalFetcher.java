@@ -18,14 +18,10 @@ package net.sf.jabref.importer.fetcher;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -51,6 +47,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -133,7 +130,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         try {
             URL url = new URL(address);
 
-            String page = getResults(url);
+            String page = Util.getResults(url);
 
             int hits = getNumberOfHits(page, "Found", ACMPortalFetcher.hitsPattern);
 
@@ -359,7 +356,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             // get abstract
             if (abs) {
                 url = new URL(ACMPortalFetcher.startUrl + ACMPortalFetcher.abstractUrl + ID);
-                String page = getResults(url);
+                String page = Util.getResults(url);
                 Matcher absM = ACMPortalFetcher.absPattern.matcher(page);
                 if (absM.find()) {
                     entry.setField("abstract", absM.group(1).trim());
@@ -427,51 +424,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             }
         }
         throw new IOException(Localization.lang("Could not parse number of hits"));
-    }
-
-    /**
-     * Download the URL and return contents as a String.
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    private String getResults(URL source) throws IOException {
-        try(InputStream in = source.openStream()) {
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[256];
-            while (true) {
-                int bytesRead = in.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                for (int i = 0; i < bytesRead; i++) {
-                    sb.append((char) buffer[i]);
-                }
-            }
-            return sb.toString();
-        }
-    }
-    /**
-     * Read results from a file instead of an URL. Just for faster debugging.
-     * @param f
-     * @return
-     * @throws IOException
-     */
-    public String getResultsFromFile(File f) throws IOException {
-        try(BufferedInputStream in = new BufferedInputStream(new FileInputStream(f))) {
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[256];
-            while (true) {
-                int bytesRead = in.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                for (int i = 0; i < bytesRead; i++) {
-                    sb.append((char) buffer[i]);
-                }
-            }
-            return sb.toString();
-        }
     }
 
     @Override

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 
 import javax.swing.JOptionPane;
@@ -36,7 +35,6 @@ import net.sf.jabref.util.Util;
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
-    private static final String ABSTRACT_URL_PATTERN = "http://www.diva-portal.org/smash/record.jsf?pid=%s";
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
     private final HTMLConverter htmlConverter = new HTMLConverter();
@@ -70,19 +68,9 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        URLConnection conn;
-        try {
-            conn = url.openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        // conn.setRequestProperty("Accept", "text/bibliography; style=bibtex");
-
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(conn, "UTF-8");
+            bibtexString = Util.getResultsWithEncoding(url, "UTF-8");
         } catch (FileNotFoundException e) {
             status.showMessage(Localization.lang("Unknown DiVA entry: '%0'.",
                             query),
@@ -120,10 +108,8 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             inspector.addEntry(entry);
 
             return true;
-        } else {
-            return false;
         }
-
+        return false;
     }
 
     @Override

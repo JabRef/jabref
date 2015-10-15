@@ -17,11 +17,7 @@ package net.sf.jabref.importer.fetcher;
 
 import java.awt.BorderLayout;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import java.net.ConnectException;
 import java.net.CookieHandler;
@@ -48,6 +44,7 @@ import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -131,7 +128,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         try {
             URL url = new URL(searchUrl);
-            String page = getResults(url);
+            String page = Util.getResults(url);
 
             if (page.contains("You have entered an invalid search")) {
                 status.showMessage(Localization.lang("You have entered an invalid search '%0'.", terms), Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
@@ -631,54 +628,5 @@ public class IEEEXploreFetcher implements EntryFetcher {
             return Integer.parseInt(m.group(1));
         }
         throw new IOException(Localization.lang("Could not parse number of hits"));
-    }
-
-    /**
-     * Download the URL and return contents as a String.
-     * 
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    private String getResults(URL source) throws IOException {
-
-        try(InputStream in = source.openStream()) {
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[256];
-            while (true) {
-                int bytesRead = in.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                for (int i = 0; i < bytesRead; i++) {
-                    sb.append((char) buffer[i]);
-                }
-            }
-            return sb.toString();
-        }
-    }
-
-    /**
-     * Read results from a file instead of an URL. Just for faster debugging.
-     * 
-     * @param f
-     * @return
-     * @throws IOException
-     */
-    public String getResultsFromFile(File f) throws IOException {
-        try(InputStream in = new BufferedInputStream(new FileInputStream(f))) {
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[256];
-            while (true) {
-                int bytesRead = in.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                for (int i = 0; i < bytesRead; i++) {
-                    sb.append((char) buffer[i]);
-                }
-            }
-            return sb.toString();
-        }
     }
 }
