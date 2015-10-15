@@ -1708,7 +1708,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class CloseDatabaseAction extends MnemonicAwareAction {
         public CloseDatabaseAction() {
-            super(IconTheme.getImage("close"));
+            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.NAME, Localization.menuTitle("Close database"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Close database"));
@@ -1778,7 +1778,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
-            super(IconTheme.getImage("preferences"));
+            super(IconTheme.JabRefIcon.PREFERENCES.getIcon());
             putValue(Action.NAME, Localization.menuTitle("Preferences"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Preferences"));
         }
@@ -1979,7 +1979,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             extends MnemonicAwareAction {
 
         public SaveSessionAction() {
-            super(IconTheme.getImage("save"));
+            super();
             putValue(Action.NAME, Localization.menuTitle("Save session"));
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Save session"));
         }
@@ -2033,7 +2033,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         volatile boolean running;
 
         public LoadSessionAction() {
-            super(IconTheme.getImage("loadSession"));
+            super();
             putValue(Action.NAME, Localization.menuTitle("Load session"));
             putValue(Action.ACCELERATOR_KEY, prefs.getKey("Load session"));
         }

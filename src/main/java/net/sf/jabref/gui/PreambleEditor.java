@@ -189,7 +189,7 @@ class PreambleEditor extends JDialog {
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", IconTheme.getImage("undo"));
+            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
 
@@ -209,7 +209,7 @@ class PreambleEditor extends JDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Undo", IconTheme.getImage("redo"));
+            super("Undo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 

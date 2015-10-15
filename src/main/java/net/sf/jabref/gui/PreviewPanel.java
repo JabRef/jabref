@@ -204,7 +204,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public PrintAction() {
-            super(Localization.lang("Print Preview"), IconTheme.getImage("psSmall"));
+            super(Localization.lang("Print Preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print Preview"));
         }
 
@@ -254,7 +254,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         private static final long serialVersionUID = 1L;
 
         public CloseAction() {
-            super(Localization.lang("Close window"), IconTheme.getImage("close"));
+            super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
 
