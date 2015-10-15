@@ -1007,11 +1007,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     @Override
-    public String getKeyStrokeName() {
-        return null;
-    }
-
-    @Override
     public JPanel getSettingsPanel() {
         return null;
         /*if (settings == null)

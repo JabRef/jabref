@@ -28,7 +28,7 @@ public class PushToApplications {
      * Set up the current available choices:
      */
     static {
-        applications = new ArrayList<PushToApplication>();
+        applications = new ArrayList<>();
 
         PushToApplications.applications.add(new PushToLyx());
         PushToApplications.applications.add(new PushToEmacs());

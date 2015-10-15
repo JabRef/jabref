@@ -35,8 +35,6 @@ public interface PushToApplication {
 
     Icon getIcon();
 
-    String getKeyStrokeName();
-
     /**
      * This method asks the implementing class to return a JPanel populated with the imlementation's options panel, if
      * necessary. If the JPanel is shown to the user, and the user indicates that settings should be stored, the

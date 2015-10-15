@@ -62,11 +62,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public String getKeyStrokeName() {
-        return "Push to " + getApplicationName();
-    }
-
-    @Override
     public void pushEntries(BibtexDatabase database, BibtexEntry[] entries, String keyString, MetaData metaData) {
 
         couldNotConnect = false;
