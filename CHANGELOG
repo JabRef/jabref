@@ -1,3 +1,4 @@
+[dev_2.11]
 2.11 beta 5
     - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is opened and closed correctly
