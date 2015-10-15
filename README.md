@@ -1,15 +1,9 @@
-# JabRef development version (2.11 line)
+# JabRef version 2.11 beta 5
 
 [![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=dev_2.11)](https://travis-ci.org/JabRef/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This version is a development version. Features may not work as expected.
-
-The branch of this README file is `dev_2.11`.
-This branch is intended for maintenance releases in the 2.11 line with Java 6 compatibility and plugin support.
-The main goal is to include important fixes only.
-Main development (bug fixes and new features) is happening in the [master branch](https://github.com/JabRef/jabref/tree/master).
-Please check it for latest development information.
+This version is a beta version. Features may not work as expected.
 
 JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
@@ -21,7 +15,8 @@ JabRef can import from and export to several formats, and you can customize expo
 JabRef can be run as a command line application to convert from any import format to any export format.
 
 This is the last version with plugin support.
-All plugins will stop working with version v2.80 of JabRef.
+All plugins will stop working starting with version v2.80 of JabRef.
+See https://github.com/JabRef/jabref/issues/152 for status of integration of plugins in the latest version of JabRef.
 
 ## Requirements
 
