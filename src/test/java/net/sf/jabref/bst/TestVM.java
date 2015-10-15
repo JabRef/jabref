@@ -1,5 +1,7 @@
 package net.sf.jabref.bst;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.StackFunction;
@@ -8,6 +10,7 @@ import net.sf.jabref.importer.ParserResult;
 
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,6 +20,12 @@ import java.util.Collection;
 import java.util.Vector;
 
 public class TestVM {
+
+    @Before
+    public void setPreferences() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
+
 
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
