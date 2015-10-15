@@ -932,7 +932,6 @@ public class VM implements Warn {
             @Override
             public void execute(BstEntry context) {
                 String s = (String) stack.pop();
-                System.out.println(s);
                 VM.this.bbl.append(s);
             }
         });
