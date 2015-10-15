@@ -24,8 +24,6 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         List<String> words = new SentenceAnalyzer(query).getWords();
         String firstWord = !words.isEmpty() ? words.get(0) : "";
 
-        System.out.println("words = " + words);
-
         String searchDescription = regExp ? Localization.lang(
                 "This group contains entries in which any field contains the regular expression <b>%0</b>",
                 StringUtil.quoteForHTML(firstWord))
