@@ -591,7 +591,7 @@ public class JabRefPreferences {
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(SEARCH_PANEL_VISIBLE, Boolean.FALSE);
-        defaults.put(DEFAULT_ENCODING, System.getProperty("file.encoding"));
+        defaults.put(DEFAULT_ENCODING, "UTF-8");
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(PRESERVE_FIELD_FORMATTING, Boolean.FALSE);
