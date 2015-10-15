@@ -105,7 +105,7 @@ public class FileListEntryEditor {
                 okPressed = true;
             }
         };
-        types = new JComboBox<ExternalFileType>();
+        types = new JComboBox<>();
         types.addItemListener(new ItemListener() {
 
             @Override
@@ -297,7 +297,7 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel<ExternalFileType>(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<>(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {

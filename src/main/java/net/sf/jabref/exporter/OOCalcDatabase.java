@@ -47,7 +47,6 @@ class OOCalcDatabase {
 
     private final Collection<BibtexEntry> entries;
 
-
     public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
@@ -65,9 +64,7 @@ class OOCalcDatabase {
                 entryList.add(bibtex.getEntryById(key));
             }
         }
-
-        entries = new SortedList<BibtexEntry>(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
-
+        entries = new SortedList<>(entryList, new FieldComparatorStack<>(comparators));
     }
 
     public Document getDOMrepresentation() {

@@ -48,7 +48,6 @@ class OpenDocumentRepresentation {
     private final Collection<BibtexEntry> entries;
     private final BibtexDatabase database;
 
-
     @SuppressWarnings("unchecked")
     public OpenDocumentRepresentation(BibtexDatabase database, Set<String> keySet) {
         this.database = database;
@@ -69,8 +68,7 @@ class OpenDocumentRepresentation {
                 entryList.add(database.getEntryById(key));
             }
         }
-
-        entries = new SortedList<BibtexEntry>(entryList, new FieldComparatorStack<BibtexEntry>(comparators));
+        entries = new SortedList<>(entryList, new FieldComparatorStack<>(comparators));
     }
 
     public Document getDOMrepresentation() {

@@ -56,10 +56,10 @@ public class FreeCiteImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
-        Scanner scan = new Scanner(in);
-        String text = scan.useDelimiter("\\A").next();
-        scan.close();
-        return importEntries(text, status);
+        try(Scanner scan = new Scanner(in)) {
+            String text = scan.useDelimiter("\\A").next();
+            return importEntries(text, status);
+        }
     }
 
     public List<BibtexEntry> importEntries(String text, OutputPrinter status) {

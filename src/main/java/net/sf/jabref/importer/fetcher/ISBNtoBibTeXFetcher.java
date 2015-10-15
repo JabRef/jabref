@@ -71,9 +71,34 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        InputStream source;
-        try {
-            source = url.openStream();
+        try(InputStream source = url.openStream()) {
+            String bibtexString;
+            try(Scanner scan = new Scanner(source)) {
+                bibtexString = scan.useDelimiter("\\A").next();
+                scan.close();
+            }
+            
+            BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
+            if (entry != null) {
+                // Optionally add curly brackets around key words to keep the case
+                String title = entry.getField("title");
+                if (title != null) {
+                    // Unit formatting
+                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
+                        title = unitFormatter.format(title);
+                    }
+
+                    // Case keeping
+                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
+                        title = caseKeeper.format(title);
+                    }
+                    entry.setField("title", title);
+                }
+
+                inspector.addEntry(entry);
+                return true;
+            }
+            return false;
         } catch (FileNotFoundException e) {
             // invalid ISBN --> 404--> FileNotFoundException
             status.showMessage(Localization.lang("Invalid ISBN"));
@@ -88,32 +113,6 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        Scanner scan = new Scanner(source);
-        String bibtexString = scan.useDelimiter("\\A").next();
-        scan.close();
-
-        BibtexEntry entry = BibtexParser.singleFromString(bibtexString);
-        if (entry != null) {
-            // Optionally add curly brackets around key words to keep the case
-            String title = entry.getField("title");
-            if (title != null) {
-                // Unit formatting
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                    title = unitFormatter.format(title);
-                }
-
-                // Case keeping
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                    title = caseKeeper.format(title);
-                }
-                entry.setField("title", title);
-            }
-
-            inspector.addEntry(entry);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override

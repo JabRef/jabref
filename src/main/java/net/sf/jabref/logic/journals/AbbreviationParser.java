@@ -30,9 +30,12 @@ public class AbbreviationParser {
     }
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
-        readJournalList(new FileReader(Objects.requireNonNull(file)));
+        try(FileReader fr = new FileReader(Objects.requireNonNull(file))) {
+            readJournalList(fr);
+        } catch(IOException e) {
+            LOGGER.info("Could not read journal list from file " + file.getAbsolutePath());
+        }
     }
-
     /**
      * Read the given file, which should contain a list of journal names and their
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"

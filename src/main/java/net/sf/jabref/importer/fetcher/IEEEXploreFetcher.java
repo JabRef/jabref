@@ -642,20 +642,20 @@ public class IEEEXploreFetcher implements EntryFetcher {
      */
     private String getResults(URL source) throws IOException {
 
-        InputStream in = source.openStream();
-        StringBuilder sb = new StringBuilder();
-        byte[] buffer = new byte[256];
-        while (true) {
-            int bytesRead = in.read(buffer);
-            if (bytesRead == -1) {
-                break;
+        try(InputStream in = source.openStream()) {
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[256];
+            while (true) {
+                int bytesRead = in.read(buffer);
+                if (bytesRead == -1) {
+                    break;
+                }
+                for (int i = 0; i < bytesRead; i++) {
+                    sb.append((char) buffer[i]);
+                }
             }
-            for (int i = 0; i < bytesRead; i++) {
-                sb.append((char) buffer[i]);
-            }
+            return sb.toString();
         }
-        in.close();
-        return sb.toString();
     }
 
     /**
@@ -666,19 +666,19 @@ public class IEEEXploreFetcher implements EntryFetcher {
      * @throws IOException
      */
     public String getResultsFromFile(File f) throws IOException {
-        InputStream in = new BufferedInputStream(new FileInputStream(f));
-        StringBuilder sb = new StringBuilder();
-        byte[] buffer = new byte[256];
-        while (true) {
-            int bytesRead = in.read(buffer);
-            if (bytesRead == -1) {
-                break;
+        try(InputStream in = new BufferedInputStream(new FileInputStream(f))) {
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[256];
+            while (true) {
+                int bytesRead = in.read(buffer);
+                if (bytesRead == -1) {
+                    break;
+                }
+                for (int i = 0; i < bytesRead; i++) {
+                    sb.append((char) buffer[i]);
+                }
             }
-            for (int i = 0; i < bytesRead; i++) {
-                sb.append((char) buffer[i]);
-            }
+            return sb.toString();
         }
-        in.close();
-        return sb.toString();
     }
 }
