@@ -80,6 +80,7 @@ public class IconTheme {
         EMAIL("\uF2AD") /*css: email*/,
         DOWNLOAD("\uF299") /*css: download */,
         EXPORT_TO_CLIPBOARD("\uF21C") /*css: clipboard-arrow-left */,
+        ATTACH_FILE("\uF469") /*css: paperclip*/,
 
 
         // STILL MISSING:
@@ -120,7 +121,9 @@ public class IconTheme {
         REQUIRED("\uF4E6", Color.RED),
         SECONDARY_SORTED_REVERSE("\uF4E6", Color.RED),
         TOGGLE_GROUPS("\uF4E6", Color.RED),
-        TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED);
+        TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),
+        OPEN_FOLDER("\uF4E6", Color.RED),
+        GROUP_REGULAR("\uF4E6", Color.RED),;
 
         private final String code;
         private final Color color;
@@ -247,8 +250,8 @@ public class IconTheme {
      * @return The ImageIcon for the function.
      */
     public static ImageIcon getImage(String name) {
-        return JabRefIcon.values()[new Random().nextInt(JabRefIcon.values().length)].getImageIcon();
-        //return new ImageIcon(getIconUrl(name));
+        //return JabRefIcon.values()[new Random().nextInt(JabRefIcon.values().length)].getImageIcon();
+        return new ImageIcon(getIconUrl(name));
     }
 
     /**
