@@ -437,7 +437,7 @@ public class BibtexEntry {
     }
 
     boolean allFieldsPresent(List<String> fields, BibtexDatabase database) {
-        return allFieldsPresent((String[]) fields.toArray(), database);
+        return allFieldsPresent(fields.toArray(new String[0]), database);
     }
 
     boolean atLeastOnePresent(String[] fields, BibtexDatabase database) {
