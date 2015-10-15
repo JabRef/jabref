@@ -137,7 +137,9 @@ class StringDialog extends JDialog {
         //am.put("up", stringUpAction);
         //im.put(prefs.getKey("String dialog, move string down"), "down");
         //am.put("down", stringDownAction);
-        im.put(prefs.getKey("Close dialog"), "close");
+        im.put(prefs.getKey("Save database"), "save");
+        am.put("save", saveAction);
+       im.put(prefs.getKey("Close dialog"), "close");
         am.put("close", closeAction);
         im.put(prefs.getKey("Help"), "help");
         am.put("help", helpAction);
@@ -153,6 +155,7 @@ class StringDialog extends JDialog {
         tlb.add(newStringAction);
         tlb.add(removeStringAction);
         tlb.addSeparator();
+        tlb.add(saveAction);
         //tlb.add(stringUpAction);
         //tlb.add(stringDownAction);
         tlb.addSeparator();
@@ -218,6 +221,9 @@ class StringDialog extends JDialog {
         table.repaint();
     }
 
+    public void saveDatabase() {
+        panel.runCommand("save");
+    }
 
     class StringTableModel extends AbstractTableModel {
 
@@ -466,6 +472,28 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+        }
+    }
+
+
+    SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
+
+
+    static class SaveDatabaseAction extends AbstractAction {
+
+        final StringDialog parent;
+
+
+        public SaveDatabaseAction(StringDialog parent) {
+            super("Save database",
+                    IconTheme.getImage("save"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save database"));
+            this.parent = parent;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parent.saveDatabase();
         }
     }
 
