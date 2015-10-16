@@ -144,7 +144,7 @@ public class LabelPatternPanel extends JPanel {
         con.weighty = 0;
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(0, 5, 0, 5);
-        JButton hlb = new JButton(IconTheme.getImage("helpSmall"));
+        JButton hlb = new JButton(IconTheme.JabRefIcon.HELP.getSmallIcon());
         hlb.setToolTipText(Localization.lang("Help on key patterns"));
         gbl.setConstraints(hlb, con);
         add(hlb);

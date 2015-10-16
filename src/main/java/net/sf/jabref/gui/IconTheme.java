@@ -30,9 +30,11 @@ public class IconTheme {
 
     public enum JabRefIcon {
         ADD("\uf494") /*css: plus-box*/,
+        ADD_NOBOX("\uF493") /*css: plus */,
         CLIPBOARD("\uf218"),
         FOLDER("\uf07b"),
         REMOVE("\uf406"),
+        REMOVE_NOBOX("\uF405") /*css: minus */,
         FILE("\uf2cf"),
         PDF_FILE("\uf2dc"),
         TAGS("\uf485"),
@@ -131,7 +133,7 @@ public class IconTheme {
         private final Color color;
 
         JabRefIcon(String code) {
-            this(code, Color.BLACK);
+            this(code, new Color(113,134,145));
         }
 
         JabRefIcon(String code, Color color) {

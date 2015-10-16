@@ -130,7 +130,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class BackAction extends AbstractAction {
 
         public BackAction() {
-            super("Back", IconTheme.getImage("left"));
+            super("Back", IconTheme.JabRefIcon.LEFT.getIcon());
             // putValue(SHORT_DESCRIPTION, "Show the previous page");
         }
 
@@ -144,7 +144,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class ForwardAction extends AbstractAction {
 
         public ForwardAction() {
-            super("Forward", IconTheme.getImage("right"));
+            super("Forward", IconTheme.JabRefIcon.RIGHT.getIcon());
         }
 
         @Override
@@ -157,7 +157,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     class ContentsAction extends AbstractAction {
 
         public ContentsAction() {
-            super("Contents", IconTheme.getImage("helpContents"));
+            super("Contents", IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
         }
 
         @Override

@@ -71,8 +71,8 @@ class ManageJournalsPanel extends JPanel {
     private final JRadioButton newFile = new JRadioButton(Localization.lang("New file"));
     private final JRadioButton oldFile = new JRadioButton(Localization.lang("Existing file"));
 
-    private final JButton add = new JButton(IconTheme.getImage("add"));
-    private final JButton remove = new JButton(IconTheme.getImage("remove"));
+    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD.getIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE.getIcon());
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -84,7 +84,7 @@ class ManageJournalsPanel extends JPanel {
         group.add(newFile);
         group.add(oldFile);
         addExtPan.setLayout(new BorderLayout());
-        JButton addExt = new JButton(IconTheme.getImage("add"));
+        JButton addExt = new JButton(IconTheme.JabRefIcon.ADD.getIcon());
         addExtPan.add(addExt, BorderLayout.EAST);
         addExtPan.setToolTipText(Localization.lang("Add"));
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
@@ -619,7 +619,7 @@ class ManageJournalsPanel extends JPanel {
         private final JTextField tf;
         private final JButton browse = new JButton(Localization.lang("Browse"));
         private final JButton view = new JButton(Localization.lang("Preview"));
-        private final JButton clear = new JButton(IconTheme.getImage("delete"));
+        private final JButton clear = new JButton(IconTheme.JabRefIcon.DELETE.getIcon());
         private final JButton download = new JButton(Localization.lang("Download"));
 
 
