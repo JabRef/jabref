@@ -68,6 +68,9 @@ public class IconTheme {
         MAKE_KEY("\uF3AC") /*css: key-variant */,
         CLEANUP_ENTRIES("\uF1C2") /*css: broom */,
         PRIORITY("\uF2F0") /*css: flag */,
+        PRIORITY_HIGH("\uF2F0", Color.RED) /*css: flag */,
+        PRIORITY_MEDIUM("\uF2F0", Color.ORANGE) /*css: flag */,
+        PRIORITY_LOW("\uF2F0", Color.GREEN) /*css: flag */,
         PRINTED("\uF4A5") /*css: printer */,
         TOGGLE_PRINTED("\uF4A5") /*css: printer */,
         RANKING("\uF42C") /*css: numeric*/,
@@ -84,7 +87,14 @@ public class IconTheme {
         EXPORT_TO_CLIPBOARD("\uF21C") /*css: clipboard-arrow-left */,
         ATTACH_FILE("\uF469") /*css: paperclip*/,
         AUTO_FILE_LINK("\uF2D6") /*css: file-find */,
+        TOGGLE_QUALITY_ASSURED("\uF5E7"),
+        QUALITY_ASSURED("\uF5E7"),
+        QUALITY("\uF5E7"),
 
+        // simple color boxes:
+        BOX_RED("\uF200", Color.RED),
+        BOX_ORANGE("\uF200", Color.ORANGE),
+        BOX_GREEN("\uF200", Color.GREEN),
 
         // STILL MISSING:
         COMPLETE("\uF4E6", Color.RED),
@@ -98,9 +108,6 @@ public class IconTheme {
         TOGGLE_RELEVANCE("\uF4E6", Color.RED),
         SET_RELEVANT("\uF4E6", Color.RED),
         RELEVANT("\uF4E6", Color.RED),
-        TOGGLE_QUALITY_ASSURED("\uF4E6", Color.RED),
-        QUALITY_ASSURED("\uF4E6", Color.RED),
-        QUALITY("\uF4E6", Color.RED),
         READ_STATUS_READ("\uF4E6", Color.RED),
         READ_STATUS_SKIMMED("\uF4E6", Color.RED),
         READ_STATUS("\uF4E6", Color.RED),
