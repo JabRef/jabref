@@ -71,8 +71,8 @@ class ManageJournalsPanel extends JPanel {
     private final JRadioButton newFile = new JRadioButton(Localization.lang("New file"));
     private final JRadioButton oldFile = new JRadioButton(Localization.lang("Existing file"));
 
-    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD.getIcon());
-    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE.getIcon());
+    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {

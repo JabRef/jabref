@@ -85,10 +85,10 @@ public class GroupSelector extends SidePaneComponent implements
 
     private static final Log LOGGER = LogFactory.getLog(GroupSelector.class);
 
-    private final JButton newButton = new JButton(IconTheme.getImage("new"));
+    private final JButton newButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
     private final JButton refresh = new JButton(
-            IconTheme.getImage("refresh"));
-    private final JButton autoGroup = new JButton(IconTheme.getImage("autoGroup"));
+            IconTheme.JabRefIcon.REFRESH.getSmallIcon());
+    private final JButton autoGroup = new JButton(IconTheme.JabRefIcon.AUTO_GROUP.getSmallIcon());
     private final JButton openset = new JButton(Localization.lang("Settings"));
     Color bgColor = Color.white;
     private GroupsTree groupsTree;
@@ -121,7 +121,7 @@ public class GroupSelector extends SidePaneComponent implements
      * quicksearch. The next two define the name and regexp for the group.
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.getImage("toggleGroups"), Localization.lang("Groups"));
+        super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
 
         this.frame = frame;
@@ -262,7 +262,7 @@ public class GroupSelector extends SidePaneComponent implements
                 }
             }
         });
-        JButton expand = new JButton(IconTheme.getImage("down"));
+        JButton expand = new JButton(IconTheme.JabRefIcon.ADD_ROW.getSmallIcon());
         expand.addActionListener(new ActionListener() {
 
             @Override
@@ -277,7 +277,7 @@ public class GroupSelector extends SidePaneComponent implements
                 LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: " + GroupSelector.this.getPreferredSize().getHeight());
             }
         });
-        JButton reduce = new JButton(IconTheme.getImage("up"));
+        JButton reduce = new JButton(IconTheme.JabRefIcon.REMOVE_ROW.getSmallIcon());
         reduce.addActionListener(new ActionListener() {
 
             @Override
@@ -315,7 +315,7 @@ public class GroupSelector extends SidePaneComponent implements
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
         JButton helpButton = new JButton(
-                IconTheme.getImage("help"));
+                IconTheme.JabRefIcon.HELP.getSmallIcon());
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);

@@ -90,6 +90,9 @@ public class IconTheme {
         TOGGLE_QUALITY_ASSURED("\uF5E7"),
         QUALITY_ASSURED("\uF5E7"),
         QUALITY("\uF5E7"),
+        OPEN("\uF300") /*css: folder */,
+        ADD_ROW("\uf4ed") /* css: server-plus*/,
+        REMOVE_ROW("\uF4E9") /*css: server-minus */,
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
@@ -102,7 +105,6 @@ public class IconTheme {
         EDIT_PREAMBLE("\uF4E6", Color.RED),
         EDIT_STRINGS("\uF4E6", Color.RED),
         EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
-        OPEN("\uF4E6", Color.RED),
         SAVE_AS("\uF4E6", Color.RED),
         WRONG("\uF4E6", Color.RED),
         TOGGLE_RELEVANCE("\uF4E6", Color.RED),
