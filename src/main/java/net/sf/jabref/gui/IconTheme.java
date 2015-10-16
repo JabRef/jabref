@@ -81,6 +81,7 @@ public class IconTheme {
         DOWNLOAD("\uF299") /*css: download */,
         EXPORT_TO_CLIPBOARD("\uF21C") /*css: clipboard-arrow-left */,
         ATTACH_FILE("\uF469") /*css: paperclip*/,
+        AUTO_FILE_LINK("\uF2D6") /*css: file-find */,
 
 
         // STILL MISSING:
@@ -123,7 +124,8 @@ public class IconTheme {
         TOGGLE_GROUPS("\uF4E6", Color.RED),
         TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),
         OPEN_FOLDER("\uF4E6", Color.RED),
-        GROUP_REGULAR("\uF4E6", Color.RED),;
+        GROUP_REGULAR("\uF4E6", Color.RED),
+        WRITE_XMP("\uF4E6", Color.RED);
 
         private final String code;
         private final Color color;
