@@ -19,6 +19,7 @@ test:
     - TERM=dumb ./gradlew test
   post:
     - TERM=dumb export PATH=$PATH:`pwd`/launch4j && ./gradlew -Pdev=true -PnsisExec="/usr/bin/makensis" release --stacktrace
+    - scripts/upload-to-gett.sh
 
 general:
   artifacts:
