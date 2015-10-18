@@ -12,7 +12,7 @@ dependencies:
     - unzip WinShell.zip
     - sudo cp Plugins/x86-ansi/WinShell.dll /usr/share/nsis/Plugins/
   override:
-    - TERM=dumb ./gradlew dependencies
+    - TERM=dumb ./gradlew getdeps
 
 test:
   override:
