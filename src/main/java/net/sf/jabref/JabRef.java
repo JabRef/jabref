@@ -235,7 +235,7 @@ public class JabRef {
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
                     // listener, we will instead import it into the current database.
-                    // This will enable easy integration with web browers that can
+                    // This will enable easy integration with web browsers that can
                     // open a reference file in JabRef.
                     if (initialStartup) {
                         toImport.add(aLeftOver);
