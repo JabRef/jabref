@@ -101,9 +101,10 @@ public class IconTheme {
         READ_STATUS_READ("\uF2C4", Color.GREEN), /*css: eye */
         READ_STATUS_SKIMMED("\uF2C4", Color.ORANGE), /*css: eye */
         READ_STATUS("\uF2C4"),/*css: eye */
-        RELEVANT("\uF265"), /*css: crosshairs-gps */
-        TOGGLE_RELEVANCE("\uF265"),/*css: crosshairs-gps */
-        SET_RELEVANT("\uF265"), /*css: crosshairs-gps */
+        RELEVANT("\uF522"), /*css: star-circle */
+        TOGGLE_RELEVANCE("\uF522"),/*css: star-circle */
+        SET_RELEVANT("\uF522"), /*css: star-circle */
+        MERGE_ENTRIES("\uf24f"), /* css: compare */
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
@@ -115,7 +116,7 @@ public class IconTheme {
         DRAG_AND_DROP_ARROW("\uF4E6", Color.RED),
         EDIT_PREAMBLE("\uF4E6", Color.RED),
         EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
-        SAVE_AS("\uF4E6", Color.RED),
+        //SAVE_AS("\uF4E6", Color.RED),
         WRONG("\uF4E6", Color.RED),
         GROUPS_HIGHLIGHT_ALL("\uF4E6", Color.RED),
         GROUPS_HIGHLIGHT_ANY("\uF4E6", Color.RED),
@@ -127,7 +128,7 @@ public class IconTheme {
         INTEGRITY_INFO("\uF4E6", Color.RED),
         INTEGRITY_WARN("\uF4E6", Color.RED),
         LOAD_SESSION("\uF4E6", Color.RED),
-        MERGE_ENTRIES("\uF4E6", Color.RED),
+
         OPTIONAL("\uF4E6", Color.RED),
         ORANGE("\uF4E6", Color.RED),
         AUTO_GROUP("\uF4E6", Color.RED),

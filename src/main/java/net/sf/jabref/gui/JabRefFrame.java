@@ -181,7 +181,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey("Help"));
     private final AbstractAction contents = new HelpAction(Localization.menuTitle("Help contents"), helpDiag,
             GUIGlobals.helpContents, Localization.lang("Help contents"),
-            IconTheme.JabRefIcon.HELP_CONTENTS.getSmallIcon());
+            IconTheme.JabRefIcon.HELP_CONTENTS.getIcon());
     private final AbstractAction about = new HelpAction(Localization.menuTitle("About JabRef"), helpDiag,
             GUIGlobals.aboutPage, Localization.lang("About JabRef"),
             IconTheme.getImage("about"));
@@ -194,14 +194,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Save database"), prefs.getKey(KeyBinds.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
             Localization.menuTitle("Save database as ..."), Localization.lang("Save database as ..."),
-            prefs.getKey(KeyBinds.SAVE_DATABASE_AS), IconTheme.JabRefIcon.SAVE_AS.getIcon());
+            prefs.getKey(KeyBinds.SAVE_DATABASE_AS));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
-            Localization.menuTitle("Save selected as ..."), Localization.lang("Save selected as ..."),
-            IconTheme.JabRefIcon.SAVE_AS.getIcon());
+            Localization.menuTitle("Save selected as ..."), Localization.lang("Save selected as ..."));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             Localization.menuTitle("Save selected as plain BibTeX ..."),
-            Localization.lang("Save selected as plain BibTeX ..."), IconTheme.JabRefIcon.SAVE_AS.getIcon());
+            Localization.lang("Save selected as plain BibTeX ..."));
     private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
@@ -267,8 +266,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY_AND_TITLE));
     private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
             Localization.menuTitle("Append database"),
-            Localization.lang("Append contents from a BibTeX database into the currently viewed database"),
-            IconTheme.JabRefIcon.OPEN.getIcon());
+            Localization.lang("Append contents from a BibTeX database into the currently viewed database"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
             prefs.getKey(KeyBinds.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
@@ -332,7 +330,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Open file"),
             Localization.lang("Open file"),
             prefs.getKey(KeyBinds.OPEN_FILE),
-            IconTheme.JabRefIcon.OPEN.getIcon());
+            IconTheme.JabRefIcon.FILE.getIcon());
     private final AbstractAction openPdf = new GeneralAction(Actions.OPEN_FILE,
             Localization.menuTitle("Open PDF or PS"),
             Localization.lang("Open PDF or PS"),
@@ -1471,8 +1469,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //tlb.addAction(winEdtPushAction);
         tlb.add(pushExternalButton.getComponent());
 
-        tlb.addAction(openFolder);
-        tlb.addAction(openFile);
+//        tlb.addAction(openFolder);
+//        tlb.addAction(openFile);
         //tlb.addAction(openPdf);
         //tlb.addAction(openUrl);
 
