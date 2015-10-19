@@ -51,6 +51,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
+import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
@@ -176,6 +177,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction integrityCheckAction = new IntegrityCheckAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
+    private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), helpDiag,
             GUIGlobals.baseFrameHelp, Localization.lang("JabRef help"),
             prefs.getKey("Help"));
@@ -1328,7 +1330,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         helpMenu.add(contents);
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
+        helpMenu.addSeparator();
         helpMenu.add(forkMeOnGitHubAction);
+        helpMenu.add(donationAction);
         helpMenu.addSeparator();
         helpMenu.add(about);
         mb.add(helpMenu);
@@ -1468,7 +1472,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //tlb.addAction(lyxPushAction);
         //tlb.addAction(winEdtPushAction);
         tlb.add(pushExternalButton.getComponent());
-
+        tlb.addSeparator();
+        tlb.add(donationAction);
 //        tlb.addAction(openFolder);
 //        tlb.addAction(openFile);
         //tlb.addAction(openPdf);
