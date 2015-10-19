@@ -545,7 +545,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class PasteAction extends BasicAction {
         public PasteAction() {
-            super("Paste", "Paste from clipboard", IconTheme.getImage("paste"));
+            super("Paste", "Paste from clipboard", IconTheme.JabRefIcon.PASTE.getIcon());
         }
 
         @Override
@@ -567,7 +567,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class LoadAction extends BasicAction {
         public LoadAction() {
-            super("Open", "Open_file", IconTheme.getImage("open"));
+            super("Open", "Open_file", IconTheme.JabRefIcon.OPEN.getIcon());
         }
 
         @Override
@@ -593,7 +593,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     class ClearAction extends BasicAction {
         public ClearAction() {
-            super("Clear", "Clear_inputarea", IconTheme.getImage("new"));
+            super("Clear", "Clear_inputarea", IconTheme.JabRefIcon.NEW.getIcon());
         }
 
         @Override
@@ -643,8 +643,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
     class SimpleCellRenderer extends DefaultListCellRenderer {
         private final Font baseFont;
         private final Font usedFont;
-        private final Icon okIcon = IconTheme.getImage("complete");
-        private final Icon needIcon = IconTheme.getImage("wrong");
+        private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
+        private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
 
         public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;

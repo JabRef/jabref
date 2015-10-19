@@ -106,7 +106,8 @@ public class IconTheme {
         SET_RELEVANT("\uF522"), /*css: star-circle */
         MERGE_ENTRIES("\uf24f"), /* css: compare */
         CONNECT_OPEN_OFFICE("\uf454") /*css: open-in-app */,
-
+        PLAIN_TEXT_IMPORT_TODO("\uf202") /* css: checkbox-blank-circle-outline*/,
+        PLAIN_TEXT_IMPORT_DONE("\uf206") /* checkbox-marked-circle-outline */,
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
