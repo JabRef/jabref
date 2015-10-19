@@ -109,6 +109,7 @@ public class IconTheme {
         PLAIN_TEXT_IMPORT_TODO("\uf202") /* css: checkbox-blank-circle-outline*/,
         PLAIN_TEXT_IMPORT_DONE("\uf206") /* checkbox-marked-circle-outline */,
         DONATE("\uf34d"), /* css: gift */
+        MOVE_TAB_ARROW("\uf14d"), /*css:  arrow-up-bold */
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
@@ -117,7 +118,7 @@ public class IconTheme {
 
         // STILL MISSING:
         COMPLETE("\uF4E6", Color.RED),
-        DRAG_AND_DROP_ARROW("\uF4E6", Color.RED),
+
         EDIT_PREAMBLE("\uF4E6", Color.RED),
         EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
         //SAVE_AS("\uF4E6", Color.RED),
@@ -164,6 +165,10 @@ public class IconTheme {
 
         public FontBasedIcon getSmallIcon() {
             return new FontBasedIcon(this.code, this.color, 16);
+        }
+
+        public String getCode() {
+            return this.code;
         }
 
         public ImageIcon getImageIcon() {
