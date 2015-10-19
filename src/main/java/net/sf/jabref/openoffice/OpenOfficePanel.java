@@ -88,7 +88,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private static final JButton merge = new JButton(Localization.lang("Merge citations"));
     private static final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private static final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private static final JButton help = new JButton(IconTheme.getImage("help"));
+    private static final JButton help = new JButton(IconTheme.JabRefIcon.HELP.getSmallIcon());
     private static final JButton test = new JButton("Test");
     private JRadioButton inPar;
     private JRadioButton inText;
@@ -117,15 +117,15 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     }
 
     private OpenOfficePanel() {
-        Icon connectImage = IconTheme.getImage("connect_no");
+        Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
 
         OpenOfficePanel.connect = new JButton(connectImage);
         OpenOfficePanel.manualConnect = new JButton(connectImage);
         OpenOfficePanel.connect.setToolTipText(Localization.lang("Connect"));
         OpenOfficePanel.manualConnect.setToolTipText(Localization.lang("Manual connect"));
-        OpenOfficePanel.selectDocument = new JButton(IconTheme.getImage("open"));
+        OpenOfficePanel.selectDocument = new JButton(IconTheme.JabRefIcon.OPEN.getSmallIcon());
         OpenOfficePanel.selectDocument.setToolTipText(Localization.lang("Select Writer document"));
-        OpenOfficePanel.update = new JButton(IconTheme.getImage("refresh"));
+        OpenOfficePanel.update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         OpenOfficePanel.update.setToolTipText(Localization.lang("Sync OO bibliography"));
         String defExecutable;
         String defJarsDir;

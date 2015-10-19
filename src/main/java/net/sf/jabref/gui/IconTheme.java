@@ -105,6 +105,8 @@ public class IconTheme {
         TOGGLE_RELEVANCE("\uF522"),/*css: star-circle */
         SET_RELEVANT("\uF522"), /*css: star-circle */
         MERGE_ENTRIES("\uf24f"), /* css: compare */
+        CONNECT_OPEN_OFFICE("\uf454") /*css: open-in-app */,
+
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
