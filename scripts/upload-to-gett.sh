@@ -5,7 +5,7 @@ branch=`git symbolic-ref -q --short HEAD`
 #enable snapshot upload only for master and upload_to_ge.tt testing branch
 if [ \( "$branch" != "master" \) -a \( "$branch" != "upload_to_ge.tt" \) ]; then
     echo "Current branch is not master or upload_to_ge.tt"
-    exit 1;
+    exit 0;
 fi;
 
 #change to directory of script
