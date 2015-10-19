@@ -47,8 +47,7 @@ import net.sf.jabref.remote.client.RemoteListenerClient;
 import net.sf.jabref.util.FileBasedLock;
 import net.sf.jabref.util.StringUtil;
 
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.nativeext.WindowsExtensions;
+import net.sf.jabref.gui.nativeext.PinToTaskbar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -170,9 +169,9 @@ public class JabRef {
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
         Globals.NEWLINE_LENGTH = Globals.NEWLINE.length();
 
-        if (OS.WINDOWS) {
+        if (OS.isWindows7OrLater()) {
             // activate pin to taskbar for Windows 7 and up
-            WindowsExtensions.enablePinToTaskbar();
+            PinToTaskbar.enablePinToTaskbar();
         }
 
         Vector<ParserResult> loaded = processArguments(args, true);
