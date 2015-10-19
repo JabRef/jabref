@@ -153,8 +153,6 @@ class StringDialog extends JDialog {
         tlb.add(newStringAction);
         tlb.add(removeStringAction);
         tlb.addSeparator();
-        tlb.add(saveAction);
-        tlb.addSeparator();
         tlb.add(helpAction);
         Container conPane = getContentPane();
         conPane.add(tlb, BorderLayout.NORTH);
