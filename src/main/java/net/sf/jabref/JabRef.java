@@ -33,7 +33,7 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.nativeext.WindowsExtensions;
+import net.sf.jabref.gui.nativeext.PinToTaskbar;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.journals.Abbreviations;
@@ -75,6 +75,12 @@ public class JabRef {
     private JabRefCLI cli;
 
     public void start(String[] args) {
+        // Native extensions
+        if (OS.isWindows7OrLater()) {
+            // activate pin to taskbar for Windows 7 and up
+            PinToTaskbar.enablePinToTaskbar();
+        }
+
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         if (prefs.getBoolean(JabRefPreferences.USE_PROXY)) {
@@ -143,11 +149,6 @@ public class JabRef {
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
-
-        if (OS.WINDOWS) {
-            // activate pin to taskbar for Windows 7 and up
-            WindowsExtensions.enablePinToTaskbar();
-        }
 
         Vector<ParserResult> loaded = processArguments(args, true);
 

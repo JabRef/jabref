@@ -2,19 +2,19 @@ package net.sf.jabref.gui.nativeext;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
 import com.sun.jna.WString;
-import com.sun.jna.ptr.PointerByReference;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Native extensions for Windows.
+ * Native pin to taskbar extension for Windows.
+ * Only use this class after checking for OS Windows 7 and up!
+ * <example>OS.isWindows7OrLater()</example>
  */
-public class WindowsExtensions {
-    private static final Log LOGGER = LogFactory.getLog(WindowsExtensions.class);
+public class PinToTaskbar {
+    private static final Log LOGGER = LogFactory.getLog(PinToTaskbar.class);
 
     // Register native calls for pin to taskbar functionality
     static {
@@ -36,11 +36,7 @@ public class WindowsExtensions {
      * http://stackoverflow.com/questions/5438651/launch4j-nsis-and-duplicate-pinned-windows-7-taskbar-icons
      */
     public static void enablePinToTaskbar() {
-        if(supportsPinToTaskbar()) {
-            setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
-        } else {
-            LOGGER.info("Does not support pin to taskbar.");
-        }
+        setCurrentProcessExplicitAppUserModelID("JabRef." + Globals.BUILD_INFO.getVersion());
     }
 
     private static void setCurrentProcessExplicitAppUserModelID(final String appID) {
@@ -50,18 +46,4 @@ public class WindowsExtensions {
     }
 
     private static native NativeLong SetCurrentProcessExplicitAppUserModelID(WString appID);
-
-    private static boolean supportsPinToTaskbar() {
-        if (!OS.WINDOWS) {
-            return false;
-        }
-
-        try {
-            Float version = Float.parseFloat(System.getProperty("os.version"));
-            // Windows 7 == 6.1
-            return version >= 6.1;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-    }
 }

@@ -11,4 +11,18 @@ public class OS {
     public static final boolean LINUX = osName.startsWith("linux");
     public static final boolean WINDOWS = osName.startsWith("win");
     public static final boolean OS_X = osName.startsWith("mac");
+
+    public static boolean isWindows7OrLater() {
+        if (!WINDOWS) {
+            return false;
+        }
+
+        try {
+            Float version = Float.parseFloat(System.getProperty("os.version"));
+            // Windows 7 == 6.1
+            return version >= 6.1;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
 }
