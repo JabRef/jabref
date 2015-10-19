@@ -47,6 +47,7 @@
     - Feature: [veryShortTitle] and [shortTitle] also skip words like "in", "among", "before", ...
     - Feature: New LabelPattern [keywordsN], where N is optional. Returns the first N keywords. If no N is specified ("[keywords]"), all keywords are returned. Spaces are removed.
     - Removes support for key bindings per external application by allowing only the key binding "push to application" for the currently selected external application.
+    - Removes "edit preamble" from toolbar
 [dev_2.11]
     - Backports from 2.80: Fix bug #194: JabRef starts again on Win XP and Win Vista
     - Backports from 2.80: Fixes #103: JDialog for auto set links is openend and closed correctly
