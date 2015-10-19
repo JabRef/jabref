@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -61,6 +61,8 @@ import net.sf.jabref.model.entry.BibtexString;
 
 class StringDialog extends JDialog {
 
+    private static final long serialVersionUID = 3649022684378600168L;
+
     // A reference to the entry this object works on.
     private final BibtexDatabase base;
     private final JabRefFrame frame;
@@ -98,9 +100,11 @@ class StringDialog extends JDialog {
         // that only allows the StringTable to gain keyboard focus.
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 
+            private static final long serialVersionUID = 601883449812894601L;
+
             @Override
             protected boolean accept(Component c) {
-                return super.accept(c) && c instanceof StringTable;
+                return super.accept(c) && (c instanceof StringTable);
             }
         });
 
@@ -133,11 +137,9 @@ class StringDialog extends JDialog {
         im.put(prefs.getKey("String dialog, remove string"), "remove");
         RemoveStringAction removeStringAction = new RemoveStringAction(this);
         am.put("remove", removeStringAction);
-        //im.put(prefs.getKey("String dialog, move string up"), "up");
-        //am.put("up", stringUpAction);
-        //im.put(prefs.getKey("String dialog, move string down"), "down");
-        //am.put("down", stringDownAction);
-        im.put(prefs.getKey("Close dialog"), "close");
+        im.put(prefs.getKey("Save database"), "save");
+        am.put("save", saveAction);
+       im.put(prefs.getKey("Close dialog"), "close");
         am.put("close", closeAction);
         im.put(prefs.getKey("Help"), "help");
         am.put("help", helpAction);
@@ -148,13 +150,10 @@ class StringDialog extends JDialog {
         RedoAction redoAction = new RedoAction();
         am.put("redo", redoAction);
 
-        //tlb.add(closeAction);
-        //tlb.addSeparator();
         tlb.add(newStringAction);
         tlb.add(removeStringAction);
         tlb.addSeparator();
-        //tlb.add(stringUpAction);
-        //tlb.add(stringDownAction);
+        tlb.add(saveAction);
         tlb.addSeparator();
         tlb.add(helpAction);
         Container conPane = getContentPane();
@@ -171,6 +170,8 @@ class StringDialog extends JDialog {
 
 
     class StringTable extends JTable {
+
+        private static final long serialVersionUID = -2772213505406760942L;
 
         final JScrollPane sp = new JScrollPane(this);
 
@@ -218,16 +219,21 @@ class StringDialog extends JDialog {
         table.repaint();
     }
 
+    public void saveDatabase() {
+        panel.runCommand("save");
+    }
 
     class StringTableModel extends AbstractTableModel {
 
-        final BibtexDatabase base;
+        private static final long serialVersionUID = -3696860403245796557L;
+
+        final BibtexDatabase tbase;
         final StringDialog parent;
 
 
         public StringTableModel(StringDialog parent, BibtexDatabase base) {
             this.parent = parent;
-            this.base = base;
+            this.tbase = base;
         }
 
         @Override
@@ -239,14 +245,10 @@ class StringDialog extends JDialog {
 
         @Override
         public void setValueAt(Object value, int row, int col) {
-            //	    if (row >= base.getStringCount())
-            //	return; // After a Remove operation the program somehow
-            // thinks the user is still editing an entry,
-            // which might now be outside
             if (col == 0) {
                 // Change name of string.
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
-                    if (base.hasStringLabel((String) value)) {
+                    if (tbase.hasStringLabel((String) value)) {
                         JOptionPane.showMessageDialog(parent,
                                 Localization.lang("A string with that label "
                                         + "already exists"),
@@ -357,6 +359,8 @@ class StringDialog extends JDialog {
 
     class CloseAction extends AbstractAction {
 
+        private static final long serialVersionUID = 5530138721879378049L;
+
         final StringDialog parent;
 
 
@@ -382,6 +386,8 @@ class StringDialog extends JDialog {
 
 
     class NewStringAction extends AbstractAction {
+
+        private static final long serialVersionUID = -950091418779927997L;
 
         final StringDialog parent;
 
@@ -449,28 +455,32 @@ class StringDialog extends JDialog {
     }
 
 
-    StoreContentAction storeContentAction = new StoreContentAction(this);
+    SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
 
+    static class SaveDatabaseAction extends AbstractAction {
 
-    static class StoreContentAction extends AbstractAction {
+        private static final long serialVersionUID = 2780778445054043703L;
 
         final StringDialog parent;
 
 
-        public StoreContentAction(StringDialog parent) {
-            super("Store string",
-                    IconTheme.getImage("add"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Store string"));
+        public SaveDatabaseAction(StringDialog parent) {
+            super("Save database",
+                    IconTheme.getImage("save"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save database"));
             this.parent = parent;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            parent.saveDatabase();
         }
     }
 
 
     class RemoveStringAction extends AbstractAction {
+
+        private static final long serialVersionUID = -1134835504587601867L;
 
         final StringDialog parent;
 
@@ -519,83 +529,15 @@ class StringDialog extends JDialog {
                     if (base.getStringCount() > 0)
                      {
                         table.setRowSelectionInterval(0, 0);
-                    //table.repaint();
-                    //panel.markBaseChanged();
                     }
                 }
             }
         }
     }
 
-
-    /*    StringUpAction stringUpAction = new StringUpAction();
-    class StringUpAction extends AbstractAction {
-    public StringUpAction() {
-        super("Move string up",
-    	  new ImageIcon(GUIGlobals.upIconFile));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Move string up"));
-    }
-    public void actionPerformed(ActionEvent e) {
-        int[] sel = table.getSelectedRows();
-        if ((sel.length == 1) && (sel[0] > 0)) {
-
-    	// Make sure no cell is being edited, as caused by the
-    	// keystroke. This makes the content hang on the screen.
-    	assureNotEditing();
-    	// Store undo information:
-    	panel.undoManager.addEdit(new UndoableMoveString
-    				      (panel, base, sel[0], true));
-
-    	BibtexString bs = base.getString(sel[0]);
-    	base.removeString(sel[0]);
-    	try {
-    	    base.addString(bs, sel[0]-1);
-    	} catch (KeyCollisionException ex) {}
-    	table.revalidate();
-    	table.setRowSelectionInterval(sel[0]-1, sel[0]-1);
-    	table.repaint();
-    	panel.markBaseChanged();
-        }
-    }
-    }
-
-    StringDownAction stringDownAction = new StringDownAction();
-    class StringDownAction extends AbstractAction {
-    public StringDownAction() {
-        super("Move string down",
-    	  new ImageIcon(GUIGlobals.downIconFile));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Move string down"));
-    }
-    public void actionPerformed(ActionEvent e) {
-        int[] sel = table.getSelectedRows();
-        if ((sel.length == 1) && (sel[0]+1 < base.getStringCount())) {
-
-    	// Make sure no cell is being edited, as caused by the
-    	// keystroke. This makes the content hang on the screen.
-    	assureNotEditing();
-
-
-    	// Store undo information:
-    	panel.undoManager.addEdit(new UndoableMoveString
-    				      (panel, base, sel[0], false));
-
-
-    	BibtexString bs = base.getString(sel[0]);
-    	base.removeString(sel[0]);
-    	try {
-    	    base.addString(bs, sel[0]+1);
-    	} catch (KeyCollisionException ex) {}
-    	table.revalidate();
-    	table.setRowSelectionInterval(sel[0]+1, sel[0]+1);
-    	table.repaint();
-    	panel.markBaseChanged();
-        }
-
-    }
-    }*/
-
-
     class UndoAction extends AbstractAction {
+
+        private static final long serialVersionUID = -599852779966425698L;
 
         public UndoAction() {
             super("Undo", IconTheme.getImage("undo"));
@@ -614,6 +556,8 @@ class StringDialog extends JDialog {
 
     class RedoAction extends AbstractAction {
 
+        private static final long serialVersionUID = -4404964237851372948L;
+
         public RedoAction() {
             super("Undo", IconTheme.getImage("redo"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Redo"));
@@ -627,5 +571,4 @@ class StringDialog extends JDialog {
             }
         }
     }
-
 }
