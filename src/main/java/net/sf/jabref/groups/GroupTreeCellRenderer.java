@@ -44,9 +44,8 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private Object[] highlight3Cells;
     private Object highlightBorderCell;
 
-    private static final Icon
-            groupRefiningIcon = IconTheme.getImage("groupRefining");
-    private static final Icon groupIncludingIcon = IconTheme.getImage("groupIncluding");
+    private static final Icon groupRefiningIcon = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
+    private static final Icon groupIncludingIcon = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
     private static final Icon groupRegularIcon = null;
 
 

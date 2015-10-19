@@ -84,8 +84,9 @@ public class IconTheme {
         RANK4("\uf521\uf521\uF521\uF521\uF524"),
         RANK5("\uf521\uf521\uF521\uF521\uF521"),
         WWW("\uF5D1") /*css: web*/,
-        GROUP_INCLUDING("\uF2E8") /*css: filter; should be rotated*/,
+        GROUP_INCLUDING("\uF2E9") /*css: filter-outline*/,
         GROUP_REFINING("\uF2E8") /*css: filter*/,
+        AUTO_GROUP("\uF154"), /*css: auto-fix*/
         EMAIL("\uF2AD") /*css: email*/,
         DOWNLOAD("\uF299") /*css: download */,
         EXPORT_TO_CLIPBOARD("\uF21C") /*css: clipboard-arrow-left */,
@@ -136,7 +137,6 @@ public class IconTheme {
 
         OPTIONAL("\uF4E6", Color.RED),
         ORANGE("\uF4E6", Color.RED),
-        AUTO_GROUP("\uF4E6", Color.RED),
         PLUGIN("\uF4E6", Color.RED),
         RED("\uF4E6", Color.RED),
         REQUIRED("\uF4E6", Color.RED),

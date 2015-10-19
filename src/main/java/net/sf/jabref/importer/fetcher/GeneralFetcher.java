@@ -42,15 +42,6 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
@@ -71,7 +62,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
-        super(p0, IconTheme.getImage("www"), Localization.lang("Web search"));
+        super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
         List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
