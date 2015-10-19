@@ -93,6 +93,13 @@ public class IconTheme {
         OPEN("\uF300") /*css: folder */,
         ADD_ROW("\uf4ed") /* css: server-plus*/,
         REMOVE_ROW("\uF4E9") /*css: server-minus */,
+        PICTURE("\uf2d7") /*css: file-image */,
+        READ_STATUS_READ("\uF2C4", Color.GREEN), /*css: eye */
+        READ_STATUS_SKIMMED("\uF2C4", Color.ORANGE), /*css: eye */
+        READ_STATUS("\uF2C4"),/*css: eye */
+        RELEVANT("\uF265"), /*css: crosshairs-gps */
+        TOGGLE_RELEVANCE("\uF265"),/*css: crosshairs-gps */
+        SET_RELEVANT("\uF265"), /*css: crosshairs-gps */
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
@@ -107,12 +114,9 @@ public class IconTheme {
         EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
         SAVE_AS("\uF4E6", Color.RED),
         WRONG("\uF4E6", Color.RED),
-        TOGGLE_RELEVANCE("\uF4E6", Color.RED),
-        SET_RELEVANT("\uF4E6", Color.RED),
-        RELEVANT("\uF4E6", Color.RED),
-        READ_STATUS_READ("\uF4E6", Color.RED),
-        READ_STATUS_SKIMMED("\uF4E6", Color.RED),
-        READ_STATUS("\uF4E6", Color.RED),
+
+
+
         GROUPS_HIGHLIGHT_ALL("\uF4E6", Color.RED),
         GROUPS_HIGHLIGHT_ANY("\uF4E6", Color.RED),
         GENERAL("\uF4E6", Color.RED),
@@ -127,7 +131,6 @@ public class IconTheme {
         OPTIONAL("\uF4E6", Color.RED),
         ORANGE("\uF4E6", Color.RED),
         AUTO_GROUP("\uF4E6", Color.RED),
-        PICTURE("\uF4E6", Color.RED),
         PLUGIN("\uF4E6", Color.RED),
         RED("\uF4E6", Color.RED),
         REQUIRED("\uF4E6", Color.RED),

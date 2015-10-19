@@ -277,7 +277,7 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             lab.setText(null);
-            lab.setIcon((ImageIcon) value);
+            lab.setIcon((Icon) value);
             return lab;
         }
     }

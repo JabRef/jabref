@@ -208,28 +208,35 @@ public class GUIGlobals {
     public static void init() {
         GUIGlobals.typeNameFont = new Font("dialog", Font.ITALIC + Font.BOLD, 18);
         JLabel label;
-        label = new JLabel(IconTheme.getImage("pdfSmall"));
+        label = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PDF");
         GUIGlobals.tableIcons.put("pdf", label);
-        label = new JLabel(IconTheme.getImage("wwwSmall"));
+
+        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " URL");
         GUIGlobals.tableIcons.put("url", label);
-        label = new JLabel(IconTheme.getImage("citeseer"));
+
+        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
         GUIGlobals.tableIcons.put("citeseerurl", label);
-        label = new JLabel(IconTheme.getImage("arxiv"));
+
+        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
         GUIGlobals.tableIcons.put("eprint", label);
-        label = new JLabel(IconTheme.getImage("doiSmall"));
+
+        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.tableIcons.put("doi", label);
-        label = new JLabel(IconTheme.getImage("psSmall"));
+
+        label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PS");
         GUIGlobals.tableIcons.put("ps", label);
-        label = new JLabel(IconTheme.getImage("psSmall"));
+
+        label = new JLabel(IconTheme.JabRefIcon.FOLDER.getSmallIcon());
         label.setToolTipText(Localization.lang("Open folder"));
         GUIGlobals.tableIcons.put(Globals.FOLDER_FIELD, label);
-        label = new JLabel(IconTheme.getImage("psSmall"));
+
+        label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open file"));
         GUIGlobals.tableIcons.put(Globals.FILE_FIELD, label);
 

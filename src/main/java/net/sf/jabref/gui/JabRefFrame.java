@@ -232,17 +232,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Relevance.getInstance().getValues().get(0).getActionName(),
             Relevance.getInstance().getValues().get(0).getMenuString(),
             Relevance.getInstance().getValues().get(0).getToolTipText(),
-            IconTheme.getImage(Relevance.getInstance().getValues().get(0).getActionName()));
+            IconTheme.JabRefIcon.TOGGLE_RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
             Quality.getInstance().getValues().get(0).getActionName(),
             Quality.getInstance().getValues().get(0).getMenuString(),
             Quality.getInstance().getValues().get(0).getToolTipText(),
-            IconTheme.getImage(Quality.getInstance().getValues().get(0).getActionName()));
+            IconTheme.JabRefIcon.QUALITY_ASSURED.getIcon());
     private final AbstractAction togglePrinted = new GeneralAction(
             Printed.getInstance().getValues().get(0).getActionName(),
             Printed.getInstance().getValues().get(0).getMenuString(),
             Printed.getInstance().getValues().get(0).getToolTipText(),
-            IconTheme.getImage(Printed.getInstance().getValues().get(0).getActionName()));
+            IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction saveSessionAction = new SaveSessionAction();
