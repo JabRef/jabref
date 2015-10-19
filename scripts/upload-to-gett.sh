@@ -53,6 +53,10 @@ if [ -z $GETT_PASSWORD ]; then
     exit 1;
 fi;
 
+#lines are separated by LF
+IFS='
+'
+
 function checkResultForError {
     if [ -z "$1" ]; then
         # no error if result is empty
@@ -125,18 +129,7 @@ checkResultForError "$shareInfo"
 fileids=`echo $shareInfo | ./jq -r ".files | map(.fileid) | .[]" | sed "s/\r//"`
 #echo "FILEIDs:"
 #echo "$fileids"
-
-#Delete all old files
-#lines are separated by LF
-IFS='
-'
-echo "Delete all existing files..."
-for fileid in $fileids; do
-    echo "Deleting id: $fileid"
-    url="${baseURL}${fileid}/destroy?accesstoken={${accesstoken}}"
-    res=`curl --silent -X POST ${url}`
-    checkResultForError "$res"
-done
+#stored for later deletion
 
 function doUpload {
     #ge.tt does not store all files, a slight delay seems to help
@@ -167,3 +160,14 @@ for path in ../build/releases/*; do
         fi
     fi
 done
+
+#After successfull upload
+#Delete all old files
+echo "Delete all existing files..."
+for fileid in $fileids; do
+    echo "Deleting id: $fileid"
+    url="${baseURL}${fileid}/destroy?accesstoken={${accesstoken}}"
+    res=`curl --silent -X POST ${url}`
+    checkResultForError "$res"
+done
+
