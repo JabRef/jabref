@@ -111,6 +111,8 @@ public class IconTheme {
         PLAIN_TEXT_IMPORT_DONE("\uf206") /* checkbox-marked-circle-outline */,
         DONATE("\uf34d"), /* css: gift */
         MOVE_TAB_ARROW("\uf14d"), /*css:  arrow-up-bold */
+        OPTIONAL("\uf3b6"), /*css: label-outline */
+        REQUIRED("\uf3b5"), /*css: label */
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
@@ -135,11 +137,10 @@ public class IconTheme {
         INTEGRITY_WARN("\uF4E6", Color.RED),
         LOAD_SESSION("\uF4E6", Color.RED),
 
-        OPTIONAL("\uF4E6", Color.RED),
         ORANGE("\uF4E6", Color.RED),
         PLUGIN("\uF4E6", Color.RED),
         RED("\uF4E6", Color.RED),
-        REQUIRED("\uF4E6", Color.RED),
+
         SECONDARY_SORTED_REVERSE("\uF4E6", Color.RED),
         TOGGLE_GROUPS("\uF4E6", Color.RED),
         TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),

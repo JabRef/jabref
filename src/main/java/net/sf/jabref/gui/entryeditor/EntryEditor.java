@@ -214,7 +214,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (reqPan.fileListEditor != null) {
             fileListEditor = reqPan.fileListEditor;
         }
-        tabbed.addTab(Localization.lang("Required fields"), IconTheme.getImage("required"), reqPan
+        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), reqPan
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(reqPan);
 
@@ -226,7 +226,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.getImage("optional"), optPan
+                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             } else {
@@ -236,7 +236,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.getImage("optional"), optPan
+                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
 
@@ -267,7 +267,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.getImage("optional"), optPan2
+                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan2
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
 
@@ -279,7 +279,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
                     }
-                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.getImage("optional"), optPan3
+                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan3
                             .getPane(), Localization.lang("Show deprecated bibtex fields"));
                     tabs.add(optPan3);
                 }
@@ -293,13 +293,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (newTab.fileListEditor != null) {
                 fileListEditor = newTab.fileListEditor;
             }
-            tabbed.addTab(tabList.getTabName(i), IconTheme.getImage("general"), newTab.getPane());
+            tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
 
         srcPanel.setName(Localization.lang("BibTeX source"));
         if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SOURCE)) {
-            tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.getImage("source"), srcPanel,
+            tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
                     Localization.lang("Show/edit BibTeX source"));
             tabs.add(srcPanel);
         }
