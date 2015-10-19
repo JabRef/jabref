@@ -139,6 +139,9 @@ for fileid in $fileids; do
 done
 
 function doUpload {
+    #ge.tt does not store all files, a slight delay seems to help
+    sleep 6
+
     path="$1"
     filename=$(basename "${path}")
 
@@ -158,6 +161,9 @@ function doUpload {
 
 for path in ../build/releases/*; do
     if [ -f "$path" ]; then
-        doUpload $path
+        if [[ "$path" != *src* ]]; then
+            # only upload binaries
+            doUpload $path
+        fi
     fi
 done
