@@ -32,8 +32,7 @@ import java.util.prefs.Preferences;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -470,6 +469,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_23, true);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put(FONT_FAMILY, "SansSerif");
+            defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 
         } else if (Globals.osName.toLowerCase().startsWith("windows")) {
             //defaults.put("pdfviewer", "cmd.exe /c start /b");
