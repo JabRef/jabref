@@ -919,11 +919,33 @@ public class Util {
      * @return
      * @throws IOException
      */
+    public static String getResults(URL source) throws IOException {
+
+        return Util.getResultsWithEncoding(source.openConnection(), null);
+    }
+
+    /**
+     * Download the URL and return contents as a String.
+     * 
+     * @param source
+     * @return
+     * @throws IOException
+     */
     public static String getResults(URLConnection source) throws IOException {
 
         return Util.getResultsWithEncoding(source, null);
     }
 
+    /**
+     * Download the URL using specified encoding and return contents as a String.
+     * 
+     * @param source encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getResultsWithEncoding(URL source, String encoding) throws IOException {
+        return Util.getResultsWithEncoding(source.openConnection(), encoding);
+    }
     /**
      * Download the URL using specified encoding and return contents as a String.
      * 
@@ -949,6 +971,30 @@ public class Util {
             sb.append((char) byteRead);
         }
         return sb.toString();
+    }
+
+    /**
+     * Read results from a file instead of an URL. Just for faster debugging.
+     * 
+     * @param f
+     * @return
+     * @throws IOException
+     */
+    public String getResultsFromFile(File f) throws IOException {
+        try(InputStream in = new BufferedInputStream(new FileInputStream(f))) {
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[256];
+            while (true) {
+                int bytesRead = in.read(buffer);
+                if (bytesRead == -1) {
+                    break;
+                }
+                for (int i = 0; i < bytesRead; i++) {
+                    sb.append((char) buffer[i]);
+                }
+            }
+            return sb.toString();
+        }
     }
 
     public static boolean updateTimeStampIsSet() {

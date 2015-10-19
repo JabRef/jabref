@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -61,7 +61,7 @@ public class FileListEntryEditor {
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Localization.lang("Ok"));
 
-    private final JComboBox types;
+    private final JComboBox<ExternalFileType> types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
     private ConfirmCloseFileListEntryEditor externalConfirm;
@@ -83,6 +83,8 @@ public class FileListEntryEditor {
 
         AbstractAction okAction = new AbstractAction() {
 
+            private static final long serialVersionUID = -1277323545446098878L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // If OK button is disabled, ignore this event:
@@ -103,7 +105,7 @@ public class FileListEntryEditor {
                 okPressed = true;
             }
         };
-        types = new JComboBox();
+        types = new JComboBox<>();
         types.addItemListener(new ItemListener() {
 
             @Override
@@ -160,6 +162,8 @@ public class FileListEntryEditor {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 5291749955917931883L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -293,7 +297,7 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<>(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {

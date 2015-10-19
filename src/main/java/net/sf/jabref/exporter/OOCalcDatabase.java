@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -47,8 +47,6 @@ class OOCalcDatabase {
 
     private final Collection<BibtexEntry> entries;
 
-
-    @SuppressWarnings("unchecked")
     public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<FieldComparator>();
@@ -66,9 +64,7 @@ class OOCalcDatabase {
                 entryList.add(bibtex.getEntryById(key));
             }
         }
-
-        entries = new SortedList(entryList, new FieldComparatorStack(comparators));
-
+        entries = new SortedList<>(entryList, new FieldComparatorStack<>(comparators));
     }
 
     public Document getDOMrepresentation() {

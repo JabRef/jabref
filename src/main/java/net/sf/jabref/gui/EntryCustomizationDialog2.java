@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,6 +36,8 @@ import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.CustomEntryType;
 
 public class EntryCustomizationDialog2 extends JDialog implements ListSelectionListener, ActionListener {
+
+    private static final long serialVersionUID = -3230726577951157332L;
 
     private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
@@ -135,6 +137,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
         AbstractAction closeAction = new AbstractAction() {
 
+            private static final long serialVersionUID = -6135336528807109378L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -223,7 +227,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     }
 
     private void applyChanges() {
-        valueChanged(new ListSelectionEvent(new JList(), 0, 0, false));
+        valueChanged(new ListSelectionEvent(new JList<>(), 0, 0, false));
         // Iterate over our map of required fields, and list those types if necessary:
 
         List<String> types = typeComp.getFields();
@@ -411,9 +415,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             BibtexEntryType type = BibtexEntryType.getStandardType(lastSelected);
             if (type != null) {
                 List<String> of = type.getOptionalFields();
-                List<String> req = type.getRequiredFieldsForCustomization();;
+                List<String> req = type.getRequiredFieldsForCustomization();
                 List<String> opt1 = new ArrayList<>();
-                List<String> opt2 = new ArrayList<>();;
+                List<String> opt2 = new ArrayList<>();
 
                 if (biblatexMode) {
                     if (of.size() != 0) {
