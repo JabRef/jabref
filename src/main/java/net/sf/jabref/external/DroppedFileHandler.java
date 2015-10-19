@@ -148,7 +148,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -193,7 +193,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -223,7 +223,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -308,7 +308,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -345,7 +345,7 @@ public class DroppedFileHandler {
                                                  BibtexEntry entry, boolean newEntry, final boolean multipleEntries, BibtexDatabase database) {
        
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {
@@ -440,7 +440,7 @@ public class DroppedFileHandler {
     private void doLink(BibtexEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(Globals.FILE_FIELD);
         FileListTableModel tm = new FileListTableModel();
         if (oldValue != null) {
             tm.setContent(oldValue);
@@ -449,7 +449,7 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
             String absFilename = !new File(filename).isAbsolute() && dirs.length > 0 ?
                     FileUtil.expandFilename(filename, dirs).getAbsolutePath() : filename;
 
@@ -468,9 +468,9 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD,
+        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD,
                 oldValue, newValue);
-        entry.setField(GUIGlobals.FILE_FIELD, newValue);
+        entry.setField(Globals.FILE_FIELD, newValue);
 
         if (edits == null) {
             panel.undoManager.addEdit(edit);
@@ -491,7 +491,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, ExternalFileType fileType, String destFilename,
                            NamedCompound edits) {
-        String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {
@@ -540,7 +540,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, ExternalFileType fileType, String toFile,
                            NamedCompound edits) {
 
-        String[] dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.length; i++) {
             if (new File(dirs[i]).exists()) {

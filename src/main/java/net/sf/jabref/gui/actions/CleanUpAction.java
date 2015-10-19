@@ -135,7 +135,7 @@ public class CleanUpAction extends AbstractWorker {
             }
         });
         cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Localization.lang("Rename only PDFs having a relative path"));
-        cleanUpUpgradeExternalLinks = new JCheckBox(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD));
+        cleanUpUpgradeExternalLinks = new JCheckBox(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", Globals.FILE_FIELD));
         cleanUpHTML = new JCheckBox(Localization.lang("Run HTML converter on title"));
         cleanUpCase = new JCheckBox(Localization.lang("Run filter on title keeping the case of selected words"));
         cleanUpLaTeX = new JCheckBox(Localization.lang("Remove unneccessary $, {, and } and move adjacent numbers into equations"));
@@ -457,7 +457,7 @@ public class CleanUpAction extends AbstractWorker {
     }
 
     private void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
-        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {
             return;
         }
@@ -481,13 +481,13 @@ public class CleanUpAction extends AbstractWorker {
         if (changed) {
             String newValue = flModel.getStringRepresentation();
             assert (!oldValue.equals(newValue));
-            entry.setField(GUIGlobals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
+            entry.setField(Globals.FILE_FIELD, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue));
         }
     }
 
     private void doMakePathsRelative(BibtexEntry entry, NamedCompound ce) {
-        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {
             return;
         }
@@ -500,7 +500,7 @@ public class CleanUpAction extends AbstractWorker {
         for (int i = 0; i < flModel.getRowCount(); i++) {
             FileListEntry flEntry = flModel.getEntry(i);
             String oldFileName = flEntry.getLink();
-            String newFileName = FileUtil.shortenFileName(new File(oldFileName), panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD)).toString();
+            String newFileName = FileUtil.shortenFileName(new File(oldFileName), panel.metaData().getFileDirectory(Globals.FILE_FIELD)).toString();
             if (!oldFileName.equals(newFileName)) {
                 flEntry.setLink(newFileName);
                 changed = true;
@@ -509,14 +509,14 @@ public class CleanUpAction extends AbstractWorker {
         if (changed) {
             String newValue = flModel.getStringRepresentation();
             assert (!oldValue.equals(newValue));
-            entry.setField(GUIGlobals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
+            entry.setField(Globals.FILE_FIELD, newValue);
+            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue));
         }
     }
 
     private void doRenamePDFs(BibtexEntry entry, NamedCompound ce) {
         //Extract the path
-        String oldValue = entry.getField(GUIGlobals.FILE_FIELD);
+        String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {
             return;
         }
@@ -542,7 +542,7 @@ public class CleanUpAction extends AbstractWorker {
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
-            File expandedOldFile = FileUtil.expandFilename(realOldFilename, panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD));
+            File expandedOldFile = FileUtil.expandFilename(realOldFilename, panel.metaData().getFileDirectory(Globals.FILE_FIELD));
             if (expandedOldFile.getParent() == null) {
                 // something went wrong. Just skipt his entry
                 continue;
@@ -584,11 +584,11 @@ public class CleanUpAction extends AbstractWorker {
         if (changed) {
             String newValue = flModel.getStringRepresentation();
             assert (!oldValue.equals(newValue));
-            entry.setField(GUIGlobals.FILE_FIELD, newValue);
+            entry.setField(Globals.FILE_FIELD, newValue);
             //we put an undo of the field content here
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldValue, newValue));
+            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue));
         }
     }
 

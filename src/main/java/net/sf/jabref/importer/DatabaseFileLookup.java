@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -47,7 +47,7 @@ class DatabaseFileLookup {
             throw new IllegalArgumentException("Passing a 'null' BibtexDatabase.");
         }
         entries = aDatabase.getEntries();
-        possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        possibleFilePaths = JabRef.jrf.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
     }
 
     /**

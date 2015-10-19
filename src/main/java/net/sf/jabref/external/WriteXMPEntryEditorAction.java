@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.external;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
@@ -68,8 +69,8 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         }
 
         // Then check the "file" field:
-        dirs = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-        String field = entry.getField(GUIGlobals.FILE_FIELD);
+        dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        String field = entry.getField(Globals.FILE_FIELD);
         if (field != null) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(field);

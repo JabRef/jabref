@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import net.sf.jabref.gui.BibtexFields;
+
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -259,7 +259,7 @@ public class CsaImporter extends ImportFormat {
                     }
 
                     BibtexEntry b =
-                            new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+                            new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
                                     BibtexEntryTypes.getEntryType(Type));
 
                     // create one here

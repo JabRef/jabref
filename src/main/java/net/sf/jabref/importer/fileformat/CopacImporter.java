@@ -26,7 +26,6 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.gui.BibtexFields;
 
 /**
  * Importer for COPAC format.
@@ -128,7 +127,7 @@ public class CopacImporter extends ImportFormat {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID,
                     BibtexEntryTypes.BOOK);
 
             String[] lines = entry.split("\n");

@@ -43,6 +43,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
+import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
+
 class GeneralTab extends JPanel implements PrefsTab {
 
     private final JCheckBox defSort;
@@ -68,7 +70,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JTextField timeStampFormat;
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
-    private final JComboBox<String> language = new JComboBox<>(GUIGlobals.LANGUAGES.keySet().toArray(new String[GUIGlobals.LANGUAGES.keySet().size()]));
+    private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
     private final JComboBox<String> encodings = new JComboBox<>(Encodings.ENCODINGS);
 
 
@@ -242,7 +244,7 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         // Language choice
         int ilk = 0;
-        for (String lan : GUIGlobals.LANGUAGES.values()) {
+        for (String lan : LANGUAGES.values()) {
             if (lan.equals(oldLan)) {
                 language.setSelectedIndex(ilk);
             }
@@ -283,9 +285,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
 
-        if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
-            prefs.put(JabRefPreferences.LANGUAGE, GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
-            Localization.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()));
+        if (!LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
+            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getSelectedItem()));
+            Localization.setLanguage(LANGUAGES.get(language.getSelectedItem()));
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:

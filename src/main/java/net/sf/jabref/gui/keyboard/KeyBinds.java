@@ -74,8 +74,6 @@ public class KeyBinds {
     public static final String PREAMBLE_EDITOR_STORE_CHANGES = "Preamble editor, store changes";
     public static final String PREVIOUS_TAB = "Previous tab";
     public static final String PUSH_TO_APPLICATION = "Push to application";
-    public static final String PUSH_TO_LY_X = "Push to LyX";
-    public static final String PUSH_TO_WIN_EDT = "Push to WinEdt";
     public static final String QUIT_JAB_REF = "Quit JabRef";
     public static final String REDO = "Redo";
     public static final String REFRESH_OO = "Refresh OO";
@@ -113,8 +111,6 @@ public class KeyBinds {
 
     public KeyBinds() {
         keyBindMap.put(PUSH_TO_APPLICATION, "ctrl L");
-        keyBindMap.put(PUSH_TO_LY_X, "ctrl L");
-        keyBindMap.put(PUSH_TO_WIN_EDT, "ctrl shift W");
         keyBindMap.put(QUIT_JAB_REF, "ctrl Q");
         keyBindMap.put(OPEN_DATABASE, "ctrl O");
         keyBindMap.put(SAVE_DATABASE, "ctrl S");

@@ -26,7 +26,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.external.*;
+import net.sf.jabref.external.ExternalFileTypeEditor;
+import net.sf.jabref.external.push.*;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -49,6 +50,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JTextField fileDir;
     private final JTextField psDir;
     private final JTextField emailSubject;
+    private final JTextField citeCommand;
 
     private final JCheckBox bibLocationAsFileDir;
     private final JCheckBox bibLocAsPrimaryDir;
@@ -84,10 +86,12 @@ class ExternalTab extends JPanel implements PrefsTab {
         JButton editFileTypes = new JButton(Localization.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
+        citeCommand = new JTextField(25);
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Localization.lang("Use Regular Expression Search"));
         ItemListener regExpListener = new ItemListener() {
 
+            
             @Override
             public void itemStateChanged(ItemEvent e) {
                 regExpTextField.setEditable(useRegExpComboBox.isSelected());
@@ -205,6 +209,12 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(butpan, 3);
 
         builder.nextLine();
+        lab = new JLabel(Localization.lang("Cite command") + ':');
+        builder.append(pan);
+        builder.append(lab);
+        builder.append(citeCommand);
+
+        builder.nextLine();
         builder.append(pan);
         builder.append(editFileTypes);
 
@@ -231,7 +241,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     public void setValues() {
         pdfDir.setText(prefs.get("pdfDirectory"));
         psDir.setText(prefs.get("psDirectory"));
-        fileDir.setText(prefs.get(GUIGlobals.FILE_FIELD + "Directory"));
+        fileDir.setText(prefs.get(Globals.FILE_FIELD + "Directory"));
         bibLocationAsFileDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
@@ -241,6 +251,8 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         emailSubject.setText(prefs.get(JabRefPreferences.EMAIL_SUBJECT));
         openFoldersOfAttachedFiles.setSelected(prefs.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
+
+        citeCommand.setText(prefs.get(JabRefPreferences.CITE_COMMAND));
 
         if (prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
             useRegExpComboBox.setSelected(true);
@@ -262,7 +274,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         // We should maybe do some checking on the validity of the contents?
         prefs.put("pdfDirectory", pdfDir.getText());
         prefs.put("psDirectory", psDir.getText());
-        prefs.put(GUIGlobals.FILE_FIELD + "Directory", fileDir.getText());
+        prefs.put(Globals.FILE_FIELD + "Directory", fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, matchExactKeyOnly.isSelected());
@@ -270,6 +282,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());
         prefs.put(JabRefPreferences.EMAIL_SUBJECT, emailSubject.getText());
         prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
+        prefs.put(JabRefPreferences.CITE_COMMAND, citeCommand.getText());
     }
 
     @Override

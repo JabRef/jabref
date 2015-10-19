@@ -57,7 +57,7 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
+import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -73,7 +73,8 @@ import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.exporter.SaveAllAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.PushToApplicationButton;
+import net.sf.jabref.external.push.PushToApplicationButton;
+import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
@@ -908,7 +909,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         setProgressBarVisible(false);
 
         pushExternalButton = new PushToApplicationButton(this,
-                PushToApplicationButton.applications);
+                PushToApplications.applications);
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
@@ -1409,8 +1410,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(newEntryAction);
         tlb.addAction(editEntry);
-        tlb.addAction(editPreamble);
-        tlb.addAction(editStrings);
+	tlb.addAction(editStrings);
         tlb.addAction(makeKeyAction);
         tlb.addAction(Cleanup);
         tlb.addAction(mergeEntries);

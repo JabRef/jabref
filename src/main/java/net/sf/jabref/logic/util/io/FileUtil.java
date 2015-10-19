@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
@@ -12,10 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class FileUtil {
@@ -116,7 +112,7 @@ public class FileUtil {
         // Find the default directory for this field type, if any:
         String[] dir = metaData.getFileDirectory(extension);
         // Include the standard "file" directory:
-        String[] fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        String[] fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<String>();
         for (String aDir : dir) {

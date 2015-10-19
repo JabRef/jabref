@@ -29,6 +29,8 @@ You should edit the [CHANGELOG](CHANGELOG) located in the root directory of the 
 Add a line with your changes and your name.
 Nicknames are OK.
 
+If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
+
 
 ### Author credits
 You will be given credit in the `AUTHORS` file in the root of the repository and the 'About' pages inside the main application.

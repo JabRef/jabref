@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,48 +17,34 @@ package net.sf.jabref.importer.fetcher;
 
 import java.awt.BorderLayout;
 
-import java.io.BufferedReader;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.journals.Abbreviations;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
+import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -71,25 +57,20 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final HTMLConverter htmlConverter = new HTMLConverter();
 
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
-    private final JRadioButton htmlButton = new JRadioButton(Localization.lang("HTML parser"));
-    private final JRadioButton bibButton = new JRadioButton(Localization.lang("BibTeX importer"));
 
     private static final int MAX_FETCH = 100;
     private final int perPage = IEEEXploreFetcher.MAX_FETCH;
     private int hits;
     private int unparseable;
     private int parsed;
-    private int piv;
     private boolean shouldContinue;
     private boolean includeAbstract;
-    private boolean importBibtex;
 
     private String terms;
     private final String endUrl = "&rowsPerPage=" + Integer.toString(perPage) + "&pageNumber=";
     private String searchUrl;
 
     private final Pattern hitsPattern = Pattern.compile("([0-9,]+) Results");
-    private final Pattern idPattern = Pattern.compile("<input name=\'\' title=\'.*\' type=\'checkbox\'" + "value=\'\'\\s*id=\'([0-9]+)\'/>");
     private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
     private final HashMap<String, String> fieldPatterns = new HashMap<String, String>();
     private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
@@ -103,7 +84,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     Pattern ieeeArticleNumberPattern = Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
     private final Pattern authorPattern = Pattern.compile("<span id=\"preferredName\" class=\"(.*)\">");
-    private static final String IMPORT_URL = "http://ieeexplore.ieee.org/xpls/downloadCitations";
     private static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 
 
@@ -131,16 +111,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
         pan.setLayout(new BorderLayout());
-        htmlButton.setSelected(true);
-        htmlButton.setEnabled(false);
-        bibButton.setEnabled(false);
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(htmlButton);
-        group.add(bibButton);
         pan.add(absCheckBox, BorderLayout.NORTH);
-        pan.add(htmlButton, BorderLayout.CENTER);
-        pan.add(bibButton, BorderLayout.EAST);
 
         return pan;
     }
@@ -148,7 +119,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         terms = query;
-        piv = 0;
         shouldContinue = true;
         parsed = 0;
         unparseable = 0;
@@ -158,7 +128,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         try {
             URL url = new URL(searchUrl);
-            String page = getResults(url);
+            String page = Util.getResults(url);
 
             if (page.contains("You have entered an invalid search")) {
                 status.showMessage(Localization.lang("You have entered an invalid search '%0'.", terms), Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
@@ -183,32 +153,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             hits = getNumberOfHits(page, "display-status", hitsPattern);
 
             includeAbstract = absCheckBox.isSelected();
-            importBibtex = bibButton.isSelected();
-
             if (hits > IEEEXploreFetcher.MAX_FETCH) {
                 // @formatter:off
                 status.showMessage(Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
                         new String[] {String.valueOf(hits), String.valueOf(IEEEXploreFetcher.MAX_FETCH)}),
                         Localization.lang("Search IEEEXplore"), JOptionPane.INFORMATION_MESSAGE);
                 // @formatter:on
-                hits = IEEEXploreFetcher.MAX_FETCH;
             }
 
-            parse(dialog, page, 0, 1);
-            int firstEntry = perPage;
-            while (shouldContinue && firstEntry < hits) {
-                pageNumber++;
-                searchUrl = makeUrl(pageNumber);
-                page = getResults(new URL(searchUrl));
-
-                if (!shouldContinue) {
-                    break;
-                }
-
-                parse(dialog, page, 0, firstEntry + 1);
-                firstEntry += perPage;
-
-            }
+            parse(dialog, page);
             return true;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -248,88 +201,17 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return IEEEXploreFetcher.START_URL + terms.replaceAll(" ", "+") + endUrl + startIndex;
     }
 
-    private void parse(ImportInspector dialog, String text, int startIndex, int firstEntryNumber) {
-        piv = startIndex;
-        
-        if (importBibtex) {
-            //TODO: Login
-            ArrayList<String> idSelected = new ArrayList<String>();
-            String id;
-            while ((id = parseNextEntryId(text, piv)) != null && shouldContinue) {
-                idSelected.add(id);
-            }
-            try {
-                BibtexDatabase dbase = parseBibtexDatabase(idSelected, includeAbstract);
-                Collection<BibtexEntry> items = dbase.getEntries();
-                for (BibtexEntry entry : items) {
-                    dialog.addEntry(cleanup(entry));
-                    dialog.setProgress(parsed + unparseable, hits);
-                    parsed++;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //for
-        } else {
-            BibtexEntry entry;
-            while ((entry = parseNextEntry(text, piv)) != null && shouldContinue) {
-                if (entry.getField("title") != null) {
-                    dialog.addEntry(entry);
-                    dialog.setProgress(parsed + unparseable, hits);
-                    parsed++;
-                }
+    private void parse(ImportInspector dialog, String text) {
+        BibtexEntry entry;
+        while (((entry = parseNextEntry(text)) != null) && shouldContinue) {
+            if (entry.getField("title") != null) {
+                dialog.addEntry(entry);
+                dialog.setProgress(parsed + unparseable, hits);
+                parsed++;
             }
         }
     }
 
-    private BibtexDatabase parseBibtexDatabase(List<String> id, boolean abs) throws IOException {
-        if (id.isEmpty()) {
-            return null;
-        }
-        URLConnection conn;
-        try {
-            conn = new URL(IEEEXploreFetcher.IMPORT_URL).openConnection();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        conn.setRequestProperty("Referer", searchUrl);
-        PrintWriter out = new PrintWriter(conn.getOutputStream());
-
-        String recordIds = "";
-        for (String anId : id) {
-            recordIds += anId + " ";
-        }
-        recordIds = recordIds.trim();
-        String citation = abs ? "citation-abstract" : "citation-only";
-
-        String content = "recordIds=" + recordIds.replaceAll(" ", "%20") + "&fromPageName=&citations-format=" + citation + "&download-format=download-bibtex";
-        LOGGER.debug(content);
-        out.write(content);
-        out.flush();
-        out.close();
-
-        BufferedReader bufr = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        char[] buffer = new char[256];
-        while (true) {
-            int bytesRead = bufr.read(buffer);
-            if (bytesRead == -1) {
-                break;
-            }
-            for (int i = 0; i < bytesRead; i++) {
-                sb.append(buffer[i]);
-            }
-        }
-        LOGGER.debug(sb.toString());
-
-        ParserResult results = new BibtexParser(bufr).parse();
-        bufr.close();
-        return results.getDatabase();
-    }
 
     private BibtexEntry cleanup(BibtexEntry entry) {
         if (entry == null) {
@@ -396,7 +278,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }*/
         // clean up month
         String month = entry.getField("month");
-        if (month != null && !month.isEmpty()) {
+        if ((month != null) && !month.isEmpty()) {
             month = month.replaceAll("\\.", "");
             month = month.toLowerCase();
 
@@ -469,7 +351,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     fullName += parts[2];
                 }
                 String note = entry.getField("note");
-                if (note != null && note.equals("Early Access")) {
+                if ((note != null) && note.equals("Early Access")) {
                     entry.setField("year", "to be published");
                     entry.clearField("month");
                     entry.clearField("pages");
@@ -590,33 +472,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return entry;
     }
 
-    private String parseNextEntryId(String allText, int startIndex) {
-        int index = allText.indexOf("<div class=\"select", startIndex);
-        int endIndex = allText.indexOf("</div>", index);
-
-        if (index >= 0 && endIndex > 0) {
-            String text = allText.substring(index, endIndex);
-            endIndex += 6;
-            piv = endIndex;
-            //parse id
-            Matcher idMatcher = idPattern.matcher(text);
-            //add id into a vector
-            if (idMatcher.find()) {
-                return idMatcher.group(1);
-            }
-        }
-        return null;
-    }
-
-    private BibtexEntry parseNextEntry(String allText, int startIndex) {
+    private BibtexEntry parseNextEntry(String allText) {
         BibtexEntry entry = null;
 
-        int index = allText.indexOf("<div class=\"detail", piv);
+        int index = allText.indexOf("<div class=\"detail", 0);
         int endIndex = allText.indexOf("</div>", index);
 
-        if (index >= 0 && endIndex > 0) {
+        if ((index >= 0) && (endIndex > 0)) {
             endIndex += 6;
-            piv = endIndex;
             String text = allText.substring(index, endIndex);
 
             BibtexEntryType type = null;
@@ -629,7 +492,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (typeName.equalsIgnoreCase("IEEE Journals &amp; Magazines") || typeName.equalsIgnoreCase("IEEE Early Access Articles") ||
                         typeName.equalsIgnoreCase("IET Journals &amp; Magazines") || typeName.equalsIgnoreCase("AIP Journals &amp; Magazines") ||
                         typeName.equalsIgnoreCase("AVS Journals &amp; Magazines") || typeName.equalsIgnoreCase("IBM Journals &amp; Magazines") ||
-                        typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines")) {
+                        typeName.equalsIgnoreCase("TUP Journals &amp; Magazines") || typeName.equalsIgnoreCase("BIAI Journals &amp; Magazines") ||
+                        typeName.equalsIgnoreCase("MIT Press Journals") || typeName.equalsIgnoreCase("Alcatel-Lucent Journal")) {
                     type = BibtexEntryType.getType("article");
                     sourceField = "journal";
                 } else
@@ -642,17 +506,21 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
                     type = BibtexEntryType.getType("electronic");
                     sourceField = "note";
-                } else
-                    if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") || typeName.equalsIgnoreCase("MIT Press eBook Chapters") || typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+                } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") ||
+                        typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
+                        typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
                     type = BibtexEntryType.getType("incollection");
                     sourceField = "booktitle";
+                } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
+                    type = BibtexEntryType.getType("book");
+                    sourceField = "note";
                 }
             }
 
             if (type == null) {
                 type = BibtexEntryType.getType("misc");
                 sourceField = "note";
-                LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
+                IEEEXploreFetcher.LOGGER.warn("Type detection failed. Use MISC instead. Type string: " + text);
                 unparseable++;
             }
 
@@ -668,6 +536,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 entry.setField("publisher", "MIT Press");
             } else if (typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
                 entry.setField("publisher", "IEEE USA");
+            } else if (typeName.equalsIgnoreCase("Morgan \\& Claypool eBooks")) {
+                entry.setField("publisher", "Morgan and Claypool");
             }
 
             if (typeName.equalsIgnoreCase("IEEE Early Access Articles")) {
@@ -687,7 +557,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         entry.setField(sourceField, sec_title);
 
                     }
-                    if (field.equals("pages") && fieldMatcher.groupCount() == 2) {
+                    if (field.equals("pages") && (fieldMatcher.groupCount() == 2)) {
                         entry.setField(field, fieldMatcher.group(1) + "-" + fieldMatcher.group(2));
                     }
                 }
@@ -707,13 +577,13 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             String authorString = authorNames.toString();
-            if (authorString == null || authorString.startsWith("a href") || authorString.startsWith("Topic(s)")) { // Fix for some documents without authors
+            if ((authorString == null) || authorString.startsWith("a href") || authorString.startsWith("Topic(s)")) { // Fix for some documents without authors
                 entry.setField("author", "");
             } else {
                 entry.setField("author", authorString);
             }
 
-            if (entry.getType() == BibtexEntryType.getStandardType("inproceedings") && entry.getField("author").equals("")) {
+            if ((entry.getType() == BibtexEntryType.getStandardType("inproceedings")) && entry.getField("author").equals("")) {
                 entry.setType(BibtexEntryType.getStandardType("proceedings"));
             }
 
@@ -737,9 +607,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         if (entry == null) {
             return null;
-        } else {
-            return cleanup(entry);
-        }
+        } 
+        return cleanup(entry);
     }
 
     /**
@@ -750,63 +619,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
-            LOGGER.debug(page);
+            IEEEXploreFetcher.LOGGER.debug(page);
             throw new IOException(Localization.lang("Could not parse number of hits"));
         }
         String substring = page.substring(ind, page.length());
         Matcher m = pattern.matcher(substring);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
-        } else {
-            throw new IOException(Localization.lang("Could not parse number of hits"));
         }
-    }
-
-    /**
-     * Download the URL and return contents as a String.
-     * 
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    private String getResults(URL source) throws IOException {
-
-        InputStream in = source.openStream();
-        StringBuilder sb = new StringBuilder();
-        byte[] buffer = new byte[256];
-        while (true) {
-            int bytesRead = in.read(buffer);
-            if (bytesRead == -1) {
-                break;
-            }
-            for (int i = 0; i < bytesRead; i++) {
-                sb.append((char) buffer[i]);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Read results from a file instead of an URL. Just for faster debugging.
-     * 
-     * @param f
-     * @return
-     * @throws IOException
-     */
-    public String getResultsFromFile(File f) throws IOException {
-        InputStream in = new BufferedInputStream(new FileInputStream(f));
-        StringBuilder sb = new StringBuilder();
-        byte[] buffer = new byte[256];
-        while (true) {
-            int bytesRead = in.read(buffer);
-            if (bytesRead == -1) {
-                break;
-            }
-            for (int i = 0; i < bytesRead; i++) {
-                sb.append((char) buffer[i]);
-            }
-        }
-        in.close();
-        return sb.toString();
+        throw new IOException(Localization.lang("Could not parse number of hits"));
     }
 }

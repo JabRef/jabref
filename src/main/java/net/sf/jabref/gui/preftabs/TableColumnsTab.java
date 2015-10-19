@@ -71,7 +71,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     /*** begin: special fields ***/
     private final JCheckBox specialFieldsEnabled;
     private JCheckBox rankingColumn;
-    private JCheckBox compactRankingColumn;
     private JCheckBox qualityColumn;
     private JCheckBox priorityColumn;
     private JCheckBox relevanceColumn;
@@ -81,7 +80,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private JRadioButton writeSpecialFields;
     private boolean oldSpecialFieldsEnabled;
     private boolean oldRankingColumn;
-    private boolean oldCompcatRankingColumn;
     private boolean oldQualityColumn;
     private boolean oldPriorityColumn;
     private boolean oldRelevanceColumn;
@@ -295,7 +293,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public void stateChanged(ChangeEvent event) {
                 boolean isEnabled = specialFieldsEnabled.isSelected();
                 rankingColumn.setEnabled(isEnabled);
-                compactRankingColumn.setEnabled(isEnabled && rankingColumn.isSelected());
                 qualityColumn.setEnabled(isEnabled);
                 priorityColumn.setEnabled(isEnabled);
                 relevanceColumn.setEnabled(isEnabled);
@@ -306,14 +303,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
         });
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
-        rankingColumn.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                compactRankingColumn.setEnabled(rankingColumn.isSelected());
-            }
-        });
-        compactRankingColumn = new JCheckBox(Localization.lang("Compact rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));
         priorityColumn = new JCheckBox(Localization.lang("Show priority"));
         relevanceColumn = new JCheckBox(Localization.lang("Show relevance"));
@@ -339,12 +328,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 3));
         specialTableColumnsBuilder.add(rankingColumn, cc.xyw(2, 2, 2));
-        specialTableColumnsBuilder.add(compactRankingColumn, cc.xy(3, 3));
-        specialTableColumnsBuilder.add(relevanceColumn, cc.xyw(2, 4, 2));
-        specialTableColumnsBuilder.add(qualityColumn, cc.xyw(2, 5, 2));
-        specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 6, 2));
-        specialTableColumnsBuilder.add(printedColumn, cc.xyw(2, 7, 2));
-        specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 8, 2));
+        specialTableColumnsBuilder.add(relevanceColumn, cc.xyw(2, 3, 2));
+        specialTableColumnsBuilder.add(qualityColumn, cc.xyw(2, 4, 2));
+        specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 5, 2));
+        specialTableColumnsBuilder.add(printedColumn, cc.xyw(2, 6, 2));
+        specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 7, 2));
         specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 10, 2));
         specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 11, 2));
         specialTableColumnsBuilder.add(showOneLetterHeadingForIconColumns, cc.xyw(1, 12, 4));
@@ -419,9 +407,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         oldRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING);
         rankingColumn.setSelected(oldRankingColumn);
-
-        oldCompcatRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT);
-        compactRankingColumn.setSelected(oldCompcatRankingColumn);
 
         oldQualityColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY);
         qualityColumn.setSelected(oldQualityColumn);
@@ -731,7 +716,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         boolean newSpecialFieldsEnabled = specialFieldsEnabled.isSelected();
         boolean newRankingColumn = rankingColumn.isSelected();
-        boolean newCompactRankingColumn = compactRankingColumn.isSelected();
         boolean newQualityColumn = qualityColumn.isSelected();
         boolean newPriorityColumn = priorityColumn.isSelected();
         boolean newRelevanceColumn = relevanceColumn.isSelected();
@@ -743,7 +727,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         boolean restartRequired;
         restartRequired = oldSpecialFieldsEnabled != newSpecialFieldsEnabled ||
                 oldRankingColumn != newRankingColumn ||
-                oldCompcatRankingColumn != newCompactRankingColumn ||
                 oldQualityColumn != newQualityColumn ||
                 oldPriorityColumn != newPriorityColumn ||
                 oldRelevanceColumn != newRelevanceColumn ||
@@ -765,7 +748,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         if (restartRequired) {
             prefs.putBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_RANKING_COMPACT, newCompactRankingColumn);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
             prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);

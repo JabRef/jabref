@@ -50,8 +50,8 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
-import net.sf.jabref.logic.bibtex.DuplicateCheck;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.JabRefExecutorService;
@@ -72,7 +72,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -821,20 +821,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         cm.getColumn(0).setMinWidth(55);
         cm.getColumn(0).setMaxWidth(55);
         for (int i = 1; i < PAD; i++) {
-            // Check if the Column is a RankingColumn
-            // If this is the case, set a certain Column-width,
-            // because the RankingIconColumn needs some more width
-            if (frame.basePanel().tableFormat.isRankingColumn(i)) {
-                // Lock the width of ranking icon column.
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            } else {
-                // Lock the width of icon columns.
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
-            }
+            // Lock the width of icon columns.
+            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
         for (int i = 0; i < fields.length; i++) {
@@ -981,7 +971,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
                 switch (col) {
                     case FILE_COL:
-                        Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                        Object o = entry.getField(Globals.FILE_FIELD);
                         if (o != null) {
                             FileListTableModel tableModel = new FileListTableModel();
                             tableModel.setContent((String) o);
@@ -1050,7 +1040,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             BibtexEntry entry = sortedList.get(row);
             JPopupMenu menu = new JPopupMenu();
             int count = 0;
-            Object o = entry.getField(GUIGlobals.FILE_FIELD);
+            Object o = entry.getField(Globals.FILE_FIELD);
             FileListTableModel fileList = new FileListTableModel();
             fileList.setContent((String) o);
             // If there are one or more links, open the first one:
@@ -1236,13 +1226,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel model = new FileListTableModel();
-            String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
+            String oldVal = entry.getField(Globals.FILE_FIELD);
             if (oldVal != null) {
                 model.setContent(oldVal);
             }
             model.addEntry(model.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
-            entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+            entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
             entries.getReadWriteLock().writeLock().unlock();
             glTable.repaint();
         }
@@ -1275,7 +1265,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             }
             final FileListTableModel model = new FileListTableModel();
-            String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
+            String oldVal = entry.getField(Globals.FILE_FIELD);
             if (oldVal != null) {
                 model.setContent(oldVal);
             }
@@ -1288,7 +1278,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 public void actionPerformed(ActionEvent e) {
                     if (e.getID() > 0) {
                         entries.getReadWriteLock().writeLock().lock();
-                        entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+                        entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
                         entries.getReadWriteLock().writeLock().unlock();
                         glTable.repaint();
                     }
@@ -1321,13 +1311,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             editor.setVisible(true, true);
             if (editor.okPressed()) {
                 FileListTableModel model = new FileListTableModel();
-                String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
+                String oldVal = entry.getField(Globals.FILE_FIELD);
                 if (oldVal != null) {
                     model.setContent(oldVal);
                 }
                 model.addEntry(model.getRowCount(), flEntry);
                 entries.getReadWriteLock().writeLock().lock();
-                entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+                entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
                 entries.getReadWriteLock().writeLock().unlock();
                 glTable.repaint();
             }
@@ -1337,13 +1327,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel model = new FileListTableModel();
-            String oldVal = entry.getField(GUIGlobals.FILE_FIELD);
+            String oldVal = entry.getField(Globals.FILE_FIELD);
             if (oldVal != null) {
                 model.setContent(oldVal);
             }
             model.addEntry(model.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
-            entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+            entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
             entries.getReadWriteLock().writeLock().unlock();
             glTable.repaint();
         }
@@ -1401,7 +1391,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(new String[]{GUIGlobals.FILE_FIELD}));
+                comparators.add(new IconComparator(new String[]{Globals.FILE_FIELD}));
             } else if (i == PDF_COL) {
                 comparators.add(new IconComparator(new String[]{"pdf"}));
             } else if (i == PS_COL) {
@@ -1510,7 +1500,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     case DUPL_COL:
                         return entry.isGroupHit() ? duplLabel : null;
                     case FILE_COL:
-                        o = entry.getField(GUIGlobals.FILE_FIELD);
+                        o = entry.getField(Globals.FILE_FIELD);
                         if (o != null) {
                             FileListTableModel model = new FileListTableModel();
                             model.setContent((String) o);

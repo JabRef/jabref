@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -35,7 +35,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
@@ -61,7 +61,7 @@ public class FileListEntryEditor {
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Localization.lang("Ok"));
 
-    private final JComboBox types;
+    private final JComboBox<ExternalFileType> types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
     private ConfirmCloseFileListEntryEditor externalConfirm;
@@ -83,6 +83,8 @@ public class FileListEntryEditor {
 
         AbstractAction okAction = new AbstractAction() {
 
+            private static final long serialVersionUID = -1277323545446098878L;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // If OK button is disabled, ignore this event:
@@ -103,7 +105,7 @@ public class FileListEntryEditor {
                 okPressed = true;
             }
         };
-        types = new JComboBox();
+        types = new JComboBox<>();
         types.addItemListener(new ItemListener() {
 
             @Override
@@ -160,6 +162,8 @@ public class FileListEntryEditor {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 5291749955917931883L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -293,7 +297,7 @@ public class FileListEntryEditor {
         link.setText(entry.getLink());
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel(Globals.prefs.getExternalFileTypeSelection()));
+        types.setModel(new DefaultComboBoxModel<>(Globals.prefs.getExternalFileTypeSelection()));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.getType() != null) && !(entry.getType() instanceof UnknownExternalFileType)) {
@@ -308,7 +312,7 @@ public class FileListEntryEditor {
         entry.setDescription(description.getText().trim());
         // See if we should trim the file link to be relative to the file directory:
         try {
-            String[] dirs = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+            String[] dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
             if (dirs.length == 0) {
                 entry.setLink(link.getText().trim());
             } else {
@@ -371,7 +375,7 @@ public class FileListEntryEditor {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());

@@ -23,7 +23,7 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
-import spl.gui.ImportDialog;
+import net.sf.jabref.pdfimport.ImportDialog;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

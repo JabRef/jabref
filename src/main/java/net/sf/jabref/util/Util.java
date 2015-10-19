@@ -64,7 +64,6 @@ import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.gui.EntryMarker;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.JabRefPreferences;
@@ -548,7 +547,7 @@ public class Util {
         for (BibtexEntry entry : entries) {
             FileListTableModel tableModel = new FileListTableModel();
             // If there are already links in the file field, keep those on top:
-            String oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
+            String oldFileContent = entry.getField(Globals.FILE_FIELD);
             if (oldFileContent != null) {
                 tableModel.setContent(oldFileContent);
             }
@@ -568,8 +567,8 @@ public class Util {
             }
             if (tableModel.getRowCount() != oldRowCount) {
                 String newValue = tableModel.getStringRepresentation();
-                entry.setField(GUIGlobals.FILE_FIELD, newValue);
-                ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldFileContent, newValue));
+                entry.setField(Globals.FILE_FIELD, newValue);
+                ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
             }
         }
         ce.end();
@@ -920,11 +919,33 @@ public class Util {
      * @return
      * @throws IOException
      */
+    public static String getResults(URL source) throws IOException {
+
+        return Util.getResultsWithEncoding(source.openConnection(), null);
+    }
+
+    /**
+     * Download the URL and return contents as a String.
+     * 
+     * @param source
+     * @return
+     * @throws IOException
+     */
     public static String getResults(URLConnection source) throws IOException {
 
         return Util.getResultsWithEncoding(source, null);
     }
 
+    /**
+     * Download the URL using specified encoding and return contents as a String.
+     * 
+     * @param source encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getResultsWithEncoding(URL source, String encoding) throws IOException {
+        return Util.getResultsWithEncoding(source.openConnection(), encoding);
+    }
     /**
      * Download the URL using specified encoding and return contents as a String.
      * 
@@ -950,6 +971,30 @@ public class Util {
             sb.append((char) byteRead);
         }
         return sb.toString();
+    }
+
+    /**
+     * Read results from a file instead of an URL. Just for faster debugging.
+     * 
+     * @param f
+     * @return
+     * @throws IOException
+     */
+    public String getResultsFromFile(File f) throws IOException {
+        try(InputStream in = new BufferedInputStream(new FileInputStream(f))) {
+            StringBuilder sb = new StringBuilder();
+            byte[] buffer = new byte[256];
+            while (true) {
+                int bytesRead = in.read(buffer);
+                if (bytesRead == -1) {
+                    break;
+                }
+                for (int i = 0; i < bytesRead; i++) {
+                    sb.append((char) buffer[i]);
+                }
+            }
+            return sb.toString();
+        }
     }
 
     public static boolean updateTimeStampIsSet() {
@@ -1015,7 +1060,7 @@ public class Util {
             public void run() {
                 // determine directories to search in
                 ArrayList<File> dirs = new ArrayList<File>();
-                String[] dirsS = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }
@@ -1039,7 +1084,7 @@ public class Util {
                 // Iterate over the entries:
                 for (BibtexEntry anEntry : result.keySet()) {
                     FileListTableModel tableModel;
-                    String oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
+                    String oldVal = anEntry.getField(Globals.FILE_FIELD);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
                         if (oldVal != null) {
@@ -1080,12 +1125,12 @@ public class Util {
                             }
                             if (ce != null) {
                                 // store undo information
-                                UndoableFieldChange change = new UndoableFieldChange(anEntry, GUIGlobals.FILE_FIELD, oldVal, newVal);
+                                UndoableFieldChange change = new UndoableFieldChange(anEntry, Globals.FILE_FIELD, oldVal, newVal);
                                 ce.addEdit(change);
                             }
                             // hack: if table model is given, do NOT modify entry
                             if (singleTableModel == null) {
-                                anEntry.setField(GUIGlobals.FILE_FIELD, newVal);
+                                anEntry.setField(Globals.FILE_FIELD, newVal);
                             }
                             if (changedEntries != null) {
                                 changedEntries.add(anEntry);

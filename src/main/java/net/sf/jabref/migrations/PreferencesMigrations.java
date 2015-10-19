@@ -41,7 +41,7 @@ public class PreferencesMigrations {
      */
     public static void upgradeFaultyEncodingStrings() {
         JabRefPreferences prefs = Globals.prefs;
-        String defaultEncoding = prefs.get(prefs.DEFAULT_ENCODING);
+        String defaultEncoding = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         if (defaultEncoding == null) {
             return;
         }

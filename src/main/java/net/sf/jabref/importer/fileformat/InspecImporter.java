@@ -28,7 +28,7 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
-import net.sf.jabref.gui.BibtexFields;
+
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
@@ -161,7 +161,7 @@ public class InspecImporter extends ImportFormat {
                     }
                 }
             }
-            BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
                     .getEntryType(Type)); // id assumes an existing database so don't
             // create one here
             b.setField(h);

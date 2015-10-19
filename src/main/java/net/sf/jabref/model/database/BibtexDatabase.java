@@ -29,7 +29,7 @@ Modified for use in JabRef
 */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.logic.bibtex.EntrySorter;
+import net.sf.jabref.bibtex.EntrySorter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.MonthUtil;
 

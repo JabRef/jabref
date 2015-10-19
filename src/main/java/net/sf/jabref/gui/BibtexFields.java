@@ -53,10 +53,6 @@ public class BibtexFields {
     public static final String TIMESTAMP = "timestamp"; // it's also definied at the JabRefPreferences class
     private static final String ENTRYTYPE = "entrytype";
 
-    public static final String// Using this when I have no database open or when I read
-            // non bibtex file formats (used by the ImportFormatReader.java)
-            DEFAULT_BIBTEXENTRY_ID = "__ID";
-
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
             {"author", "title", "year", BibtexEntry.KEY_FIELD};
 
@@ -192,7 +188,7 @@ public class BibtexFields {
         add(new BibtexSingleField("keywords", false, GUIGlobals.SMALL_W));
         //FIELD_EXTRAS.put("keywords", "selector");
 
-        dummy = new BibtexSingleField(GUIGlobals.FILE_FIELD, false);
+        dummy = new BibtexSingleField(Globals.FILE_FIELD, false);
         dummy.setEditorType(GUIGlobals.FILE_LIST_EDITOR);
         add(dummy);
 

@@ -25,4 +25,24 @@ public class OS {
             return false;
         }
     }
+    
+    public static final String guessProgramPath(String programName, String windowsDirectory) {
+        if (OS.WINDOWS) {
+            String progFiles = System.getenv("ProgramFiles(x86)");
+            if (progFiles == null) {
+                progFiles = System.getenv("ProgramFiles");
+            }
+            if ((windowsDirectory != null) && !windowsDirectory.isEmpty()) {
+                return progFiles + "\\" + windowsDirectory + "\\" + programName + ".exe";
+            } else {
+                return progFiles + "\\" + programName + ".exe";
+            }
+        } else {
+            return programName;
+        }
+    }
+
+    public static final String guessProgramPath(String programName) {
+        return OS.guessProgramPath(programName, null);
+    }
 }

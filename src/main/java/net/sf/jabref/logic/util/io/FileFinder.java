@@ -4,7 +4,6 @@ import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.util.Util;
@@ -22,7 +21,7 @@ public class FileFinder {
      * Searches the given directory and subdirectories for a pdf file with name
      * as given + ".pdf"
      */
-    public static String findPdf(String key, String extension, String directory, OpenFileFilter off) {
+    public static String findPdf(String key, String extension, String directory, FilenameFilter off) {
         // String filename = key + "."+extension;
 
         /*
@@ -46,7 +45,7 @@ public class FileFinder {
     }
 
     public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
-        Set<File> result = new HashSet<File>();
+        Set<File> result = new HashSet<>();
 
         for (File directory : directories) {
             result.addAll(FileFinder.findFiles(extensions, directory));
@@ -56,7 +55,7 @@ public class FileFinder {
     }
 
     private static Collection<? extends File> findFiles(Collection<String> extensions, File directory) {
-        Set<File> result = new HashSet<File>();
+        Set<File> result = new HashSet<>();
 
         File[] children = directory.listFiles();
         if (children == null)
@@ -120,7 +119,7 @@ public class FileFinder {
      */
     public static String findFile(BibtexEntry entry, ExternalFileType fileType, List<String> extraDirs) {
 
-        List<String> dirs = new ArrayList<String>();
+        List<String> dirs = new ArrayList<>();
         dirs.addAll(extraDirs);
         if (Globals.prefs.hasKey(fileType.getExtension() + "Directory")) {
             dirs.add(Globals.prefs.get(fileType.getExtension() + "Directory"));
@@ -304,7 +303,7 @@ public class FileFinder {
                 }
                 // Do for all direct and indirect subdirs
                 if (dirToProcess.equals("**")) {
-                    List<File> toDo = new LinkedList<File>();
+                    List<File> toDo = new LinkedList<>();
                     toDo.add(directory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
@@ -343,13 +342,7 @@ public class FileFinder {
                 final Pattern toMatch = Pattern
                         .compile(dirToProcess.replaceAll("\\\\\\\\", "\\\\"));
 
-                File[] matches = directory.listFiles(new FilenameFilter() {
-
-                    @Override
-                    public boolean accept(File arg0, String arg1) {
-                        return toMatch.matcher(arg1).matches();
-                    }
-                });
+                File[] matches = directory.listFiles((arg0, arg1) -> toMatch.matcher(arg1).matches());
                 if (matches == null || matches.length == 0) {
                     return null;
                 }
@@ -368,13 +361,7 @@ public class FileFinder {
         final Pattern toMatch = Pattern.compile('^'
                 + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$');
 
-        File[] matches = directory.listFiles(new FilenameFilter() {
-
-            @Override
-            public boolean accept(File arg0, String arg1) {
-                return toMatch.matcher(arg1).matches();
-            }
-        });
+        File[] matches = directory.listFiles((arg0, arg1) -> toMatch.matcher(arg1).matches());
         if (matches == null || matches.length == 0) {
             return null;
         }
@@ -386,25 +373,20 @@ public class FileFinder {
         }
     }
 
-    private static String findInDir(String key, String dir, OpenFileFilter off, int count) {
-        if (count > 20)
-         {
+    private static String findInDir(String key, String dir, FilenameFilter off, int count) {
+        if (count > 20) {
             return null; // Make sure an infinite loop doesn't occur.
         }
         File f = new File(dir);
         File[] all = f.listFiles();
-        if (all == null)
-         {
-            return null; // An error occured. We may not have
-        // permission to list the files.
+        if (all == null) {
+            return null; // An error occured. We may not have permission to list the files.
         }
-
-        int numFiles = all.length;
 
         for (File curFile : all) {
             if (curFile.isFile()) {
                 String name = curFile.getName();
-                if (name.startsWith(key + '.') && off.accept(name)) {
+                if (name.startsWith(key + '.') && off.accept(f, name)) {
                     return curFile.getPath();
                 }
 

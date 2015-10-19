@@ -21,7 +21,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
-import net.sf.jabref.external.PushToApplication;
+import net.sf.jabref.external.push.PushToApplication;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -1004,11 +1004,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     @Override
     public Icon getIcon() {
         return IconTheme.getImage("openoffice");
-    }
-
-    @Override
-    public String getKeyStrokeName() {
-        return null;
     }
 
     @Override

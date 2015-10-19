@@ -135,10 +135,6 @@ public class GUIGlobals {
 
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
-    public static final String FILE_FIELD = "file";
-
-    private static final String FOLDER_FIELD = "folder";
-
     public static final double SMALL_W = 0.30;
     public static final double MEDIUM_W = 0.5;
     public static final double LARGE_W = 1.5;
@@ -155,7 +151,6 @@ public class GUIGlobals {
 
     public static final int DEFAULT_FIELD_LENGTH = 100;
     public static final int NUMBER_COL_LENGTH = 32;
-    public static final int WIDTH_ICON_COL_RANKING = 35; // Width of Ranking Icon Column
     public static final int WIDTH_ICON_COL = 19;
 
     // Column widths for export customization dialog table:
@@ -169,29 +164,7 @@ public class GUIGlobals {
     public static final int IMPORT_DIALOG_COL_2_WIDTH = 200;
     public static final int IMPORT_DIALOG_COL_3_WIDTH = 200;
 
-    public static final Map<String, String> LANGUAGES;
-
     static {
-        LANGUAGES = new TreeMap<>();
-
-        // LANGUAGES contains mappings for supported languages.
-        GUIGlobals.LANGUAGES.put("Dansk", "da");
-        GUIGlobals.LANGUAGES.put("Deutsch", "de");
-        GUIGlobals.LANGUAGES.put("English", "en");
-        GUIGlobals.LANGUAGES.put("Español", "es");
-        GUIGlobals.LANGUAGES.put("Persian (فارسی)", "fa");
-        GUIGlobals.LANGUAGES.put("Fran\u00E7ais", "fr");
-        GUIGlobals.LANGUAGES.put("Bahasa Indonesia", "in");
-        GUIGlobals.LANGUAGES.put("Italiano", "it");
-        GUIGlobals.LANGUAGES.put("Japanese", "ja");
-        GUIGlobals.LANGUAGES.put("Nederlands", "nl");
-        GUIGlobals.LANGUAGES.put("Norsk", "no");
-        GUIGlobals.LANGUAGES.put("Brazilian Portugese", "pt_BR");
-        GUIGlobals.LANGUAGES.put("Russian", "ru");
-        GUIGlobals.LANGUAGES.put("Turkish", "tr");
-        GUIGlobals.LANGUAGES.put("Vietnamese", "vi");
-        GUIGlobals.LANGUAGES.put("Simplified Chinese", "zh");
-
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();
     }
@@ -255,10 +228,10 @@ public class GUIGlobals {
         GUIGlobals.tableIcons.put("ps", label);
         label = new JLabel(IconTheme.getImage("psSmall"));
         label.setToolTipText(Localization.lang("Open folder"));
-        GUIGlobals.tableIcons.put(GUIGlobals.FOLDER_FIELD, label);
+        GUIGlobals.tableIcons.put(Globals.FOLDER_FIELD, label);
         label = new JLabel(IconTheme.getImage("psSmall"));
         label.setToolTipText(Localization.lang("Open file"));
-        GUIGlobals.tableIcons.put(GUIGlobals.FILE_FIELD, label);
+        GUIGlobals.tableIcons.put(Globals.FILE_FIELD, label);
 
         for (ExternalFileType fileType : Globals.prefs.getExternalFileTypeSelection()) {
             label = new JLabel(fileType.getIcon());

@@ -12,13 +12,14 @@ dependencies:
     - unzip WinShell.zip
     - sudo cp Plugins/x86-ansi/WinShell.dll /usr/share/nsis/Plugins/
   override:
-    - TERM=dumb ./gradlew dependencies
+    - TERM=dumb ./gradlew getdeps
 
 test:
   override:
     - TERM=dumb ./gradlew test
   post:
     - TERM=dumb export PATH=$PATH:`pwd`/launch4j && ./gradlew -Pdev=true -PnsisExec="/usr/bin/makensis" release --stacktrace
+    - scripts/upload-to-gett.sh
 
 general:
   artifacts:

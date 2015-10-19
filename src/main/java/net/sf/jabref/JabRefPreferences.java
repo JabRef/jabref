@@ -43,7 +43,6 @@ import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.CustomEntryType;
@@ -295,12 +294,6 @@ public class JabRefPreferences {
     public static final String FILECHOOSER_DISABLE_RENAME = "filechooserDisableRename";
     public static final String USE_NATIVE_FILE_DIALOG_ON_MAC = "useNativeFileDialogOnMac";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
-    public static final String CITE_COMMAND_LED = "citeCommandLed";
-    public static final String CITE_COMMAND_WIN_EDT = "citeCommandWinEdt";
-    public static final String CITE_COMMAND_EMACS = "citeCommandEmacs";
-    public static final String CITE_COMMAND_TEXMAKER = "citeCommandTexmaker";
-    public static final String CITE_COMMAND_VIM = "citeCommandVim";
-    public static final String CITE_COMMAND_TEXSTUDIO = "citeCommandTeXstudio";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     public static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
@@ -431,6 +424,11 @@ public class JabRefPreferences {
         // load user preferences 
         prefs = Preferences.userNodeForPackage(JabRef.class);
 
+        defaults.put(TEXMAKER_PATH, OS.guessProgramPath("texmaker", "Texmaker"));
+        defaults.put(WIN_EDT_PATH, OS.guessProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(LATEX_EDITOR_PATH, OS.guessProgramPath("LEd", "LEd"));
+        defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
+        
         if (OS.OS_X) {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
@@ -445,9 +443,6 @@ public class JabRefPreferences {
             //defaults.put("psviewer", "cmd.exe /c start /b");
             //defaults.put("htmlviewer", "cmd.exe /c start /b");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
-            defaults.put(WIN_EDT_PATH, "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
-            defaults.put(LATEX_EDITOR_PATH, "C:\\Program Files\\LEd\\LEd.exe");
-            defaults.put(TEXMAKER_PATH, "C:\\Program Files\\Texmaker\\texmaker.exe");
             defaults.put(EMACS_PATH, "emacsclient.exe");
             defaults.put(EMACS_23, true);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
@@ -464,7 +459,6 @@ public class JabRefPreferences {
             defaults.put(EMACS_PATH, "gnuclient");
             defaults.put(EMACS_23, false);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
-            defaults.put(TEXMAKER_PATH, "texmaker");
             
         }
         defaults.put(USE_PROXY, Boolean.FALSE);
@@ -597,7 +591,7 @@ public class JabRefPreferences {
         defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(SEARCH_PANEL_VISIBLE, Boolean.FALSE);
-        defaults.put(DEFAULT_ENCODING, System.getProperty("file.encoding"));
+        defaults.put(DEFAULT_ENCODING, "UTF-8");
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(PRESERVE_FIELD_FORMATTING, Boolean.FALSE);
@@ -656,7 +650,6 @@ public class JabRefPreferences {
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_RANKING_COMPACT, SpecialFieldsUtils.PREF_RANKING_COMPACT_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, SpecialFieldsUtils.PREF_SHOWCOLUMN_READ_DEFAULT);
@@ -757,13 +750,7 @@ public class JabRefPreferences {
 
         defaults.put(PERSONAL_JOURNAL_LIST, null);
         defaults.put(EXTERNAL_JOURNAL_LISTS, null);
-        defaults.put(CITE_COMMAND, "cite"); // obsoleted by the app-specific ones
-        defaults.put(CITE_COMMAND_VIM, "\\cite");
-        defaults.put(CITE_COMMAND_EMACS, "\\cite");
-        defaults.put(CITE_COMMAND_WIN_EDT, "\\cite");
-        defaults.put(CITE_COMMAND_TEXSTUDIO, "\\cite");
-        defaults.put(CITE_COMMAND_LED, "\\cite");
-        defaults.put(CITE_COMMAND_TEXMAKER, "\\cite");
+        defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(USE_NATIVE_FILE_DIALOG_ON_MAC, Boolean.FALSE);
@@ -842,14 +829,14 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(USER_FILE_DIR, GUIGlobals.FILE_FIELD + "Directory");
+        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + "Directory");
         try {
-            defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
         } catch (UnknownHostException ex) {
             LOGGER.info("Hostname not found.", ex);
-            defaults.put(USER_FILE_DIR_IND_LEGACY, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, GUIGlobals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
+            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + "Directory" + '-' + get(DEFAULT_OWNER));
         }
     }
 

@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.logic.journals;
 
 
@@ -30,9 +45,14 @@ public class AbbreviationParser {
     }
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
-        readJournalList(new FileReader(Objects.requireNonNull(file)));
+        try(FileReader reader = new FileReader(Objects.requireNonNull(file))) {
+            readJournalList(reader);
+        } catch (FileNotFoundException e) {
+            throw e;
+        } catch (IOException e) {
+            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath());
+        }
     }
-
     /**
      * Read the given file, which should contain a list of journal names and their
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
