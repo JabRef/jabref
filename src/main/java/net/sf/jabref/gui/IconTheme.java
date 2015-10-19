@@ -76,8 +76,7 @@ public class IconTheme {
         PRIORITY_LOW("\uF2F0", Color.GREEN) /*css: flag */,
         PRINTED("\uF4A5") /*css: printer */,
         TOGGLE_PRINTED("\uF4A5") /*css: printer */,
-        RANKING("\uf521") /*css: numeric*/,
-        //RANK1("\uF430") /*css: numeric-1-box */,
+        RANKING("\uf521") /*css: star */,
         RANK1("\uf521\uf524\uF524\uF524\uF524"),
         RANK2("\uf521\uf521\uF524\uF524\uF524"),
         RANK3("\uf521\uf521\uF521\uF524\uF524"),
@@ -120,16 +119,7 @@ public class IconTheme {
         BOX_GREEN("\uF200", Color.GREEN),
 
         // STILL MISSING:
-        COMPLETE("\uF4E6", Color.RED),
-
-        EDIT_PREAMBLE("\uF4E6", Color.RED),
         EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
-        //SAVE_AS("\uF4E6", Color.RED),
-        WRONG("\uF4E6", Color.RED),
-        GROUPS_HIGHLIGHT_ALL("\uF4E6", Color.RED),
-        GROUPS_HIGHLIGHT_ANY("\uF4E6", Color.RED),
-        GENERAL("\uF4E6", Color.RED),
-        GREEN("\uF4E6", Color.RED),
         IMPORT_FROM_KEYWORDS("\uF4E6", Color.RED),
         INTEGRITY_CHECK("\uF4E6", Color.RED),
         INTEGRITY_FAIL("\uF4E6", Color.RED),
@@ -137,16 +127,16 @@ public class IconTheme {
         INTEGRITY_WARN("\uF4E6", Color.RED),
         LOAD_SESSION("\uF4E6", Color.RED),
 
-        ORANGE("\uF4E6", Color.RED),
-        PLUGIN("\uF4E6", Color.RED),
-        RED("\uF4E6", Color.RED),
-
-        SECONDARY_SORTED_REVERSE("\uF4E6", Color.RED),
         TOGGLE_GROUPS("\uF4E6", Color.RED),
         TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),
         OPEN_FOLDER("\uF4E6", Color.RED),
         GROUP_REGULAR("\uF4E6", Color.RED),
-        WRITE_XMP("\uF4E6", Color.RED);
+        WRITE_XMP("\uF4E6", Color.RED),
+
+        //WILL BE REMOVED
+        GROUPS_HIGHLIGHT_ALL("\uF4E6", Color.RED),
+        GROUPS_HIGHLIGHT_ANY("\uF4E6", Color.RED),
+        EDIT_PREAMBLE("\uF4E6", Color.RED);
 
         private final String code;
         private final Color color;
@@ -170,42 +160,6 @@ public class IconTheme {
 
         public String getCode() {
             return this.code;
-        }
-
-        public ImageIcon getImageIcon() {
-            return new ImageIcon() {
-
-                private FontBasedIcon icon = getIcon();
-
-                @Override
-                public synchronized void paintIcon(Component c, Graphics g, int x, int y) {
-                    icon.paintIcon(c, g, x, y);
-                }
-
-                @Override
-                public int getIconWidth() {
-                    return icon.getIconWidth();
-                }
-
-                @Override
-                public int getIconHeight() {
-                    return icon.getIconHeight();
-                }
-
-                @Override
-                public Image getImage() {
-                    int w = icon.getIconWidth();
-                    int h = icon.getIconHeight();
-                    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                    GraphicsDevice gd = ge.getDefaultScreenDevice();
-                    GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                    BufferedImage image = gc.createCompatibleImage(w, h);
-                    Graphics2D g = image.createGraphics();
-                    icon.paintIcon(null, g, 0, 0);
-                    g.dispose();
-                    return image;
-                }
-            };
         }
 
         public JLabel getLabel() {
@@ -277,7 +231,6 @@ public class IconTheme {
      * @return The ImageIcon for the function.
      */
     public static ImageIcon getImage(String name) {
-        //return JabRefIcon.values()[new Random().nextInt(JabRefIcon.values().length)].getImageIcon();
         return new ImageIcon(getIconUrl(name));
     }
 
