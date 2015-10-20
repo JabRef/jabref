@@ -25,7 +25,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 public class DonateAction extends AbstractAction {
-    private static final String donationLink = "https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com";
+    private static final String donationLink = "https://github.com/JabRef/jabref/wiki/Donations";
 
     public DonateAction() {
         super(Localization.menuTitle("Donate to JabRef"));
