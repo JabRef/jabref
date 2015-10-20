@@ -202,16 +202,30 @@ shadowJar {
  * Changes project.version to VERSION--snapshot--DATE--GIT_HASH
  */
 if (hasProperty('dev')) {
-    String command = "git log --pretty=format:'%cd--%h' -n 1 --date=short"
-    String result = ""
+    String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
+    String commitInfo = ""
     if (OperatingSystem.current().isWindows()) {
-        result = "cmd /c $command".execute().in.text
+        commitInfo = "cmd /c $command".execute().in.text
     } else {
-        result = command.execute().in.text
+        commitInfo = command.execute().in.text
     }
 
-    // remove enclosing ' of result
-    project.version += "--snapshot--" + result.substring(1, result.length() - 1)
+    // determine branch
+    command = "git symbolic-ref -q --short HEAD"
+    String branchName = ""
+    if (OperatingSystem.current().isWindows()) {
+        branchName = "cmd /c $command".execute().in.text
+    } else {
+        branchName = command.execute().in.text
+    }
+    // a newline is returned. Remove it.
+    branchName = branchName.trim()
+
+    // hack string
+    // first the date (%cd), then the branch name, and finally the commit id (%h)
+    String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
+
+    project.version += "--snapshot--" + infoString
 }
 
 task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "releaseSourceZip", "releaseSourceTar"]) {
