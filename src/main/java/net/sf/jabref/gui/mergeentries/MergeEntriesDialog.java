@@ -112,17 +112,7 @@ public class MergeEntriesDialog extends JDialog {
             }
         });
 
-        JButton newentry = new JButton(Localization.lang("Add new entry and keep both old entries"));
-        newentry.setActionCommand("newentry");
-        newentry.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(e.getActionCommand());
-            }
-        });
-
-        JButton replaceentries = new JButton(Localization.lang("Replace old entries with new entry"));
+        JButton replaceentries = new JButton(Localization.lang("Merge entries"));
         replaceentries.setActionCommand("replace");
         replaceentries.addActionListener(new ActionListener() {
 
@@ -132,7 +122,7 @@ public class MergeEntriesDialog extends JDialog {
             }
         });
 
-        bb.addButton(new JButton[] {replaceentries, newentry, cancel});
+        bb.addButton(new JButton[] {replaceentries, cancel});
         this.add(bb.getPanel(), cc.xy(1, 5));
 
         // Add some margin around the layout
@@ -169,15 +159,6 @@ public class MergeEntriesDialog extends JDialog {
             panel.output(Localization.lang("Cancelled merging entries"));
 
             dispose();
-        } else if (button.equals("newentry")) {
-            // Create a new entry and add it to the undo stack
-            // Keep the other two entries
-            panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
-            ce.end();
-            panel.undoManager.addEdit(ce);
-            panel.output(Localization.lang("Merged entries into a new and kept the old"));
-            dispose();
         } else if (button.equals("replace")) {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
@@ -189,7 +170,7 @@ public class MergeEntriesDialog extends JDialog {
             panel.database().removeEntry(two.getId());
             ce.end();
             panel.undoManager.addEdit(ce);
-            panel.output(Localization.lang("Merged entries into a new and removed the old"));
+            panel.output(Localization.lang("Merged entries"));
             dispose();
         }
     }
