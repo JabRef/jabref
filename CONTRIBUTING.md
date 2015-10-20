@@ -21,6 +21,7 @@ Ensure your code is formatted according the JabRef formatting guidelines.
 These are provided as Eclipse formatting configuration in [formatter_settings.xml](ide-settings/formatter_settings.xml).
 Ensure that JabRef's code cleanup settings are activated.
 Import [cleanup_settings.xml](ide-settings/cleanup_settings.xml).
+When you use Eclipse, the required config is generated automatically by `gradlew eclipse`.
 You can also run `gradlew format` to let the [Gradle Format plugin](https://github.com/youribonnaffe/gradle-format-plugin) do the formatting.
 
 

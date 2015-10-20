@@ -16,6 +16,7 @@ apply plugin: "sonar-runner"
 apply plugin: "maven"
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply from: 'eclipse.gradle'
 
 group = "net.sf.jabref"
 version = "2.80dev"
@@ -363,9 +364,3 @@ task getdeps(type: Copy) {
     into 'build/tmp/alldeps/'
 }
 
-// workaround until https://issues.gradle.org/browse/GRADLE-2274 is resolved
-eclipseJdt << {
-    File f = file('.settings/org.eclipse.core.resources.prefs')
-    f.write('eclipse.preferences.version=1\n')
-    f.append('encoding/<project>=UTF-8')
-}
