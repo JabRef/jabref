@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <profiles version="2">
 <profile kind="CleanUpProfile" name="JabRef" version="2">
-<setting id="cleanup.qualify_static_method_accesses_with_declaring_class" value="true"/>
+<setting id="cleanup.qualify_static_method_accesses_with_declaring_class" value="false"/>
 <setting id="cleanup.always_use_this_for_non_static_method_access" value="true"/>
 <setting id="cleanup.organize_imports" value="false"/>
 <setting id="cleanup.remove_trailing_whitespaces_ignore_empty" value="false"/>
@@ -51,7 +51,7 @@
 <setting id="cleanup.make_local_variable_final" value="false"/>
 <setting id="cleanup.add_missing_methods" value="false"/>
 <setting id="cleanup.never_use_parentheses_in_expressions" value="false"/>
-<setting id="cleanup.qualify_static_member_accesses_with_declaring_class" value="true"/>
+<setting id="cleanup.qualify_static_member_accesses_with_declaring_class" value="false"/>
 <setting id="cleanup.use_parentheses_in_expressions" value="true"/>
 <setting id="cleanup.add_missing_override_annotations" value="true"/>
 <setting id="cleanup.use_blocks" value="true"/>
