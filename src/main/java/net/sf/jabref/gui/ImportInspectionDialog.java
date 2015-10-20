@@ -357,8 +357,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
 
-            private static final long serialVersionUID = -8941873408564974406L;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -630,8 +628,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     class AddToGroupAction extends AbstractAction {
 
-        private static final long serialVersionUID = -1970798352969620339L;
-
         final GroupTreeNode node;
 
 
@@ -883,8 +879,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     class DeleteListener extends AbstractAction {
-
-        private static final long serialVersionUID = 2194171696097722369L;
 
         public DeleteListener() {
             super(Localization.lang("Delete"), IconTheme.getImage("delete"));
@@ -1179,8 +1173,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class AttachUrl extends JMenuItem implements ActionListener {
 
-        private static final long serialVersionUID = 7383044092577400425L;
-
         public AttachUrl() {
             super(Localization.lang("Attach URL"));
             addActionListener(this);
@@ -1209,8 +1201,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class DownloadFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
-
-        private static final long serialVersionUID = 2352217043684991255L;
 
         BibtexEntry entry;
 
@@ -1263,8 +1253,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class AutoSetLinks extends JMenuItem implements ActionListener {
 
-        private static final long serialVersionUID = 157259103597850990L;
-
         public AutoSetLinks() {
             super(Localization.lang("Autoset external links"));
             addActionListener(this);
@@ -1315,8 +1303,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     class LinkLocalFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
-
-        private static final long serialVersionUID = -8747503564455760079L;
 
         BibtexEntry entry;
 
@@ -1453,8 +1439,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
 
     class EntryTable extends JTable {
-
-        private static final long serialVersionUID = 1709722308102333448L;
 
         final GeneralRenderer renderer = new GeneralRenderer(Color.white);
 

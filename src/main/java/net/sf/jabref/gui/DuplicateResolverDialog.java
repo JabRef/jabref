@@ -42,8 +42,6 @@ import net.sf.jabref.util.Util;
 
 public class DuplicateResolverDialog extends JDialog {
 
-    private static final long serialVersionUID = -2557945726792977644L;
-
     private static final int NOT_CHOSEN = -1;
     public static final int KEEP_BOTH = 0;
     public static final int KEEP_UPPER = 1;
@@ -98,29 +96,34 @@ public class DuplicateResolverDialog extends JDialog {
         JButton first;
         switch (type) {
         case DUPLICATE_SEARCH:
-            first = new JButton(Localization.lang("Keep upper"));
-            second = new JButton(Localization.lang("Keep lower"));
+            first = new JButton(Localization.lang("Keep entry 1"));
+            second = new JButton(Localization.lang("Keep entry 2"));
             both = new JButton(Localization.lang("Keep both"));
+            me = new MergeEntries(one, two, Localization.lang("Entry 1"),
+                    Localization.lang("Entry 2"));
             break;
         case INSPECTION:
             first = new JButton(Localization.lang("Remove old entry"));
             second = new JButton(Localization.lang("Remove entry from import"));
             both = new JButton(Localization.lang("Keep both"));
+            me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                    Localization.lang("From import"));
             break;
         case DUPLICATE_SEARCH_WITH_EXACT:
-            first = new JButton(Localization.lang("Keep upper"));
-            second = new JButton(Localization.lang("Keep lower"));
+            first = new JButton(Localization.lang("Keep entry 1"));
+            second = new JButton(Localization.lang("Keep entry 2"));
             both = new JButton(Localization.lang("Keep both"));
             removeExact = new JButton(Localization.lang("Automatically remove exact duplicates"));
+            me = new MergeEntries(one, two, Localization.lang("Entry 1"),
+                    Localization.lang("Entry 2"));
             break;
         default:
             first = new JButton(Localization.lang("Import and remove old entry"));
             second = new JButton(Localization.lang("Do not import entry"));
             both = new JButton(Localization.lang("Import and keep old entry"));
+            me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                    Localization.lang("From import"));
         }
-
-        me = new MergeEntries(one, two, Localization.lang("Upper"),
-                Localization.lang("Lower"));
 
         String layout = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         p1 = new PreviewPanel(null, one, null, new MetaData(), layout);
@@ -150,30 +153,48 @@ public class DuplicateResolverDialog extends JDialog {
 
         // @formatter:off
         TitleLabel lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ||
-                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ? "" :
-                Localization.lang("Entry in current database"));
+                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ? 
+                        Localization.lang("Entry 1") :
+                        Localization.lang("Entry in current database"));
         // @formatter:on
         gbl.setConstraints(lab, con);
         main.add(lab);
+        // @formatter:off
+        lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ||
+                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ? 
+                        Localization.lang("Entry 1") :
+                        Localization.lang("Entry in current database"));
+        // @formatter:on
+        gbl.setConstraints(lab, con);
+        source.add(lab);
         con.weighty = 1;
         con.insets = new Insets(5, 10, 10, 10);
         JScrollPane sp = new JScrollPane(p1);
         gbl.setConstraints(sp, con);
         main.add(sp);
+        sp = new JScrollPane(ta1);
+        gbl.setConstraints(sp, con);
+        source.add(sp);
         con.weighty = 0;
         con.insets = new Insets(10, 10, 0, 10);
         // @formatter:off
         lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ||
-                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ? "" :
-                Localization.lang("Entry in import"));
+                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ?
+                        Localization.lang("Entry 2") :
+                        Localization.lang("Entry in import"));
         // @formatter:on
         gbl.setConstraints(lab, con);
         main.add(lab);
+        // @formatter:off
+        lab = new TitleLabel((type == DuplicateResolverDialog.DUPLICATE_SEARCH) ||
+                (type == DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT) ?
+                        Localization.lang("Entry 2") :
+                        Localization.lang("Entry in import"));
+        // @formatter:on
+        gbl.setConstraints(lab, con);
+        source.add(lab);
         con.weighty = 1;
         con.insets = new Insets(5, 10, 10, 10);
-        sp = new JScrollPane(ta1);
-        gbl.setConstraints(sp, con);
-        source.add(sp);
         sp = new JScrollPane(p2);
         gbl.setConstraints(sp, con);
         main.add(sp);
@@ -185,6 +206,9 @@ public class DuplicateResolverDialog extends JDialog {
         lab = new TitleLabel(Localization.lang("Merged entry"));
         gbl.setConstraints(lab, con);
         main.add(lab);
+        lab = new TitleLabel(Localization.lang("Merged entry"));
+        gbl.setConstraints(lab, con);
+        source.add(lab);
         con.weighty = 1;
         con.insets = new Insets(5, 10, 10, 10);
         sp = new JScrollPane(p3);

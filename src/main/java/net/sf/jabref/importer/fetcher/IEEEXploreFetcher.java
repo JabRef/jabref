@@ -63,6 +63,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private int hits;
     private int unparseable;
     private int parsed;
+    private int piv;
     private boolean shouldContinue;
     private boolean includeAbstract;
 
@@ -122,6 +123,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         shouldContinue = true;
         parsed = 0;
         unparseable = 0;
+        piv = 0;
         int pageNumber = 1;
 
         searchUrl = makeUrl(pageNumber);//start at page 1
@@ -475,11 +477,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private BibtexEntry parseNextEntry(String allText) {
         BibtexEntry entry = null;
 
-        int index = allText.indexOf("<div class=\"detail", 0);
+        int index = allText.indexOf("<div class=\"detail", piv);
         int endIndex = allText.indexOf("</div>", index);
 
         if ((index >= 0) && (endIndex > 0)) {
             endIndex += 6;
+            piv = endIndex;
             String text = allText.substring(index, endIndex);
 
             BibtexEntryType type = null;
