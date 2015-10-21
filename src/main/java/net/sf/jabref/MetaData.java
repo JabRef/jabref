@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -31,8 +31,6 @@ public class MetaData implements Iterable<String> {
 
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    
-    private static final int METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
 
     private final HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private GroupTreeNode groupsRoot;
@@ -265,7 +263,6 @@ public class MetaData implements Iterable<String> {
                 sb.append(StringUtil.quote(orderedData.elementAt(j), ";", '\\')).append(";");
             }
             sb.append("}");
-            wrapStringBuffer(sb, METADATA_LINE_LENGTH);
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
 
@@ -292,7 +289,6 @@ public class MetaData implements Iterable<String> {
             while (tok.hasMoreTokens()) {
                 StringBuffer s =
                         new StringBuffer(StringUtil.quote(tok.nextToken(), ";", '\\') + ";");
-                wrapStringBuffer(s, METADATA_LINE_LENGTH);
                 sb.append(s);
                 sb.append(Globals.NEWLINE);
             }
@@ -300,12 +296,6 @@ public class MetaData implements Iterable<String> {
             sb.append(Globals.NEWLINE);
             sb.append(Globals.NEWLINE);
             out.write(sb.toString());
-        }
-    }
-
-    private void wrapStringBuffer(StringBuffer sb, int lineLength) {
-        for (int i = lineLength; i < sb.length(); i += lineLength + Globals.NEWLINE.length()) {
-            sb.insert(i, Globals.NEWLINE);
         }
     }
 
