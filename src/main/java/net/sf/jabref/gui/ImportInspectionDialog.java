@@ -198,12 +198,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"), Globals.prefs
             .getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
 
-    private final JLabel duplLabel = new JLabel(IconTheme.getImage("duplicate"));
-    private final JLabel fileLabel = new JLabel(IconTheme.getImage("psSmall"));
-    private final JLabel pdfLabel = new JLabel(IconTheme
-            .getImage("pdfSmall"));
-    private final JLabel psLabel = new JLabel(IconTheme.getImage("psSmall"));
-    private final JLabel urlLabel = new JLabel(IconTheme.getImage("wwwSmall"));
+    private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
+    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+    private final JLabel pdfLabel = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
+    private final JLabel psLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
     private final int DUPL_COL = 1;
     private final int FILE_COL = 2;
@@ -881,7 +880,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     class DeleteListener extends AbstractAction {
 
         public DeleteListener() {
-            super(Localization.lang("Delete"), IconTheme.getImage("delete"));
+            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getSmallIcon());
         }
 
         @Override
