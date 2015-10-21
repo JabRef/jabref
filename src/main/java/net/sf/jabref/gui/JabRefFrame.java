@@ -1922,7 +1922,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
                             remove = true;
                         } else if (res == DuplicateResolverDialog.KEEP_MERGE) {
-                            LOGGER.error("Merge button!");
                             dupli = true;
                             remove = true;
                             toAdd.add(drd.getMergedEntry());

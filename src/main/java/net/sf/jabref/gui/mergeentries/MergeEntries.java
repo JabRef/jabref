@@ -322,7 +322,7 @@ public class MergeEntries {
         // JScrollPane jsppp = new JScrollPane(pp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(pp, cc.xyw(1, 8, 6));
 
-        label = new JLabel(Localization.lang("Merged BibTeX entry"));
+        label = new JLabel(Localization.lang("Merged BibTeX source code"));
         font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         mainPanel.add(label, cc.xyw(8, 6, 4));

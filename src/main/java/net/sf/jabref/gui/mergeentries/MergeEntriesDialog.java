@@ -42,9 +42,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
  */
 public class MergeEntriesDialog extends JDialog {
 
-    private static final long serialVersionUID = 5454378088546423798L;
-
-    // private String [] preferedOrder = {"author", "title", "journal", "booktitle", "volume", "number", "pages", "year", "month"};
     private final Dimension DIM = new Dimension(800, 800);
     private final BasePanel panel;
     private final JabRefFrame frame;
