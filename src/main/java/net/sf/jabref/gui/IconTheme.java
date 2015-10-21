@@ -18,6 +18,9 @@ public class IconTheme {
     public static Font FONT;
     public static Font FONT_16;
 
+    public static final Color DEFAULT_COLOR = new Color(113,134,145);
+    public static final Color DEFAULT_DISABLED_COLOR = new Color(220,220,250);
+
     static {
         try {
             FONT = Font.createFont(Font.TRUETYPE_FONT, FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf"));
@@ -29,6 +32,7 @@ public class IconTheme {
     }
 
     public enum JabRefIcon {
+
         ADD("\uf494") /*css: plus-box*/,
         ADD_NOBOX("\uF493") /*css: plus */,
         ADD_ENTRY("\uF571") /*css: tooltip-outline-plus */,
@@ -133,7 +137,7 @@ public class IconTheme {
         private final Color color;
 
         JabRefIcon(String code) {
-            this(code, new Color(113,134,145));
+            this(code, IconTheme.DEFAULT_COLOR);
         }
 
         JabRefIcon(String code, Color color) {
@@ -206,6 +210,10 @@ public class IconTheme {
         @Override
         public int getIconHeight() {
             return size;
+        }
+
+        public FontBasedIcon createDisabledIcon() {
+            return new FontBasedIcon(this.iconCode, IconTheme.DEFAULT_DISABLED_COLOR);
         }
     }
 

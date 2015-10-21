@@ -130,6 +130,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (!OS.OS_X) {
                 b.setMargin(marg);
             }
+            // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
+            Object obj = a.getValue(Action.SMALL_ICON);
+            if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
+                b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
+            }
             add(b);
         }
     }
