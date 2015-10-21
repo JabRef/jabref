@@ -218,8 +218,10 @@ if (hasProperty('dev')) {
     } else {
         branchName = command.execute().in.text
     }
-    // a newline is returned. Remove it.
-    // Also fix filename - see http://stackoverflow.com/a/15075907/873282
+    // A newline is returned. Remove it. (trim())
+    // In the context of github, the branch name could be something like "pull/277"
+    // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
+    // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
     branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_");
 
     // hack string
