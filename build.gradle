@@ -219,7 +219,8 @@ if (hasProperty('dev')) {
         branchName = command.execute().in.text
     }
     // a newline is returned. Remove it.
-    branchName = branchName.trim()
+    // Also fix filename - see http://stackoverflow.com/a/15075907/873282
+    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_");
 
     // hack string
     // first the date (%cd), then the branch name, and finally the commit id (%h)
