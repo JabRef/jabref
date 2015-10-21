@@ -218,10 +218,10 @@ public class IntegrityMessagePanel
     class IntegrityListRenderer extends DefaultListCellRenderer
     {
 
-        final Icon warnIcon = IconTheme.getImage("integrityWarn");
-        final Icon infoIcon = IconTheme.getImage("integrityInfo");
-        final Icon failIcon = IconTheme.getImage("integrityFail");
-        final Icon fixedIcon = IconTheme.getImage("complete");
+        final Icon warnIcon = IconTheme.JabRefIcon.INTEGRITY_WARN.getSmallIcon();
+        final Icon infoIcon = IconTheme.JabRefIcon.INTEGRITY_INFO.getSmallIcon();
+        final Icon failIcon = IconTheme.JabRefIcon.INTEGRITY_FAIL.getSmallIcon();
+        final Icon fixedIcon = IconTheme.JabRefIcon.INTEGRITY_SUCCESS.getSmallIcon();
 
 
         @Override

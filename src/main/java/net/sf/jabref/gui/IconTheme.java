@@ -112,6 +112,10 @@ public class IconTheme {
         MOVE_TAB_ARROW("\uf14d"), /*css:  arrow-up-bold */
         OPTIONAL("\uf3b6"), /*css: label-outline */
         REQUIRED("\uf3b5"), /*css: label */
+        INTEGRITY_FAIL("\uF226", Color.RED), /*css: close-circle */
+        INTEGRITY_INFO("\uF39E"), /*css: information */
+        INTEGRITY_WARN("\uF120"), /*css alert-circle */
+        INTEGRITY_SUCCESS("\uf206") /*css: checkbox-marked-circle-outline */,
 
         // simple color boxes:
         BOX_RED("\uF200", Color.RED),
@@ -122,9 +126,7 @@ public class IconTheme {
         EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
         IMPORT_FROM_KEYWORDS("\uF4E6", Color.RED),
         INTEGRITY_CHECK("\uF4E6", Color.RED),
-        INTEGRITY_FAIL("\uF4E6", Color.RED),
-        INTEGRITY_INFO("\uF4E6", Color.RED),
-        INTEGRITY_WARN("\uF4E6", Color.RED),
+
         LOAD_SESSION("\uF4E6", Color.RED),
 
         TOGGLE_GROUPS("\uF4E6", Color.RED),
