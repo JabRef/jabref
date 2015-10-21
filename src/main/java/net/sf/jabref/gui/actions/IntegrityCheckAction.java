@@ -19,8 +19,7 @@ public class IntegrityCheckAction extends AbstractAction {
     private JabRefFrame jabRefFrame;
 
     public IntegrityCheckAction(JabRefFrame jabRefFrame) {
-        super(Localization.menuTitle("Integrity check"),
-                IconTheme.JabRefIcon.INTEGRITY_CHECK.getIcon());
+        super(Localization.menuTitle("Integrity check"));
         this.jabRefFrame = jabRefFrame;
         //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
         //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);

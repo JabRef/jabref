@@ -116,22 +116,11 @@ public class IconTheme {
         INTEGRITY_INFO("\uF39E"), /*css: information */
         INTEGRITY_WARN("\uF120"), /*css alert-circle */
         INTEGRITY_SUCCESS("\uf206") /*css: checkbox-marked-circle-outline */,
-
-        // simple color boxes:
-        BOX_RED("\uF200", Color.RED),
-        BOX_ORANGE("\uF200", Color.ORANGE),
-        BOX_GREEN("\uF200", Color.GREEN),
+        GITHUB("\uF350"), /*css: github-circle*/
 
         // STILL MISSING:
-        EXPORT_TO_KEYWORDS("\uF4E6", Color.RED),
-        IMPORT_FROM_KEYWORDS("\uF4E6", Color.RED),
-        INTEGRITY_CHECK("\uF4E6", Color.RED),
-
-        LOAD_SESSION("\uF4E6", Color.RED),
-
         TOGGLE_GROUPS("\uF4E6", Color.RED),
         TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),
-        OPEN_FOLDER("\uF4E6", Color.RED),
         GROUP_REGULAR("\uF4E6", Color.RED),
         WRITE_XMP("\uF4E6", Color.RED),
 
