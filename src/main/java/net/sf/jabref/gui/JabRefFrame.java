@@ -1155,6 +1155,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(importCurrent);
         file.add(exportAll);
         file.add(exportSelected);
+        file.addSeparator();
         file.add(dbConnect);
         file.add(dbImport);
         file.add(dbExport);
