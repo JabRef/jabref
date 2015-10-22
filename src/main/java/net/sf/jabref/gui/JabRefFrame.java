@@ -1236,8 +1236,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 RightClickMenu.populateSpecialFieldMenu(m, ReadStatus.getInstance(), this);
                 edit.add(m);
             }
+            edit.addSeparator();
         }
-        edit.addSeparator();
+
         edit.add(manageKeywords);
         edit.addSeparator();
         edit.add(selectAll);
@@ -1438,9 +1439,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
                 tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this));
             }
+            tlb.addSeparator();
         }
 
-        tlb.addSeparator();
         searchToggle = new JToggleButton(toggleSearch);
         searchToggle.setText(null);
         if (!OS.OS_X) {
