@@ -161,7 +161,6 @@ public class JabRefPreferences {
     public static final String AUTO_COMP_FIRST_LAST = "autoCompFF";
     public static final String AUTO_COMPLETE_FIELDS = "autoCompleteFields";
     public static final String AUTO_COMPLETE = "autoComplete";
-    public static final String SEARCH_PANE_POS_X = "searchPanePosX";
     public static final String HIGH_LIGHT_WORDS = "highLightWords";
     public static final String REG_EXP_SEARCH = "regExpSearch";
     public static final String SELECT_S = "selectS";
@@ -555,7 +554,6 @@ public class JabRefPreferences {
         defaults.put(SELECT_S, Boolean.FALSE);
         defaults.put(REG_EXP_SEARCH, Boolean.TRUE);
         defaults.put(HIGH_LIGHT_WORDS, Boolean.TRUE);
-        defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
