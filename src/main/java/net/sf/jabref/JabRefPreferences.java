@@ -179,7 +179,6 @@ public class JabRefPreferences {
     public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
     public static final String GROUP_FLOAT_SELECTIONS = "groupFloatSelections";
-    public static final String GROUP_SELECTOR_VISIBLE = "groupSelectorVisible";
     public static final String EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
     public static final String GROUP_KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -563,7 +562,6 @@ public class JabRefPreferences {
         defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(SHORTEST_TO_COMPLETE, 2);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
-        defaults.put(GROUP_SELECTOR_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
