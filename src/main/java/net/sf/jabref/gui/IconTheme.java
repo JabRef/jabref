@@ -144,13 +144,6 @@ public class IconTheme {
         public String getCode() {
             return this.code;
         }
-
-        public JLabel getLabel() {
-            JLabel label = new JLabel(this.code);
-            label.setForeground(this.color);
-            label.setFont(FONT_16);
-            return label;
-        }
     }
 
     public static class FontBasedIcon implements Icon {
