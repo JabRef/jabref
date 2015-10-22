@@ -17,8 +17,8 @@ package net.sf.jabref.gui.menus.help;
 
 import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.JabRefDesktop;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
