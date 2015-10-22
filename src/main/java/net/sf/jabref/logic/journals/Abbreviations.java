@@ -50,7 +50,7 @@ public class Abbreviations {
 
         // Read personal list
         String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
-        if (personalJournalList != null) {
+        if (personalJournalList != null && !personalJournalList.trim().isEmpty()) {
             try {
                 journalAbbrev.readJournalListFromFile(new File(personalJournalList));
             } catch (FileNotFoundException e) {
