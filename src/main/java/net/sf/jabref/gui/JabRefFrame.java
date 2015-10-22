@@ -1136,6 +1136,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu sessions = JabRefFrame.subMenu("Sessions");
         JMenu edit = JabRefFrame.subMenu("Edit");
         JMenu search = JabRefFrame.subMenu("Search");
+        JMenu groups = JabRefFrame.subMenu("Groups");
         JMenu bibtex = JabRefFrame.subMenu("BibTeX");
         JMenu view = JabRefFrame.subMenu("View");
         JMenu tools = JabRefFrame.subMenu("Tools");
@@ -1176,7 +1177,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sessions.add(saveSessionAction);
         file.add(sessions);
         file.add(fileHistory);
-        //file.addSeparator();
 
         file.addSeparator();
         file.add(close);
@@ -1260,6 +1260,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         mb.add(search);
 
+        groups.add(toggleGroups);
+        groups.addSeparator();
+        groups.add(new JMenuItem(new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"))));
+        groups.add(new JMenuItem(new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group"))));
+        groups.add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
+        groups.addSeparator();
+        groups.add(toggleHighlightAny);
+        groups.add(toggleHighlightAll);
+        mb.add(groups);
+
         view.add(back);
         view.add(forward);
         view.add(focusTable);
@@ -1276,9 +1286,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(toggleGroups);
         view.add(togglePreview);
         view.add(switchPreview);
-        view.addSeparator();
-        view.add(toggleHighlightAny);
-        view.add(toggleHighlightAll);
+
         mb.add(view);
 
         bibtex.add(newEntryAction);
