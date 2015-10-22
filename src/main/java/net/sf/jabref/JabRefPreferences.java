@@ -221,7 +221,6 @@ public class JabRefPreferences {
     public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
-    public static final String PRESERVE_FIELD_FORMATTING = "preserveFieldFormatting";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String GROUPS_VISIBLE_ROWS = "groupsVisibleRows";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
@@ -581,7 +580,6 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_ENCODING, "UTF-8");
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
-        defaults.put(PRESERVE_FIELD_FORMATTING, Boolean.FALSE);
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
