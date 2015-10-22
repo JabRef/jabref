@@ -296,9 +296,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     class FetcherAction extends AbstractAction {
 
         public FetcherAction() {
-            super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getIcon());
+            super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getSmallIcon());
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(Action.ACCELERATOR_KEY, Globals.prefs.getKey("Fetch Medline"));
+            putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
         }
 
         @Override

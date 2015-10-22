@@ -30,8 +30,9 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 public class ForkMeOnGitHubAction extends AbstractAction {
 
     public ForkMeOnGitHubAction() {
-        super(Localization.menuTitle("Fork me on GitHub"), IconTheme.JabRefIcon.GITHUB.getIcon());
+        super(Localization.menuTitle("Fork me on GitHub"), IconTheme.JabRefIcon.GITHUB.getSmallIcon());
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Opens JabRef's GitHub page"));
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.GITHUB.getIcon());
     }
 
     @Override

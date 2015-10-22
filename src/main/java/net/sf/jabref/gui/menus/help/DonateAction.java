@@ -30,7 +30,8 @@ public class DonateAction extends AbstractAction {
     public DonateAction() {
         super(Localization.menuTitle("Donate to JabRef"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Donate to JabRef"));
-        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.DONATE.getIcon());
+        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.DONATE.getSmallIcon());
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.DONATE.getIcon());
     }
 
     @Override
