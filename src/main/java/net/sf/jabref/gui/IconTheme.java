@@ -20,6 +20,8 @@ public class IconTheme {
 
     public static final Color DEFAULT_COLOR = new Color(113,134,145);
     public static final Color DEFAULT_DISABLED_COLOR = new Color(220,220,250);
+    public static final int DEFAULT_SIZE = 24;
+    public static final int SMALL_SIZE = 16;
 
     static {
         try {
@@ -150,7 +152,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon getSmallIcon() {
-            return new FontBasedIcon(this.code, this.color, 16);
+            return new FontBasedIcon(this.code, this.color, IconTheme.SMALL_SIZE);
         }
 
         public String getCode() {
@@ -174,7 +176,7 @@ public class IconTheme {
         public FontBasedIcon(String code, Color iconColor) {
             this.iconCode = code;
             this.iconColor = iconColor;
-            this.size = 24;
+            this.size = IconTheme.DEFAULT_SIZE;
         }
 
         public FontBasedIcon(String code, Color iconColor, int size) {
@@ -214,6 +216,10 @@ public class IconTheme {
 
         public FontBasedIcon createDisabledIcon() {
             return new FontBasedIcon(this.iconCode, IconTheme.DEFAULT_DISABLED_COLOR);
+        }
+
+        public FontBasedIcon createSmallIcon() {
+            return new FontBasedIcon(this.iconCode, this.iconColor, IconTheme.SMALL_SIZE);
         }
     }
 
