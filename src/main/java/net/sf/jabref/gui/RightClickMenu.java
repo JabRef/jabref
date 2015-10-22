@@ -441,7 +441,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-
+        // create disabledIcons for all menu entries
+        frame.createDisabledIconsForMenuEntries(this);
     }
 
     /**

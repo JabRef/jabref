@@ -131,7 +131,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 b.setMargin(marg);
             }
             // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
-            Object obj = a.getValue(Action.SMALL_ICON);
+            Object obj = a.getValue(Action.LARGE_ICON_KEY);
             if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
                 b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
@@ -1341,6 +1341,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         helpMenu.addSeparator();
         helpMenu.add(about);
         mb.add(helpMenu);
+
+        createDisabledIconsForMenuEntries(mb);
     }
 
     public static JMenu subMenu(String name) {
@@ -1667,6 +1669,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     public void closeCurrentTabNoWarning() {
         closeDatabaseAction.close();
+    }
+
+    /**
+     * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.
+     * This is necessary as Swing is not able to generate default disabled icons for font based icons.
+     *
+     * @param menuElement   the menuElement for which disabled icons should be generated
+     */
+    public void createDisabledIconsForMenuEntries(MenuElement menuElement) {
+        for(MenuElement subElement : menuElement.getSubElements()) {
+            if(subElement instanceof JMenu || subElement instanceof JPopupMenu) {
+                createDisabledIconsForMenuEntries(subElement);
+            } else if (subElement instanceof JMenuItem) {
+                JMenuItem item = (JMenuItem) subElement;
+                if(item.getIcon() instanceof IconTheme.FontBasedIcon) {
+                    item.setDisabledIcon(((IconTheme.FontBasedIcon)item.getIcon()).createDisabledIcon());
+                }
+            }
+        }
     }
 
 

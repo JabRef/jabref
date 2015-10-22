@@ -215,7 +215,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon createDisabledIcon() {
-            return new FontBasedIcon(this.iconCode, IconTheme.DEFAULT_DISABLED_COLOR);
+            return new FontBasedIcon(this.iconCode, IconTheme.DEFAULT_DISABLED_COLOR, this.size);
         }
 
         public FontBasedIcon createSmallIcon() {
