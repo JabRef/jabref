@@ -214,8 +214,6 @@ public class JabRefPreferences {
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
     public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
-    public static final String MENU_FONT_STYLE = "menuFontStyle";
-    public static final String MENU_FONT_FAMILY = "menuFontFamily";
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
@@ -595,8 +593,6 @@ public class JabRefPreferences {
         defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_FAMILY, "Times");
-        defaults.put(MENU_FONT_STYLE, java.awt.Font.PLAIN);
         defaults.put(MENU_FONT_SIZE, 11);
         defaults.put(TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
