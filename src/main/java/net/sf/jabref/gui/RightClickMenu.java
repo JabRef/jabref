@@ -74,7 +74,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
-        add(new AbstractAction(Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getIcon()) {
+        add(new AbstractAction(Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -85,7 +85,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-        add(new AbstractAction(Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getIcon()) {
+        add(new AbstractAction(Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,7 +96,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-        add(new AbstractAction(Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getIcon()) {
+        add(new AbstractAction(Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +108,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getIcon()) {
+        add(new AbstractAction(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,7 +125,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         });
         addSeparator();
 
-        add(new AbstractAction(Localization.lang("Export to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getIcon()) {
+        add(new AbstractAction(Localization.lang("Export to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -136,7 +136,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-        add(new AbstractAction(Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon()) {
+        add(new AbstractAction(Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -156,7 +156,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
 
         if (multiple) {
-            add(new AbstractAction(Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon()) {
+            add(new AbstractAction(Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -170,7 +170,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
             add(markSpecific);
 
-            add(new AbstractAction(Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getIcon()) {
+            add(new AbstractAction(Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -186,7 +186,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             String marked = be.getField(BibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
             if (marked == null || marked.isEmpty()) {
-                add(new AbstractAction(Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon()) {
+                add(new AbstractAction(Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()) {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -201,7 +201,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 add(markSpecific);
             } else {
                 add(markSpecific);
-                add(new AbstractAction(Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getIcon()) {
+                add(new AbstractAction(Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()) {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -269,7 +269,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Open file"), IconTheme.JabRefIcon.FILE.getIcon()) {
+        add(new AbstractAction(Localization.lang("Open file"), IconTheme.JabRefIcon.FILE.getSmallIcon()) {
 
             {
                 if(!isFieldSetForSelectedEntry("file")) {
@@ -287,7 +287,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getIcon()) {
+        add(new AbstractAction(Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -306,7 +306,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });*/
 
-        add(new AbstractAction(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getIcon()) {
+        add(new AbstractAction(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
 
             {
                 if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
@@ -324,7 +324,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Get BibTeX data from DOI"), IconTheme.JabRefIcon.DOI.getIcon()) {
+        add(new AbstractAction(Localization.lang("Get BibTeX data from DOI"), IconTheme.JabRefIcon.DOI.getSmallIcon()) {
 
             {
                 if(!(isFieldSetForSelectedEntry("doi"))) {
@@ -462,7 +462,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
         //menu.removeAll();
         menu.setText(field.getMenuString());
-        menu.setIcon(field.getRepresentingIcon());
+        menu.setIcon(((IconTheme.FontBasedIcon) field.getRepresentingIcon()).createSmallIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(val.getMenuAction(frame));
         }
@@ -578,13 +578,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
             switch (group.getHierarchicalContext()) {
             case INCLUDING:
-                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_INCLUDING.getIcon());
+                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon());
                 break;
             case REFINING:
-                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REFINING.getIcon());
+                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon());
                 break;
             default:
-                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REGULAR.getIcon());
+                menuItem.setIcon(IconTheme.JabRefIcon.GROUP_REGULAR.getSmallIcon());
                 break;
             }
         }
