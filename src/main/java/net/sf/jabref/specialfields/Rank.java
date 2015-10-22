@@ -50,7 +50,7 @@ public class Rank extends SpecialField {
 
     @Override
     public Icon getRepresentingIcon() {
-        return IconTheme.JabRefIcon.RANKING.getSmallIcon();
+        return IconTheme.JabRefIcon.RANKING.getIcon();
     }
 
     @Override

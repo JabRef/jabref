@@ -40,13 +40,11 @@ public class IconTheme {
         ADD_ENTRY("\uF571") /*css: tooltip-outline-plus */,
         EDIT_ENTRY("\uf56e") /*css: tooltip-edit */,
         EDIT_STRINGS("\uf572") /*css: tooltip-text */,
-        CLIPBOARD("\uf218"),
         FOLDER("\uf07b"),
         REMOVE("\uf406"),
         REMOVE_NOBOX("\uF405") /*css: minus */,
         FILE("\uf2cf"),
         PDF_FILE("\uf2dc"),
-        TAGS("\uf485"),
         DOI("\uF5D1") /*css: web*/,
         DUPLICATE("\uF255") /*css: content-duplicate */,
         EDIT("\uF1AB") /*css: pencil */,
@@ -64,7 +62,6 @@ public class IconTheme {
         REFRESH("\uF4BB") /*css: refresh */,
         DELETE("\uF280") /*css: delete */,
         SEARCH("\uF3DE") /*css: magnify */,
-        INC_SEARCH("\uF3DE") /*css: magnify */,
         PREFERENCES("\uF4F0") /*css: settings */,
         HELP("\uF37D") /*css: help-circle*/,
         HELP_CONTENTS("\uF1A0") /*css: book-open */,
@@ -72,7 +69,6 @@ public class IconTheme {
         DOWN("\uF211") /*css: chevron-down */,
         LEFT("\uF141") /* css; arrow-left-bold */,
         RIGHT("\uF146") /*css: arrow-right-bold */,
-        UNKNOWN("\uF37C") /*css: help */,
         SOURCE("\uF232") /*css: code-braces*/,
         MAKE_KEY("\uF3AC") /*css: key-variant */,
         CLEANUP_ENTRIES("\uF1C2") /*css: broom */,
@@ -81,7 +77,6 @@ public class IconTheme {
         PRIORITY_MEDIUM("\uF2F0", Color.ORANGE) /*css: flag */,
         PRIORITY_LOW("\uF2F0", Color.GREEN) /*css: flag */,
         PRINTED("\uF4A5") /*css: printer */,
-        TOGGLE_PRINTED("\uF4A5") /*css: printer */,
         RANKING("\uf521") /*css: star */,
         RANK1("\uf521\uf524\uF524\uF524\uF524"),
         RANK2("\uf521\uf521\uF524\uF524\uF524"),
@@ -93,11 +88,9 @@ public class IconTheme {
         GROUP_REFINING("\uF2E8") /*css: filter*/,
         AUTO_GROUP("\uF154"), /*css: auto-fix*/
         EMAIL("\uF2AD") /*css: email*/,
-        DOWNLOAD("\uF299") /*css: download */,
         EXPORT_TO_CLIPBOARD("\uF21C") /*css: clipboard-arrow-left */,
         ATTACH_FILE("\uF469") /*css: paperclip*/,
         AUTO_FILE_LINK("\uF2D6") /*css: file-find */,
-        TOGGLE_QUALITY_ASSURED("\uF5E7"),
         QUALITY_ASSURED("\uF5E7"),
         QUALITY("\uF5E7"),
         OPEN("\uF300") /*css: folder */,
@@ -107,9 +100,7 @@ public class IconTheme {
         READ_STATUS_READ("\uF2C4", Color.GREEN), /*css: eye */
         READ_STATUS_SKIMMED("\uF2C4", Color.ORANGE), /*css: eye */
         READ_STATUS("\uF2C4"),/*css: eye */
-        RELEVANT("\uF522"), /*css: star-circle */
-        TOGGLE_RELEVANCE("\uF522"),/*css: star-circle */
-        SET_RELEVANT("\uF522"), /*css: star-circle */
+        RELEVANCE("\uF522"),/*css: star-circle */
         MERGE_ENTRIES("\uf24f"), /* css: compare */
         CONNECT_OPEN_OFFICE("\uf454") /*css: open-in-app */,
         PLAIN_TEXT_IMPORT_TODO("\uf202") /* css: checkbox-blank-circle-outline*/,
@@ -123,12 +114,12 @@ public class IconTheme {
         INTEGRITY_WARN("\uF120"), /*css alert-circle */
         INTEGRITY_SUCCESS("\uf206") /*css: checkbox-marked-circle-outline */,
         GITHUB("\uF350"), /*css: github-circle*/
+        TOGGLE_ENTRY_PREVIEW("\uf3c7"), /*css: library-books */
+        TOGGLE_GROUPS("\uf4e8"), /*css: server */
+        WRITE_XMP("\uf39c"), /* css: import */
 
         // STILL MISSING:
-        TOGGLE_GROUPS("\uF4E6", Color.RED),
-        TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),
-        GROUP_REGULAR("\uF4E6", Color.RED),
-        WRITE_XMP("\uF4E6", Color.RED);
+        GROUP_REGULAR("\uF4E6", Color.RED);
 
         private final String code;
         private final Color color;

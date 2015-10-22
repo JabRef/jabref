@@ -236,7 +236,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Relevance.getInstance().getValues().get(0).getActionName(),
             Relevance.getInstance().getValues().get(0).getMenuString(),
             Relevance.getInstance().getValues().get(0).getToolTipText(),
-            IconTheme.JabRefIcon.TOGGLE_RELEVANCE.getIcon());
+            IconTheme.JabRefIcon.RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
             Quality.getInstance().getValues().get(0).getActionName(),
             Quality.getInstance().getValues().get(0).getMenuString(),
@@ -253,7 +253,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public final AbstractAction loadSessionAction = new LoadSessionAction();
     private final AbstractAction incrementalSearch = new GeneralAction(Actions.INC_SEARCH,
             Localization.menuTitle("Incremental search"), Localization.lang("Start incremental search"),
-            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH), IconTheme.JabRefIcon.INC_SEARCH.getIcon());
+            prefs.getKey(KeyBinds.INCREMENTAL_SEARCH));
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), prefs.getKey(KeyBinds.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
     private final AbstractAction toggleSearch = new GeneralAction(Actions.TOGGLE_SEARCH,
