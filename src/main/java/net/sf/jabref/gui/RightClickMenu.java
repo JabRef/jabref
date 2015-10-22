@@ -269,7 +269,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Open file"), IconTheme.JabRefIcon.FILE.getSmallIcon()) {
+        add(new AbstractAction(Localization.lang("Open file"), getFileIconForSelectedEntry()) {
 
             {
                 if(!isFieldSetForSelectedEntry("file")) {
@@ -324,7 +324,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new AbstractAction(Localization.lang("Get BibTeX data from DOI"), IconTheme.JabRefIcon.DOI.getSmallIcon()) {
+        add(new AbstractAction(Localization.lang("Get BibTeX data from DOI")) {
 
             {
                 if(!(isFieldSetForSelectedEntry("doi"))) {
@@ -631,6 +631,17 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         } else {
             return false;
         }
+    }
+
+    private Icon getFileIconForSelectedEntry() {
+        if (panel.mainTable.getSelectedRowCount() == 1) {
+            BibtexEntry entry = panel.mainTable.getSelected().get(0);
+            String file = entry.getField(Globals.FILE_FIELD);
+            if(file!=null) {
+                return FileListTableModel.getFirstLabel(file).getIcon();
+            }
+        }
+        return IconTheme.JabRefIcon.FILE.getSmallIcon();
     }
 
 
