@@ -263,9 +263,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
-    private final AbstractAction//"Put a BibTeX reference to the selected entries on the clipboard",
-            copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle("Copy \\cite{BibTeX key}"),
-            //"Put a BibTeX reference to the selected entries on the clipboard",
+    private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle("Copy \\cite{BibTeX key}"),
             prefs.getKey(KeyBinds.COPY_CITE_BIB_TE_X_KEY));
     private final AbstractAction copyKeyAndTitle = new GeneralAction(Actions.COPY_KEY_AND_TITLE,
             Localization.menuTitle("Copy BibTeX key and title"),
@@ -359,7 +357,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
     AbstractAction exportToClipboard = new GeneralAction("exportToClipboard",
-            Localization.menuTitle("Export selected entries to clipboard"));
+            Localization.menuTitle("Export selected entries to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links"),
             Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
@@ -1073,6 +1071,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
+        public GeneralAction(String command, String text, Icon icon) {
+            super(icon);
+
+            this.command = command;
+            putValue(Action.NAME, text);
+        }
+
         public GeneralAction(String command, String text, String description, Icon icon) {
             super(icon);
 
@@ -1107,13 +1112,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             if (tabbedPane.getTabCount() > 0) {
                 try {
-                    ((BasePanel) tabbedPane.getSelectedComponent())
-                            .runCommand(command);
+                    ((BasePanel) tabbedPane.getSelectedComponent()).runCommand(command);
                 } catch (Throwable ex) {
                     ex.printStackTrace();
                 }
             } else {
-                    LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
+                LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
             }
         }
     }
@@ -1193,7 +1197,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(copyKey);
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
-        //edit.add(exportToClipboard);
+        edit.add(exportToClipboard);
+        edit.add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
+
         edit.addSeparator();
         edit.add(mark);
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
