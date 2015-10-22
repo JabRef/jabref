@@ -18,8 +18,8 @@ public class IconTheme {
     public static Font FONT;
     public static Font FONT_16;
 
-    public static final Color DEFAULT_COLOR = new Color(113,134,145);
-    public static final Color DEFAULT_DISABLED_COLOR = new Color(220,220,250);
+    public static final Color DEFAULT_COLOR = new Color(98, 119, 130);
+    public static final Color DEFAULT_DISABLED_COLOR = new Color(200,200,200);
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
@@ -75,7 +75,7 @@ public class IconTheme {
         PRIORITY("\uF2F0") /*css: flag */,
         PRIORITY_HIGH("\uF2F0", Color.RED) /*css: flag */,
         PRIORITY_MEDIUM("\uF2F0", Color.ORANGE) /*css: flag */,
-        PRIORITY_LOW("\uF2F0", Color.GREEN) /*css: flag */,
+        PRIORITY_LOW("\uF2F0", new Color(111, 204, 117)) /*css: flag */,
         PRINTED("\uF4A5") /*css: printer */,
         RANKING("\uf521") /*css: star */,
         RANK1("\uf521\uf524\uF524\uF524\uF524"),
@@ -97,7 +97,7 @@ public class IconTheme {
         ADD_ROW("\uf4ed") /* css: server-plus*/,
         REMOVE_ROW("\uF4E9") /*css: server-minus */,
         PICTURE("\uf2d7") /*css: file-image */,
-        READ_STATUS_READ("\uF2C4", Color.GREEN), /*css: eye */
+        READ_STATUS_READ("\uF2C4", new Color(111, 204, 117)), /*css: eye */
         READ_STATUS_SKIMMED("\uF2C4", Color.ORANGE), /*css: eye */
         READ_STATUS("\uF2C4"),/*css: eye */
         RELEVANCE("\uF522"),/*css: star-circle */
