@@ -1184,6 +1184,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(paste);
         //edit.add(remove);
         edit.add(delete);
+        edit.addSeparator();
         edit.add(copyKey);
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
@@ -1227,6 +1228,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         edit.addSeparator();
         edit.add(manageKeywords);
+        edit.addSeparator();
         edit.add(selectAll);
         mb.add(edit);
 
