@@ -4,6 +4,7 @@
     - Removes button to merge entries and keep the old ones.
     - Removes non-compact rank symbols in favor of compact rank
     - Feature: Merge information from both entries on duplication detection
+    - Always use import inspection dialog on import from file
     - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields
     - Fixed a bug in the IEEEXploreFetcher
     - Feature: Merge information from a DOI generated BibTex entry to an entry

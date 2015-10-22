@@ -57,8 +57,6 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.bibtex.DuplicateCheck;
-import net.sf.jabref.logic.id.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibtexDatabase;
@@ -90,9 +88,6 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.util.ManageKeywordsAction;
 import net.sf.jabref.util.MassSetFieldAction;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -1402,7 +1397,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(newEntryAction);
         tlb.addAction(editEntry);
-	tlb.addAction(editStrings);
+	    tlb.addAction(editStrings);
         tlb.addAction(makeKeyAction);
         tlb.addAction(Cleanup);
         tlb.addAction(mergeEntries);
@@ -1808,13 +1803,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     private void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries,
                                     String filename, final boolean openInNew) {
-        /*
-         * Use the import inspection dialog if it is enabled in preferences, and
-         * (there are more than one entry or the inspection dialog is also
-         * enabled for single entries):
-         */
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
-                (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE) || entries.size() > 1)) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -1829,144 +1817,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     diag.toFront();
                 }
             });
-
-        } else {
-            JabRefFrame.this.addBibEntries(entries, filename, openInNew);
-            if (panel != null && entries.size() == 1) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        panel.highlightEntry(entries.get(0));
-                    }
-                });
-            }
-        }
-    }
-
-    /**
-     * Adds the entries to the database, possibly checking for duplicates first.
-     *
-     * @param filename If non-null, a message is printed to the status line describing
-     *                 how many entries were imported, and from which file. If null, the message will not
-     *                 be printed.
-     * @param intoNew  Determines if the entries will be put in a new database or in the current
-     *                 one.
-     */
-    private int addBibEntries(List<BibtexEntry> bibentries, String filename,
-                              boolean intoNew) {
-        if (bibentries == null || bibentries.isEmpty()) {
-
-            // No entries found. We need a message for this.
-            JOptionPane.showMessageDialog(JabRefFrame.this, Localization.lang("No entries found. Please make sure you are "
-                            + "using the correct import filter."), Localization.lang("Import failed"),
-                    JOptionPane.ERROR_MESSAGE);
-            return 0;
-        }
-
-        int addedEntries = 0;
-
-        // Set owner and timestamp fields:
-        Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
-
-        if (intoNew || tabbedPane.getTabCount() == 0) {
-            // Import into new database.
-            BibtexDatabase database = new BibtexDatabase();
-            for (BibtexEntry entry : bibentries) {
-
-                entry.setId(IdGenerator.next());
-                database.insertEntry(entry);
-
-            }
-            // Metadata are only put in bibtex files, so we will not find it
-            // in imported files. We therefore pass in an empty MetaData:
-            BasePanel bp = new BasePanel(JabRefFrame.this, database, null, new MetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
-            /*
-                  if (prefs.getBoolean("autoComplete")) {
-                  db.setCompleters(autoCompleters);
-                  }
-             */
-            addedEntries = database.getEntryCount();
-            tabbedPane.add(GUIGlobals.untitledTitle, bp);
-            bp.markBaseChanged();
-            tabbedPane.setSelectedComponent(bp);
-            if (filename != null) {
-                output(Localization.lang("Imported database") + " '" + filename + "' " +
-                        Localization.lang("with") + ' ' +
-                        database.getEntryCount() + ' ' +
-                        Localization.lang("entries into new database") + '.');
-            }
-        } else {
-            // Import into current database.
-            BasePanel basePanel = basePanel();
-            BibtexDatabase database = basePanel.database;
-            int oldCount = database.getEntryCount();
-            NamedCompound ce = new NamedCompound(Localization.lang("Import entries"));
-
-            mainLoop:
-            for (BibtexEntry entry : bibentries) {
-                boolean dupli = false;
-                final ArrayList<BibtexEntry> toAdd = new ArrayList<BibtexEntry>();
-                // Check for duplicates among the current entries:
-                for (String s : database.getKeySet()) {
-                    BibtexEntry existingEntry = database.getEntryById(s);
-                    boolean remove = false;
-                    if (DuplicateCheck.isDuplicate(entry, existingEntry)) {
-                        DuplicateResolverDialog drd = new DuplicateResolverDialog
-                                (JabRefFrame.this, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
-                        drd.setVisible(true);
-                        int res = drd.getSelected();
-                        if (res == DuplicateResolverDialog.KEEP_LOWER) {
-                            dupli = true;
-                        } else if (res == DuplicateResolverDialog.KEEP_UPPER) {
-                            remove = true;
-                        } else if (res == DuplicateResolverDialog.KEEP_MERGE) {
-                            dupli = true;
-                            remove = true;
-                            toAdd.add(drd.getMergedEntry());
-                        } else if (res == DuplicateResolverDialog.BREAK) {
-                            break mainLoop;
-                        }
-                        if (remove) {
-                            database.removeEntry(existingEntry.getId());
-                            ce.addEdit(new UndoableRemoveEntry(database, existingEntry, basePanel));
-                        }
-                        break;
-                    }
-                }
-                if (!dupli) {
-
-                    entry.setId(IdGenerator.next());
-                    database.insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry
-                            (database, entry, basePanel));
-                    addedEntries++;
-                }
-                if (!toAdd.isEmpty()) {
-                    for (BibtexEntry addEntry : toAdd) {
-                        addEntry.setId(IdGenerator.next());
-                        database.insertEntry(addEntry);
-                        ce.addEdit(new UndoableInsertEntry(database, addEntry, basePanel));
-                        addedEntries++;
-                    }
-                }
-            }
-            if (addedEntries > 0) {
-                ce.end();
-                basePanel.undoManager.addEdit(ce);
-                basePanel.markBaseChanged();
-                if (filename != null) {
-                    output(Localization.lang("Imported database") + " '" + filename + "' " +
-                            Localization.lang("with") + ' ' +
-                            (database.getEntryCount() - oldCount) + ' ' +
-                            Localization.lang("entries into new database") + '.');
-                }
-            }
-
-        }
-
-        return addedEntries;
     }
 
     private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {

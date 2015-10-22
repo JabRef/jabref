@@ -238,8 +238,6 @@ public class JabRefPreferences {
     public static final String UNMARK_ALL_ENTRIES_BEFORE_IMPORTING = "unmarkAllEntriesBeforeImporting";
     public static final String MARK_IMPORTED_ENTRIES = "markImportedEntries";
     public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
-    public static final String USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE = "useImportInspectionDialogForSingle";
-    public static final String USE_IMPORT_INSPECTION_DIALOG = "useImportInspectionDialog";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String PUT_BRACES_AROUND_CAPITALS = "putBracesAroundCapitals";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
@@ -700,8 +698,6 @@ public class JabRefPreferences {
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
-        defaults.put(USE_IMPORT_INSPECTION_DIALOG, Boolean.TRUE);
-        defaults.put(USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, Boolean.TRUE);
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
         defaults.put(MARK_IMPORTED_ENTRIES, Boolean.TRUE);
         defaults.put(UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, Boolean.TRUE);

@@ -32,12 +32,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.bibtex.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.model.entry.BibtexEntryType;
@@ -50,7 +45,6 @@ import net.sf.jabref.util.Util;
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
-    private static final long serialVersionUID = 6164143717906802116L;
     private final JabRefFrame frame;
     private final boolean openInNew;
     private final ImportFormat importer;
@@ -187,140 +181,29 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 return;
             }
 
-            // TODO: undo is not handled properly here, except for the entries
-            // added by
-            //  the import inspection dialog.
             if (bibtexResult != null) {
                 if (!openInNew) {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
-                    BibtexDatabase toAddTo = panel.database();
-
-                    // Use the import inspection dialog if it is enabled in preferences, and
-                    // (there are more than one entry or the inspection dialog is also enabled
-                    // for single entries):
-                    if (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG) &&
-                            (Globals.prefs.getBoolean(JabRefPreferences.USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE)
-                            || (bibtexResult.getDatabase().getEntryCount() > 1))) {
-                        ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel,
-                                BibtexFields.DEFAULT_INSPECTION_FIELDS,
-                                Localization.lang("Import"), openInNew);
-                        diag.addEntries(bibtexResult.getDatabase().getEntries());
-                        diag.entryListComplete();
-                        Util.placeDialog(diag, frame);
-                        diag.setVisible(true);
-                        diag.toFront();
-                    } else {
-                        Integer addCount = 0;
-                        Integer replaceCount = 0;
-                        Integer mergeCount = 0;
-                        String preString = null;
-                        boolean generateKeys = Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION);
-                        NamedCompound ce = new NamedCompound(Localization.lang("Import entries"));
-
-                        // Check if we should unmark entries before adding the new ones:
-                        if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
-                            for (BibtexEntry entry : toAddTo.getEntries()) {
-                                EntryMarker.unmarkEntry(entry, true, toAddTo, ce);
-                            }
-                        }
-
-                        mainLoop:
-                        for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()) {
-                            try {
-                                // Check if the entry is a duplicate of an existing one:
-                                boolean keepEntry = true;
-                                boolean remove = false;
-                                BibtexEntry mergedEntry = null;
-                                BibtexEntry duplicate = DuplicateCheck.containsDuplicate(toAddTo, entry);
-                                if (duplicate != null) {
-                                    DuplicateResolverDialog drd = new DuplicateResolverDialog
-                                            (frame, duplicate, entry, DuplicateResolverDialog.IMPORT_CHECK);
-                                    drd.setVisible(true);
-                                    int answer = drd.getSelected();
-                                    // int answer = DuplicateResolverDialog.resolveDuplicateInImport
-                                    //        (frame, duplicate, entry);
-                                    // The upper entry is the
-                                    if (answer == DuplicateResolverDialog.DO_NOT_IMPORT) {
-                                        keepEntry = false;
-                                    } else if (answer == DuplicateResolverDialog.IMPORT_AND_DELETE_OLD) {
-                                        remove = true;
-                                        replaceCount++;
-                                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
-                                        keepEntry = false;
-                                        remove = true;
-                                        mergedEntry = drd.getMergedEntry();
-                                        mergeCount++;
-                                    } else if (answer == DuplicateResolverDialog.BREAK) {
-                                        preString = Localization.lang("Import cancelled.");
-                                        break mainLoop;
-                                    }
-                                }
-
-                                // Remove the old entry, if we are supposed to
-                                if (remove) {
-                                 // Remove the old one and import the new one.
-                                    toAddTo.removeEntry(duplicate.getId());
-                                    ce.addEdit(new UndoableRemoveEntry(toAddTo, duplicate, panel));
-                                }
-                                // Add the entry, if we are supposed to:
-                                if (keepEntry) {
-                                    toAddTo.insertEntry(entry);
-                                    // Generate key, if we are supposed to:
-                                    if (generateKeys) {
-                                        LabelPatternUtil.makeLabel(panel.metaData(), toAddTo, entry);
-                                        //System.out.println("gen:"+entry.getCiteKey());
-                                    }
-                                    ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
-                                    addCount++;
-                                }
-                                // Add the merged entry, if we are supposed to:
-                                if (mergedEntry != null) {
-                                    toAddTo.insertEntry(mergedEntry);
-                                    // Generate key, if we are supposed to:
-                                    if (generateKeys) {
-                                        LabelPatternUtil.makeLabel(panel.metaData(), toAddTo, mergedEntry);
-                                        //System.out.println("gen:"+entry.getCiteKey());
-                                    }
-                                    ce.addEdit(new UndoableInsertEntry(toAddTo, mergedEntry, panel));
-                                }
-                                
-                            } catch (KeyCollisionException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        ce.end();
-                        if (ce.hasEdits()) {
-                            panel.undoManager.addEdit(ce);
-                            panel.markBaseChanged();
-                        }
-                        if (preString != null) {
-                            frame.output(preString + " " + Localization.lang("Added %0 entries. Replaced %1 entries. Added information to %2 entries.", addCount.toString(), replaceCount.toString(), mergeCount.toString()));
-                        } else {
-                            frame.output(Localization.lang("Added %0 entries. Replaced %1 entries. Added information to %2 entries.", addCount.toString(), replaceCount.toString(), mergeCount.toString()));
-                        }
-                    }
-
-                }
-
-                else {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
-                            bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
+                    
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, BibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    diag.addEntries(bibtexResult.getDatabase().getEntries());
+                    diag.entryListComplete();
+                    Util.placeDialog(diag, frame);
+                    diag.setVisible(true);
+                    diag.toFront();
+                } else {
+                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(), Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), true);
                     frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 }
-
             } else {
                 if (importer == null) {
                     frame.output(Localization.lang("Could not find a suitable import format."));
                 } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError != null) {
-                        JOptionPane.showMessageDialog(frame, importError.getMessage(), Localization.lang("Import failed"),
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                    else {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("No entries found. Please make sure you are "
-                                        + "using the correct import filter."), Localization.lang("Import failed"),
-                                JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, importError.getMessage(), Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("No entries found. Please make sure you are " + "using the correct import filter."), Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
