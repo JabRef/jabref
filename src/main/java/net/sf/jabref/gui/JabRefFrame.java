@@ -170,8 +170,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton groupToggle;
     public JToggleButton searchToggle;
     public JToggleButton previewToggle;
-    public JToggleButton highlightAny;
-    public JToggleButton highlightAll;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final AbstractAction
@@ -282,8 +280,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE,
             Localization.menuTitle("Edit preamble"),
             Localization.lang("Edit preamble"),
-            prefs.getKey(KeyBinds.EDIT_PREAMBLE),
-            IconTheme.JabRefIcon.EDIT_PREAMBLE.getIcon());
+            prefs.getKey(KeyBinds.EDIT_PREAMBLE));
     private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS,
             Localization.menuTitle("Edit strings"),
             Localization.lang("Edit strings"),
@@ -310,12 +307,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon());
     private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             Localization.menuTitle("Highlight groups matching any selected entry"),
-            Localization.lang("Highlight groups matching any selected entry"),
-            IconTheme.JabRefIcon.GROUPS_HIGHLIGHT_ANY.getIcon());
+            Localization.lang("Highlight groups matching any selected entry"));
     private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             Localization.menuTitle("Highlight groups matching all selected entries"),
-            Localization.lang("Highlight groups matching all selected entries"),
-            IconTheme.JabRefIcon.GROUPS_HIGHLIGHT_ALL.getIcon());
+            Localization.lang("Highlight groups matching all selected entries"));
     final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             Localization.menuTitle("Switch preview layout"),
             prefs.getKey(KeyBinds.SWITCH_PREVIEW_LAYOUT));
@@ -531,10 +526,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
                     searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
                     previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
-                    highlightAny
-                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY));
-                    highlightAll
-                            .setSelected(Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL));
                     Globals.focusListener.setFocused(bp.mainTable);
                     setWindowTitle();
                     // Update search autocompleter with information for the correct database:
@@ -1449,7 +1440,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             previewToggle.setMargin(marg);
         }
         tlb.add(previewToggle);
-        tlb.addSeparator();
 
         groupToggle = new JToggleButton(toggleGroups);
         groupToggle.setText(null);
@@ -1457,19 +1447,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupToggle.setMargin(marg);
         }
         tlb.add(groupToggle);
-
-        highlightAny = new JToggleButton(toggleHighlightAny);
-        highlightAny.setText(null);
-        if (!OS.OS_X) {
-            highlightAny.setMargin(marg);
-        }
-        tlb.add(highlightAny);
-        highlightAll = new JToggleButton(toggleHighlightAll);
-        highlightAll.setText(null);
-        if (!OS.OS_X) {
-            highlightAll.setMargin(marg);
-        }
-        tlb.add(highlightAll);
 
         tlb.addSeparator();
 
@@ -1529,8 +1506,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 incrementalSearch, replaceAll, importMenu, exportMenu,
                 /* openSpires wasn't being supported so no point in supporting
                  * openInspire */
-                openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/togglePreview, dupliCheck, /*strictDupliCheck,*/highlightAll,
-                highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/togglePreview, dupliCheck, /*strictDupliCheck,*/
+                newEntryAction, plainTextImport, massSetField, manageKeywords,
                 closeDatabaseAction, switchPreview, integrityCheckAction,
                 toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
                 abbreviateMedline, unabbreviate, exportAll, exportSelected,

@@ -128,12 +128,7 @@ public class IconTheme {
         TOGGLE_GROUPS("\uF4E6", Color.RED),
         TOGGLE_ENTRY_PREVIEW("\uF4E6", Color.RED),
         GROUP_REGULAR("\uF4E6", Color.RED),
-        WRITE_XMP("\uF4E6", Color.RED),
-
-        //WILL BE REMOVED
-        GROUPS_HIGHLIGHT_ALL("\uF4E6", Color.RED),
-        GROUPS_HIGHLIGHT_ANY("\uF4E6", Color.RED),
-        EDIT_PREAMBLE("\uF4E6", Color.RED);
+        WRITE_XMP("\uF4E6", Color.RED);
 
         private final String code;
         private final Color color;
