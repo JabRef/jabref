@@ -10,8 +10,6 @@ public class Actions {
     public static final String ADD_FILE_LINK = "addFileLink";
     public static final String ADD_TO_GROUP = "addToGroup";
     public static final String AUTO_SET_FILE = "autoSetFile";
-    public static final String AUTO_SET_PDF = "autoSetPdf";
-    public static final String AUTO_SET_PS = "autoSetPs";
     public static final String BACK = "back";
     public static final String CLEANUP = "Cleanup";
     public static final String COPY = "copy";
