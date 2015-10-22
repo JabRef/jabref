@@ -170,6 +170,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton groupToggle;
     public JToggleButton searchToggle;
     public JToggleButton previewToggle;
+    public JToggleButton fetcherToggle;
 
     final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final AbstractAction
@@ -425,6 +426,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PushToApplicationButton pushExternalButton;
 
+    GeneralFetcher generalFetcher;
+
     private final List<Action> fetcherActions = new LinkedList<>();
 
     private SearchManager searchManager;
@@ -526,6 +529,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
                     searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
                     previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
+                    fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
                     Globals.focusListener.setFocused(bp.mainTable);
                     setWindowTitle();
                     // Update search autocompleter with information for the correct database:
@@ -626,9 +630,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         groupSelector = new GroupSelector(this, sidePaneManager);
         searchManager = new SearchManager(this, sidePaneManager);
+        generalFetcher = new GeneralFetcher(sidePaneManager, this);
 
         sidePaneManager.register("groups", groupSelector);
-        sidePaneManager.register("search", searchManager);
+        sidePaneManager.register("search", searchManager);;
 
         // Show the search panel if it was visible at last shutdown:
         if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_PANEL_VISIBLE)) {
@@ -1242,7 +1247,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //search.add(strictDupliCheck);
         search.add(autoSetFile);
         search.addSeparator();
-        GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this);
         search.add(generalFetcher.getAction());
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
@@ -1261,6 +1265,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(decreseFontSize);
         view.addSeparator();
         view.add(toggleToolbar);
+        view.add(toggleSearch);
+        view.add(generalFetcher.getAction());
         view.add(toggleGroups);
         view.add(togglePreview);
         view.add(switchPreview);
@@ -1435,6 +1441,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             searchToggle.setMargin(marg);
         }
         tlb.add(searchToggle);
+
+        fetcherToggle = new JToggleButton(generalFetcher.getAction());
+        fetcherToggle.setText(null);
+        if (!OS.OS_X) {
+            fetcherToggle.setMargin(marg);
+        }
+        tlb.add(fetcherToggle);
 
         previewToggle = new JToggleButton(togglePreview);
         previewToggle.setText(null);
