@@ -78,7 +78,6 @@ public class JabRefPreferences {
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
-    public static final String SHOW_SHORT = "showShort";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
@@ -486,7 +485,6 @@ public class JabRefPreferences {
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
-        defaults.put(SHOW_SHORT, Boolean.TRUE);
 
         // Sorting preferences
         defaults.put(TABLE_PRIMARY_SORT_FIELD, "author");

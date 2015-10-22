@@ -380,7 +380,6 @@ public class MainTableFormat implements TableFormat<BibtexEntry> {
         }
 
         // Read name format options:
-        boolean showShort = Globals.prefs.getBoolean(JabRefPreferences.SHOW_SHORT);
         namesNatbib = Globals.prefs.getBoolean(JabRefPreferences.NAMES_NATBIB); //MK:
         namesLastOnly = Globals.prefs.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
         namesAsIs = Globals.prefs.getBoolean(JabRefPreferences.NAMES_AS_IS);
