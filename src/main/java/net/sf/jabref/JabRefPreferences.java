@@ -82,7 +82,6 @@ public class JabRefPreferences {
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
     public static final String NAMES_NATBIB = "namesNatbib";
-    public static final String NAMES_LAST_FIRST = "namesLf";
     public static final String NAMES_FIRST_LAST = "namesFf";
     public static final String NAMES_AS_IS = "namesAsIs";
     public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
@@ -479,7 +478,6 @@ public class JabRefPreferences {
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(NAMES_LAST_FIRST, Boolean.FALSE); // "Show 'Lastname, Firstname'"
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
         defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
