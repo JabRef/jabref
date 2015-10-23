@@ -22,6 +22,8 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sf.jabref.model.entry.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
@@ -47,8 +49,6 @@ public class DuplicateResolverDialog extends JDialog {
     public static final int IMPORT_CHECK = 2;
     public static final int INSPECTION = 3;
     public static final int DUPLICATE_SEARCH_WITH_EXACT = 4;
-
-    private final Dimension DIM = new Dimension(800, 700);
 
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
@@ -119,6 +119,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_UPPER;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -129,6 +130,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_LOWER;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -139,6 +141,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_BOTH;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -149,6 +152,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_MERGE;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -160,6 +164,7 @@ public class DuplicateResolverDialog extends JDialog {
                 public void actionPerformed(ActionEvent e) {
                     status = DuplicateResolverDialog.AUTOREMOVE_EXACT;
                     block = false;
+                    savePosition();
                     dispose();
                 }
             });
@@ -171,6 +176,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.BREAK;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -180,18 +186,23 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        if (getHeight() > DIM.height) {
-            setSize(new Dimension(getWidth(), DIM.height));
-        }
-        if (getWidth() > DIM.width) {
-            setSize(new Dimension(DIM.width, getHeight()));
-        }
+        setLocation(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_Y));
+        setSize(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_Y));
 
         both.requestFocus();
 
     }
 
 
+    private void savePosition() {
+        Point p = getLocation();
+        Dimension d = getSize();
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_X, p.x);
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_Y, p.y);
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_X, d.width);
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_Y, d.height);
+    }
+    
     public boolean isBlocking() {
         return block;
     }
