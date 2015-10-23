@@ -108,8 +108,6 @@ To get a list of all targets, use `gradlew tasks`.
 release - Creates a release for all target platforms.
 releaseJar - Creates a Jar release.
 releaseMac - Creates an OSX release.
-releaseSourceTar - Creates a tar archive of the source code.
-releaseSourceZip - Creates a zip archive of the source code.
 releaseWindows - Creates a Windows executable and installer.
 ```
 

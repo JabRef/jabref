@@ -231,7 +231,7 @@ if (hasProperty('dev')) {
     project.version += "--snapshot--" + infoString
 }
 
-task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar", "releaseSourceZip", "releaseSourceTar"]) {
+task release(dependsOn: ["releaseWindows", "releaseMac", "releaseJar"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }
@@ -324,36 +324,6 @@ macAppBundle {
             "CFBundleTypeExtensions": ["bib"]
     ]
     bundleExtras.put("CFBundleDocumentTypes", [map])
-}
-
-task releaseSourceZip(type: Exec) {
-    group = 'JabRef - Release'
-    description "Creates a zip archive of the source code."
-
-    if (OperatingSystem.current().isWindows()) {
-        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
-    } else {
-        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD --format=zip > ${buildDir}/releases/JabRef-${version}-src.zip"
-    }
-
-    doFirst {
-        mkdir("$buildDir/releases")
-    }
-}
-
-task releaseSourceTar(type: Exec) {
-    group = 'JabRef - Release'
-    description "Creates a tar archive of the source code."
-
-    if (OperatingSystem.current().isWindows()) {
-        commandLine 'cmd', '/c', "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
-    } else {
-        commandLine "bash", "-c", "git -c core.autocrlf=false -c core.eol=lf archive HEAD > ${buildDir}/releases/JabRef-${version}-src.tar.gz"
-    }
-
-    doFirst {
-        mkdir("$buildDir/releases")
-    }
 }
 
 // fetch all dependencies to speedup CircleCI build
