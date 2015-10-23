@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.TreeSet;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,7 +48,6 @@ import net.sf.jabref.model.entry.BibtexEntry;
  */
 public class MassSetFieldAction extends MnemonicAwareAction {
 
-    private static final long serialVersionUID = -3335783568376999899L;
     private final JabRefFrame frame;
     private JDialog diag;
     private JRadioButton all;
@@ -55,11 +55,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JRadioButton clear;
     private JRadioButton set;
     private JRadioButton rename;
-    private JTextField field;
+    private JComboBox<String> field;
     private JTextField text;
     private JTextField renameTo;
     private boolean cancelled = true;
     private JCheckBox overwrite;
+    private TreeSet<String> allFields;
 
 
     public MassSetFieldAction(JabRefFrame frame) {
@@ -70,7 +71,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private void createDialog() {
         diag = new JDialog(frame, Localization.lang("Set/clear/rename fields"), true);
 
-        field = new JTextField();
+        field = new JComboBox<>();
+        field.setEditable(true);
         text = new JTextField();
         text.setEnabled(false);
         renameTo = new JTextField();
@@ -85,6 +87,18 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         set = new JRadioButton(Localization.lang("Set fields"));
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
+        
+        Collection<BibtexEntry> be = frame.basePanel().database().getEntries();
+        allFields = new TreeSet<String>();
+        for (BibtexEntry e : be) {
+            allFields.addAll(e.getAllFields());
+        }
+        for (String f : allFields) {
+            if (!f.startsWith("__")) {
+                field.addItem(f);
+            }
+        }
+        
         set.addChangeListener(new ChangeListener() {
 
             @Override
@@ -150,7 +164,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             public void actionPerformed(ActionEvent e) {
                 // Check if the user tries to rename multiple fields:
                 if (rename.isSelected()) {
-                    String[] fields = getFieldNames(field.getText());
+                    String[] fields = getFieldNames((String) field.getSelectedItem());
                     if (fields.length > 1) {
                         JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
                                 "", JOptionPane.ERROR_MESSAGE);
@@ -163,8 +177,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         });
 
         AbstractAction cancelAction = new AbstractAction() {
-
-            private static final long serialVersionUID = 5590008814009727518L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -224,7 +236,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (toSet.isEmpty()) {
             toSet = null;
         }
-        String[] fields = getFieldNames(field.getText().trim().toLowerCase());
+        String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase());
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
