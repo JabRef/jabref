@@ -303,7 +303,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addRelatedGap();
-        JButton help = new JButton(Localization.lang("Help"));
+        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp).getIconButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -334,7 +334,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         deselectAllDuplicates.addActionListener(new DeselectDuplicatesButtonListener());
         deselectAllDuplicates.setEnabled(false);
         delete.addActionListener(deleteListener);
-        help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
         // Remember and default to last size:

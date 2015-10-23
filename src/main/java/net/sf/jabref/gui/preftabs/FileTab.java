@@ -83,8 +83,6 @@ class FileTab extends JPanel implements PrefsTab {
         this.prefs = prefs;
         this.frame = frame;
 
-        HelpAction autosaveHelp = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp, Localization.lang("Help"),
-                IconTheme.JabRefIcon.HELP.getSmallIcon());
         openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Localization.lang("Backup old file when saving"));
         autoSave = new JCheckBox(Localization.lang("Autosave"));
@@ -154,8 +152,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
-        JButton help = new JButton(autosaveHelp);
-        help.setText(null);
+        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.autosaveHelp).getIconButton();
         help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());

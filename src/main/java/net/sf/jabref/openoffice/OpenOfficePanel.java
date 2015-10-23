@@ -88,7 +88,7 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
     private static final JButton merge = new JButton(Localization.lang("Merge citations"));
     private static final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private static final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private static final JButton help = new JButton(IconTheme.JabRefIcon.HELP.getSmallIcon());
+    private static final JButton help = new HelpAction(GUIGlobals.helpDiag, "OpenOfficeIntegration.html").getIconButton();
     private static final JButton test = new JButton("Test");
     private JRadioButton inPar;
     private JRadioButton inText;
@@ -373,8 +373,6 @@ public class OpenOfficePanel extends AbstractWorker implements PushToApplication
                 showSettingsPopup();
             }
         });
-
-        OpenOfficePanel.help.addActionListener(new HelpAction(GUIGlobals.helpDiag, "OpenOfficeIntegration.html"));
 
         OpenOfficePanel.manageCitations.addActionListener(new ActionListener() {
 

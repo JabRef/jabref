@@ -185,7 +185,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.addPropertyChangeListener(this);
         this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
 
-        helpAction = new HelpAction(this.frame.helpDiag, GUIGlobals.entryEditorHelp, Localization.lang("Help"));
+        helpAction = new HelpAction(this.frame.helpDiag, GUIGlobals.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
         generateKeyAction = new GenerateKeyAction(this.frame);
         storeFieldAction = new StoreFieldAction();

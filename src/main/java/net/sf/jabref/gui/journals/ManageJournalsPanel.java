@@ -144,7 +144,8 @@ class ManageJournalsPanel extends JPanel {
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addUnrelatedGap();
-        JButton help = new JButton(Localization.lang("Help"));
+
+        JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp, IconTheme.JabRefIcon.HELP.getSmallIcon()).getIconButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -223,7 +224,6 @@ class ManageJournalsPanel extends JPanel {
                 }
             }
         });
-        help.addActionListener(new HelpAction(GUIGlobals.helpDiag, GUIGlobals.journalAbbrHelp));
 
         AbstractAction cancelAction = new AbstractAction() {
 

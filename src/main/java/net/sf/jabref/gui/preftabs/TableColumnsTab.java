@@ -281,10 +281,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special table columns and special fields ***/
 
-        HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
-        JButton helpButton = new JButton(IconTheme.JabRefIcon.HELP.getSmallIcon());
-        helpButton.setToolTipText(Localization.lang("Help on special fields"));
-        helpButton.addActionListener(help);
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, Localization.lang("Help on special fields")).getIconButton();
 
         specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {

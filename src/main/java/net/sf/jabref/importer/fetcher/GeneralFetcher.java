@@ -46,13 +46,13 @@ import net.sf.jabref.util.Util;
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
     private final JTextField tf = new JTextField();
-    private final JButton helpBut = new JButton(
-            IconTheme.JabRefIcon.HELP.getSmallIcon());
+
     private final JComboBox<String> fetcherChoice;
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
-    private HelpAction help;
+    private final HelpAction help;
+    private final JButton helpBut;
 
     private final SidePaneManager sidePaneManager;
     private final Action action;
@@ -89,6 +89,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
+        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage());
+        helpBut = help.getIconButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
@@ -133,9 +135,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         action = new FetcherAction();
 
-        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage(), Localization.lang("Help"));
 
-        helpBut.addActionListener(help);
+
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
 

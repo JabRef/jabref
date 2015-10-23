@@ -314,8 +314,7 @@ public class GroupSelector extends SidePaneComponent implements
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new JButton(
-                IconTheme.JabRefIcon.HELP.getSmallIcon());
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.groupsHelp, Localization.lang("Help on groups")).getIconButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);
@@ -388,10 +387,7 @@ public class GroupSelector extends SidePaneComponent implements
         main.add(autoGroup);
         con.gridx = 3;
         con.gridwidth = GridBagConstraints.REMAINDER;
-        HelpAction helpAction = new HelpAction(frame.helpDiag,
-                GUIGlobals.groupsHelp, Localization.lang("Help on groups"));
-        helpButton.addActionListener(helpAction);
-        helpButton.setToolTipText(Localization.lang("Help on groups"));
+
         gbl.setConstraints(helpButton, con);
         main.add(helpButton);
 

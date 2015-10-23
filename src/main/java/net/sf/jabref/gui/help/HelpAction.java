@@ -38,31 +38,20 @@ public class HelpAction extends MnemonicAwareAction {
 
 
     public HelpAction(HelpDialog diag, String helpFile) {
-        super(IconTheme.JabRefIcon.HELP.getIcon());
-        putValue(Action.NAME, Localization.menuTitle("Help"));
-        this.diag = diag;
-        this.helpFile = helpFile;
+        this(diag, helpFile, Localization.lang("Help"), IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
-        super(IconTheme.JabRefIcon.HELP.getIcon());
-        putValue(Action.NAME, Localization.menuTitle("Help"));
-        putValue(Action.SHORT_DESCRIPTION,tooltip);
-        this.diag = diag;
-        this.helpFile = helpFile;
+        this(diag, helpFile, tooltip, IconTheme.JabRefIcon.HELP.getSmallIcon());
+    }
+
+    public HelpAction(HelpDialog diag, String helpFile, Icon iconFile) {
+        this(diag, helpFile, Localization.lang("Help"), iconFile);
     }
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip, Icon iconFile) {
         super(iconFile);
         putValue(Action.NAME, Localization.menuTitle("Help"));
-        putValue(Action.SHORT_DESCRIPTION, tooltip);
-        this.diag = diag;
-        this.helpFile = helpFile;
-    }
-
-    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
-        super(IconTheme.JabRefIcon.HELP.getIcon());
-        putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, tooltip);
         this.diag = diag;
         this.helpFile = helpFile;
@@ -93,6 +82,7 @@ public class HelpAction extends MnemonicAwareAction {
         JButton hlp = new JButton(this);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));
+        hlp.setToolTipText(getValue(Action.SHORT_DESCRIPTION).toString());
         return hlp;
     }
 

@@ -107,10 +107,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
-        HelpAction ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
-                Localization.lang("Help"), IconTheme.JabRefIcon.HELP.getSmallIcon());
-        HelpAction timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, Localization.lang("Help"),
-                IconTheme.JabRefIcon.HELP.getSmallIcon());
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
 
@@ -140,9 +136,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new JButton(ownerHelp);
-        help.setText(null);
-        help.setPreferredSize(new Dimension(24, 24));
+        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp).getIconButton();
         builder.append(help);
         builder.nextLine();
 
@@ -152,9 +146,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new JButton(timeStampHelp);
-        help.setText(null);
-        help.setPreferredSize(new Dimension(24, 24));
+        help = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp).getIconButton();
         builder.append(help);
         builder.nextLine();
 
