@@ -45,10 +45,8 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     private final JabRefFrame frame;
 
-    private final JTextField pdfDir;
     private final JTextField regExpTextField;
     private final JTextField fileDir;
-    private final JTextField psDir;
     private final JTextField emailSubject;
     private final JTextField citeCommand;
 
@@ -69,8 +67,6 @@ class ExternalTab extends JPanel implements PrefsTab {
         this.frame = frame;
         setLayout(new BorderLayout());
 
-        psDir = new JTextField(25);
-        pdfDir = new JTextField(25);
         fileDir = new JTextField(25);
         bibLocationAsFileDir = new JCheckBox(Localization.lang("Allow file links relative to each bib file's location"));
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
@@ -168,32 +164,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(openFoldersOfAttachedFiles);
         builder.nextLine();
 
-        builder.appendSeparator(Localization.lang("Legacy file fields"));
-        pan = new JPanel();
-        builder.append(pan);
-        builder.append(new JLabel("<html>" + Localization.lang("Note that these settings are used for the legacy "
-                + "<b>pdf</b> and <b>ps</b> fields only.<br>For most users, setting the <b>Main file directory</b> "
-                + "above should be sufficient.") + "</html>"), 5);
-        builder.nextLine();
-        pan = new JPanel();
-        builder.append(pan);
-        lab = new JLabel(Localization.lang("Main PDF directory") + ':');
-        builder.append(lab);
-        builder.append(pdfDir);
-        browse = BrowseAction.buildForDir(this.frame, pdfDir);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-
-        pan = new JPanel();
-        builder.append(pan);
-        lab = new JLabel(Localization.lang("Main PS directory") + ':');
-        builder.append(lab);
-        builder.append(psDir);
-        browse = BrowseAction.buildForDir(this.frame, psDir);
-        builder.append(new JButton(browse));
-        builder.nextLine();
         builder.appendSeparator(Localization.lang("External programs"));
-
         builder.nextLine();
 
         JPanel butpan = new JPanel();
@@ -239,8 +210,6 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        pdfDir.setText(prefs.get("pdfDirectory"));
-        psDir.setText(prefs.get("psDirectory"));
         fileDir.setText(prefs.get(Globals.FILE_FIELD + "Directory"));
         bibLocationAsFileDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
@@ -272,8 +241,6 @@ class ExternalTab extends JPanel implements PrefsTab {
         }
 
         // We should maybe do some checking on the validity of the contents?
-        prefs.put("pdfDirectory", pdfDir.getText());
-        prefs.put("psDirectory", psDir.getText());
         prefs.put(Globals.FILE_FIELD + "Directory", fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOCATION_AS_FILE_DIR, bibLocationAsFileDir.isSelected());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());

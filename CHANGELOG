@@ -1,5 +1,6 @@
 [master]
     - Fixes bug when having added and then removed a personal journal list, an exception is always shown on startup
+    - Removes legacy options to sync files in the "pdf" or "ps" field
     - Removes button to merge entries and keep the old ones.
     - Removes non-compact rank symbols in favor of compact rank
     - All duplicate whitespaces / tabs / newlines are now removed from non-multiline fields

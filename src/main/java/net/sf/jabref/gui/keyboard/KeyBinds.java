@@ -97,8 +97,6 @@ public class KeyBinds {
     public static final String STRING_DIALOG_REMOVE_STRING = "String dialog, remove string";
     public static final String SWITCH_PREVIEW_LAYOUT = "Switch preview layout";
     public static final String SYNCHRONIZE_FILES = "Synchronize files";
-    public static final String SYNCHRONIZE_PDF = "Synchronize PDF";
-    public static final String SYNCHRONIZE_PS = "Synchronize PS";
     public static final String TOGGLE_ENTRY_PREVIEW = "Toggle entry preview";
     public static final String TOGGLE_GROUPS_INTERFACE = "Toggle groups interface";
     public static final String UNABBREVIATE = "Unabbreviate";
@@ -181,8 +179,6 @@ public class KeyBinds {
         keyBindMap.put(SEARCH_ADS, "ctrl shift F6");
         keyBindMap.put(NEW_FROM_PLAIN_TEXT, "ctrl shift N");
         keyBindMap.put(SYNCHRONIZE_FILES, "ctrl F4");
-        keyBindMap.put(SYNCHRONIZE_PDF, "shift F4");
-        keyBindMap.put(SYNCHRONIZE_PS, "ctrl shift F4");
         keyBindMap.put(FOCUS_ENTRY_TABLE, "ctrl shift E");
         keyBindMap.put(ABBREVIATE, "ctrl alt A");
         keyBindMap.put(UNABBREVIATE, "ctrl alt shift A");

@@ -364,12 +364,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
     AbstractAction exportToClipboard = new GeneralAction("exportToClipboard",
             Localization.menuTitle("Export selected entries to clipboard"));
-    private final AbstractAction autoSetPdf = new GeneralAction(Actions.AUTO_SET_PDF,
-            Localization.menuTitle("Synchronize PDF links"),
-            prefs.getKey(KeyBinds.SYNCHRONIZE_PDF));
-    private final AbstractAction autoSetPs = new GeneralAction(Actions.AUTO_SET_PS,
-            Localization.menuTitle("Synchronize PS links"),
-            prefs.getKey(KeyBinds.SYNCHRONIZE_PS));
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links"),
             Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
@@ -1320,8 +1314,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
         tools.addSeparator();
-        checkAndFix.add(autoSetPdf);
-        checkAndFix.add(autoSetPs);
         checkAndFix.add(integrityCheckAction);
         tools.add(checkAndFix);
 
@@ -1535,7 +1527,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                  * openInspire */
                 openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/togglePreview, dupliCheck, /*strictDupliCheck,*/highlightAll,
                 highlightAny, newEntryAction, plainTextImport, massSetField, manageKeywords,
-                closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
+                closeDatabaseAction, switchPreview, integrityCheckAction,
                 toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
                 abbreviateMedline, unabbreviate, exportAll, exportSelected,
                 importCurrent, saveAll, dbConnect, dbExport, focusTable));

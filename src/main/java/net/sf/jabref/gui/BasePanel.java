@@ -1352,8 +1352,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-        actions.put(Actions.AUTO_SET_PDF, new AutoSetExternalFileForEntries(this, "pdf"));
-        actions.put(Actions.AUTO_SET_PS, new AutoSetExternalFileForEntries(this, "ps"));
         actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
 
         actions.put(Actions.BACK, (BaseAction) BasePanel.this::back);
