@@ -1397,7 +1397,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(newEntryAction);
         tlb.addAction(editEntry);
-	    tlb.addAction(editStrings);
+        tlb.addAction(editStrings);
         tlb.addAction(makeKeyAction);
         tlb.addAction(Cleanup);
         tlb.addAction(mergeEntries);
