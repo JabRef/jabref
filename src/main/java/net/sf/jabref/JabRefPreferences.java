@@ -78,12 +78,10 @@ public class JabRefPreferences {
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
-    public static final String SHOW_SHORT = "showShort";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
     public static final String NAMES_NATBIB = "namesNatbib";
-    public static final String NAMES_LAST_FIRST = "namesLf";
     public static final String NAMES_FIRST_LAST = "namesFf";
     public static final String NAMES_AS_IS = "namesAsIs";
     public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
@@ -163,8 +161,6 @@ public class JabRefPreferences {
     public static final String AUTO_COMP_FIRST_LAST = "autoCompFF";
     public static final String AUTO_COMPLETE_FIELDS = "autoCompleteFields";
     public static final String AUTO_COMPLETE = "autoComplete";
-    public static final String SEARCH_PANE_POS_Y = "searchPanePosY";
-    public static final String SEARCH_PANE_POS_X = "searchPanePosX";
     public static final String HIGH_LIGHT_WORDS = "highLightWords";
     public static final String REG_EXP_SEARCH = "regExpSearch";
     public static final String SELECT_S = "selectS";
@@ -183,7 +179,6 @@ public class JabRefPreferences {
     public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
     public static final String GROUP_FLOAT_SELECTIONS = "groupFloatSelections";
-    public static final String GROUP_SELECTOR_VISIBLE = "groupSelectorVisible";
     public static final String EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
     public static final String GROUP_KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -196,7 +191,6 @@ public class JabRefPreferences {
     public static final String PDF_COLUMN = "pdfColumn";
     public static final String DISABLE_ON_MULTIPLE_SELECTION = "disableOnMultipleSelection";
     public static final String CTRL_CLICK = "ctrlClick";
-    public static final String ANTIALIAS = "antialias";
     public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
@@ -220,8 +214,6 @@ public class JabRefPreferences {
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
     public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
-    public static final String MENU_FONT_STYLE = "menuFontStyle";
-    public static final String MENU_FONT_FAMILY = "menuFontFamily";
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
@@ -229,7 +221,6 @@ public class JabRefPreferences {
     public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
-    public static final String PRESERVE_FIELD_FORMATTING = "preserveFieldFormatting";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String GROUPS_VISIBLE_ROWS = "groupsVisibleRows";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
@@ -480,13 +471,11 @@ public class JabRefPreferences {
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
-        defaults.put(NAMES_LAST_FIRST, Boolean.FALSE); // "Show 'Lastname, Firstname'"
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
         defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
-        defaults.put(SHOW_SHORT, Boolean.TRUE);
 
         // Sorting preferences
         defaults.put(TABLE_PRIMARY_SORT_FIELD, "author");
@@ -560,8 +549,6 @@ public class JabRefPreferences {
         defaults.put(SELECT_S, Boolean.FALSE);
         defaults.put(REG_EXP_SEARCH, Boolean.TRUE);
         defaults.put(HIGH_LIGHT_WORDS, Boolean.TRUE);
-        defaults.put(SEARCH_PANE_POS_X, 0);
-        defaults.put(SEARCH_PANE_POS_Y, 0);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -571,7 +558,6 @@ public class JabRefPreferences {
         defaults.put(AUTO_COMP_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(SHORTEST_TO_COMPLETE, 2);
         defaults.put(AUTOCOMPLETE_FIRSTNAME_MODE, JabRefPreferences.AUTOCOMPLETE_FIRSTNAME_MODE_BOTH);
-        defaults.put(GROUP_SELECTOR_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
@@ -594,7 +580,6 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_ENCODING, "UTF-8");
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
-        defaults.put(PRESERVE_FIELD_FORMATTING, Boolean.FALSE);
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
@@ -606,8 +591,6 @@ public class JabRefPreferences {
         defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_FAMILY, "Times");
-        defaults.put(MENU_FONT_STYLE, java.awt.Font.PLAIN);
         defaults.put(MENU_FONT_SIZE, 11);
         defaults.put(TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
@@ -634,7 +617,6 @@ public class JabRefPreferences {
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 
-        defaults.put(ANTIALIAS, Boolean.FALSE);
         defaults.put(CTRL_CLICK, Boolean.FALSE);
         defaults.put(DISABLE_ON_MULTIPLE_SELECTION, Boolean.FALSE);
         defaults.put(PDF_COLUMN, Boolean.FALSE);

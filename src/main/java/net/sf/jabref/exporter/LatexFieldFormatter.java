@@ -141,11 +141,6 @@ public class LatexFieldFormatter {
 
             stringBuilder = new StringBuilder(
                     valueDelimiterStartOfValue + "");
-            // No formatting at all for these fields, to allow custom formatting?
-            //            if (Globals.prefs.getBoolean("preserveFieldFormatting"))
-            //              sb.append(text);
-            //            else
-            //             currently, we do not do any more wrapping
             // these two are also hard coded in net.sf.jabref.importer.fileformat.FieldContentParser.multiLineFields
             // there, JabRefPreferences.NON_WRAPPABLE_FIELDS are also included
             boolean isAbstract = "abstract".equals(fieldName);

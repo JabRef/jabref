@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -49,23 +50,23 @@ public class ColorSetupPanel extends JPanel {
                         "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
 
-        buttons.add(new ColorButton("tableText", Localization.lang("Table text color")));
-        buttons.add(new ColorButton("markedEntryBackground0", Localization.lang("Marking color %0", "1")));
-        buttons.add(new ColorButton("tableBackground", Localization.lang("Table background color")));
-        buttons.add(new ColorButton("markedEntryBackground1", Localization.lang("Marking color %0", "2")));
-        buttons.add(new ColorButton("tableReqFieldBackground", Localization.lang("Background color for required fields")));
-        buttons.add(new ColorButton("markedEntryBackground2", Localization.lang("Marking color %0", "3")));
-        buttons.add(new ColorButton("tableOptFieldBackground", Localization.lang("Background color for optional fields")));
-        buttons.add(new ColorButton("markedEntryBackground3", Localization.lang("Marking color %0", "4")));
-        buttons.add(new ColorButton("incompleteEntryBackground", Localization.lang("Color for marking incomplete entries")));
-        buttons.add(new ColorButton("markedEntryBackground4", Localization.lang("Marking color %0", "5")));
-        buttons.add(new ColorButton("gridColor", Localization.lang("Table grid color")));
-        buttons.add(new ColorButton("markedEntryBackground5", Localization.lang("Import marking color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.TABLE_TEXT), Localization.lang("Table text color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.MARKED_ENTRY_BACKGROUND0), Localization.lang("Marking color %0", "1")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.TABLE_BACKGROUND), Localization.lang("Table background color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.MARKED_ENTRY_BACKGROUND1), Localization.lang("Marking color %0", "2")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Localization.lang("Background color for required fields")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.MARKED_ENTRY_BACKGROUND2), Localization.lang("Marking color %0", "3")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Localization.lang("Background color for optional fields")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.MARKED_ENTRY_BACKGROUND3), Localization.lang("Marking color %0", "4")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND), Localization.lang("Color for marking incomplete entries")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.MARKED_ENTRY_BACKGROUND4), Localization.lang("Marking color %0", "5")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.GRID_COLOR), Localization.lang("Table grid color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.MARKED_ENTRY_BACKGROUND5), Localization.lang("Import marking color")));
 
-        buttons.add(new ColorButton("fieldEditorTextColor", Localization.lang("Entry editor font color")));
-        buttons.add(new ColorButton("validFieldBackgroundColor", Localization.lang("Entry editor background color")));
-        buttons.add(new ColorButton("activeFieldEditorBackgroundColor", Localization.lang("Entry editor active background color")));
-        buttons.add(new ColorButton("invalidFieldBackgroundColor", Localization.lang("Entry editor invalid field color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR), Localization.lang("Entry editor font color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR), Localization.lang("Entry editor background color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR), Localization.lang("Entry editor active background color")));
+        buttons.add(new ColorButton(Globals.prefs.get(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR), Localization.lang("Entry editor invalid field color")));
 
         int rowcnt = 0;
         int col = 0;
