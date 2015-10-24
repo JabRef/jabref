@@ -341,10 +341,4 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
 
     }
-
-    public static void main(String[] args) {
-        Authors format = new Authors();
-        format.setArgument("lastfirstfirstfirst , initials,  Nocomma,Amp,Semicolon,30 ,EtAl = m.fl.");
-        System.out.println(format.format("Alfredsen, Jr, Jo Arve and Morten Omholt Alver and Yngvar von Olsen and Sebastian A. L. M. Kooijman"));
-    }
 }

@@ -42,11 +42,6 @@ public class FieldWeightDialog extends JDialog {
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
-
-    public static void main(String[] args) {
-        new FieldWeightDialog(null).setVisible(true);
-    }
-
     private FieldWeightDialog(JabRefFrame frame) {
         this.frame = frame;
         JPanel main = buildMainPanel();
