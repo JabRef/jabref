@@ -37,7 +37,7 @@ JabRef can be run as a command line application to convert from any import forma
 * Development mailing list: https://lists.sourceforge.net/lists/listinfo/jabref-devel
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
-* CI Servers: https://travis-ci.org/JabRef/jabref and https://circleci.com/gh/JabRef/jabref
+* CI Server: https://circleci.com/gh/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
 ### Bug Reports, Suggestions, Other Feedback
