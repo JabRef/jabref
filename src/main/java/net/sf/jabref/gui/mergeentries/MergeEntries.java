@@ -18,7 +18,6 @@ package net.sf.jabref.gui.mergeentries;
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.*;
@@ -68,7 +67,7 @@ public class MergeEntries {
     private JTextArea jta;
     private PreviewPanel pp;
     private Boolean doneBuilding = false;
-    private Set<String> joint;
+    private TreeSet<String> joint;
     private String[] jointStrings;
     private final JPanel mergePanel = new JPanel();
     private final JPanel mainPanel = new JPanel();
@@ -76,7 +75,7 @@ public class MergeEntries {
 
     /**
      * Constructor taking two entries
-     * 
+     *
      * @param bOne First entry
      * @param bTwo Second entry
      */
@@ -88,7 +87,7 @@ public class MergeEntries {
 
     /**
      * Constructor with optional column captions for the two entries
-     * 
+     *
      * @param bOne First entry
      * @param bTwo Second entry
      * @param headingOne Heading for first entry
@@ -108,11 +107,11 @@ public class MergeEntries {
      */
     private void initialize() {
 
-        joint = new TreeSet<String>(one.getAllFields());
+        joint = new TreeSet<>(one.getAllFields());
         joint.addAll(two.getAllFields());
 
         // Remove field starting with __
-        Set<String> toberemoved = new TreeSet<String>();
+        TreeSet<String> toberemoved = new TreeSet<>();
         for (String field : joint) {
             if (field.startsWith("__")) {
                 toberemoved.add(field);
@@ -147,9 +146,9 @@ public class MergeEntries {
         JLabel label = new JLabel(Localization.lang("Use"));
         Font font = label.getFont();
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-        
+
         mainPanel.add(label, cc.xyw(4, 1, 7, "center, bottom"));
-        
+
         // Set headings
         JLabel headingLabels[] = new JLabel[6];
         for (int i = 0; i < 6; i++) {
@@ -364,7 +363,7 @@ public class MergeEntries {
             public void run() {
                 scrollPane.getVerticalScrollBar().setValue(0);
             }
-         });
+        });
     }
 
     /**
