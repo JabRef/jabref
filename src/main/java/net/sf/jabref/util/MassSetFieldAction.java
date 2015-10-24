@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.util;
 
 import java.awt.BorderLayout;
@@ -87,18 +87,13 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         set = new JRadioButton(Localization.lang("Set fields"));
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
-        
-        Collection<BibtexEntry> be = frame.basePanel().database().getEntries();
-        allFields = new TreeSet<String>();
-        for (BibtexEntry e : be) {
-            allFields.addAll(e.getAllFields());
-        }
+
+        allFields = frame.basePanel().database().getAllVisibleFields();
+
         for (String f : allFields) {
-            if (!f.startsWith("__")) {
-                field.addItem(f);
-            }
+            field.addItem(f);
         }
-        
+
         set.addChangeListener(new ChangeListener() {
 
             @Override
@@ -250,7 +245,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             for (String field1 : fields) {
                 ce.addEdit(Util.massSetField(entryList, field1,
                         set.isSelected() ? toSet : null,
-                        overwrite.isSelected()));
+                                overwrite.isSelected()));
             }
         }
         ce.end();
