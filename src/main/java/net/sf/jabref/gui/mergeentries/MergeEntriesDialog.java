@@ -37,14 +37,11 @@ import com.jgoodies.forms.layout.ColumnSpec;
 
 /**
  * @author Oscar
- * 
+ *
  *         Dialog for merging two Bibtex entries
  */
 public class MergeEntriesDialog extends JDialog {
 
-    private static final long serialVersionUID = 5454378088546423798L;
-
-    // private String [] preferedOrder = {"author", "title", "journal", "booktitle", "volume", "number", "pages", "year", "month"};
     private final Dimension DIM = new Dimension(800, 800);
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -68,7 +65,7 @@ public class MergeEntriesDialog extends JDialog {
 
     /**
      * Sets up the dialog
-     * 
+     *
      * @param selected Selected BibtexEntries
      */
     private void init(BibtexEntry[] selected) {
@@ -149,8 +146,8 @@ public class MergeEntriesDialog extends JDialog {
 
     /**
      * Act on button pressed
-     * 
-     * @param button Butten pressed
+     *
+     * @param button Button pressed
      */
     private void buttonPressed(String button) {
         BibtexEntry mergedEntry = mergeEntries.getMergeEntry();

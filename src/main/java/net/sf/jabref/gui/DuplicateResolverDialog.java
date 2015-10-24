@@ -18,17 +18,13 @@ package net.sf.jabref.gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringWriter;
 
 import javax.swing.*;
 
-import net.sf.jabref.bibtex.BibtexEntryWriter;
 import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -44,6 +40,7 @@ public class DuplicateResolverDialog extends JDialog {
     public static final int KEEP_UPPER = 1;
     public static final int KEEP_LOWER = 2;
     public static final int AUTOREMOVE_EXACT = 3;
+    public static final int KEEP_MERGE = 4;
     public static final int BREAK = 5; // close
     public static final int IMPORT_AND_DELETE_OLD = 1;
     public static final int IMPORT_AND_KEEP_OLD = 0;
@@ -53,23 +50,13 @@ public class DuplicateResolverDialog extends JDialog {
     public static final int INSPECTION = 3;
     public static final int DUPLICATE_SEARCH_WITH_EXACT = 4;
 
-    private final Dimension DIM = new Dimension(650, 600);
-
-    private PreviewPanel p1;
-    private PreviewPanel p2;
-    private JTextArea ta1;
-    private JTextArea ta2;
-    private final JTabbedPane tabbed = new JTabbedPane();
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
     private JButton removeExact;
     private final JPanel options = new JPanel();
-    private final JPanel main = new JPanel();
-    private final JPanel source = new JPanel();
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private boolean block = true;
-
+    private MergeEntries me;
 
     public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
@@ -89,86 +76,42 @@ public class DuplicateResolverDialog extends JDialog {
         JButton first;
         switch (type) {
         case DUPLICATE_SEARCH:
-            first = new JButton(Localization.lang("Keep upper"));
-            second = new JButton(Localization.lang("Keep lower"));
+            first = new JButton(Localization.lang("Keep left"));
+            second = new JButton(Localization.lang("Keep right"));
             both = new JButton(Localization.lang("Keep both"));
+            me = new MergeEntries(one, two);
             break;
         case INSPECTION:
             first = new JButton(Localization.lang("Remove old entry"));
             second = new JButton(Localization.lang("Remove entry from import"));
             both = new JButton(Localization.lang("Keep both"));
+            me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                    Localization.lang("From import"));
             break;
         case DUPLICATE_SEARCH_WITH_EXACT:
-            first = new JButton(Localization.lang("Keep upper"));
-            second = new JButton(Localization.lang("Keep lower"));
+            first = new JButton(Localization.lang("Keep left"));
+            second = new JButton(Localization.lang("Keep right"));
             both = new JButton(Localization.lang("Keep both"));
             removeExact = new JButton(Localization.lang("Automatically remove exact duplicates"));
+            me = new MergeEntries(one, two);
             break;
         default:
             first = new JButton(Localization.lang("Import and remove old entry"));
             second = new JButton(Localization.lang("Do not import entry"));
             both = new JButton(Localization.lang("Import and keep old entry"));
+            me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                    Localization.lang("From import"));
         }
 
-        String layout = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
-        p1 = new PreviewPanel(null, one, null, new MetaData(), layout);
-        p2 = new PreviewPanel(null, two, null, new MetaData(), layout);
-        ta1 = new JTextArea();
-        ta2 = new JTextArea();
-        ta1.setEditable(false);
-        ta2.setEditable(false);
-
-        //ta1.setPreferredSize(dim);
-        //ta2.setPreferredSize(dim);
-
-        setSourceView(one, two);
-
-        //getContentPane().setLayout();
-        main.setLayout(gbl);
-        source.setLayout(gbl);
-        con.insets = new Insets(10, 10, 0, 10);
-        con.fill = GridBagConstraints.BOTH;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        con.weightx = 1;
-        con.weighty = 0;
-        TitleLabel lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
-                Localization.lang("Entry in current database"));
-        gbl.setConstraints(lab, con);
-        main.add(lab);
-        con.weighty = 1;
-        con.insets = new Insets(5, 10, 10, 10);
-        JScrollPane sp = new JScrollPane(p1);
-        gbl.setConstraints(sp, con);
-        main.add(sp);
-        con.weighty = 0;
-        con.insets = new Insets(10, 10, 0, 10);
-        lab = new TitleLabel(type == DuplicateResolverDialog.DUPLICATE_SEARCH ? "" :
-                Localization.lang("Entry in import"));
-        gbl.setConstraints(lab, con);
-        main.add(lab);
-        con.weighty = 1;
-        con.insets = new Insets(5, 10, 10, 10);
-        sp = new JScrollPane(ta1);
-        gbl.setConstraints(sp, con);
-        source.add(sp);
-        sp = new JScrollPane(p2);
-        gbl.setConstraints(sp, con);
-        main.add(sp);
-        sp = new JScrollPane(ta2);
-        gbl.setConstraints(sp, con);
-        source.add(sp);
-        tabbed.add(Localization.lang("Short form"), main);
-        tabbed.add(Localization.lang("Complete record"), source);
         if (removeExact != null) {
             options.add(removeExact);
         }
         options.add(first);
         options.add(second);
         options.add(both);
-        if (type != DuplicateResolverDialog.IMPORT_CHECK) {
-            options.add(Box.createHorizontalStrut(5));
-            options.add(cancel);
-        }
+        options.add(merge);
+        options.add(Box.createHorizontalStrut(5));
+        options.add(cancel);
 
         first.addActionListener(new ActionListener() {
 
@@ -176,6 +119,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_UPPER;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -186,6 +130,7 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_LOWER;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -196,6 +141,18 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.KEEP_BOTH;
                 block = false;
+                savePosition();
+                dispose();
+            }
+        });
+
+        merge.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                status = DuplicateResolverDialog.KEEP_MERGE;
+                block = false;
+                savePosition();
                 dispose();
             }
         });
@@ -207,6 +164,7 @@ public class DuplicateResolverDialog extends JDialog {
                 public void actionPerformed(ActionEvent e) {
                     status = DuplicateResolverDialog.AUTOREMOVE_EXACT;
                     block = false;
+                    savePosition();
                     dispose();
                 }
             });
@@ -218,53 +176,43 @@ public class DuplicateResolverDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 status = DuplicateResolverDialog.BREAK;
                 block = false;
+                savePosition();
                 dispose();
             }
         });
 
-        getContentPane().add(tabbed, BorderLayout.CENTER);
+
+        getContentPane().add(me.getMergeEntryPanel());
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        if (getHeight() > DIM.height) {
-            setSize(new Dimension(getWidth(), DIM.height));
-        }
-        if (getWidth() > DIM.width) {
-            setSize(new Dimension(DIM.width, getHeight()));
-        }
+        setLocation(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_POS_Y));
+        setSize(Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_X), Globals.prefs.getInt(JabRefPreferences.DUPLICATES_SIZE_Y));
 
         both.requestFocus();
 
     }
 
-    private void setSourceView(BibtexEntry one, BibtexEntry two) {
-        try {
-            StringWriter sw = new StringWriter();
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(one, sw);
-            ta1.setText(sw.getBuffer().toString());
-            sw = new StringWriter();
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(two, sw);
-            ta2.setText(sw.getBuffer().toString());
-        } catch (IOException ignored) {
-        }
-    }
 
-    public void setEntries(BibtexEntry newOne, BibtexEntry newTwo) {
-        setSourceView(newOne, newTwo);
-        p1.setEntry(newOne);
-        p2.setEntry(newTwo);
-        status = DuplicateResolverDialog.NOT_CHOSEN;
-        p1.revalidate();
-        p1.repaint();
-        block = true;
+    private void savePosition() {
+        Point p = getLocation();
+        Dimension d = getSize();
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_X, p.x);
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_POS_Y, p.y);
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_X, d.width);
+        Globals.prefs.putInt(JabRefPreferences.DUPLICATES_SIZE_Y, d.height);
     }
-
+    
     public boolean isBlocking() {
         return block;
     }
 
     public int getSelected() {
         return status;
+    }
+
+    public BibtexEntry getMergedEntry() {
+        return me.getMergeEntry();
     }
 
     public static int resolveDuplicate(JFrame frame, BibtexEntry one, BibtexEntry two) {

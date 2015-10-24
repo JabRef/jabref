@@ -143,6 +143,10 @@ public class JabRefPreferences {
     public static final String STRINGS_SIZE_X = "stringsSizeX";
     public static final String STRINGS_POS_Y = "stringsPosY";
     public static final String STRINGS_POS_X = "stringsPosX";
+    public static final String DUPLICATES_SIZE_Y = "duplicatesSizeY";
+    public static final String DUPLICATES_SIZE_X = "duplicatesSizeX";
+    public static final String DUPLICATES_POS_Y = "duplicatesPosY";
+    public static final String DUPLICATES_POS_X = "duplicatesPosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String BACKUP = "backup";
@@ -238,8 +242,6 @@ public class JabRefPreferences {
     public static final String UNMARK_ALL_ENTRIES_BEFORE_IMPORTING = "unmarkAllEntriesBeforeImporting";
     public static final String MARK_IMPORTED_ENTRIES = "markImportedEntries";
     public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
-    public static final String USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE = "useImportInspectionDialogForSingle";
-    public static final String USE_IMPORT_INSPECTION_DIALOG = "useImportInspectionDialog";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String PUT_BRACES_AROUND_CAPITALS = "putBracesAroundCapitals";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
@@ -535,6 +537,10 @@ public class JabRefPreferences {
         defaults.put(STRINGS_POS_Y, 0);
         defaults.put(STRINGS_SIZE_X, 600);
         defaults.put(STRINGS_SIZE_Y, 400);
+        defaults.put(DUPLICATES_POS_X, 0);
+        defaults.put(DUPLICATES_POS_Y, 0);
+        defaults.put(DUPLICATES_SIZE_X, 800);
+        defaults.put(DUPLICATES_SIZE_Y, 600);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(SHOW_SOURCE, Boolean.TRUE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
@@ -700,8 +706,6 @@ public class JabRefPreferences {
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
-        defaults.put(USE_IMPORT_INSPECTION_DIALOG, Boolean.TRUE);
-        defaults.put(USE_IMPORT_INSPECTION_DIALOG_FOR_SINGLE, Boolean.TRUE);
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
         defaults.put(MARK_IMPORTED_ENTRIES, Boolean.TRUE);
         defaults.put(UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, Boolean.TRUE);

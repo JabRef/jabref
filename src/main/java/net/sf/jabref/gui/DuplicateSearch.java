@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.bibtex.DuplicateCheck;
@@ -67,6 +68,7 @@ public class DuplicateSearch implements Runnable {
         int current = 0;
 
         final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
+        final ArrayList<BibtexEntry> toAdd = new ArrayList<BibtexEntry>();
         while (!st.finished() || current < duplicates.size())
         {
 
@@ -120,6 +122,10 @@ public class DuplicateSearch implements Runnable {
                         st.setFinished(); // thread killing
                         current = Integer.MAX_VALUE;
                         duplicateCounter--; // correct counter
+                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                        toRemove.add(be[0]);
+                        toRemove.add(be[1]);
+                        toAdd.add(cb.getMergedEntry());
                     }
                 }
             }
@@ -138,6 +144,15 @@ public class DuplicateSearch implements Runnable {
                     }
                     panel.markBaseChanged();
                 }
+                // and adding merged entries:
+                if (!toAdd.isEmpty()) {
+                    for (BibtexEntry entry : toAdd) {
+                        panel.database.insertEntry(entry);
+                        ce.addEdit(new UndoableInsertEntry(panel.database, entry, panel));
+                    }
+                    panel.markBaseChanged();
+                }
+
                 panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
                         + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
 
@@ -197,6 +212,7 @@ public class DuplicateSearch implements Runnable {
         private final BibtexEntry one;
         private final BibtexEntry two;
         private final int dialogType;
+        private BibtexEntry merged;
 
 
         public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,
@@ -212,12 +228,17 @@ public class DuplicateSearch implements Runnable {
             return reply;
         }
 
+        public BibtexEntry getMergedEntry() {
+            return merged;
+        }
+
         @Override
         public void update() {
             diag = new DuplicateResolverDialog(frame, one, two, dialogType);
             diag.setVisible(true);
             diag.dispose();
             reply = diag.getSelected();
+            merged = diag.getMergedEntry();
         }
     }
 
