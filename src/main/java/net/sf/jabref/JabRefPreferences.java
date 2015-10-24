@@ -1044,12 +1044,19 @@ public class JabRefPreferences {
      * @return The RGB values corresponding to this color setting.
      */
     private int[] getRgb(String value) {
-        String[] elements = value.split(":");
         int[] values = new int[3];
-        values[0] = Integer.parseInt(elements[0]);
-        values[1] = Integer.parseInt(elements[1]);
-        values[2] = Integer.parseInt(elements[2]);
-        return values;
+        
+        if (value != null && !value.isEmpty()) {
+            String[] elements = value.split(":");
+            values[0] = Integer.parseInt(elements[0]);
+            values[1] = Integer.parseInt(elements[1]);
+            values[2] = Integer.parseInt(elements[2]);
+        } else {
+            values[0] = 0;
+            values[1] = 0;
+            values[2] = 0;
+        }
+        return values; 
     }
 
     /**

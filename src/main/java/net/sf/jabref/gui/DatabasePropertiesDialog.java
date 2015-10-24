@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,8 +34,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -46,7 +44,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
@@ -123,68 +121,55 @@ public class DatabasePropertiesDialog extends JDialog {
 
         setupSortOrderConfiguration();
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref", ""));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        builder.append(Localization.lang("Database encoding"));
-        builder.append(encoding);
-        builder.nextLine();
+        builder.add(Localization.lang("Database encoding")).xy(1, 1);
+        builder.add(encoding).xy(3, 1);
 
-        builder.appendSeparator(Localization.lang("Override default file directories"));
-        builder.nextLine();
-        builder.append(Localization.lang("General file directory"));
-        builder.append(fileDir);
-        builder.append(browseFile);
-        builder.nextLine();
-        builder.append(Localization.lang("User-specific file directory"));
-        builder.append(fileDirIndv);
-        builder.append(browseFileIndv);
-        builder.nextLine();
-        builder.append(Localization.lang("PDF directory"));
-        builder.append(pdfDir);
-        builder.append(browsePdf);
-        builder.nextLine();
-        builder.append(Localization.lang("PS directory"));
-        builder.append(psDir);
-        builder.append(browsePs);
-        builder.nextLine();
-
-        builder.appendSeparator(Localization.lang("Save sort order"));
-        builder.append(saveAsConfiguredGlobally, 1);
-        builder.nextLine();
-        builder.append(saveInOriginalOrder, 1);
-        builder.nextLine();
-        builder.append(saveInSpecifiedOrder, 1);
-        builder.nextLine();
-
+        builder.addSeparator(Localization.lang("Override default file directories")).xyw(1, 3, 5);
+        builder.add(Localization.lang("General file directory")).xy(1, 5);
+        builder.add(fileDir).xy(3, 5);
+        builder.add(browseFile).xy(5, 5);
+        builder.add(Localization.lang("User-specific file directory")).xy(1, 7);
+        builder.add(fileDirIndv).xy(3, 7);
+        builder.add(browseFileIndv).xy(5, 7);
+        builder.add(Localization.lang("PDF directory")).xy(1, 9);
+        builder.add(pdfDir).xy(3, 9);
+        builder.add(browsePdf).xy(5, 9);
+        builder.add(Localization.lang("PS directory")).xy(1, 11);
+        builder.add(psDir).xy(3, 11);
+        builder.add(browsePs).xy(5, 11);
+        
+        builder.addSeparator(Localization.lang("Save sort order")).xyw(1, 13, 5);
+        builder.add(saveAsConfiguredGlobally).xyw(1, 15, 5);
+        builder.add(saveInOriginalOrder).xyw(1, 17, 5);
+        builder.add(saveInSpecifiedOrder).xyw(1, 19, 5);
+        
         // Create a new panel with its own FormLayout for these items:
-        FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        JLabel lab = new JLabel(Localization.lang("Primary sort criterion"));
-        builder2.append(lab);
-        builder2.append(savePriSort);
-        builder2.append(savePriField);
-        builder2.append(savePriDesc);
-        builder2.nextLine();
-        lab = new JLabel(Localization.lang("Secondary sort criterion"));
-        builder2.append(lab);
-        builder2.append(saveSecSort);
-        builder2.append(saveSecField);
-        builder2.append(saveSecDesc);
-        builder2.nextLine();
-        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
-        builder2.append(lab);
-        builder2.append(saveTerSort);
-        builder2.append(saveTerField);
-        builder2.append(saveTerDesc);
+        FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
+                "pref, 2dlu, pref, 2dlu, pref");
+        FormBuilder builder2 = FormBuilder.create().layout(layout2);
+        builder2.add(Localization.lang("Primary sort criterion")).xy(1, 1);
+        builder2.add(savePriSort).xy(3, 1);
+        builder2.add(savePriField).xy(5, 1);
+        builder2.add(savePriDesc).xy(7, 1);
 
-        JPanel saveSpecPanel = builder2.getPanel();
-        builder.append(saveSpecPanel);
-        builder.nextLine();
+        builder2.add(Localization.lang("Secondary sort criterion")).xy(1, 3);
+        builder2.add(saveSecSort).xy(3, 3);
+        builder2.add(saveSecField).xy(5, 3);
+        builder2.add(saveSecDesc).xy(7, 3);
 
-        builder.appendSeparator(Localization.lang("Database protection"));
-        builder.nextLine();
-        builder.append(protect, 3);
+        builder2.add(Localization.lang("Tertiary sort criterion")).xy(1, 5);
+        builder2.add(saveTerSort).xy(3, 5);
+        builder2.add(saveTerField).xy(5, 5);
+        builder2.add(saveTerDesc).xy(7, 5);
+
+        builder.add(builder2.getPanel()).xyw(1, 21, 5);
+
+        builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
+        builder.add(protect).xyw(1, 25, 5);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);

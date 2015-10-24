@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -126,8 +126,6 @@ import javax.swing.event.ListSelectionListener;
 
 class FontSelector extends JButton {
 
-    private static final long serialVersionUID = 7745223550102664896L;
-
     private static final String PLAIN = "plain";
     private static final String BOLD = "bold";
     private static final String BOLD_ITALIC = "bold-italic";
@@ -200,8 +198,6 @@ class FontSelector extends JButton {
 
 public class FontSelectorDialog extends JDialog {
 
-    private static final long serialVersionUID = -8670346696048738055L;
-
     private static final String PLAIN = "plain";
     private static final String BOLD = "bold";
     private static final String BOLD_ITALIC = "bold-italic";
@@ -245,7 +241,7 @@ public class FontSelectorDialog extends JDialog {
         sizeList.setSelectedValue(String.valueOf(font.getSize()), true);
         sizeField.setText(String.valueOf(font.getSize()));
         styleList.setSelectedIndex(font.getStyle());
-        styleField.setText((String) styleList.getSelectedValue());
+        styleField.setText(styleList.getSelectedValue());
 
         ListHandler listHandler = new ListHandler();
         familyList.addListSelectionListener(listHandler);
@@ -386,7 +382,7 @@ public class FontSelectorDialog extends JDialog {
         }
     }
 
-    private JPanel createTextFieldAndListPanel(String label, JTextField textField, JList list) {
+    private JPanel createTextFieldAndListPanel(String label, JTextField textField, JList<String> list) {
         GridBagLayout layout = new GridBagLayout();
         JPanel panel = new JPanel(layout);
 
@@ -456,19 +452,19 @@ public class FontSelectorDialog extends JDialog {
         {
             Object source = evt.getSource();
             if (source == familyList) {
-                String family = (String) familyList.getSelectedValue();
+                String family = familyList.getSelectedValue();
                 if (family != null) {
                     familyField.setText(family);
                 }
             }
             else if (source == sizeList) {
-                String size = (String) sizeList.getSelectedValue();
+                String size = sizeList.getSelectedValue();
                 if (size != null) {
                     sizeField.setText(size);
                 }
             }
             else if (source == styleList) {
-                String style = (String) styleList.getSelectedValue();
+                String style = styleList.getSelectedValue();
                 if (style != null) {
                     styleField.setText(style);
                 }

@@ -410,7 +410,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private void insertTextForTag() {
-        String type = (String) fieldList.getSelectedValue();
+        String type = fieldList.getSelectedValue();
         if (type != null) {
             String txt = textPane.getSelectedText();
 
@@ -581,9 +581,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        eKit.read(new FileInputStream(newFile), doc, 0);
-                        doc.setLogicalStyle(0, doc.getStyle("regular"));
-                    }
+                        try(FileInputStream fis = new FileInputStream(newFile)) {
+                            eKit.read(fis, doc, 0);
+                            doc.setLogicalStyle(0, doc.getStyle("regular"));
+                        }
+                    }   
                 }
             } catch (Exception ignored) {}
         }
@@ -623,11 +625,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
                 if (!isAdjusting) {
                     if (lastIndex > -1) {
-                        String tag1 = (String) fieldList.getModel().getElementAt(lastIndex);
+                        String tag1 = fieldList.getModel().getElementAt(lastIndex);
                         marked.setStyleForTag(tag1, "used", doc);
                     }
 
-                    String tag2 = (String) fieldList.getModel().getElementAt(index);
+                    String tag2 = fieldList.getModel().getElementAt(index);
                     marked.setStyleForTag(tag2, "marked", doc);
 
                     lastIndex = index;
