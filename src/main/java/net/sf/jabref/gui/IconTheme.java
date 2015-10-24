@@ -24,15 +24,6 @@ public class IconTheme {
     private static final String DEFAULT_ICON_PATH = "/images/crystal_16/red.png";
 
     /**
-     * Get a Map of all application icons mapped from their keys.
-     *
-     * @return A Map containing all icons used in the application.
-     */
-    public static Map<String, String> getAllIcons() {
-        return Collections.unmodifiableMap(KEY_TO_ICON);
-    }
-
-    /**
      * Constructs an ImageIcon for the image representing the given function, in the resource
      * file listing images.
      *

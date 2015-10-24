@@ -137,24 +137,6 @@ public class ExternalFileTypeEntryEditor {
             }
         });
 
-        icon.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String initSel = ExternalFileTypeEntryEditor.this.entry.getIconName();
-                if (selectedIcon != null) {
-                    initSel = selectedIcon;
-                }
-                IconSelection ic = new IconSelection(diag, initSel);
-                ic.setVisible(true);
-                if (ic.isOkPressed()) {
-                    selectedIcon = ic.getSelectedIconKey();
-                    icon.setIcon(IconTheme.getImage(selectedIcon));
-                }
-                //JOptionPane.showMessageDialog(null, "Sorry, the icon can unfortunately not be changed in this version of JabRef");
-            }
-        });
-
         if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
