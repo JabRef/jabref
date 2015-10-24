@@ -1,14 +1,23 @@
-This document lists the libraries used by JabRef.
+This document lists the fonts and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
-Legend
-------
+# Legend
+
 License:
  * GPLv2+ means "GPLv2 or later"
  * GPLv2! means "exactly version 2.0 of GPL"
  * GPLv2  means, we haven't checked whether later options are allowed
  * similar for LGPL and other version of GPL
 
+# Fonts
+
+Name:    Material Design Icons
+Version: v1.2.64
+URLs:    https://materialdesignicons.com/ and https://github.com/Templarian/MaterialDesign-Webfont/tree/master/fonts
+License: SIL Open Font License, Version 1.1
+Note:    Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
+
+# Libraries
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
