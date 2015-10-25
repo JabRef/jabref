@@ -687,40 +687,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // General info dialog.  The MacAdapter calls this method when "About"
     // is selected from the application menu.
     public void about() {
-        JDialog about = new JDialog(JabRefFrame.this, Localization.lang("About JabRef"),
-                true);
-        JEditorPane jp = new JEditorPane();
-        JScrollPane sp = new JScrollPane
-                (jp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jp.setEditable(false);
-        try {
-            jp.setPage(GUIGlobals.class.getResource("/help/About.html"));//GUIGlobals.aboutPage);
-            // We need a hyperlink listener to be able to switch to the license
-            // terms and back.
-            jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-
-                @Override
-                public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {
-                    if (e.getEventType()
-                            == javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) {
-                        try {
-                            ((JEditorPane) e.getSource()).setPage(e.getURL());
-                        } catch (IOException ignored) {
-                        }
-                    }
-                }
-            });
-            about.getContentPane().add(sp);
-            about.setSize(GUIGlobals.aboutSize);
-            Util.placeDialog(about, JabRefFrame.this);
-            about.setVisible(true);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(JabRefFrame.this, "Could not load file 'About.html'",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
+        // reuse the normal about action
+        // null as parameter is OK as the code of actionPerformed does not rely on the data sent in the event.
+        about.actionPerformed(null);
     }
 
     // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
