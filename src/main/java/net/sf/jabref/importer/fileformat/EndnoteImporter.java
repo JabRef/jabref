@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -82,7 +82,7 @@ public class EndnoteImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String ENDOFRECORD = "__EOREOR__";
@@ -106,7 +106,7 @@ public class EndnoteImporter extends ImportFormat {
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
         String author;
         String Type;
         String editor;
@@ -128,17 +128,17 @@ public class EndnoteImporter extends ImportFormat {
                 }
 
                 /*
-                   * Details of Refer format for Journal Article and Book:
-                   *
-                   * Generic Ref Journal Article Book Code Author %A Author Author Year %D
-                   * Year Year Title %T Title Title Secondary Author %E Series Editor
-                   * Secondary Title %B Journal Series Title Place Published %C City
-                   * Publisher %I Publisher Volume %V Volume Volume Number of Volumes %6
-                   * Number of Volumes Number %N Issue Pages %P Pages Number of Pages
-                   * Edition %7 Edition Subsidiary Author %? Translator Alternate Title %J
-                   * Alternate Journal Label %F Label Label Keywords %K Keywords Keywords
-                   * Abstract %X Abstract Abstract Notes %O Notes Notes
-                   */
+                 * Details of Refer format for Journal Article and Book:
+                 *
+                 * Generic Ref Journal Article Book Code Author %A Author Author Year %D
+                 * Year Year Title %T Title Title Secondary Author %E Series Editor
+                 * Secondary Title %B Journal Series Title Place Published %C City
+                 * Publisher %I Publisher Volume %V Volume Volume Number of Volumes %6
+                 * Number of Volumes Number %N Issue Pages %P Pages Number of Pages
+                 * Edition %7 Edition Subsidiary Author %? Translator Alternate Title %J
+                 * Alternate Journal Label %F Label Label Keywords %K Keywords Keywords
+                 * Abstract %X Abstract Abstract Notes %O Notes Notes
+                 */
 
                 String prefix = field.substring(0, 1);
 
@@ -269,7 +269,7 @@ public class EndnoteImporter extends ImportFormat {
                 hm.put("editor", fixAuthor(editor));
             }
             //if pages missing and article number given, use the article number
-            if ((hm.get("pages") == null || hm.get("pages").equals("-")) && !artnum.equals("")) {
+            if (((hm.get("pages") == null) || hm.get("pages").equals("-")) && !artnum.equals("")) {
                 hm.put("pages", artnum);
             }
 
@@ -296,14 +296,14 @@ public class EndnoteImporter extends ImportFormat {
      * @param s The author string
      * @return The fixed author string
      */
-    private String fixAuthor(String s) {
+    private static String fixAuthor(String s) {
         int index = s.indexOf(" and ");
         if (index >= 0) {
             return AuthorList.fixAuthor_lastNameFirst(s);
         }
         // Look for the comma at the end:
         index = s.lastIndexOf(",");
-        if (index == s.length() - 1) {
+        if (index == (s.length() - 1)) {
             String mod = s.substring(0, s.length() - 1).replaceAll(", ", " and ");
             return AuthorList.fixAuthor_lastNameFirst(mod);
         } else {

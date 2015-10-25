@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 /*
@@ -266,8 +266,8 @@ public class FontSelectorDialog extends JDialog {
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint
-                        (RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON);
+                (RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
                 super.paint(g2);
             }
 
@@ -354,13 +354,13 @@ public class FontSelectorDialog extends JDialog {
 
     // [pending] from GeneralCustomizer :
     // GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()
-    private String[] getFontList() {
+    private static String[] getFontList() {
         try {
             Class<?> GEClass = Class.forName("java.awt.GraphicsEnvironment");
             Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
 
             String[] nameArray = (String[]) GEClass.getMethod("getAvailableFontFamilyNames").invoke(GEInstance);
-            Vector<String> nameVector = new Vector<String>(nameArray.length);
+            Vector<String> nameVector = new Vector<>(nameArray.length);
 
             for (int i = 0, j; i < nameArray.length; i++) {
                 for (j = 0; j < FontSelectorDialog.HIDEFONTS.length; j++) {
@@ -382,7 +382,7 @@ public class FontSelectorDialog extends JDialog {
         }
     }
 
-    private JPanel createTextFieldAndListPanel(String label, JTextField textField, JList<String> list) {
+    private static JPanel createTextFieldAndListPanel(String label, JTextField textField, JList<String> list) {
         GridBagLayout layout = new GridBagLayout();
         JPanel panel = new JPanel(layout);
 
@@ -477,5 +477,5 @@ public class FontSelectorDialog extends JDialog {
             Font font = new FontSelectorDialog(null,new Font("Times",Font.PLAIN,12)).getSelectedFont();
 
         }
-    */
+     */
 }

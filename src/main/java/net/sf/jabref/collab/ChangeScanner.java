@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.collab;
 
 import java.io.File;
@@ -170,7 +170,7 @@ public class ChangeScanner implements Runnable {
 
     private void scanMetaData(MetaData inMem, MetaData inTemp, MetaData onDisk) {
         MetaDataChange mdc = new MetaDataChange(inMem, inTemp);
-        ArrayList<String> handledOnDisk = new ArrayList<String>();
+        ArrayList<String> handledOnDisk = new ArrayList<>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
         for (String key : inTemp) {
@@ -211,8 +211,8 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        HashSet<String> used = new HashSet<String>(disk.getEntryCount());
-        HashSet<Integer> notMatched = new HashSet<Integer>(tmp.getEntryCount());
+        HashSet<String> used = new HashSet<>(disk.getEntryCount());
+        HashSet<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -223,7 +223,7 @@ public class ChangeScanner implements Runnable {
             double comp = -1;
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
-            if (!used.contains("" + piv2) && piv2 < disk.getEntryCount()) {
+            if (!used.contains("" + piv2) && (piv2 < disk.getEntryCount())) {
                 comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
             }
             if (comp > 1) {
@@ -233,7 +233,7 @@ public class ChangeScanner implements Runnable {
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < disk.getEntryCount() - 1) {
+            if (piv2 < (disk.getEntryCount() - 1)) {
                 for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
                     if (!used.contains("" + i)) {
                         comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
@@ -266,7 +266,7 @@ public class ChangeScanner implements Runnable {
                 double bestMatch = 0;
                 double comp;
 
-                if (piv2 < disk.getEntryCount() - 1) {
+                if (piv2 < (disk.getEntryCount() - 1)) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
                         if (!used.contains("" + i)) {
                             comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1),
@@ -317,7 +317,7 @@ public class ChangeScanner implements Runnable {
         }
 
         // Finally, look if there are still untouched entries in the disk database. These
-        // mayhave been added.
+        // may have been added.
         if (used.size() < disk.getEntryCount()) {
             for (int i = 0; i < disk.getEntryCount(); i++) {
                 if (!used.contains("" + i)) {
@@ -353,7 +353,7 @@ public class ChangeScanner implements Runnable {
      * @param index int
      * @return BibtexEntry
      */
-    private BibtexEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
+    private static BibtexEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
         double comp = -1;
         int found = 0;
         for (int i = 0; i < neu.getEntryCount(); i++) {
@@ -375,11 +375,11 @@ public class ChangeScanner implements Runnable {
         String tmp = onTmp.getPreamble();
         String disk = onDisk.getPreamble();
         if (tmp != null) {
-            if (disk == null || !tmp.equals(disk)) {
+            if ((disk == null) || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(tmp, mem, disk));
             }
         }
-        else if (disk != null && !disk.isEmpty()) {
+        else if ((disk != null) && !disk.isEmpty()) {
             changes.add(new PreambleChange(tmp, mem, disk));
         }
     }
@@ -387,13 +387,13 @@ public class ChangeScanner implements Runnable {
     private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
         int nTmp = onTmp.getStringCount();
         int nDisk = onDisk.getStringCount();
-        if (nTmp == 0 && nDisk == 0) {
+        if ((nTmp == 0) && (nDisk == 0)) {
             return;
         }
 
-        HashSet<Object> used = new HashSet<Object>();
-        HashSet<Object> usedInMem = new HashSet<Object>();
-        HashSet<String> notMatched = new HashSet<String>(onTmp.getStringCount());
+        HashSet<Object> used = new HashSet<>();
+        HashSet<Object> usedInMem = new HashSet<>();
+        HashSet<String> notMatched = new HashSet<>(onTmp.getStringCount());
 
         // First try to match by string names.
         //int piv2 = -1;
@@ -406,7 +406,7 @@ public class ChangeScanner implements Runnable {
                     BibtexString disk = onDisk.getString(diskId);
                     if (disk.getName().equals(tmp.getName())) {
                         // We have found a string with a matching name.
-                        if (tmp.getContent() != null && !tmp.getContent().equals(disk.getContent())) {
+                        if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
                             BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                             if (mem != null) {
@@ -493,7 +493,7 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
+    private static BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
         if (!base.hasStringLabel(name)) {
             return null;
         }
@@ -508,17 +508,16 @@ public class ChangeScanner implements Runnable {
     }
 
     /**
-     * This method only detects wheter a change took place or not. It does not
-     * determine the type of change. This would be possible, but difficult to do
-     * properly, so I rather only report the change.
+     * This method only detects whether a change took place or not. It does not determine the type of change. This would
+     * be possible, but difficult to do properly, so I rather only report the change.
      */
     private void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
-        if (groupsTmp == null && groupsDisk == null) {
+        if ((groupsTmp == null) && (groupsDisk == null)) {
             return;
         }
-        if (groupsTmp != null && groupsDisk == null || groupsTmp == null) {
+        if (((groupsTmp != null) && (groupsDisk == null)) || (groupsTmp == null)) {
             changes.add(new GroupChange(groupsDisk, groupsTmp));
             return;
         }

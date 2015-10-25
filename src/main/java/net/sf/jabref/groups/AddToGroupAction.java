@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
@@ -64,7 +64,7 @@ public class AddToGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         final BibtexEntry[] entries = m_panel.getSelectedEntries();
-        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<GroupTreeNode>(); // used only when moving
+        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
 
         if (m_move) {
             // collect warnings for removal
@@ -81,7 +81,7 @@ public class AddToGroupAction extends AbstractAction {
                     }
                 }
             }
-            // warning for all groups from which the entries are removed, and 
+            // warning for all groups from which the entries are removed, and
             // for the one to which they are added! hence the magical +1
             AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size() + 1];
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
@@ -90,14 +90,14 @@ public class AddToGroupAction extends AbstractAction {
             groups[groups.length - 1] = m_node.getGroup();
             if (!Util.warnAssignmentSideEffects(groups,
                     entries, m_panel.getDatabase(), m_panel.frame()))
-             {
+            {
                 return; // user aborted operation
             }
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
             if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {m_node.getGroup()},
                     entries, m_panel.getDatabase(), m_panel.frame()))
-             {
+            {
                 return; // user aborted operation
             }
         }
@@ -125,7 +125,7 @@ public class AddToGroupAction extends AbstractAction {
         } else {
             AbstractUndoableEdit undoAdd = m_node.addToGroup(entries);
             if (undoAdd == null)
-             {
+            {
                 return; // no changed made
             }
             undoAll.addEdit(undoAdd);

@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.groups;
 
 import java.awt.BorderLayout;
@@ -52,7 +52,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     JLabel nf = new JLabel(Localization.lang("Field to group by") + ":");
     JLabel nr = new JLabel(Localization.lang("Characters to ignore") + ":");
     private final JRadioButton
-            keywords = new JRadioButton(Localization.lang("Generate groups from keywords in a BibTeX field"));
+    keywords = new JRadioButton(Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
@@ -102,7 +102,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         hs = Util
                                 .findDeliminatedWordsInField(panel.getDatabase(),
                                         field().toLowerCase().trim(), deliminator
-                                                .getText());
+                                        .getText());
                     } else {
                         hs = Util.findAllWordsInField(panel.getDatabase(),
                                 field().toLowerCase().trim(), remove());
@@ -110,13 +110,13 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     }
                 }
                 else if (authors.isSelected()) {
-                    List<String> fields = new ArrayList<String>(2);
+                    List<String> fields = new ArrayList<>(2);
                     fields.add("author");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
                     field = "author";
                 }
                 else if (editors.isSelected()) {
-                    List<String> fields = new ArrayList<String>(2);
+                    List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
                     hs = Util.findAuthorLastNames(panel.getDatabase(), fields);
                     field = "editor";
@@ -168,7 +168,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         bg.add(authors);
         bg.add(editors);
         keywords.setSelected(true);
-        
+
         FormBuilder b = FormBuilder.create();
         b.layout(new FormLayout
                 ("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
@@ -238,7 +238,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(cancel, con);
         opt.add(cancel);*/
-        
+
         main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         opt.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         getContentPane().add(main, BorderLayout.CENTER);

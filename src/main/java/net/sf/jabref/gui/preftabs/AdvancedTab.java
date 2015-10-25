@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -33,12 +33,9 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpDialog;
 import net.sf.jabref.logic.journals.Abbreviations;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
@@ -67,7 +64,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
     private final JabRef jabRef;
-    private RemotePreferences remotePreferences;
+    private final RemotePreferences remotePreferences;
 
 
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag, JabRef jabRef) {
@@ -89,13 +86,14 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 "com.jgoodies.looks.windows.WindowsLookAndFeel"
         };
         // Only list L&F which are available
-        List<String> lookAndFeels = new ArrayList<String>();
+        List<String> lookAndFeels = new ArrayList<>();
         for (String lf : possibleLookAndFeels) {
             try {
                 // Try to find L&F, throws exception if not successful
                 Class.forName(lf);
                 lookAndFeels.add(lf);
             } catch (ClassNotFoundException ignored) {
+                // Ignored
             }
         }
         className = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
@@ -114,7 +112,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                "");
+                        "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
@@ -237,12 +235,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         preferences.putBoolean(JabRefPreferences.BIBLATEX_MODE, biblatexMode.isSelected());
 
-        if (useDefault.isSelected() == oldUseDef ||
+        if ((useDefault.isSelected() == oldUseDef) ||
                 !oldLnf.equals(className.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have changed the look and feel setting.")
-                            .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    .concat(" ")
+                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                     Localization.lang("Changed look and feel settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -250,8 +248,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
         if (biblatexMode.isSelected() != oldBiblMode) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have toggled the BibLaTeX mode.")
-                            .concat(" ")
-                            .concat("You must restart JabRef for this change to come into effect."),
+                    .concat(" ")
+                    .concat("You must restart JabRef for this change to come into effect."),
                     Localization.lang("BibLaTeX mode"), JOptionPane.WARNING_MESSAGE);
         }
 
@@ -269,8 +267,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 if(remotePreferences.useRemoteServer()) {
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Remote server port")
-                                    .concat(" ")
-                                    .concat("You must restart JabRef for this change to come into effect."),
+                            .concat(" ")
+                            .concat("You must restart JabRef for this change to come into effect."),
                             Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -304,9 +302,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
-                    (null, Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
-                            Localization.lang("Remote server port") + '\'', Localization.lang("Remote server port"),
-                            JOptionPane.ERROR_MESSAGE);
+            (null, Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for") + " '" +
+                    Localization.lang("Remote server port") + '\'', Localization.lang("Remote server port"),
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         }
 

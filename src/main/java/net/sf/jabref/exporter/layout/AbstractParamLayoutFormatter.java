@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.exporter.layout;
 
 import java.util.ArrayList;
@@ -34,11 +34,11 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
      * @return An array of strings representing the parts of the argument.
      */
     protected static String[] parseArgument(String arg) {
-        List<String> parts = new ArrayList<String>();
+        List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         for (int i = 0; i < arg.length(); i++) {
-            if (arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR && !escaped) {
+            if ((arg.charAt(i) == AbstractParamLayoutFormatter.SEPARATOR) && !escaped) {
                 parts.add(current.toString());
                 current = new StringBuilder();
             } else if (arg.charAt(i) == '\\') {
@@ -55,7 +55,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
                 } else if (arg.charAt(i) == 't') {
                     current.append('\t');
                 } else {
-                    if (arg.charAt(i) != ',' && arg.charAt(i) != '"') {
+                    if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"')) {
                         current.append('\\');
                     }
                     current.append(arg.charAt(i));

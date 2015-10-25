@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 ///////////////////////////////////////////////////////////////////////////////
 //  Filename: $RCSfile$
 //  Purpose:  Atom representation.
@@ -99,26 +99,26 @@ public class CreateDocBookAuthors implements LayoutFormatter
         for (int i = 0; i < al.size(); i++) {
             sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);
-            if (a.getFirst() != null && !a.getFirst().isEmpty()) {
+            if ((a.getFirst() != null) && !a.getFirst().isEmpty()) {
                 sb.append("<firstname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getFirst()));
                 sb.append("</firstname>");
             }
-            if (a.getVon() != null && !a.getVon().isEmpty()) {
+            if ((a.getVon() != null) && !a.getVon().isEmpty()) {
                 sb.append("<othername>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getVon()));
                 sb.append("</othername>");
             }
-            if (a.getLast() != null && !a.getLast().isEmpty()) {
+            if ((a.getLast() != null) && !a.getLast().isEmpty()) {
                 sb.append("<surname>");
                 sb.append(CreateDocBookAuthors.xc.format(a.getLast()));
-                if (a.getJr() != null && !a.getJr().isEmpty()) {
+                if ((a.getJr() != null) && !a.getJr().isEmpty()) {
                     sb.append(' ').append(CreateDocBookAuthors.xc.format(a.getJr()));
                 }
                 sb.append("</surname>");
             }
 
-            if (i < al.size() - 1) {
+            if (i < (al.size() - 1)) {
                 sb.append("</").append(tagName).append(">\n       ");
             } else {
                 sb.append("</").append(tagName).append('>');
@@ -133,7 +133,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
     protected void singleAuthor(StringBuffer sb, String author)
     {
         // TODO: replace special characters
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
 
         String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 
@@ -161,11 +161,11 @@ public class CreateDocBookAuthors implements LayoutFormatter
             sb.append("</firstname>");
             sb.append("<othername role=\"mi\">");
 
-            for (int i = 1; i < v.size() - 1; i++)
+            for (int i = 1; i < (v.size() - 1); i++)
             {
                 sb.append(v.get(i));
 
-                if (i < v.size() - 2)
+                if (i < (v.size() - 2))
                 {
                     sb.append(' ');
                 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
@@ -103,13 +103,13 @@ public class CiteSeerXFetcher implements EntryFetcher {
      */
     private List<String> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<String>();
+        ArrayList<String> ids = new ArrayList<>();
         try {
             urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER, URLEncoder.encode(query, "UTF-8"));
             int count = 1;
             String nextPage;
-            while ((nextPage = getCitationsFromUrl(urlQuery, ids)) != null
-                    && count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD) {
+            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
+                    && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
                 urlQuery = nextPage;
                 count++;
                 if (stopFetching) {
@@ -122,7 +122,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         }
     }
 
-    private String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
+    private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
         //System.out.println(cont);
@@ -142,7 +142,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static final Pattern abstractPattern = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
 
-    private BibtexEntry getSingleCitation(String urlString) throws IOException {
+    private static BibtexEntry getSingleCitation(String urlString) throws IOException {
 
         URL url = new URL(urlString);
         String cont = new URLDownload(url).downloadToString("UTF8");

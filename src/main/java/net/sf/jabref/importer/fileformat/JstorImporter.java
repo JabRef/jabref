@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.InputStream;
@@ -68,10 +68,10 @@ public class JstorImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         String s = "";
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        while (s != null && !s.startsWith("Item Type")) {
+        while ((s != null) && !s.startsWith("Item Type")) {
             s = in.readLine();
         }
 
@@ -111,6 +111,7 @@ public class JstorImporter extends ImportFormat {
                 ImportFormatReader.setIfNecessary(be, "keywords", fields[17]);
                 ImportFormatReader.setIfNecessary(be, "copyright", fields[21]);
             } catch (ArrayIndexOutOfBoundsException ignored) {
+                // Ignored
             }
             bibitems.add(be);
         }

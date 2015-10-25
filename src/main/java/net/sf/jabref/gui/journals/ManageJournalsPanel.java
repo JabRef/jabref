@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.journals;
 
 import java.awt.BorderLayout;
@@ -66,7 +66,7 @@ class ManageJournalsPanel extends JPanel {
     private final JTextField nameTf = new JTextField();
     private final JTextField newNameTf = new JTextField();
     private final JTextField abbrTf = new JTextField();
-    private final List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
+    private final List<ExternalFileEntry> externals = new ArrayList<>(); // To hold references to external journal lists.
     private final JDialog dialog;
     private final JRadioButton newFile = new JRadioButton(Localization.lang("New file"));
     private final JRadioButton oldFile = new JRadioButton(Localization.lang("Existing file"));
@@ -90,7 +90,7 @@ class ManageJournalsPanel extends JPanel {
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                "pref, pref, pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
+                        "pref, pref, pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         /*JLabel description = new JLabel("<HTML>"+Glbals.lang("JabRef can switch journal names between "
@@ -98,7 +98,7 @@ class ManageJournalsPanel extends JPanel {
             +"you may need to add your own definitions.")+"</HTML>");*/
         builder.addSeparator(Localization.lang("Built-in journal list")).xyw(2, 1, 6);
         JLabel description = new JLabel("<HTML>" + Localization.lang("JabRef includes a built-in list of journal abbreviations.")
-                + "<br>" + Localization.lang("You can add additional journal names by setting up a personal journal list,<br>as "
+        + "<br>" + Localization.lang("You can add additional journal names by setting up a personal journal list,<br>as "
                 + "well as linking to external journal lists.") + "</HTML>");
         description.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         builder.add(description).xyw(2, 2, 6);
@@ -304,7 +304,7 @@ class ManageJournalsPanel extends JPanel {
 
     private void setupExternals() {
         String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if (externalFiles == null || externalFiles.length == 0) {
+        if ((externalFiles == null) || (externalFiles.length == 0)) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
@@ -343,10 +343,10 @@ class ManageJournalsPanel extends JPanel {
         if (newFile.isSelected()) {
             if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
-                return !f.exists() || JOptionPane.showConfirmDialog
+                return !f.exists() || (JOptionPane.showConfirmDialog
                         (this, "'" + f.getName() + "' " + Localization.lang("exists. Overwrite file?"),
                                 Localization.lang("Store journal abbreviations"), JOptionPane.OK_CANCEL_OPTION)
-                == JOptionPane.OK_OPTION;
+                        == JOptionPane.OK_OPTION);
             } else {
                 if (tableModel.getRowCount() > 0) {
                     JOptionPane.showMessageDialog(this, Localization.lang("You must choose a filename to store journal abbreviations"),
@@ -367,8 +367,8 @@ class ManageJournalsPanel extends JPanel {
             if (!newNameTf.getText().isEmpty()) {
                 f = new File(newNameTf.getText());
             }// else {
-             //    return; // Nothing to do.
-             //}
+            //    return; // Nothing to do.
+            //}
         } else {
             f = new File(personalFile.getText());
         }
@@ -408,7 +408,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<String>();
+        ArrayList<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!efe.getValue().equals("")) {
                 extFiles.add(efe.getValue());
@@ -492,8 +492,8 @@ class ManageJournalsPanel extends JPanel {
                         JFileChooser.OPEN_DIALOG, false);
             }
             if (chosen != null) {
-                File newFile = new File(chosen);
-                comp.setText(newFile.getPath());
+                File nFile = new File(chosen);
+                comp.setText(nFile.getPath());
             }
         }
     }
@@ -509,7 +509,7 @@ class ManageJournalsPanel extends JPanel {
         }
 
         public void setJournals(SortedSet<Abbreviation> journals) {
-            this.journals = new ArrayList<JournalEntry>();
+            this.journals = new ArrayList<>();
             for (Abbreviation abbreviation : journals) {
                 this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }

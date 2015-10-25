@@ -127,7 +127,7 @@ public class ADSFetcher implements EntryFetcher {
         return null;
     }
 
-    private String constructUrl(String key) {
+    private static String constructUrl(String key) {
         return "http://adsabs.harvard.edu/doi/" + key;
     }
 
@@ -161,7 +161,7 @@ public class ADSFetcher implements EntryFetcher {
             entry.setField("abstract", abstractText);
         } catch (XMLStreamException e) {
             status.showMessage(Localization.lang(
-                            "An Error occurred while parsing abstract"),
+                    "An Error occurred while parsing abstract"),
                     Localization.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             status.showMessage(Localization.lang(

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 ///////////////////////////////////////////////////////////////////////////////
 //  Filename: $RCSfile$
 //  Purpose:  Atom representation.
@@ -71,7 +71,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
             for (int i = 0; i < names.length; i++)
             {
                 singleAuthor(sb, names[i], i + 1);
-                if (i < names.length - 1) {
+                if (i < (names.length - 1)) {
                     sb.append('\n');
                 }
             }
@@ -87,7 +87,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
      * @param author
      * @param position
      */
-    private void singleAuthor(StringBuffer sb, String author, int position) {
+    private static void singleAuthor(StringBuffer sb, String author, int position) {
         sb.append("<bibo:contribution>\n");
         sb.append("  <bibo:Contribution>\n");
         sb.append("    <bibo:role rdf:resource=\"http://purl.org/ontology/bibo/roles/author\" />\n");
