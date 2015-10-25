@@ -107,10 +107,6 @@ class HelpContent extends JTextPane {
         }
 
         String middle = prefs.get(JabRefPreferences.LANGUAGE) + '/';
-        if (middle.equals("en/"))
-         {
-            middle = ""; // english in base help dir.
-        }
 
         URL old = getPage();
         try {
