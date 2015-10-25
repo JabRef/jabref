@@ -9,7 +9,6 @@ plugins {
 }
 
 apply plugin: "java"
-apply plugin: "eclipse"
 apply plugin: "application"
 apply plugin: "project-report"
 apply plugin: "maven"
