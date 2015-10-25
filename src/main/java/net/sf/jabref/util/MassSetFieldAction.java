@@ -253,7 +253,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         bp.markBaseChanged();
     }
 
-    private String[] getFieldNames(String s) {
+    private static String[] getFieldNames(String s) {
         return s.split("[\\s;,]");
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.worker;
 
 import java.awt.Desktop;
@@ -38,13 +38,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
- * 
+ *
  * It uses the mailto:-mechanism
- * 
+ *
  * Microsoft Outlook does not support attachments via mailto
  * Therefore, the folder(s), where the file(s) belonging to the entry are stored,
  * are opened. This feature is disabled by default and can be switched on at
- * preferences/external programs   
+ * preferences/external programs
  */
 public class SendAsEMailAction extends AbstractWorker {
 
@@ -88,10 +88,10 @@ public class SendAsEMailAction extends AbstractWorker {
             }
         }
 
-        ArrayList<String> attachments = new ArrayList<String>();
+        ArrayList<String> attachments = new ArrayList<>();
 
         // open folders is needed to indirectly support email programs, which cannot handle
-        //   the unofficial "mailto:attachment" property 
+        //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<File> fileList = Util.getListOfLinkedFiles(bes, frame.basePanel().metaData().getFileDirectory(Globals.FILE_FIELD));

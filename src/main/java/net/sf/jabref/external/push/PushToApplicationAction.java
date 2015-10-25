@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.external.push;
 
 import java.awt.event.ActionEvent;
@@ -67,7 +67,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
             for (BibtexEntry entry : entries) {
-                if (entry.getCiteKey() == null || entry.getCiteKey().trim().isEmpty()) {
+                if ((entry.getCiteKey() == null) || entry.getCiteKey().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -93,14 +93,14 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         });
     }
 
-    private String getKeyString(BibtexEntry[] entries) {
+    private static String getKeyString(BibtexEntry[] bibentries) {
         StringBuilder result = new StringBuilder();
         String citeKey;
         boolean first = true;
-        for (BibtexEntry bes : entries) {
+        for (BibtexEntry bes : bibentries) {
             citeKey = bes.getField(BibtexEntry.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
-            if (citeKey == null || citeKey.equals("")) {
+            if ((citeKey == null) || citeKey.equals("")) {
                 continue;
             }
             if (first) {

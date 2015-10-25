@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fetcher;
 
 import java.awt.BorderLayout;
@@ -73,7 +73,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private final Pattern hitsPattern = Pattern.compile("([0-9,]+) Results");
     private final Pattern typePattern = Pattern.compile("<span class=\"type\">\\s*(.+)");
-    private final HashMap<String, String> fieldPatterns = new HashMap<String, String>();
+    private final HashMap<String, String> fieldPatterns = new HashMap<>();
     private final Pattern absPattern = Pattern.compile("<p>\\s*(.+)");
 
     Pattern stdEntryPattern = Pattern.compile(".*<strong>(.+)</strong><br>" + "\\s+(.+)");
@@ -88,7 +88,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final String START_URL = "http://ieeexplore.ieee.org/search/freesearchresult.jsp?queryText=";
 
 
-    // Common words in IEEE Xplore that should always be 
+    // Common words in IEEE Xplore that should always be
 
     public IEEEXploreFetcher() {
         super();
@@ -231,7 +231,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
             // Replace general expressions
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
-            // Deal with subscripts and superscripts       
+            // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
                 title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
                 title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
@@ -448,7 +448,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
-            // Deal with subscripts and superscripts       
+            // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
                 abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
                 abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
@@ -501,23 +501,23 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     sourceField = "journal";
                 } else
                     if (typeName.equalsIgnoreCase("IEEE Conference Publications") || typeName.equalsIgnoreCase("IET Conference Publications") || typeName.equalsIgnoreCase("VDE Conference Publications")) {
-                    type = BibtexEntryType.getType("inproceedings");
-                    sourceField = "booktitle";
-                } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
-                    type = BibtexEntryType.getType("standard");
-                    sourceField = "number";
-                } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
-                    type = BibtexEntryType.getType("electronic");
-                    sourceField = "note";
-                } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") ||
-                        typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
-                        typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
-                    type = BibtexEntryType.getType("incollection");
-                    sourceField = "booktitle";
-                } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
-                    type = BibtexEntryType.getType("book");
-                    sourceField = "note";
-                }
+                        type = BibtexEntryType.getType("inproceedings");
+                        sourceField = "booktitle";
+                    } else if (typeName.equalsIgnoreCase("IEEE Standards") || typeName.equalsIgnoreCase("Standards")) {
+                        type = BibtexEntryType.getType("standard");
+                        sourceField = "number";
+                    } else if (typeName.equalsIgnoreCase("IEEE eLearning Library Courses")) {
+                        type = BibtexEntryType.getType("electronic");
+                        sourceField = "note";
+                    } else if (typeName.equalsIgnoreCase("Wiley-IEEE Press eBook Chapters") ||
+                            typeName.equalsIgnoreCase("MIT Press eBook Chapters") ||
+                            typeName.equalsIgnoreCase("IEEE USA Books &amp; eBooks")) {
+                        type = BibtexEntryType.getType("incollection");
+                        sourceField = "booktitle";
+                    } else if (typeName.equalsIgnoreCase("Morgan and Claypool eBooks")) {
+                        type = BibtexEntryType.getType("book");
+                        sourceField = "note";
+                    }
             }
 
             if (type == null) {
@@ -610,16 +610,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         if (entry == null) {
             return null;
-        } 
+        }
         return cleanup(entry);
     }
 
     /**
      * Find out how many hits were found.
-     * 
+     *
      * @param page
      */
-    private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
+    private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
             IEEEXploreFetcher.LOGGER.debug(page);

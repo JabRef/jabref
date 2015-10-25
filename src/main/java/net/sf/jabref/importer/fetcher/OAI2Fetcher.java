@@ -167,7 +167,7 @@ public class OAI2Fetcher implements EntryFetcher {
         int dot = key.indexOf('.');
         int slash = key.indexOf('/');
 
-        if (dot > -1 && dot < slash) {
+        if ((dot > -1) && (dot < slash)) {
             key = key.substring(0, dot) + key.substring(slash, key.length());
         }
 
@@ -281,12 +281,12 @@ public class OAI2Fetcher implements EntryFetcher {
                  * some archives - like arxive.org - might expect of you to wait
                  * some time
                  */
-                if (shouldWait() && lastCall != null) {
+                if (shouldWait() && (lastCall != null)) {
 
                     long elapsed = new Date().getTime() - lastCall.getTime();
 
                     while (elapsed < waitTime) {
-                        status.setStatus(Localization.lang("Waiting for ArXiv...") + (waitTime - elapsed) / 1000 + " s");
+                        status.setStatus(Localization.lang("Waiting for ArXiv...") + ((waitTime - elapsed) / 1000) + " s");
                         Thread.sleep(1000);
                         elapsed = new Date().getTime() - lastCall.getTime();
                     }

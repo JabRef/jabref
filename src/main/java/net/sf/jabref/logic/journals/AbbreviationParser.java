@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.logic.journals;
 
 
@@ -81,7 +81,7 @@ public class AbbreviationParser {
             final String abbrName = parts[1].trim();
 
             // check
-            if (fullName.length() <= 0 || abbrName.length() <= 0) {
+            if ((fullName.length() <= 0) || (abbrName.length() <= 0)) {
                 return;
             }
 
@@ -91,6 +91,6 @@ public class AbbreviationParser {
     }
 
     public List<Abbreviation> getAbbreviations() {
-        return new LinkedList<Abbreviation>(abbreviations);
+        return new LinkedList<>(abbreviations);
     }
 }

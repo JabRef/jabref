@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.openoffice;
 
 import java.awt.BorderLayout;
@@ -199,21 +199,21 @@ class StyleSelectDialog {
 
         diag = new JDialog(frame, Localization.lang("Styles"), true);
 
-        styles = new BasicEventList<OOBibStyle>();
-        EventList<OOBibStyle> sortedStyles = new SortedList<OOBibStyle>(styles);
+        styles = new BasicEventList<>();
+        EventList<OOBibStyle> sortedStyles = new SortedList<>(styles);
 
         // Create a preview panel for previewing styles:
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
 
-        tableModel = new EventTableModel<OOBibStyle>(sortedStyles, new StyleTableFormat());
+        tableModel = new EventTableModel<>(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        selectionModel = new EventSelectionModel<OOBibStyle>(sortedStyles);
+        selectionModel = new EventSelectionModel<>(sortedStyles);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -488,9 +488,8 @@ class StyleSelectDialog {
     private OOBibStyle getSelectedStyle() {
         if (!selectionModel.getSelected().isEmpty()) {
             return selectionModel.getSelected().get(0);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private void setupPrevEntry() {
@@ -541,7 +540,7 @@ class StyleSelectDialog {
             }
         }
 
-        private String formatJournals(Set<String> journals) {
+        private static String formatJournals(Set<String> journals) {
             StringBuilder sb = new StringBuilder("");
             for (Iterator<String> i = journals.iterator(); i.hasNext();) {
                 sb.append(i.next());
@@ -566,7 +565,7 @@ class StyleSelectDialog {
         try {
             // Read the contents of the default style file:
             URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.defaultAuthorYearStylePath) :
-                    JabRef.class.getResource(OpenOfficePanel.defaultNumericalStylePath);
+                JabRef.class.getResource(OpenOfficePanel.defaultNumericalStylePath);
             BufferedReader r = new BufferedReader(new InputStreamReader(defPath.openStream()));
             String line;
             StringBuilder sb = new StringBuilder();
@@ -578,9 +577,9 @@ class StyleSelectDialog {
             // Make a dialog box to display the contents:
             final JDialog dd = new JDialog(diag, Localization.lang("Default style"), true);
             JLabel header = new JLabel("<html>" + Localization.lang("The panel below shows the definition of the default style.")
-                    //+"<br>"
-                    + Localization.lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
-                    + "</html>");
+            //+"<br>"
+            + Localization.lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
+            + "</html>");
 
             header.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             dd.getContentPane().add(header, BorderLayout.NORTH);

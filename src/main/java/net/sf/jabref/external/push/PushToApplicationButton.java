@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.external.push;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -49,7 +49,7 @@ public class PushToApplicationButton implements ActionListener {
     private JButton menuButton;
     private int selected;
     private JPopupMenu popup;
-    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
+    private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
     private final MenuAction mAction = new MenuAction();

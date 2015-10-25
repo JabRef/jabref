@@ -43,10 +43,10 @@ import net.sf.jabref.sql.SQLUtil;
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:09:08 PM To
  * change this template use File | Settings | File Templates.
- * 
+ *
  * Jan. 20th Changed to accomodate the new way to connect to DB and also to show
  * the exceptions and to display more than one DB imported (by ifsteinm)
- * 
+ *
  */
 public class DbImportAction extends AbstractWorker {
 
@@ -141,10 +141,10 @@ public class DbImportAction extends AbstractWorker {
                 ResultSet rs = SQLUtil.queryAllFromTable(conn,
                         "jabref_database");
                 Vector<String> v;
-                Vector<Vector<String>> matrix = new Vector<Vector<String>>();
+                Vector<Vector<String>> matrix = new Vector<>();
 
                 while (rs.next()) {
-                    v = new Vector<String>();
+                    v = new Vector<>();
                     v.add(rs.getString("database_name"));
                     matrix.add(v);
                 }
