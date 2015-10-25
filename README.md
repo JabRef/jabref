@@ -1,6 +1,6 @@
 # JabRef Development Version
 
-[![Build Status](https://api.travis-ci.org/JabRef/jabref.png?branch=master)](https://travis-ci.org/JabRef/jabref)
+[![Build Status](https://circleci.com/gh/JabRef/jabref.svg?style=svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![Coverage Status](https://coveralls.io/repos/JabRef/jabref/badge.svg)](https://coveralls.io/r/JabRef/jabref)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
@@ -37,7 +37,7 @@ JabRef can be run as a command line application to convert from any import forma
 * Development mailing list: https://lists.sourceforge.net/lists/listinfo/jabref-devel
 * Development page: https://github.com/JabRef
 * Main git repository: https://github.com/JabRef/jabref
-* CI Servers: https://travis-ci.org/JabRef/jabref and https://circleci.com/gh/JabRef/jabref
+* CI Server: https://circleci.com/gh/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
 ### Bug Reports, Suggestions, Other Feedback
@@ -90,6 +90,7 @@ appear in your chosen languages.
 If you want a step-by-step tutorial, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
 To compile JabRef from source, you need a Java compiler supporting Java 1.8 and `JAVA_HOME` pointing to this JDK.
+You have to set `GRADLE_OPTS` to `-Dfile.encoding=UTF-8` as [gradle uses the JVM's platform encoding](https://discuss.gradle.org/t/is-there-a-way-to-tell-gradle-to-read-gradle-build-scripts-using-a-specified-encoding/7535).
 
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`

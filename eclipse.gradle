@@ -1,3 +1,5 @@
+apply plugin: "eclipse"
+
 // workaround until https://issues.gradle.org/browse/GRADLE-2274 is resolved
 eclipseJdt << {
     File f = file('.settings/org.eclipse.core.resources.prefs')

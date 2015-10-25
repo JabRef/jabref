@@ -18,6 +18,10 @@ test:
   override:
     - TERM=dumb ./gradlew test
   post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - TERM=dumb ./gradlew jacocoTestReport coveralls
+    - bash <(curl -s https://codecov.io/bash)
     - TERM=dumb export PATH=$PATH:`pwd`/launch4j && ./gradlew -Pdev=true -PnsisExec="/usr/bin/makensis" release --stacktrace
     - timeout 580 scripts/upload-to-gett.sh || exit 0
 
