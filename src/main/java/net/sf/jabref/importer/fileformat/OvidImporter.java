@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.util.regex.Matcher;
@@ -85,7 +85,7 @@ public class OvidImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
-        while ((str = in.readLine()) != null && i < 50) {
+        while (((str = in.readLine()) != null) && (i < 50)) {
 
             if (OvidImporter.ovidPattern.matcher(str).find()) {
                 return true;
@@ -103,12 +103,12 @@ public class OvidImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
         while ((line = in.readLine()) != null) {
-            if (!line.isEmpty() && line.charAt(0) != ' ') {
+            if (!line.isEmpty() && (line.charAt(0) != ' ')) {
                 sb.append("__NEWFIELD__");
             }
             sb.append(line);
@@ -118,7 +118,7 @@ public class OvidImporter extends ImportFormat {
         String[] items = sb.toString().split("<[0-9]+>");
 
         for (int i = 1; i < items.length; i++) {
-            HashMap<String, String> h = new HashMap<String, String>();
+            HashMap<String, String> h = new HashMap<>();
             String[] fields = items[i].split("__NEWFIELD__");
             for (String field : fields) {
                 int linebreak = field.indexOf('\n');
@@ -126,7 +126,7 @@ public class OvidImporter extends ImportFormat {
                 String content = field.substring(linebreak).trim();
 
                 // Check if this is the author field (due to a minor special treatment for this field):
-                boolean isAuthor = fieldName.indexOf("Author") == 0
+                boolean isAuthor = (fieldName.indexOf("Author") == 0)
                         && !fieldName.contains("Author Keywords")
                         && !fieldName.contains("Author e-mail");
 
@@ -206,7 +206,7 @@ public class OvidImporter extends ImportFormat {
             // Now we need to check if a book entry has given editors in the author field;
             // if so, rearrange:
             String auth = h.get("author");
-            if (auth != null && auth.contains(" [Ed]")) {
+            if ((auth != null) && auth.contains(" [Ed]")) {
                 h.remove("author");
                 h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
             }
@@ -247,7 +247,7 @@ public class OvidImporter extends ImportFormat {
      * @param content The name string.
      * @return The formatted names.
      */
-    private String fixNames(String content) {
+    private static String fixNames(String content) {
         String names;
         if (content.indexOf(";") > 0) { //LN FN; [LN FN;]*
             names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");

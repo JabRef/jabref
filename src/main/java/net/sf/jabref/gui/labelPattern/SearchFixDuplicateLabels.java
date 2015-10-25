@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.labelPattern;
 
 import net.sf.jabref.gui.BasePanel;
@@ -46,14 +46,14 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
     @Override
     public void run() {
         // Find all multiple occurences of BibTeX keys.
-        dupes = new HashMap<String, List<BibtexEntry>>();
+        dupes = new HashMap<>();
 
-        HashMap<String, BibtexEntry> foundKeys = new HashMap<String, BibtexEntry>();
+        HashMap<String, BibtexEntry> foundKeys = new HashMap<>();
         BibtexDatabase db = panel.database();
         for (BibtexEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
             // Only handle keys that are actually set:
-            if (key != null && !key.isEmpty()) {
+            if ((key != null) && !key.isEmpty()) {
                 // See whether this entry's key is already known:
                 if (!foundKeys.containsKey(key)) {
                     // Not already known. Add key and entry to map:
@@ -67,7 +67,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                     }
                     else {
                         // Construct a list of entries for this key:
-                        ArrayList<BibtexEntry> al = new ArrayList<BibtexEntry>();
+                        ArrayList<BibtexEntry> al = new ArrayList<>();
                         // Add both the first one we found, and the one we found just now:
                         al.add(foundKeys.get(key));
                         al.add(entry);
@@ -87,7 +87,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
 
     @Override
     public void update() {
-        List<BibtexEntry> toGenerateFor = new ArrayList<BibtexEntry>();
+        List<BibtexEntry> toGenerateFor = new ArrayList<>();
         for (String key : dupes.keySet()) {
             ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel,
                     key, dupes.get(key));

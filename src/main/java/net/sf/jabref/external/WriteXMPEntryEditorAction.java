@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.external;
 
 import net.sf.jabref.Globals;
@@ -58,7 +58,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         BibtexEntry entry = editor.getEntry();
 
         // Make a list of all PDFs linked from this entry:
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
 
         // First check the (legacy) "pdf" field:
         String pdf = entry.getField("pdf");
@@ -76,7 +76,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             tm.setContent(field);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
-                if (flEntry.getType() != null && flEntry.getType().getName().toLowerCase().equals("pdf")) {
+                if ((flEntry.getType() != null) && flEntry.getType().getName().toLowerCase().equals("pdf")) {
                     f = FileUtil.expandFilename(flEntry.getLink(), dirs);
                     if (f != null) {
                         files.add(f);
