@@ -38,5 +38,7 @@ blockquote { background-color: #f3f2fa; padding: 5px; }
 
 a, a:visited { text-decoration: underline; color: #4f5f8f; }
 
+pre { text-align: left; }
+
 #aboutpage { text-align: center; }
 #logo { margin-bottom: 10px; }

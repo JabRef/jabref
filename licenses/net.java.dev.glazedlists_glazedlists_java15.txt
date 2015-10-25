@@ -1,0 +1,13 @@
+
+Glazed Lists
+Copyright (c) 2003-2006, publicobject.com, O'Dell Engineering Ltd.
+
+Glazed Lists is free software and business friendly. It allows you to
+  * distribute Glazed Lists free of charge
+  * use Glazed Lists in a commercial or closed source application
+It does not allow you to
+  * create a fork of Glazed Lists that is closed-source
+
+It is made available under two licenses:
+  LGPL, http://creativecommons.org/licenses/LGPL/2.1/
+  MPL, http://www.mozilla.org/MPL/

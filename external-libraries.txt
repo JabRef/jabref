@@ -3,17 +3,20 @@ This file is manually kept in sync with build.gradle and the binary jars contain
 
 # Legend
 
-License:
+## License
+
  * GPLv2+ means "GPLv2 or later"
  * GPLv2! means "exactly version 2.0 of GPL"
  * GPLv2  means, we haven't checked whether later options are allowed
  * similar for LGPL and other version of GPL
 
+
 # Fonts
 
-Name:    Material Design Icons
+Id:      material-design-icons.font
+Project: Material Design Icons
 Version: v1.2.64
-URLs:    https://materialdesignicons.com/ and https://github.com/Templarian/MaterialDesign-Webfont/tree/master/fonts
+URL:     https://materialdesignicons.com/
 License: SIL Open Font License, Version 1.1
 Note:    Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 
@@ -123,16 +126,18 @@ Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL 3.0
 
-Path:    org.postgresql:postgresql
+Id:      org.postgresql:postgresql
 Project: PostgreSQL JDBC Driver
 URL:     http://jdbc.postgresql.org/download.html
 License: BSD
 
+Id:      microba
 Path:    lib/microba.jar
 Project: Microba
 URL:     https://github.com/tdbear/microba
 License: BSD
 
+Id:      spin
 Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
