@@ -89,10 +89,11 @@ sourceSets {
 
 processResources {
     def licenseInformation = ""
-    def id
+    def id = ""
     def projectName
     def url
     def license
+    def note = ""
 
     def externalLibraries = new File('external-libraries.txt')
     externalLibraries.eachLine { currentLine ->
@@ -107,11 +108,17 @@ processResources {
             url = currentLine.substring(9)
         } else if (currentLine.startsWith('License:')) {
             license = currentLine.substring(9)
-            // this is the last entry in a section, collect content and write it out
+        } else if (currentLine.startsWith('Note:')) {
+            note =  currentLine.substring(9)
+        } else if (currentLine.isEmpty() && (!id.equals(""))) {
+            // the entry is finished, write it
 
             licenseInformation += "\n<h3>" + projectName + "</h3>\n"
             licenseInformation += '<p>URL: <a href="' + url + '">' + url + '</a></p>\n'
             licenseInformation += '<p>License: ' + license + '</p>\n'
+            if (!note.equals("")) {
+                licenseInformation += '<p>Note: ' + note + '</p>\n'
+            }
 
             id = id.replaceAll(':', '_')
             def fileName = "licenses/" + id + ".txt"
@@ -122,6 +129,11 @@ processResources {
                 licenseInformation += licenseInformationFile.text
                 licenseInformation += '</pre>\n'
             }
+
+            // mark that entry has been written
+            id = ""
+            // note is not present at all antries. Ensure that no note is written instead of the last note
+            note = ""
         }
     }
 
