@@ -86,7 +86,7 @@ public class SearchManager extends SidePaneComponent
     // that the search is inactive.
 
     public SearchManager(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.getImage("search"), Localization.lang("Search"));
+        super(manager, IconTheme.JabRefIcon.SEARCH.getIcon(), Localization.lang("Search"));
 
         this.frame = frame;
         incSearcher = new IncrementalSearcher(Globals.prefs);
@@ -239,13 +239,8 @@ public class SearchManager extends SidePaneComponent
         //search.setMargin(margin);
         escape.setMargin(margin);
         openset.setMargin(margin);
-        JButton help = new JButton(IconTheme.getImage("help"));
-        int butSize = help.getIcon().getIconHeight() + 5;
-        Dimension butDim = new Dimension(butSize, butSize);
-        help.setPreferredSize(butDim);
-        help.setMinimumSize(butDim);
+        JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.searchHelp).getIconButton();
         help.setMargin(margin);
-        help.addActionListener(new HelpAction(GUIGlobals.helpDiag, GUIGlobals.searchHelp, Localization.lang("Help")));
 
         // Select the last used mode of search:
         if (Globals.prefs.getBoolean(JabRefPreferences.INCREMENT_S)) {

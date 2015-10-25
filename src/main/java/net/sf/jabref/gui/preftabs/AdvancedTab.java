@@ -75,8 +75,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences = prefs;
         this.remotePreferences = new RemotePreferences(preferences);
 
-        HelpAction remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, Localization.lang("Help"),
-                IconTheme.getImage("helpSmall"));
         useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useNativeFileDialogOnMac = new JCheckBox(Localization.lang("Use native file dialog"));
@@ -159,7 +157,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(remoteHelp.getIconButton());
+        p.add(new HelpAction(diag, GUIGlobals.remoteHelp).getIconButton());
         builder.append(p);
 
         //if (Globals.OS_X) {

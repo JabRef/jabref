@@ -368,7 +368,7 @@ public class JabRefPreferences {
     // Map containing all registered external file types:
     private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
-    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.getImage("www"));
+    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.JabRefIcon.WWW.getSmallIcon());
 
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
@@ -1356,8 +1356,8 @@ public class JabRefPreferences {
 
     public List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<ExternalFileType>();
-        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.getImage("pdfSmall")));
-        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.getImage("psSmall")));
+        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon()));
+        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
         list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
@@ -1368,17 +1368,17 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
         list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture", IconTheme.getImage("picture")));
-        list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture", IconTheme.getImage("picture")));
-        list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture", IconTheme.getImage("picture")));
-        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.getImage("psSmall")));
+        list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
         list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.getImage("emacs")));
         list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.getImage("emacs")));
-        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.getImage("www")));
-        list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture", IconTheme.getImage("picture")));
-        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.getImage("www")));
-        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.getImage("www")));
-        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.getImage("www")));
+        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
+        list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
+        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
+        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
+        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
 
         // On all OSes there is a generic application available to handle file opening,
         // so we don't need the default application settings anymore:

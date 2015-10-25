@@ -70,7 +70,7 @@ public class DbImportAction extends AbstractWorker {
     class DbImpAction extends MnemonicAwareAction {
 
         public DbImpAction() {
-            super(IconTheme.getImage("dbImport"));
+            super();
             putValue(Action.NAME, Localization.menuTitle("Import from external SQL database"));
 
         }

@@ -26,17 +26,17 @@ public class ReadStatus extends SpecialField {
 
     private static ReadStatus INSTANCE;
 
-    private final Icon icon = IconTheme.getImage("readstatus");
+    private final Icon icon = IconTheme.JabRefIcon.READ_STATUS.getIcon();
 
 
     private ReadStatus() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
         Icon icon;
-        icon = IconTheme.getImage("readStatusRead");
+        icon = IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Localization.lang("Set read status to read"), icon, Localization.lang("Read status read")));
-        icon = IconTheme.getImage("readStatusSkimmed");
+        icon = IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
         values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), icon, Localization.lang("Read status skimmed")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";

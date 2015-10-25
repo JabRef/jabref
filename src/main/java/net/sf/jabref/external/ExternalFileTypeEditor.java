@@ -51,9 +51,9 @@ public class ExternalFileTypeEditor extends JDialog {
     private FileTypeTableModel tableModel;
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final JButton add = new JButton(IconTheme.getImage("add"));
-    private final JButton remove = new JButton(IconTheme.getImage("remove"));
-    private final JButton edit = new JButton(IconTheme.getImage("edit"));
+    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+    private final JButton edit = new JButton(IconTheme.JabRefIcon.EDIT.getIcon());
     private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
@@ -277,7 +277,7 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             lab.setText(null);
-            lab.setIcon((ImageIcon) value);
+            lab.setIcon((Icon) value);
             return lab;
         }
     }

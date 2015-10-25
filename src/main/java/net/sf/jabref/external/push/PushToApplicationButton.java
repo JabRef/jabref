@@ -51,7 +51,7 @@ public class PushToApplicationButton implements ActionListener {
     private JPopupMenu popup;
     private final HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
     private final Dimension buttonDim = new Dimension(23, 23);
-    private static final Icon ARROW_ICON = IconTheme.getImage("secondary_sorted_reverse");
+    private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
     private final MenuAction mAction = new MenuAction();
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
@@ -141,6 +141,7 @@ public class PushToApplicationButton implements ActionListener {
 
         Globals.prefs.put("pushToApplication", toApp.getName());
         mAction.setTitle(toApp.getApplicationName());
+        mAction.setIcon(toApp.getIcon());
     }
 
     /**
@@ -287,13 +288,16 @@ public class PushToApplicationButton implements ActionListener {
         }
 
         public void setTitle(String appName) {
-            putValue(Action.NAME, Localization.lang("Push entries to external application (%0)",
-                    appName));
+            putValue(Action.NAME, Localization.lang("Push entries to external application (%0)", appName));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             PushToApplicationButton.this.actionPerformed(null);
+        }
+
+        public void setIcon(Icon icon) {
+            putValue(Action.SMALL_ICON, icon);
         }
     }
 

@@ -281,10 +281,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special table columns and special fields ***/
 
-        HelpAction help = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp);
-        JButton helpButton = new JButton(IconTheme.getImage("helpSmall"));
-        helpButton.setToolTipText(Localization.lang("Help on special fields"));
-        helpButton.addActionListener(help);
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.specialFieldsHelp, Localization.lang("Help on special fields")).getIconButton();
 
         specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.addChangeListener(new ChangeListener() {
@@ -458,7 +455,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.getImage("remove"));
+            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -488,7 +485,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.getImage("add"));
+            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
@@ -539,7 +536,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowUpAction extends AbstractMoveRowAction {
 
         public MoveRowUpAction() {
-            super("Up", IconTheme.getImage("up"));
+            super("Up", IconTheme.JabRefIcon.UP.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
         }
 
@@ -572,7 +569,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowDownAction extends AbstractMoveRowAction {
 
         public MoveRowDownAction() {
-            super("Down", IconTheme.getImage("down"));
+            super("Down", IconTheme.JabRefIcon.DOWN.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
         }
 

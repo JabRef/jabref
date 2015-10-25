@@ -49,7 +49,7 @@ public class ExternalFileTypeEntryEditor {
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
     private String selectedIcon;
-    private final JButton icon = new JButton(IconTheme.getImage("picture"));
+    private final JButton icon = new JButton(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JButton ok = new JButton(Localization.lang("Ok"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));

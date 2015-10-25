@@ -26,19 +26,19 @@ public class Priority extends SpecialField {
 
     private static Priority INSTANCE;
 
-    private final Icon icon = IconTheme.getImage("priority");
+    private final Icon icon = IconTheme.JabRefIcon.PRIORITY.getIcon();
 
 
     private Priority() {
         ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
         values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null, Localization.lang("No priority information")));
         Icon icon;
-        icon = IconTheme.getImage("red");
+        icon = IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
         // DO NOT TRANSLATE "prio1" etc. as this makes the .bib files non portable
         values.add(new SpecialFieldValue(this, "prio1", "setPriority1", Localization.lang("Set priority to high"), icon, Localization.lang("Priority high")));
-        icon = IconTheme.getImage("orange");
+        icon = IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
         values.add(new SpecialFieldValue(this, "prio2", "setPriority2", Localization.lang("Set priority to medium"), icon, Localization.lang("Priority medium")));
-        icon = IconTheme.getImage("green");
+        icon = IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
         values.add(new SpecialFieldValue(this, "prio3", "setPriority3", Localization.lang("Set priority to low"), icon, Localization.lang("Priority low")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set priority to '%0' for %1 entries";

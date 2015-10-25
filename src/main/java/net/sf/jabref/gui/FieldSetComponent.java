@@ -122,8 +122,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
         con.gridwidth = 1;
         if (arrows) {
             con.weightx = 0;
-            up = new JButton(IconTheme.getImage("up"));
-            down = new JButton(IconTheme.getImage("down"));
+            up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
+            down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
             up.addActionListener(this);
             down.addActionListener(this);
             up.setToolTipText(Localization.lang("Move up"));

@@ -16,7 +16,8 @@ public class CopyAction extends AbstractAction {
 
         putValue(Action.NAME, Localization.lang("Copy to clipboard"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy to clipboard"));
-        putValue(Action.SMALL_ICON, IconTheme.getImage("copy"));
+        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.COPY.getSmallIcon());
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.COPY.getIcon());
     }
 
     @Override

@@ -36,7 +36,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     private static ExternalFileType getPDFExternalFileType() {
         ExternalFileType pdfFileType = JabRefPreferences.getInstance().getExternalFileTypeByExt("pdf");
         if (pdfFileType == null) {
-            return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.getImage("pdfSmall"));
+            return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }
         return pdfFileType;
     }

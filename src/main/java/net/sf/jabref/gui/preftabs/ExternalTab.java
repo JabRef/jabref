@@ -141,9 +141,8 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
-        HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-                Localization.lang("Help on Regular Expression Search"), IconTheme.getImage("helpSmall"));
-        builder.append(helpAction.getIconButton());
+        builder.append(new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
+                Localization.lang("Help on Regular Expression Search")).getIconButton());
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(runAutoFileSearch, 3);
@@ -169,13 +168,9 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         JPanel butpan = new JPanel();
         butpan.setLayout(new GridLayout(3, 3));
-        addSettingsButton(new PushToLyx(), butpan);
-        addSettingsButton(new PushToEmacs(), butpan);
-        addSettingsButton(new PushToWinEdt(), butpan);
-        addSettingsButton(new PushToVim(), butpan);
-        addSettingsButton(new PushToLatexEditor(), butpan);
-        addSettingsButton(new PushToTeXstudio(), butpan);
-        addSettingsButton(new PushToTexmaker(), butpan);
+        for(PushToApplication pushToApplication : PushToApplications.applications) {
+            addSettingsButton(pushToApplication, butpan);
+        }
         builder.append(new JPanel());
         builder.append(butpan, 3);
 

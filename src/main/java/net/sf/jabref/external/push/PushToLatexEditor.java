@@ -32,7 +32,7 @@ public class PushToLatexEditor extends AbstractPushToApplication implements Push
 
     @Override
     public Icon getIcon() {
-        return IconTheme.getImage("edit");
+        return IconTheme.JabRefIcon.EDIT.getSmallIcon();
     }
 
     @Override

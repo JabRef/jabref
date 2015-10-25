@@ -185,7 +185,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.addPropertyChangeListener(this);
         this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
 
-        helpAction = new HelpAction(this.frame.helpDiag, GUIGlobals.entryEditorHelp, Localization.lang("Help"));
+        helpAction = new HelpAction(this.frame.helpDiag, GUIGlobals.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
         generateKeyAction = new GenerateKeyAction(this.frame);
         storeFieldAction = new StoreFieldAction();
@@ -214,7 +214,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         if (reqPan.fileListEditor != null) {
             fileListEditor = reqPan.fileListEditor;
         }
-        tabbed.addTab(Localization.lang("Required fields"), IconTheme.getImage("required"), reqPan
+        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), reqPan
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(reqPan);
 
@@ -226,7 +226,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.getImage("optional"), optPan
+                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             } else {
@@ -236,7 +236,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (optPan.fileListEditor != null) {
                     fileListEditor = optPan.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.getImage("optional"), optPan
+                tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
 
@@ -267,7 +267,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.getImage("optional"), optPan2
+                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan2
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
 
@@ -279,7 +279,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
                     }
-                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.getImage("optional"), optPan3
+                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan3
                             .getPane(), Localization.lang("Show deprecated bibtex fields"));
                     tabs.add(optPan3);
                 }
@@ -293,13 +293,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (newTab.fileListEditor != null) {
                 fileListEditor = newTab.fileListEditor;
             }
-            tabbed.addTab(tabList.getTabName(i), IconTheme.getImage("general"), newTab.getPane());
+            tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
 
         srcPanel.setName(Localization.lang("BibTeX source"));
         if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_SOURCE)) {
-            tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.getImage("source"), srcPanel,
+            tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
                     Localization.lang("Show/edit BibTeX source"));
             tabs.add(srcPanel);
         }
@@ -1007,7 +1007,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public TypeButton(String type) {
-            super(IconTheme.getImage("edit"));
+            super(IconTheme.JabRefIcon.EDIT.getIcon());
             setToolTipText(Localization.lang("Change entry type"));
             addActionListener(new ActionListener() {
 
@@ -1126,7 +1126,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public DeleteAction() {
-            super(Localization.lang("Delete"), IconTheme.getImage("delete"));
+            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
 
@@ -1152,7 +1152,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public CloseAction() {
-            super(Localization.lang("Close window"), IconTheme.getImage("close"));
+            super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
 
@@ -1373,7 +1373,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public NextEntryAction() {
-            super(Localization.lang("Next entry"), IconTheme.getImage("down"));
+            super(Localization.lang("Next entry"), IconTheme.JabRefIcon.DOWN.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Next entry"));
         }
@@ -1404,7 +1404,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public PrevEntryAction() {
-            super(Localization.lang("Previous entry"), IconTheme.getImage("up"));
+            super(Localization.lang("Previous entry"), IconTheme.JabRefIcon.UP.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Previous entry"));
         }
@@ -1438,7 +1438,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
         public GenerateKeyAction(JabRefFrame parentFrame) {
-            super(Localization.lang("Generate BibTeX key"), IconTheme.getImage("makeKey"));
+            super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
             parent = parentFrame;
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Generate BibTeX key"));
@@ -1501,7 +1501,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public UndoAction() {
-            super("Undo", IconTheme.getImage("undo"));
+            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
 
@@ -1516,7 +1516,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public RedoAction() {
-            super("Undo", IconTheme.getImage("redo"));
+            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 
@@ -1614,7 +1614,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         private static final long serialVersionUID = 1L;
 
         public AutoLinkAction() {
-            putValue(Action.SMALL_ICON, IconTheme.getImage("autoGroup"));
+            putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Automatically set file links for this entry") + " (Alt-F)");
         }
 

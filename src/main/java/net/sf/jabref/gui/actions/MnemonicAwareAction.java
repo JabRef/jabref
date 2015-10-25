@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.gui.actions;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -31,7 +32,12 @@ public abstract class MnemonicAwareAction extends AbstractAction {
     public MnemonicAwareAction() {}
 
     public MnemonicAwareAction(Icon icon) {
-        putValue(Action.SMALL_ICON, icon);
+        if(icon instanceof IconTheme.FontBasedIcon) {
+            putValue(Action.SMALL_ICON, ((IconTheme.FontBasedIcon) icon).createSmallIcon());
+            putValue(Action.LARGE_ICON_KEY, icon);
+        } else {
+            putValue(Action.SMALL_ICON, icon);
+        }
     }
 
     @Override

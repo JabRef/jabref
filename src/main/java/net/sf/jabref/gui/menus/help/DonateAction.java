@@ -15,33 +15,32 @@
 */
 package net.sf.jabref.gui.menus.help;
 
+import net.sf.jabref.JabRef;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+public class DonateAction extends AbstractAction {
+    private static final String donationLink = "https://github.com/JabRef/jabref/wiki/Donations";
 
-import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-
-@SuppressWarnings("serial")
-public class ForkMeOnGitHubAction extends AbstractAction {
-
-    public ForkMeOnGitHubAction() {
-        super(Localization.menuTitle("Fork me on GitHub"), IconTheme.JabRefIcon.GITHUB.getSmallIcon());
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Opens JabRef's GitHub page"));
-        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.GITHUB.getIcon());
+    public DonateAction() {
+        super(Localization.menuTitle("Donate to JabRef"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Donate to JabRef"));
+        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.DONATE.getSmallIcon());
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.DONATE.getIcon());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            JabRefDesktop.openBrowser("https://github.com/JabRef/jabref");
+            JabRefDesktop.openBrowser(donationLink);
         } catch (IOException ex) {
             ex.printStackTrace();
-            JabRef.jrf.basePanel().output(Localization.lang("Could not open browser.") + " " + Localization.lang("Please open http://github.com/JabRef/jabref manually."));
+            JabRef.jrf.basePanel().output(Localization.lang("Could not open browser window."));
         }
     }
 }

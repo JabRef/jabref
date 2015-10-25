@@ -155,7 +155,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.getImage("remove"));
+            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -184,7 +184,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.getImage("add"));
+            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 

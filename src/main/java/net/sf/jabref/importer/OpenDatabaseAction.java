@@ -72,7 +72,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(IconTheme.getImage("open"));
+        super(IconTheme.JabRefIcon.OPEN.getIcon());
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(Action.NAME, Localization.menuTitle("Open database"));

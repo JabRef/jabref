@@ -246,9 +246,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(closeAction);
 
-        JButton helpButton = new JButton(Localization.lang("Help"));
-        helpButton.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp,
-                Localization.lang("Help")));
+        JButton helpButton = new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp).getIconButton();
 
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
