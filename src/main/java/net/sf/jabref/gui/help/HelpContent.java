@@ -91,6 +91,8 @@ class HelpContent extends JTextPane {
         history.removeAllElements();
     }
 
+    // .getResource is called at resourceOwner. This method is available at all Class objects
+    @SuppressWarnings("rawtypes")
     public void setPage(String filename, Class resourceOwner) {
 
         // Check for anchor
