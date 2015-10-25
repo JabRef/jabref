@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.actions.*;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -601,6 +602,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             }
             setBounds(posX, posY, sizeX, sizeY);
+        }
+    }
+
+    /**
+     * Tries to open a browser with the given URL
+     *
+     * All errors are logged
+     *
+     * @param url the url to open
+     */
+    public void openBrowser(String url) {
+        try {
+            JabRefDesktop.openBrowser(url);
+            output(Localization.lang("External viewer called") + '.');
+        } catch (IOException ex) {
+            output(Localization.lang("Error") + ": " + ex.getMessage());
+            LOGGER.debug("Could not open browser", ex);
         }
     }
 

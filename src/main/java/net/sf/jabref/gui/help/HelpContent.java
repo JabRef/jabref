@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.help;
 
 import java.io.File;
@@ -23,6 +23,7 @@ import java.util.Stack;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
@@ -55,17 +56,39 @@ class HelpContent extends JTextPane {
         setText("");
         setEditable(false);
 
-        // Handles Anchors
-        final HyperlinkListener hyperLinkListener = new HyperlinkListener() {
+        addHyperlinkListener(new HyperlinkListener() {
+
+            private boolean lastStatusUpdateWasALink = false;
 
             @Override
-            public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getDescription().startsWith("#")) {
-                    scrollToReference(e.getDescription().substring(1));
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                String link = e.getDescription();
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    lastStatusUpdateWasALink = false;
+                    // Handles Anchors
+                    if (link.startsWith("#")) {
+                        scrollToReference(link.substring(1));
+                    } else {
+                        if (link.startsWith("http")) {
+                            //  open all external URLs externally
+                            JabRef.jrf.openBrowser(link);
+                        } else {
+                            // nothing has to be done: JTextFrame handles internal links by itself
+                        }
+                    }
+                } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+                    // show the link in the status bar - similar to Firefox behavior
+                    JabRef.jrf.setStatus(link);
+                    lastStatusUpdateWasALink = true;
+                } else {
+                    if (lastStatusUpdateWasALink) {
+                        // remove the link from the status bar
+                        JabRef.jrf.setStatus("");
+                        lastStatusUpdateWasALink = false;
+                    }
                 }
             }
-        };
-        addHyperlinkListener(hyperLinkListener);
+        });
     }
 
     public boolean back() {

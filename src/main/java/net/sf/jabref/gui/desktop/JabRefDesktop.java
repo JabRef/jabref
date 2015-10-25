@@ -83,6 +83,9 @@ public class JabRefDesktop {
             } catch (IOException e) {
                 System.err.println(Localization.lang("Error_opening_file_'%0'.", link));
                 e.printStackTrace();
+                // TODO: should we rethrow the exception?
+                // In BasePanel.java, the exception is catched and a text output to the frame
+                // throw e;
             }
         } else if (fieldName.equals("ps")) {
             try {
