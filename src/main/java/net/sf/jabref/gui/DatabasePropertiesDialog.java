@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -141,12 +141,12 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.add(Localization.lang("PS directory")).xy(1, 11);
         builder.add(psDir).xy(3, 11);
         builder.add(browsePs).xy(5, 11);
-        
+
         builder.addSeparator(Localization.lang("Save sort order")).xyw(1, 13, 5);
         builder.add(saveAsConfiguredGlobally).xyw(1, 15, 5);
         builder.add(saveInOriginalOrder).xyw(1, 17, 5);
         builder.add(saveInSpecifiedOrder).xyw(1, 19, 5);
-        
+
         // Create a new panel with its own FormLayout for these items:
         FormLayout layout2 = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
                 "pref, 2dlu, pref, 2dlu, pref");
@@ -241,7 +241,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveInOriginalOrder.addActionListener(listener);
         saveInSpecifiedOrder.addActionListener(listener);
 
-        ArrayList<String> v = new ArrayList<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        ArrayList<String> v = new ArrayList<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         v.add(BibtexEntry.KEY_FIELD);
         Collections.sort(v);
         String[] allPlusKey = v.toArray(new String[v.size()]);
@@ -435,7 +435,7 @@ public class DatabasePropertiesDialog extends JDialog {
         String newEncoding = (String) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
-        Vector<String> dir = new Vector<String>(1);
+        Vector<String> dir = new Vector<>(1);
         String text = fileDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -444,7 +444,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
-        dir = new Vector<String>(1);
+        dir = new Vector<>(1);
         text = fileDirIndv.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -453,7 +453,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         }
 
-        dir = new Vector<String>(1);
+        dir = new Vector<>(1);
         text = pdfDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -462,7 +462,7 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove("pdfDirectory");
         }
 
-        dir = new Vector<String>(1);
+        dir = new Vector<>(1);
         text = psDir.getText().trim();
         if (!text.isEmpty()) {
             dir.add(text);
@@ -472,7 +472,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         if (protect.isSelected()) {
-            dir = new Vector<String>(1);
+            dir = new Vector<>(1);
             dir.add("true");
             metaData.putData(Globals.PROTECTED_FLAG_META, dir);
         } else {

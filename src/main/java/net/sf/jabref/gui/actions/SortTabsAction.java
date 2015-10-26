@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -46,7 +46,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
     public void actionPerformed(ActionEvent e) {
         JTabbedPane tabbedPane = frame.getTabbedPane();
         // Make a sorted Map that compares case-insensitively:
-        TreeMap<String, BasePanel> map = new TreeMap<String, BasePanel>(this);
+        TreeMap<String, BasePanel> map = new TreeMap<>(this);
 
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             BasePanel panel = (BasePanel) tabbedPane.getComponent(i);

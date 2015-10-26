@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
 
 
     public GlazedEntrySorter(Map<String, BibtexEntry> entries) {
-        list = new BasicEventList<BibtexEntry>();
+        list = new BasicEventList<>();
         list.getReadWriteLock().writeLock().lock();
         Set<String> keySet = entries.keySet();
         for (String aKeySet : keySet) {
@@ -66,7 +66,7 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
             if (index != -1) {
                 // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
                 // DatabaseChangeEvent.ADDED_ENTRY
-                // thus, 
+                // thus,
                 list.set(index, e.getEntry());
             }
         }

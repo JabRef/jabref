@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 public class SixpackImporter extends ImportFormat {
 
     private final String SEPARATOR = new String(new char[] {0, 48});
-    
+
     private static final Log LOGGER = LogFactory.getLog(SixpackImporter.class);
 
 
@@ -68,7 +68,7 @@ public class SixpackImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
         int i = 0;
-        while ((str = in.readLine()) != null && i < 50) {
+        while (((str = in.readLine()) != null) && (i < 50)) {
 
             if (str.contains(SEPARATOR)) {
                 return true;
@@ -87,7 +87,7 @@ public class SixpackImporter extends ImportFormat {
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        HashMap<String, String> fI = new HashMap<String, String>();
+        HashMap<String, String> fI = new HashMap<>();
         fI.put("id", "bibtexkey");
         fI.put("au", "author");
         fI.put("ti", "title");
@@ -116,7 +116,7 @@ public class SixpackImporter extends ImportFormat {
         fI.put("cr", "crossref");
         fI.put("fi", "file");
 
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         in.readLine();
         String ln = in.readLine();
@@ -133,7 +133,7 @@ public class SixpackImporter extends ImportFormat {
                 String[] fields = s.split(SEPARATOR);
                 // Check type and create entry:
                 if (fields.length < 2)
-                 {
+                {
                     continue; // Avoid ArrayIndexOutOfBoundsException
                 }
                 BibtexEntryType typ = BibtexEntryType

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 ///////////////////////////////////////////////////////////////////////////////
 //  Filename: $RCSfile$
 //  Purpose:  Atom representation.
@@ -48,8 +48,8 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
 public class XMLChars implements LayoutFormatter {
 
     private static final XmlCharsMap XML_CHARS = new XmlCharsMap();
-    
-    private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<String, String>();
+
+    private static final Map<String, String> ASCII_TO_XML_CHARS = new HashMap<>();
 
     static {
         ASCII_TO_XML_CHARS.put("<", "&lt;");
@@ -72,7 +72,7 @@ public class XMLChars implements LayoutFormatter {
         return restFormat(fieldText);
     }
 
-    private String firstFormat(String s) {
+    private static String firstFormat(String s) {
         return s.replaceAll("&|\\\\&", "&#x0026;").replaceAll("--", "&#x2013;");
     }
 
@@ -107,14 +107,14 @@ public class XMLChars implements LayoutFormatter {
 
             // Checking the case when the character is already escaped
             // Just push "&#" to the buffer and keep going from the next char
-            if (code == 38 && fieldText.charAt(i + 1) == 35) {
+            if ((code == 38) && (fieldText.charAt(i + 1) == 35)) {
                 i += 2;
                 buffer.append("&#");
                 code = fieldText.charAt(i);
             }
 
-            // TODO: Check whether > 125 is correct here or whether it should rather be >=  
-            if (code > 125 || forceReplace[code]) {
+            // TODO: Check whether > 125 is correct here or whether it should rather be >=
+            if ((code > 125) || forceReplace[code]) {
                 buffer.append("&#").append(code).append(';');
             } else {
                 buffer.append((char) code);

@@ -21,9 +21,8 @@ public class Abbreviation implements Comparable<Abbreviation> {
         if (abbreviation.contains(SPLITTER)) {
             String[] restParts = abbreviation.split(SPLITTER);
             return restParts[0].trim();
-        } else {
-            return abbreviation;
         }
+        return abbreviation;
     }
 
     public String getMedlineAbbreviation() {
@@ -69,7 +68,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         Abbreviation that = (Abbreviation) o;

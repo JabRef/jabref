@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.event.*;
@@ -62,7 +62,7 @@ class PreambleEditor extends JDialog {
 
             @Override
             protected boolean accept(Component c) {
-                return super.accept(c) && c instanceof FieldEditor;
+                return super.accept(c) && (c instanceof FieldEditor);
             }
         });
 
@@ -123,9 +123,9 @@ class PreambleEditor extends JDialog {
     private class FieldListener extends FocusAdapter {
 
         /*
-        * Focus listener that fires the storeFieldAction when a TextArea
-        * loses focus.
-        */
+         * Focus listener that fires the storeFieldAction when a TextArea
+         * loses focus.
+         */
         @Override
         public void focusLost(FocusEvent e) {
             if (!e.isTemporary()) {
@@ -158,7 +158,7 @@ class PreambleEditor extends JDialog {
             if (toSet == null) {
                 set = base.getPreamble() != null;
             } else {
-                set = !(base.getPreamble() != null
+                set = !((base.getPreamble() != null)
                         && toSet.equals(base.getPreamble()));
             }
 
@@ -166,7 +166,7 @@ class PreambleEditor extends JDialog {
                 panel.undoManager.addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
-                if (toSet != null && !toSet.isEmpty()) {
+                if ((toSet != null) && !toSet.isEmpty()) {
                     ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
                     ed.setValidBackgroundColor();
                 } else {
@@ -198,6 +198,7 @@ class PreambleEditor extends JDialog {
             try {
                 panel.runCommand("undo");
             } catch (Throwable ignored) {
+                // Ignored
             }
         }
     }
@@ -218,6 +219,7 @@ class PreambleEditor extends JDialog {
             try {
                 panel.runCommand("redo");
             } catch (Throwable ignored) {
+                // Ignored
             }
         }
     }

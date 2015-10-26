@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.InputStream;
@@ -70,11 +70,11 @@ public class SilverPlatterImporter extends ImportFormat {
         while ((str = in.readLine()) != null) {
 
             if (pat1.matcher(str).find())
-             {
+            {
                 return false; // This is an inspec file, so return false.
             }
 
-            if (str.length() >= 5 && str.substring(0, 5).equals("TI:  ")) {
+            if ((str.length() >= 5) && str.substring(0, 5).equals("TI:  ")) {
                 return true;
             }
         }
@@ -87,139 +87,139 @@ public class SilverPlatterImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        boolean isChapter = false;
-        String str;
-        StringBuilder sb = new StringBuilder();
-        while ((str = in.readLine()) != null) {
-            if (str.length() < 2) {
-                sb.append("__::__").append(str);
-            } else {
-                sb.append("__NEWFIELD__").append(str);
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            boolean isChapter = false;
+            String str;
+            StringBuilder sb = new StringBuilder();
+            while ((str = in.readLine()) != null) {
+                if (str.length() < 2) {
+                    sb.append("__::__").append(str);
+                } else {
+                    sb.append("__NEWFIELD__").append(str);
+                }
             }
-        }
-        in.close();
-        String[] entries = sb.toString().split("__::__");
-        String Type = "";
-        HashMap<String, String> h = new HashMap<String, String>();
-        for (String entry : entries) {
-            if (entry.trim().length() < 6) {
-                continue;
-            }
-            //System.out.println("'"+entries[i]+"'");
-            h.clear();
-            String[] fields = entry.split("__NEWFIELD__");
-            for (String field : fields) {
-                if (field.length() < 6) {
+            String[] entries = sb.toString().split("__::__");
+            String Type = "";
+            HashMap<String, String> h = new HashMap<>();
+            for (String entry : entries) {
+                if (entry.trim().length() < 6) {
                     continue;
                 }
-                //System.out.println(">"+fields[j]+"<");
-                String f3 = field.substring(0, 2);
-                String frest = field.substring(5);
-                if (f3.equals("TI")) {
-                    h.put("title", frest);
-                } else if (f3.equals("AU")) {
-                    if (frest.trim().endsWith("(ed)")) {
-                        String ed = frest.trim();
-                        ed = ed.substring(0, ed.length() - 4);
-                        h.put("editor", AuthorList.fixAuthor_lastNameFirst(ed.replaceAll(",-", ", ")
-                                .replaceAll(";", " and ")));
-                    } else {
-                        h.put("author", AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(
-                                ",-", ", ").replaceAll(";", " and ")));
+                //System.out.println("'"+entries[i]+"'");
+                h.clear();
+                String[] fields = entry.split("__NEWFIELD__");
+                for (String field : fields) {
+                    if (field.length() < 6) {
+                        continue;
                     }
-                } else if (f3.equals("AB")) {
-                    h.put("abstract", frest);
-                } else if (f3.equals("DE")) {
-                    String kw = frest.replaceAll("-;", ",").toLowerCase();
-                    h.put("keywords", kw.substring(0, kw.length() - 1));
-                } else if (f3.equals("SO")) {
-                    int m = frest.indexOf(".");
-                    if (m >= 0) {
-                        String jr = frest.substring(0, m);
-                        h.put("journal", jr.replaceAll("-", " "));
-                        frest = frest.substring(m);
-                        m = frest.indexOf(";");
-                        if (m >= 5) {
-                            String yr = frest.substring(m - 5, m).trim();
-                            h.put("year", yr);
+                    //System.out.println(">"+fields[j]+"<");
+                    String f3 = field.substring(0, 2);
+                    String frest = field.substring(5);
+                    if (f3.equals("TI")) {
+                        h.put("title", frest);
+                    } else if (f3.equals("AU")) {
+                        if (frest.trim().endsWith("(ed)")) {
+                            String ed = frest.trim();
+                            ed = ed.substring(0, ed.length() - 4);
+                            h.put("editor", AuthorList.fixAuthor_lastNameFirst(ed.replaceAll(",-", ", ")
+                                    .replaceAll(";", " and ")));
+                        } else {
+                            h.put("author", AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(
+                                    ",-", ", ").replaceAll(";", " and ")));
+                        }
+                    } else if (f3.equals("AB")) {
+                        h.put("abstract", frest);
+                    } else if (f3.equals("DE")) {
+                        String kw = frest.replaceAll("-;", ",").toLowerCase();
+                        h.put("keywords", kw.substring(0, kw.length() - 1));
+                    } else if (f3.equals("SO")) {
+                        int m = frest.indexOf(".");
+                        if (m >= 0) {
+                            String jr = frest.substring(0, m);
+                            h.put("journal", jr.replaceAll("-", " "));
                             frest = frest.substring(m);
-                            m = frest.indexOf(":");
-                            if (m >= 0) {
-                                String pg = frest.substring(m + 1).trim();
-                                h.put("pages", pg);
-                                h.put("volume", frest.substring(1, m));
-                            }
-                        }
-                    }
-                } else if (f3.equals("PB")) {
-                    int m = frest.indexOf(":");
-                    if (m >= 0) {
-                        String jr = frest.substring(0, m);
-                        h.put("publisher", jr.replaceAll("-", " ").trim());
-                        frest = frest.substring(m);
-                        m = frest.indexOf(", ");
-                        if (m + 2 < frest.length()) {
-                            String yr = frest.substring(m + 2).trim();
-                            try {
-                                Integer.parseInt(yr);
+                            m = frest.indexOf(";");
+                            if (m >= 5) {
+                                String yr = frest.substring(m - 5, m).trim();
                                 h.put("year", yr);
-                            } catch (NumberFormatException ex) {
-                                // Let's assume that this wasn't a number, since it
-                                // couldn't be parsed as an integer.
+                                frest = frest.substring(m);
+                                m = frest.indexOf(":");
+                                if (m >= 0) {
+                                    String pg = frest.substring(m + 1).trim();
+                                    h.put("pages", pg);
+                                    h.put("volume", frest.substring(1, m));
+                                }
+                            }
+                        }
+                    } else if (f3.equals("PB")) {
+                        int m = frest.indexOf(":");
+                        if (m >= 0) {
+                            String jr = frest.substring(0, m);
+                            h.put("publisher", jr.replaceAll("-", " ").trim());
+                            frest = frest.substring(m);
+                            m = frest.indexOf(", ");
+                            if ((m + 2) < frest.length()) {
+                                String yr = frest.substring(m + 2).trim();
+                                try {
+                                    Integer.parseInt(yr);
+                                    h.put("year", yr);
+                                } catch (NumberFormatException ex) {
+                                    // Let's assume that this wasn't a number, since it
+                                    // couldn't be parsed as an integer.
+                                }
+
                             }
 
                         }
+                    } else if (f3.equals("AF")) {
+                        h.put("school", frest.trim());
 
-                    }
-                } else if (f3.equals("AF")) {
-                    h.put("school", frest.trim());
-
-                } else if (f3.equals("DT")) {
-                    frest = frest.trim();
-                    if (frest.equals("Monograph")) {
-                        Type = "book";
-                    } else if (frest.startsWith("Dissertation")) {
-                        Type = "phdthesis";
-                    } else if (frest.toLowerCase().contains("journal")) {
-                        Type = "article";
-                    } else if (frest.equals("Contribution") || frest.equals("Chapter")) {
-                        Type = "incollection";
-                        // This entry type contains page numbers and booktitle in the
-                        // title field.
-                        isChapter = true;
-                    } else {
-                        Type = frest.replaceAll(" ", "");
+                    } else if (f3.equals("DT")) {
+                        frest = frest.trim();
+                        if (frest.equals("Monograph")) {
+                            Type = "book";
+                        } else if (frest.startsWith("Dissertation")) {
+                            Type = "phdthesis";
+                        } else if (frest.toLowerCase().contains("journal")) {
+                            Type = "article";
+                        } else if (frest.equals("Contribution") || frest.equals("Chapter")) {
+                            Type = "incollection";
+                            // This entry type contains page numbers and booktitle in the
+                            // title field.
+                            isChapter = true;
+                        } else {
+                            Type = frest.replaceAll(" ", "");
+                        }
                     }
                 }
-            }
 
-            if (isChapter) {
-                Object titleO = h.get("title");
-                if (titleO != null) {
-                    String title = ((String) titleO).trim();
-                    int inPos = title.indexOf("\" in ");
-                    int pgPos = title.lastIndexOf(" ");
-                    if (inPos > 1) {
-                        h.put("title", title.substring(1, inPos));
-                    }
-                    if (pgPos > inPos) {
-                        h.put("pages", title.substring(pgPos)
-                                .replaceAll("-", "--"));
+                if (isChapter) {
+                    Object titleO = h.get("title");
+                    if (titleO != null) {
+                        String title = ((String) titleO).trim();
+                        int inPos = title.indexOf("\" in ");
+                        int pgPos = title.lastIndexOf(" ");
+                        if (inPos > 1) {
+                            h.put("title", title.substring(1, inPos));
+                        }
+                        if (pgPos > inPos) {
+                            h.put("pages", title.substring(pgPos)
+                                    .replaceAll("-", "--"));
+                        }
+
                     }
 
                 }
 
+                BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
+                        .getEntryType(Type)); // id assumes an existing database so don't
+                // create one here
+                b.setField(h);
+
+                bibitems.add(b);
+
             }
-
-            BibtexEntry b = new BibtexEntry(DEFAULT_BIBTEXENTRY_ID, BibtexEntryTypes
-                    .getEntryType(Type)); // id assumes an existing database so don't
-            // create one here
-            b.setField(h);
-
-            bibitems.add(b);
-
         }
 
         return bibitems;

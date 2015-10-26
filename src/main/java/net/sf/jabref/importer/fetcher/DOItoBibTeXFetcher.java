@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package net.sf.jabref.importer.fetcher;
 
 import java.io.FileNotFoundException;
@@ -51,9 +51,8 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         if (entry != null) {
             inspector.addEntry(entry);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override
@@ -109,8 +108,8 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             if (status != null) {
                 // @formatter:off
                 status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
-                                   Localization.lang("Get BibTeX entry from DOI"),
-                                   JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Get BibTeX entry from DOI"),
+                        JOptionPane.INFORMATION_MESSAGE);
                 // @formatter:on
             }
             return null;
@@ -119,7 +118,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        //Usually includes an en-dash in the page range. Char is in cp1252 but not 
+        //Usually includes an en-dash in the page range. Char is in cp1252 but not
         // ISO 8859-1 (which is what latex expects). For convenience replace here.
         bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
         BibtexEntry entry = BibtexParser.singleFromString(bibtexString);

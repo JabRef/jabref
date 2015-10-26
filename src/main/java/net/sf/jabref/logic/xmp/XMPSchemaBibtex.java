@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.logic.xmp;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     /**
      * Create a new empty XMPSchemaBibtex as a child in the given XMPMetadata.
-     * 
+     *
      * @param parent
      */
     public XMPSchemaBibtex(XMPMetadata parent) {
@@ -56,7 +56,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     /**
      * Create schema from an existing XML element.
-     * 
+     *
      * @param e
      *            The existing XML element.
      */
@@ -64,13 +64,13 @@ public class XMPSchemaBibtex extends XMPSchema {
         super(e, XMPSchemaBibtex.KEY);
     }
 
-    private String makeProperty(String propertyName) {
+    private static String makeProperty(String propertyName) {
         return XMPSchemaBibtex.KEY + ':' + propertyName;
     }
 
     /**
      * Uses XMPSchema methods
-     * 
+     *
      * @param field
      * @return
      */
@@ -174,7 +174,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     /**
      * Returns a map of all properties and their values. LIs and bags in seqs
      * are concatenated using " and ".
-     * 
+     *
      * @return Map from name of textproperty (String) to value (String). For
      *         instance: "year" => "2005". Empty map if none found.
      * @throws TransformerException
@@ -182,7 +182,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     public static Map<String, String> getAllProperties(XMPSchema schema, String namespaceName) {
         NodeList nodes = schema.getElement().getChildNodes();
 
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         if (nodes == null) {
             return result;
@@ -193,8 +193,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (int i = 0; i < n; i++) {
             Node node = nodes.item(i);
-            if (node.getNodeType() != Node.ATTRIBUTE_NODE
-                    && node.getNodeType() != Node.ELEMENT_NODE) {
+            if ((node.getNodeType() != Node.ATTRIBUTE_NODE)
+                    && (node.getNodeType() != Node.ELEMENT_NODE)) {
                 continue;
             }
 
@@ -202,7 +202,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
             String[] split = nodeName.split(":");
 
-            if (split.length == 2 && split[0].equals(namespaceName)) {
+            if ((split.length == 2) && split[0].equals(namespaceName)) {
                 NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
                 if (seqList.getLength() > 0) {
 
@@ -235,14 +235,14 @@ public class XMPSchemaBibtex extends XMPSchema {
 
             String nodeName = attr.getNodeName();
             String[] split = nodeName.split(":");
-            if (split.length == 2 && split[0].equals(namespaceName)) {
+            if ((split.length == 2) && split[0].equals(namespaceName)) {
                 result.put(split[1], attr.getNodeValue());
             }
         }
 
         /*
          * Collapse Whitespace
-         * 
+         *
          * Quoting from
          * http://www.gerg.ca/software/btOOL/doc/bt_postprocess.html: <cite>
          * "The exact rules for collapsing whitespace are simple: non-space
@@ -264,7 +264,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
 
-    private static final HashSet<String> preserveWhiteSpace = new HashSet<String>();
+    private static final HashSet<String> preserveWhiteSpace = new HashSet<>();
     static {
         XMPSchemaBibtex.preserveWhiteSpace.add("abstract");
         XMPSchemaBibtex.preserveWhiteSpace.add("note");
@@ -277,7 +277,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     }
 
     /**
-     * 
+     *
      * @param entry
      * @param database maybenull
      */
@@ -287,7 +287,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         if (prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER)) {
-            TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
+            TreeSet<String> filters = new TreeSet<>(
+                    Arrays.asList(prefs.getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS)));
             fields.removeAll(filters);
         }
 
@@ -323,9 +324,9 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     /**
      * Taken from DOM2Utils.java:
-     * 
+     *
      * JBoss, the OpenSource EJB server
-     * 
+     *
      * Distributable under LGPL license. See terms of license at gnu.org.
      */
     public static String getTextContent(Node node) {

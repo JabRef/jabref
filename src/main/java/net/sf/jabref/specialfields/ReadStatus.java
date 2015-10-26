@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
@@ -30,14 +30,16 @@ public class ReadStatus extends SpecialField {
 
 
     private ReadStatus() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null, Localization.lang("No read status information")));
-        Icon icon;
-        icon = IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
+        Icon tmpicon;
+        tmpicon = IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
         // DO NOT TRANSLATE "read" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead", Localization.lang("Set read status to read"), icon, Localization.lang("Read status read")));
-        icon = IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
-        values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), icon, Localization.lang("Read status skimmed")));
+        values.add(new SpecialFieldValue(this, "read", "setReadStatusToRead",
+                Localization.lang("Set read status to read"), tmpicon, Localization.lang("Read status read")));
+        tmpicon = IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+        values.add(new SpecialFieldValue(this, "skimmed", "setReadStatusToSkimmed",
+                Localization.lang("Set read status to skimmed"), tmpicon, Localization.lang("Read status skimmed")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Set read status to '%0' for %1 entries";
     }

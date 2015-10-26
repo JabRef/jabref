@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer;
 
 import java.io.File;
@@ -32,8 +32,8 @@ public class ParserResult {
     private final HashMap<String, BibtexEntryType> entryTypes;
 
     private File file;
-    private final ArrayList<String> warnings = new ArrayList<String>();
-    private final ArrayList<String> duplicateKeys = new ArrayList<String>();
+    private final ArrayList<String> warnings = new ArrayList<>();
+    private final ArrayList<String> duplicateKeys = new ArrayList<>();
 
     private String errorMessage;
     // Which encoding was used?
@@ -80,7 +80,7 @@ public class ParserResult {
 
     /**
      * Set the JabRef version number string for this parser result.
-     * @param jabrefVersion The version number string.                                         
+     * @param jabrefVersion The version number string.
      */
     public void setJabrefVersion(String jabrefVersion) {
         this.jabrefVersion = jabrefVersion;

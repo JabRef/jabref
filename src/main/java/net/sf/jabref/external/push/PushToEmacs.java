@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.external.push;
 
 import java.io.IOException;
@@ -110,65 +110,67 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
             }
 
             com[com.length - 1] = OS.WINDOWS ?
-            // Windows gnuclient escaping:
-            // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
-            // so cmd receives: (insert \"\\cite{Blah2001}\")
-            // so emacs receives: (insert "\cite{Blah2001}")
-            prefix.concat("\\\"\\" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
-            // Linux gnuclient escaping:
-            // java string: "(insert \"\\\\cite{Blah2001}\")"
-            // so sh receives: (insert "\\cite{Blah2001}")
-            // so emacs receives: (insert "\cite{Blah2001}")
-            prefix.concat("\"" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
+                    // Windows gnuclient escaping:
+                    // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
+                    // so cmd receives: (insert \"\\cite{Blah2001}\")
+                    // so emacs receives: (insert "\cite{Blah2001}")
+                    prefix.concat("\\\"\\" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
+                        // Linux gnuclient escaping:
+                        // java string: "(insert \"\\\\cite{Blah2001}\")"
+                        // so sh receives: (insert "\\cite{Blah2001}")
+                        // so emacs receives: (insert "\cite{Blah2001}")
+                        prefix.concat("\"" + citeCommand.replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
 
-            final Process p = Runtime.getRuntime().exec(com);
+                    final Process p = Runtime.getRuntime().exec(com);
 
-            Runnable errorListener = new Runnable() {
+                    Runnable errorListener = new Runnable() {
 
-                @Override
-                public void run() {
-                    InputStream out = p.getErrorStream();
-                    //                    try {
-                    //                    	if (out.available() <= 0)
-                    //                    		out = p.getInputStream();
-                    //                    } catch (Exception e) {
-                    //                    }
-                    int c;
-                    StringBuilder sb = new StringBuilder();
-                    try {
-                        while ((c = out.read()) != -1) {
-                            sb.append((char) c);
+                        @Override
+                        public void run() {
+                            try (InputStream out = p.getErrorStream()) {
+                                //                    try {
+                                //                    	if (out.available() <= 0)
+                                //                    		out = p.getInputStream();
+                                //                    } catch (Exception e) {
+                                //                    }
+                                int c;
+                                StringBuilder sb = new StringBuilder();
+                                try {
+                                    while ((c = out.read()) != -1) {
+                                        sb.append((char) c);
+                                    }
+                                } catch (IOException e) {
+                                    LOGGER.warn("Could not read from stderr.");
+                                }
+                                // Error stream has been closed. See if there were any errors:
+                                if (!sb.toString().trim().isEmpty()) {
+                                    LOGGER.warn("Push to Emacs error: " + sb);
+                                    couldNotConnect = true;
+                                }
+                            } catch (IOException e) {
+                                LOGGER.warn("File problem.", e);
+                            }
                         }
-                    } catch (IOException e) {
-                        LOGGER.warn("Could not read from stderr.");
-                    }
-                    // Error stream has been closed. See if there were any errors:
-                    if (!sb.toString().trim().isEmpty()) {
-                        LOGGER.warn("Push to Emacs error: " + sb);
-                        couldNotConnect = true;
-                    }
-                }
-            };
-            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
+                    };
+                    JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
         } catch (IOException excep) {
             couldNotCall = true;
         }
-
     }
 
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
             // @formatter:off
-            JOptionPane.showMessageDialog(panel.frame(), "<HTML>" + 
+            JOptionPane.showMessageDialog(panel.frame(), "<HTML>" +
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
-                    + "Emacs or XEmacs is running,<BR>and that the server has been started "
-                    + "(by running the command 'server-start'/'gnuserv-start').") + "</HTML>",
+                            + "Emacs or XEmacs is running,<BR>and that the server has been started "
+                            + "(by running the command 'server-start'/'gnuserv-start').") + "</HTML>",
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (couldNotCall) {
             JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
-                    + "the emacsclient/gnuclient program installed and available in the PATH."),
+                            + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             // @formatter:on
         } else {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +18,7 @@ package net.sf.jabref.gui.mergeentries;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.*;
@@ -38,12 +39,10 @@ import com.jgoodies.forms.layout.ColumnSpec;
 
 /**
  * @author Oscar
- * 
+ *
  *         Dialog for merging Bibtex entry with data fetched from DOI
  */
 public class MergeEntryDOIDialog extends JDialog {
-
-    private static final long serialVersionUID = 5454378088546423798L;
 
     private final Dimension DIM = new Dimension(800, 800);
     private final BasePanel panel;
@@ -94,7 +93,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
     /**
      * Sets up the dialog
-     * 
+     *
      * @param selected Selected BibtexEntries
      */
     private void init() {
@@ -163,7 +162,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
     /**
      * Act on button pressed
-     * 
+     *
      * @param button Butten pressed
      */
     private void buttonPressed(String button) {
@@ -176,7 +175,7 @@ public class MergeEntryDOIDialog extends JDialog {
         } else if (button.equals("done")) {
             // Create a new entry and add it to the undo stack
             // Remove the old entry and add it to the undo stack (which is not working...)
-            TreeSet<String> joint = new TreeSet<String>(mergedEntry.getAllFields());
+            Set<String> joint = new TreeSet<>(mergedEntry.getAllFields());
             Boolean edited = false;
 
             for (String field : joint) {

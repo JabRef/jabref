@@ -12,7 +12,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package net.sf.jabref.util;
 
 import java.awt.BorderLayout;
@@ -89,7 +89,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private boolean cancelled;
 
-    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<String>();
+    private final TreeSet<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
@@ -100,8 +100,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private void createDialog() {
         keyword = new JTextField();
 
-        keywordListModel = new DefaultListModel<String>();
-        keywordList = new JList<String>(keywordListModel);
+        keywordListModel = new DefaultListModel<>();
+        keywordList = new JList<>(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -293,21 +293,21 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        HashSet<String> keywordsToAdd = new HashSet<String>();
-        HashSet<String> userSelectedKeywords = new HashSet<String>();
+        HashSet<String> keywordsToAdd = new HashSet<>();
+        HashSet<String> userSelectedKeywords = new HashSet<>();
         // build keywordsToAdd and userSelectedKeywords in parallel
         for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
-            String keyword = keywords.nextElement();
-            userSelectedKeywords.add(keyword);
-            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
-                keywordsToAdd.add(keyword);
+            String kword = keywords.nextElement();
+            userSelectedKeywords.add(kword);
+            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(kword)) {
+                keywordsToAdd.add(kword);
             }
         }
 
-        HashSet<String> keywordsToRemove = new HashSet<String>();
-        for (String keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-            if (!userSelectedKeywords.contains(keyword)) {
-                keywordsToRemove.add(keyword);
+        HashSet<String> keywordsToRemove = new HashSet<>();
+        for (String kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+            if (!userSelectedKeywords.contains(kword)) {
+                keywordsToRemove.add(kword);
             }
         }
 
@@ -377,7 +377,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             // we "intercept" with a treeset
             // pro: no duplicates
             // possible con: alphabetical sorting of the keywords
-            TreeSet<String> keywords = new TreeSet<String>();
+            TreeSet<String> keywords = new TreeSet<>();
             keywords.addAll(separatedKeywords);
 
             // update keywords
@@ -399,7 +399,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     @SuppressWarnings("unchecked")
-    private HashSet<String> createClone(HashSet<String> keywordsToAdd) {
+    private static HashSet<String> createClone(HashSet<String> keywordsToAdd) {
         return (HashSet<String>) keywordsToAdd.clone();
     }
 

@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.external.push;
 
 import java.io.IOException;
@@ -95,7 +95,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     public void operationCompleted(BasePanel panel) {
         if (notDefined) {
             // @formatter:off
-            panel.output(Localization.lang("Error") + ": " 
+            panel.output(Localization.lang("Error") + ": "
                     + Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
             // @formatter:on
         } else if (couldNotCall) {
@@ -120,6 +120,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * @param keyString String containing the Bibtex keys to be pushed to the application
      * @return String array with the command to call and its arguments
      */
+    @SuppressWarnings("unused")
     protected String[] getCommandLine(String keyString) {
         return null;
     }

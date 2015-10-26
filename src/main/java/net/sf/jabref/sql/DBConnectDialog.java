@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.sql;
 
 import java.awt.BorderLayout;
@@ -37,9 +37,8 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class DBConnectDialog extends JDialog {
 
-    private static final long serialVersionUID = 7395276764910821176L;
     // input fields
-    private final JComboBox<String> cmbServerType = new JComboBox<String>();
+    private final JComboBox<String> cmbServerType = new JComboBox<>();
     private final JTextField txtServerHostname = new JTextField(40);
     private final JTextField txtDatabase = new JTextField(40);
     private final JTextField txtUsername = new JTextField(40);
@@ -61,7 +60,7 @@ public class DBConnectDialog extends JDialog {
         dbStrings = dbs;
 
         // build collections of components
-        ArrayList<JLabel> lhs = new ArrayList<JLabel>();
+        ArrayList<JLabel> lhs = new ArrayList<>();
         JLabel lblServerType = new JLabel();
         lhs.add(lblServerType);
         JLabel lblServerHostname = new JLabel();
@@ -73,7 +72,7 @@ public class DBConnectDialog extends JDialog {
         JLabel lblPassword = new JLabel();
         lhs.add(lblPassword);
 
-        ArrayList<JComponent> rhs = new ArrayList<JComponent>();
+        ArrayList<JComponent> rhs = new ArrayList<>();
         rhs.add(cmbServerType);
         rhs.add(txtServerHostname);
         rhs.add(txtDatabase);
@@ -191,7 +190,7 @@ public class DBConnectDialog extends JDialog {
     /**
      * Checks the user input, and ensures that required fields have entries
      *
-     * @return 
+     * @return
      *      Appropriate error message to be displayed to user
      */
     private String checkInput() {

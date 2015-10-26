@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.importer.ImportFormatReader;
@@ -81,7 +81,7 @@ public class BiomailImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         BufferedReader in =
@@ -113,7 +113,7 @@ public class BiomailImporter extends ImportFormat {
         String[] entries = sb.toString().split("::");
 
         // skip the first entry as it is either empty or has document header
-        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, String> hm = new HashMap<>();
 
         for (String entry : entries) {
             String[] fields = entry.split(" ## ");
@@ -209,7 +209,7 @@ public class BiomailImporter extends ImportFormat {
             // the first bibitem is always empty, presumably as a result of trying
             // to parse header informaion. So add only if we have at least author or
             // title fields.
-            if (hm.get("author") != null || hm.get("title") != null) {
+            if ((hm.get("author") != null) || (hm.get("title") != null)) {
                 bibitems.add(b);
             }
         }

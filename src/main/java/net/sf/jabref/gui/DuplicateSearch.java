@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 // created by : ?
 //
 // modified : r.nagel 2.09.2004
@@ -40,7 +40,7 @@ public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
     private BibtexEntry[] bes;
-    private final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
+    private final Vector<BibtexEntry[]> duplicates = new Vector<>();
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -67,9 +67,9 @@ public class DuplicateSearch implements Runnable {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
-        final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
-        final ArrayList<BibtexEntry> toAdd = new ArrayList<BibtexEntry>();
-        while (!st.finished() || current < duplicates.size())
+        final ArrayList<BibtexEntry> toRemove = new ArrayList<>();
+        final ArrayList<BibtexEntry> toAdd = new ArrayList<>();
+        while (!st.finished() || (current < duplicates.size()))
         {
 
             if (current >= duplicates.size())
@@ -82,6 +82,7 @@ public class DuplicateSearch implements Runnable {
                     {
                         duplicates.wait();
                     } catch (Exception ignored) {
+                        // Ignore
                     }
                 }
             } else // duplicates found
@@ -97,23 +98,22 @@ public class DuplicateSearch implements Runnable {
                             toRemove.add(be[1]);
                             duplicateCounter++;
                             continue;
-                        } else {
-                            askAboutExact = true;
                         }
+                        askAboutExact = true;
                     }
 
                     DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
                             askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
-                                    DuplicateResolverDialog.DUPLICATE_SEARCH);
+                                DuplicateResolverDialog.DUPLICATE_SEARCH);
                     ((CallBack) Spin.over(cb)).update();
 
                     duplicateCounter++;
                     int answer = cb.getSelected();
-                    if (answer == DuplicateResolverDialog.KEEP_UPPER
-                            || answer == DuplicateResolverDialog.AUTOREMOVE_EXACT) {
+                    if ((answer == DuplicateResolverDialog.KEEP_UPPER)
+                            || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
                         toRemove.add(be[1]);
                         if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
-                         {
+                        {
                             autoRemoveExactDuplicates = true; // Remember choice
                         }
                     } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
@@ -154,7 +154,7 @@ public class DuplicateSearch implements Runnable {
                 }
 
                 panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
+                + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
 
                 ce.end();
                 panel.undoManager.addEdit(ce);
@@ -172,8 +172,8 @@ public class DuplicateSearch implements Runnable {
 
         @Override
         public void run() {
-            for (int i = 0; i < bes.length - 1 && !finished; i++) {
-                for (int j = i + 1; j < bes.length && !finished; j++) {
+            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
+                for (int j = i + 1; (j < bes.length) && !finished; j++) {
                     boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
 
                     // If (suspected) duplicates, add them to the duplicates vector.

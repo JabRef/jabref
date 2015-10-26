@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -70,7 +70,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     /**
      * Customization of external program paths.
-     * 
+     *
      * @param prefs
      *            a <code>JabRefPreferences</code> value
      */
@@ -80,12 +80,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         /**
          * Added Bibtexkey to combobox.
-         * 
+         *
          * [ 1540646 ] default sort order: bibtexkey
-         * 
+         *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        Vector<String> fieldNames = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
+        Vector<String> fieldNames = new Vector<>(Arrays.asList(BibtexFields.getAllFieldNames()));
         fieldNames.add(BibtexEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
@@ -241,7 +241,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         autoResizeMode
-                .setSelected(prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
+        .setSelected(prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         priField.setText(prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD));
         secField.setText(prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD));
@@ -288,7 +288,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     /**
      * Store changes to table preferences. This method is called when the user
      * clicks Ok.
-     * 
+     *
      */
     @Override
     public void storeSettings() {
@@ -316,9 +316,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (newVal.isEmpty()) {
             newVal = null;
         }
-        if (newVal != null && oldVal == null
-                || newVal == null && oldVal != null
-                || newVal != null && !newVal.equals(oldVal)) {
+        if (((newVal != null) && (oldVal == null))
+                || ((newVal == null) && (oldVal != null))
+                || ((newVal != null) && !newVal.equals(oldVal))) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             BibtexFields.setNumericFieldsFromPrefs();
         }

@@ -12,14 +12,13 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui;
 
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 
 import javax.swing.*;
 
@@ -76,7 +75,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     /**
      * Used by SidePaneManager only, to keep track of visibility.
-     * 
+     *
      */
     void setVisibility(boolean vis) {
         visible = vis;
@@ -84,7 +83,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     /**
      * Used by SidePaneManager only, to keep track of visibility.
-     * 
+     *
      */
     boolean hasVisibility() {
         return visible;

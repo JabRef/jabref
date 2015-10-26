@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -56,9 +56,9 @@ import net.sf.jabref.util.Util;
  * separate classes. Tabs MUST implement the PrefsTab interface, since this
  * dialog will call the storeSettings() method of all tabs when the user presses
  * ok.
- * 
+ *
  * With this design, it should be very easy to add new tabs later.
- * 
+ *
  */
 public class PreferencesDialog extends JDialog {
 
@@ -137,7 +137,7 @@ public class PreferencesDialog extends JDialog {
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
-                String o = (String) chooser.getSelectedValue();
+                String o = chooser.getSelectedValue();
                 cardLayout.show(main, o);
             }
         });
@@ -183,16 +183,16 @@ public class PreferencesDialog extends JDialog {
                 }
                 File file = new File(filename);
                 if (!file.exists()
-                        || JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
-                                + "' " + Localization.lang("exists. Overwrite file?"),
-                                Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                        || (JOptionPane.showConfirmDialog(PreferencesDialog.this, '\'' + file.getName()
+                        + "' " + Localization.lang("exists. Overwrite file?"),
+                        Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
                     try {
                         prefs.exportPreferences(filename);
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(PreferencesDialog.this,
                                 Localization.lang("Could not export preferences")
-                                        + ": " + ex.getMessage(), Localization.lang("Export preferences"),
+                                + ": " + ex.getMessage(), Localization.lang("Export preferences"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -220,7 +220,7 @@ public class PreferencesDialog extends JDialog {
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("Could not import preferences")
-                                    + ": " + ex.getMessage(), Localization.lang("Import preferences"),
+                            + ": " + ex.getMessage(), Localization.lang("Import preferences"),
                             JOptionPane.ERROR_MESSAGE);
                 }
             }

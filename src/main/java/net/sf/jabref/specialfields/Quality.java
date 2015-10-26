@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class Quality extends SpecialField {
 
 
     private Quality() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<SpecialFieldValue>();
+        ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // DO NOT TRANSLATE "qualityAssured" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Localization.lang("Toogle quality assured"), IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon(), Localization.lang("Toogle quality assured")));
         this.setValues(values);

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 
 // created by : Morten O. Alver 2003
 
@@ -148,7 +148,7 @@ public class Util {
     /**
      * Will return the publication date of the given bibtex entry in conformance to ISO 8601, i.e. either YYYY or
      * YYYY-MM.
-     * 
+     *
      * @param entry
      * @return will return the publication date of the entry or null if no year was found.
      */
@@ -175,9 +175,9 @@ public class Util {
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
      * acceptable for bibtex.
-     * 
+     *
      * Watch-out that the returned string might be of length 0 afterwards.
-     * 
+     *
      * @param key mayBeNull
      */
     public static String checkLegalKey(String key) {
@@ -224,7 +224,7 @@ public class Util {
     }
 
     public static TreeSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field, String deliminator) {
-        TreeSet<String> res = new TreeSet<String>();
+        TreeSet<String> res = new TreeSet<>();
 
         for (String s : db.getKeySet()) {
             BibtexEntry be = db.getEntryById(s);
@@ -243,14 +243,14 @@ public class Util {
     /**
      * Returns a HashMap containing all words used in the database in the given field type. Characters in
      * <code>remove</code> are not included.
-     * 
+     *
      * @param db a <code>BibtexDatabase</code> value
      * @param field a <code>String</code> value
      * @param remove a <code>String</code> value
      * @return a <code>HashSet</code> value
      */
     public static TreeSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
-        TreeSet<String> res = new TreeSet<String>();
+        TreeSet<String> res = new TreeSet<>();
         StringTokenizer tok;
         for (String s : db.getKeySet()) {
             BibtexEntry be = db.getEntryById(s);
@@ -267,13 +267,13 @@ public class Util {
 
     /**
      * Finds all authors' last names in all the given fields for the given database.
-     * 
+     *
      * @param db The database.
      * @param fields The fields to look in.
      * @return a set containing the names.
      */
     public static Set<String> findAuthorLastNames(BibtexDatabase db, List<String> fields) {
-        Set<String> res = new TreeSet<String>();
+        Set<String> res = new TreeSet<>();
         for (String s : db.getKeySet()) {
             BibtexEntry be = db.getEntryById(s);
             for (String field : fields) {
@@ -298,9 +298,9 @@ public class Util {
     /**
      * Make sure an URL is "portable", in that it doesn't contain bad characters that break the open command in some
      * OSes.
-     * 
+     *
      * A call to this method will also remove \\url{} enclosings and clean Doi links.
-     * 
+     *
      * @param link :the URL to sanitize.
      * @return Sanitized URL
      */
@@ -337,11 +337,12 @@ public class Util {
         try {
             link = URLDecoder.decode(link, "UTF-8");
         } catch (UnsupportedEncodingException ignored) {
+            // Ignored
         }
 
         /**
          * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
-         * 
+         *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1574773&group_id=92314&atid=600306
          */
         try {
@@ -353,7 +354,7 @@ public class Util {
 
     public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
-        ArrayList<String[]> result = new ArrayList<String[]>();
+        ArrayList<String[]> result = new ArrayList<>();
 
         char[] c = calls.toCharArray();
 
@@ -458,7 +459,7 @@ public class Util {
     /**
      * Sets empty or non-existing owner fields of bibtex entries inside a List to a specified default value. Timestamp
      * field is also set. Preferences are checked to see if these options are enabled.
-     * 
+     *
      * @param bibs List of bibtex entries
      */
     public static void setAutomaticFields(Collection<BibtexEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
@@ -489,7 +490,7 @@ public class Util {
     /**
      * Sets empty or non-existing owner fields of a bibtex entry to a specified default value. Timestamp field is also
      * set. Preferences are checked to see if these options are enabled.
-     * 
+     *
      * @param entry The entry to set fields for.
      * @param overwriteOwner Indicates whether owner should be set if it is already set.
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
@@ -524,7 +525,7 @@ public class Util {
     /**
      * Collect file links from the given set of fields, and add them to the list contained in the field
      * GUIGlobals.FILE_FIELD.
-     * 
+     *
      * @param database The database to modify.
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
@@ -536,7 +537,7 @@ public class Util {
     /**
      * Collect file links from the given set of fields, and add them to the list contained in the field
      * GUIGlobals.FILE_FIELD.
-     * 
+     *
      * @param entries The entries to modify.
      * @param fields The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
@@ -580,13 +581,13 @@ public class Util {
      * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
      * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
      * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" field.
-     * 
+     *
      * @param parent The Component used as a parent when displaying a confirmation dialog.
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
      *         otherwise (this indicates that the user has aborted the assignment).
      */
     public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries, BibtexDatabase db, Component parent) {
-        Vector<String> affectedFields = new Vector<String>();
+        Vector<String> affectedFields = new Vector<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
                 KeywordGroup kg = (KeywordGroup) group;
@@ -608,7 +609,7 @@ public class Util {
 
         // show a warning, then return
         StringBuffer message = // JZTODO lyrics...
-        new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+                new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i) {
             message.append(affectedFields.elementAt(i)).append("\n");
         }
@@ -646,7 +647,7 @@ public class Util {
     /**
      * This method looks up what kind of external binding is used for the given field, and constructs on OpenFileFilter
      * suitable for browsing for an external file.
-     * 
+     *
      * @param fieldName The BibTeX field in question.
      * @return The file filter.
      */
@@ -665,7 +666,7 @@ public class Util {
     /**
      * Set a given field to a given value for all entries in a Collection. This method DOES NOT update any UndoManager,
      * but returns a relevant CompoundEdit that should be registered by the caller.
-     * 
+     *
      * @param entries The entries to set the field for.
      * @param field The name of the field to set.
      * @param text The value to set. This value can be null, indicating that the field should be cleared.
@@ -696,7 +697,7 @@ public class Util {
 
     /**
      * Move contents from one field to another for a Collection of entries.
-     * 
+     *
      * @param entries The entries to do this operation for.
      * @param field The field to move contents from.
      * @param newField The field to move contents into.
@@ -761,7 +762,7 @@ public class Util {
 
     /**
      * Static equals that can also return the right result when one of the objects is null.
-     * 
+     *
      * @param one The object whose equals method is called if the first is not null.
      * @param two The object passed to the first one if the first is not null.
      * @return <code>one == null ? two == null : one.equals(two);</code>
@@ -772,7 +773,7 @@ public class Util {
 
     /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
-     * 
+     *
      * @param worker The worker to run.
      * @throws Throwable
      */
@@ -825,7 +826,7 @@ public class Util {
      * @return an ArrayList containing the keywords. An emtpy list if keywords are null or empty
      */
     public static ArrayList<String> getSeparatedKeywords(String keywords) {
-        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<>();
         if (keywords == null) {
             return res;
         }
@@ -900,7 +901,7 @@ public class Util {
 
     /**
      * Binds ESC-Key to cancel button
-     * 
+     *
      * @param rootPane the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
      * @param cancelAction the action to bind
      */
@@ -914,7 +915,7 @@ public class Util {
 
     /**
      * Download the URL and return contents as a String.
-     * 
+     *
      * @param source
      * @return
      * @throws IOException
@@ -926,7 +927,7 @@ public class Util {
 
     /**
      * Download the URL and return contents as a String.
-     * 
+     *
      * @param source
      * @return
      * @throws IOException
@@ -938,7 +939,7 @@ public class Util {
 
     /**
      * Download the URL using specified encoding and return contents as a String.
-     * 
+     *
      * @param source encoding
      * @return
      * @throws IOException
@@ -948,7 +949,7 @@ public class Util {
     }
     /**
      * Download the URL using specified encoding and return contents as a String.
-     * 
+     *
      * @param source encoding
      * @return
      * @throws IOException
@@ -975,7 +976,7 @@ public class Util {
 
     /**
      * Read results from a file instead of an URL. Just for faster debugging.
-     * 
+     *
      * @param f
      * @return
      * @throws IOException
@@ -1059,14 +1060,14 @@ public class Util {
             @Override
             public void run() {
                 // determine directories to search in
-                ArrayList<File> dirs = new ArrayList<File>();
+                ArrayList<File> dirs = new ArrayList<>();
                 String[] dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }
 
                 // determine extensions
-                Collection<String> extensions = new ArrayList<String>();
+                Collection<String> extensions = new ArrayList<>();
                 for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }
@@ -1187,7 +1188,7 @@ public class Util {
      * @return the runnable able to perform the autosetting
      */
     public static Runnable autoSetLinks(final BibtexEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        final Collection<BibtexEntry> entries = new ArrayList<>();
         entries.add(entry);
 
         return Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
@@ -1195,14 +1196,14 @@ public class Util {
 
     /**
      * Returns the list of linked files. The files have the absolute filename
-     * 
+     *
      * @param bes list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
-     * 
+     *
      * @return list of files. May be empty
      */
     public static List<File> getListOfLinkedFiles(BibtexEntry[] bes, String[] fileDirs) {
-        ArrayList<File> res = new ArrayList<File>();
+        ArrayList<File> res = new ArrayList<>();
         for (BibtexEntry entry : bes) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField("file"));
@@ -1219,7 +1220,7 @@ public class Util {
     }
 
     public static Map<BibtexEntry, List<File>> findAssociatedFiles(Collection<BibtexEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibtexEntry, List<File>> result = new HashMap<BibtexEntry, List<File>>();
+        HashMap<BibtexEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
         Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);

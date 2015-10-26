@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -49,8 +49,8 @@ class HelpContent extends JTextPane {
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setDoubleBuffered(true);
         prefs = prefs_;
-        history = new Stack<URL>();
-        forw = new Stack<URL>();
+        history = new Stack<>();
+        forw = new Stack<>();
         setEditorKitForContentType("text/html", new MyEditorKit());
         setContentType("text/html");
         setText("");

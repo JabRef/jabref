@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 Raik Nagel and JabRef contributors
+/*  Copyright (C) 2003-2015 Raik Nagel and JabRef contributors
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 //
 // function : Handling of bibtex fields.
 //            All bibtex-field related stuff should be placed here!
@@ -63,11 +63,11 @@ public class BibtexFields {
     private final HashMap<String, BibtexSingleField> fieldSet;
 
     // contains all known (and public) bibtex fieldnames
-    private String[] PUBLIC_FIELDS;
+    private final String[] PUBLIC_FIELDS;
 
 
     private BibtexFields() {
-        fieldSet = new HashMap<String, BibtexSingleField>();
+        fieldSet = new HashMap<>();
         BibtexSingleField dummy;
 
         // FIRST: all standard fields
@@ -169,7 +169,7 @@ public class BibtexFields {
 
         add(new BibtexSingleField("pmid", false, GUIGlobals.SMALL_W, 60).setNumeric(true));
 
-        // additional fields ------------------------------------------------------ 
+        // additional fields ------------------------------------------------------
         add(new BibtexSingleField("location", false));
         add(new BibtexSingleField("abstract", false, GUIGlobals.LARGE_W, 400));
 
@@ -234,7 +234,7 @@ public class BibtexFields {
         add(dummy);
 
         // collect all public fields for the PUBLIC_FIELDS array
-        Vector<String> pFields = new Vector<String>(fieldSet.size());
+        Vector<String> pFields = new Vector<>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
             if (sField.isPublic()) {
                 pFields.add(sField.getFieldName());
@@ -260,7 +260,7 @@ public class BibtexFields {
             return;
         }
         // Build a Set of field names for the fields that should be sorted numerically:
-        HashSet<String> nF = new HashSet<String>();
+        HashSet<String> nF = new HashSet<>();
         Collections.addAll(nF, numFields);
         // Look through all registered fields, and activate numeric sorting if necessary:
         for (String fieldName : BibtexFields.runtime.fieldSet.keySet()) {
@@ -349,12 +349,12 @@ public class BibtexFields {
 
     public static boolean isWriteableField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        return sField == null || sField.isWriteable();
+        return (sField == null) || sField.isWriteable();
     }
 
     public static boolean isDisplayableField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        return sField == null || sField.isDisplayable();
+        return (sField == null) || sField.isDisplayable();
     }
 
     /**
@@ -365,12 +365,12 @@ public class BibtexFields {
      */
     public static boolean isStandardField(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        return sField != null && sField.isStandard();
+        return (sField != null) && sField.isStandard();
     }
 
     public static boolean isNumeric(String field) {
         BibtexSingleField sField = BibtexFields.getField(field);
-        return sField != null && sField.isNumeric();
+        return (sField != null) && sField.isNumeric();
     }
 
     /**
@@ -384,7 +384,7 @@ public class BibtexFields {
      * returns an string-array with only private fieldnames
      */
     public static String[] getAllPrivateFieldNames() {
-        Vector<String> pFields = new Vector<String>();
+        Vector<String> pFields = new Vector<>();
         for (BibtexSingleField sField : BibtexFields.runtime.fieldSet.values()) {
             if (sField.isPrivate()) {
                 pFields.add(sField.getFieldName());
@@ -424,7 +424,7 @@ public class BibtexFields {
     private static class BibtexSingleField {
 
         private static final int
-                STANDARD = 0x01; // it is a standard bibtex-field
+        STANDARD = 0x01; // it is a standard bibtex-field
         private static final int PRIVATE = 0x02; // internal use, e.g. owner, timestamp
         private static final int DISPLAYABLE = 0x04; // These fields cannot be shown inside the source editor panel
         private static final int WRITEABLE = 0x08; // These fields will not be saved to the .bib file.
@@ -486,7 +486,7 @@ public class BibtexFields {
         }
 
         public BibtexSingleField(String fieldName, boolean pStandard,
-                                 double pWeight, int pLength) {
+                double pWeight, int pLength) {
             name = fieldName;
             setFlag(pStandard, BibtexSingleField.STANDARD);
             weight = pWeight;
@@ -517,7 +517,7 @@ public class BibtexFields {
                 {
                     try {
                         weight = Double.parseDouble(wStr);
-                        if (weight < 0.0 || weight > GUIGlobals.MAX_FIELD_WEIGHT) {
+                        if ((weight < 0.0) || (weight > GUIGlobals.MAX_FIELD_WEIGHT)) {
                             weight = GUIGlobals.DEFAULT_FIELD_WEIGHT;
                         }
                     } catch (Exception e) {

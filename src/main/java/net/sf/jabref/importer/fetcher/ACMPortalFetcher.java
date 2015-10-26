@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.importer.fetcher;
 
 import java.awt.Dimension;
@@ -125,7 +125,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         fetchAbstract = absCheckBox.isSelected();
         int firstEntry = 1;
         String address = makeUrl(firstEntry);
-        LinkedHashMap<String, JLabel> previews = new LinkedHashMap<String, JLabel>();
+        LinkedHashMap<String, JLabel> previews = new LinkedHashMap<>();
 
         try {
             URL url = new URL(address);
@@ -145,7 +145,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             if (hits == 0) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
-                                terms),
+                        terms),
                         Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -259,7 +259,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         }
     }
 
-    private String getEntryBibTeXURL(String fullCitation) {
+    private static String getEntryBibTeXURL(String fullCitation) {
         // Get ID
         Matcher idMatcher = ACMPortalFetcher.idPattern.matcher(fullCitation);
         if (idMatcher.find()) {
@@ -329,18 +329,14 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 preview.setPreferredSize(new Dimension(750, 100));
                 entries.put(link, preview);
                 return true;
-            } else {
-                System.out.printf("Citation Unmatched %d%n", entryNumber);
-                System.out.printf(text);
-                return false;
             }
-
+            LOGGER.warn("Citation Unmatched " + Integer.toString(entryNumber));
+            return false;
         }
-
         return false;
     }
 
-    private BibtexEntry downloadEntryBibTeX(String ID, boolean abs) {
+    private static BibtexEntry downloadEntryBibTeX(String ID, boolean abs) {
         try {
             URL url = new URL(ACMPortalFetcher.startUrl + ACMPortalFetcher.bibtexUrl + ID + ACMPortalFetcher.bibtexUrlEnd);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -367,17 +363,17 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             return entry;
 
         } catch (NoSuchElementException e) {
-            LOGGER.info("Bad Bibtex record read at: " + ACMPortalFetcher.bibtexUrl + ID + ACMPortalFetcher.bibtexUrlEnd);
-            e.printStackTrace();
+            LOGGER.info("Bad Bibtex record read at: " + ACMPortalFetcher.bibtexUrl + ID + ACMPortalFetcher.bibtexUrlEnd,
+                    e);
             return null;
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.info("Malformed URL.", e);
             return null;
         } catch (ConnectException e) {
-            e.printStackTrace();
+            LOGGER.info("Cannot connect.", e);
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.info("Cannot connect.", e);
             return null;
         } catch (InterruptedException ignored) {
             return null;
@@ -398,7 +394,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      * Find out how many hits were found.
      * @param page
      */
-    private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
+    private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind < 0) {
             throw new IOException(Localization.lang("Could not parse number of hits"));
@@ -454,7 +450,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         shouldContinue = false;
     }
 
-    private void save(String filename, String content) throws IOException {
+    private static void save(String filename, String content) throws IOException {
         try(BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
             out.write(content);
         }

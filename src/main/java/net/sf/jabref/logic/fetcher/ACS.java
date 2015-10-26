@@ -31,6 +31,7 @@ public class ACS implements FullTextFinder {
      * @throws NullPointerException if no BibTex entry is given
      * @throws java.io.IOException
      */
+    @Override
     public Optional<URL> findFullText(BibtexEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();

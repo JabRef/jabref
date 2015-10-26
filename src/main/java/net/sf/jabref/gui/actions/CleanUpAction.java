@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012 JabRef contributors.
+/*  Copyright (C) 2012-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.gui.actions;
 
 import java.io.File;
@@ -114,7 +114,7 @@ public class CleanUpAction extends AbstractWorker {
         initOptionsPanel();
     }
 
-    private void removeFieldValue(BibtexEntry entry, String fieldName, NamedCompound compound) {
+    private static void removeFieldValue(BibtexEntry entry, String fieldName, NamedCompound compound) {
         String origValue = entry.getField(fieldName);
         compound.addEdit(new UndoableFieldChange(entry, fieldName, origValue, ""));
         entry.setField(fieldName, "");
@@ -163,7 +163,7 @@ public class CleanUpAction extends AbstractWorker {
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 14);
         builder.add(cleanUpBibLatex).xyw(1, 15, 2);
         optionsPanel = builder.build();
-        
+
     }
 
     private void retrieveSettings() {
@@ -212,7 +212,6 @@ public class CleanUpAction extends AbstractWorker {
 
     private boolean cancelled;
     private int modifiedEntriesCount;
-    int numSelected;
 
 
     @Override
@@ -366,7 +365,7 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
      */
-    private void doCleanUpSuperscripts(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpSuperscripts(BibtexEntry entry, NamedCompound ce) {
         final String field = "booktitle";
         String oldValue = entry.getField(field);
         if (oldValue == null) {
@@ -382,9 +381,9 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Removes the http://... for each DOI
      * Moves DOIs from URL and NOTE filed to DOI field
-     * @param ce 
+     * @param ce
      */
-    private void doCleanUpDOI(BibtexEntry bes, NamedCompound ce) {
+    private static void doCleanUpDOI(BibtexEntry bes, NamedCompound ce) {
         // fields to check
         String[] fields = {"note", "url", "ee"};
 
@@ -425,7 +424,7 @@ public class CleanUpAction extends AbstractWorker {
         }
     }
 
-    private void doCleanUpMonth(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpMonth(BibtexEntry entry, NamedCompound ce) {
         // implementation based on patch 3470076 by Mathias Walter
         String oldValue = entry.getField("month");
         if (oldValue == null) {
@@ -444,7 +443,7 @@ public class CleanUpAction extends AbstractWorker {
         }
     }
 
-    private void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
+    private static void doCleanUpPageNumbers(BibtexEntry entry, NamedCompound ce) {
         String oldValue = entry.getField("pages");
         if (oldValue == null) {
             return;
@@ -456,7 +455,7 @@ public class CleanUpAction extends AbstractWorker {
         }
     }
 
-    private void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
+    private static void fixWrongFileEntries(BibtexEntry entry, NamedCompound ce) {
         String oldValue = entry.getField(Globals.FILE_FIELD);
         if (oldValue == null) {
             return;
@@ -595,7 +594,7 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Converts HTML code to LaTeX code
      */
-    private void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertHTML(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
         String oldValue = entry.getField(field);
         if (oldValue == null) {
@@ -612,7 +611,7 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Converts Unicode characters to LaTeX code
      */
-    private void doConvertUnicode(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertUnicode(BibtexEntry entry, NamedCompound ce) {
         final String[] fields = {"title", "author", "abstract"};
         for (String field : fields) {
             String oldValue = entry.getField(field);
@@ -631,7 +630,7 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Adds curly brackets {} around keywords
      */
-    private void doConvertCase(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertCase(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
         String oldValue = entry.getField(field);
         if (oldValue == null) {
@@ -645,7 +644,7 @@ public class CleanUpAction extends AbstractWorker {
         }
     }
 
-    private void doConvertUnits(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertUnits(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
         String oldValue = entry.getField(field);
         if (oldValue == null) {
@@ -659,7 +658,7 @@ public class CleanUpAction extends AbstractWorker {
         }
     }
 
-    private void doConvertLaTeX(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertLaTeX(BibtexEntry entry, NamedCompound ce) {
         final String field = "title";
         String oldValue = entry.getField(field);
         if (oldValue == null) {
@@ -696,7 +695,7 @@ public class CleanUpAction extends AbstractWorker {
     /**
      * Converts to BibLatex format
      */
-    private void doConvertToBiblatex(BibtexEntry entry, NamedCompound ce) {
+    private static void doConvertToBiblatex(BibtexEntry entry, NamedCompound ce) {
 
         for (Map.Entry<String, String> alias : BibtexEntry.FIELD_ALIASES_OLD_TO_NEW.entrySet()) {
             String oldFieldName = alias.getKey();

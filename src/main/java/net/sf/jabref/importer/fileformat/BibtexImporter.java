@@ -1,20 +1,18 @@
-/*
- *  This file is part of JabRef.
- *
- *  JabRef is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  JabRef is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with JAbRef.  If not, see <http://www.gnu.org/licenses/>. 
- */
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
@@ -28,7 +26,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibtexEntry;
 
 /**
- * Imported requried to support --importToOpen someEntry.bib 
+ * Imported requried to support --importToOpen someEntry.bib
  */
 public class BibtexImporter extends ImportFormat {
 
@@ -44,7 +42,7 @@ public class BibtexImporter extends ImportFormat {
      * Parses the given input stream.
      * Only plain bibtex entries are returned.
      * That especially means that metadata is ignored.
-     * 
+     *
      * @param in the inputStream to read from
      * @param status the OutputPrinter to put status to
      * @return a list of BibTeX entries contained in the given inputStream
@@ -53,7 +51,7 @@ public class BibtexImporter extends ImportFormat {
     public List<BibtexEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
         ParserResult pr = BibtexParser.parse(new InputStreamReader(in));
-        return new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
+        return new ArrayList<>(pr.getDatabase().getEntries());
     }
 
     @Override

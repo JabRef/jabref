@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.Globals;
@@ -27,7 +27,7 @@ import java.util.HashMap;
  */
 public class FormatChars implements LayoutFormatter {
 
-    private static final HashMap<String, String> CHARS = new HashMap<String, String>();
+    private static final HashMap<String, String> CHARS = new HashMap<>();
 
     static {
         CHARS.put("`A", "À"); // #192
@@ -247,7 +247,7 @@ public class FormatChars implements LayoutFormatter {
 
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
-            if (escaped && c == '\\') {
+            if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
             } else if (c == '\\') {
@@ -264,9 +264,9 @@ public class FormatChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            } else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || c == '%'
+            } else if (Character.isLetter(c) || (c == '%')
                     || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
@@ -274,11 +274,11 @@ public class FormatChars implements LayoutFormatter {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom: if (currentCommand.length() == 1
+                    testCharCom: if ((currentCommand.length() == 1)
                             && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= field.length() - 1) {
+                        if (i >= (field.length() - 1)) {
                             break testCharCom;
                         }
 
@@ -305,7 +305,7 @@ public class FormatChars implements LayoutFormatter {
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if (i + 1 == field.length()) {
+                        if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
                             Object result = FormatChars.CHARS.get(command);
                             /* If found, then use translated version. If not,
@@ -326,7 +326,7 @@ public class FormatChars implements LayoutFormatter {
 
                 if (!incommand) {
                     sb.append(c);
-                } else if (Character.isWhitespace(c) || c == '{' || c == '}') {
+                } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
                     // First test if we are already at the end of the string.
                     // if (i >= field.length()-1)
                     // break testContent;
@@ -376,16 +376,16 @@ public class FormatChars implements LayoutFormatter {
 
                     argument = "";
                  }*/else {
-                    /*
-                     * TODO: this point is reached, apparently, if a command is
-                     * terminated in a strange way, such as with "$\omega$".
-                     * Also, the command "\&" causes us to get here. The former
-                     * issue is maybe a little difficult to address, since it
-                     * involves the LaTeX math mode. We don't have a complete
-                     * LaTeX parser, so maybe it's better to ignore these
-                     * commands?
-                     */
-                }
+                     /*
+                      * TODO: this point is reached, apparently, if a command is
+                      * terminated in a strange way, such as with "$\omega$".
+                      * Also, the command "\&" causes us to get here. The former
+                      * issue is maybe a little difficult to address, since it
+                      * involves the LaTeX math mode. We don't have a complete
+                      * LaTeX parser, so maybe it's better to ignore these
+                      * commands?
+                      */
+                 }
 
                 incommand = false;
                 escaped = false;

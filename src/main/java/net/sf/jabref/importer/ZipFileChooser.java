@@ -1,4 +1,4 @@
-/*
+/* Copyright (C) 2015 JabRef contributors.
  Copyright (C) 2005 Andreas Rudert
 
  All programs in this directory and
@@ -59,17 +59,17 @@ import net.sf.jabref.util.Util;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
- * 
+ *
  * @author andreas_sf at rudert-home dot de
  */
 class ZipFileChooser extends JDialog {
 
     /**
      * Table model for the ZIP archive contents.
-     * 
+     *
      * <p>Contains one row for each entry.
      * Does not contain rows for directory entries.</p>
-     * 
+     *
      * <p>The columns contain information about ZIIP file entries:
      * <ol><li>
      *   name {@link String}
@@ -86,8 +86,8 @@ class ZipFileChooser extends JDialog {
                 Localization.lang("Last modified"),
                 Localization.lang("Size")
         };
-        private ZipEntry[] rows;
-        private ZipFile zipFile;
+        private final ZipEntry[] rows;
+        private final ZipFile zipFile;
 
 
         ZipFileChooserTableModel(ZipFile zipFile, ZipEntry[] rows) {
@@ -125,7 +125,7 @@ class ZipFileChooser extends JDialog {
 
         /**
          * Zip-File entry at the given row index.
-         * 
+         *
          * @param rowIndex  row index
          * @return  Zip file entry
          */
@@ -135,7 +135,7 @@ class ZipFileChooser extends JDialog {
 
         /**
          * Zip file which contains all entries of this model.
-         * 
+         *
          * @return zip file
          */
         public ZipFile getZipFile() {
@@ -183,12 +183,12 @@ class ZipFileChooser extends JDialog {
 
     /**
      * Entries that can be selected with this dialog.
-     * 
+     *
      * @param zipFile  Zip-File
      * @return  entries that can be selected
      */
-    private ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
-        List<ZipEntry> entries = new ArrayList<ZipEntry>();
+    private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
+        List<ZipEntry> entries = new ArrayList<>();
         Enumeration<? extends ZipEntry> e = zipFile.entries();
         while (e.hasMoreElements()) {
             ZipEntry entry = e.nextElement();
@@ -201,7 +201,7 @@ class ZipFileChooser extends JDialog {
 
     /**
      * New Zip file chooser.
-     * 
+     *
      * @param owner  Owner of the file chooser
      * @param zipFile  Zip-Fle to choose from, must be readable
      * @throws HeadlessException
