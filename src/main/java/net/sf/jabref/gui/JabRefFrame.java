@@ -138,6 +138,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             add(b);
         }
+
+        void addJToogleButton(JToggleButton button) {
+            button.setText(null);
+            if (!OS.OS_X) {
+                button.setMargin(marg);
+            }
+            Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
+            if ((obj != null) && (obj instanceof IconTheme.FontBasedIcon)) {
+                button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
+            }
+            add(button);
+        }
+
+
     }
 
 
@@ -300,6 +314,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Toggle groups interface"),
             prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
             IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
+    private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"));
+    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group"));
+    private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group"));
+
+
     private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
             Localization.menuTitle("Toggle entry preview"),
             Localization.lang("Toggle entry preview"),
@@ -388,7 +407,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Export to external SQL database"),
             Localization.lang("Export to external SQL database"));
 
-    private final AbstractAction Cleanup = new GeneralAction(Actions.CLEANUP,
+    private final AbstractAction cleanupEntries = new GeneralAction(Actions.CLEANUP,
             Localization.menuTitle("Cleanup entries"),
             Localization.lang("Cleanup entries"),
             prefs.getKey(KeyBinds.CLEANUP),
@@ -409,6 +428,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Resolve duplicate BibTeX keys"),
             Localization.lang("Find and remove duplicate BibTeX keys"),
             prefs.getKey(KeyBinds.RESOLVE_DUPLICATE_BIB_TE_X_KEYS));
+
+    private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
+            Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon());
 
     final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
@@ -1184,7 +1206,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
         edit.add(exportToClipboard);
-        edit.add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
+        edit.add(sendAsEmail);
 
         edit.addSeparator();
         edit.add(mark);
@@ -1249,9 +1271,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         groups.add(toggleGroups);
         groups.addSeparator();
-        groups.add(new JMenuItem(new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"))));
-        groups.add(new JMenuItem(new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group"))));
-        groups.add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
+        groups.add(new JMenuItem(addToGroup));
+        groups.add(new JMenuItem(removeFromGroup));
+        groups.add(moveToGroup);
         groups.addSeparator();
         groups.add(toggleHighlightAny);
         groups.add(toggleHighlightAll);
@@ -1289,7 +1311,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(bibtex);
 
         tools.add(makeKeyAction);
-        tools.add(Cleanup);
+        tools.add(cleanupEntries);
         tools.add(mergeEntries);
         tools.add(downloadFullText);
         tools.add(newSubDatabaseAction);
@@ -1407,7 +1429,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(editEntry);
         tlb.addAction(editStrings);
         tlb.addAction(makeKeyAction);
-        tlb.addAction(Cleanup);
+        tlb.addAction(cleanupEntries);
         tlb.addAction(mergeEntries);
 
         tlb.addSeparator();
@@ -1437,32 +1459,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         searchToggle = new JToggleButton(toggleSearch);
-        searchToggle.setText(null);
-        if (!OS.OS_X) {
-            searchToggle.setMargin(marg);
-        }
-        tlb.add(searchToggle);
+        tlb.addJToogleButton(searchToggle);
 
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
-        fetcherToggle.setText(null);
-        if (!OS.OS_X) {
-            fetcherToggle.setMargin(marg);
-        }
-        tlb.add(fetcherToggle);
+        tlb.addJToogleButton(fetcherToggle);
 
         previewToggle = new JToggleButton(togglePreview);
-        previewToggle.setText(null);
-        if (!OS.OS_X) {
-            previewToggle.setMargin(marg);
-        }
-        tlb.add(previewToggle);
+        tlb.addJToogleButton(previewToggle);
 
         groupToggle = new JToggleButton(toggleGroups);
-        groupToggle.setText(null);
-        if (!OS.OS_X) {
-            groupToggle.setMargin(marg);
-        }
-        tlb.add(groupToggle);
+        tlb.addJToogleButton(groupToggle);
 
         tlb.addSeparator();
 
@@ -1518,12 +1524,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, saveSelectedAsPlain, undo,
                 redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry,
                 selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings, toggleGroups, toggleSearch,
-                makeKeyAction, normalSearch,
-                incrementalSearch, replaceAll, importMenu, exportMenu,
-                /* openSpires wasn't being supported so no point in supporting
-                 * openInspire */
-                openPdf, openUrl, openFolder, openFile, openSpires, /*openInspire,*/togglePreview, dupliCheck, /*strictDupliCheck,*/
-                newEntryAction, plainTextImport, massSetField, manageKeywords,
+                makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
+                incrementalSearch, replaceAll, importMenu, exportMenu, sendAsEmail, downloadFullText, writeXmpAction,
+                findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
+                openPdf, openUrl, openFolder, openFile, openSpires, togglePreview, dupliCheck, autoSetFile,
+                newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
                 closeDatabaseAction, switchPreview, integrityCheckAction,
                 toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
                 abbreviateMedline, unabbreviate, exportAll, exportSelected,
