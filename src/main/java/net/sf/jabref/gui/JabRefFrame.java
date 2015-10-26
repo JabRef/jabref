@@ -394,7 +394,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.CLEANUP),
             IconTheme.JabRefIcon.CLEANUP_ENTRIES.getIcon());
 
-    private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES,
+    // used by RightClickMenu
+    final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES,
             Localization.menuTitle("Merge entries"),
             Localization.lang("Merge entries"),
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
