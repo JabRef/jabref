@@ -21,6 +21,7 @@ import javax.swing.Action;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
@@ -65,7 +66,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
                 if (panel.getFile() == null) {
                     frame.showBaseAt(i);
                 }
-                panel.runCommand("save");
+                panel.runCommand(Actions.SAVE);
                 // TODO: can we find out whether the save was actually done or not?
                 saved++;
             }

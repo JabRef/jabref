@@ -333,7 +333,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.CUT, (BaseAction) () -> {
-            runCommand("copy");
+            runCommand(Actions.COPY);
             BibtexEntry[] bes = mainTable.getSelectedEntries();
             //int row0 = mainTable.getSelectedRow();
             if (bes != null && bes.length > 0) {
@@ -1048,13 +1048,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         if (bes != null && bes.length == 1) {
                             Object link = bes[0].getField(field);
                             if (link == null) {
-                                runCommand("openFile"); // Fall back on PDF/PS fields???
+                                runCommand(Actions.OPEN_FILE); // Fall back on PDF/PS fields???
                                 return;
                             }
                             FileListTableModel tableModel = new FileListTableModel();
                             tableModel.setContent((String) link);
                             if (tableModel.getRowCount() == 0) {
-                                runCommand("openFile"); // Fall back on PDF/PS fields???
+                                runCommand(Actions.OPEN_FILE); // Fall back on PDF/PS fields???
                                 return;
                             }
                             FileListEntry flEntry = tableModel.getEntry(0);
@@ -1688,40 +1688,40 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         };
         mainTable.addSelectionListener(groupsHighlightListener);
 
-        mainTable.getActionMap().put("cut", new AbstractAction() {
+        mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    runCommand("cut");
+                    runCommand(Actions.CUT);
                 } catch (Throwable ex) {
                     ex.printStackTrace();
                 }
             }
         });
-        mainTable.getActionMap().put("copy", new AbstractAction() {
+        mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    runCommand("copy");
+                    runCommand(Actions.COPY);
                 } catch (Throwable ex) {
                     ex.printStackTrace();
                 }
             }
         });
-        mainTable.getActionMap().put("paste", new AbstractAction() {
+        mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    runCommand("paste");
+                    runCommand(Actions.PASTE);
                 } catch (Throwable ex) {
                     ex.printStackTrace();
                 }
@@ -1777,7 +1777,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 } else if (keyCode == KeyEvent.VK_ENTER) {
                     e.consume();
                     try {
-                        runCommand("edit");
+                        runCommand(Actions.EDIT);
                     } catch (Throwable ex) {
                         ex.printStackTrace();
                     }

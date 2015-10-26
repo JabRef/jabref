@@ -48,6 +48,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinds;
 import net.sf.jabref.bibtex.BibtexEntryWriter;
@@ -1507,7 +1508,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.runCommand("undo");
+            panel.runCommand(Actions.UNDO);
         }
     }
 
@@ -1522,7 +1523,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.runCommand("redo");
+            panel.runCommand(Actions.REDO);
         }
     }
 
@@ -1549,7 +1550,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
 
-            panel.runCommand("save");
+            panel.runCommand(Actions.SAVE);
 
         }
     }

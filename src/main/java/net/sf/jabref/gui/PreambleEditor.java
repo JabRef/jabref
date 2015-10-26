@@ -20,6 +20,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.model.database.BibtexDatabase;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -108,9 +109,9 @@ class PreambleEditor extends JDialog {
         ta.getActionMap().put("close", closeAction);
 
         ta.getInputMap().put(prefs.getKey("Undo"), "undo");
-        ta.getActionMap().put("undo", undoAction);
+        ta.getActionMap().put(Actions.UNDO, undoAction);
         ta.getInputMap().put(prefs.getKey("Redo"), "redo");
-        ta.getActionMap().put("redo", redoAction);
+        ta.getActionMap().put(Actions.REDO, redoAction);
 
         ta.addFocusListener(new FieldListener());
     }
@@ -196,7 +197,7 @@ class PreambleEditor extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("undo");
+                panel.runCommand(Actions.UNDO);
             } catch (Throwable ignored) {
                 // Ignored
             }
@@ -210,14 +211,14 @@ class PreambleEditor extends JDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Undo", IconTheme.JabRefIcon.REDO.getIcon());
+            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("redo");
+                panel.runCommand(Actions.REDO);
             } catch (Throwable ignored) {
                 // Ignored
             }

@@ -2025,7 +2025,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         if (answer == JOptionPane.YES_OPTION) {
                             // The user wants to save.
                             try {
-                                basePanel().runCommand("save");
+                                basePanel().runCommand(Actions.SAVE);
                             } catch (Throwable ignored) {
                             }
                         }

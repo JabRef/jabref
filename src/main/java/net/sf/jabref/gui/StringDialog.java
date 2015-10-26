@@ -48,6 +48,7 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.UndoableInsertString;
@@ -210,7 +211,7 @@ class StringDialog extends JDialog {
     }
 
     public void saveDatabase() {
-        panel.runCommand("save");
+        panel.runCommand(Actions.SAVE);
     }
 
 
@@ -495,7 +496,7 @@ class StringDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("undo");
+                panel.runCommand(Actions.UNDO);
             } catch (Throwable ignored) {
             }
         }
@@ -504,14 +505,14 @@ class StringDialog extends JDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Undo", IconTheme.JabRefIcon.REDO.getIcon());
+            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Redo"));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                panel.runCommand("redo");
+                panel.runCommand(Actions.REDO);
             } catch (Throwable ignored) {
             }
         }
