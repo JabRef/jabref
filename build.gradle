@@ -132,7 +132,7 @@ processResources {
 
             // mark that entry has been written
             id = ""
-            // note is not present at all antries. Ensure that no note is written instead of the last note
+            // note is not present at all entries. Ensure that no note is written instead of the last note.
             note = ""
         }
     }
