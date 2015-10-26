@@ -1823,39 +1823,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             });
     }
 
-    private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
-        importMenu.removeAll();
-
-        // Add a menu item for autodetecting import format:
-        importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_));
-
-        // Add custom importers
-        importMenu.addSeparator();
-
-        SortedSet<ImportFormat> customImporters = Globals.importFormatReader.getCustomImportFormats();
-        JMenu submenu = new JMenu(Localization.lang("Custom importers"));
-        submenu.setMnemonic(KeyEvent.VK_S);
-
-        // Put in all formatters registered in ImportFormatReader:
-        for (ImportFormat imFo : customImporters) {
-            submenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
-        }
-
-        if (!customImporters.isEmpty()) {
-            submenu.addSeparator();
-        }
-
-        submenu.add(customImpAction);
-
-        importMenu.add(submenu);
-        importMenu.addSeparator();
-
-        // Put in all formatters registered in ImportFormatReader:
-        for (ImportFormat imFo : Globals.importFormatReader.getBuiltInInputFormats()) {
-            importMenu.add(new ImportMenuItem(JabRefFrame.this, intoNew_, imFo));
-        }
-    }
-
     public FileHistory getFileHistory() {
         return fileHistory;
     }
