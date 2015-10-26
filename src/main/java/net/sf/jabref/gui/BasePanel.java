@@ -94,7 +94,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
-    private static final long serialVersionUID = 1L;
+
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     public static final int SHOWING_NOTHING = 0;
@@ -102,7 +102,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public static final int SHOWING_EDITOR = 2;
     public static final int WILL_SHOW_EDITOR = 3;
 
-    /* 
+    /*
      * The database shown in this panel.
      */
     public BibtexDatabase database;
@@ -186,7 +186,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public final MetaData metaData;
 
     private final HashMap<String, Object> actions = new HashMap<>();
-    private SidePaneManager sidePaneManager;
+    private final SidePaneManager sidePaneManager;
 
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
@@ -305,7 +305,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.COPY, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
 
-            if (bes != null && bes.length > 0) {
+            if ((bes != null) && (bes.length > 0)) {
                 TransferableBibtexEntry trbe
                         = new TransferableBibtexEntry(bes);
                 // ! look at ClipBoardManager
@@ -318,7 +318,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // The user maybe selected a single cell.
                 int[] rows = mainTable.getSelectedRows();
                 int[] cols = mainTable.getSelectedColumns();
-                if (cols.length == 1 && rows.length == 1) {
+                if ((cols.length == 1) && (rows.length == 1)) {
                     // Copy single value.
                     Object o = mainTable.getValueAt(rows[0], cols[0]);
                     if (o != null) {
@@ -336,7 +336,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             runCommand(Actions.COPY);
             BibtexEntry[] bes = mainTable.getSelectedEntries();
             //int row0 = mainTable.getSelectedRow();
-            if (bes != null && bes.length > 0) {
+            if ((bes != null) && (bes.length > 0)) {
                 // Create a CompoundEdit to make the action undoable.
                 NamedCompound ce = new NamedCompound
                         (Localization.lang(bes.length > 1 ? "cut entries" : "cut entry"));
@@ -360,7 +360,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.DELETE, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
-            if (bes != null && bes.length > 0) {
+            if ((bes != null) && (bes.length > 0)) {
 
                 boolean goOn = showDeleteConfirmationDialog(bes.length);
                 if (goOn) {
@@ -424,7 +424,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
                 // or were parsed from a string
-                if (bes != null && bes.length > 0) {
+                if ((bes != null) && (bes.length > 0)) {
 
                     NamedCompound ce = new NamedCompound(Localization.lang(bes.length > 1 ? "paste entries" : "paste entry"));
 
@@ -719,7 +719,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         @Override
                         public void run() {
                             final int row = mainTable.findEntry(bibEntry);
-                            if (row >= 0 && mainTable.getSelectedRowCount() < entries.size()) {
+                            if ((row >= 0) && (mainTable.getSelectedRowCount() < entries.size())) {
                                 mainTable.addRowSelectionInterval(row, row);
                             }
                         }
@@ -762,7 +762,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> {
             BibtexEntry[] bes = mainTable.getSelectedEntries();
-            if (bes != null && bes.length > 0) {
+            if ((bes != null) && (bes.length > 0)) {
                 storeCurrentEdit();
                 List<String> keys = new ArrayList<>(bes.length);
                 // Collect all non-null keys.
@@ -803,7 +803,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void action() {
                 BibtexEntry[] bes = mainTable.getSelectedEntries();
-                if (bes != null && bes.length > 0) {
+                if ((bes != null) && (bes.length > 0)) {
                     storeCurrentEdit();
                     List<String> keys = new ArrayList<>(bes.length);
                     // Collect all non-null keys.
@@ -846,7 +846,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void action() {
                 BibtexEntry[] bes = mainTable.getSelectedEntries();
-                if (bes != null && bes.length > 0) {
+                if ((bes != null) && (bes.length > 0)) {
                     storeCurrentEdit();
 
                     // OK: in a future version, this string should be configurable to allow arbitrary exports
@@ -905,7 +905,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
                         String field = "ps";
 
-                        if (bes != null && bes.length == 1) {
+                        if ((bes != null) && (bes.length == 1)) {
                             FileListEntry entry = null;
                             FileListTableModel tm = new FileListTableModel();
                             tm.setContent(bes[0].getField("file"));
@@ -972,7 +972,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                         if (!res.isEmpty()) {
                                             filepath = res.get(0).getPath();
                                             int index = filepath.lastIndexOf('.');
-                                            if (index >= 0 && index < filepath.length() - 1) {
+                                            if ((index >= 0) && (index < (filepath.length() - 1))) {
                                                 String extension = filepath.substring(index + 1);
                                                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt(extension);
                                                 if (type != null) {
@@ -1045,7 +1045,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     public void run() {
                         BibtexEntry[] bes = mainTable.getSelectedEntries();
                         String field = Globals.FILE_FIELD;
-                        if (bes != null && bes.length == 1) {
+                        if ((bes != null) && (bes.length == 1)) {
                             Object link = bes[0].getField(field);
                             if (link == null) {
                                 runCommand(Actions.OPEN_FILE); // Fall back on PDF/PS fields???
@@ -1099,7 +1099,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void action() {
                 BibtexEntry[] bes = mainTable.getSelectedEntries();
                 String field = "doi";
-                if (bes != null && bes.length == 1) {
+                if ((bes != null) && (bes.length == 1)) {
                     Object link = bes[0].getField("doi");
                     if (bes[0].getField("url") != null) {
                         link = bes[0].getField("url");
@@ -1151,7 +1151,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void action() {
                 BibtexEntry[] bes = mainTable.getSelectedEntries();
-                if (bes != null && bes.length == 1) {
+                if ((bes != null) && (bes.length == 1)) {
                     Object link = null;
                     if (bes[0].getField("eprint") != null) {
                         link = SPIRESFetcher.constructUrlFromEprint(bes[0].getField("eprint"));
@@ -1561,7 +1561,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
-            if (e.getType() == ChangeType.ADDED_ENTRY
+            if ((e.getType() == ChangeType.ADDED_ENTRY)
                     && Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
                     && frame.groupToggle.isSelected()) {
                 BibtexEntry[] entries = {e.getEntry()};
@@ -1592,7 +1592,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
-            if (e.getType() == ChangeType.CHANGED_ENTRY || e.getType() == ChangeType.ADDED_ENTRY) {
+            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
                 searchAutoCompleter.addBibtexEntry(e.getEntry());
             }
         }
@@ -1606,7 +1606,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
-            if (e.getType() == ChangeType.CHANGED_ENTRY || e.getType() == ChangeType.ADDED_ENTRY) {
+            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
                 BasePanel.this.autoCompleters.addEntry(e.getEntry());
             }
         }
@@ -1911,8 +1911,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void adjustSplitter() {
-        int mode = getMode();
-        if (mode == BasePanel.SHOWING_PREVIEW) {
+        if (getMode() == BasePanel.SHOWING_PREVIEW) {
             splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT));
         } else {
             splitPane.setDividerLocation(splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
@@ -1935,6 +1934,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    @SuppressWarnings("unused")
     public void moveFocusToEntryEditor() {
         Component c = splitPane.getBottomComponent();
         if (c instanceof EntryEditor) {
@@ -1943,8 +1943,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private boolean isShowingEditor() {
-        return splitPane.getBottomComponent() != null
-                && splitPane.getBottomComponent() instanceof EntryEditor;
+        return (splitPane.getBottomComponent() != null)
+                && (splitPane.getBottomComponent() instanceof EntryEditor);
     }
 
     public void showEntry(final BibtexEntry be) {
@@ -2033,7 +2033,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             // If the cached editor is not the same as the currently shown one,
             // make sure the current one stores its current edit:
-            if (visibleNow != null && form != visibleNow) {
+            if ((visibleNow != null) && (form != visibleNow)) {
                 visibleNow.storeCurrentEdit();
             }
 
@@ -2164,7 +2164,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param be a <code>BibtexEntry</code> value
      */
     public void ensureNotShowing(BibtexEntry be) {
-        if (mode == BasePanel.SHOWING_EDITOR && currentEditor.getEntry() == be) {
+        if ((mode == BasePanel.SHOWING_EDITOR) && (currentEditor.getEntry() == be)) {
             selectionListener.entryEditorClosing(currentEditor);
         }
     }
@@ -2362,7 +2362,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void changeType(BibtexEntry[] bes, BibtexEntryType type) {
 
-        if (bes == null || bes.length == 0) {
+        if ((bes == null) || (bes.length == 0)) {
             output("First select the entries you wish to change type " +
                     "for.");
             return;
@@ -2433,7 +2433,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             for (BibtexEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
-                if (oldKey == null || oldKey.isEmpty()) {
+                if ((oldKey == null) || oldKey.isEmpty()) {
                     LabelPatternUtil.makeLabel(metaData, database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
                             bes.getField(BibtexEntry.KEY_FIELD)));
@@ -2481,10 +2481,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() {
             try {
                 JComponent focused = Globals.focusListener.getFocused();
-                if (focused != null && focused instanceof FieldEditor && focused.hasFocus()) {
+                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     // Check if it is the preamble:
-                    if (preambleEditor != null && focused == preambleEditor.getFieldEditor()) {
+                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
                         preambleEditor.storeCurrentEdit();
                     } else {
                         storeCurrentEdit();
@@ -2513,7 +2513,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
 
                 JComponent focused = Globals.focusListener.getFocused();
-                if (focused != null && focused instanceof FieldEditor && focused.hasFocus()) {
+                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     storeCurrentEdit();
                 }
@@ -2537,10 +2537,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Method pertaining to the ClipboardOwner interface.
     @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
+        // Nothing
     }
 
     private void setEntryEditorEnabled(boolean enabled) {
-        if (getShowing() != null && splitPane.getBottomComponent() instanceof EntryEditor) {
+        if ((getShowing() != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {
             EntryEditor ed = (EntryEditor) splitPane.getBottomComponent();
             if (ed.isEnabled() != enabled) {
                 ed.setEnabled(enabled);
@@ -2590,7 +2591,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         };
 
         // Test: running scan automatically in background
-        if (BasePanel.this.getFile() != null &&
+        if ((BasePanel.this.getFile() != null) &&
                 !FileBasedLock.waitForFileLock(BasePanel.this.getFile(), 10)) {
             // The file is locked even after the maximum wait. Do nothing.
             System.err.println("File updated externally, but change scan failed because the file is locked.");
@@ -2667,7 +2668,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (BibtexEntry bes : mainTable.getSelected()) {
             citeKey = bes.getField(BibtexEntry.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
-            if (citeKey == null || citeKey.isEmpty()) {
+            if ((citeKey == null) || citeKey.isEmpty()) {
                 continue;
             }
             if (first) {
@@ -2805,11 +2806,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (chosenFile != null) {
                 File expFile = new File(chosenFile);
                 if (!expFile.exists() ||
-                        JOptionPane.showConfirmDialog
+                        (JOptionPane.showConfirmDialog
                                 (frame, '\'' + expFile.getName() + "' " +
                                                 Localization.lang("exists. Overwrite file?"),
                                         Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                                == JOptionPane.OK_OPTION) {
+                                == JOptionPane.OK_OPTION)) {
 
                     saveDatabase(expFile, true, Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING), saveType);
                     frame.getFileHistory().newFile(expFile.getPath());

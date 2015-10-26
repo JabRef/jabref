@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -101,7 +101,6 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
                 // Perform all accepted changes:
                 // Store all edits in an Undoable object:
                 NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-                @SuppressWarnings("unchecked")
                 Enumeration<Change> enumer = root.children();
                 boolean anyDisabled = false;
                 while (enumer.hasMoreElements()) {

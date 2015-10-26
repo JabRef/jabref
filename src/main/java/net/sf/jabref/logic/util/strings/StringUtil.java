@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2015 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
@@ -47,7 +62,7 @@ public class StringUtil {
 
         }
         while (!endOk) {
-            if (end > begin + 1) {
+            if (end > (begin + 1)) {
                 first = toShave.charAt(end - 1);
                 if (Character.isWhitespace(first)) {
                     end--;
@@ -59,10 +74,10 @@ public class StringUtil {
             }
         }
 
-        if (end > begin + 1) {
+        if (end > (begin + 1)) {
             first = toShave.charAt(begin);
             second = toShave.charAt(end - 1);
-            if (first == '{' && second == '}' || first == '"' && second == '"') {
+            if (((first == '{') && (second == '}')) || ((first == '"') && (second == '"'))) {
                 begin++;
                 end--;
             }
@@ -91,7 +106,7 @@ public class StringUtil {
      * @return
      */
     public static String join(String[] strings, String separator, int from, int to) {
-        if (strings.length == 0 || from >= to) {
+        if ((strings.length == 0) || (from >= to)) {
             return "";
         }
 
@@ -99,7 +114,7 @@ public class StringUtil {
         to = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = from; i < to - 1; i++) {
+        for (int i = from; i < (to - 1); i++) {
             stringBuilder.append(strings[i]).append(separator);
         }
         return stringBuilder.append(strings[to - 1]).toString();
@@ -201,18 +216,18 @@ public class StringUtil {
 
         // advance to first char and skip whitespace
         index++;
-        while (index < text.length() && Character.isWhitespace(text.charAt(index))) {
+        while ((index < text.length()) && Character.isWhitespace(text.charAt(index))) {
             index++;
         }
 
         // then grab whathever is the first token (counting braces)
         while (index < text.length()) {
             c = text.charAt(index);
-            if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
+            if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
                 // end argument and leave whitespace for further processing
                 break;
             }
-            if (c == '}' && --count < 0) {
+            if ((c == '}') && (--count < 0)) {
                 break;
             } else if (c == '{') {
                 count++;
@@ -263,7 +278,7 @@ public class StringUtil {
 
         while (length < result.length()) {
             int current = result.indexOf(" ", length + wrapAmount);
-            if (current < 0 || current >= result.length()) {
+            if ((current < 0) || (current >= result.length())) {
                 break;
             }
 
@@ -309,9 +324,9 @@ public class StringUtil {
         boolean isSpecial;
         for (int i = 0; i < toQuote.length(); ++i) {
             c = toQuote.charAt(i);
-            isSpecial = specials.indexOf(c) >= 0 || c == quoteChar;
+            isSpecial = (specials.indexOf(c) >= 0) || (c == quoteChar);
             // linebreak?
-            if (linewrap > 0 && (++lineLength >= linewrap || isSpecial && lineLength >= linewrap - 1)) {
+            if ((linewrap > 0) && ((++lineLength >= linewrap) || (isSpecial && (lineLength >= (linewrap - 1))))) {
                 result.append(quoteChar);
                 result.append('\n');
                 lineLength = 0;
@@ -382,7 +397,7 @@ public class StringUtil {
      * @return A List of character encodings
      */
     public static List<String> findEncodingsForString(String characters) {
-        List<String> encodings = new ArrayList<String>();
+        List<String> encodings = new ArrayList<>();
         for (int i = 0; i < Encodings.ENCODINGS.length; i++) {
             CharsetEncoder encoder = Charset.forName(Encodings.ENCODINGS[i]).newEncoder();
             if (encoder.canEncode(characters)) {
@@ -402,7 +417,7 @@ public class StringUtil {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
             sb.append(encodeStringArray(values[i]));
-            if (i < values.length - 1) {
+            if (i < (values.length - 1)) {
                 sb.append(';');
             }
         }
@@ -419,7 +434,7 @@ public class StringUtil {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entry.length; i++) {
             sb.append(encodeString(entry[i]));
-            if (i < entry.length - 1) {
+            if (i < (entry.length - 1)) {
                 sb.append(':');
             }
 
@@ -435,25 +450,25 @@ public class StringUtil {
      * @return The decoded String array.
      */
     public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<String>();
+        ArrayList<String> thisEntry = new ArrayList<>();
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
-            if (!escaped && c == '\\') {
+            if (!escaped && (c == '\\')) {
                 escaped = true;
                 continue;
             }
-            else if (!escaped && c == ':') {
+            else if (!escaped && (c == ':')) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
             }
-            else if (!escaped && c == ';') {
+            else if (!escaped && (c == ';')) {
                 thisEntry.add(sb.toString());
                 sb = new StringBuilder();
                 newList.add(thisEntry);
-                thisEntry = new ArrayList<String>();
+                thisEntry = new ArrayList<>();
             } else {
                 sb.append(c);
             }
@@ -484,7 +499,7 @@ public class StringUtil {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == ';' || c == ':' || c == '\\') {
+            if ((c == ';') || (c == ':') || (c == '\\')) {
                 sb.append('\\');
             }
             sb.append(c);
@@ -507,7 +522,7 @@ public class StringUtil {
     		return new String[0];
     	}
 
-        ArrayList<String> al = new ArrayList<String>();
+        ArrayList<String> al = new ArrayList<>();
         for (String anAll : all) {
             boolean found = false;
             for (String aSubset : subset) {
@@ -564,12 +579,12 @@ public class StringUtil {
                 inBrace++;
             } else if (c == '}') {
                 inBrace--;
-            } else if (!escaped && c == '#') {
+            } else if (!escaped && (c == '#')) {
                 inString = !inString;
             }
 
             // See if we should start bracing:
-            if (inBrace == 0 && !isBracing && !inString && Character.isLetter((char) c)
+            if ((inBrace == 0) && !isBracing && !inString && Character.isLetter((char) c)
                     && Character.isUpperCase((char) c)) {
 
                 buf.append('{');
@@ -587,7 +602,7 @@ public class StringUtil {
             buf.append((char) c);
 
             // Check if we are entering an escape sequence:
-            escaped = c == '\\' && !escaped;
+            escaped = (c == '\\') && !escaped;
 
         }
         // Check if we have an unclosed brace:

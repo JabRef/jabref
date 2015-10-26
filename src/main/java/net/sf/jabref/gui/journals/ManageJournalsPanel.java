@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -377,29 +377,16 @@ class ManageJournalsPanel extends JPanel {
             if (!f.exists()) {
                 throw new FileNotFoundException(f.getAbsolutePath());
             }
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter(f, false);
+            try (FileWriter fw = new FileWriter(f, false)) {
                 for (JournalEntry entry : tableModel.getJournals()) {
                     fw.write(entry.name);
                     fw.write(" = ");
                     fw.write(entry.abbreviation);
                     fw.write(Globals.NEWLINE);
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
-
-            } finally {
-                if (fw != null) {
-                    try {
-                        fw.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
-
             String filename = f.getPath();
             if (filename.equals("")) {
                 filename = null;

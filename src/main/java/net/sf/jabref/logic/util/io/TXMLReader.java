@@ -46,7 +46,7 @@ public class TXMLReader {
                 try {
                     stream = new FileInputStream("src" + resPath);
                 } catch (Exception ignored) {
-
+                    // Ignore
                 }
             }
 
@@ -67,7 +67,7 @@ public class TXMLReader {
         return config.getElementsByTagName(name);
     }
 
-    private Element getFirstElement(Element element, String name) {
+    private static Element getFirstElement(Element element, String name) {
         NodeList nl = element.getElementsByTagName(name);
         if (nl.getLength() < 1) {
             throw new RuntimeException("Element: " + element + " does not contain: " + name);
@@ -82,7 +82,7 @@ public class TXMLReader {
     }
 
     /** collect all "plain" data of a xml node */
-    private String getSimpleElementText(Element node) {
+    private static String getSimpleElementText(Element node) {
         StringBuffer sb = new StringBuffer();
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
@@ -106,6 +106,7 @@ public class TXMLReader {
                     try {
                         back = Integer.parseInt(data);
                     } catch (Exception ignored) {
+                        // Ignore
                     }
                 }
             }

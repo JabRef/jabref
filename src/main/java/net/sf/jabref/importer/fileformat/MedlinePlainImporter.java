@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-    
+
 */
 
 package net.sf.jabref.importer.fileformat;
@@ -33,10 +33,10 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 /**
  * Importer for the MEDLINE Plain format.
- * 
+ *
  * check here for details on the format
  * http://www.nlm.nih.gov/bsd/mms/medlineelements.html
- * 
+ *
  * @author vegeziel
  */
 public class MedlinePlainImporter extends ImportFormat {
@@ -64,7 +64,7 @@ public class MedlinePlainImporter extends ImportFormat {
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-        // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line 
+        // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         Pattern pat1 = Pattern.compile("PMID.*-.*");
@@ -87,7 +87,7 @@ public class MedlinePlainImporter extends ImportFormat {
      */
     @Override
     public List<BibtexEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
+        ArrayList<BibtexEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -107,7 +107,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String author = "";
             String editor = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<String, String>();
+            HashMap<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
@@ -119,12 +119,12 @@ public class MedlinePlainImporter extends ImportFormat {
                 StringBuilder current = new StringBuilder(fields[j]);
                 boolean done = false;
 
-                while (!done && j < fields.length - 1) {
+                while (!done && (j < (fields.length - 1))) {
                     if (fields[j + 1].length() <= 4) {
                         System.out.println("aaa");
                     }
                     if (fields[j + 1].charAt(4) != '-') {
-                        if (current.length() > 0
+                        if ((current.length() > 0)
                                 && !Character.isWhitespace(current.charAt(current.length() - 1))) {
                             current.append(' ');
                         }
@@ -215,7 +215,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 } else if (lab.equals("DP")) {
                     String[] parts = val.split(" ");
                     hm.put("year", parts[0]);
-                    if (parts.length > 1 && !parts[1].isEmpty()) {
+                    if ((parts.length > 1) && !parts[1].isEmpty()) {
                         hm.put("month", parts[1]);
                     }
                 } else if (lab.equals("MH") || lab.equals("OT")) {
@@ -265,10 +265,10 @@ public class MedlinePlainImporter extends ImportFormat {
                     .getEntryType(type)); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<Object>();
+            ArrayList<Object> toRemove = new ArrayList<>();
             for (String key : hm.keySet()) {
                 String content = hm.get(key);
-                if (content == null || content.trim().isEmpty()) {
+                if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(key);
                 }
             }

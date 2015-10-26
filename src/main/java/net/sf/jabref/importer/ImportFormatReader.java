@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -35,7 +35,7 @@ public class ImportFormatReader {
     /**
      * all import formats, in the default order of import formats
      */
-    private final SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
+    private final SortedSet<ImportFormat> formats = new TreeSet<>();
 
     private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
@@ -172,7 +172,7 @@ public class ImportFormatReader {
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getCustomImportFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<ImportFormat>();
+        SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
             if (format.getIsCustomImporter()) {
                 result.add(format);
@@ -189,7 +189,7 @@ public class ImportFormatReader {
      * @return all custom importers, elements are of type InputFormat
      */
     public SortedSet<ImportFormat> getBuiltInInputFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<ImportFormat>();
+        SortedSet<ImportFormat> result = new TreeSet<>();
         for (ImportFormat format : formats) {
             if (!format.getIsCustomImporter()) {
                 result.add(format);
@@ -262,7 +262,7 @@ public class ImportFormatReader {
                     } else {
                         sb.append(names[j]);
                     }
-                    if (j < names.length - 1) {
+                    if (j < (names.length - 1)) {
                         sb.append(", ");
                     }
                 }
@@ -277,7 +277,7 @@ public class ImportFormatReader {
                     sb.append(names[j]);
                 }
             }
-            if (i < authors.length - 1) {
+            if (i < (authors.length - 1)) {
                 sb.append(" and ");
             }
         }
@@ -294,7 +294,7 @@ public class ImportFormatReader {
             return s;
         }
         // If only one character (uppercase letter), add a dot and return immediately:
-        if (s.length() == 1 && Character.isLetter(s.charAt(0)) &&
+        if ((s.length() == 1) && Character.isLetter(s.charAt(0)) &&
                 Character.isUpperCase(s.charAt(0))) {
             return s + ".";
         }
@@ -453,8 +453,8 @@ public class ImportFormatReader {
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
                     Globals.prefs.get(JabRefPreferences.DEFAULT_ENCODING));
-            if (pr.getDatabase().getEntryCount() > 0
-                    || pr.getDatabase().getStringCount() > 0) {
+            if ((pr.getDatabase().getEntryCount() > 0)
+                    || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }

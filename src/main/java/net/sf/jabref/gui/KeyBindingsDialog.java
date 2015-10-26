@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,15 +36,11 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
@@ -61,9 +57,12 @@ class KeyBindingsDialog extends JDialog {
     // currently not displayed as it does not get updated
     private final JTextField keyTF = new JTextField();
 
-    private final JButton ok;
-    private final JButton cancel;
-    private final JButton defB;
+    private final JButton ok = new JButton(Localization.lang("Ok"));
+    private final JButton cancel = new JButton(Localization.lang("Cancel"));
+    private final JButton defB = new JButton(Localization.lang("Default"));
+    private final JButton grabB = new JButton(Localization.lang("Grab"));
+
+    private final Box buttonBox = new Box(BoxLayout.X_AXIS);
 
     // stores the user-selected key bindings
     private final HashMap<String, String> bindHM;
@@ -103,11 +102,6 @@ class KeyBindingsDialog extends JDialog {
         listScroller.setPreferredSize(new Dimension(250, 400));
         getContentPane().add(listScroller, BorderLayout.CENTER);
 
-        Box buttonBox = new Box(BoxLayout.X_AXIS);
-        ok = new JButton(Localization.lang("Ok"));
-        cancel = new JButton(Localization.lang("Cancel"));
-        JButton grabB = new JButton(Localization.lang("Grab"));
-        defB = new JButton(Localization.lang("Default"));
         grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
         buttonBox.add(grabB);
         buttonBox.add(defB);
@@ -141,7 +135,8 @@ class KeyBindingsDialog extends JDialog {
         // TODO: setup so that clicking on list will display the current binding
     }
 
-    private void setTop() {
+
+    /*    private void setTop() {
         Box topBox = new Box(BoxLayout.X_AXIS);
 
         topBox.add(new JLabel(Localization.lang("Binding") + ":", JLabel.RIGHT));
@@ -149,7 +144,7 @@ class KeyBindingsDialog extends JDialog {
         getContentPane().add(topBox, BorderLayout.NORTH);
 
     }
-
+    */
 
     /**
      * respond to grabKey and display the key binding
@@ -171,8 +166,8 @@ class KeyBindingsDialog extends JDialog {
 
             if (mod.equals("")) {
                 int kc = evt.getKeyCode();
-                if (!(kc >= KeyEvent.VK_F1 && kc <= KeyEvent.VK_F12 ||
-                        kc == KeyEvent.VK_ESCAPE || kc == KeyEvent.VK_DELETE)) {
+                if (!(((kc >= KeyEvent.VK_F1) && (kc <= KeyEvent.VK_F12)) ||
+                        (kc == KeyEvent.VK_ESCAPE) || (kc == KeyEvent.VK_DELETE))) {
                     return; // need a modifier except for function keys
                 }
             }
@@ -204,40 +199,9 @@ class KeyBindingsDialog extends JDialog {
             table.setValueAt(newKey, selRow, 1);
             table.revalidate();
             table.repaint();
-            //Util.pr(selectedFunction);
-            //String selectedFunction = (String) list.getSelectedValue();
-            // log print
-            // System.out.println("selectedfunction " + selectedFunction + " new key: " + newKey);
             bindHM.put(selectedFunction, newKey);
-            //table.setValueAt(newKey, );
         }
     }
-
-    /**
-     * put the corresponding key binding into keyTF
-     */
-    private class MyListSelectionListener
-            implements ListSelectionListener {
-
-        // This method is called each time the user changes the set of selected items
-        @Override
-        public void valueChanged(ListSelectionEvent evt) {
-            // When the user release the mouse button and completes the selection,
-            // getValueIsAdjusting() becomes false
-            if (!evt.getValueIsAdjusting()) {
-                JList list = (JList) evt.getSource();
-
-                // Get all selected items
-                Object[] selected = list.getSelectedValues();
-
-                // Iterate all selected items
-                for (Object sel : selected) {
-                    keyTF.setText(bindHM.get(sel));
-                }
-            }
-        }
-    }
-
 
     /**
      * Puts the content of bindHM into the table
@@ -254,7 +218,7 @@ class KeyBindingsDialog extends JDialog {
             i++;
             //listModel.addElement(s + " (" + bindHM.get(s) + ")");
         }
-        TreeMap<String, String[]> sorted = new TreeMap<String, String[]>();
+        TreeMap<String, String[]> sorted = new TreeMap<>();
         for (i = 0; i < tableData.length; i++) {
             sorted.put(tableData[i][0], tableData[i]);
         }
@@ -262,12 +226,10 @@ class KeyBindingsDialog extends JDialog {
         KeystrokeTableModel tableModel = new KeystrokeTableModel(sorted);
         table.setModel(tableModel);
 
-        // has to be done each time as the columnModel is dependend on the tableModel
+        // has to be done each time as the columnModel is dependent on the tableModel
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(GUIGlobals.KEYBIND_COL_0);
         cm.getColumn(1).setPreferredWidth(GUIGlobals.KEYBIND_COL_1);
-        //    table.setRowSelectionInterval(0, 0); //select the first entry
-
     }
 
 
@@ -294,7 +256,6 @@ class KeyBindingsDialog extends JDialog {
         final String[][] data;
 
 
-        //String[] trData;
         public KeystrokeTableModel(TreeMap<String, String[]> sorted) {
             data = new String[sorted.size()][3];
             Iterator<String> i = sorted.keySet().iterator();
@@ -302,8 +263,6 @@ class KeyBindingsDialog extends JDialog {
             while (i.hasNext()) {
                 data[row++] = sorted.get(i.next());
             }
-            //for (int i=0; i<trData.length; i++)
-            //  trData[i] = Globals.lang(data[i][0]);
         }
 
         @Override
@@ -328,10 +287,7 @@ class KeyBindingsDialog extends JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            //if (columnIndex == 0)
             return data[rowIndex][columnIndex];
-            //else
-            //return data[rowIndex][0];
         }
 
         @Override
@@ -341,7 +297,7 @@ class KeyBindingsDialog extends JDialog {
     }
 
 
-    // listners
+    // listeners
     private void setButtons() {
         ok.addActionListener(new ActionListener() {
 
@@ -368,7 +324,7 @@ class KeyBindingsDialog extends JDialog {
                 int[] selected = table.getSelectedRows();
                 if (selected.length == 0) {
                     int answer = JOptionPane.showOptionDialog(KeyBindingsDialog.this,
-                            Localization.lang("All key bindings will be reset to their defaults.") + " " + 
+                            Localization.lang("All key bindings will be reset to their defaults.") + " " +
                             Localization.lang("Continue?"),
                             Localization.lang("Resetting all key bindings"),
                             JOptionPane.YES_NO_OPTION,

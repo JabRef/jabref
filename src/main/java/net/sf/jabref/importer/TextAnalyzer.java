@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,9 +26,9 @@ import net.sf.jabref.model.entry.BibtexEntry;
 class TextAnalyzer {
 
     private final BibtexEntry be = null;
-    
+
     private static final Log LOGGER = LogFactory.getLog(TextAnalyzer.class);
-    
+
     // Needs to give a year definitely in the future.
     // Used for guessing the
     // year field when parsing textual data. :-)
@@ -44,7 +44,7 @@ class TextAnalyzer {
 
     private void guessBibtexFields(String text) {
 
-        TreeSet<Substring> usedParts = new TreeSet<Substring>();
+        TreeSet<Substring> usedParts = new TreeSet<>();
 
         text = "  " + text + "  ";
 
@@ -76,10 +76,10 @@ class TextAnalyzer {
                         yearFound = number;
                     } else {
                         // More than one found. Be a bit more specific.
-                        if (yearFound < FUTURE_YEAR && number < FUTURE_YEAR) {
+                        if ((yearFound < FUTURE_YEAR) && (number < FUTURE_YEAR)) {
                             good = -1;
                             break; // Give up, both seem good enough.
-                        } else if (yearFound >= FUTURE_YEAR && number < FUTURE_YEAR) {
+                        } else if ((yearFound >= FUTURE_YEAR) && (number < FUTURE_YEAR)) {
                             good = i;
                             yearFound = number;
                         }
@@ -110,7 +110,7 @@ class TextAnalyzer {
                 //   Util.pr("Pg: "+pages);
                 int first = Integer.parseInt(split[0]);
                 int second = Integer.parseInt(split[1]);
-                if (second - first > 3) {
+                if ((second - first) > 3) {
                     found = i;
                     break;
                 }
@@ -155,17 +155,17 @@ class TextAnalyzer {
 
         // Then try to find title and authors.
         Substring ss;
-        Vector<String> free = new Vector<String>();
+        Vector<String> free = new Vector<>();
         int piv = 0;
         for (Substring usedPart : usedParts) {
             ss = usedPart;
-            if (ss.begin() - piv > 10) {
+            if ((ss.begin() - piv) > 10) {
                 LOGGER.info("... " + text.substring(piv, ss.begin()));
                 free.add(clean(text.substring(piv, ss.begin())));
             }
             piv = ss.end();
         }
-        if (text.length() - piv > 10) {
+        if ((text.length() - piv) > 10) {
             free.add(clean(text.substring(piv)));
         }
         LOGGER.info("Free parts:");
@@ -174,7 +174,7 @@ class TextAnalyzer {
         }
     }
 
-    private String[] getMatches(String text, String regexp) {
+    private static String[] getMatches(String text, String regexp) {
         int piv = 0;
         String[] test = text.split(regexp);
         if (test.length < 2) {
@@ -191,24 +191,24 @@ class TextAnalyzer {
         return out;
     }
 
-    private String clean(String s) {
+    private static String clean(String s) {
         boolean found = false;
         int left = 0;
         int right = s.length() - 1;
-        while (!found && left < s.length()) {
+        while (!found && (left < s.length())) {
             char c = s.charAt(left);
-            if (Character.isWhitespace(c) || c == '.' || c == ',' || c == '('
-                    || c == ':' || c == ')') {
+            if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == '(')
+                    || (c == ':') || (c == ')')) {
                 left++;
             } else {
                 found = true;
             }
         }
         found = false;
-        while (!found && right > left) {
+        while (!found && (right > left)) {
             char c = s.charAt(right);
-            if (Character.isWhitespace(c) || c == '.' || c == ',' || c == ')'
-                    || c == ':' || c == '(') {
+            if (Character.isWhitespace(c) || (c == '.') || (c == ',') || (c == ')')
+                    || (c == ':') || (c == '(')) {
                 right--;
             } else {
                 found = true;

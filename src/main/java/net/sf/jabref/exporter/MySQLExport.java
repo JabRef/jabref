@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -33,23 +33,17 @@ public class MySQLExport extends ExportFormat {
 
     /**
      * First method called when user starts the export.
-     * 
-     * @param database
-     *            The bibtex database from which to export.
-     * @param file
-     *            The filename to which the export should be writtten.
-     * @param encoding
-     *            The encoding to use.
-     * @param keySet
-     *            The set of IDs of the entries to export.
-     * @throws java.lang.Exception
-     *             If something goes wrong, feel free to throw an exception. The
-     *             error message is shown to the user.
+     *
+     * @param database The bibtex database from which to export.
+     * @param file The filename to which the export should be writtten.
+     * @param encodingToUse The encoding to use.
+     * @param keySet The set of IDs of the entries to export.
+     * @throws java.lang.Exception If something goes wrong, feel free to throw an exception. The error message is shown
+     *             to the user.
      */
     @Override
-    public void performExport(final BibtexDatabase database,
-            final MetaData metaData, final String file, final String encoding,
-            Set<String> keySet) throws Exception {
+    public void performExport(final BibtexDatabase database, final MetaData metaData, final String file,
+            final String encodingToUse, Set<String> keySet) throws Exception {
 
         new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file);
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -57,7 +57,7 @@ public class LabelPatternPanel extends JPanel {
     protected final JTextField defaultPat = new JTextField();
 
     // one field for each type
-    private final HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
+    private final HashMap<String, JTextField> textFields = new HashMap<>();
 
 
     public LabelPatternPanel(HelpDialog helpDiag) {
@@ -216,8 +216,8 @@ public class LabelPatternPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JTextField tf = textFields.get(e.getActionCommand());
-                tf.setText("");
+                JTextField tField = textFields.get(e.getActionCommand());
+                tField.setText("");
             }
         });
         c.add(but);
@@ -258,7 +258,7 @@ public class LabelPatternPanel extends JPanel {
 
     /**
      * Fills the current values to the text fields
-     * 
+     *
      * @param keypatterns the LabelPattern to use as initial value
      */
     public void setValues(AbstractLabelPattern keypatterns) {
@@ -274,11 +274,10 @@ public class LabelPatternPanel extends JPanel {
         }
     }
 
-    private void setValue(JTextField tf, String fieldName, AbstractLabelPattern keypatterns) {
+    private static void setValue(JTextField tf, String fieldName, AbstractLabelPattern keypatterns) {
         if (keypatterns.isDefaultValue(fieldName)) {
             tf.setText("");
         } else {
-            //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
             tf.setText(keypatterns.getValue(fieldName).get(0));
         }
     }

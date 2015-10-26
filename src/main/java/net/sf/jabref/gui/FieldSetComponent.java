@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -51,11 +51,11 @@ import net.sf.jabref.util.Util;
  */
 class FieldSetComponent extends JPanel implements ActionListener {
 
-    private final Set<ActionListener> additionListeners = new HashSet<ActionListener>();
-    final JList list;
-    private JScrollPane sp;
-    DefaultListModel listModel;
-    private JComboBox sel;
+    private final Set<ActionListener> additionListeners = new HashSet<>();
+    final JList<String> list;
+    private final JScrollPane sp;
+    DefaultListModel<String> listModel;
+    private JComboBox<String> sel;
     private JTextField input;
     private final JButton add;
     final JButton remove;
@@ -65,10 +65,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
     final GridBagConstraints con = new GridBagConstraints();
     final boolean forceLowerCase;
     boolean changesMade;
-    private final Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
+    private final Set<ListDataListener> modelListeners = new HashSet<>();
 
 
-    /** 
+    /**
      * Creates a new instance of FieldSetComponent, with preset selection
      * values. These are put into a JComboBox.
      */
@@ -89,7 +89,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         this.forceLowerCase = forceLowerCase;
         add = new JButton(Localization.lang(addText));
         remove = new JButton(Localization.lang(removeText));
-        listModel = new DefaultListModel();
+        listModel = new DefaultListModel<>();
         JLabel title1 = null;
         if (title != null) {
             title1 = new JLabel(title);
@@ -98,7 +98,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         for (String field : fields) {
             listModel.addElement(field);
         }
-        list = new JList(listModel);
+        list = new JList<>(listModel);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         // Set up GUI:
         add.addActionListener(this);
@@ -154,7 +154,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         con.gridwidth = 3;
         con.weightx = 1;
         if (preset != null) {
-            sel = new JComboBox(preset.toArray(new String[preset.size()]));
+            sel = new JComboBox<>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
             //sel.addActionListener(this);
             gbl.setConstraints(sel, con);
@@ -215,7 +215,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
     }
 
     public void setFields(List<String> fields) {
-        DefaultListModel newListModel = new DefaultListModel();
+        DefaultListModel<String> newListModel = new DefaultListModel<>();
         for (String field : fields) {
             newListModel.addElement(field);
         }
@@ -227,7 +227,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
     }
 
     /**
-     * This method is called when a new field should be added to the list. Performs validation of the 
+     * This method is called when a new field should be added to the list. Performs validation of the
      * field.
      */
     void addField(String s) {
@@ -240,7 +240,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         }
 
         String testString = Util.checkLegalKey(s);
-        if (!testString.equals(s) || s.indexOf('&') >= 0) {
+        if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
                             + "characters") + ": # { } ~ , ^ &",
@@ -291,10 +291,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * Return the current list.
      */
     public List<String> getFields() {
-        ArrayList<String> res = new ArrayList<String>(listModel.getSize());
-        Enumeration elements = listModel.elements();
+        ArrayList<String> res = new ArrayList<>(listModel.getSize());
+        Enumeration<String> elements = listModel.elements();
         while (elements.hasMoreElements()) {
-            res.add((String) elements.nextElement());
+            res.add(elements.nextElement());
         }
         return res;
     }
@@ -331,7 +331,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         if (oldIdx < 0) {
             return;
         }
-        String o = (String) listModel.get(oldIdx);
+        String o = listModel.get(oldIdx);
         // Compute the new index:
         int newInd = Math.max(0, Math.min(listModel.size() - 1, oldIdx + dy));
         listModel.remove(oldIdx);
@@ -345,10 +345,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         if (src == add) {
             // Selection has been made, or add button pressed:
-            if (sel != null && sel.getSelectedItem() != null) {
+            if ((sel != null) && (sel.getSelectedItem() != null)) {
                 String s = sel.getSelectedItem().toString();
                 addField(s);
-            } else if (input != null && !input.getText().equals("")) {
+            } else if ((input != null) && !input.getText().equals("")) {
                 addField(input.getText());
             }
         }
@@ -360,7 +360,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             removeSelected();
         }
         else if (src == sel) {
-            if (e.getActionCommand().equals("comboBoxChanged") && e.getModifiers() == 0) {
+            if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0)) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
                 // everywhere.

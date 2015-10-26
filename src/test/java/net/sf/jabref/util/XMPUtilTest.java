@@ -191,7 +191,7 @@ public class XMPUtilTest {
         e
                 .setField(
                         "abstract",
-                        "The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
+                "The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
         return e;
     }
 
@@ -318,7 +318,7 @@ public class XMPUtilTest {
     public void testReadXMPUTF8() throws Exception {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n"
-                + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
+ + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
                 + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
@@ -355,7 +355,8 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             BibtexEntry x = l.get(0);
 
-            Set<String> expectedFields = new HashSet<String>(Arrays.asList("bibtexkey", "booktitle",
+            Set<String> expectedFields = new HashSet<>(
+                    Arrays.asList("bibtexkey", "booktitle",
                     "owner", "timestamp", "url", "year"));
 
             Assert.assertEquals(expectedFields, x.getAllFields());
@@ -476,7 +477,7 @@ public class XMPUtilTest {
     public void testWriteReadManually() throws Exception {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n"
-                + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
+ + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
                 + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
@@ -914,18 +915,18 @@ public class XMPUtilTest {
         /* Test minimal syntaxical completeness */
         Assert.assertTrue(xmp.indexOf("xpacket") > 0);
         Assert.assertTrue(xmp.indexOf("adobe:ns:meta") > 0);
-        Assert.assertTrue(xmp.indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>") > 0
-                || xmp.indexOf("bibtex:bibtexkey=") > 0);
+        Assert.assertTrue((xmp.indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>") > 0)
+                || (xmp.indexOf("bibtex:bibtexkey=") > 0));
         Assert.assertTrue(xmp.indexOf("<rdf:li>Norton Bar</rdf:li>") > 0);
-        Assert.assertTrue(xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0
-                || xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0);
-        Assert.assertTrue(xmp
-                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0
-                || xmp
-                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0);
+        Assert.assertTrue((xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0)
+                || (xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0));
+        Assert.assertTrue((xmp
+                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0)
+                || (xmp
+                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0));
         Assert.assertTrue(xmp.indexOf("<rdf:Description") > 0);
-        Assert.assertTrue(xmp.indexOf("<?xpacket end='w'?>") > 0
-                || xmp.indexOf("<?xpacket end=\"w\"?>") > 0);
+        Assert.assertTrue((xmp.indexOf("<?xpacket end='w'?>") > 0)
+                || (xmp.indexOf("<?xpacket end=\"w\"?>") > 0));
 
         /* Test contents of string */
         writeManually(pdfFile, xmp);
@@ -990,7 +991,7 @@ public class XMPUtilTest {
      */
     @Test
     public void testWriteMultiple() throws IOException, TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(t2BibtexEntry());
         l.add(t3BibtexEntry());
 
@@ -1015,7 +1016,7 @@ public class XMPUtilTest {
 
     @Test
     public void testReadWriteDC() throws IOException, TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
         XMPUtil.writeXMP(pdfFile, l, null, true);
@@ -1097,7 +1098,7 @@ public class XMPUtilTest {
     @Test
     public void testWriteSingleUpdatesDCAndInfo() throws IOException,
             TransformerException {
-        List<BibtexEntry> l = new LinkedList<BibtexEntry>();
+        List<BibtexEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
         XMPUtil.writeXMP(pdfFile, l, null, true);
@@ -1309,19 +1310,19 @@ public class XMPUtilTest {
             /* Test minimal syntaxical completeness */
         Assert.assertTrue(xmp.indexOf("xpacket") > 0);
         Assert.assertTrue(xmp.indexOf("adobe:ns:meta") > 0);
-        Assert.assertTrue(xmp
-                .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>") > 0
-                || xmp.indexOf("bibtex:bibtexkey=") > 0);
+        Assert.assertTrue((xmp
+                .indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>") > 0)
+                || (xmp.indexOf("bibtex:bibtexkey=") > 0));
         Assert.assertTrue(xmp.indexOf("<rdf:li>K. Crowston</rdf:li>") > 0);
-        Assert.assertTrue(xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0
-                || xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0);
-        Assert.assertTrue(xmp
-                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0
-                || xmp
-                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0);
+        Assert.assertTrue((xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>") > 0)
+                || (xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>") > 0));
+        Assert.assertTrue((xmp
+                .indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'") > 0)
+                || (xmp
+                .indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"") > 0));
         Assert.assertTrue(xmp.indexOf("<rdf:Description") > 0);
-        Assert.assertTrue(xmp.indexOf("<?xpacket end='w'?>") > 0
-                || xmp.indexOf("<?xpacket end=\"w\"?>") > 0);
+        Assert.assertTrue((xmp.indexOf("<?xpacket end='w'?>") > 0)
+                || (xmp.indexOf("<?xpacket end=\"w\"?>") > 0));
 
             /* Test contents of string */
         writeManually(pdfFile, xmp);
@@ -1517,18 +1518,20 @@ public class XMPUtilTest {
             XMPUtil.readXMP(XMPUtilTest.SRC_TEST_ESOURCES_ENCRYPTED_PDF);
             Assert.fail();
         } catch (EncryptionNotSupportedException ignored) {
+            // Ignored
         }
 
         try {
             XMPUtil.writeXMP(XMPUtilTest.SRC_TEST_ESOURCES_ENCRYPTED_PDF, t1BibtexEntry(), null);
             Assert.fail();
         } catch (EncryptionNotSupportedException ignored) {
+            // Ignored
         }
     }
 
     /**
-     * A better testcase for resolveStrings. Makes sure that also the document
-     * information and dublin core are written correctly.
+     * A better testcase for resolveStrings. Makes sure that also the document information and dublin core are written
+     * correctly.
      * <p/>
      * Data was contributed by Philip K.F. Hölzenspies (p.k.f.holzenspies [at] utwente.nl).
      *

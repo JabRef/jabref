@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -57,12 +57,12 @@ public class PageNumbers {
             result.appendChild(textNode);
         }
         else {
-            Element start = document.createElement("start");
-            Element end = document.createElement("end");
-            start.appendChild(document.createTextNode("" + this.start));
-            end.appendChild(document.createTextNode("" + this.end));
-            result.appendChild(start);
-            result.appendChild(end);
+            Element tmpStart = document.createElement("start");
+            Element tmpEnd = document.createElement("end");
+            tmpStart.appendChild(document.createTextNode("" + this.start));
+            tmpEnd.appendChild(document.createTextNode("" + this.end));
+            result.appendChild(tmpStart);
+            result.appendChild(tmpEnd);
         }
         return result;
     }

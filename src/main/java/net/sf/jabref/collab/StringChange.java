@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -42,12 +42,11 @@ class StringChange extends Change {
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
     private final BibtexString tmpString;
-    
+
     private static final Log LOGGER = LogFactory.getLog(StringChange.class);
 
 
-    public StringChange(BibtexString string, BibtexString tmpString, String label,
-            String mem, String tmp, String disk) {
+    public StringChange(BibtexString string, BibtexString tmpString, String label, String mem, String disk) {
         this.tmpString = tmpString;
         name = Localization.lang("Modified string") + ": '" + label + '\'';
         this.string = string;

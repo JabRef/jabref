@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -33,30 +33,30 @@ import net.sf.jabref.model.entry.BibtexEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * 
+ *
  * This class allows to access the Slac SPIRES database.
- * 
+ *
  * It can either be a GeneralFetcher to pose requests to the database or fetch
  * individual entries.
- * 
+ *
  * @author Fedor Bezrukov
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class SPIRESFetcher implements EntryFetcher {
 
     private static final String spiresHost = "www-spires.slac.stanford.edu";
 
+
     /**
      * Construct the query URL
-     * 
-     * @param key
-     *            The key of the OAI2 entry that the url should poitn to.
-     * 
+     *
+     * @param key The key of the OAI2 entry that the url should point to.
+     *
      * @return a String denoting the query URL
      */
-    private String constructUrl(String key) {
+    private static String constructUrl(String key) {
         String identifier;
         try {
             identifier = URLEncoder.encode(key, "UTF-8");
@@ -68,7 +68,7 @@ public class SPIRESFetcher implements EntryFetcher {
 
     /**
      * Constructs a SPIRES query url from slaccitation field
-     * 
+     *
      * @param slaccitation
      * @return query string
      */
@@ -82,13 +82,14 @@ public class SPIRESFetcher implements EntryFetcher {
         try {
             key = URLEncoder.encode(key, "UTF-8");
         } catch (UnsupportedEncodingException ignored) {
+            // Ignored
         }
         return "http://" + SPIRESFetcher.spiresHost + "/" + "spires/find/hep/www" + "?" + "rawcmd=find+" + cmd + "+" + key;
     }
 
     /**
      * Construct an SPIRES query url from eprint field
-     * 
+     *
      * @param eprint
      * @return query string
      */
@@ -105,7 +106,7 @@ public class SPIRESFetcher implements EntryFetcher {
     /**
      * Import an entry from an OAI2 archive. The BibtexEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
-     * 
+     *
      * @param key
      *            The OAI2 key to fetch from ArXiv.
      * @return The imnported BibtexEntry or null if none.
@@ -117,12 +118,10 @@ public class SPIRESFetcher implements EntryFetcher {
             conn.setRequestProperty("User-Agent", "Jabref");
             InputStream inputStream = conn.getInputStream();
 
-            SPIRESBibtexFilterReader reader = new SPIRESBibtexFilterReader(
-                    new InputStreamReader(inputStream));
-
-            ParserResult pr = BibtexParser.parse(reader);
-
-            return pr.getDatabase();
+            try (SPIRESBibtexFilterReader reader = new SPIRESBibtexFilterReader(new InputStreamReader(inputStream))) {
+                ParserResult pr = BibtexParser.parse(reader);
+                return pr.getDatabase();
+            }
         } catch (IOException e) {
             frame.showMessage(Localization.lang(
                             "An Exception ocurred while accessing '%0'", url)
@@ -178,13 +177,17 @@ public class SPIRESFetcher implements EntryFetcher {
      * @see net.sf.jabref.gui.ImportInspectionDialog.CallBack
      */
     public void cancelled() {
+        // Nothing
     }
 
+    @SuppressWarnings("unused")
     public void done(int entriesImported) {
+        // Nothing
     }
 
     @Override
     public void stopFetching() {
+        // Nothing
     }
 
     /*

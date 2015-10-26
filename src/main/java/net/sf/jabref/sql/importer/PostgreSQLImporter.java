@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,12 +25,12 @@ import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.SQLUtil;
 
 /**
- * 
+ *
  * @author ifsteinm.
- * 
+ *
  *  Jan 20th	Extends DBExporter to provide features specific for PostgreSQL
- *  			Created after a refactory on SQLUtil. 
- *          
+ *  			Created after a refactory on SQLUtil.
+ *
  */
 public class PostgreSQLImporter extends DBImporter {
 
@@ -41,7 +41,7 @@ public class PostgreSQLImporter extends DBImporter {
     }
 
     /**
-     * 
+     *
      * @return The singleton instance of the MySQLImporter
      */
     public static PostgreSQLImporter getInstance() {
@@ -53,9 +53,10 @@ public class PostgreSQLImporter extends DBImporter {
 
     @Override
     protected ResultSet readColumnNames(Connection conn) throws SQLException {
-        Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
-                "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';");
-        return statement.getResultSet();
+        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
+                "SELECT column_name FROM information_schema.columns WHERE table_name ='entries';")) {
+            return statement.getResultSet();
+        }
     }
 
     @Override

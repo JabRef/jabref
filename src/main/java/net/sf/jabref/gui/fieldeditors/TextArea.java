@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -129,15 +129,17 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void paste(String textToInsert) {
-        replaceSelection(textToInsert); 
+        replaceSelection(textToInsert);
     }
 
     @Override
     public void undo() {
+        // Nothing
     }
 
     @Override
     public void redo() {
+        // Nothing
     }
 
     @Override

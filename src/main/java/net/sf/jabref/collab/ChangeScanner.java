@@ -168,19 +168,19 @@ public class ChangeScanner implements Runnable {
         });
     }
 
-    private void scanMetaData(MetaData inMem, MetaData inTemp, MetaData onDisk) {
-        MetaDataChange mdc = new MetaDataChange(inMem, inTemp);
+    private void scanMetaData(MetaData inMem1, MetaData inTemp1, MetaData onDisk) {
+        MetaDataChange mdc = new MetaDataChange(inMem1, inTemp1);
         ArrayList<String> handledOnDisk = new ArrayList<>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
-        for (String key : inTemp) {
+        for (String key : inTemp1) {
             // See if the key is missing in the disk database:
             Vector<String> vod = onDisk.getData(key);
             if (vod == null) {
                 mdc.insertMetaDataRemoval(key);
             } else {
                 // Both exist. Check if they are different:
-                Vector<String> vit = inTemp.getData(key);
+                Vector<String> vit = inTemp1.getData(key);
                 if (!vod.equals(vit)) {
                     mdc.insertMetaDataChange(key, vod);
                 }
@@ -370,8 +370,8 @@ public class ChangeScanner implements Runnable {
         return neu.getEntryAt(found);
     }
 
-    private void scanPreamble(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
-        String mem = inMem.getPreamble();
+    private void scanPreamble(BibtexDatabase inMem1, BibtexDatabase onTmp, BibtexDatabase onDisk) {
+        String mem = inMem1.getPreamble();
         String tmp = onTmp.getPreamble();
         String disk = onDisk.getPreamble();
         if (tmp != null) {
@@ -384,7 +384,7 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private void scanStrings(BibtexDatabase inMem, BibtexDatabase onTmp, BibtexDatabase onDisk) {
+    private void scanStrings(BibtexDatabase inMem1, BibtexDatabase onTmp, BibtexDatabase onDisk) {
         int nTmp = onTmp.getStringCount();
         int nDisk = onDisk.getStringCount();
         if ((nTmp == 0) && (nDisk == 0)) {
@@ -408,13 +408,12 @@ public class ChangeScanner implements Runnable {
                         // We have found a string with a matching name.
                         if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
-                            BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
+                            BibtexString mem = findString(inMem1, tmp.getName(), usedInMem);
                             if (mem != null) {
-                                changes.add(new StringChange(mem, tmp, tmp.getName(),
-                                        mem.getContent(),
-                                        tmp.getContent(), disk.getContent()));
+                                changes.add(
+                                        new StringChange(mem, tmp, tmp.getName(), mem.getContent(), disk.getContent()));
                             } else {
-                                changes.add(new StringChange(null, tmp, tmp.getName(), null, tmp.getContent(), disk.getContent()));
+                                changes.add(new StringChange(null, tmp, tmp.getName(), null, disk.getContent()));
                             }
                         }
                         used.add(diskId);
@@ -448,8 +447,8 @@ public class ChangeScanner implements Runnable {
                             // Try to find the matching one in memory:
                             BibtexString bsMem = null;
 
-                            for (String memId : inMem.getStringKeySet()) {
-                                BibtexString bsMem_cand = inMem.getString(memId);
+                            for (String memId : inMem1.getStringKeySet()) {
+                                BibtexString bsMem_cand = inMem1.getString(memId);
                                 if (bsMem_cand.getContent().equals(disk.getContent()) &&
                                         !usedInMem.contains(memId)) {
                                     usedInMem.add(memId);
@@ -474,7 +473,7 @@ public class ChangeScanner implements Runnable {
             // Still one or more non-matched strings. So they must have been removed.
             for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
-                BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
+                BibtexString mem = findString(inMem1, tmp.getName(), usedInMem);
                 if (mem != null) { // The removed string is not removed from the mem version.
                     changes.add(new StringRemoveChange(tmp, tmp, mem));
                 }

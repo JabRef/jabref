@@ -49,12 +49,12 @@ class OOCalcDatabase {
 
     public OOCalcDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
-        List<FieldComparator> comparators = new ArrayList<FieldComparator>();
+        List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
         comparators.add(new FieldComparator(BibtexEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList<BibtexEntry> entryList = new BasicEventList<BibtexEntry>();
+        BasicEventList<BibtexEntry> entryList = new BasicEventList<>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
         if (keySet == null) {
@@ -207,12 +207,12 @@ class OOCalcDatabase {
         return result;
     }
 
-    private String getField(BibtexEntry e, String field) {
+    private static String getField(BibtexEntry e, String field) {
         Object o = e.getField(field);
         return o == null ? "" : o.toString();
     }
 
-    private void addTableCell(Document doc, Element parent, String content) {
+    private static void addTableCell(Document doc, Element parent, String content) {
         Element cell = doc.createElement("table:table-cell");
         Element text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -46,7 +46,7 @@ import net.sf.jabref.logic.l10n.Localization;
  * <li>Parse it with the BibtexParser</li>
  * <li>Import the BibtexEntrys via the ImportInspectionDialog</li>
  * </ol>
- * 
+ *
  * @author Juliane Doege, Tobias Langner
  */
 public class JSTORFetcher implements EntryFetcher {
@@ -63,19 +63,19 @@ public class JSTORFetcher implements EntryFetcher {
 
     /**
      * location where the ticket is obtained
-     * 
+     *
      */
     private static final String URL_TICKET = "http://www.jstor.org/search";
 
     /**
      * Cookie key for citations to be fetched
-     * 
+     *
      */
     private static final String COOKIE_CITATIONS = "Jstor_citations0";
 
     /**
      * location where to obtain the citations cookie
-     * 
+     *
      */
     private static final String URL_BIBTEX = "http://www.jstor.org/browse/citations.txt?exportFormat=bibtex&exportAction=Display&frame=noframe&dpi=3&config=jstor&viewCitations=1&View=View";
 
@@ -138,7 +138,7 @@ public class JSTORFetcher implements EntryFetcher {
 
     /**
      * Given a ticket an a list of citations, retrieve BibtexEntries from JStor
-     * 
+     *
      * @param ticket
      *            A valid ticket as returned by openTicket()
      * @param citations
@@ -148,7 +148,7 @@ public class JSTORFetcher implements EntryFetcher {
      * @throws IOException
      *             Most probably related to a problem connecting to JStor.
      */
-    private Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
+    private static Collection<BibtexEntry> getBibtexEntries(String ticket, String citations)
             throws IOException {
         try {
             URL url = new URL(JSTORFetcher.URL_BIBTEX);
@@ -166,11 +166,11 @@ public class JSTORFetcher implements EntryFetcher {
     }
 
     /**
-     * 
+     *
      * @return a Jstor ticket ID
      * @throws IOException
      */
-    private String openTicket() throws IOException {
+    private static String openTicket() throws IOException {
         URL url = new URL(JSTORFetcher.URL_TICKET);
         URLConnection conn = url.openConnection();
         return JSTORFetcher.getCookie(JSTORFetcher.COOKIE_TICKET, conn);
@@ -178,7 +178,7 @@ public class JSTORFetcher implements EntryFetcher {
 
     /**
      * requires a valid JStor Ticket ID
-     * 
+     *
      * @param query
      *            The search term to query JStor for.
      * @param ticket
@@ -187,7 +187,7 @@ public class JSTORFetcher implements EntryFetcher {
      *         search is empty or ticket is invalid
      * @throws IOException
      */
-    private String getCitations(String ticket, String query) throws IOException {
+    private static String getCitations(String ticket, String query) throws IOException {
         String urlQuery;
         try {
             urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS +
@@ -205,7 +205,7 @@ public class JSTORFetcher implements EntryFetcher {
 
     /**
      * evaluates the 'Set-Cookie'-Header of a HTTP response
-     * 
+     *
      * @param name
      *            key of a cookie value
      * @param conn
@@ -219,11 +219,11 @@ public class JSTORFetcher implements EntryFetcher {
             String headerName = conn.getHeaderFieldKey(i);
             String headerValue = conn.getHeaderField(i);
 
-            if (headerName == null && headerValue == null) {
+            if ((headerName == null) && (headerValue == null)) {
                 // No more headers
                 break;
             }
-            if (headerName != null && headerName.equals("Set-Cookie")) {
+            if ((headerName != null) && headerName.equals("Set-Cookie")) {
                 if (headerValue.startsWith(name)) {
                     // several key-value-pairs are separated by ';'
                     StringTokenizer st = new StringTokenizer(headerValue, "; ");

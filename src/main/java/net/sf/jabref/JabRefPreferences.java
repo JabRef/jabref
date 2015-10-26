@@ -64,9 +64,9 @@ public class JabRefPreferences {
     /**
      * HashMap that contains all preferences which are set by default
      */
-    public final HashMap<String, Object> defaults = new HashMap<String, Object>();
+    public final HashMap<String, Object> defaults = new HashMap<>();
 
-    /* contents of the defaults HashMap that are defined in this class. 
+    /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
     */
     public static final String EMACS_PATH = "emacsPath";
@@ -343,7 +343,7 @@ public class JabRefPreferences {
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
-    
+
     private int SHORTCUT_MASK = -1;
 
     private final Preferences prefs;
@@ -351,8 +351,8 @@ public class JabRefPreferences {
     private KeyBinds keyBinds = new KeyBinds();
     private KeyBinds defaultKeyBinds = new KeyBinds();
 
-    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
-    private final HashSet<String> nonWrappableFields = new HashSet<String>(5);
+    private final HashSet<String> putBracesAroundCapitalsFields = new HashSet<>(4);
+    private final HashSet<String> nonWrappableFields = new HashSet<>(5);
     private static GlobalLabelPattern keyPattern;
 
     // Object containing custom export formats:
@@ -366,7 +366,7 @@ public class JabRefPreferences {
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
     // Map containing all registered external file types:
-    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
+    private final TreeSet<ExternalFileType> externalFileTypes = new TreeSet<>();
 
     private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.JabRefIcon.WWW.getSmallIcon());
 
@@ -413,14 +413,14 @@ public class JabRefPreferences {
             LOGGER.info("Could not import preferences from jabref.xml:" + e.getLocalizedMessage(), e);
         }
 
-        // load user preferences 
+        // load user preferences
         prefs = Preferences.userNodeForPackage(JabRef.class);
 
         defaults.put(TEXMAKER_PATH, OS.guessProgramPath("texmaker", "Texmaker"));
         defaults.put(WIN_EDT_PATH, OS.guessProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(LATEX_EDITOR_PATH, OS.guessProgramPath("LEd", "LEd"));
         defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
-        
+
         if (OS.OS_X) {
             //defaults.put("pdfviewer", "/Applications/Preview.app");
             //defaults.put("psviewer", "/Applications/Preview.app");
@@ -452,7 +452,7 @@ public class JabRefPreferences {
             defaults.put(EMACS_PATH, "gnuclient");
             defaults.put(EMACS_23, false);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
-            
+
         }
         defaults.put(USE_PROXY, Boolean.FALSE);
         defaults.put(PROXY_HOSTNAME, "my proxy host");
@@ -964,7 +964,7 @@ public class JabRefPreferences {
 
         if (value.length > 0) {
             StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < value.length - 1; i++) {
+            for (int i = 0; i < (value.length - 1); i++) {
                 linked.append(makeEscape(value[i]));
                 linked.append(';');
             }
@@ -985,13 +985,14 @@ public class JabRefPreferences {
         }
 
         StringReader rd = new StringReader(names);
-        Vector<String> arr = new Vector<String>();
+        Vector<String> arr = new Vector<>();
         String rs;
         try {
             while ((rs = getNextUnit(rd)) != null) {
                 arr.add(rs);
             }
         } catch (IOException ignored) {
+            // Ignored
         }
         String[] res = new String[arr.size()];
         for (int i = 0; i < res.length; i++) {
@@ -1047,10 +1048,10 @@ public class JabRefPreferences {
      * @param value The key for this setting.
      * @return The RGB values corresponding to this color setting.
      */
-    private int[] getRgb(String value) {
+    private static int[] getRgb(String value) {
         int[] values = new int[3];
-        
-        if (value != null && !value.isEmpty()) {
+
+        if ((value != null) && !value.isEmpty()) {
             String[] elements = value.split(":");
             values[0] = Integer.parseInt(elements[0]);
             values[1] = Integer.parseInt(elements[1]);
@@ -1060,7 +1061,7 @@ public class JabRefPreferences {
             values[1] = 0;
             values[2] = 0;
         }
-        return values; 
+        return values;
     }
 
     /**
@@ -1120,7 +1121,7 @@ public class JabRefPreferences {
                 try {
                     SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
                 } catch (Throwable ignored) {
-
+                    // Ignored
                 }
             }
 
@@ -1254,8 +1255,8 @@ public class JabRefPreferences {
         String[] bindings = getStringArray("bindings");
 
         // Then set up the key bindings HashMap.
-        if (bindNames == null || bindings == null
-                || bindNames.length != bindings.length) {
+        if ((bindNames == null) || (bindings == null)
+                || (bindNames.length != bindings.length)) {
             // Nothing defined in Preferences, or something is wrong.
             keyBinds = new KeyBinds();
             return;
@@ -1266,7 +1267,7 @@ public class JabRefPreferences {
         }
     }
 
-    private String getNextUnit(Reader data) throws IOException {
+    private static String getNextUnit(Reader data) throws IOException {
         // character last read
         // -1 if end of stream
         // initialization necessary, because of Java compiler
@@ -1279,7 +1280,7 @@ public class JabRefPreferences {
         boolean done = false;
 
         StringBuilder res = new StringBuilder();
-        while (!done && (c = data.read()) != -1) {
+        while (!done && ((c = data.read()) != -1)) {
             if (c == '\\') {
                 if (!escape) {
                     escape = true;
@@ -1310,12 +1311,12 @@ public class JabRefPreferences {
         }
     }
 
-    private String makeEscape(String s) {
+    private static String makeEscape(String s) {
         StringBuilder sb = new StringBuilder();
         int c;
         for (int i = 0; i < s.length(); i++) {
             c = s.charAt(i);
-            if (c == '\\' || c == ';') {
+            if ((c == '\\') || (c == ';')) {
                 sb.append('\\');
             }
             sb.append((char) c);
@@ -1417,7 +1418,7 @@ public class JabRefPreferences {
      */
     public ExternalFileType getExternalFileTypeByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if (type.getExtension() != null && type.getExtension().equalsIgnoreCase(extension)) {
+            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
                 return type;
             }
         }
@@ -1434,7 +1435,7 @@ public class JabRefPreferences {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if (type.getExtension() != null && filename.toLowerCase().
+            if ((type.getExtension() != null) && filename.toLowerCase().
                     endsWith(type.getExtension().toLowerCase())) {
                 if (type.getExtension().length() > longestFound) {
                     longestFound = type.getExtension().length();
@@ -1454,7 +1455,7 @@ public class JabRefPreferences {
      */
     public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
         for (ExternalFileType type : externalFileTypes) {
-            if (type.getMimeType() != null && type.getMimeType().equals(mimeType)) {
+            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
                 return type;
             }
         }
@@ -1475,7 +1476,7 @@ public class JabRefPreferences {
         // First find a list of the default types:
         List<ExternalFileType> defTypes = getDefaultExternalFileTypes();
         // Make a list of types that are unchanged:
-        List<ExternalFileType> unchanged = new ArrayList<ExternalFileType>();
+        List<ExternalFileType> unchanged = new ArrayList<>();
 
         externalFileTypes.clear();
         for (ExternalFileType type : types) {
@@ -1539,7 +1540,7 @@ public class JabRefPreferences {
         // Read the prefs information for file types:
         String[][] vals = StringUtil.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
         for (String[] val : vals) {
-            if (val.length == 2 && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
+            if ((val.length == 2) && val[1].equals(JabRefPreferences.FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType type : types) {

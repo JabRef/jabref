@@ -134,7 +134,7 @@ public class UnitFormatter implements LayoutFormatter {
         if (text == null) {
             return null;
         }
-        return this.format(text, UnitFormatter.unitCombinations);
+        return format(text, UnitFormatter.unitCombinations);
     }
 
 }

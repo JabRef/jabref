@@ -157,7 +157,7 @@ class StringDialog extends JDialog {
             setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " + panel.getFile().getName());
         } else {
             // @formatter:off
-            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": " 
+            setTitle(Localization.lang(GUIGlobals.stringsTitle) + ": "
                     + Localization.lang(GUIGlobals.untitledTitle));
             // @formatter:on
         }
@@ -196,7 +196,7 @@ class StringDialog extends JDialog {
 
     private void sortStrings() {
         // Rebuild our sorted set of strings:
-        TreeSet<BibtexString> stringsSet = new TreeSet<BibtexString>(new BibtexStringComparator(false));
+        TreeSet<BibtexString> stringsSet = new TreeSet<>(new BibtexStringComparator(false));
         for (String s : base.getStringKeySet()) {
             stringsSet.add(base.getString(s));
         }
@@ -238,7 +238,7 @@ class StringDialog extends JDialog {
                 if (!value.equals(((BibtexString) strings[row]).getName())) {
                     if (tbase.hasStringLabel((String) value)) {
                         // @formatter:off
-                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label " 
+                        JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
                                 + "already exists"),
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                     } else if (((String) value).contains(" ")) {
@@ -254,7 +254,8 @@ class StringDialog extends JDialog {
                     } else {
                         // Store undo information.
                         BibtexString subject = (BibtexString) strings[row];
-                        panel.undoManager.addEdit(new UndoableStringChange(panel, subject, true, subject.getName(), (String) value));
+                        panel.undoManager.addEdit(
+                                new UndoableStringChange(panel, subject, true, subject.getName(), (String) value));
                         subject.setName((String) value);
                         panel.markBaseChanged();
                         refreshTable();
@@ -271,7 +272,8 @@ class StringDialog extends JDialog {
                         return;
                     }
                     // Store undo information.
-                    panel.undoManager.addEdit(new UndoableStringChange(panel, subject, false, subject.getContent(), (String) value));
+                    panel.undoManager.addEdit(
+                            new UndoableStringChange(panel, subject, false, subject.getContent(), (String) value));
 
                     subject.setContent((String) value);
                     panel.markBaseChanged();
@@ -292,7 +294,7 @@ class StringDialog extends JDialog {
         @Override
         public String getColumnName(int col) {
             // @formatter:off
-            return col == 0 ? Localization.lang("Name") : 
+            return col == 0 ? Localization.lang("Name") :
                 Localization.lang("Content");
             // @formatter:on
         }
@@ -304,7 +306,7 @@ class StringDialog extends JDialog {
     }
 
 
-    private boolean isNumber(String name) {
+    private static boolean isNumber(String name) {
         // A pure integer number cannot be used as a string label,
         // since Bibtex will read it as a number.
         try {
@@ -404,7 +406,7 @@ class StringDialog extends JDialog {
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
                 // @formatter:off
-                JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label " 
+                JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label "
                         + "already exists"),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                 // @formatter:on
@@ -422,8 +424,7 @@ class StringDialog extends JDialog {
 
 
         public SaveDatabaseAction(StringDialog parent) {
-            super("Save database",
-                    IconTheme.JabRefIcon.SAVE.getIcon());
+            super("Save database", IconTheme.JabRefIcon.SAVE.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save database"));
             this.parent = parent;
         }
@@ -455,8 +456,8 @@ class StringDialog extends JDialog {
                 assureNotEditing();
 
                 // @formatter:off
-                String msg = Localization.lang("Really delete the selected") + ' ' 
-                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries") 
+                String msg = Localization.lang("Really delete the selected") + ' '
+                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
                         : Localization.lang("entry")) + '?';
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -498,6 +499,7 @@ class StringDialog extends JDialog {
             try {
                 panel.runCommand(Actions.UNDO);
             } catch (Throwable ignored) {
+                // Ignore
             }
         }
     }
@@ -514,6 +516,7 @@ class StringDialog extends JDialog {
             try {
                 panel.runCommand(Actions.REDO);
             } catch (Throwable ignored) {
+                // Ignore
             }
         }
     }

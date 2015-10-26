@@ -26,8 +26,6 @@ import org.jdesktop.swingx.JXTitledPanel;
 
 public abstract class SidePaneComponent extends JXTitledPanel {
 
-    private static final long serialVersionUID = 1L;
-
     protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
 
     private boolean visible;
@@ -101,14 +99,14 @@ public abstract class SidePaneComponent extends JXTitledPanel {
      * Override this method if the component needs to make any changes before it can close.
      */
     public void componentClosing() {
-
+        // Nothing right now
     }
 
     /**
      * Override this method if the component needs to do any actions when opening.
      */
     public void componentOpening() {
-
+        // Nothing right now
     }
 
     @Override

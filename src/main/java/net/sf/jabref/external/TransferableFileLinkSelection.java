@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,11 +30,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * 
+ *
  */
 public class TransferableFileLinkSelection implements Transferable {
 
-    private final List<File> fileList = new ArrayList<File>();
+    private final List<File> fileList = new ArrayList<>();
 
 
     public TransferableFileLinkSelection(BasePanel panel, BibtexEntry[] selection) {
@@ -100,10 +100,10 @@ public class TransferableFileLinkSelection implements Transferable {
                 System.out.println("dir:"+dir1);
             }
             File expLink = Util.expandFilename(tm.getEntry(0).getLink(), dirs);
-            try { 
+            try {
                 System.out.println(expLink.toURI().toURL().toString());
                 ss = new StringSelection(expLink.toURI().toURL().toString());
-                
+
             } catch (MalformedURLException ex) {
                 ss = new StringSelection("");
             }
