@@ -98,7 +98,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.compiler.problem.unclosedCloseable=warning
         org.eclipse.jdt.core.compiler.problem.undocumentedEmptyBlock=warning
         org.eclipse.jdt.core.compiler.problem.unhandledWarningToken=warning
-        org.eclipse.jdt.core.compiler.problem.unnecessaryElse=warning
+        org.eclipse.jdt.core.compiler.problem.unnecessaryElse=ignore
         org.eclipse.jdt.core.compiler.problem.unnecessaryTypeCheck=warning
         org.eclipse.jdt.core.compiler.problem.unqualifiedFieldAccess=ignore
         org.eclipse.jdt.core.compiler.problem.unusedDeclaredThrownException=warning
