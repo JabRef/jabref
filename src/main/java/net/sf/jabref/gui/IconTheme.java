@@ -130,7 +130,7 @@ public class IconTheme {
         INTEGRITY_SUCCESS("\uf206") /*css: checkbox-marked-circle-outline */,
         GITHUB("\uF350"), /*css: github-circle*/
         TOGGLE_ENTRY_PREVIEW("\uf3c7"), /*css: library-books */
-        TOGGLE_GROUPS("\uf4e8"), /*css: server */
+        TOGGLE_GROUPS("\uf5a7"), /*css: view-list */
         WRITE_XMP("\uf39c"), /* css: import */
         FILE_WORD("\uf2e2"), /*css: file-word */
         FILE_EXCEL("\uf2d4"), /*css: file-excel */
