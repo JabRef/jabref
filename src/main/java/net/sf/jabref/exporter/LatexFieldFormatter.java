@@ -99,22 +99,8 @@ public class LatexFieldFormatter {
 
         // If the field is non-standard, we will just append braces,
         // wrap and write.
-        boolean resolveStrings = true;
-        if (resolveStringsAllFields) {
-            // Resolve strings for all fields except some:
+        boolean resolveStrings = shouldResolveStrings(fieldName);
 
-            String[] exceptions = doNotResolveStringsFors;
-            for (String exception : exceptions) {
-                if (exception.equals(fieldName)) {
-                    resolveStrings = false;
-                    break;
-                }
-            }
-        } else {
-            // Default operation - we only resolve strings for standard fields:
-            resolveStrings = BibtexFields.isStandardField(fieldName)
-                    || BIBTEX_STRING.equals(fieldName);
-        }
         if (!resolveStrings) {
             return formatWithoutResolvingStrings(content, fieldName);
         }
@@ -186,6 +172,26 @@ public class LatexFieldFormatter {
             return parser.format(stringBuilder.toString(), fieldName);
         }
 
+    }
+
+    private boolean shouldResolveStrings(String fieldName) {
+        boolean resolveStrings = true;
+        if (resolveStringsAllFields) {
+            // Resolve strings for all fields except some:
+
+            String[] exceptions = doNotResolveStringsFors;
+            for (String exception : exceptions) {
+                if (exception.equals(fieldName)) {
+                    resolveStrings = false;
+                    break;
+                }
+            }
+        } else {
+            // Default operation - we only resolve strings for standard fields:
+            resolveStrings = BibtexFields.isStandardField(fieldName)
+                    || BIBTEX_STRING.equals(fieldName);
+        }
+        return resolveStrings;
     }
 
     private String formatWithoutResolvingStrings(String content, String fieldName) {
