@@ -488,7 +488,7 @@ tasks.eclipse.doFirst {
             sp_cleanup.always_use_this_for_non_static_method_access=true
             sp_cleanup.convert_functional_interfaces=false
             sp_cleanup.convert_to_enhanced_for_loop=false
-            sp_cleanup.correct_indentation=true
+            sp_cleanup.correct_indentation=false
             sp_cleanup.format_source_code=true
             sp_cleanup.format_source_code_changes_only=true
             sp_cleanup.insert_inferred_type_arguments=false
