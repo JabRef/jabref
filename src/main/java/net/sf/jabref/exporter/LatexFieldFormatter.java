@@ -86,12 +86,14 @@ public class LatexFieldFormatter {
             return valueDelimiterStartOfValue + "" + valueDelimiterEndOfValue;
         }
 
-        if (Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName)) {
+        boolean shouldWrapWithBraces = Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName);
+        if (shouldWrapWithBraces) {
             content = StringUtil.putBracesAroundCapitals(content);
         }
 
         // normalize newlines
-        if (!content.contains(Globals.NEWLINE) && content.contains("\n")) {
+        boolean shouldNormalizeNewlines = !content.contains(Globals.NEWLINE) && content.contains("\n");
+        if (shouldNormalizeNewlines) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
             content = content.replaceAll("\n", Globals.NEWLINE);
