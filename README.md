@@ -122,10 +122,10 @@ All binaries are created inside the directory `build/releases`.
 ### Releasing Developer Releases
 
 Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
-The only difference is that the version contains the keyword *snapshot*, the *date*, and the *shortend git hash*.
+The only difference is that the version contains the keyword *snapshot*, the *date*, the *branch name*, and the *shortend git hash*.
 
 Normal: `JabRef--2.80dev.jar`
-With `-Pdev=true`: `JabRef--2.80dev--snapshot--2015-07-30--48a23d1.jar`
+With `-Pdev=true`: `JabRef-2.80dev--snapshot--2015-10-26--master--d7eb10c.jar`
 
 ## License
 
