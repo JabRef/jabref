@@ -200,28 +200,7 @@ public class LatexFieldFormatter {
     }
 
     private String formatWithoutResolvingStrings(String content, String fieldName) {
-        int numberOfBrackets = 0;
-        boolean ok = true;
-        for (int i = 0; i < content.length(); i++) {
-            char c = content.charAt(i);
-            //Util.pr(""+c);
-            if (c == '{') {
-                numberOfBrackets++;
-            }
-            if (c == '}') {
-                numberOfBrackets--;
-            }
-            if (numberOfBrackets < 0) {
-                ok = false;
-                break;
-            }
-        }
-        if (numberOfBrackets > 0) {
-            ok = false;
-        }
-        if (!ok) {
-            throw new IllegalArgumentException("Curly braces { and } must be balanced.");
-        }
+        checkBraces(content);
 
         stringBuilder = new StringBuilder(
                 valueDelimiterStartOfValue + "");
