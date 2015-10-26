@@ -148,7 +148,6 @@ public class ImportCustomizationDialog extends JDialog {
                         addOrReplaceImporter(importer);
                         customImporterTable.revalidate();
                         customImporterTable.repaint();
-                        frame.setUpImportMenus();
                     } catch (Exception exc) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", chosenFileStr));
                     } catch (NoClassDefFoundError exc) {
@@ -188,7 +187,6 @@ public class ImportCustomizationDialog extends JDialog {
                     zipFileChooser.setVisible(true);
                     customImporterTable.revalidate();
                     customImporterTable.repaint(10);
-                    frame.setUpImportMenus();
                 }
 
             }
@@ -228,7 +226,6 @@ public class ImportCustomizationDialog extends JDialog {
                     Globals.importFormatReader.resetImportFormats();
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
-                    frame.setUpImportMenus();
                 } else {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
