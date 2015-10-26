@@ -1271,8 +1271,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         groups.add(toggleGroups);
         groups.addSeparator();
-        groups.add(new JMenuItem(addToGroup));
-        groups.add(new JMenuItem(removeFromGroup));
+        groups.add(addToGroup);
+        groups.add(removeFromGroup);
         groups.add(moveToGroup);
         groups.addSeparator();
         groups.add(toggleHighlightAny);
