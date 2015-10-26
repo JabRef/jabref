@@ -74,27 +74,27 @@ public class LatexFieldFormatter {
     /**
      * Formats the content of a field.
      *
-     * @param s the content of the field
+     * @param content the content of the field
      * @param fieldName the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @return a formatted string suitable for output
      * @throws IllegalArgumentException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
-    public String format(String text, String fieldName)
+    public String format(String content, String fieldName)
             throws IllegalArgumentException {
 
-        if (text == null) {
+        if (content == null) {
             return valueDelimiterStartOfValue + "" + valueDelimiterEndOfValue;
         }
 
         if (Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName)) {
-            text = StringUtil.putBracesAroundCapitals(text);
+            content = StringUtil.putBracesAroundCapitals(content);
         }
 
         // normalize newlines
-        if (!text.contains(Globals.NEWLINE) && text.contains("\n")) {
+        if (!content.contains(Globals.NEWLINE) && content.contains("\n")) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
-            text = text.replaceAll("\n", Globals.NEWLINE);
+            content = content.replaceAll("\n", Globals.NEWLINE);
         }
 
         // If the field is non-standard, we will just append braces,
@@ -118,8 +118,8 @@ public class LatexFieldFormatter {
         if (!resolveStrings) {
             int numberOfBrackets = 0;
             boolean ok = true;
-            for (int i = 0; i < text.length(); i++) {
-                char c = text.charAt(i);
+            for (int i = 0; i < content.length(); i++) {
+                char c = content.charAt(i);
                 //Util.pr(""+c);
                 if (c == '{') {
                     numberOfBrackets++;
@@ -149,9 +149,9 @@ public class LatexFieldFormatter {
             boolean strangePrefSettings = writefieldWrapfield && !Globals.prefs.isNonWrappableField(fieldName);
 
             if (strangePrefSettings && doWrap) {
-                stringBuilder.append(parser.format(StringUtil.wrap(text, GUIGlobals.LINE_LENGTH), fieldName));
+                stringBuilder.append(parser.format(StringUtil.wrap(content, GUIGlobals.LINE_LENGTH), fieldName));
             } else {
-                stringBuilder.append(parser.format(text, fieldName));
+                stringBuilder.append(parser.format(content, fieldName));
             }
 
             stringBuilder.append(valueDelimiterEndOfValue);
@@ -167,14 +167,14 @@ public class LatexFieldFormatter {
         // #jan# - #feb#
         // ...which will be written to the file like this:
         // jan # { - } # feb
-        checkBraces(text);
+        checkBraces(content);
 
-        while (pivot < text.length()) {
+        while (pivot < content.length()) {
             int goFrom = pivot;
             pos1 = pivot;
             while (goFrom == pos1) {
-                pos1 = text.indexOf('#', goFrom);
-                if (pos1 > 0 && text.charAt(pos1 - 1) == '\\') {
+                pos1 = content.indexOf('#', goFrom);
+                if (pos1 > 0 && content.charAt(pos1 - 1) == '\\') {
                     goFrom = pos1 + 1;
                     pos1++;
                 } else {
@@ -183,30 +183,30 @@ public class LatexFieldFormatter {
             }
 
             if (pos1 == -1) {
-                pos1 = text.length(); // No more occurrences found.
+                pos1 = content.length(); // No more occurrences found.
                 pos2 = -1;
             } else {
-                pos2 = text.indexOf('#', pos1 + 1);
+                pos2 = content.indexOf('#', pos1 + 1);
                 if (pos2 == -1) {
                     if (!neverFailOnHashes) {
                         throw new IllegalArgumentException(Localization.lang("The # character is not allowed in BibTeX strings unless escaped as in '\\#'.") + '\n' +
                                 Localization.lang("In JabRef, use pairs of # characters to indicate a string.") + '\n' +
                                 Localization.lang("Note that the entry causing the problem has been selected."));
                     } else {
-                        pos1 = text.length(); // just write out the rest of the text, and throw no exception
+                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     }
                 }
             }
 
             if (pos1 > pivot) {
-                writeText(text, pivot, pos1);
+                writeText(content, pivot, pos1);
             }
-            if (pos1 < text.length() && pos2 - 1 > pos1) {
+            if (pos1 < content.length() && pos2 - 1 > pos1) {
                 // We check that the string label is not empty. That means
                 // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
-                writeStringLabel(text, pos1 + 1, pos2, pos1 == pivot,
-                        pos2 + 1 == text.length());
+                writeStringLabel(content, pos1 + 1, pos2, pos1 == pivot,
+                        pos2 + 1 == content.length());
             }
 
             if (pos2 > -1) {
