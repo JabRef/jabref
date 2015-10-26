@@ -105,6 +105,10 @@ public class LatexFieldFormatter {
             return formatWithoutResolvingStrings(content, fieldName);
         }
 
+        return formatAndResolveStrings(content, fieldName);
+    }
+
+    private String formatAndResolveStrings(String content, String fieldName) {
         stringBuilder = new StringBuilder();
         int pivot = 0;
         int pos1;
@@ -171,7 +175,6 @@ public class LatexFieldFormatter {
         } else {
             return parser.format(stringBuilder.toString(), fieldName);
         }
-
     }
 
     private boolean shouldResolveStrings(String fieldName) {
