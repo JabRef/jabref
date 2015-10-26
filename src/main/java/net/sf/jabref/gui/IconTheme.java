@@ -132,6 +132,10 @@ public class IconTheme {
         TOGGLE_ENTRY_PREVIEW("\uf3c7"), /*css: library-books */
         TOGGLE_GROUPS("\uf4e8"), /*css: server */
         WRITE_XMP("\uf39c"), /* css: import */
+        FILE_WORD("\uf2e2"), /*css: file-word */
+        FILE_EXCEL("\uf2d4"), /*css: file-excel */
+        FILE_POWERPOINT("\uf2de"), /*css: file-powerpoint */
+        FILE_TEXT("\uf2d2"), /*css: file-document */
 
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);

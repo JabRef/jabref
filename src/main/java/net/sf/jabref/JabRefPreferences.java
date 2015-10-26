@@ -1355,25 +1355,25 @@ public class JabRefPreferences {
     }
 
     public List<ExternalFileType> getDefaultExternalFileTypes() {
-        List<ExternalFileType> list = new ArrayList<ExternalFileType>();
+        List<ExternalFileType> list = new ArrayList<>();
         list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon()));
         list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
-        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_WORD.getSmallIcon()));
+        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_WORD.getSmallIcon()));
         list.add(new ExternalFileType("OpenDocument text", "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice", IconTheme.JabRefIcon.FILE_EXCEL.getSmallIcon()));
+        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice", IconTheme.JabRefIcon.FILE_EXCEL.getSmallIcon()));
         list.add(new ExternalFileType("OpenDocument spreadsheet", "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice", IconTheme.JabRefIcon.FILE_POWERPOINT.getSmallIcon()));
+        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.JabRefIcon.FILE_POWERPOINT.getSmallIcon()));
         list.add(new ExternalFileType("OpenDocument presentation", "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice", IconTheme.getImage("openoffice")));
-        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.getImage("openoffice")));
+        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("PNG image", "png", "image/png", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("GIF image", "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("JPG image", "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("Djvu", "djvu", "", "evince", "psSmall", IconTheme.JabRefIcon.FILE.getSmallIcon()));
-        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.getImage("emacs")));
-        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.getImage("emacs")));
+        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
+        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getSmallIcon()));
         list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
         list.add(new ExternalFileType("TIFF image", "tiff", "image/tiff", "gimp", "picture", IconTheme.JabRefIcon.PICTURE.getSmallIcon()));
         list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcon.WWW.getSmallIcon()));
