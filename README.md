@@ -1,6 +1,6 @@
 # JabRef Development Version
 
-[![Build Status](https://circleci.com/gh/JabRef/jabref.svg?style=svg)](https://circleci.com/gh/JabRef/jabref)
+[![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref.svg)](https://circleci.com/gh/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![Coverage Status](https://coveralls.io/repos/JabRef/jabref/badge.svg)](https://coveralls.io/r/JabRef/jabref)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt)
