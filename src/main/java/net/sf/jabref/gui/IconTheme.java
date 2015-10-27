@@ -137,6 +137,8 @@ public class IconTheme {
         FILE_POWERPOINT("\uf2de"), /*css: file-powerpoint */
         FILE_TEXT("\uf2d2"), /*css: file-document */
         FILE_MULTIPLE("\uf2d9"), /*css: file-multiple */
+        KEY_BINDINGS("\uf3ad"), /*css: keyboard */
+        FIND_DUPLICATES("\uf233"), /*css: code-equal */
 
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);

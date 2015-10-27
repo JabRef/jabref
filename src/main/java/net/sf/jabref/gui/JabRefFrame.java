@@ -278,7 +278,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             prefs.getKey(KeyBinds.COPY_BIB_TE_X_KEY));
-    private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle("Copy \\cite{BibTeX key}"),
+    private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle(
+            "Copy \\cite{BibTeX key}"),
             prefs.getKey(KeyBinds.COPY_CITE_BIB_TE_X_KEY));
     private final AbstractAction copyKeyAndTitle = new GeneralAction(Actions.COPY_KEY_AND_TITLE,
             Localization.menuTitle("Copy BibTeX key and title"),
@@ -315,7 +316,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.TOGGLE_GROUPS_INTERFACE),
             IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"));
-    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group"));
+    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang(
+            "Remove from group"));
     private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group"));
 
 
@@ -367,7 +369,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Open SPIRES entry"),
             prefs.getKey(KeyBinds.OPEN_SPIRES_ENTRY));
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
-            Localization.menuTitle("Find duplicates"));
+            Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
             Localization.menuTitle("New entry from plain text"),
             prefs.getKey(KeyBinds.NEW_FROM_PLAIN_TEXT));
@@ -376,8 +378,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
-    AbstractAction exportToClipboard = new GeneralAction("exportToClipboard",
-            Localization.menuTitle("Export selected entries to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon());
+    private final AbstractAction exportToClipboard = new GeneralAction("exportToClipboard",
+            Localization.menuTitle("Export selected entries to clipboard"),
+            IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links"),
             Globals.prefs.getKey(KeyBinds.SYNCHRONIZE_FILES));
@@ -430,7 +433,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             prefs.getKey(KeyBinds.RESOLVE_DUPLICATE_BIB_TE_X_KEYS));
 
     private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
-            Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon());
+            Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon());
 
     final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
@@ -1692,6 +1695,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     class SelectKeysAction extends AbstractAction {
         public SelectKeysAction() {
             super(Localization.lang("Customize key bindings"));
+            this.putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.KEY_BINDINGS.getSmallIcon());
         }
 
         @Override
