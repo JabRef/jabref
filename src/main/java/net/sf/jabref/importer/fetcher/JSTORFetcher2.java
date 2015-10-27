@@ -156,7 +156,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 }
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + numberOfRefs[0]);
                 //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + " refsRequested=" + numberOfRefs[1]);
-                refsRequested = Integer.valueOf(numberOfRefs[1]);
+                refsRequested = Util.intValueOf(numberOfRefs[1]);
                 //System.out.println("JSTORFetcher2 getCitations refsRequested=" + Integer.valueOf(refsRequested));
                 numberOfPagesRequested = ((refsRequested - 1 - ((refsRequested - 1) % JSTORFetcher2.REFS_PER_PAGE)) / JSTORFetcher2.REFS_PER_PAGE) + 1;
                 //System.out.println("JSTORFetcher2 getCitations numberOfPagesRequested=" + Integer.valueOf(numberOfPagesRequested));
@@ -187,7 +187,7 @@ public class JSTORFetcher2 implements EntryFetcher {
             if (mn.find()) {
                 //System.out.println("JSTORFetcher2 getCitationsFromUrl numberofhits=" + mn.group(1));
                 numberOfRefs[0] = mn.group(1);
-                countOfRefs = Integer.valueOf(numberOfRefs[0]);
+                countOfRefs = Util.intValueOf(numberOfRefs[0]);
                 //System.out.println("JSTORFetcher2 getCitationsFromUrl numberofrefs[0]=" + Integer.valueOf(numberOfRefs[0]));
             } else {
                 //System.out.println("JSTORFetcher2 getCitationsFromUrl cant find numberofhits=");
@@ -212,8 +212,8 @@ public class JSTORFetcher2 implements EntryFetcher {
                 }
             }
         }
-        countOfRefs = Integer.valueOf(numberOfRefs[0]);
-        refsRequested = Integer.valueOf(numberOfRefs[1]);
+        countOfRefs = Util.intValueOf(numberOfRefs[0]);
+        refsRequested = Util.intValueOf(numberOfRefs[1]);
 
         Matcher m = JSTORFetcher2.idPattern.matcher(cont);
 
